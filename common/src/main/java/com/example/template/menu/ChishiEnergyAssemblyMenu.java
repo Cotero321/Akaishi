@@ -19,7 +19,7 @@ public class ChishiEnergyAssemblyMenu extends AbstractContainerMenu {
     private final ContainerData data;
 
     public ChishiEnergyAssemblyMenu(int id, Inventory inv, ChishiEnergyAssemblyBlockEntity be) {
-        this(id, inv, be.inventory(), be.data());
+        this(id, inv, be, be.data());
     }
 
     public ChishiEnergyAssemblyMenu(int id, Inventory inv, Container container, ContainerData data) {
@@ -29,6 +29,16 @@ public class ChishiEnergyAssemblyMenu extends AbstractContainerMenu {
 
         // 燃料槽
         addSlot(new Slot(container, ChishiEnergyAssemblyBlockEntity.FUEL_SLOT, 25, 42));
+
+        // 能源产生升级组件装配槽 5×2（最多 10 个）
+        int[] cols = {8, 26, 44, 62, 80};
+        int[] rows = {58, 68};
+        for (int r = 0; r < rows.length; r++) {
+            for (int c = 0; c < cols.length; c++) {
+                addSlot(new SpeedUpgradeSlot(container, ChishiEnergyAssemblyBlockEntity.UPGRADE_SLOT_START + r * cols.length + c,
+                        cols[c], rows[r]));
+            }
+        }
 
         // 玩家背包 3×9
         for (int row = 0; row < 3; row++) {
@@ -61,6 +71,16 @@ public class ChishiEnergyAssemblyMenu extends AbstractContainerMenu {
         return data.get(3) == 1;
     }
 
+    /** 已装配的加速组件数量（0-10） */
+    public int getUpgradeCount() {
+        return data.get(4);
+    }
+
+    /** 当前加速倍率（供界面显示） */
+    public double getBoostMultiplier() {
+        return ChishiEnergyAssemblyBlockEntity.getBoostMultiplier(getUpgradeCount());
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
@@ -68,13 +88,13 @@ public class ChishiEnergyAssemblyMenu extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack current = slot.getItem();
             result = current.copy();
-            if (index < ChishiEnergyAssemblyBlockEntity.SLOT_COUNT) {
+            if (index < ChishiEnergyAssemblyBlockEntity.TOTAL_SLOTS) {
                 // 方块槽 → 玩家背包（总槽数 = 方块槽 + 36）
-                if (!this.moveItemStackTo(current, ChishiEnergyAssemblyBlockEntity.SLOT_COUNT, ChishiEnergyAssemblyBlockEntity.SLOT_COUNT + 36, true)) {
+                if (!this.moveItemStackTo(current, ChishiEnergyAssemblyBlockEntity.TOTAL_SLOTS, ChishiEnergyAssemblyBlockEntity.TOTAL_SLOTS + 36, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                if (!this.moveItemStackTo(current, 0, ChishiEnergyAssemblyBlockEntity.SLOT_COUNT, false)) {
+                if (!this.moveItemStackTo(current, 0, ChishiEnergyAssemblyBlockEntity.TOTAL_SLOTS, false)) {
                     return ItemStack.EMPTY;
                 }
             }

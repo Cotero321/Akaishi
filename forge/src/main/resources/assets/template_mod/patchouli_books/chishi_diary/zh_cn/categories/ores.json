@@ -2,5 +2,9 @@
   "name": "赤石矿簇",
   "description": "认识埋藏于地下的赤石矿簇",
   "icon": "template_mod:chishi_ore_low",
-  "sortnum": 1
+  "sortnum": 1,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "template_mod:first_ore"
+  }
 }

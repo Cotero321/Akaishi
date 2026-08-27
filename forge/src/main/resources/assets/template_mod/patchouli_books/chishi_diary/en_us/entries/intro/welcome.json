@@ -1,12 +1,22 @@
 {
-  "name": "Welcome",
+  "name": "Prologue: The Diary",
   "icon": "template_mod:chishi_crystal",
   "category": "template_mod:intro",
   "sortnum": 0,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Welcome to the Chapter of Chishi.$(br)This diary records my research on the mysterious power of Chishi, from raw ore to refined energy."
+      "text": "$(bold)In the depths of a mine, I found a diary.$(br2)Its previous owner wrote with hasty, feverish strokes:$(br)\"These red stones... they breathe. The crystals they form can store some invisible 'force'.\"$(br2)I closed the diary and decided to test it myself. The first step: find a$(bold) Chishi ore cluster$()."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Chishi ore clusters can be found across the world - in the$(bold) Overworld, Deepslate layers, the Nether and the End$().$(br2)The rarer the cluster's concentration, the more$(bold) Chishi Crystals$() it drops.$(br2)Grab a pickaxe and head out. Your first Chishi Crystal is where this research journey begins."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:ores/overview"
+      ]
     }
   ]
 }

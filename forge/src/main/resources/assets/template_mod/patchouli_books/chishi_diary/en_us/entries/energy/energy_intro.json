@@ -1,12 +1,24 @@
 {
-  "name": "The Nature of Chi Energy",
+  "name": "The Awakening of Chi Energy",
   "icon": "template_mod:chishi_energy_cell_basic",
   "category": "template_mod:energy",
   "sortnum": 0,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Chi Energy is the refined form of Chishi power.$(br)Machines like the Chishi Purifier generate and consume it.$(br)Energy can be stored in Energy Cells and distributed through Energy Pipes."
+      "text": "$(bold)Diary fragment:$()\"Chishi Crystals are merely sleeping fuel. Feed them to the Purifier and the 'force' truly awakens - we call it$(2) Chi Energy$().\"$(br2)Chi Energy is the blood of Chishi technology: the Purifier produces and consumes it, Energy Cells hoard it, and Energy Pipes deliver it to every machine."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "This chapter covers:$(li)Chishi Purifier: the first Chi machine$(li)Energy Cell: the energy warehouse$(li)Energy Pipe: the energy artery$(li)Speed upgrades and multi-blocks: large-scale generation and refining$(br2)Every machine in later chapters runs on Chi Energy - build this foundation first."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:energy/purifier",
+        "template_mod:energy/energy_cell",
+        "template_mod:energy/energy_pipe"
+      ]
     }
   ]
 }

@@ -17,6 +17,8 @@ public final class ModBlockEntities {
 
     /** 赤石提纯器方块实体类型 */
     public static RegistrySupplier<BlockEntityType<ChishiPurifierBlockEntity>> CHISHI_PURIFIER;
+    /** 高级提纯构建方块方块实体类型（提纯矩阵外壳，单放独立提纯） */
+    public static RegistrySupplier<BlockEntityType<ChishiAdvancedPurifierBlockEntity>> CHISHI_ADVANCED_PURIFIER;
     /** 赤能源储存单元方块实体类型 */
     public static RegistrySupplier<BlockEntityType<ChishiEnergyCellBlockEntity>> CHISHI_ENERGY_CELL;
     /** 赤能源管道方块实体类型 */
@@ -45,6 +47,38 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<ChishiUpgradeStationBlockEntity>> CHISHI_UPGRADE_STATION;
     /** 创造模式能量源（赤/生命两种方块共用，无限输出） */
     public static RegistrySupplier<BlockEntityType<CreativeEnergySourceBlockEntity>> CREATIVE_ENERGY_SOURCE;
+    /** 赤石催化器方块实体类型（4 级共用，等级由方块决定） */
+    public static RegistrySupplier<BlockEntityType<ChishiCatalystBlockEntity>> CHISHI_CATALYST;
+    /** 自动收集器方块实体类型（4 级共用，等级由方块决定） */
+    public static RegistrySupplier<BlockEntityType<ChishiAutoCollectorBlockEntity>> CHISHI_AUTO_COLLECTOR;
+    /** 物品管道方块实体类型（4 级共用，等级由方块决定） */
+    public static RegistrySupplier<BlockEntityType<ChishiItemPipeBlockEntity>> CHISHI_ITEM_PIPE;
+    /** 生命能量提纯器方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiLifePurifierBlockEntity>> CHISHI_LIFE_PURIFIER;
+    /** 液体管道方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiFluidPipeBlockEntity>> CHISHI_FLUID_PIPE;
+    /** 能量液化装置方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiEnergyLiquefierBlockEntity>> CHISHI_ENERGY_LIQUEFIER;
+    /** 能量加工器方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiEnergyProcessorBlockEntity>> CHISHI_ENERGY_PROCESSOR;
+    /** 燃料装罐机方块实体 */
+    public static RegistrySupplier<BlockEntityType<ChishiFuelCannerBlockEntity>> CHISHI_FUEL_CANNER;
+    /** 燃料混合器方块实体 */
+    public static RegistrySupplier<BlockEntityType<ChishiFuelMixerBlockEntity>> CHISHI_FUEL_MIXER;
+    /** 液体储罐方块实体类型（基础/高级/超级共用） */
+    public static RegistrySupplier<BlockEntityType<ChishiFluidTankBlockEntity>> CHISHI_FLUID_TANK;
+    /** 反应堆控制器方块实体类型（主方块，持有全部反应堆状态） */
+    public static RegistrySupplier<BlockEntityType<ChishiReactorControllerBlockEntity>> CHISHI_REACTOR_CONTROLLER;
+    /** 燃料投放口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiReactorFuelPortBlockEntity>> CHISHI_REACTOR_FUEL_PORT;
+    /** 能量输出口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiReactorEnergyOutputBlockEntity>> CHISHI_REACTOR_ENERGY_OUTPUT;
+    /** 废品输出口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiReactorWastePortBlockEntity>> CHISHI_REACTOR_WASTE_PORT;
+    /** 散热组件方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiReactorCoolerBlockEntity>> CHISHI_REACTOR_COOLER;
+    /** 衰竭保存桶方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiExhaustedBarrelBlockEntity>> CHISHI_EXHAUSTED_BARREL;
 
     private ModBlockEntities() {
     }
@@ -55,6 +89,11 @@ public final class ModBlockEntities {
                 .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_purifier"),
                         () -> BlockEntityType.Builder.of(ChishiPurifierBlockEntity::new, ModBlocks.CHISHI_PURIFIER.get())
+                                .build(null));
+        CHISHI_ADVANCED_PURIFIER = (RegistrySupplier<BlockEntityType<ChishiAdvancedPurifierBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_advanced_purifier"),
+                        () -> BlockEntityType.Builder.of(ChishiAdvancedPurifierBlockEntity::new, ModBlocks.CHISHI_ADVANCED_PURIFIER.get())
                                 .build(null));
         // 储存单元：基础/高级/超级三个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_ENERGY_CELL = (RegistrySupplier<BlockEntityType<ChishiEnergyCellBlockEntity>>) (Object) RegistrarManager
@@ -155,6 +194,130 @@ public final class ModBlockEntities {
                         () -> BlockEntityType.Builder.of(CreativeEnergySourceBlockEntity::new,
                                 ModBlocks.CHISHI_CREATIVE_ENERGY_CELL.get(),
                                 ModBlocks.CHISHI_CREATIVE_LIFE_CELL.get())
+                                .build(null));
+        // 赤石催化器：初/中/高/终四个方块共用一个方块实体类型，等级由方块本身决定
+        CHISHI_CATALYST = (RegistrySupplier<BlockEntityType<ChishiCatalystBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_catalyst"),
+                        () -> BlockEntityType.Builder.of(ChishiCatalystBlockEntity::new,
+                                ModBlocks.CHISHI_CATALYST_BASIC.get(),
+                                ModBlocks.CHISHI_CATALYST_MEDIUM.get(),
+                                ModBlocks.CHISHI_CATALYST_ADVANCED.get(),
+                                ModBlocks.CHISHI_CATALYST_ULTIMATE.get())
+                                .build(null));
+        // 自动收集器：初/中/高/终四个方块共用一个方块实体类型，等级由方块本身决定
+        CHISHI_AUTO_COLLECTOR = (RegistrySupplier<BlockEntityType<ChishiAutoCollectorBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_auto_collector"),
+                        () -> BlockEntityType.Builder.of(ChishiAutoCollectorBlockEntity::new,
+                                ModBlocks.CHISHI_COLLECTOR_BASIC.get(),
+                                ModBlocks.CHISHI_COLLECTOR_MEDIUM.get(),
+                                ModBlocks.CHISHI_COLLECTOR_ADVANCED.get(),
+                                ModBlocks.CHISHI_COLLECTOR_ULTIMATE.get())
+                                .build(null));
+        // 物品管道：基础/高级/精英/终极四个方块共用一个方块实体类型，等级由方块本身决定
+        CHISHI_ITEM_PIPE = (RegistrySupplier<BlockEntityType<ChishiItemPipeBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_item_pipe"),
+                        () -> BlockEntityType.Builder.of(ChishiItemPipeBlockEntity::new,
+                                ModBlocks.CHISHI_ITEM_PIPE.get(),
+                                ModBlocks.CHISHI_ITEM_PIPE_ADVANCED.get(),
+                                ModBlocks.CHISHI_ITEM_PIPE_ELITE.get(),
+                                ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE.get())
+                                .build(null));
+        // 生命能量提纯器（赤能源驱动，输出生命能量固态物）
+        CHISHI_LIFE_PURIFIER = (RegistrySupplier<BlockEntityType<ChishiLifePurifierBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_purifier"),
+                        () -> BlockEntityType.Builder.of(ChishiLifePurifierBlockEntity::new,
+                                ModBlocks.CHISHI_LIFE_PURIFIER.get())
+                                .build(null));
+        // 液体管道（传输下界能量/燃料液体）
+        CHISHI_FLUID_PIPE = (RegistrySupplier<BlockEntityType<ChishiFluidPipeBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fluid_pipe"),
+                        () -> BlockEntityType.Builder.of(ChishiFluidPipeBlockEntity::new,
+                                ModBlocks.CHISHI_FLUID_PIPE.get())
+                                .build(null));
+        // 能量液化装置（赤能源驱动，产出下界能量液体）
+        CHISHI_ENERGY_LIQUEFIER = (RegistrySupplier<BlockEntityType<ChishiEnergyLiquefierBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_energy_liquefier"),
+                        () -> BlockEntityType.Builder.of(ChishiEnergyLiquefierBlockEntity::new,
+                                ModBlocks.CHISHI_ENERGY_LIQUEFIER.get())
+                                .build(null));
+        // 能量加工器（赤能源驱动，固态物 + 下界能量液体 → 燃料）
+        CHISHI_ENERGY_PROCESSOR = (RegistrySupplier<BlockEntityType<ChishiEnergyProcessorBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_energy_processor"),
+                        () -> BlockEntityType.Builder.of(ChishiEnergyProcessorBlockEntity::new,
+                                ModBlocks.CHISHI_ENERGY_PROCESSOR.get())
+                                .build(null));
+        // 燃料装罐机（液体燃料 → 10L 燃料罐）
+        CHISHI_FUEL_CANNER = (RegistrySupplier<BlockEntityType<ChishiFuelCannerBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fuel_canner"),
+                        () -> BlockEntityType.Builder.of(ChishiFuelCannerBlockEntity::new,
+                                ModBlocks.CHISHI_FUEL_CANNER.get())
+                                .build(null));
+        // 燃料混合器（燃料液体 1:1:1 调和 → 高级/终极混合燃料）
+        CHISHI_FUEL_MIXER = (RegistrySupplier<BlockEntityType<ChishiFuelMixerBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fuel_mixer"),
+                        () -> BlockEntityType.Builder.of(ChishiFuelMixerBlockEntity::new,
+                                ModBlocks.CHISHI_FUEL_MIXER.get())
+                                .build(null));
+        // 液体储罐（一个方块实体类型承载 基础/高级/超级 三个等级）
+        CHISHI_FLUID_TANK = (RegistrySupplier<BlockEntityType<ChishiFluidTankBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fluid_tank"),
+                        () -> BlockEntityType.Builder.of(ChishiFluidTankBlockEntity::new,
+                                ModBlocks.CHISHI_FLUID_TANK_BASIC.get(),
+                                ModBlocks.CHISHI_FLUID_TANK_ADVANCED.get(),
+                                ModBlocks.CHISHI_FLUID_TANK_SUPER.get())
+                                .build(null));
+        // ===== 反应堆体系 =====
+        // 控制器（多方块主方块）
+        CHISHI_REACTOR_CONTROLLER = (RegistrySupplier<BlockEntityType<ChishiReactorControllerBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_controller"),
+                        () -> BlockEntityType.Builder.of(ChishiReactorControllerBlockEntity::new,
+                                ModBlocks.CHISHI_REACTOR_CONTROLLER.get())
+                                .build(null));
+        // 燃料投放口（燃料罐缓冲槽）
+        CHISHI_REACTOR_FUEL_PORT = (RegistrySupplier<BlockEntityType<ChishiReactorFuelPortBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_fuel_port"),
+                        () -> BlockEntityType.Builder.of(ChishiReactorFuelPortBlockEntity::new,
+                                ModBlocks.CHISHI_REACTOR_FUEL_PORT.get())
+                                .build(null));
+        // 能量输出口（赤能源缓冲）
+        CHISHI_REACTOR_ENERGY_OUTPUT = (RegistrySupplier<BlockEntityType<ChishiReactorEnergyOutputBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_energy_output"),
+                        () -> BlockEntityType.Builder.of(ChishiReactorEnergyOutputBlockEntity::new,
+                                ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get())
+                                .build(null));
+        // 废品输出口（衰竭燃料缓冲）
+        CHISHI_REACTOR_WASTE_PORT = (RegistrySupplier<BlockEntityType<ChishiReactorWastePortBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_waste_port"),
+                        () -> BlockEntityType.Builder.of(ChishiReactorWastePortBlockEntity::new,
+                                ModBlocks.CHISHI_REACTOR_WASTE_PORT.get())
+                                .build(null));
+        // 散热组件（单散热片槽位）
+        CHISHI_REACTOR_COOLER = (RegistrySupplier<BlockEntityType<ChishiReactorCoolerBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_cooler"),
+                        () -> BlockEntityType.Builder.of(ChishiReactorCoolerBlockEntity::new,
+                                ModBlocks.CHISHI_REACTOR_COOLER.get())
+                                .build(null));
+        // 衰竭保存桶（专储衰竭燃料）
+        CHISHI_EXHAUSTED_BARREL = (RegistrySupplier<BlockEntityType<ChishiExhaustedBarrelBlockEntity>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.BLOCK_ENTITY_TYPE)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_exhausted_barrel"),
+                        () -> BlockEntityType.Builder.of(ChishiExhaustedBarrelBlockEntity::new,
+                                ModBlocks.CHISHI_EXHAUSTED_BARREL.get())
                                 .build(null));
     }
 }

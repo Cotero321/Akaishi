@@ -2,5 +2,9 @@
   "name": "Chi Energy",
   "description": "The energy system that powers Chishi technology",
   "icon": "template_mod:chishi_energy_cell_basic",
-  "sortnum": 3
+  "sortnum": 3,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "template_mod:first_purifier"
+  }
 }

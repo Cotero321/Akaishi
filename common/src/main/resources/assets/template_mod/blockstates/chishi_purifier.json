@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "formed=false": {
+      "model": "template_mod:block/chishi_purifier"
+    },
+    "formed=true": {
       "model": "template_mod:block/chishi_purifier"
     }
   }

@@ -19,7 +19,8 @@ public class ChishiEnergyGeneratorMenu extends AbstractContainerMenu {
     private final ContainerData data;
 
     public ChishiEnergyGeneratorMenu(int id, Inventory inv, ChishiEnergyGeneratorBlockEntity be) {
-        this(id, inv, be.inventory(), be.data());
+        // 传入 BE 自身作为容器：成型（多方块外壳）时自动代理到中心主方块，未成型时操作自身槽位
+        this(id, inv, be, be.data());
     }
 
     public ChishiEnergyGeneratorMenu(int id, Inventory inv, Container container, ContainerData data) {
@@ -29,6 +30,16 @@ public class ChishiEnergyGeneratorMenu extends AbstractContainerMenu {
 
         // 燃料槽
         addSlot(new Slot(container, ChishiEnergyGeneratorBlockEntity.FUEL_SLOT, 56, 17));
+
+        // 能源产生升级组件装配槽 5×2（最多 10 个）
+        int[] cols = {8, 26, 44, 62, 80};
+        int[] rows = {58, 68};
+        for (int r = 0; r < rows.length; r++) {
+            for (int c = 0; c < cols.length; c++) {
+                addSlot(new SpeedUpgradeSlot(container, ChishiEnergyGeneratorBlockEntity.UPGRADE_SLOT_START + r * cols.length + c,
+                        cols[c], rows[r]));
+            }
+        }
 
         // 玩家背包 3×9
         for (int row = 0; row < 3; row++) {
@@ -56,6 +67,16 @@ public class ChishiEnergyGeneratorMenu extends AbstractContainerMenu {
         return data.get(2);
     }
 
+    /** 已装配的加速组件数量（0-10） */
+    public int getUpgradeCount() {
+        return data.get(3);
+    }
+
+    /** 当前加速倍率（供界面显示） */
+    public double getBoostMultiplier() {
+        return ChishiEnergyGeneratorBlockEntity.getBoostMultiplier(getUpgradeCount());
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
@@ -63,13 +84,13 @@ public class ChishiEnergyGeneratorMenu extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack current = slot.getItem();
             result = current.copy();
-            if (index < ChishiEnergyGeneratorBlockEntity.SLOT_COUNT) {
+            if (index < ChishiEnergyGeneratorBlockEntity.TOTAL_SLOTS) {
                 // 方块槽 → 玩家背包（总槽数 = 方块槽 + 36）
-                if (!this.moveItemStackTo(current, ChishiEnergyGeneratorBlockEntity.SLOT_COUNT, ChishiEnergyGeneratorBlockEntity.SLOT_COUNT + 36, true)) {
+                if (!this.moveItemStackTo(current, ChishiEnergyGeneratorBlockEntity.TOTAL_SLOTS, ChishiEnergyGeneratorBlockEntity.TOTAL_SLOTS + 36, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                if (!this.moveItemStackTo(current, 0, ChishiEnergyGeneratorBlockEntity.SLOT_COUNT, false)) {
+                if (!this.moveItemStackTo(current, 0, ChishiEnergyGeneratorBlockEntity.TOTAL_SLOTS, false)) {
                     return ItemStack.EMPTY;
                 }
             }

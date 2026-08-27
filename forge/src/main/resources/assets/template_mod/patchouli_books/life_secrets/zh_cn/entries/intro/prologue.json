@@ -1,0 +1,22 @@
+{
+  "name": "扉页",
+  "icon": "template_mod:chishi_life_aggregation_converter",
+  "category": "template_mod:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "这本日记还几乎空白——只有扉页上留着前主人一行潦草的字：$(br)$(2)\"赤能源的尽头，是生命的起点。\"$(br2)聚合出第一缕生命能量的那一刻，它的每一页都会被新的发现填满。$(br2)$(bold)当前内容：$(li)生命能量提纯器$(li)生命能量固态物"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "本书与《赤石研究日记》同源，记载赤石之章之后的生命能源篇章：$(li)生命聚合转换器$(li)生命转换架构$(li)生命能量管道$(li)生命能量储存器$(li)生命能量提纯器$(br2)每研究出一步，新的章节就会浮现——就像赤石之路那样。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:life_energy/life_energy"
+      ]
+    }
+  ]
+}

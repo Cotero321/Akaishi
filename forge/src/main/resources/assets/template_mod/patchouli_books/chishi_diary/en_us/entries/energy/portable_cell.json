@@ -1,0 +1,34 @@
+{
+  "name": "Portable Chishi Energy Cell",
+  "icon": "template_mod:portable_chishi_cell_basic",
+  "category": "template_mod:energy",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:portable_chishi_cell_basic",
+      "text": "Carry energy in your pocket - the $(bold)Portable Chishi Energy Cell$() is an energy bank that travels with you.$(br2)Hold it in your $(bold)main or off hand$() and it will automatically spend Chi Energy to repair the durability of all equipped Chishi gear (100 Chi per durability point)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Three tiers of portable cells:$(li)$(bold)Basic$(): 50M capacity, repairs 10 durability/tick$(li)$(bold)Advanced$(): 200M capacity, repairs 20 durability/tick$(li)$(bold)Super$(): 1B capacity, repairs 40 durability/tick$(br2)When depleted, place the cell in the charging slot of a $(bold)Chi Energy Cell$() to recharge automatically."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:portable_chishi_cell_basic",
+      "recipe2": "template_mod:portable_chishi_cell_advanced"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:portable_chishi_cell_super",
+      "text": "The Super cell requires Condensed Chishi Essence Blocks."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:energy/energy_cell",
+        "template_mod:equipment/equipment_intro"
+      ]
+    }
+  ]
+}

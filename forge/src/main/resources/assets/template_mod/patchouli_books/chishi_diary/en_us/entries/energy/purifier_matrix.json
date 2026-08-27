@@ -1,0 +1,16 @@
+{
+  "name": "Purification Matrix",
+  "icon": "template_mod:chishi_purifier",
+  "category": "template_mod:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Purification Matrix$(): integrate 26 Advanced Purifiers into a $(bold)3x3x3$() multiblock - place a $(bold)normal Chishi Purifier in the center$(), and fill all other 26 blocks with Advanced Purifiers. Once formed, the center switches to centralized purification mode."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Centralized Purifying:$(br)$(li)Speed: $(bold)30x$() a normal purifier (~3.34 ticks per operation)$(li)Cost: $(bold)150$() Chi Energy per tick (30x burn rate)$(br)$(bold)Note:$(br)It must be powered continuously once formed. The center is fully enclosed, so pipe energy into any shell block. Right-click a shell to open the center GUI."
+    }
+  ]
+}

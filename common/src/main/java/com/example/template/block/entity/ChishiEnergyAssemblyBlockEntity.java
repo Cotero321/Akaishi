@@ -36,6 +36,12 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
+    /** 能源产生升级组件装配槽起始（燃料槽之后连续 10 格，最多装 10 个） */
+    public static final int UPGRADE_SLOT_START = SLOT_COUNT;
+    /** 升级装配槽数量 */
+    public static final int UPGRADE_SLOTS = 10;
+    /** 容器总槽数 = 燃料 + 升级 */
+    public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
     /** 最大能量存储 = 单台发生机 10 万 × 50 倍 */
     public static final int MAX_ENERGY = 100000 * 50;
@@ -59,14 +65,31 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
     public ChishiEnergyAssemblyBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_ASSEMBLY.get(), pos, state);
         this.energy = new ChishiEnergyStorage(ChishiEnergyType.INSTANCE, MAX_ENERGY);
-        this.inventory = new SimpleContainer(SLOT_COUNT) {
+        this.inventory = new SimpleContainer(TOTAL_SLOTS) {
             @Override
             public void setChanged() {
                 super.setChanged();
                 ChishiEnergyAssemblyBlockEntity.this.setChanged();
             }
         };
-        this.data = new SimpleContainerData(4);
+        this.data = new SimpleContainerData(5);
+    }
+
+    /** 加速倍率：n 个组件 → 2^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 922 倍 */
+    public static double getBoostMultiplier(int upgradeCount) {
+        int n = Math.max(0, Math.min(upgradeCount, ChishiEnergyAssemblyBlockEntity.UPGRADE_SLOTS));
+        return Math.pow(2, n) * (1.0 - 0.01 * n);
+    }
+
+    /** 统计装配的能源产生升级组件数量（0-10，最多 10 个） */
+    public int getUpgradeCount() {
+        int n = 0;
+        for (int i = UPGRADE_SLOT_START; i < TOTAL_SLOTS; i++) {
+            if (inventory.getItem(i).is(com.example.template.item.ModItems.chishiSpeedUpgrade.get())) {
+                n++;
+            }
+        }
+        return n;
     }
 
     /** 服务端 tick：验证结构 + 集中产能 */
@@ -79,6 +102,8 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         data.set(0, (int) energy.getEnergyStored());
         data.set(1, burnEnergy);
         data.set(2, burnEnergyTotal);
+        int upgrades = getUpgradeCount();
+        data.set(4, upgrades);
 
         boolean formed = getBlockState().getValue(ChishiEnergyAssemblyBlock.FORMED);
         boolean valid = isStructureValid();
@@ -105,7 +130,8 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
                 // 每 tick 产出并消耗 min(剩余, 3375)，按能量精确消耗，低档燃料不再被取整吞掉
                 int consume = Math.min(GENERATE_RATE, burnEnergy);
                 burnEnergy -= consume;
-                energy.addEnergy(consume, false);
+                // 升级组件：翻倍产出速度、减少 1% 产出（净倍率 2^n × (1-0.01n)）
+                energy.addEnergy((long) (consume * getBoostMultiplier(upgrades)), false);
                 changed = true;
             }
         }
@@ -245,8 +271,8 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         tag.putLong("Energy", energy.getEnergyStored());
         tag.putInt("BurnEnergy", burnEnergy);
         tag.putInt("BurnEnergyTotal", burnEnergyTotal);
-        NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
-        for (int i = 0; i < SLOT_COUNT; i++) {
+        NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
+        for (int i = 0; i < TOTAL_SLOTS; i++) {
             items.set(i, inventory.getItem(i));
         }
         ContainerHelper.saveAllItems(tag, items);
@@ -258,9 +284,9 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         energy.setEnergy(tag.getLong("Energy"));
         burnEnergy = tag.getInt("BurnEnergy");
         burnEnergyTotal = tag.getInt("BurnEnergyTotal");
-        NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+        NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
-        for (int i = 0; i < SLOT_COUNT; i++) {
+        for (int i = 0; i < TOTAL_SLOTS; i++) {
             inventory.setItem(i, items.get(i));
         }
     }

@@ -43,6 +43,12 @@ public class ChishiEnergyGeneratorScreen extends AbstractContainerScreen<ChishiE
             int flameHeight = (int) (14.0F * burn / burnTotal);
             gui.blit(TEXTURE, x + 81, y + 49 - flameHeight, 176, 49 - flameHeight, 14, flameHeight);
         }
+
+        // 加速组件装配数：左上角显示当前倍率
+        gui.drawString(this.font,
+                Component.translatable("gui.template_mod.boost_mult",
+                        String.format("%.1f", menu.getBoostMultiplier())),
+                x + 8, y + 40, 0xFFE0E0E0, false);
     }
 
     @Override

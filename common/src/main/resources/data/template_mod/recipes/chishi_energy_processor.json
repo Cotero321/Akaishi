@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CGC",
+    "SES",
+    "CGC"
+  ],
+  "key": {
+    "C": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "S": {
+      "item": "template_mod:chishi_life_essence_solid"
+    },
+    "E": {
+      "item": "template_mod:chishi_energy_cell_basic"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_energy_processor"
+  }
+}

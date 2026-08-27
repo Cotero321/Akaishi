@@ -1,12 +1,12 @@
 {
-  "name": "About Chishi",
-  "category": "template_mod:intro",
+  "name": "Research Roadmap",
   "icon": "template_mod:chishi_crystal",
-  "sortnum": 0,
+  "category": "template_mod:intro",
+  "sortnum": 1,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Chishi is an ore imbued with strange energy, buried deep in the world as ore clusters. Study it and you will uncover the secrets of Chishi power.$(br2)This book records Chishi knowledge by category and will grow as your research progresses."
+      "text": "Research on Chishi technology follows a clear mainline, and diary chapters unlock as you progress:$(br)$(li)$(bold)Ore Clusters$(): mine your first cluster$(li)$(bold)Chishi Crystal$(): craft Raw Chishi Blocks$(li)$(bold)Chi Energy$(): craft the Purifier and ignite the flame$(li)$(bold)Logistics$(): craft Item Pipes and free your hands$(li)$(bold)Equipment$(): condense Chishi Ingots and forge your armament$(li)$(bold)Life Energy$(): touch the higher form beyond Chi$(br2)Each step unlocks a new chapter - follow the progress and you will never lose your way."
     }
   ]
 }

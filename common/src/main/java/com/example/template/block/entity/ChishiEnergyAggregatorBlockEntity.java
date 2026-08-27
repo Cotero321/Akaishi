@@ -3,6 +3,7 @@ package com.example.template.block.entity;
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
+import com.example.template.api.item.IItemPipeDevice;
 import com.example.template.block.ModBlocks;
 import com.example.template.energy.ChishiEnergyStorage;
 import com.example.template.energy.ChishiEnergyType;
@@ -34,7 +35,7 @@ import java.util.List;
  * 配方：10M 赤能源 + 1 下界合金锭 → 1 赤石锭；10M 赤能源 + 1 母岩 → 下一等级母岩。
  * 赤能源只进不出（由管道供能）。
  */
-public class ChishiEnergyAggregatorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiEnergyAggregatorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice {
 
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
@@ -171,6 +172,18 @@ public class ChishiEnergyAggregatorBlockEntity extends BlockEntity implements Ex
     }
 
     // ---- Container（原版容器接口，AE2 存储总线 / Mekanism 物流管道可直接访问槽位） ----
+
+    // ---- IItemPipeDevice：物品管道精准对接——原料进 0 号输入槽，产物从 1 号输出槽取走 ----
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{INPUT_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{OUTPUT_SLOT};
+    }
 
     @Override
     public int getContainerSize() {

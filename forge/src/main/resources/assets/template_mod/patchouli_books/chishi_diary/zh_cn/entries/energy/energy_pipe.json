@@ -35,6 +35,13 @@
       "recipe": "template_mod:chishi_debug_tool",
       "title": "赤能源配置器",
       "text": "铁锭与赤石晶驱动的管道调试工具。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:logistics/item_pipe"
+      ],
+      "text": "能量有了自己的动脉，物资也该有——$(bold)物品管道$()将接管你的物资运输。"
     }
   ]
 }

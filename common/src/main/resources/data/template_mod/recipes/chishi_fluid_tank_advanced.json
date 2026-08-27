@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DGD",
+    "GUG",
+    "DGD"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "U": {
+      "item": "template_mod:chishi_fluid_tank_basic"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_fluid_tank_advanced"
+  }
+}

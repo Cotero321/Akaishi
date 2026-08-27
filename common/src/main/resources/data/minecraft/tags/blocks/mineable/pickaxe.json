@@ -24,6 +24,15 @@
     "template_mod:chishi_geode_pristine",
     "template_mod:chishi_geode_perfect",
     "template_mod:chishi_crystal_cluster",
-    "template_mod:chishi_crystal_block"
+    "template_mod:chishi_crystal_block",
+    "template_mod:chishi_reactor_shell",
+    "template_mod:chishi_reactor_controller",
+    "template_mod:chishi_reactor_fuel_port",
+    "template_mod:chishi_reactor_energy_output",
+    "template_mod:chishi_reactor_waste_port",
+    "template_mod:chishi_reactor_fuel_rod",
+    "template_mod:chishi_reactor_cooler",
+    "template_mod:chishi_reactor_core",
+    "template_mod:chishi_exhausted_barrel"
   ]
 }

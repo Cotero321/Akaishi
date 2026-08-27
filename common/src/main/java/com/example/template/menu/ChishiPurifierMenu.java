@@ -1,5 +1,6 @@
 package com.example.template.menu;
 
+import com.example.template.block.ModBlocks;
 import com.example.template.block.entity.ChishiPurifierBlockEntity;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,9 +29,29 @@ public class ChishiPurifierMenu extends AbstractContainerMenu {
         this.data = data;
 
         // 方块槽：燃料 / 输入 / 输出
-        addSlot(new Slot(container, ChishiPurifierBlockEntity.FUEL_SLOT, 56, 53));
-        addSlot(new Slot(container, ChishiPurifierBlockEntity.INPUT_SLOT, 56, 17));
-        addSlot(new Slot(container, ChishiPurifierBlockEntity.OUTPUT_SLOT, 116, 35));
+        // 燃料槽：仅燃料可放入；提纯矩阵成型后禁用（矩阵由外部赤能源驱动，不再烧燃料）
+        addSlot(new Slot(container, ChishiPurifierBlockEntity.FUEL_SLOT, 56, 53) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return data.get(ChishiPurifierBlockEntity.DATA_FORMED) == 0
+                        && ChishiPurifierBlockEntity.getFuelEnergy(stack) > 0;
+            }
+        });
+        // 输入槽：仅接受提纯原料（粗制赤石块 / 赤石水晶块）
+        addSlot(new Slot(container, ChishiPurifierBlockEntity.INPUT_SLOT, 56, 17) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
+                        || stack.is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+            }
+        });
+        // 输出槽：只出不进
+        addSlot(new Slot(container, ChishiPurifierBlockEntity.OUTPUT_SLOT, 116, 35) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return false;
+            }
+        });
 
         // 玩家背包 3×9
         for (int row = 0; row < 3; row++) {
@@ -64,6 +85,11 @@ public class ChishiPurifierMenu extends AbstractContainerMenu {
     /** 燃料总时间（GUI 火焰动画分母） */
     public int getBurnTimeTotal() {
         return data.get(3);
+    }
+
+    /** 是否提纯矩阵成型（GUI 据此切换无燃料版贴图并隐藏燃料槽/火焰） */
+    public boolean isFormed() {
+        return data.get(ChishiPurifierBlockEntity.DATA_FORMED) == 1;
     }
 
     @Override

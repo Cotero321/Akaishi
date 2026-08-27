@@ -1,0 +1,51 @@
+{
+  "name": "Item Pipe",
+  "icon": "template_mod:chishi_item_pipe",
+  "category": "template_mod:logistics",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_item_pipe",
+      "text": "Energy flows, but materials still need manual carrying? Time to let them move on their own.$(br2)Item Pipes form $(bold)logistics networks$(): connect chests and machines, and items are automatically moved from sources to sinks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Four tiers of pipes, higher tiers transfer more items per tick:$(li)$(bold)Basic$(): 1 item/tick$(li)$(bold)Advanced$(): 4 items/tick$(li)$(bold)Elite$(): 16 items/tick$(li)$(bold)Ultimate$(): 64 items/tick$(br2)Network throughput equals the sum of all pipe rates, scheduled by the representative node (the pipe with the smallest coordinates)."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_item_pipe",
+      "text": "Basic Item Pipe: Gold Ingot + Glass + Chishi Crystal, crafts 8 at a time."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_item_pipe_advanced",
+      "recipe2": "template_mod:chishi_item_pipe_elite",
+      "text": "Advanced / Elite pipes are upgraded from lower tiers; the Ultimate pipe also needs Condensed Chishi Essence Blocks."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_item_pipe_ultimate"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_debug_tool",
+      "text": "$(bold)Smart connection$():$(li)Vanilla containers (chests etc.): all slots act as both input and output$(li)Chishi machines (Purifier, Aggregator, etc.): precise input / output per internal definition$(li)Auto Collector: all 27 slots flow$(br2)$(bold)Configurator$(): right-click to cycle Normal / Push / Pull, sneak + right-click to disconnect a face - the same tool used for Energy Pipes."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_debug_tool",
+      "title": "Chishi Configurator",
+      "text": "One tool controls both energy and logistics."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:energy/energy_pipe",
+        "template_mod:energy/collector",
+        "template_mod:equipment/energy_aggregator"
+      ]
+    }
+  ]
+}

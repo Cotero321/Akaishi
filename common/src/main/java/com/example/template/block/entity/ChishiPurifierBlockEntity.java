@@ -2,6 +2,8 @@ package com.example.template.block.entity;
 
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
+import com.example.template.block.ChishiAdvancedPurifierBlock;
+import com.example.template.block.ChishiPurifierBlock;
 import com.example.template.block.ModBlocks;
 import com.example.template.energy.ChishiEnergyStorage;
 import com.example.template.energy.ChishiEnergyType;
@@ -38,12 +40,16 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
     public static final int INPUT_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
+    /** 与 Menu 同步的数据槽数量（0=能量 1=燃烧时间 2=进度 3=燃烧总时间 4=矩阵成型标记） */
+    public static final int DATA_SLOTS = 5;
+    /** data 索引：提纯矩阵成型标记（1=成型，GUI 据此隐藏燃料槽与火焰） */
+    public static final int DATA_FORMED = 4;
 
     /** 最大能量存储 */
     public static final int MAX_ENERGY = 10000;
-    /** 提纯所需总进度（tick） */
+    /** 提纯进度百分比满值（GUI 进度条分母） */
     public static final int MAX_PROGRESS = 100;
-    /** 每 tick 提纯消耗能量（需求减半后 10→5，燃烧产能 10/tick 可净积累 5/tick） */
+    /** 单方块每 tick 提纯消耗能量（需求减半后 10→5，燃烧产能 10/tick 可净积累 5/tick） */
     public static final int ENERGY_PER_TICK = 5;
     /** 每 tick 燃烧产能（产能减半后 20→10，与提纯消耗持平，可配合管道外部供能缓冲） */
     private static final int BURN_RATE = 10;
@@ -51,15 +57,24 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
     public static final int FUEL_CRYSTAL = 200;
     /** 燃料能量：粗制赤石块 */
     public static final int FUEL_RAW_BLOCK = 2000;
+    /** 单方块完成一次提纯所需总能量 = 100 tick × 5（提纯矩阵与单台一致，速度与耗能同步 30 倍） */
+    public static final long TOTAL_COST = 500L;
+    /** 提纯矩阵成型后每 tick 消耗 = 普通（5）× 30（耗能率 30 倍，配合 30 倍速度） */
+    public static final long RATE_FORMED = 150L;
 
     private final SimpleContainer inventory;
-    /** 与 Menu 同步的数据缓存：0=能量 1=燃烧时间 2=进度 3=燃烧总时间 */
+    /** 与 Menu 同步的数据缓存：0=能量 1=燃烧时间 2=进度百分比 3=燃烧总时间 4=矩阵成型标记 */
     private final SimpleContainerData data;
     private ChishiEnergyStorage energy;
 
     private int burnTime;
     private int burnTimeTotal;
-    private int progress;
+    /** 已投入提纯能量（能量池模式，满 {@link #needed()} 完成一次） */
+    private long progressEnergy;
+    /** 提纯矩阵成型缓存（每 tick 仅读缓存，仅邻居方块变化时重扫） */
+    private boolean matrixFormed;
+    /** 矩阵结构待重扫标记（外壳放置/移除、区块加载时置位） */
+    private boolean matrixDirty = true;
 
     public ChishiPurifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_PURIFIER.get(), pos, state);
@@ -73,7 +88,7 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
             }
         };
         // 数据缓存：服务端每 tick 写入，客户端经 Menu 同步 set 覆盖，GUI 据此绘制
-        this.data = new SimpleContainerData(4);
+        this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
     /** 服务端 tick：燃烧产能 + 提纯 */
@@ -83,14 +98,19 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
 
     private void tickServer() {
         boolean changed = false;
+        // 提纯矩阵成型检测：缓存化 + 事件驱动（仅外壳方块放置/移除时重扫），每 tick 零方块查询
+        refreshMatrix();
+        boolean matrixFormed = this.matrixFormed;
+
         // 写入数据缓存：Menu 的 broadcastChanges 每 tick 据此同步到客户端 GUI
         data.set(0, (int) energy.getEnergyStored());
         data.set(1, burnTime);
-        data.set(2, progress);
+        data.set(2, (int) (progressEnergy * 100 / needed()));
         data.set(3, burnTimeTotal);
+        data.set(4, matrixFormed ? 1 : 0);
 
-        // 1) 燃烧燃料产生赤石能量
-        if (energy.getEnergyStored() < MAX_ENERGY) {
+        // 1) 燃烧燃料产生赤石能量（矩阵成型后禁用：耗能远超自产，统一由管道外部供能）
+        if (!matrixFormed && energy.getEnergyStored() < MAX_ENERGY) {
             if (burnTime <= 0) {
                 int fuel = getFuelEnergy(inventory.getItem(FUEL_SLOT));
                 if (fuel > 0) {
@@ -109,12 +129,14 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
         }
 
         // 2) 消耗能量提纯输入（能量不足时进度暂停，不清零）
+        //    未成型：每 tick 5，共 500（100 tick/次）；成型：每 tick 150，共 500（3.34 tick/次 = 30 倍，耗能率同步 30 倍）
         if (canProcess()) {
-            if (energy.getEnergyStored() >= ENERGY_PER_TICK) {
-                progress++;
-                energy.extractEnergy(ENERGY_PER_TICK, false);
-                if (progress >= MAX_PROGRESS) {
-                    progress = 0;
+            long extract = Math.min(rate(), energy.getEnergyStored());
+            if (extract > 0) {
+                energy.extractEnergy(extract, false);
+                progressEnergy += extract;
+                if (progressEnergy >= needed()) {
+                    progressEnergy -= needed();
                     inventory.removeItem(INPUT_SLOT, 1);
                     ItemStack out = inventory.getItem(OUTPUT_SLOT);
                     if (out.isEmpty()) {
@@ -127,12 +149,84 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
             }
         } else {
             // 无有效输入或输出已满：重置进度
-            progress = 0;
+            progressEnergy = 0;
         }
 
         if (changed) {
             setChanged();
         }
+    }
+
+    /** 当前模式完成一次提纯所需总能量（矩阵成型与单台一致，均为 500） */
+    private long needed() {
+        return TOTAL_COST;
+    }
+
+    /** 当前模式每 tick 提纯消耗能量（矩阵成型 150，未成型 5） */
+    private long rate() {
+        return matrixFormed ? RATE_FORMED : ENERGY_PER_TICK;
+    }
+
+    /** 当前成型缓存值（供外壳查询，不触发扫描） */
+    public boolean isMatrixFormed() {
+        return matrixFormed;
+    }
+
+    /** 全量扫描 26 个邻居：自身为 3×3×3 中心且周围全部是高级提纯构建方块则成型（仅缓存失效时执行） */
+    private boolean scanMatrix() {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
+                    if (!(level.getBlockState(worldPosition.offset(dx, dy, dz)).getBlock()
+                            instanceof ChishiAdvancedPurifierBlock)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /** 结构变化时由外壳方块触发：标记缓存失效，下次 tick 重扫 */
+    public void markMatrixDirty() {
+        matrixDirty = true;
+    }
+
+    /** 通知 3×3×3 范围内的提纯器中心重新校验结构（外壳方块放置/移除时调用） */
+    public static void notifyNearbyCenters(Level level, BlockPos pos) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    BlockPos p = pos.offset(dx, dy, dz);
+                    if (level.getBlockEntity(p) instanceof ChishiPurifierBlockEntity center) {
+                        center.markMatrixDirty();
+                    }
+                }
+            }
+        }
+    }
+
+    /** 仅当结构缓存失效时重新校验提纯矩阵并同步成型状态（避免每 tick 26 次方块查询） */
+    private void refreshMatrix() {
+        if (!matrixDirty) {
+            return;
+        }
+        matrixDirty = false;
+        boolean formed = scanMatrix();
+        if (formed == matrixFormed) {
+            return;
+        }
+        matrixFormed = formed;
+        BlockState blockState = level.getBlockState(worldPosition);
+        if (formed != blockState.getValue(ChishiPurifierBlock.FORMED)) {
+            level.setBlock(worldPosition, blockState.setValue(ChishiPurifierBlock.FORMED, formed), 3);
+        }
+        // 中心成型状态变化会影响所有邻近外壳，通知其重新检测
+        ChishiAdvancedPurifierBlockEntity.notifyNearbyShells(level, worldPosition);
+        setChanged();
     }
 
     /** 是否具备提纯条件：输入有效 + 输出可容纳（能量检查在 tick 内做，不足时暂停而非清零） */
@@ -159,8 +253,8 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
         return inventory.getItem(INPUT_SLOT).is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
     }
 
-    /** 燃料能量值，非燃料返回 0 */
-    private static int getFuelEnergy(ItemStack stack) {
+    /** 燃料能量值，非燃料返回 0（public 供 Menu 燃料槽放入校验） */
+    public static int getFuelEnergy(ItemStack stack) {
         if (stack.is(ModItems.chishiCrystal.get())) {
             return FUEL_CRYSTAL;
         }
@@ -262,7 +356,7 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
         tag.putLong("Energy", energy.getEnergyStored());
         tag.putInt("BurnTime", burnTime);
         tag.putInt("BurnTimeTotal", burnTimeTotal);
-        tag.putInt("Progress", progress);
+        tag.putLong("ProgressEnergy", progressEnergy);
         NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
         for (int i = 0; i < SLOT_COUNT; i++) {
             items.set(i, inventory.getItem(i));
@@ -277,7 +371,7 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
         energy.setEnergy(tag.getLong("Energy"));
         burnTime = tag.getInt("BurnTime");
         burnTimeTotal = tag.getInt("BurnTimeTotal");
-        progress = tag.getInt("Progress");
+        progressEnergy = tag.getLong("ProgressEnergy");
         NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
         for (int i = 0; i < SLOT_COUNT; i++) {

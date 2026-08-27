@@ -12,6 +12,14 @@
     {
       "type": "patchouli:crafting",
       "recipe": "template_mod:raw_chishi_block"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:crystal/chishi_geode",
+        "template_mod:energy/purifier"
+      ],
+      "text": "Raw Chishi Blocks are the fuel of the Purifier. Feed your crystals into the$(bold) Purifier$() and the Chi Energy path begins."
     }
   ]
 }

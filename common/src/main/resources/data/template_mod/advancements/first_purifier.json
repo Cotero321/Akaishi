@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "template_mod:chishi_purifier"
+    },
+    "title": {
+      "translate": "advancements.template_mod.first_purifier.title"
+    },
+    "description": {
+      "translate": "advancements.template_mod.first_purifier.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "template_mod:first_refine",
+  "criteria": {
+    "has_chishi_purifier": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "template_mod:chishi_purifier"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

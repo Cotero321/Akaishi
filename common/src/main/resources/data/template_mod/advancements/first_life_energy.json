@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "template_mod:chishi_life_aggregation_converter"
+    },
+    "title": {
+      "translate": "advancements.template_mod.first_life_energy.title"
+    },
+    "description": {
+      "translate": "advancements.template_mod.first_life_energy.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "template_mod:first_aggregator",
+  "criteria": {
+    "has_life_converter": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "template_mod:chishi_life_aggregation_converter"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

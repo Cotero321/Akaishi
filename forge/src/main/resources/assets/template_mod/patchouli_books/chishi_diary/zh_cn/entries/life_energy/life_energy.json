@@ -5,6 +5,10 @@
   "sortnum": 0,
   "pages": [
     {
+      "type": "patchouli:text",
+      "text": "$(bold)日记最后一页：$()\"赤能源并不是终点。当聚合器的能量达到某种阈值，我触碰到了更本质的力量——$(2)生命能量$()。它温润、沉稳，仿佛矿石中沉睡的灵魂。\"$(br2)这是赤石之章的最高成就，也是新的开始。"
+    },
+    {
       "type": "patchouli:spotlight",
       "item": "template_mod:chishi_life_aggregation_converter",
       "text": "生命能量是赤能源的高级衍生物。生命聚合转换器消耗赤能源聚合出生命能量：$(br)每次消耗 $(bold)10M 赤能源$()，产出 $(bold)10 生命能量$()。$(br)单方块每秒聚合 10 次（10 生命/tick）。"

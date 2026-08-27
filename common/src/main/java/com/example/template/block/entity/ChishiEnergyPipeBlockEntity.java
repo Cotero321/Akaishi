@@ -26,7 +26,7 @@ import java.util.Set;
  * 管道可被配置器设置为方向模式：正常 / 推 / 拉，并可断开单侧连接以精细控制流向。
  * 传输按能量类型隔离：BFS 只连通同类型管道，设备按 {@link IEnergyProvider#getEnergyStorage(IEnergyType)} 按类型匹配。
  */
-public class ChishiEnergyPipeBlockEntity extends BlockEntity {
+public class ChishiEnergyPipeBlockEntity extends BlockEntity implements ChishiPipeControl {
 
     /** 方向模式：正常（默认，按设备能力双向判定） */
     public static final int MODE_NORMAL = 0;

@@ -1,6 +1,7 @@
 package com.example.template.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
@@ -47,14 +48,25 @@ public class ChishiGeodeBlock extends Block {
         return true;
     }
 
-    /** 随机 tick：按等级概率在顶面生长水晶簇（顶面需为空） */
+    /** 随机 tick：按等级概率在随机 6 个面之一生长水晶簇（该方向邻格需为空，晶体自附着面朝外） */
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (random.nextFloat() < tier.growthChance) {
-            BlockPos above = pos.above();
-            if (level.getBlockState(above).isAir()) {
-                level.setBlock(above, ModBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState(), 3);
-            }
+        tryGrow(level, pos, random, tier.growthChance);
+    }
+
+    /**
+     * 尝试在母岩随机 6 面之一生长水晶簇（邻格需为空）。
+     * 供母岩自身随机 tick 与赤石催化器（催生）共用。
+     */
+    public static void tryGrow(ServerLevel level, BlockPos geodePos, RandomSource random, float chance) {
+        if (random.nextFloat() >= chance) {
+            return;
+        }
+        Direction dir = Direction.getRandom(random);
+        BlockPos neighbor = geodePos.relative(dir);
+        if (level.getBlockState(neighbor).isAir()) {
+            level.setBlock(neighbor, ModBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState()
+                    .setValue(ChishiCrystalClusterBlock.FACING, dir), 3);
         }
     }
 }

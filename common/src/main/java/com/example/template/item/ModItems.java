@@ -35,6 +35,28 @@ public final class ModItems {
     public static final String PORTABLE_CELL_BASIC_ID = "portable_chishi_cell_basic";
     public static final String PORTABLE_CELL_ADVANCED_ID = "portable_chishi_cell_advanced";
     public static final String PORTABLE_CELL_SUPER_ID = "portable_chishi_cell_super";
+    /** 能源产生升级组件：装配到发生器（单块/多方块中心），每个提升一倍产能速度、减少 1% 产出，最多 10 个 */
+    public static final String SPEED_UPGRADE_ID = "chishi_speed_upgrade";
+    /** 生命能量固态物：由生命能量提纯器以 1000 生命能量 + 10M 赤能源固化，生命能源体系的基础材料 */
+    public static final String LIFE_ESSENCE_SOLID_ID = "chishi_life_essence_solid";
+    /** 末地混合物：末影之眼+潜影贝壳+紫颂果合成，液化 → 末地混合燃料 */
+    public static final String END_MIXTURE_ID = "end_mixture";
+    /** 巨龙混合物：龙息+末地水晶+黑曜石合成，液化 → 末地巨龙燃料 */
+    public static final String DRAGON_MIXTURE_ID = "dragon_mixture";
+    /** 幽匿生命体：回响碎片+幽匿块+金苹果+赤石精华块合成，液化 → 幽匿生命燃料 */
+    public static final String SCULK_LIFEFORM_ID = "sculk_lifeform";
+    /** 燃料罐：装罐机充装液体燃料，容量 10L（10000mb），装液后不可堆叠 */
+    public static final String FUEL_CELL_ID = "fuel_cell";
+    /** 劣质散热片：散热效率 1%，耐久 36k tick（反应堆散热组件消耗品） */
+    public static final String HEAT_SINK_POOR_ID = "heat_sink_poor";
+    /** 普通散热片：散热效率 2%，耐久 72k tick */
+    public static final String HEAT_SINK_NORMAL_ID = "heat_sink_normal";
+    /** 良好散热片：散热效率 3%，耐久 108k tick */
+    public static final String HEAT_SINK_GOOD_ID = "heat_sink_good";
+    /** 优质散热片：散热效率 4%，耐久 144k tick */
+    public static final String HEAT_SINK_FINE_ID = "heat_sink_fine";
+    /** 精良散热片：散热效率 5%，耐久 180k tick */
+    public static final String HEAT_SINK_EXQUISITE_ID = "heat_sink_exquisite";
     /** 赤石晶延迟注册引用（注册完成后可用） */
     public static RegistrySupplier<Item> chishiCrystal;
     /** 赤石精华延迟注册引用 */
@@ -73,6 +95,28 @@ public final class ModItems {
     public static RegistrySupplier<Item> portableCellAdvanced;
     /** 便携赤能源储存单元（高级） */
     public static RegistrySupplier<Item> portableCellSuper;
+    /** 能源产生升级组件 */
+    public static RegistrySupplier<Item> chishiSpeedUpgrade;
+    /** 生命能量固态物 */
+    public static RegistrySupplier<Item> chishiLifeEssenceSolid;
+    /** 末地混合物 */
+    public static RegistrySupplier<Item> endMixture;
+    /** 巨龙混合物 */
+    public static RegistrySupplier<Item> dragonMixture;
+    /** 幽匿生命体 */
+    public static RegistrySupplier<Item> sculkLifeform;
+    /** 燃料罐（空罐） */
+    public static RegistrySupplier<Item> fuelCell;
+    /** 劣质散热片 */
+    public static RegistrySupplier<Item> heatSinkPoor;
+    /** 普通散热片 */
+    public static RegistrySupplier<Item> heatSinkNormal;
+    /** 良好散热片 */
+    public static RegistrySupplier<Item> heatSinkGood;
+    /** 优质散热片 */
+    public static RegistrySupplier<Item> heatSinkFine;
+    /** 精良散热片 */
+    public static RegistrySupplier<Item> heatSinkExquisite;
 
     private ModItems() {
     }
@@ -140,5 +184,44 @@ public final class ModItems {
         portableCellSuper = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, PORTABLE_CELL_SUPER_ID),
                         () -> new ChishiPortableEnergyCell(PortableCellTier.SUPER, new Item.Properties()));
+        chishiSpeedUpgrade = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, SPEED_UPGRADE_ID),
+                        () -> new Item(new Item.Properties()));
+        // 生命能量固态物（生命能量提纯器产出，生命能源体系基础材料）
+        chishiLifeEssenceSolid = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, LIFE_ESSENCE_SOLID_ID),
+                        () -> new Item(new Item.Properties()));
+        // 末地混合物（工作台合成，液化装置 → 末地混合燃料）
+        endMixture = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, END_MIXTURE_ID),
+                        () -> new Item(new Item.Properties()));
+        // 巨龙混合物（工作台合成，液化装置 → 末地巨龙燃料）
+        dragonMixture = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, DRAGON_MIXTURE_ID),
+                        () -> new Item(new Item.Properties()));
+        // 幽匿生命体（工作台合成，液化装置 → 幽匿生命燃料）
+        sculkLifeform = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, SCULK_LIFEFORM_ID),
+                        () -> new Item(new Item.Properties()));
+        // 燃料罐（装罐机充装液体燃料，空罐可堆叠 64）
+        fuelCell = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, FUEL_CELL_ID),
+                        () -> new ChishiFuelCellItem(new Item.Properties()));
+        // 散热片（5 品质）：插入反应堆散热组件，消耗品带耐久
+        heatSinkPoor = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_POOR_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.POOR));
+        heatSinkNormal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_NORMAL_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.NORMAL));
+        heatSinkGood = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_GOOD_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.GOOD));
+        heatSinkFine = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_FINE_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.FINE));
+        heatSinkExquisite = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_EXQUISITE_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.EXQUISITE));
     }
 }

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "343",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:redstone"
+    },
+    "2": {
+      "item": "template_mod:chishi_ingot"
+    },
+    "3": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "4": {
+      "item": "template_mod:chishi_crystal"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_speed_upgrade",
+    "count": 2
+  }
+}

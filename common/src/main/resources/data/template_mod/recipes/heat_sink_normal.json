@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "IDI",
+    " I "
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "D": { "item": "minecraft:netherite_scrap" }
+  },
+  "result": {
+    "item": "template_mod:heat_sink_normal"
+  }
+}

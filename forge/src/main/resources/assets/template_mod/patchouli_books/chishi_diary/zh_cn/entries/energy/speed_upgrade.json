@@ -1,0 +1,16 @@
+{
+  "name": "能源产生升级组件",
+  "icon": "template_mod:chishi_speed_upgrade",
+  "category": "template_mod:energy",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)能源产生升级组件$()：可装配到$(bold)赤能源发生机$()（单台）、$(bold)小型赤能源组合结构$()与$(bold)超级发生器架构$()的 GUI 升级槽中，用于提升产能。$(br)$(li)每个组件产能速度翻倍$(li)每个组件减少 1% 产出$(li)最多装配 10 个"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)倍率表（n 个组件 = 2^n × (1 - 1%×n)）：$(br)$(li)1 个：×1.98$(li)2 个：×3.92$(li)3 个：×7.76$(li)5 个：×30.4$(li)10 个：×921.6$(br)$(bold)提示：$()单台发生机基础产能 75/t，满配 10 个可达约 6.9 万/t。多方块结构的装配槽位于中心主方块 GUI，外壳发生机的槽位在结构成型时同样代理到中心。"
+    }
+  ]
+}

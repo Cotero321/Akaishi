@@ -2,5 +2,9 @@
   "name": "Chishi Crystal",
   "description": "The vessel of Chishi power",
   "icon": "template_mod:chishi_crystal",
-  "sortnum": 2
+  "sortnum": 2,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "template_mod:first_refine"
+  }
 }

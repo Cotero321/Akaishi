@@ -15,6 +15,8 @@ import net.minecraft.world.entity.player.Inventory;
 public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifierMenu> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_purifier.png");
+    /** 提纯矩阵成型版贴图：抹去燃料槽与火焰区域（矩阵由外部赤能源驱动，无燃料槽） */
+    private static final ResourceLocation TEXTURE_MATRIX = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_purifier_matrix.png");
 
     public ChishiPurifierScreen(ChishiPurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -26,7 +28,8 @@ public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifier
     protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        // 成型态切换无燃料版贴图（燃料槽/火焰区域已抹除）
+        gui.blit(menu.isFormed() ? TEXTURE_MATRIX : TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         // 赤石能量条：右侧垂直条，与贴图内底(153,18..62)对齐，从底部向上填充
         int maxEnergy = ChishiPurifierBlockEntity.MAX_ENERGY;
@@ -36,12 +39,14 @@ public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifier
             gui.fill(x + 153, y + 62 - energyHeight, x + 163, y + 62, 0xFFE03030);
         }
 
-        // 燃料火焰动画：从贴图满帧(176,46)按剩余比例裁剪，叠在背景空帧火焰上
-        int burn = menu.getBurnTime();
-        int burnTotal = menu.getBurnTimeTotal();
-        if (burnTotal > 0 && burn > 0) {
-            int flameHeight = (int) (14.0F * burn / burnTotal);
-            gui.blit(TEXTURE, x + 81, y + 60 - flameHeight, 176, 60 - flameHeight, 14, flameHeight);
+        // 燃料火焰动画：仅未成型（有燃料槽）时绘制
+        if (!menu.isFormed()) {
+            int burn = menu.getBurnTime();
+            int burnTotal = menu.getBurnTimeTotal();
+            if (burnTotal > 0 && burn > 0) {
+                int flameHeight = (int) (14.0F * burn / burnTotal);
+                gui.blit(TEXTURE, x + 81, y + 60 - flameHeight, 176, 60 - flameHeight, 14, flameHeight);
+            }
         }
 
         // 提纯进度箭头：覆盖贴图箭头左半(79,36..51)，从左向右填充
@@ -64,16 +69,15 @@ public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifier
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.energy", menu.getEnergy(), ChishiPurifierBlockEntity.MAX_ENERGY),
                     mouseX, mouseY);
-        } else if (isHovering(81, 46, 14, 14, mouseX, mouseY)) {
-            // 燃料火焰
+        } else if (!menu.isFormed() && isHovering(81, 46, 14, 14, mouseX, mouseY)) {
+            // 燃料火焰（成型态无燃料槽，不显示）
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.fuel", menu.getBurnTime()),
                     mouseX, mouseY);
         } else if (isHovering(79, 36, 10, 16, mouseX, mouseY)) {
             // 提纯进度箭头
             gui.renderTooltip(this.font,
-                    Component.translatable("gui.template_mod.progress",
-                            menu.getProgress() * 100 / ChishiPurifierBlockEntity.MAX_PROGRESS),
+                    Component.translatable("gui.template_mod.progress", menu.getProgress()),
                     mouseX, mouseY);
         }
     }

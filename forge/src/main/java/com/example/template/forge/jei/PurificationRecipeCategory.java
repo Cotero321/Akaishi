@@ -72,13 +72,17 @@ public class PurificationRecipeCategory implements IRecipeCategory<PurificationR
 
         /** 生成全部展示配方：不同燃料对应不同配方 */
         public static List<PurificationRecipe> getAll() {
-            ItemStack input = new ItemStack(ModBlocks.RAW_CHISHI_BLOCK.get());
-            ItemStack output = new ItemStack(ModItems.chishiEssence.get());
+            ItemStack raw = new ItemStack(ModBlocks.RAW_CHISHI_BLOCK.get());
+            ItemStack crystalBlock = new ItemStack(ModBlocks.CHISHI_CRYSTAL_BLOCK.get());
+            ItemStack essence = new ItemStack(ModItems.chishiEssence.get());
+            ItemStack essence4 = new ItemStack(ModItems.chishiEssence.get(), 4);
             List<PurificationRecipe> recipes = new ArrayList<>();
-            // 燃料：赤石晶（200 能量）
-            recipes.add(new PurificationRecipe(input.copy(), new ItemStack(ModItems.chishiCrystal.get()), output.copy()));
-            // 燃料：粗制赤石块（2000 能量）
-            recipes.add(new PurificationRecipe(input.copy(), input.copy(), output.copy()));
+            // 粗制赤石块 + 赤石晶 → 1 精华
+            recipes.add(new PurificationRecipe(raw.copy(), new ItemStack(ModItems.chishiCrystal.get()), essence.copy()));
+            // 粗制赤石块 + 粗制赤石块 → 1 精华
+            recipes.add(new PurificationRecipe(raw.copy(), raw.copy(), essence.copy()));
+            // 赤石水晶块 + 赤石晶 → 4 精华
+            recipes.add(new PurificationRecipe(crystalBlock.copy(), new ItemStack(ModItems.chishiCrystal.get()), essence4.copy()));
             return recipes;
         }
     }

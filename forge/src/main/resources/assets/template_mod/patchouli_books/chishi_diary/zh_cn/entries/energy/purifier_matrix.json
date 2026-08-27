@@ -1,0 +1,16 @@
+{
+  "name": "提纯矩阵",
+  "icon": "template_mod:chishi_purifier",
+  "category": "template_mod:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)提纯矩阵$()：将 26 个高级提纯构建方块集成为 $(bold)3×3×3$() 多方块结构——$(bold)中心放普通赤石提纯器$()，其余 26 格全部是高级提纯构建方块。成型后中心自动进入集中提纯模式。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)集中提纯效果：$(br)$(li)速度：普通提纯器的 $(bold)30 倍$()（约 3.34 tick 完成一次）$(li)耗能：每 tick 消耗 $(bold)150$() 点赤能源（30 倍耗能率）$(br)$(bold)注意：$(br)成型后需持续供能，中心被外壳完全包裹，请用赤能源管道连接任意外壳供能。点击外壳即打开中心界面。"
+    }
+  ]
+}

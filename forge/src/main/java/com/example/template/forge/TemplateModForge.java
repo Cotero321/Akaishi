@@ -2,6 +2,9 @@ package com.example.template.forge;
 
 import com.example.template.TemplateMod;
 import com.example.template.command.ModCommands;
+import com.example.template.forge.fluid.ForgeFluidBridge;
+import com.example.template.forge.fluid.ModFluidsImpl;
+import com.example.template.gametest.ChishiFuelSystemTests;
 import com.example.template.item.ChishiPortableEnergyCell;
 import com.example.template.item.ChishiUpgradeHelper;
 import com.example.template.item.ModItems;
@@ -24,11 +27,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegisterGameTestsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -66,6 +71,15 @@ public final class TemplateModForge {
     public TemplateModForge() {
         // 将 Forge 的 Mod 事件总线交给 Architectury，使内容在正确的时机加载
         EventBuses.registerModEventBus(TemplateMod.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+
+        // 注册 4 种液体（下界至纯/复合能量 + 至纯/复合燃料）到 Forge 注册表
+        ModFluidsImpl.register(FMLJavaModLoadingContext.get().getModEventBus());
+        // 注入外部液体访问桥（MEK 等第三方液体能力对接）
+        ForgeFluidBridge.init();
+
+        // 注册燃料系统 GameTest（dev 环境 -Dchishi.gametest=1 自动运行）
+        FMLJavaModLoadingContext.get().getModEventBus()
+                .addListener((RegisterGameTestsEvent event) -> event.register(ChishiFuelSystemTests.class));
 
         // 调用通用初始化逻辑
         TemplateMod.init();
@@ -373,6 +387,26 @@ public final class TemplateModForge {
                             UUID id, double amount, AttributeModifier.Operation operation) {
         if (amount != 0.0) {
             event.addModifier(attribute, new AttributeModifier(id, "Chishi ability", amount, operation));
+        }
+    }
+
+    /** dev 环境燃料系统/反应堆系统 GameTest 入口（-Dchishi.gametest=1 / -Dchishi.gametest.reactor=1 时服务端启动后自动运行） */
+    @SubscribeEvent
+    public void onServerStarted(ServerStartedEvent event) {
+        if (System.getProperty("chishi.gametest") != null) {
+            ChishiGameTestAutoRunner.start(event.getServer());
+        }
+        if (System.getProperty("chishi.gametest.reactor") != null) {
+            ChishiReactorGameTestAutoRunner.start(event.getServer());
+        }
+    }
+
+    /** 测试运行期间每 tick 检查进度，全部完成后自动关闭服务端 */
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            ChishiGameTestAutoRunner.tick();
+            ChishiReactorGameTestAutoRunner.tick();
         }
     }
 }

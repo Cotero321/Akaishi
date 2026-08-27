@@ -1,0 +1,12 @@
+{
+  "name": "生命能量固态物",
+  "icon": "template_mod:chishi_life_essence_solid",
+  "category": "template_mod:intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "1000 点生命能量被赤能源固化后的产物。它比任何水晶都要澄澈，握在手中能感到若有若无的脉搏。$(br2)$(bold)当前用途：未知。$(br2)后续的生命研究——反应堆、基因、器官改造——都将以它为起点。"
+    }
+  ]
+}

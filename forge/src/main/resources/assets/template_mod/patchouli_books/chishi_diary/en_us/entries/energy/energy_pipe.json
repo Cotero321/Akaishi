@@ -35,6 +35,13 @@
       "recipe": "template_mod:chishi_debug_tool",
       "title": "Chi Energy Configurator",
       "text": "A pipe tuning tool driven by iron and Chishi crystals."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "template_mod:logistics/item_pipe"
+      ],
+      "text": "Energy has its artery - now give items one too.$(bold)Item Pipes$() will take over your material transport."
     }
   ]
 }

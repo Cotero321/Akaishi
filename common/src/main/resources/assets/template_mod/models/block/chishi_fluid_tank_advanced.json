@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "template_mod:block/chishi_fluid_tank_bottom",
+    "top": "template_mod:block/chishi_fluid_tank_advanced_top",
+    "side": "template_mod:block/chishi_fluid_tank_advanced_side"
+  }
+}

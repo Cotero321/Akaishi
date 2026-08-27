@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "IDI",
+    " I "
+  ],
+  "key": {
+    "I": { "item": "template_mod:chishi_ingot" },
+    "D": { "item": "minecraft:diamond" }
+  },
+  "result": {
+    "item": "template_mod:heat_sink_fine"
+  }
+}

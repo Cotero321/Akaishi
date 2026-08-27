@@ -2,5 +2,9 @@
   "name": "生命能源",
   "description": "由赤能源聚合而成的高级能量",
   "icon": "template_mod:chishi_life_aggregation_converter",
-  "sortnum": 4
+  "sortnum": 6,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "template_mod:first_life_energy"
+  }
 }

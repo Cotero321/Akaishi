@@ -45,6 +45,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_PURIFIER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER.get()));
                                     }
+                                    if (ModBlocks.CHISHI_ADVANCED_PURIFIER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ADVANCED_PURIFIER.get()));
+                                    }
                                     // 赤能源储存单元 + 管道
                                     if (ModBlocks.CHISHI_ENERGY_CELL_BASIC != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_CELL_BASIC.get()));
@@ -78,6 +81,10 @@ public final class ModCreativeTabs {
                                     // 赤红高级机械组件
                                     if (ModItems.chishiAdvancedComponent != null) {
                                         output.accept(new ItemStack(ModItems.chishiAdvancedComponent.get()));
+                                    }
+                                    // 能源产生升级组件（发生器装配加速）
+                                    if (ModItems.chishiSpeedUpgrade != null) {
+                                        output.accept(new ItemStack(ModItems.chishiSpeedUpgrade.get()));
                                     }
                                     // 赤石精华
                                     if (ModItems.chishiEssence != null) {
@@ -191,12 +198,142 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_CRYSTAL_BLOCK != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CRYSTAL_BLOCK.get()));
                                     }
+                                    // 赤石催化器（4 级）：催生母岩生长
+                                    if (ModBlocks.CHISHI_CATALYST_BASIC != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_BASIC.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_CATALYST_MEDIUM != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_MEDIUM.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_CATALYST_ADVANCED != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_ADVANCED.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_CATALYST_ULTIMATE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_ULTIMATE.get()));
+                                    }
+                                    // 自动收集器（4 级）：自动收获水晶簇
+                                    if (ModBlocks.CHISHI_COLLECTOR_BASIC != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_BASIC.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_COLLECTOR_MEDIUM != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_MEDIUM.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_COLLECTOR_ADVANCED != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_ADVANCED.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_COLLECTOR_ULTIMATE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_ULTIMATE.get()));
+                                    }
+                                    // 物品管道（4 级）：物流网络中继，传输物品到相连容器/机器
+                                    if (ModBlocks.CHISHI_ITEM_PIPE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_PIPE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_ITEM_PIPE_ADVANCED != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_PIPE_ADVANCED.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_ITEM_PIPE_ELITE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_PIPE_ELITE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE.get()));
+                                    }
+                                    // 生命能量提纯器 + 生命能量固态物
+                                    if (ModBlocks.CHISHI_LIFE_PURIFIER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_PURIFIER.get()));
+                                    }
+                                    if (ModItems.chishiLifeEssenceSolid != null) {
+                                        output.accept(new ItemStack(ModItems.chishiLifeEssenceSolid.get()));
+                                    }
                                     // 创造模式能量源（测试用，无限输出）
                                     if (ModBlocks.CHISHI_CREATIVE_ENERGY_CELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_ENERGY_CELL.get()));
                                     }
                                     if (ModBlocks.CHISHI_CREATIVE_LIFE_CELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_LIFE_CELL.get()));
+                                    }
+                                    // 液体管道 + 液体储罐（3 级）
+                                    if (ModBlocks.CHISHI_FLUID_PIPE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_PIPE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_FLUID_TANK_BASIC != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_TANK_BASIC.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_FLUID_TANK_ADVANCED != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_TANK_ADVANCED.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_FLUID_TANK_SUPER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_TANK_SUPER.get()));
+                                    }
+                                    // 能量液化装置 + 能量加工器（燃料加工核心）
+                                    if (ModBlocks.CHISHI_ENERGY_LIQUEFIER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_LIQUEFIER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_ENERGY_PROCESSOR != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PROCESSOR.get()));
+                                    }
+                                    // 燃料装罐机 + 燃料混合器 + 燃料罐
+                                    if (ModBlocks.CHISHI_FUEL_CANNER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUEL_CANNER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_FUEL_MIXER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUEL_MIXER.get()));
+                                    }
+                                    if (ModItems.fuelCell != null) {
+                                        output.accept(new ItemStack(ModItems.fuelCell.get()));
+                                    }
+                                    // 末地/巨龙/幽匿混合物（燃料液化原料）
+                                    if (ModItems.endMixture != null) {
+                                        output.accept(new ItemStack(ModItems.endMixture.get()));
+                                    }
+                                    if (ModItems.dragonMixture != null) {
+                                        output.accept(new ItemStack(ModItems.dragonMixture.get()));
+                                    }
+                                    if (ModItems.sculkLifeform != null) {
+                                        output.accept(new ItemStack(ModItems.sculkLifeform.get()));
+                                    }
+                                    // 反应堆体系：外壳/控制器/投放口/输出口/废品口/燃料棒/散热组件/核心
+                                    if (ModBlocks.CHISHI_REACTOR_SHELL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_SHELL.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_CONTROLLER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_CONTROLLER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_FUEL_PORT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_FUEL_PORT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_WASTE_PORT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_WASTE_PORT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_FUEL_ROD != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_FUEL_ROD.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_COOLER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_COOLER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_REACTOR_CORE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_CORE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_EXHAUSTED_BARREL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_EXHAUSTED_BARREL.get()));
+                                    }
+                                    // 散热片（5 品质）
+                                    if (ModItems.heatSinkPoor != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkPoor.get()));
+                                    }
+                                    if (ModItems.heatSinkNormal != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkNormal.get()));
+                                    }
+                                    if (ModItems.heatSinkGood != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkGood.get()));
+                                    }
+                                    if (ModItems.heatSinkFine != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkFine.get()));
+                                    }
+                                    if (ModItems.heatSinkExquisite != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkExquisite.get()));
                                     }
                                     // 手册“赤石研究日记”由帕秋莉按 creative_tab 自动加入，此处不重复添加
                                 })

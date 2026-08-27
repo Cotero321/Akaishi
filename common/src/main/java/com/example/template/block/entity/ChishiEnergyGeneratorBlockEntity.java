@@ -7,6 +7,7 @@ import com.example.template.block.ChishiSuperGeneratorCoreBlock;
 import com.example.template.energy.ChishiEnergyStorage;
 import com.example.template.energy.ChishiEnergyType;
 import com.example.template.energy.ChishiFuels;
+import com.example.template.item.ModItems;
 import com.example.template.menu.ChishiEnergyGeneratorMenu;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -36,6 +37,12 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
+    /** 能源产生升级组件装配槽起始（燃料槽之后连续 10 格，最多装 10 个） */
+    public static final int UPGRADE_SLOT_START = SLOT_COUNT;
+    /** 升级装配槽数量 */
+    public static final int UPGRADE_SLOTS = 10;
+    /** 容器总槽数 = 燃料 + 升级 */
+    public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
     /** 最大能量存储 */
     public static final int MAX_ENERGY = 100000;
@@ -52,14 +59,20 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
     public ChishiEnergyGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_GENERATOR.get(), pos, state);
         this.energy = new ChishiEnergyStorage(ChishiEnergyType.INSTANCE, MAX_ENERGY);
-        this.inventory = new SimpleContainer(SLOT_COUNT) {
+        this.inventory = new SimpleContainer(TOTAL_SLOTS) {
             @Override
             public void setChanged() {
                 super.setChanged();
                 ChishiEnergyGeneratorBlockEntity.this.setChanged();
             }
         };
-        this.data = new SimpleContainerData(3);
+        this.data = new SimpleContainerData(4);
+    }
+
+    /** 加速倍率：n 个组件 → 2^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 922 倍 */
+    public static double getBoostMultiplier(int upgradeCount) {
+        int n = Math.max(0, Math.min(upgradeCount, ChishiEnergyGeneratorBlockEntity.UPGRADE_SLOTS));
+        return Math.pow(2, n) * (1.0 - 0.01 * n);
     }
 
     /** 服务端 tick：燃烧产能；结构外壳时休眠 */
@@ -72,6 +85,8 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
         data.set(0, (int) energy.getEnergyStored());
         data.set(1, burnTime);
         data.set(2, burnTimeTotal);
+        int upgrades = getUpgradeCount();
+        data.set(3, upgrades);
 
         // formed=true 表示被多方块结构征用为外壳：休眠，不独立燃烧
         boolean formed = getBlockState().getValue(com.example.template.block.ChishiEnergyGeneratorBlock.FORMED);
@@ -88,7 +103,8 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
             }
             if (burnTime > 0) {
                 burnTime--;
-                energy.addEnergy(GENERATE_RATE, false);
+                // 升级组件：每个翻倍产能速度、减少 1% 产出（净倍率 2^n × (1-0.01n)）
+                energy.addEnergy((long) (GENERATE_RATE * getBoostMultiplier(upgrades)), false);
                 changed = true;
             }
         }
@@ -100,6 +116,17 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
 
     public Container inventory() {
         return inventory;
+    }
+
+    /** 统计装配的能源产生升级组件数量（0-10，最多 10 个） */
+    public int getUpgradeCount() {
+        int n = 0;
+        for (int i = UPGRADE_SLOT_START; i < TOTAL_SLOTS; i++) {
+            if (inventory.getItem(i).is(ModItems.chishiSpeedUpgrade.get())) {
+                n++;
+            }
+        }
+        return n;
     }
 
     /** 成型后作为多方块外壳：容器访问动态代理到中心主方块，使 AE2 存储总线 / Mekanism 物流管道能经外壳给结构喂燃料 */
@@ -255,8 +282,8 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
         tag.putLong("Energy", energy.getEnergyStored());
         tag.putInt("BurnTime", burnTime);
         tag.putInt("BurnTimeTotal", burnTimeTotal);
-        NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
-        for (int i = 0; i < SLOT_COUNT; i++) {
+        NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
+        for (int i = 0; i < TOTAL_SLOTS; i++) {
             items.set(i, inventory.getItem(i));
         }
         ContainerHelper.saveAllItems(tag, items);
@@ -268,9 +295,9 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
         energy.setEnergy(tag.getLong("Energy"));
         burnTime = tag.getInt("BurnTime");
         burnTimeTotal = tag.getInt("BurnTimeTotal");
-        NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+        NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
-        for (int i = 0; i < SLOT_COUNT; i++) {
+        for (int i = 0; i < TOTAL_SLOTS; i++) {
             inventory.setItem(i, items.get(i));
         }
     }

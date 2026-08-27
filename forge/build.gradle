@@ -24,6 +24,10 @@ loom {
             name "Forge Server"
             runDir "run/server"
             vmArgs "-Dneoforge.enabledGameTestNamespace=template_mod"
+            // 转发测试开关：Gradle --system-prop 仅写入 Gradle JVM，JavaExec 子进程不继承，
+            // 需显式将 chishi.* 系统属性注入服务器 JVM（chishi.gametest / chishi.gametest.reactor 等）
+            System.getProperties().stringPropertyNames().findAll { it.startsWith("chishi.") }
+                    .each { key -> vmArgs "-D$key=${System.getProperty(key)}" }
         }
     }
 }
@@ -49,6 +53,9 @@ shadowJar {
     
     // 排除 module-info.class 避免 JPMS 冲突
     exclude 'module-info.class'
+
+    // common 资源已并入 forge sourceSet，打包时与 shadowCommon 重复的条目去重
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 
@@ -174,7 +181,15 @@ sourceSets {
             // Avoid JPMS split-package: keep top-level network package only in common
         }
         resources {
-            exclude 'assets/template_mod/lang/*.json'
+            // 合并 common 模块资源（data/assets/lang）：FML 仅以 mod 文件（mods.toml）形式加载
+            // 资源包/数据包，common 的 data 若不合并，dev 运行（runServer/runClient）将缺失全部
+            // 配方/战利品/标签/语言/模型纹理，与发布 jar（transformProductionForge 已含 common 资源）不一致
+            srcDir project(":common").sourceSets.main.resources
         }
     }
+}
+
+// 合并 common 资源后 forge 与 common 可能出现同名文件，去重避免 processResources 失败
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

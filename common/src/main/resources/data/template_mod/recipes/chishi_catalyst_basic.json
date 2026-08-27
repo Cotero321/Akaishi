@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "343",
+    "151"
+  ],
+  "key": {
+    "1": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "2": {
+      "item": "template_mod:chishi_crystal"
+    },
+    "3": {
+      "item": "template_mod:chishi_ingot"
+    },
+    "4": {
+      "item": "template_mod:chishi_energy_cell_basic"
+    },
+    "5": {
+      "item": "template_mod:chishi_crystal_block"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_catalyst_basic"
+  }
+}
