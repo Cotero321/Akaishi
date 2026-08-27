@@ -1,0 +1,17 @@
+{
+  "name": "赤石装备打造器",
+  "icon": "template_mod:chishi_equipment_forger",
+  "category": "template_mod:equipment",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_equipment_forger",
+      "text": "赤石装备打造器将下界合金装备与赤石锭融合为赤石装备：$(br2)$(li)基础消耗 50M 赤能源 + 对应下界合金装备 + 数枚赤石锭$(li)产出基础属性（护甲/韧性）为下界合金 1.25 倍的赤石装备$(li)初始拥有 4 个升级槽位$(br2)【半定制系统】$(br2)升级点为可选：$(li)攻速 / 伤害 / 生命 / 护甲 / 韧性 五选一，可重复投点，总计 4 次$(li)每次投点额外消耗 10M 赤能源，投入点数越少锻造消耗越低$(li)点选属性可 Shift 点击撤销$(br2)准备就绪后$(bold)点击锻造按钮$()执行重铸；$(li)更换输入装备或取走产物后，升级点自动重置供重新选择"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_equipment_forger"
+    }
+  ]
+}

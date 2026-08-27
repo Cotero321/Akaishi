@@ -1,0 +1,12 @@
+{
+  "name": "Chishi Ore Clusters",
+  "icon": "template_mod:chishi_ore_low",
+  "category": "template_mod:ores",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Chishi ore clusters are buried in the overworld, the deepslate, the nether and the end.$(br)Mining them yields Chishi Crystals. Higher density clusters drop more."
+    }
+  ]
+}

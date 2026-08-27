@@ -1,0 +1,12 @@
+{
+  "name": "Welcome",
+  "icon": "template_mod:chishi_crystal",
+  "category": "template_mod:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Welcome to the Chapter of Chishi.$(br)This diary records my research on the mysterious power of Chishi, from raw ore to refined energy."
+    }
+  ]
+}

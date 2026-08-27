@@ -1,0 +1,17 @@
+{
+  "name": "赤石晶",
+  "category": "template_mod:crystal",
+  "icon": "template_mod:chishi_crystal",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_crystal",
+      "text": "开采赤石矿簇获得的红色晶体，是赤石之力的载体。$(br2)赤石水晶簇破坏时会掉落 1-2 个赤石精华，是稳定的精华来源。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:raw_chishi_block"
+    }
+  ]
+}

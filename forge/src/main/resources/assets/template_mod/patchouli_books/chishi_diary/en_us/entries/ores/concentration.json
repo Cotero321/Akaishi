@@ -1,0 +1,17 @@
+{
+  "name": "Density Levels",
+  "category": "template_mod:ores",
+  "icon": "template_mod:chishi_ore_flawless",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Chishi ore clusters come in four densities:$(li)$(bold)Low$(): most common, drops 1 Crystal$(li)$(bold)Medium$(): drops 2$(li)$(bold)Perfect$(): drops 3$(li)$(bold)Flawless$(): rarest, drops 4$(br2)No matter the density, the drop count is $(bold)fixed$() — $(bold)Fortune$() and $(bold)Luck$() do not increase it!"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_ore_flawless",
+      "text": "A flawless cluster — a rare, perfect crystal formation."
+    }
+  ]
+}

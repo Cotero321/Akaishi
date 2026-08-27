@@ -1,11 +1,13 @@
  architectury {
-    common("fabric", "forge")
+    common("forge")
 }
 
 dependencies {
     // Architectury API（作为 mod 依赖以启用 Loom 重映射）
     modImplementation("dev.architectury:architectury:9.2.14")
-    compileOnly("net.fabricmc:fabric-loader:${project.loader_version}")
+
+    // Cloth Config 核心 API（AutoConfig 注解配置框架，跨平台共享）
+    modImplementation("me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}")
 }
  
 sourceSets {

@@ -1,0 +1,12 @@
+{
+  "name": "欢迎",
+  "icon": "template_mod:chishi_crystal",
+  "category": "template_mod:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "欢迎翻开《赤石研究日记》。$(br)这里记录了我对赤石之力的研究历程——从原矿到精炼能量，一步步揭开它的面纱。"
+    }
+  ]
+}

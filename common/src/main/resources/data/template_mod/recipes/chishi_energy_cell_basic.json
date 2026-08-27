@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "ICI",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "template_mod:chishi_crystal"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_energy_cell_basic"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "赤石研究日记",
+  "landing_text": "记录赤石之力的研究心得",
+  "use_resource_pack": true,
+  "i18n": true,
+  "model": "template_mod:chishi_diary",
+  "crafting_recipe": "template_mod:chishi_diary",
+  "creative_tab": "template_mod:chishi",
+  "book_texture": "patchouli:textures/gui/book_brown.png",
+  "filler_texture": "patchouli:textures/gui/page_filler.png",
+  "show_progress": false,
+  "version": 1
+}

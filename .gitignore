@@ -10,11 +10,6 @@ bin/
 /common/bin/
 /common/run/
 
-/fabric/build/
-/fabric/.gradle/
-/fabric/bin/
-/fabric/run/
-
 /forge/build/
 /forge/.gradle/
 /forge/bin/

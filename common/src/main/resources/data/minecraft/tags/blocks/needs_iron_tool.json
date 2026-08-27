@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "template_mod:chishi_ore_low",
+    "template_mod:chishi_ore_medium",
+    "template_mod:chishi_ore_perfect",
+    "template_mod:chishi_ore_flawless",
+    "template_mod:deepslate_chishi_ore_low",
+    "template_mod:deepslate_chishi_ore_medium",
+    "template_mod:deepslate_chishi_ore_perfect",
+    "template_mod:deepslate_chishi_ore_flawless",
+    "template_mod:nether_chishi_ore_low",
+    "template_mod:nether_chishi_ore_medium",
+    "template_mod:nether_chishi_ore_perfect",
+    "template_mod:nether_chishi_ore_flawless",
+    "template_mod:end_chishi_ore_low",
+    "template_mod:end_chishi_ore_medium",
+    "template_mod:end_chishi_ore_perfect",
+    "template_mod:end_chishi_ore_flawless",
+    "template_mod:raw_chishi_block",
+    "template_mod:chishi_purifier",
+    "template_mod:chishi_geode_flawed",
+    "template_mod:chishi_geode_normal",
+    "template_mod:chishi_geode_pristine",
+    "template_mod:chishi_geode_perfect",
+    "template_mod:chishi_crystal_block"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Chishi Purifier",
+  "icon": "template_mod:chishi_purifier",
+  "category": "template_mod:energy",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_purifier",
+      "text": "The core machine of Chishi tech: burning Chishi materials generates Chi Energy, which purifies Raw Chishi Blocks into Chishi Essence."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_purifier",
+      "text": "Crafting the purifier requires a Red Machine Component, a Furnace, a Blast Furnace, Gold Ingots and Raw Chishi Blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Fuel:$(br)$(li)Chishi Crystal$(li)Raw Chishi Block$(br)$(bold)Purifying:$(br)Draws 5 Chi Energy per tick to turn Raw Chishi Blocks into Chishi Essence.$(br)Connect it to an Energy Cell via pipes so it never runs dry."
+    }
+  ]
+}

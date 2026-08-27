@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "template_mod:block/chishi_life_conversion_architecture"
+    },
+    "formed=true": {
+      "model": "template_mod:block/chishi_life_conversion_architecture_formed"
+    }
+  }
+}

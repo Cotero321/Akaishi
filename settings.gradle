@@ -37,6 +37,12 @@ dependencyResolutionManagement {
 		maven { url = 'https://maven.fabricmc.net/' }
 		maven { url = 'https://api.modrinth.com/maven' }
 		maven { url = 'https://maven.minecraftforge.net/' }
+		// 可选依赖库的官方仓库
+		maven { url = 'https://maven.shedaniel.me/' }          // Cloth Config
+		maven { url = 'https://maven.blamejared.com/' }        // Patchouli / JEI
+		maven { url = 'https://maven.theillusivec4.top/' }     // Curios API
+		maven { url = 'https://maven.latvian.dev/releases' }   // KubeJS / Rhino
+		maven { url = 'https://maven.parchmentmc.org/' }       // Parchment 映射
 
 		// 仅从官方仓库解析 Forge 组件，避免无意义的回退请求
 		exclusiveContent {
@@ -53,8 +59,7 @@ dependencyResolutionManagement {
 		}
 	}
 }
-rootProject.name = 'template-mod'
-// 包含子项目
+rootProject.name = 'template_mod'
+// 包含子项目（仅 Forge 平台）
 include 'common'
-include 'fabric'
 include 'forge'

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "343",
+    "151"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "2": {
+      "item": "minecraft:obsidian"
+    },
+    "3": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "4": {
+      "item": "template_mod:chishi_energy_cell_basic"
+    },
+    "5": {
+      "item": "template_mod:chishi_advanced_component"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_energy_aggregator"
+  }
+}

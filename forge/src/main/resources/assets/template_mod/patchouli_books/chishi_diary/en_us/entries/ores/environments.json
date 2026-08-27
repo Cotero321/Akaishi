@@ -1,0 +1,12 @@
+{
+  "name": "Generation Environments",
+  "category": "template_mod:ores",
+  "icon": "template_mod:nether_chishi_ore_low",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Chishi ore clusters appear across dimensions and strata:$(li)$(bold)Overworld$(): Y 0~64, replacing common stone$(li)$(bold)Deepslate$(): Y -64~0, replacing deepslate$(li)$(bold)Nether$(): Y 0~128, replacing netherrack$(li)$(bold)End$(): Y 0~128, replacing end stone$(br2)The higher the density, the fewer generation attempts per chunk — harder to find."
+    }
+  ]
+}

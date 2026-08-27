@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "template_mod:chishi_essence",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1.0,
+                "max": 2.0
+              }
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

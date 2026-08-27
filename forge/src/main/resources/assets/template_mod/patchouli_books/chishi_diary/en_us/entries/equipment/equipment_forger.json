@@ -1,0 +1,17 @@
+{
+  "name": "Chishi Equipment Forger",
+  "icon": "template_mod:chishi_equipment_forger",
+  "category": "template_mod:equipment",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_equipment_forger",
+      "text": "The Chishi Equipment Forger merges Netherite equipment with Chishi Ingots into Chishi equipment:$(br2)$(li)Base cost 50M Chi Energy + Netherite equipment + several Chishi Ingots$(li)Output has 1.25x the armor/toughness of Netherite$(li)Starts with 4 upgrade slots$(br2)[Semi-Custom System]$(br2)Upgrade points are optional:$(li)Choose from Speed / Damage / Health / Armor / Toughness, repeatable up to 4 total$(li)Each point costs +10M Chi Energy; fewer points means lower cost$(li)Shift-click a stat to undo an allocation$(br2)Once ready, $(bold)click the Forge button$() to craft:$(li)Swapping the input gear or removing the output resets the points for re-allocation"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_equipment_forger"
+    }
+  ]
+}

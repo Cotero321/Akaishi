@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "template_mod:chishi_energy_aggregator"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

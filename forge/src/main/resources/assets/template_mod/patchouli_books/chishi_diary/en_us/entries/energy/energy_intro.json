@@ -1,0 +1,12 @@
+{
+  "name": "The Nature of Chi Energy",
+  "icon": "template_mod:chishi_energy_cell_basic",
+  "category": "template_mod:energy",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Chi Energy is the refined form of Chishi power.$(br)Machines like the Chishi Purifier generate and consume it.$(br)Energy can be stored in Energy Cells and distributed through Energy Pipes."
+    }
+  ]
+}

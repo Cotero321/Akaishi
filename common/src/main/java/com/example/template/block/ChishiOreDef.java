@@ -1,0 +1,13 @@
+package com.example.template.block;
+
+/**
+ * 赤石矿组合定义：浓度 × 环境 → 唯一方块 id。
+ * 16 个方块（4 浓度 × 4 环境）均由本记录派生。
+ */
+public record ChishiOreDef(ChishiOreTier tier, ChishiOreEnvironment env) {
+
+    /** 方块注册 id，如 deepslate_chishi_ore_perfect */
+    public String id() {
+        return env.idPrefix() + "chishi_ore_" + tier.suffix();
+    }
+}

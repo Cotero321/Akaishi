@@ -1,0 +1,17 @@
+{
+  "name": "生命能量储存器",
+  "icon": "template_mod:chishi_life_energy_cell",
+  "category": "template_mod:life_energy",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_life_energy_cell",
+      "text": "生命能量储存器：大容量（1M）生命能量缓冲，可被生命能量管道接入充放。$(br)建议与生命转换架构配合：架构产出的生命能量经管道汇入储存器，供生命体系设备持续取用。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_life_energy_cell"
+    }
+  ]
+}

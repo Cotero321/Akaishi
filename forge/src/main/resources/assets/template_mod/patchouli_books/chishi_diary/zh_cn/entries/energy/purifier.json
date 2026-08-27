@@ -1,0 +1,22 @@
+{
+  "name": "赤石提纯器",
+  "icon": "template_mod:chishi_purifier",
+  "category": "template_mod:energy",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_purifier",
+      "text": "赤石科技的核心机器：燃烧赤石材料产生赤能源，再将粗制赤石块提纯为赤石精华。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_purifier",
+      "text": "合成提纯器需要：赤红机器组件、熔炉、高炉、金锭与粗制赤石块。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)燃料：$(br)$(li)赤石晶$(li)粗制赤石块$(br)$(bold)提纯：$(br)每 tick 消耗 5 点赤能源，将粗制赤石块提纯为赤石精华。$(br)用赤能源管道连接储存单元，即可确保能量不断供。"
+    }
+  ]
+}

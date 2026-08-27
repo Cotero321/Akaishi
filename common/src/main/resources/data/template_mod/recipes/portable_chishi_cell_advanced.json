@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ACA",
+    "BPB",
+    "ACA"
+  ],
+  "key": {
+    "A": {
+      "item": "template_mod:chishi_advanced_component"
+    },
+    "C": {
+      "item": "template_mod:chishi_crystal"
+    },
+    "B": {
+      "item": "template_mod:chishi_ingot"
+    },
+    "P": {
+      "item": "template_mod:portable_chishi_cell_basic"
+    }
+  },
+  "result": {
+    "item": "template_mod:portable_chishi_cell_advanced"
+  }
+}

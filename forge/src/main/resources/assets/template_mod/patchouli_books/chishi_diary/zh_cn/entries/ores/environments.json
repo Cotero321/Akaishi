@@ -1,0 +1,12 @@
+{
+  "name": "生成环境",
+  "category": "template_mod:ores",
+  "icon": "template_mod:nether_chishi_ore_low",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤石矿簇在不同维度与地层均有分布：$(li)$(bold)主世界$()：0~64 层，替换常见岩石$(li)$(bold)深板岩层$()：-64~0 层，替换深板岩$(li)$(bold)下界$()：0~128 层，替换下界岩$(li)$(bold)末地$()：0~128 层，替换末地石$(br2)浓度越高，每个区块的生成尝试次数越少，越难寻觅。"
+    }
+  ]
+}

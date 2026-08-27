@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "434",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "template_mod:chishi_essence_compressed"
+    },
+    "2": {
+      "item": "minecraft:ender_pearl"
+    },
+    "3": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "4": {
+      "item": "template_mod:chishi_energy_pipe"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_energy_assembly"
+  }
+}

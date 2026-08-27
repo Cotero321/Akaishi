@@ -1,0 +1,17 @@
+{
+  "name": "Ore Cluster Overview",
+  "category": "template_mod:ores",
+  "icon": "template_mod:chishi_crystal",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Chishi ore clusters generate underground in $(bold)16$() variants:$(li)4 densities: Low, Medium, Perfect, Flawless$(li)4 environments: Overworld, Deepslate, Nether, End$(br2)The higher the density, the rarer the cluster — but the more Chishi Crystals it holds."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_ore_low",
+      "text": "A low-density cluster near the overworld surface. The most common variant."
+    }
+  ]
+}

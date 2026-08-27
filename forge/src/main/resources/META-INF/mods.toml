@@ -4,22 +4,61 @@ loaderVersion = "[47,)"
 license = "MIT"
 
 [[mods]]
-modId = "template-mod"
+modId = "template_mod"
 version = "${mod_version}"
 displayName = "Template Mod"
 authors = "Template Author"
-description = '''Template Mod for Architectury'''
+description = '''Template Mod for Architectury
+本模组仅支持 Forge 加载器，不支持 Fabric。'''
 
-[[dependencies.template-mod]]
+[[dependencies.template_mod]]
 modId = "forge"
 mandatory = true
 versionRange = "[47,48)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.template-mod]]
+[[dependencies.template_mod]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1,1.21)"
+ordering = "NONE"
+side = "BOTH"
+
+# 硬依赖：Cloth Config（配置系统 GUI 基础）
+[[dependencies.template_mod]]
+modId = "cloth_config"
+mandatory = true
+versionRange = "[11,12)"
+ordering = "NONE"
+side = "BOTH"
+
+# ===== 可选依赖：不安装对应 mod 时相关功能自动禁用 =====
+
+[[dependencies.template_mod]]
+modId = "curios"
+mandatory = false
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.template_mod]]
+modId = "patchouli"
+mandatory = false
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.template_mod]]
+modId = "jei"
+mandatory = false
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.template_mod]]
+modId = "kubejs"
+mandatory = false
+versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"

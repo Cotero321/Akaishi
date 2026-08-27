@@ -1,0 +1,12 @@
+{
+  "name": "赤能源的本质",
+  "icon": "template_mod:chishi_energy_cell_basic",
+  "category": "template_mod:energy",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤能源是赤石之力的精炼形态。$(br)赤石提纯器等机器可产生并消耗赤能源。$(br)能量可存储于储存单元，并经由赤能源管道输送到需要的地方。"
+    }
+  ]
+}

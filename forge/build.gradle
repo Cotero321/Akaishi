@@ -9,21 +9,21 @@ architectury {
 
 loom {
     forge {
-        mixinConfig "template-mod.mixins.json"
+        mixinConfig "template_mod.mixins.json"
     }
     runs {
         client {
             client()
             name "Forge Client"
             runDir "run/client"
-            vmArgs "-Dneoforge.enabledGameTestNamespace=template-mod"
+            vmArgs "-Dneoforge.enabledGameTestNamespace=template_mod"
             programArgs "--username", "Player1"
         }
         server {
             server()
             name "Forge Server"
             runDir "run/server"
-            vmArgs "-Dneoforge.enabledGameTestNamespace=template-mod"
+            vmArgs "-Dneoforge.enabledGameTestNamespace=template_mod"
         }
     }
 }
@@ -93,6 +93,10 @@ repositories {
         url "https://cursemaven.com"
         name "CurseMaven"
     }
+    // 可选依赖库的官方仓库
+    maven { url "https://maven.blamejared.com/" }          // Patchouli / JEI
+    maven { url "https://maven.theillusivec4.top/" }       // Curios API
+    maven { url "https://maven.latvian.dev/releases" }     // KubeJS / Rhino
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -102,7 +106,7 @@ tasks.named('processResources', ProcessResources).configure {
         forge_version: project.forge_version,
         forge_version_range: '[47,48)',
         loader_version_range: '[47,)',
-        mod_id: 'template-mod',
+        mod_id: 'template_mod',
         mod_name: 'Template Mod',
         mod_version: project.version,
         mod_authors: 'Template Author',
@@ -127,6 +131,26 @@ dependencies {
     // Architectury API - 使用 Jar-in-Jar 内嵌
     modApi("dev.architectury:architectury-forge:9.2.14")
     include("dev.architectury:architectury-forge:9.2.14")
+
+    // Cloth Config（配置 GUI 基础，硬依赖）
+    modApi("me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}")
+
+    // ===== 可选依赖（compileOnly 编译 + 运行时检测，不强制玩家安装） =====
+
+    // Curios API：饰品槽（编译用官方推荐 API artifact，运行时加载完整 jar）
+    modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
+    modLocalRuntime("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}")
+
+    // Patchouli：模组手册
+    modCompileOnly("vazkii.patchouli:Patchouli:${rootProject.patchouli_version}")
+    modLocalRuntime("vazkii.patchouli:Patchouli:${rootProject.patchouli_version}")
+
+    // JEI：配方展示（编译用 API artifact，运行时加载完整 jar）
+    modCompileOnly("mezz.jei:jei-1.20.1-forge-api:${rootProject.jei_version}")
+    modLocalRuntime("mezz.jei:jei-1.20.1-forge:${rootProject.jei_version}")
+
+    // KubeJS：内容脚本化（后期实现绑定层，暂只声明）
+    modCompileOnly("dev.latvian.mods:kubejs-forge:${rootProject.kubejs_version}")
 }
 
 // Source JAR 组装（合并 common 源码）
@@ -150,7 +174,7 @@ sourceSets {
             // Avoid JPMS split-package: keep top-level network package only in common
         }
         resources {
-            exclude 'assets/template-mod/lang/*.json'
+            exclude 'assets/template_mod/lang/*.json'
         }
     }
 }

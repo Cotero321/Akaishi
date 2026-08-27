@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "template_mod:block/creative_chishi_energy_cell"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "关于赤石",
+  "category": "template_mod:intro",
+  "icon": "template_mod:chishi_crystal",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤石是蕴含着奇特能量的矿石，以矿簇形态埋藏于世界的深处。研究它，你将揭开赤石之力的奥秘。$(br2)本书按分类记录赤石相关的知识，并会随研究进度不断补充。"
+    }
+  ]
+}
