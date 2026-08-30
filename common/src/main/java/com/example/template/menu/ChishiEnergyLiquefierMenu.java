@@ -27,10 +27,10 @@ public class ChishiEnergyLiquefierMenu extends AbstractContainerMenu {
         this.container = container;
         this.data = data;
 
-        // 材料输入槽：只进不出（位置对齐 GUI 纹理中的槽位图形）
-        addSlot(new Slot(container, ChishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 30));
+        // 材料输入槽：只进不出（位于三条状态条下方，避开条形区域）
+        addSlot(new Slot(container, ChishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 58));
         // 生命能量固态物输入槽（末地/幽匿/巨龙燃料液化消耗）
-        addSlot(new Slot(container, ChishiEnergyLiquefierBlockEntity.SOLID_SLOT, 62, 35));
+        addSlot(new Slot(container, ChishiEnergyLiquefierBlockEntity.SOLID_SLOT, 62, 58));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {

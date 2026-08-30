@@ -36,14 +36,22 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
     /** 方向模式：拉（相连设备只作物品源，管道主动从设备拉物品） */
     public static final int MODE_PULL = 2;
 
-    /** 网络规模上限，防止极端情况下 BFS 性能问题 */
-    private static final int MAX_NETWORK = 256;
+    /** 网络规模上限：防止超大网络 BFS 遍历过多节点拖慢主线程（超出则截断，远端设备可能无法接入） */
+    private static final int MAX_NETWORK = 1024;
 
     /** 本段管道方向模式，默认正常 */
     private int mode = MODE_NORMAL;
 
     /** 被配置器断开的连接面（bit 0-5 对应 Direction.ordinal()），断开后不参与连接与传输 */
     private int disconnectedMask;
+
+    // ===== 网络拓扑缓存：仅在结构变化时重扫，避免每 tick 全网络 BFS（与能量管道一致）=====
+    /** 网络结构是否可能已变化（放置/拆除/断开时置位，经邻居管道逐 tick 传播至代表） */
+    private boolean networkDirty = true;
+    /** 代表节点缓存的本网络管道列表（BFS 结果）；null 表示尚无缓存 */
+    private List<BlockPos> cachedPipes;
+    /** 代表节点缓存的本网络总传输速率（各段管道速率之和） */
+    private long cachedNetworkRate;
 
     public ChishiItemPipeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -77,26 +85,61 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
     /** 切换某方向的连接（断开↔恢复），返回切换后是否处于断开状态 */
     public boolean toggleDisconnected(Direction dir) {
         disconnectedMask ^= (1 << dir.ordinal());
+        networkDirty = true; // 连接拓扑变化 → 缓存失效
         setChanged();
         return isDisconnected(dir);
     }
 
+    /** 网络拓扑可能已变化，通知本管道缓存失效（方块放置/拆除/断开连接时调用） */
+    public void markDirty() {
+        networkDirty = true;
+    }
+
     private void tickServer() {
         // 快速裁剪：若存在坐标更小的相邻同类管道，则本节点非网络代表，交由代表统一传输
+        if (!isNetworkRepresentative()) {
+            // 非代表：若自身缓存标记脏，把标记传播给相邻管道（逐 tick 泛洪至代表），并清除自身标记
+            if (networkDirty) {
+                networkDirty = false;
+                for (Direction dir : Direction.values()) {
+                    if (isDisconnected(dir)) {
+                        continue;
+                    }
+                    BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
+                    if (neighbor instanceof ChishiItemPipeBlockEntity np) {
+                        np.markDirty();
+                    }
+                }
+            }
+            return;
+        }
+        // 代表：无缓存时先做轻量邻居检查，孤立管道（无管道/容器邻居）无需处理
+        if (cachedPipes == null && !hasNetworkNeighbor()) {
+            return;
+        }
+        // 拓扑变化或无缓存 → 重扫网络并刷新缓存
+        if (networkDirty || cachedPipes == null) {
+            refreshNetwork();
+        }
+        if (cachedPipes.isEmpty()) {
+            return;
+        }
+        transferNetwork();
+    }
+
+    /** 是否本网络代表：不存在坐标更小的相邻同类管道（局部最小唯一，等于网络坐标最小节点） */
+    private boolean isNetworkRepresentative() {
         for (Direction dir : Direction.values()) {
             if (isDisconnected(dir)) {
                 continue;
             }
             BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-            if (neighbor instanceof ChishiItemPipeBlockEntity && neighbor.getBlockPos().compareTo(worldPosition) < 0) {
-                return;
+            if (neighbor instanceof ChishiItemPipeBlockEntity
+                    && neighbor.getBlockPos().compareTo(worldPosition) < 0) {
+                return false;
             }
         }
-        // 孤立管道（无管道/容器邻居）无需处理
-        if (!hasNetworkNeighbor()) {
-            return;
-        }
-        transferNetwork();
+        return true;
     }
 
     /** 是否存在相邻的同类管道或可访问容器设备 */
@@ -120,8 +163,8 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
     private record DeviceEntry(Container device, int[] inputSlots, int[] outputSlots) {
     }
 
-    /** 沿管道 BFS 收集网络成员（含相邻容器设备），并执行一次物品传输 */
-    private void transferNetwork() {
+    /** 沿管道 BFS 收集全部连通管道并刷新缓存（仅代表在拓扑变化时调用）；同时清除网络内所有管道的脏标记 */
+    private void refreshNetwork() {
         List<BlockPos> pipes = new ArrayList<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
         Set<BlockPos> visitedPipes = new HashSet<>();
@@ -131,6 +174,9 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
             BlockPos cur = queue.poll();
             pipes.add(cur);
             ChishiItemPipeBlockEntity curPipe = level.getBlockEntity(cur) instanceof ChishiItemPipeBlockEntity p ? p : null;
+            if (curPipe != null) {
+                curPipe.networkDirty = false; // 缓存已刷新，清除脏标记
+            }
             for (Direction dir : Direction.values()) {
                 if (curPipe != null && curPipe.isDisconnected(dir)) {
                     continue;
@@ -144,6 +190,22 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
                 }
             }
         }
+        // 缓存网络总传输速率（各段管道速率之和），避免每 tick 重算
+        long rate = 0;
+        for (BlockPos pipe : pipes) {
+            if (level.getBlockEntity(pipe) instanceof ChishiItemPipeBlockEntity
+                    && level.getBlockState(pipe).getBlock() instanceof ChishiItemPipeBlock pb) {
+                rate += pb.getTransferRate();
+            }
+        }
+        this.cachedPipes = pipes;
+        this.cachedNetworkRate = rate;
+        this.networkDirty = false;
+    }
+
+    /** 基于缓存的网络成员执行一次物品传输（代表每 tick 调用，正常 tick 零 BFS） */
+    private void transferNetwork() {
+        List<BlockPos> pipes = cachedPipes;
 
         // 收集源与汇。推模式：相连设备只作汇；拉模式：只作源；正常模式：按设备能力双向判定。
         // 纯源（仅输出）与双向缓冲分开记录，传输时优先抽取纯源，避免先抽干缓冲。
@@ -201,14 +263,8 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
             return;
         }
 
-        // 网络每 tick 总传输上限 = 网络中所有物品管道传输速率之和（个/tick）
-        long networkRate = 0;
-        for (BlockPos pipe : pipes) {
-            if (level.getBlockEntity(pipe) instanceof ChishiItemPipeBlockEntity
-                    && level.getBlockState(pipe).getBlock() instanceof ChishiItemPipeBlock pb) {
-                networkRate += pb.getTransferRate();
-            }
-        }
+        // 网络每 tick 总传输上限 = 缓存的全网络管道传输速率之和（个/tick）
+        long networkRate = cachedNetworkRate;
         if (networkRate <= 0) {
             return;
         }
@@ -348,7 +404,7 @@ public class ChishiItemPipeBlockEntity extends BlockEntity implements ChishiPipe
             if (remaining.isEmpty()) {
                 break;
             }
-            if (container.getItem(slot).isEmpty()) {
+            if (container.getItem(slot).isEmpty() && container.canPlaceItem(slot, remaining)) {
                 if (!simulate) {
                     container.setItem(slot, remaining.copy());
                     container.setChanged();

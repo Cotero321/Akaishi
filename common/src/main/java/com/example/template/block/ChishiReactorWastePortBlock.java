@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * 控制器将燃烧废品（衰竭的生命燃料）灌入废品口缓冲罐，液体管道/保存桶可抽取。
  * 管道只能从本口抽取，不能反向注入。
  */
-public class ChishiReactorWastePortBlock extends BaseEntityBlock {
+public class ChishiReactorWastePortBlock extends ChishiMachineBlock {
 
     public ChishiReactorWastePortBlock() {
         super(Properties.of()

@@ -1,5 +1,6 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.block.ChishiEnergyAssemblyBlock;
@@ -33,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 作为 3x3 多方块结构外壳时（formed=true）休眠，不再独立燃烧。
  * 数据槽：0=能量，1=燃烧时间，2=燃烧总时间。
  */
-public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -44,8 +45,8 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
     /** 容器总槽数 = 燃料 + 升级 */
     public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
-    /** 最大能量存储 */
-    public static final int MAX_ENERGY = 100000;
+    /** 最大能量存储（10M，容纳满配升级约 145 tick 产出） */
+    public static final int MAX_ENERGY = 10_000_000;
     /** 单方块燃烧产能速率（产能减半后 150→75） */
     public static final int GENERATE_RATE = 75;
 
@@ -69,10 +70,10 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
         this.data = new SimpleContainerData(4);
     }
 
-    /** 加速倍率：n 个组件 → 2^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 922 倍 */
+    /** 加速倍率：n 个组件 → 1.75^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 242 倍 */
     public static double getBoostMultiplier(int upgradeCount) {
         int n = Math.max(0, Math.min(upgradeCount, ChishiEnergyGeneratorBlockEntity.UPGRADE_SLOTS));
-        return Math.pow(2, n) * (1.0 - 0.01 * n);
+        return Math.pow(1.75, n) * (1.0 - 0.01 * n);
     }
 
     /** 服务端 tick：燃烧产能；结构外壳时休眠 */
@@ -103,7 +104,7 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
             }
             if (burnTime > 0) {
                 burnTime--;
-                // 升级组件：每个翻倍产能速度、减少 1% 产出（净倍率 2^n × (1-0.01n)）
+                // 升级组件：每个 ×1.75 倍产出速度、减少 1% 产出（净倍率 1.75^n × (1-0.01n)）
                 energy.addEnergy((long) (GENERATE_RATE * getBoostMultiplier(upgrades)), false);
                 changed = true;
             }
@@ -274,6 +275,12 @@ public class ChishiEnergyGeneratorBlockEntity extends BlockEntity implements Ext
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         buf.writeBlockPos(worldPosition);
+    }
+
+    /** 挖掘保留数据：排除随方块掉落的容器物品，防止放置时复制 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items"};
     }
 
     @Override

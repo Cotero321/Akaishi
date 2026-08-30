@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.block.ChishiFluidTankBlock;
 import com.example.template.fluid.FluidTank;
@@ -26,7 +28,7 @@ import java.util.List;
  * 容量由方块等级 {@link FluidTankTier} 决定，NBT 持久化液体。
  * 数据槽：0=液体量 1=容量（供界面显示）。
  */
-public class ChishiFluidTankBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice {
+public class ChishiFluidTankBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
     public static final int DATA_SLOTS = 2;
     public static final int DATA_AMOUNT = 0;

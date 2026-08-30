@@ -39,13 +39,14 @@ public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifier
             gui.fill(x + 153, y + 62 - energyHeight, x + 163, y + 62, 0xFFE03030);
         }
 
-        // 燃料火焰动画：仅未成型（有燃料槽）时绘制
+        // 燃料火焰动画：仅未成型（有燃料槽）时绘制。火焰框位于燃料槽右侧空档（81,60..73），
+        // 与提纯进度箭头（79,36..52）错开，避免重叠
         if (!menu.isFormed()) {
             int burn = menu.getBurnTime();
             int burnTotal = menu.getBurnTimeTotal();
             if (burnTotal > 0 && burn > 0) {
                 int flameHeight = (int) (14.0F * burn / burnTotal);
-                gui.blit(TEXTURE, x + 81, y + 60 - flameHeight, 176, 60 - flameHeight, 14, flameHeight);
+                gui.blit(TEXTURE, x + 81, y + 74 - flameHeight, 176, 60 - flameHeight, 14, flameHeight);
             }
         }
 
@@ -69,7 +70,7 @@ public class ChishiPurifierScreen extends AbstractContainerScreen<ChishiPurifier
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.energy", menu.getEnergy(), ChishiPurifierBlockEntity.MAX_ENERGY),
                     mouseX, mouseY);
-        } else if (!menu.isFormed() && isHovering(81, 46, 14, 14, mouseX, mouseY)) {
+        } else if (!menu.isFormed() && isHovering(81, 60, 14, 14, mouseX, mouseY)) {
             // 燃料火焰（成型态无燃料槽，不显示）
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.fuel", menu.getBurnTime()),

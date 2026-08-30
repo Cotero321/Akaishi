@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 消耗赤能源（输入率 1M/t），将生命固态物 + 下界能量液体
  * 加工为反应堆燃料（至纯燃料 100mb / 下界复合燃料 1000mb 每固态物）。
  */
-public class ChishiEnergyProcessorBlock extends BaseEntityBlock {
+public class ChishiEnergyProcessorBlock extends ChishiMachineBlock {
 
     public ChishiEnergyProcessorBlock() {
         super(Properties.of()

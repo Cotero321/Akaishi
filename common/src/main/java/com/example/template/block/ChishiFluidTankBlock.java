@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 液体储罐：大容量液体存储方块，可被液体管道注入/抽取（含 MEK 等外部设备）。
  * 按 {@link FluidTankTier} 参数化，同一方块实体类型承载不同等级，单方块结构。
  */
-public class ChishiFluidTankBlock extends BaseEntityBlock {
+public class ChishiFluidTankBlock extends ChishiMachineBlock {
 
     private final FluidTankTier tier;
 

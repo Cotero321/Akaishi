@@ -30,4 +30,12 @@ public interface IEnergyStorage {
      * @param simulate true 时仅模拟不写入
      */
     long extractEnergy(long amount, boolean simulate);
+
+    /**
+     * 直接设置当前能量值（钳制到 [0, 容量]）。
+     * 默认抛异常：仅用于测试注入/存档恢复等特殊场景，生产存储一般通过 add/extract 变更。
+     */
+    default void setEnergy(long amount) {
+        throw new UnsupportedOperationException("setEnergy not supported by " + getClass().getSimpleName());
+    }
 }

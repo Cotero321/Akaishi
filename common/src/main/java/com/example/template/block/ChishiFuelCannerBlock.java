@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * 燃料装罐机：将液体燃料灌装进燃料罐（10L/罐）。
  * 液体经液体管道注入（可注不可抽），空罐经物品管道/漏斗供给，满罐由输出槽抽出。
  */
-public class ChishiFuelCannerBlock extends BaseEntityBlock {
+public class ChishiFuelCannerBlock extends ChishiMachineBlock {
 
     public ChishiFuelCannerBlock() {
         super(Properties.of()

@@ -33,11 +33,10 @@ versionRange = "[11,12)"
 ordering = "NONE"
 side = "BOTH"
 
-# ===== 可选依赖：不安装对应 mod 时相关功能自动禁用 =====
-
+# 硬依赖：Curios（饰品系统核心，玩家必须安装）
 [[dependencies.template_mod]]
 modId = "curios"
-mandatory = false
+mandatory = true
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"

@@ -1,6 +1,9 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/orientable",
   "textures": {
-    "all": "template_mod:block/chishi_reactor_controller"
+    "top": "template_mod:block/chishi_reactor_controller_top",
+    "front": "template_mod:block/chishi_reactor_controller_front",
+    "side": "template_mod:block/chishi_reactor_controller_side",
+    "bottom": "template_mod:block/chishi_reactor_controller_bottom"
   }
 }

@@ -41,6 +41,7 @@ public class ChishiExhaustedBarrelScreen extends AbstractContainerScreen<ChishiE
 
         long clamped = Math.max(0, Math.min(menu.getFluidAmount(), menu.getFluidMax()));
         long cap = Math.max(1, menu.getFluidMax());
+        GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
         int barWidth = (int) (BAR_W * clamped / cap);
         if (barWidth > 0) {
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + barWidth, y + BAR_Y + BAR_H, FLUID_COLOR);
@@ -49,7 +50,7 @@ public class ChishiExhaustedBarrelScreen extends AbstractContainerScreen<ChishiE
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -68,7 +69,8 @@ public class ChishiExhaustedBarrelScreen extends AbstractContainerScreen<ChishiE
         }
         Component label = Component.literal(text);
         int w = this.font.width(label);
-        gui.drawString(this.font, label, this.leftPos + 88 - w / 2, this.topPos + BAR_Y - 2, 0xFFE0E0E0, false);
+        // 数值文本居中对齐于条上方（基线 y20），不遮挡液位条（y30..38）
+        gui.drawString(this.font, label, this.leftPos + 88 - w / 2, this.topPos + BAR_Y - 10, 0xFF3F3F3F, false);
 
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,

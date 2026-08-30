@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 赤石装备打造器：消耗赤能源 + 赤石锭，将下界合金装备重铸为赤石装备（基础属性 1.25 倍，初始 4 槽）。
  */
-public class ChishiEquipmentForgerBlock extends BaseEntityBlock {
+public class ChishiEquipmentForgerBlock extends ChishiMachineBlock {
 
     public ChishiEquipmentForgerBlock() {
         super(Properties.of().mapColor(MapColor.COLOR_RED).strength(5.0F, 6.0F).sound(SoundType.METAL));

@@ -2,14 +2,15 @@ package com.example.template.block;
 
 import com.example.template.block.entity.ChishiExhaustedBarrelBlockEntity;
 import com.example.template.block.entity.ModBlockEntities;
+import com.example.template.decay.DecayZoneManager;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 衰竭保存桶：仅容纳衰竭的生命燃料的专用储液桶（独立单方块，非多方块部件）。
  * 液体管道可从废品输出口抽取后注入本桶；右键打开液位界面。
  */
-public class ChishiExhaustedBarrelBlock extends BaseEntityBlock {
+public class ChishiExhaustedBarrelBlock extends ChishiMachineBlock {
 
     public ChishiExhaustedBarrelBlock() {
         super(Properties.of()
@@ -61,6 +62,20 @@ public class ChishiExhaustedBarrelBlock extends BaseEntityBlock {
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        // 桶内含有衰竭燃料时被破坏 → 触发衰竭区域（液体占比越高，衰变等级越强 1-3 级）
+        if (!state.is(newState.getBlock()) && level instanceof ServerLevel serverLevel
+                && level.getBlockEntity(pos) instanceof ChishiExhaustedBarrelBlockEntity barrel) {
+            long amount = barrel.tank().getAmount();
+            if (amount > 0) {
+                int amp = 1 + (int) (3 * amount / (double) barrel.tank().getCapacity());
+                DecayZoneManager.createZone(serverLevel, pos, Math.min(3, amp), false);
+            }
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

@@ -319,6 +319,51 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_EXHAUSTED_BARREL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_EXHAUSTED_BARREL.get()));
                                     }
+                                    // 发生器矩阵体系（类反应堆式：外壳/控制器/能量输出口/燃料输入口）
+                                    if (ModBlocks.CHISHI_GEN_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CASING.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_GEN_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_ENERGY_OUTPUT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_GEN_FUEL_INPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_FUEL_INPUT.get()));
+                                    }
+                                    // 提纯矩阵体系（外壳/控制器/能量输入口/物品输入口/物品输出口）
+                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CASING.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_PURIFIER_ENERGY_INPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ENERGY_INPUT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_PURIFIER_ITEM_INPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ITEM_INPUT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_PURIFIER_ITEM_OUTPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ITEM_OUTPUT.get()));
+                                    }
+                                    // 生命转换矩阵体系（外壳/控制器/能源输入口/能源输出口）
+                                    if (ModBlocks.CHISHI_LIFE_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CASING.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT.get()));
+                                    }
                                     // 散热片（5 品质）
                                     if (ModItems.heatSinkPoor != null) {
                                         output.accept(new ItemStack(ModItems.heatSinkPoor.get()));
@@ -335,6 +380,81 @@ public final class ModCreativeTabs {
                                     if (ModItems.heatSinkExquisite != null) {
                                         output.accept(new ItemStack(ModItems.heatSinkExquisite.get()));
                                     }
+                                    // 赤石饰品（Curios 槽位：charm/ring/hands/necklace/body/bracelet/belt）
+                                    if (ModItems.satiationCharm != null) {
+                                        output.accept(new ItemStack(ModItems.satiationCharm.get()));
+                                    }
+                                    if (ModItems.huntingRing != null) {
+                                        output.accept(new ItemStack(ModItems.huntingRing.get()));
+                                    }
+                                    if (ModItems.gatheringBracelet != null) {
+                                        output.accept(new ItemStack(ModItems.gatheringBracelet.get()));
+                                    }
+                                    if (ModItems.fireNecklace != null) {
+                                        output.accept(new ItemStack(ModItems.fireNecklace.get()));
+                                    }
+                                    if (ModItems.blastCharm != null) {
+                                        output.accept(new ItemStack(ModItems.blastCharm.get()));
+                                    }
+                                    if (ModItems.antidoteBracelet != null) {
+                                        output.accept(new ItemStack(ModItems.antidoteBracelet.get()));
+                                    }
+                                    if (ModItems.witherCharm != null) {
+                                        output.accept(new ItemStack(ModItems.witherCharm.get()));
+                                    }
+                                    // 躯体检查仪（生命科技：体检面板）
+                                    if (ModBlocks.CHISHI_BODY_SCANNER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_BODY_SCANNER.get()));
+                                    }
+                                    // 生命分析台（生命科技：样本解构）
+                                    if (ModBlocks.CHISHI_GENE_ANALYZER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GENE_ANALYZER.get()));
+                                    }
+                                    // 部件培养舱（生命科技：提纯 + 器官升级）
+                                    if (ModBlocks.CHISHI_CULTIVATOR != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_CULTIVATOR.get()));
+                                    }
+                                    // 生命结构台（生命科技：基因序列 → 器官）
+                                    if (ModBlocks.CHISHI_LIFE_STRUCT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_STRUCT.get()));
+                                    }
+                                    // 手术仓（生命科技：器官移植/摘除）
+                                    if (ModBlocks.CHISHI_SURGERY != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_SURGERY.get()));
+                                    }
+                                    // 药剂台（生命科技：永久/突破药剂）
+                                    if (ModBlocks.CHISHI_POTION_TABLE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_POTION_TABLE.get()));
+                                    }
+                                    // 药剂（生命科技：永久/突破模板）
+                                    if (ModItems.chishiPotion != null) {
+                                        output.accept(new ItemStack(ModItems.chishiPotion.get()));
+                                    }
+                                    // 器官储藏库（生命科技：按槽位分页的器官仓库）
+                                    if (ModBlocks.CHISHI_ORGAN_VAULT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ORGAN_VAULT.get()));
+                                    }
+                                    // 药剂库（生命科技：大容量药剂仓库，自动合并）
+                                    if (ModBlocks.CHISHI_POTION_CABINET != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_POTION_CABINET.get()));
+                                    }
+                                    // 生命科技：样本采集器 + 生命样本 + 基因序列片段
+                                    if (ModItems.sampleCollector != null) {
+                                        output.accept(new ItemStack(ModItems.sampleCollector.get()));
+                                    }
+                                    if (ModItems.geneSequence != null) {
+                                        output.accept(new ItemStack(ModItems.geneSequence.get()));
+                                    }
+                                    // 生命科技：9 个槽位的基础器官物品
+                                    output.accept(new ItemStack(ModItems.chishiOrganEye.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganHeart.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganLungs.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganViscera.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganKidneys.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganLeftArm.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganRightArm.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganLeftLeg.get()));
+                                    output.accept(new ItemStack(ModItems.chishiOrganRightLeg.get()));
                                     // 手册“赤石研究日记”由帕秋莉按 creative_tab 自动加入，此处不重复添加
                                 })
                                 .build());

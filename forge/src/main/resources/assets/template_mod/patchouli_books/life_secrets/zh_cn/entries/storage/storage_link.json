@@ -1,0 +1,16 @@
+{
+  "name": "存储联动",
+  "icon": "template_mod:chishi_sample_vault",
+  "category": "template_mod:storage",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "将存储库摆放在机器$(bold)3 格范围$()内（3×3×3），打开机器的界面，右上角会出现$(bold)「存储」$()按钮。$(br2)点击后展开$(bold)18 格浮层$()，可翻页浏览整个存储库并直接存取物品，无需离开机器界面。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)适用机器：$()分析台、培养舱、生命结构台、手术仓、药剂台。$(br)$(bold)适用存储库：$()样本库、器官储藏库、药剂库。$(br2)$(2)例如手术台旁放器官储藏库，移植用的器官随取随用；药剂台旁放药剂库，成品一键入库。$()"
+    }
+  ]
+}

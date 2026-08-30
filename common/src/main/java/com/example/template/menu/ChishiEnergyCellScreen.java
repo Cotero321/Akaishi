@@ -64,6 +64,7 @@ public class ChishiEnergyCellScreen extends AbstractContainerScreen<ChishiEnergy
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         // 纤细横向赤能源条：从左到右填充（long 计算避免溢出）
+        GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
         long energy = Math.max(0, Math.min(menu.getEnergy(), menu.getMaxEnergy()));
         long max = Math.max(1, menu.getMaxEnergy());
         int barWidth = (int) (BAR_W * energy / max);
@@ -81,7 +82,7 @@ public class ChishiEnergyCellScreen extends AbstractContainerScreen<ChishiEnergy
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         // 仅绘制标题，抑制原版"物品栏"标签避免与信息面板重叠
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -93,14 +94,14 @@ public class ChishiEnergyCellScreen extends AbstractContainerScreen<ChishiEnergy
         // 能量数值文本（能量条下方居中，单位缩写显示）
         Component text = Component.literal(formatEnergy(menu.getEnergy()) + " / " + formatEnergy(menu.getMaxEnergy()));
         int textWidth = this.font.width(text);
-        gui.drawString(this.font, text, this.leftPos + 88 - textWidth / 2, this.topPos + 40, 0xFFE0E0E0, false);
+        gui.drawString(this.font, text, this.leftPos + 88 - textWidth / 2, this.topPos + 40, 0xFF3F3F3F, false);
 
         // 便携单元能量文本（充能槽下方居中，无单元时隐藏）
         if (menu.hasCell()) {
             Component cellText = Component.literal(formatEnergy(menu.getCellEnergy()) + " / " + formatEnergy(menu.getCellMaxEnergy()));
             int cellWidth = this.font.width(cellText);
             gui.drawString(this.font, cellText,
-                    this.leftPos + CELL_SLOT_X + 8 - cellWidth / 2, this.topPos + CELL_SLOT_Y + 19, 0xFFE0E0E0, false);
+                    this.leftPos + CELL_SLOT_X + 8 - cellWidth / 2, this.topPos + CELL_SLOT_Y + 19, 0xFF3F3F3F, false);
         }
 
         // 鼠标悬停在能量条上时显示名称与数值（单位缩写）

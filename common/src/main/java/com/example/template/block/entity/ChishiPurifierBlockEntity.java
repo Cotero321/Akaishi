@@ -1,8 +1,8 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
-import com.example.template.block.ChishiAdvancedPurifierBlock;
 import com.example.template.block.ChishiPurifierBlock;
 import com.example.template.block.ModBlocks;
 import com.example.template.energy.ChishiEnergyStorage;
@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 逻辑：燃烧赤石晶/粗制块产生赤石能量 → 消耗能量提纯输入为赤石精华。
  * 配方：粗制赤石块 → 1 精华；赤石水晶块 → 4 精华。
  */
-public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int INPUT_SLOT = 1;
@@ -172,22 +172,10 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
         return matrixFormed;
     }
 
-    /** 全量扫描 26 个邻居：自身为 3×3×3 中心且周围全部是高级提纯构建方块则成型（仅缓存失效时执行） */
+    /** 全量扫描 26 个邻居：自身为 3×3×3 中心且周围全部是高级提纯构建方块则成型（仅缓存失效时执行）。
+     *  旧提纯矩阵已停用：新式提纯矩阵由 {@link ChishiPurifierMatrixControllerBlockEntity} 接管，恒不成型。 */
     private boolean scanMatrix() {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue;
-                    }
-                    if (!(level.getBlockState(worldPosition.offset(dx, dy, dz)).getBlock()
-                            instanceof ChishiAdvancedPurifierBlock)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     /** 结构变化时由外壳方块触发：标记缓存失效，下次 tick 重扫 */
@@ -337,7 +325,10 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.template_mod.chishi_purifier");
+        // 提纯矩阵成型时显示"高级提纯器"，未成型显示普通"赤石提纯器"
+        return matrixFormed
+                ? Component.translatable("gui.template_mod.purifier.matrix")
+                : Component.translatable("block.template_mod.chishi_purifier");
     }
 
     @Override

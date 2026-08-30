@@ -17,12 +17,14 @@ public class ChishiLifePurifierScreen extends AbstractContainerScreen<ChishiLife
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
-    /** 赤能源条区域 */
-    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
+    /** 赤能源条区域（对齐贴图框 y=24..32，条宽收窄避开输出槽） */
+    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 24, BAR_W = 88, BAR_H = 8;
     /** 生命能量条区域 */
-    private static final int LIFE_BAR_Y = 28;
-    /** 固化进度条区域 */
-    private static final int PROGRESS_X = 80, PROGRESS_Y = 30, PROGRESS_W = 28, PROGRESS_H = 16;
+    private static final int LIFE_BAR_Y = 36;
+    /** 固化进度条区域（位于两条下方空档） */
+    private static final int PROGRESS_X = 20, PROGRESS_Y = 48, PROGRESS_W = 88, PROGRESS_H = 8;
+    /** 机器槽位数量（输出槽，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = 1;
 
     public ChishiLifePurifierScreen(ChishiLifePurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -63,10 +65,19 @@ public class ChishiLifePurifierScreen extends AbstractContainerScreen<ChishiLife
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
+        // 机器槽位框（贴图无图形，自绘补齐；输出槽位于条形区右侧）
+        for (int i = 0; i < MACHINE_SLOTS; i++) {
+            var slot = menu.slots.get(i);
+            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
+        }
+
         // 赤能源条（红）
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, BAR_W, BAR_H);
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + LIFE_BAR_Y, BAR_W, BAR_H);
+        GuiWidgets.track(gui, x + PROGRESS_X, y + PROGRESS_Y, PROGRESS_W, PROGRESS_H);
         drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, menu.getChishiEnergy(), menu.getChishiMax(), 0xFFE03030);
         // 生命能量条（绿）
-        drawBar(gui, x + CHISHI_BAR_X, y + LIFE_BAR_Y, menu.getLifeEnergy(), menu.getLifeMax(), 0xFF30E030);
+        drawBar(gui, x + CHISHI_BAR_X, y + LIFE_BAR_Y, menu.getLifeEnergy(), menu.getLifeMax(), 0xFF28B428);
         // 固化进度条（黄）
         int progressWidth = (int) (PROGRESS_W * menu.getProgress() / 100.0F);
         if (progressWidth > 0) {
@@ -76,7 +87,7 @@ public class ChishiLifePurifierScreen extends AbstractContainerScreen<ChishiLife
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -85,17 +96,11 @@ public class ChishiLifePurifierScreen extends AbstractContainerScreen<ChishiLife
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
 
-        // 赤能源数值
+        // 赤能源数值（生命能量数值经悬停提示展示，避免与条形区重叠）
         Component chishiText = Component.translatable("energy.template_mod.chishi")
                 .append(Component.literal(" " + formatEnergy(menu.getChishiEnergy()) + " / " + formatEnergy(menu.getChishiMax())));
         int w1 = this.font.width(chishiText);
-        gui.drawString(this.font, chishiText, this.leftPos + 88 - w1 / 2, this.topPos + 16 - 2, 0xFFE0E0E0, false);
-
-        // 生命能量数值
-        Component lifeText = Component.translatable("energy.template_mod.life")
-                .append(Component.literal(" " + formatEnergy(menu.getLifeEnergy()) + " / " + formatEnergy(menu.getLifeMax())));
-        int w2 = this.font.width(lifeText);
-        gui.drawString(this.font, lifeText, this.leftPos + 88 - w2 / 2, this.topPos + 28 - 2, 0xFFE0E0E0, false);
+        gui.drawString(this.font, chishiText, this.leftPos + 88 - w1 / 2, this.topPos + CHISHI_BAR_Y - 10, 0xFF3F3F3F, false);
 
         // 悬停提示
         if (isHovering(CHISHI_BAR_X, CHISHI_BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {

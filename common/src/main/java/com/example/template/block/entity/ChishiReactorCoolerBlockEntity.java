@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.item.IItemPipeDevice;
 import com.example.template.block.ChishiReactorFuelRodBlock;
 import com.example.template.item.ChishiHeatSinkItem;
@@ -21,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 反应堆成型且燃烧时每 tick 消耗散热片 1 点耐久，耐久归零破碎消失。
  * NBT 持久化散热片与控制器坐标。
  */
-public class ChishiReactorCoolerBlockEntity extends BlockEntity implements IItemPipeDevice {
+public class ChishiReactorCoolerBlockEntity extends BlockEntity implements IItemPipeDevice, IDataCarrier {
 
     public static final int SINK_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -78,6 +80,18 @@ public class ChishiReactorCoolerBlockEntity extends BlockEntity implements IItem
             }
         }
         return 0;
+    }
+
+    /** 返回散热片剩余耐久百分比（0-100）；无散热片或不可损坏返回 -1（供控制器 GUI 展示） */
+    public static int getDurabilityPercentAt(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof ChishiReactorCoolerBlockEntity c) {
+            ItemStack sink = c.sinkSlot.getItem(SINK_SLOT);
+            if (!sink.isEmpty() && sink.getMaxDamage() > 0) {
+                int remaining = sink.getMaxDamage() - sink.getDamageValue();
+                return (int) ((long) remaining * 100 / sink.getMaxDamage());
+            }
+        }
+        return -1;
     }
 
     /** 插入散热片，返回实际插入数（0 表示槽已占或非散热片） */
@@ -177,6 +191,12 @@ public class ChishiReactorCoolerBlockEntity extends BlockEntity implements IItem
     @Override
     public void clearContent() {
         sinkSlot.clearContent();
+    }
+
+    /** 挖掘保留数据：散热片缓冲物品不保留，排除物品与旧控制器关联坐标 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items", "ControllerPos"};
     }
 
     @Override

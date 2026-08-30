@@ -1,0 +1,17 @@
+{
+  "name": "药剂台",
+  "icon": "template_mod:chishi_potion_table",
+  "category": "template_mod:machines",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_potion_table",
+      "text": "以样本为主料的制药台，顶部选择$(bold)药剂模板$()。$(br2)原料：$(bold)纯度 ≥25 的样本$() + 生命能量固态物 + 生命能量（消耗随模板）。产出的$(bold)生物药剂$()继承样本来源与纯度。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)永久药剂$()：稳定的增益，无副作用。$(bold)突破药剂$()：效果 ×1.5，但放大缺点并产生排斥等副作用。$(br2)副作用强度与样本纯度相关——$(2)低纯度样本副作用更强$()。不同生物的药剂效果各有差异，多收集样本以解锁最优配方。"
+    }
+  ]
+}

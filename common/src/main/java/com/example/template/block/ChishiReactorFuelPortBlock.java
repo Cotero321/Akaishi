@@ -2,12 +2,10 @@ package com.example.template.block;
 
 import com.example.template.block.entity.ChishiReactorFuelPortBlockEntity;
 import com.example.template.block.entity.ModBlockEntities;
-import com.example.template.item.ChishiFuelCellItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -22,10 +20,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 燃料投放口：反应堆外壳上的燃料输入口（可多个，数据共享）。
- * 支持管道插入与手动投料：手持燃料罐右键投入缓冲槽，空手右键取出一罐（空罐）。
- * 缓冲槽中的燃料罐由投放口自动分配到控制器的空燃料槽。
+ * 仅作物流输入接口（管道插入燃料罐/取出空罐），不开放手动 GUI；
+ * 手动添加燃料通过控制器燃料页操作。
  */
-public class ChishiReactorFuelPortBlock extends BaseEntityBlock {
+public class ChishiReactorFuelPortBlock extends ChishiMachineBlock {
 
     public ChishiReactorFuelPortBlock() {
         super(Properties.of()
@@ -56,30 +54,9 @@ public class ChishiReactorFuelPortBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (level.isClientSide) {
-            return InteractionResult.sidedSuccess(true);
-        }
-        if (level.getBlockEntity(pos) instanceof ChishiReactorFuelPortBlockEntity port) {
-            ItemStack held = player.getItemInHand(hand);
-            if (held.getItem() instanceof ChishiFuelCellItem) {
-                // 手持燃料罐 → 投入缓冲槽
-                int inserted = port.insertCell(held);
-                if (inserted > 0) {
-                    held.shrink(inserted);
-                }
-                return InteractionResult.sidedSuccess(false);
-            }
-            // 空手 → 取出一罐（优先空罐，方便回收）
-            ItemStack taken = port.takeCell();
-            if (!taken.isEmpty()) {
-                if (held.isEmpty()) {
-                    player.setItemInHand(hand, taken);
-                } else {
-                    player.getInventory().placeItemBackInInventory(taken);
-                }
-            }
-        }
-        return InteractionResult.sidedSuccess(false);
+        // 燃料口仅作物流输入接口（管道/漏斗），不开放手动 GUI；
+        // 手动添加燃料请通过控制器燃料页操作
+        return InteractionResult.PASS;
     }
 
     @Override

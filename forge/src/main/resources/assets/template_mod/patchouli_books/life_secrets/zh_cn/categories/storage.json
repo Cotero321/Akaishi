@@ -1,0 +1,6 @@
+{
+  "name": "存储与联动",
+  "description": "样本、器官与药剂的仓库，以及机器的联动存取",
+  "icon": "template_mod:chishi_sample_vault",
+  "sortnum": 2
+}

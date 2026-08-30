@@ -1,13 +1,22 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.item.IItemPipeDevice;
 import com.example.template.fluid.ReactorFuels;
 import com.example.template.item.ChishiFuelCellItem;
+import com.example.template.menu.ChishiReactorFuelPortMenu;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,9 +25,9 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 燃料投放口方块实体：燃料罐缓冲槽（27 格），对接物品管道/手动投料。
  * 结构成型后自动将缓冲槽内的燃料罐分配到控制器空燃料槽，并回收控制器中的空罐。
- * NBT 持久化缓冲槽与控制器坐标。
+ * NBT 持久化缓冲槽与控制器坐标。右键打开 27 格缓冲界面。
  */
-public class ChishiReactorFuelPortBlockEntity extends BlockEntity implements IItemPipeDevice {
+public class ChishiReactorFuelPortBlockEntity extends BlockEntity implements IItemPipeDevice, ExtendedMenuProvider, IDataCarrier {
 
     public static final int BUFFER_SLOTS = 27;
 
@@ -138,6 +147,28 @@ public class ChishiReactorFuelPortBlockEntity extends BlockEntity implements IIt
         return ItemStack.EMPTY;
     }
 
+    /** 缓冲容器（供菜单添加槽位） */
+    public SimpleContainer buffer() {
+        return buffer;
+    }
+
+    // ===== ExtendedMenuProvider：右键打开 27 格缓冲界面 =====
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.template_mod.chishi_reactor_fuel_port");
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new ChishiReactorFuelPortMenu(id, inv, buffer);
+    }
+
+    @Override
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(worldPosition);
+    }
+
     // ===== IItemPipeDevice：全槽可进（燃料罐）、可出（空罐/多余罐） =====
 
     @Override
@@ -180,6 +211,12 @@ public class ChishiReactorFuelPortBlockEntity extends BlockEntity implements IIt
     }
 
     @Override
+    public boolean canPlaceItem(int index, ItemStack stack) {
+        // 仅允许空/燃料罐：供管道/漏斗在放入前预判，避免非燃料物品被 setItem 静默吞掉
+        return stack.isEmpty() || stack.getItem() instanceof ChishiFuelCellItem;
+    }
+
+    @Override
     public void setItem(int index, ItemStack stack) {
         // 管道灌入不经过类型校验：燃料口只允许空/燃料罐，防止杂物占用缓冲槽卡死物流
         if (stack.isEmpty() || stack.getItem() instanceof ChishiFuelCellItem) {
@@ -188,13 +225,19 @@ public class ChishiReactorFuelPortBlockEntity extends BlockEntity implements IIt
     }
 
     @Override
-    public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
     @Override
     public void clearContent() {
         buffer.clearContent();
+    }
+
+    /** 挖掘保留数据：反应堆燃料缓冲不保留，排除物品与旧控制器关联坐标 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items", "ControllerPos"};
     }
 
     @Override

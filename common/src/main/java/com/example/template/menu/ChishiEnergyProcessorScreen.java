@@ -18,13 +18,15 @@ public class ChishiEnergyProcessorScreen extends AbstractContainerScreen<ChishiE
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
-    private static final int CHISHI_BAR_X = 20, BAR_W = 136, BAR_H = 8;
-    private static final int CHISHI_BAR_Y = 16;
-    private static final int PURE_IN_BAR_Y = 28;
-    private static final int COMPOUND_IN_BAR_Y = 40;
-    private static final int PURE_OUT_BAR_Y = 52;
-    private static final int COMPOUND_OUT_BAR_Y = 60;
-    private static final int PROGRESS_Y = 68;
+    private static final int CHISHI_BAR_X = 20, BAR_W = 88, BAR_H = 8;
+    private static final int CHISHI_BAR_Y = 24;
+    private static final int PURE_IN_BAR_Y = 34;
+    private static final int COMPOUND_IN_BAR_Y = 44;
+    private static final int PURE_OUT_BAR_Y = 54;
+    private static final int COMPOUND_OUT_BAR_Y = 64;
+    private static final int PROGRESS_Y = 74;
+    /** 机器槽位数量（输入槽，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = 1;
 
     public ChishiEnergyProcessorScreen(ChishiEnergyProcessorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -50,12 +52,17 @@ public class ChishiEnergyProcessorScreen extends AbstractContainerScreen<ChishiE
         return String.format(Locale.ROOT, "%.1f", d);
     }
 
-    private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
+    /** 条内左侧固定标签区宽度（px），填充从标签区右端开始避免覆盖文字 */
+    private static final int LABEL_W = 40;
+
+    private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
+        GuiWidgets.track(gui, x, y, BAR_W, BAR_H);
+        gui.drawString(this.font, Component.translatable(labelKey), x + 2, y + 1, 0xFF3F3F3F, false);
         long clamped = Math.max(0, Math.min(energy, max));
         long cap = Math.max(1, max);
-        int barWidth = (int) (BAR_W * clamped / cap);
+        int barWidth = (int) ((BAR_W - LABEL_W) * clamped / cap);
         if (barWidth > 0) {
-            gui.fill(x, y, x + barWidth, y + BAR_H, color);
+            gui.fill(x + LABEL_W, y, x + LABEL_W + barWidth, y + BAR_H, color);
         }
     }
 
@@ -65,26 +72,41 @@ public class ChishiEnergyProcessorScreen extends AbstractContainerScreen<ChishiE
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
+        // 机器槽位框（贴图无图形，自绘补齐；输入槽位于条形区右侧）
+        for (int i = 0; i < MACHINE_SLOTS; i++) {
+            var slot = menu.slots.get(i);
+            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
+        }
+
         // 赤能源条（红）
-        drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, menu.getChishiEnergy(), menu.getChishiMax(), 0xFFE03030);
+        drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, "gui.template_mod.proc.chishi",
+                menu.getChishiEnergy(), menu.getChishiMax(), 0xFFE03030);
         // 至纯能量输入条（青）
-        drawBar(gui, x + CHISHI_BAR_X, y + PURE_IN_BAR_Y, menu.getPureInAmount(), menu.getPureInMax(), ModFluids.COLOR_NETHER_PURE_ENERGY);
+        drawBar(gui, x + CHISHI_BAR_X, y + PURE_IN_BAR_Y, "gui.template_mod.proc.pure_in",
+                menu.getPureInAmount(), menu.getPureInMax(), ModFluids.COLOR_NETHER_PURE_ENERGY);
         // 复合能量输入条（紫）
-        drawBar(gui, x + CHISHI_BAR_X, y + COMPOUND_IN_BAR_Y, menu.getCompoundInAmount(), menu.getCompoundInMax(), ModFluids.COLOR_NETHER_COMPOUND_ENERGY);
+        drawBar(gui, x + CHISHI_BAR_X, y + COMPOUND_IN_BAR_Y, "gui.template_mod.proc.compound_in",
+                menu.getCompoundInAmount(), menu.getCompoundInMax(), ModFluids.COLOR_NETHER_COMPOUND_ENERGY);
         // 至纯燃料输出条（黄）
-        drawBar(gui, x + CHISHI_BAR_X, y + PURE_OUT_BAR_Y, menu.getPureOutAmount(), menu.getPureOutMax(), ModFluids.COLOR_PURE_FUEL);
+        drawBar(gui, x + CHISHI_BAR_X, y + PURE_OUT_BAR_Y, "gui.template_mod.proc.pure_out",
+                menu.getPureOutAmount(), menu.getPureOutMax(), ModFluids.COLOR_PURE_FUEL);
         // 复合燃料输出条（橙）
-        drawBar(gui, x + CHISHI_BAR_X, y + COMPOUND_OUT_BAR_Y, menu.getCompoundOutAmount(), menu.getCompoundOutMax(), ModFluids.COLOR_NETHER_COMPOUND_FUEL);
-        // 加工进度条（亮黄）
-        int progressWidth = (int) (BAR_W * menu.getProgress() / 100.0F);
+        drawBar(gui, x + CHISHI_BAR_X, y + COMPOUND_OUT_BAR_Y, "gui.template_mod.proc.compound_out",
+                menu.getCompoundOutAmount(), menu.getCompoundOutMax(), ModFluids.COLOR_NETHER_COMPOUND_FUEL);
+        // 加工进度条（亮黄，标签区固定，填充从标签区右端开始）
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + PROGRESS_Y, BAR_W, BAR_H);
+        gui.drawString(this.font, Component.translatable("gui.template_mod.proc.progress"),
+                x + CHISHI_BAR_X + 2, y + PROGRESS_Y + 1, 0xFF3F3F3F, false);
+        int progressWidth = (int) ((BAR_W - LABEL_W) * menu.getProgress() / 100.0F);
         if (progressWidth > 0) {
-            gui.fill(x + CHISHI_BAR_X, y + PROGRESS_Y, x + CHISHI_BAR_X + progressWidth, y + PROGRESS_Y + BAR_H, 0xFFFFD030);
+            gui.fill(x + CHISHI_BAR_X + LABEL_W, y + PROGRESS_Y,
+                    x + CHISHI_BAR_X + LABEL_W + progressWidth, y + PROGRESS_Y + BAR_H, 0xFFFFD030);
         }
     }
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -93,17 +115,7 @@ public class ChishiEnergyProcessorScreen extends AbstractContainerScreen<ChishiE
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
 
-        drawBarLabel(gui, CHISHI_BAR_Y, Component.translatable("energy.template_mod.chishi")
-                .append(Component.literal(" " + formatEnergy(menu.getChishiEnergy()) + " / " + formatEnergy(menu.getChishiMax()))));
-        drawBarLabel(gui, PURE_IN_BAR_Y, Component.translatable("energy.template_mod.pure")
-                .append(Component.literal(" " + formatEnergy(menu.getPureInAmount()) + " / " + formatEnergy(menu.getPureInMax()))));
-        drawBarLabel(gui, COMPOUND_IN_BAR_Y, Component.translatable("energy.template_mod.compound")
-                .append(Component.literal(" " + formatEnergy(menu.getCompoundInAmount()) + " / " + formatEnergy(menu.getCompoundInMax()))));
-        drawBarLabel(gui, PURE_OUT_BAR_Y, Component.translatable("energy.template_mod.pure_fuel")
-                .append(Component.literal(" " + menu.getPureOutAmount() + " / " + menu.getPureOutMax())));
-        drawBarLabel(gui, COMPOUND_OUT_BAR_Y, Component.translatable("energy.template_mod.compound_fuel")
-                .append(Component.literal(" " + menu.getCompoundOutAmount() + " / " + menu.getCompoundOutMax())));
-
+        // 数值经各条形区悬停提示展示，不再绘制常驻文本避免与条形区重叠
         // 悬停提示
         if (isHovering(CHISHI_BAR_X, CHISHI_BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
@@ -135,10 +147,5 @@ public class ChishiEnergyProcessorScreen extends AbstractContainerScreen<ChishiE
                             menu.getCompoundOutAmount(), menu.getCompoundOutMax()),
                     mouseX, mouseY);
         }
-    }
-
-    private void drawBarLabel(GuiGraphics gui, int barY, Component text) {
-        int w = this.font.width(text);
-        gui.drawString(this.font, text, this.leftPos + 88 - w / 2, this.topPos + barY - 2, 0xFFE0E0E0, false);
     }
 }

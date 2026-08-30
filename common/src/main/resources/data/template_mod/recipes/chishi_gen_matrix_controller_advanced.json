@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CEC",
+    "BKB",
+    "CEC"
+  ],
+  "key": {
+    "E": { "item": "template_mod:chishi_energy_generator" },
+    "B": { "item": "template_mod:chishi_gen_matrix_controller_basic" },
+    "K": { "item": "template_mod:chishi_super_generator_core" },
+    "C": { "item": "template_mod:chishi_crystal_block" }
+  },
+  "result": {
+    "item": "template_mod:chishi_gen_matrix_controller_advanced"
+  }
+}

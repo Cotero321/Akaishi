@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.fluid.FluidTank;
 import com.example.template.fluid.ModFluids;
@@ -17,7 +19,7 @@ import java.util.List;
  * 反应堆控制器每 tick 将产出的衰竭燃料灌入本罐，液体管道从此抽出运走。
  * NBT 持久化缓冲罐与控制器坐标。
  */
-public class ChishiReactorWastePortBlockEntity extends BlockEntity implements IFluidPipeDevice {
+public class ChishiReactorWastePortBlockEntity extends BlockEntity implements IFluidPipeDevice, IDataCarrier {
 
     /** 缓冲容量：足以容纳控制器废品罐（64L）的一次性清空 */
     public static final long BUFFER_CAPACITY = 64_000;
@@ -90,6 +92,12 @@ public class ChishiReactorWastePortBlockEntity extends BlockEntity implements IF
     @Override
     public boolean canPipeInsert(FluidTank tank) {
         return false;
+    }
+
+    /** 挖掘保留数据：反应堆废料不保留，仅排除旧控制器关联坐标与废液罐 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"WasteTank", "ControllerPos"};
     }
 
     @Override

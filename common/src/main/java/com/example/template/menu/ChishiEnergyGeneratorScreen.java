@@ -19,7 +19,13 @@ public class ChishiEnergyGeneratorScreen extends AbstractContainerScreen<ChishiE
     public ChishiEnergyGeneratorScreen(ChishiEnergyGeneratorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.imageWidth = 176;
-        this.imageHeight = 166;
+        this.imageHeight = 176;
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
+        // 仅绘制标题：背包区下移后抑制原版"物品栏"标签，避免压在第二行升级槽上
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -28,10 +34,10 @@ public class ChishiEnergyGeneratorScreen extends AbstractContainerScreen<ChishiE
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 赤能源条：右侧垂直条，从底部向上填充
+        // 赤能源条：右侧垂直条，从底部向上填充（ceil 保证低储量时至少 1px 可见）
         int maxEnergy = ChishiEnergyGeneratorBlockEntity.MAX_ENERGY;
         int energy = Math.max(0, Math.min(menu.getEnergy(), maxEnergy));
-        int energyHeight = (int) (44.0F * energy / maxEnergy);
+        int energyHeight = (int) Math.ceil(44.0 * energy / maxEnergy);
         if (energyHeight > 0) {
             gui.fill(x + 153, y + 62 - energyHeight, x + 163, y + 62, 0xFFE03030);
         }
@@ -48,7 +54,7 @@ public class ChishiEnergyGeneratorScreen extends AbstractContainerScreen<ChishiE
         gui.drawString(this.font,
                 Component.translatable("gui.template_mod.boost_mult",
                         String.format("%.1f", menu.getBoostMultiplier())),
-                x + 8, y + 40, 0xFFE0E0E0, false);
+                x + 8, y + 40, 0xFF3F3F3F, false);
     }
 
     @Override

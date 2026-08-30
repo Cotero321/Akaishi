@@ -2,6 +2,19 @@ package com.example.template.item;
 
 import com.example.template.TemplateMod;
 import com.example.template.energy.PortableCellTier;
+import com.example.template.item.curio.ChishiAntidoteBracelet;
+import com.example.template.item.curio.ChishiBlastCharm;
+import com.example.template.item.curio.ChishiFireNecklace;
+import com.example.template.item.curio.ChishiGatheringBracelet;
+import com.example.template.item.curio.ChishiHuntingRing;
+import com.example.template.item.curio.ChishiSatiationCharm;
+import com.example.template.item.curio.ChishiWitherCharm;
+import com.example.template.life.body.BodySlot;
+import com.example.template.life.organ.ChishiOrganItem;
+import com.example.template.life.potion.ChishiPotionItem;
+import com.example.template.life.sample.ChishiLifeSampleItem;
+import com.example.template.life.sample.ChishiSampleCollectorItem;
+import com.example.template.life.sequence.ChishiGeneSequenceItem;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
@@ -35,7 +48,7 @@ public final class ModItems {
     public static final String PORTABLE_CELL_BASIC_ID = "portable_chishi_cell_basic";
     public static final String PORTABLE_CELL_ADVANCED_ID = "portable_chishi_cell_advanced";
     public static final String PORTABLE_CELL_SUPER_ID = "portable_chishi_cell_super";
-    /** 能源产生升级组件：装配到发生器（单块/多方块中心），每个提升一倍产能速度、减少 1% 产出，最多 10 个 */
+    /** 能源产生升级组件：装配到发生器（单块/多方块中心），每个提升 1.75 倍产能速度、减少 1% 产出，最多 10 个（满配约 242 倍） */
     public static final String SPEED_UPGRADE_ID = "chishi_speed_upgrade";
     /** 生命能量固态物：由生命能量提纯器以 1000 生命能量 + 10M 赤能源固化，生命能源体系的基础材料 */
     public static final String LIFE_ESSENCE_SOLID_ID = "chishi_life_essence_solid";
@@ -57,6 +70,38 @@ public final class ModItems {
     public static final String HEAT_SINK_FINE_ID = "heat_sink_fine";
     /** 精良散热片：散热效率 5%，耐久 180k tick */
     public static final String HEAT_SINK_EXQUISITE_ID = "heat_sink_exquisite";
+    /** 赤石饱食护符（charm 槽）：消耗赤能源补充饱和度 */
+    public static final String SATIATION_CHARM_ID = "chishi_satiation_charm";
+    /** 赤石狩猎指环（ring 槽）：击杀生物概率掉落赤石晶 */
+    public static final String HUNTING_RING_ID = "chishi_hunting_ring";
+    /** 赤石采集手环（hands 槽）：挖掘方块概率掉落赤石晶 */
+    public static final String GATHERING_BRACELET_ID = "chishi_gathering_bracelet";
+    /** 赤石防火吊坠（necklace 槽）：消耗赤能源维持防火 */
+    public static final String FIRE_NECKLACE_ID = "chishi_fire_necklace";
+    /** 赤石防爆护符（body 槽）：消耗赤能源抵消爆炸伤害 */
+    public static final String BLAST_CHARM_ID = "chishi_blast_charm";
+    /** 赤石净化手镯（bracelet 槽）：消耗赤能源移除中毒 */
+    public static final String ANTIDOTE_BRACELET_ID = "chishi_antidote_bracelet";
+    /** 赤石凋零护符（belt 槽）：消耗赤能源移除凋零 */
+    public static final String WITHER_CHARM_ID = "chishi_wither_charm";
+    /** 样本采集器：随身生命能量容器，右键生物抽取生命样本，右键生命能量方块充能 */
+    public static final String SAMPLE_COLLECTOR_ID = "chishi_sample_collector";
+    /** 生命样本：从活体生物抽取的遗传物质，生命分析台原料 */
+    public static final String LIFE_SAMPLE_ID = "chishi_life_sample";
+    /** 基因序列片段：纯度 100 样本在分析台解构的产物，生命结构台原料 */
+    public static final String GENE_SEQUENCE_ID = "chishi_gene_sequence";
+    /** 器官物品 ID（9 槽位各一），基因来源/品质存 NBT */
+    public static final String ORGAN_EYE_ID = "chishi_organ_eye";
+    /** 药剂（单物品承载永久/突破模板，模板 id 与纯度写 NBT） */
+    public static final String POTION_ID = "chishi_potion";
+    public static final String ORGAN_HEART_ID = "chishi_organ_heart";
+    public static final String ORGAN_LUNGS_ID = "chishi_organ_lungs";
+    public static final String ORGAN_VISCERA_ID = "chishi_organ_viscera";
+    public static final String ORGAN_KIDNEYS_ID = "chishi_organ_kidneys";
+    public static final String ORGAN_LEFT_ARM_ID = "chishi_organ_left_arm";
+    public static final String ORGAN_RIGHT_ARM_ID = "chishi_organ_right_arm";
+    public static final String ORGAN_LEFT_LEG_ID = "chishi_organ_left_leg";
+    public static final String ORGAN_RIGHT_LEG_ID = "chishi_organ_right_leg";
     /** 赤石晶延迟注册引用（注册完成后可用） */
     public static RegistrySupplier<Item> chishiCrystal;
     /** 赤石精华延迟注册引用 */
@@ -117,6 +162,38 @@ public final class ModItems {
     public static RegistrySupplier<Item> heatSinkFine;
     /** 精良散热片 */
     public static RegistrySupplier<Item> heatSinkExquisite;
+    /** 赤石饱食护符 */
+    public static RegistrySupplier<Item> satiationCharm;
+    /** 赤石狩猎指环 */
+    public static RegistrySupplier<Item> huntingRing;
+    /** 赤石采集手环 */
+    public static RegistrySupplier<Item> gatheringBracelet;
+    /** 赤石防火吊坠 */
+    public static RegistrySupplier<Item> fireNecklace;
+    /** 赤石防爆护符 */
+    public static RegistrySupplier<Item> blastCharm;
+    /** 赤石净化手镯 */
+    public static RegistrySupplier<Item> antidoteBracelet;
+    /** 赤石凋零护符 */
+    public static RegistrySupplier<Item> witherCharm;
+    /** 样本采集器 */
+    public static RegistrySupplier<Item> sampleCollector;
+    /** 生命样本 */
+    public static RegistrySupplier<Item> lifeSample;
+    /** 基因序列片段 */
+    public static RegistrySupplier<Item> geneSequence;
+    /** 药剂（永久/突破模板共用） */
+    public static RegistrySupplier<Item> chishiPotion;
+    /** 器官物品（9 槽位各一） */
+    public static RegistrySupplier<Item> chishiOrganEye;
+    public static RegistrySupplier<Item> chishiOrganHeart;
+    public static RegistrySupplier<Item> chishiOrganLungs;
+    public static RegistrySupplier<Item> chishiOrganViscera;
+    public static RegistrySupplier<Item> chishiOrganKidneys;
+    public static RegistrySupplier<Item> chishiOrganLeftArm;
+    public static RegistrySupplier<Item> chishiOrganRightArm;
+    public static RegistrySupplier<Item> chishiOrganLeftLeg;
+    public static RegistrySupplier<Item> chishiOrganRightLeg;
 
     private ModItems() {
     }
@@ -223,5 +300,69 @@ public final class ModItems {
         heatSinkExquisite = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_EXQUISITE_ID),
                         () -> new ChishiHeatSinkItem(HeatSinkQuality.EXQUISITE));
+        // 赤石饰品（Curios 槽位：charm/ring/hands/necklace/body/bracelet/belt）
+        satiationCharm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, SATIATION_CHARM_ID),
+                        () -> new ChishiSatiationCharm(new Item.Properties()));
+        huntingRing = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HUNTING_RING_ID),
+                        () -> new ChishiHuntingRing(new Item.Properties()));
+        gatheringBracelet = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, GATHERING_BRACELET_ID),
+                        () -> new ChishiGatheringBracelet(new Item.Properties()));
+        fireNecklace = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, FIRE_NECKLACE_ID),
+                        () -> new ChishiFireNecklace(new Item.Properties()));
+        blastCharm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, BLAST_CHARM_ID),
+                        () -> new ChishiBlastCharm(new Item.Properties()));
+        antidoteBracelet = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ANTIDOTE_BRACELET_ID),
+                        () -> new ChishiAntidoteBracelet(new Item.Properties()));
+        witherCharm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, WITHER_CHARM_ID),
+                        () -> new ChishiWitherCharm(new Item.Properties()));
+        // 生命科技：样本采集器（不可堆叠）+ 生命样本（可堆叠 64）
+        sampleCollector = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, SAMPLE_COLLECTOR_ID),
+                        () -> new ChishiSampleCollectorItem(new Item.Properties().stacksTo(1)));
+        lifeSample = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, LIFE_SAMPLE_ID),
+                        () -> new ChishiLifeSampleItem(new Item.Properties()));
+        geneSequence = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, GENE_SEQUENCE_ID),
+                        () -> new ChishiGeneSequenceItem(new Item.Properties()));
+        // 药剂（永久/突破模板，模板 id + 纯度写 NBT，可堆叠）
+        chishiPotion = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, POTION_ID),
+                        () -> new ChishiPotionItem(new Item.Properties().stacksTo(16)));
+        // 器官物品（9 槽位各一，不可堆叠）
+        chishiOrganEye = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_EYE_ID),
+                        () -> new ChishiOrganItem(BodySlot.EYE, new Item.Properties().stacksTo(1)));
+        chishiOrganHeart = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_HEART_ID),
+                        () -> new ChishiOrganItem(BodySlot.HEART, new Item.Properties().stacksTo(1)));
+        chishiOrganLungs = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_LUNGS_ID),
+                        () -> new ChishiOrganItem(BodySlot.LUNGS, new Item.Properties().stacksTo(1)));
+        chishiOrganViscera = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_VISCERA_ID),
+                        () -> new ChishiOrganItem(BodySlot.VISCERA, new Item.Properties().stacksTo(1)));
+        chishiOrganKidneys = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_KIDNEYS_ID),
+                        () -> new ChishiOrganItem(BodySlot.KIDNEYS, new Item.Properties().stacksTo(1)));
+        chishiOrganLeftArm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_LEFT_ARM_ID),
+                        () -> new ChishiOrganItem(BodySlot.LEFT_ARM, new Item.Properties().stacksTo(1)));
+        chishiOrganRightArm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_RIGHT_ARM_ID),
+                        () -> new ChishiOrganItem(BodySlot.RIGHT_ARM, new Item.Properties().stacksTo(1)));
+        chishiOrganLeftLeg = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_LEFT_LEG_ID),
+                        () -> new ChishiOrganItem(BodySlot.LEFT_LEG, new Item.Properties().stacksTo(1)));
+        chishiOrganRightLeg = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_RIGHT_LEG_ID),
+                        () -> new ChishiOrganItem(BodySlot.RIGHT_LEG, new Item.Properties().stacksTo(1)));
     }
 }

@@ -69,13 +69,8 @@ public class ChishiSuperGeneratorCoreBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ChishiSuperGeneratorCoreBlockEntity core) {
-                MenuRegistry.openExtendedMenu(serverPlayer, core);
-            }
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        // 已停用为纯合成材料：不提供任何交互界面
+        return InteractionResult.PASS;
     }
 
     @Override

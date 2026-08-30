@@ -1,0 +1,17 @@
+{
+  "name": "Gene Analyzer",
+  "icon": "template_mod:chishi_gene_analyzer",
+  "category": "template_mod:machines",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_gene_analyzer",
+      "text": "Deconstructs life samples into $(bold)gene sequences$() - the start of genetic engineering.$(br2)Only samples with $(bold)purity ≥25$() fit the input slot; lower ones belong to the Potion Table.$(br)Each run costs $(bold)5,000 life energy$() and takes 5 seconds."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Success rate scales with sample purity$(): 70% at purity 25, 95% at purity 100, linear in between.$(br2)Success keeps the $(bold)purity$() in the sequence; failure loses the sample.$(br2)$(2)Purify before analyzing - high purity pays off.$()"
+    }
+  ]
+}

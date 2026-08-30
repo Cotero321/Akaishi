@@ -18,12 +18,14 @@ public class ChishiEnergyLiquefierScreen extends AbstractContainerScreen<ChishiE
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
-    /** 赤能源条区域 */
-    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
+    /** 赤能源条区域（对齐贴图框 y=24..32，三条间距 12） */
+    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 24, BAR_W = 136, BAR_H = 8;
     /** 输出液体条区域 */
-    private static final int FLUID_BAR_Y = 28;
+    private static final int FLUID_BAR_Y = 36;
     /** 液化进度条区域 */
-    private static final int PROGRESS_Y = 40;
+    private static final int PROGRESS_Y = 48;
+    /** 机器槽位数量（输入槽 + 固态物槽，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = 2;
     /** 液体条通用颜色（产物类型随输入物品而异，统一青色） */
     private static final int FLUID_COLOR = 0xFF40C8FF;
 
@@ -66,7 +68,16 @@ public class ChishiEnergyLiquefierScreen extends AbstractContainerScreen<ChishiE
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
+        // 机器槽位框（贴图无图形，自绘补齐；槽位于条形区下方 y=58）
+        for (int i = 0; i < MACHINE_SLOTS; i++) {
+            var slot = menu.slots.get(i);
+            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
+        }
+
         // 赤能源条（红）
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, BAR_W, BAR_H);
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + FLUID_BAR_Y, BAR_W, BAR_H);
+        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + PROGRESS_Y, BAR_W, BAR_H);
         drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, menu.getChishiEnergy(), menu.getChishiMax(), 0xFFE03030);
         // 输出液体条（青，产物类型随输入物品而异）
         drawBar(gui, x + CHISHI_BAR_X, y + FLUID_BAR_Y, menu.getFluidAmount(), menu.getFluidMax(), FLUID_COLOR);
@@ -79,7 +90,7 @@ public class ChishiEnergyLiquefierScreen extends AbstractContainerScreen<ChishiE
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -88,18 +99,7 @@ public class ChishiEnergyLiquefierScreen extends AbstractContainerScreen<ChishiE
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
 
-        // 赤能源数值
-        Component chishiText = Component.translatable("energy.template_mod.chishi")
-                .append(Component.literal(" " + formatEnergy(menu.getChishiEnergy()) + " / " + formatEnergy(menu.getChishiMax())));
-        int w1 = this.font.width(chishiText);
-        gui.drawString(this.font, chishiText, this.leftPos + 88 - w1 / 2, this.topPos + CHISHI_BAR_Y - 2, 0xFFE0E0E0, false);
-
-        // 液体数值
-        Component fluidText = Component.translatable("gui.template_mod.fluid")
-                .append(Component.literal(" " + formatEnergy(menu.getFluidAmount()) + " / " + formatEnergy(menu.getFluidMax())));
-        int w2 = this.font.width(fluidText);
-        gui.drawString(this.font, fluidText, this.leftPos + 88 - w2 / 2, this.topPos + FLUID_BAR_Y - 2, 0xFFE0E0E0, false);
-
+        // 数值经悬停提示展示（能量/液体条 tooltip），不再绘制常驻文本避免与条形区重叠
         // 悬停提示
         if (isHovering(CHISHI_BAR_X, CHISHI_BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,

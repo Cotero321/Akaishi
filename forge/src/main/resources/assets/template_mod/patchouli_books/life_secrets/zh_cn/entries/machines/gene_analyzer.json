@@ -1,0 +1,17 @@
+{
+  "name": "生命分析台",
+  "icon": "template_mod:chishi_gene_analyzer",
+  "category": "template_mod:machines",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_gene_analyzer",
+      "text": "将生命样本解构为$(bold)基因序列$()的仪器，是基因工程的起点。$(br2)$(bold)纯度 ≥25$()的样本才能放入输入槽——低纯度样本只能用于药剂台。$(br)每次解构消耗 $(bold)5000 生命能量$()，耗时 5 秒。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)成功率随样本纯度浮动$()：纯度 25 时 70%，纯度 100 时 95%，区间内线性。$(br2)成功产出基因序列并$(bold)保留样本纯度$()；失败则样本损失。$(br2)$(2)提纯样本再分析，投入高纯度才有高回报。$()"
+    }
+  ]
+}

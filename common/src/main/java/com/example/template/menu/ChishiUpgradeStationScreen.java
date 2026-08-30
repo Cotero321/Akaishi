@@ -23,15 +23,15 @@ public class ChishiUpgradeStationScreen extends AbstractContainerScreen<ChishiUp
     private static final int BAR_X = 20, BAR_Y = 16, BAR_W = 136, BAR_H = 8;
 
     /** 升级类型按钮区（横向排列，数量随装备部位动态，最多 8 个） */
-    private static final int TYPE_BTN_Y = 58;
-    private static final int TYPE_BTN_W = 16;
-    private static final int TYPE_BTN_H = 14;
+    private static final int TYPE_BTN_Y = 56;
+    private static final int TYPE_BTN_W = 18;
+    private static final int TYPE_BTN_H = 16;
     private static final int TYPE_BTN_GAP = 1;
-    /** 执行按钮（第二行，居中） */
-    private static final int EXEC_BTN_X = 58;
-    private static final int EXEC_BTN_Y = 76;
-    private static final int EXEC_BTN_W = 60;
-    private static final int EXEC_BTN_H = 14;
+    /** 执行按钮（第二行，居中；底边不超过背包区 y=84） */
+    private static final int EXEC_BTN_X = 50;
+    private static final int EXEC_BTN_Y = 72;
+    private static final int EXEC_BTN_W = 76;
+    private static final int EXEC_BTN_H = 12;
 
     public ChishiUpgradeStationScreen(ChishiUpgradeStationMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -46,11 +46,17 @@ public class ChishiUpgradeStationScreen extends AbstractContainerScreen<ChishiUp
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         // 赤能源条（红色）
+        GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
         long max = Math.max(1, menu.getMaxEnergy());
         int energyWidth = (int) (BAR_W * Math.max(0, Math.min(menu.getEnergy(), menu.getMaxEnergy())) / max);
         if (energyWidth > 0) {
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + energyWidth, y + BAR_Y + BAR_H, 0xFFE03030);
         }
+
+        // 输入/模板/输出槽位框（背景贴图复用能量单元，无槽位底框，自绘原版风格）
+        GuiWidgets.slotBox(gui, x + 44, y + 30);
+        GuiWidgets.slotBox(gui, x + 62, y + 30);
+        GuiWidgets.slotBox(gui, x + 116, y + 30);
 
         // 特殊能力按钮：选中橙色 + 亮边框，未选中深灰 + 暗边框（仅绘制当前装备可用的能力）
         List<Integer> visible = visibleAbilities();
@@ -68,7 +74,7 @@ public class ChishiUpgradeStationScreen extends AbstractContainerScreen<ChishiUp
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
 
         // 槽位信息：直接读客户端已同步的输入槽物品，避免依赖服务端 data 广播时序导致残留
         ItemStack gear = this.menu.getSlot(ChishiUpgradeStationBlockEntity.INPUT_GEAR_SLOT).getItem();
@@ -81,13 +87,14 @@ public class ChishiUpgradeStationScreen extends AbstractContainerScreen<ChishiUp
         // 特殊能力按钮文字（按装备部位动态显示可用能力）
         ChishiUpgradeHelper.SpecialAbility[] abilities = ChishiUpgradeHelper.SpecialAbility.values();
         List<Integer> visible = visibleAbilities();
+        int typeTextY = TYPE_BTN_Y + (TYPE_BTN_H - 8) / 2;
         for (int idx = 0; idx < visible.size(); idx++) {
             int lx = TYPE_BTN_X(idx) + TYPE_BTN_W / 2;
             gui.drawCenteredString(this.font, Component.translatable(abilities[visible.get(idx)].buttonKey),
-                    lx, TYPE_BTN_Y + 3, 0xFFFFFF);
+                    lx, typeTextY, 0xFFFFFF);
         }
         gui.drawCenteredString(this.font, Component.translatable("gui.template_mod.upgrade.execute"),
-                EXEC_BTN_X + EXEC_BTN_W / 2, EXEC_BTN_Y + 3, 0xFFFFFF);
+                EXEC_BTN_X + EXEC_BTN_W / 2, EXEC_BTN_Y + (EXEC_BTN_H - 8) / 2, 0xFFFFFF);
     }
 
     @Override

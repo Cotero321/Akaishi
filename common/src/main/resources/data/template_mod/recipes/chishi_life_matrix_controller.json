@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    " A ",
+    " C "
+  ],
+  "key": {
+    "A": { "item": "template_mod:chishi_life_conversion_architecture" },
+    "C": { "item": "template_mod:chishi_crystal_block" }
+  },
+  "result": {
+    "item": "template_mod:chishi_life_matrix_controller"
+  }
+}

@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.block.ChishiAdvancedPurifierBlock;
@@ -22,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 成型后（formed=true）休眠，能量与容器访问代理到中心提纯器——
  * 中心被 26 格外壳完全包裹，管道经外壳才能给中心供能，AE2/物流管道经外壳读写中心槽位。
  */
-public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IEnergyProvider, Container {
+public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IEnergyProvider, Container, IDataCarrier {
 
     /** 自身能量存储：单放时无意义（无 UI/无消耗），成型后代理中心存储 */
     private final ChishiEnergyStorage energy;
@@ -30,6 +32,8 @@ public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IE
     private final SimpleContainer inventory;
     /** 成型检测缓存失效标记（中心方块变化/自身加载时置位，每 tick 仅读缓存） */
     private boolean dirty = true;
+    /** 缓存的中心引用：成型时指向中心提纯器，容器/能量访问直接读缓存，避免每次 26 次方块查询 */
+    private ChishiPurifierBlockEntity cachedCenter;
 
     public ChishiAdvancedPurifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ADVANCED_PURIFIER.get(), pos, state);
@@ -68,17 +72,34 @@ public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IE
 
     private void tickServer() {
         // 缓存化：仅当中心方块变化/自身加载时重新查找成型中心，每 tick 零方块查询
+        refreshCache();
+    }
+
+    /** 缓存失效时重新查找中心并同步成型状态（由 tick 或容器/能量访问触发） */
+    private void refreshCache() {
         if (!dirty) {
             return;
         }
         dirty = false;
-        ChishiPurifierBlockEntity center = findMatrixCenter();
-        boolean formed = center != null;
+        cachedCenter = findMatrixCenter();
+        boolean formed = cachedCenter != null;
         BlockState blockState = level.getBlockState(worldPosition);
         if (formed != blockState.getValue(ChishiAdvancedPurifierBlock.FORMED)) {
             level.setBlock(worldPosition, blockState.setValue(ChishiAdvancedPurifierBlock.FORMED, formed), 3);
             setChanged();
         }
+    }
+
+    /** 获取缓存中心：dirty 或缓存失效（中心被移除/所在区块卸载）时重查，否则 O(1) 直接读缓存 */
+    private ChishiPurifierBlockEntity cachedCenter() {
+        if (dirty) {
+            refreshCache();
+        } else if (cachedCenter != null
+                && level.getBlockEntity(cachedCenter.getBlockPos()) != cachedCenter) {
+            // 兜底：正常移除会置 dirty，此处覆盖区块卸载等未通知场景，避免代理到已失效对象
+            cachedCenter = findMatrixCenter();
+        }
+        return cachedCenter;
     }
 
     /** 在 3×3×3 范围内查找成型的提纯矩阵中心（普通提纯器） */
@@ -107,9 +128,9 @@ public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IE
         return inventory;
     }
 
-    /** 成型后作为外壳：容器访问动态代理到中心提纯器（AE2 存储总线 / 物流管道经外壳读写中心输入输出） */
+    /** 成型后作为外壳：容器访问代理到中心提纯器（AE2 存储总线 / 物流管道经外壳读写中心输入输出，读缓存零查询） */
     private Container currentContainer() {
-        ChishiPurifierBlockEntity center = findMatrixCenter();
+        ChishiPurifierBlockEntity center = cachedCenter();
         return center != null ? center.inventory() : inventory;
     }
 
@@ -157,8 +178,8 @@ public class ChishiAdvancedPurifierBlockEntity extends BlockEntity implements IE
 
     @Override
     public IEnergyStorage getEnergyStorage() {
-        // 成型后代理中心提纯器存储（中心被外壳包围，管道必须经外壳才能供能）
-        ChishiPurifierBlockEntity center = findMatrixCenter();
+        // 成型后代理中心提纯器存储（中心被外壳包围，管道必须经外壳才能供能，读缓存零查询）
+        ChishiPurifierBlockEntity center = cachedCenter();
         return center != null ? center.energy() : energy;
     }
 

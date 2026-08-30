@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -47,7 +49,7 @@ import java.util.List;
  * （末地/幽匿/巨龙燃料液化时消耗 1 个固态物，下界能量液化无需固态物）。
  */
 public class ChishiEnergyLiquefierBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier {
 
     /** 每 tick 赤能源输入率 */
     public static final long CHISHI_RATE = 1_000_000L;

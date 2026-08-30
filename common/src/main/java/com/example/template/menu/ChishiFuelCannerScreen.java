@@ -15,9 +15,13 @@ public class ChishiFuelCannerScreen extends AbstractContainerScreen<ChishiFuelCa
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_fuel_canner.png");
 
-    /** 输入液体条区域 */
-    private static final int FLUID_BAR_X = 20, FLUID_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
+    /** 输入液体条区域（较原位置下移 18px，避开上方数值文字与燃料名称） */
+    private static final int FLUID_BAR_X = 20, FLUID_BAR_Y = 34, BAR_W = 136, BAR_H = 8;
     private static final int FLUID_COLOR = 0xFF40C8FF;
+    /** 数值文字固定行（保持原位不动） */
+    private static final int TEXT_Y = 14;
+    /** 燃料名称文字行（进度条上方） */
+    private static final int FUEL_NAME_Y = 24;
 
     public ChishiFuelCannerScreen(ChishiFuelCannerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -64,13 +68,27 @@ public class ChishiFuelCannerScreen extends AbstractContainerScreen<ChishiFuelCa
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFE0E0E0, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
 
-        // 液体数值
-        Component fluidText = Component.translatable("gui.template_mod.fluid")
-                .append(Component.literal(" " + formatEnergy(menu.getFluidAmount()) + " / " + formatEnergy(menu.getFluidMax())));
+        // 燃料名称：显示当前输入液体（空 = 灰色"无燃料"）
+        String fuelId = menu.getFuelId();
+        Component fuelName = fuelId.isEmpty()
+                ? Component.translatable("gui.template_mod.fuel_empty")
+                : Component.translatable(fuelKey(fuelId));
+        gui.drawString(this.font, fuelName, FLUID_BAR_X, FUEL_NAME_Y,
+                fuelId.isEmpty() ? 0xFF808080 : 0xFF55E050, false);
+
+        // 液体数值（保持原位 TEXT_Y 不动，带参渲染，避免无参 translatable 输出 %s 占位字面乱码）
+        Component fluidText = Component.translatable("gui.template_mod.fluid",
+                formatEnergy(menu.getFluidAmount()), formatEnergy(menu.getFluidMax()));
         int w = this.font.width(fluidText);
-        gui.drawString(this.font, fluidText, 88 - w / 2, FLUID_BAR_Y - 2, 0xFFE0E0E0, false);
+        gui.drawString(this.font, fluidText, FLUID_BAR_X + BAR_W / 2 - w / 2, TEXT_Y, 0xFF3F3F3F, false);
+    }
+
+    /** fluid 注册名 → 本地化 key（fluid.template_mod.xxx，对应语言文件流体条目） */
+    private static String fuelKey(String fuelId) {
+        int i = fuelId.indexOf(':');
+        return "fluid." + fuelId.substring(0, i) + "." + fuelId.substring(i + 1);
     }
 
     @Override

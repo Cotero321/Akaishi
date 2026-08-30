@@ -1,14 +1,19 @@
 package com.example.template.forge;
 
 import com.example.template.TemplateMod;
+import com.example.template.block.ModBlocks;
 import com.example.template.command.ModCommands;
 import com.example.template.forge.fluid.ForgeFluidBridge;
 import com.example.template.forge.fluid.ModFluidsImpl;
+import com.example.template.forge.life.ChishiLifeInteraction;
+import com.example.template.forge.life.PlayerBodyCapability;
 import com.example.template.gametest.ChishiFuelSystemTests;
 import com.example.template.item.ChishiPortableEnergyCell;
 import com.example.template.item.ChishiUpgradeHelper;
 import com.example.template.item.ModItems;
 import dev.architectury.platform.forge.EventBuses;
+import dev.architectury.registry.client.rendering.RenderTypeRegistry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -36,6 +41,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.ArrayList;
@@ -81,12 +87,30 @@ public final class TemplateModForge {
         FMLJavaModLoadingContext.get().getModEventBus()
                 .addListener((RegisterGameTestsEvent event) -> event.register(ChishiFuelSystemTests.class));
 
+        // Curios 饰品集成：通用事件（击杀/挖掘/受伤）走游戏总线；装备与每 tick 由 Curios 自动驱动
+        MinecraftForge.EVENT_BUS.register(ChishiCurioIntegration.INSTANCE);
+
+        // 玩家躯体状态（9 槽位器官/肢体）：capability 挂载 + 向 common 注入访问器
+        PlayerBodyCapability.init();
+        MinecraftForge.EVENT_BUS.register(PlayerBodyCapability.INSTANCE);
+
+        // 生命科技交互：手持样本采集器右键生物抽取样本
+        MinecraftForge.EVENT_BUS.register(ChishiLifeInteraction.INSTANCE);
+
         // 调用通用初始化逻辑
         TemplateMod.init();
 
         // 游戏事件总线：动态属性修饰符事件 + 特殊能力战斗事件 + 测试指令
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> ModCommands.build(event.getDispatcher()));
+
+        // 客户端：赤石水晶簇贴图含透明像素，须注册 cutout 渲染，否则透明区域渲染成黑色块
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+    }
+
+    /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定 cutout */
+    private void onClientSetup(FMLClientSetupEvent event) {
+        RenderTypeRegistry.register(RenderType.cutout(), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get());
     }
 
     /**

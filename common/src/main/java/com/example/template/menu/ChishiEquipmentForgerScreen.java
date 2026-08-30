@@ -20,15 +20,15 @@ public class ChishiEquipmentForgerScreen extends AbstractContainerScreen<ChishiE
 
     private static final int BAR_X = 20, BAR_Y = 16, BAR_W = 136, BAR_H = 8;
     /** 属性分配按钮区（最多 6 个横向排列，效率按钮仅挖掘工具显示） */
-    private static final int ATTR_BTN_Y = 58;
-    private static final int ATTR_BTN_W = 16;
-    private static final int ATTR_BTN_H = 14;
+    private static final int ATTR_BTN_Y = 56;
+    private static final int ATTR_BTN_W = 18;
+    private static final int ATTR_BTN_H = 16;
     private static final int ATTR_BTN_GAP = 1;
     /** 锻造按钮（右侧） */
-    private static final int FORGE_BTN_X = 132;
-    private static final int FORGE_BTN_Y = 58;
-    private static final int FORGE_BTN_W = 36;
-    private static final int FORGE_BTN_H = 14;
+    private static final int FORGE_BTN_X = 136;
+    private static final int FORGE_BTN_Y = 56;
+    private static final int FORGE_BTN_W = 38;
+    private static final int FORGE_BTN_H = 16;
 
     /** 该升级按钮是否显示：效率按钮仅对挖掘类工具（铲/斧/镐）显示 */
     private boolean showUpgradeButton(int i) {
@@ -49,11 +49,17 @@ public class ChishiEquipmentForgerScreen extends AbstractContainerScreen<ChishiE
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         // 赤能源条（红色）
+        GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
         long max = Math.max(1, menu.getMaxEnergy());
         int energyWidth = (int) (BAR_W * Math.max(0, Math.min(menu.getEnergy(), menu.getMaxEnergy())) / max);
         if (energyWidth > 0) {
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + energyWidth, y + BAR_Y + BAR_H, 0xFFE03030);
         }
+
+        // 输入/材料/输出槽位框（背景贴图复用能量单元，无槽位底框，自绘原版风格）
+        GuiWidgets.slotBox(gui, x + 38, y + 30);
+        GuiWidgets.slotBox(gui, x + 62, y + 30);
+        GuiWidgets.slotBox(gui, x + 116, y + 30);
 
         // 属性分配按钮：有点数可分配时亮色，否则暗色；已选次数越多边框越亮（效率仅挖掘工具显示）
         for (int i = 0; i < ChishiUpgradeHelper.UpgradeType.values().length; i++) {
@@ -78,7 +84,7 @@ public class ChishiEquipmentForgerScreen extends AbstractContainerScreen<ChishiE
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
 
         // 剩余升级点
         gui.drawString(this.font,
@@ -87,15 +93,16 @@ public class ChishiEquipmentForgerScreen extends AbstractContainerScreen<ChishiE
 
         // 属性按钮文字（按钮 key 与 UpgradeType 顺序一致，效率仅挖掘工具显示）
         ChishiUpgradeHelper.UpgradeType[] types = ChishiUpgradeHelper.UpgradeType.values();
+        int attrTextY = ATTR_BTN_Y + (ATTR_BTN_H - 8) / 2;
         for (int i = 0; i < types.length; i++) {
             if (!showUpgradeButton(i)) {
                 continue;
             }
             gui.drawCenteredString(this.font, Component.translatable(types[i].buttonKey), attrBtnX(i) + ATTR_BTN_W / 2,
-                    ATTR_BTN_Y + 3, 0xFFFFFF);
+                    attrTextY, 0xFFFFFF);
         }
         gui.drawCenteredString(this.font, Component.translatable("gui.template_mod.forger.forge"),
-                FORGE_BTN_X + FORGE_BTN_W / 2, FORGE_BTN_Y + 3, 0xFFFFFF);
+                FORGE_BTN_X + FORGE_BTN_W / 2, FORGE_BTN_Y + (FORGE_BTN_H - 8) / 2, 0xFFFFFF);
     }
 
     @Override

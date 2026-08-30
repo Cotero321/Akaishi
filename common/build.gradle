@@ -2,12 +2,20 @@
     common("forge")
 }
 
+repositories {
+    // Curios API 官方仓库（Loom 项目级仓库会忽略 settings 声明，需在此补充）
+    maven { url "https://maven.theillusivec4.top/" }
+}
+
 dependencies {
     // Architectury API（作为 mod 依赖以启用 Loom 重映射）
     modImplementation("dev.architectury:architectury:9.2.14")
 
     // Cloth Config 核心 API（AutoConfig 注解配置框架，跨平台共享）
     modImplementation("me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}")
+
+    // Curios API：饰品系统硬依赖。饰品基类实现 ICurioItem 接口需要编译期 API（运行时由 Forge 侧提供完整 jar）
+    modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
 }
  
 sourceSets {

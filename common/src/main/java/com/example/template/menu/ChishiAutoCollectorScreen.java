@@ -28,19 +28,20 @@ public class ChishiAutoCollectorScreen extends AbstractContainerScreen<ChishiAut
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 赤石能量条：右侧垂直条，从底部向上填充
+        // 赤石能量条：横向条置于收集进度条下方空档（y79..83，避开 9×3 存储槽 y17..71 与进度条 y74..77）
+        GuiWidgets.track(gui, x + 8, y + 79, 160, 4);
         int maxEnergy = menu.getEnergyCapacity();
         int energy = Math.max(0, Math.min(menu.getEnergy(), maxEnergy));
-        int energyHeight = (int) (44.0F * energy / Math.max(1, maxEnergy));
-        if (energyHeight > 0) {
-            gui.fill(x + 153, y + 62 - energyHeight, x + 163, y + 62, 0xFFE03030);
+        int energyWidth = (int) (160.0F * energy / Math.max(1, maxEnergy));
+        if (energyWidth > 0) {
+            gui.fill(x + 8, y + 79, x + 8 + energyWidth, y + 83, 0xFFE03030);
         }
 
-        // 收集进度：进度条（中部下方），从左向右填充
+        // 收集进度：进度条（存储区与背包之间的空档，避免压在存储槽上）
         int progress = menu.getProgress();
-        int progressWidth = (int) (30.0F * progress / 100);
+        int progressWidth = (int) (160.0F * progress / 100);
         if (progressWidth > 0) {
-            gui.fill(x + 79, y + 53, x + 79 + progressWidth, y + 57, 0xFFE8E8EA);
+            gui.fill(x + 8, y + 74, x + 8 + progressWidth, y + 78, 0xFFE8E8EA);
         }
     }
 
@@ -51,11 +52,11 @@ public class ChishiAutoCollectorScreen extends AbstractContainerScreen<ChishiAut
         this.renderTooltip(gui, mouseX, mouseY);
 
         // 鼠标悬停在功能图标上时显示名称与数值
-        if (isHovering(153, 18, 10, 44, mouseX, mouseY)) {
+        if (isHovering(8, 79, 160, 4, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.energy", menu.getEnergy(), menu.getEnergyCapacity()),
                     mouseX, mouseY);
-        } else if (isHovering(79, 53, 30, 4, mouseX, mouseY)) {
+        } else if (isHovering(8, 74, 160, 4, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.template_mod.collect_progress", menu.getProgress()),
                     mouseX, mouseY);

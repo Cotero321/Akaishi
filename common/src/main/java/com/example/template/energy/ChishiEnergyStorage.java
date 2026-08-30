@@ -38,22 +38,38 @@ public class ChishiEnergyStorage implements IEnergyStorage {
 
     @Override
     public long addEnergy(long amount, boolean simulate) {
-        long current = energy.get();
-        long toAdd = Math.min(amount, maxEnergy - current);
-        if (toAdd > 0 && !simulate) {
-            energy.addAndGet(toAdd);
+        // CAS 循环：并发 add 不会超额（原 check-then-act 写法两个线程会同时通过检查导致超容量）
+        while (true) {
+            long current = energy.get();
+            long toAdd = Math.min(amount, maxEnergy - current);
+            if (toAdd <= 0) {
+                return 0;
+            }
+            if (simulate) {
+                return toAdd;
+            }
+            if (energy.compareAndSet(current, current + toAdd)) {
+                return toAdd;
+            }
         }
-        return toAdd;
     }
 
     @Override
     public long extractEnergy(long amount, boolean simulate) {
-        long current = energy.get();
-        long toExtract = Math.min(amount, current);
-        if (toExtract > 0 && !simulate) {
-            energy.addAndGet(-toExtract);
+        // CAS 循环：并发 extract 不会超额扣减为负
+        while (true) {
+            long current = energy.get();
+            long toExtract = Math.min(amount, current);
+            if (toExtract <= 0) {
+                return 0;
+            }
+            if (simulate) {
+                return toExtract;
+            }
+            if (energy.compareAndSet(current, current - toExtract)) {
+                return toExtract;
+            }
         }
-        return toExtract;
     }
 
     /**

@@ -151,6 +151,52 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_REACTOR_CORE;
     /** 衰竭保存桶：专储衰竭的生命燃料，带 GUI 液位 */
     public static RegistrySupplier<Block> CHISHI_EXHAUSTED_BARREL;
+    /** 躯体检查仪：展示玩家躯体状态（9 槽位器官/肢体 + 排斥值） */
+    public static RegistrySupplier<Block> CHISHI_BODY_SCANNER;
+    /** 生命分析台：纯度 100 样本解构为基因序列片段（有失败率） */
+    public static RegistrySupplier<Block> CHISHI_GENE_ANALYZER;
+    /** 部件培养舱：样本提纯 + 器官品质升级（双模式） */
+    public static RegistrySupplier<Block> CHISHI_CULTIVATOR;
+    /** 生命结构台：基因序列解析为指定槽位器官 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_STRUCT;
+    /** 手术仓：移植/摘除玩家躯体器官（消耗固态 + 生命能量，带进度） */
+    public static RegistrySupplier<Block> CHISHI_SURGERY;
+    /** 药剂台：样本（纯度 ≥25）+ 固态 + 生命能量 → 永久/突破药剂 */
+    public static RegistrySupplier<Block> CHISHI_POTION_TABLE;
+    /** 器官储藏库：按躯体槽位分页的器官仓库（生命能量维持活性） */
+    public static RegistrySupplier<Block> CHISHI_ORGAN_VAULT;
+    /** 药剂库：大容量药剂仓库（同 NBT 自动合并，按模板筛选） */
+    public static RegistrySupplier<Block> CHISHI_POTION_CABINET;
+    /** 样本库：大容量生命样本仓库（同 NBT 自动合并，机器联动存取） */
+    public static RegistrySupplier<Block> CHISHI_SAMPLE_VAULT;
+    /** 发生器矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
+    public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CASING;
+    /** 发生器矩阵控制器（低级 3×3×3，45 倍，沿用组合结构数据） */
+    public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CONTROLLER_BASIC;
+    /** 发生器矩阵控制器（高级 5×5×5，200 倍，沿用超级架构数据） */
+    public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED;
+    /** 发生器矩阵能量输出口（纯发电，仅管道抽取） */
+    public static RegistrySupplier<Block> CHISHI_GEN_ENERGY_OUTPUT;
+    /** 发生器矩阵燃料输入口（燃料物品输入，管道/漏斗） */
+    public static RegistrySupplier<Block> CHISHI_GEN_FUEL_INPUT;
+    /** 提纯矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_MATRIX_CASING;
+    /** 提纯矩阵控制器：主方块，结构成型后集中提纯 */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_MATRIX_CONTROLLER;
+    /** 提纯矩阵能量输入口（赤能源输入，仅管道供能） */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_ENERGY_INPUT;
+    /** 提纯矩阵物品输入口（提纯原料输入，管道/漏斗） */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_ITEM_INPUT;
+    /** 提纯矩阵物品输出口（提纯产物输出，仅管道抽取） */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_ITEM_OUTPUT;
+    /** 生命转换矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_CASING;
+    /** 生命转换矩阵控制器：主方块，结构成型后 45 倍集中转换 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_CONTROLLER;
+    /** 生命转换矩阵能量输入口（赤能源输入，仅管道供能） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_ENERGY_INPUT;
+    /** 生命转换矩阵能量输出口（生命能量输出，仅管道抽取） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_ENERGY_OUTPUT;
 
     private ModBlocks() {
     }
@@ -406,6 +452,39 @@ public final class ModBlocks {
         CHISHI_REACTOR_COOLER = registerReactorBlock(blockRegistrar, "chishi_reactor_cooler", ChishiReactorCoolerBlock::new);
         CHISHI_REACTOR_CORE = registerReactorBlock(blockRegistrar, "chishi_reactor_core", ChishiReactorCoreBlock::new);
         CHISHI_EXHAUSTED_BARREL = registerReactorBlock(blockRegistrar, "chishi_exhausted_barrel", ChishiExhaustedBarrelBlock::new);
+
+        // ===== 生命科技 =====
+        CHISHI_BODY_SCANNER = registerReactorBlock(blockRegistrar, "chishi_body_scanner", ChishiBodyScannerBlock::new);
+        CHISHI_GENE_ANALYZER = registerReactorBlock(blockRegistrar, "chishi_gene_analyzer", ChishiGeneAnalyzerBlock::new);
+        CHISHI_CULTIVATOR = registerReactorBlock(blockRegistrar, "chishi_cultivator", ChishiCultivatorBlock::new);
+        CHISHI_LIFE_STRUCT = registerReactorBlock(blockRegistrar, "chishi_life_struct", ChishiLifeStructBlock::new);
+        CHISHI_SURGERY = registerReactorBlock(blockRegistrar, "chishi_surgery", ChishiSurgeryBlock::new);
+        CHISHI_POTION_TABLE = registerReactorBlock(blockRegistrar, "chishi_potion_table", ChishiPotionTableBlock::new);
+        CHISHI_ORGAN_VAULT = registerReactorBlock(blockRegistrar, "chishi_organ_vault", ChishiOrganVaultBlock::new);
+        CHISHI_POTION_CABINET = registerReactorBlock(blockRegistrar, "chishi_potion_cabinet", ChishiPotionCabinetBlock::new);
+        CHISHI_SAMPLE_VAULT = registerReactorBlock(blockRegistrar, "chishi_sample_vault", ChishiSampleVaultBlock::new);
+
+        // ===== 发生器矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
+        CHISHI_GEN_MATRIX_CASING = registerReactorBlock(blockRegistrar, "chishi_gen_matrix_casing", ChishiGenMatrixCasingBlock::new);
+        CHISHI_GEN_MATRIX_CONTROLLER_BASIC = registerGenMatrixController(
+                blockRegistrar, "chishi_gen_matrix_controller_basic", ChishiGenMatrixTier.BASIC);
+        CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED = registerGenMatrixController(
+                blockRegistrar, "chishi_gen_matrix_controller_advanced", ChishiGenMatrixTier.ADVANCED);
+        CHISHI_GEN_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "chishi_gen_energy_output", ChishiGenEnergyOutputPortBlock::new);
+        CHISHI_GEN_FUEL_INPUT = registerReactorBlock(blockRegistrar, "chishi_gen_fuel_input", ChishiGenFuelInputPortBlock::new);
+
+        // ===== 提纯矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
+        CHISHI_PURIFIER_MATRIX_CASING = registerReactorBlock(blockRegistrar, "chishi_purifier_matrix_casing", ChishiPurifierMatrixCasingBlock::new);
+        CHISHI_PURIFIER_MATRIX_CONTROLLER = registerReactorBlock(blockRegistrar, "chishi_purifier_matrix_controller", ChishiPurifierMatrixControllerBlock::new);
+        CHISHI_PURIFIER_ENERGY_INPUT = registerReactorBlock(blockRegistrar, "chishi_purifier_energy_input", ChishiPurifierEnergyInputPortBlock::new);
+        CHISHI_PURIFIER_ITEM_INPUT = registerReactorBlock(blockRegistrar, "chishi_purifier_item_input", ChishiPurifierItemInputPortBlock::new);
+        CHISHI_PURIFIER_ITEM_OUTPUT = registerReactorBlock(blockRegistrar, "chishi_purifier_item_output", ChishiPurifierItemOutputPortBlock::new);
+
+        // ===== 生命转换矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
+        CHISHI_LIFE_MATRIX_CASING = registerReactorBlock(blockRegistrar, "chishi_life_matrix_casing", ChishiLifeMatrixCasingBlock::new);
+        CHISHI_LIFE_MATRIX_CONTROLLER = registerReactorBlock(blockRegistrar, "chishi_life_matrix_controller", ChishiLifeMatrixControllerBlock::new);
+        CHISHI_LIFE_MATRIX_ENERGY_INPUT = registerReactorBlock(blockRegistrar, "chishi_life_matrix_energy_input", ChishiLifeMatrixEnergyInputPortBlock::new);
+        CHISHI_LIFE_MATRIX_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "chishi_life_matrix_energy_output", ChishiLifeMatrixEnergyOutputPortBlock::new);
     }
 
     /** 注册一个指定等级的赤能源储存单元及其 BlockItem */
@@ -476,6 +555,17 @@ public final class ModBlocks {
     private static RegistrySupplier<Block> registerReactorBlock(Registrar<Block> blockRegistrar, String id,
                                                                 java.util.function.Supplier<Block> factory) {
         RegistrySupplier<Block> block = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, id), factory);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, id),
+                        () -> new BlockItem(block.get(), new Item.Properties()));
+        return block;
+    }
+
+    /** 注册一个指定等级的发生器矩阵控制器及其 BlockItem（低级/高级共用方块类，等级由实例决定） */
+    private static RegistrySupplier<Block> registerGenMatrixController(Registrar<Block> blockRegistrar, String id,
+                                                                       ChishiGenMatrixTier tier) {
+        RegistrySupplier<Block> block = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, id),
+                () -> new ChishiGenMatrixControllerBlock(tier));
         RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, id),
                         () -> new BlockItem(block.get(), new Item.Properties()));

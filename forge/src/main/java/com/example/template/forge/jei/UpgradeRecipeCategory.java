@@ -4,6 +4,7 @@ import com.example.template.TemplateMod;
 import com.example.template.block.ModBlocks;
 import com.example.template.item.ChishiUpgradeHelper;
 import com.example.template.item.ModItems;
+import com.example.template.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -33,13 +34,13 @@ public class UpgradeRecipeCategory implements IRecipeCategory<UpgradeRecipeCateg
             RecipeType.create(TemplateMod.MOD_ID, "upgrade", UpgradeRecipe.class);
 
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/jei_purification.png");
+            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
     private final IDrawable background;
     private final IDrawable icon;
 
     public UpgradeRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 116, 60);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 68);
         this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_UPGRADE_STATION.get()));
     }
 
@@ -65,17 +66,21 @@ public class UpgradeRecipeCategory implements IRecipeCategory<UpgradeRecipeCateg
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, UpgradeRecipe recipe, IFocusGroup focuses) {
-        // 输入：任意赤石装备 + 升级模板；输出：同装备（应用能力）
-        builder.addSlot(RecipeIngredientRole.INPUT, 8, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.gear());
-        builder.addSlot(RecipeIngredientRole.INPUT, 37, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.template());
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 92, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.gear());
+        // 槽位坐标与游戏内升级台一致：装备 44,30 / 模板 62,30 / 输出 116,30
+        builder.addSlot(RecipeIngredientRole.INPUT, 44, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.gear());
+        builder.addSlot(RecipeIngredientRole.INPUT, 62, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.template());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 116, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.gear());
     }
 
     @Override
     public void draw(UpgradeRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.template_mod.cost_upgrade"), 36, 42, 0xFF404040);
+        // 与游戏内一致自绘槽位框
+        GuiWidgets.slotBox(guiGraphics, 44, 30);
+        GuiWidgets.slotBox(guiGraphics, 62, 30);
+        GuiWidgets.slotBox(guiGraphics, 116, 30);
+        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.template_mod.cost_upgrade"), 8, 52, 0xFF404040);
         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(recipe.ability().tooltipKey, 1).plainCopy(),
-                36, 51, 0xFFA03030);
+                8, 61, 0xFFA03030);
     }
 
     /** 升级配方展示数据 */

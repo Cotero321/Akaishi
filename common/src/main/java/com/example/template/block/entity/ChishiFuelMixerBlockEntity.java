@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -36,7 +38,7 @@ import java.util.List;
  * 输入量不足 / 输出罐不可容纳 / 组合不匹配时停机。输入罐只可注入、输出罐只可抽取。
  */
 public class ChishiFuelMixerBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier {
 
     /** Menu 同步数据槽：0/1=赤能量/容量 2/3=输入1量/容量 4/5=输入2量/容量 6/7=输出量/容量 8=混合进度 */
     public static final int DATA_SLOTS = 9;

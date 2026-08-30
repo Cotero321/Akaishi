@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "template_mod:block/chishi_gen_matrix_controller_advanced"
+    },
+    "formed=true": {
+      "model": "template_mod:block/chishi_gen_matrix_controller_advanced_formed"
+    }
+  }
+}

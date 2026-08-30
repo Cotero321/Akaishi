@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * 消耗赤能源（输入率 1M/t），将下界之星 / 凋零玫瑰液化成
  * 下界至纯能量 / 下界复合能量（液体），供能量加工器与液体管道使用。
  */
-public class ChishiEnergyLiquefierBlock extends BaseEntityBlock {
+public class ChishiEnergyLiquefierBlock extends ChishiMachineBlock {
 
     public ChishiEnergyLiquefierBlock() {
         super(Properties.of()

@@ -1,5 +1,7 @@
 package com.example.template.block;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -62,11 +64,18 @@ public class ChishiGeodeBlock extends Block {
         if (random.nextFloat() >= chance) {
             return;
         }
-        Direction dir = Direction.getRandom(random);
-        BlockPos neighbor = geodePos.relative(dir);
-        if (level.getBlockState(neighbor).isAir()) {
-            level.setBlock(neighbor, ModBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState()
-                    .setValue(ChishiCrystalClusterBlock.FACING, dir), 3);
+        // 收集所有空邻格后随机选一个生长，避免随机方向命中已占用格直接失败导致生长率偏低
+        List<Direction> airDirs = new ArrayList<>(6);
+        for (Direction dir : Direction.values()) {
+            if (level.getBlockState(geodePos.relative(dir)).isAir()) {
+                airDirs.add(dir);
+            }
         }
+        if (airDirs.isEmpty()) {
+            return;
+        }
+        Direction dir = airDirs.get(random.nextInt(airDirs.size()));
+        level.setBlock(geodePos.relative(dir), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState()
+                .setValue(ChishiCrystalClusterBlock.FACING, dir), 3);
     }
 }

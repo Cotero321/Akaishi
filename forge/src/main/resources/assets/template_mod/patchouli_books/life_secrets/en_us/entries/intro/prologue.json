@@ -6,17 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "This diary is still almost blank - only a hasty line remains on the flyleaf:$(br)$(2)\"At the end of Chi Energy lies the beginning of Life.\"$(br2)The moment you aggregate your first Life Energy, every page will be filled with new discoveries.$(br2)$(bold)Current contents:$(li)Life Energy Purifier$(li)Life Essence Solid"
+      "text": "This diary is nearly blank - only a scrawled line on the flyleaf:$(br)$(2)\"The end of Chishi power is the beginning of life.\"$(br2)Every page has been filled since the first life energy was aggregated.$(br2)$(bold)Current contents:$(li)Life Energy Purifier$(li)Life Essence Solid$(li)Machines (Gene Analyzer / Cultivator / Life Structure Table / Surgery Chamber / Potion Table)$(li)Storage & Linking (Sample / Organ / Potion vaults)"
     },
     {
       "type": "patchouli:text",
-      "text": "This book shares its origin with the Chishi Research Diary, covering the Life Energy chapter after the Chapter of Chishi:$(li)Life Aggregation Converter$(li)Life Conversion Architecture$(li)Life Energy Pipe$(li)Life Energy Cell$(li)Life Energy Purifier$(br2)Each step of research will reveal a new section - just like the Chishi path."
-    },
-    {
-      "type": "patchouli:relations",
-      "entries": [
-        "template_mod:life_energy/life_energy"
-      ]
+      "text": "A companion book to the Chishi Research Diary, covering the life-energy chapter beyond Chishi:$(li)Life Aggregation Converter$(li)Life Conversion Architecture$(li)Life Energy Pipe$(li)Life Energy Cell$(li)Life Energy Purifier$(br2)New chapters unfold with each step of research - just like the Chishi path."
     }
   ]
 }

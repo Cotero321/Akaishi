@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    " E ",
+    "C C"
+  ],
+  "key": {
+    "C": { "item": "template_mod:chishi_purifier_matrix_casing" },
+    "E": { "item": "template_mod:chishi_energy_cell_basic" }
+  },
+  "result": {
+    "item": "template_mod:chishi_purifier_energy_input"
+  }
+}

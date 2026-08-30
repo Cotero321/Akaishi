@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * 高级提纯构建方块：直接消耗赤能源将粗制赤石块/赤石水晶块提纯为赤石精华（无燃料槽）。
  * 作为"提纯矩阵"（3×3×3）外壳时（formed=true）休眠，由中心提纯器集中提纯。
  */
-public class ChishiAdvancedPurifierBlock extends BaseEntityBlock {
+public class ChishiAdvancedPurifierBlock extends ChishiMachineBlock {
 
     /** 是否为提纯矩阵外壳（休眠标记，由中心提纯器写入） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");

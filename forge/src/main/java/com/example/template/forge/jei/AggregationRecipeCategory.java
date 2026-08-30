@@ -3,6 +3,7 @@ package com.example.template.forge.jei;
 import com.example.template.TemplateMod;
 import com.example.template.block.ModBlocks;
 import com.example.template.item.ModItems;
+import com.example.template.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -25,6 +26,7 @@ import java.util.List;
 /**
  * JEI 展示的"赤石能量聚合"配方类别：
  * 10M 赤能源 + 下界合金锭 → 赤石锭；10M 赤能源 + 母岩 → 上一等级母岩。
+ * 背景使用聚合机 GUI 贴图，槽位坐标与游戏内一致（输入 44,30 / 输出 116,30）。
  */
 public class AggregationRecipeCategory implements IRecipeCategory<AggregationRecipeCategory.AggregationRecipe> {
 
@@ -33,13 +35,13 @@ public class AggregationRecipeCategory implements IRecipeCategory<AggregationRec
             RecipeType.create(TemplateMod.MOD_ID, "aggregation", AggregationRecipe.class);
 
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/jei_purification.png");
+            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
     private final IDrawable background;
     private final IDrawable icon;
 
     public AggregationRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 116, 60);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 60);
         this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_ENERGY_AGGREGATOR.get()));
     }
 
@@ -65,13 +67,17 @@ public class AggregationRecipeCategory implements IRecipeCategory<AggregationRec
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AggregationRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 8, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.input());
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 92, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.output());
+        // 槽位坐标与游戏内聚合机一致
+        builder.addSlot(RecipeIngredientRole.INPUT, 44, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.input());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 116, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.output());
     }
 
     @Override
     public void draw(AggregationRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.template_mod.cost_aggregate"), 40, 28, 0xFF404040);
+        // 与游戏内一致自绘槽位框
+        GuiWidgets.slotBox(guiGraphics, 44, 30);
+        GuiWidgets.slotBox(guiGraphics, 116, 30);
+        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.template_mod.cost_aggregate"), 8, 52, 0xFF404040);
     }
 
     /** 聚合配方展示数据 */

@@ -61,6 +61,10 @@ public class ChishiFluidPipeBlock extends BaseEntityBlock {
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, BlockPos neighborPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, neighbor, neighborPos, isMoving);
         if (!level.isClientSide) {
+            // 邻居方块变化（管道放置/拆除/设备增减）→ 网络拓扑可能变化，标记缓存失效
+            if (level.getBlockEntity(pos) instanceof ChishiFluidPipeBlockEntity be) {
+                be.markDirty();
+            }
             BlockState computed = computeConnections(state, level, pos);
             if (computed != state) {
                 level.setBlock(pos, computed, 3);

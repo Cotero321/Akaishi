@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "template_mod:block/chishi_life_matrix_controller"
+    },
+    "formed=true": {
+      "model": "template_mod:block/chishi_life_matrix_controller_formed"
+    }
+  }
+}

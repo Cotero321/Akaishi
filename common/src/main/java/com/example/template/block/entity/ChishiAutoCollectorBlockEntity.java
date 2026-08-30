@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.item.IItemPipeDevice;
@@ -33,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 3×3×3 范围内一颗水晶簇，将产物（赤石精华 1-2 个）存入内部 27 槽容器。
  * 实现 Container 接口：漏斗可抽取，AE2 存储总线 / Mekanism 物流管道可直接读写。
  */
-public class ChishiAutoCollectorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice {
+public class ChishiAutoCollectorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     /** 内部存储槽数（箱子一样：27 格） */
     public static final int STORAGE_SIZE = 27;

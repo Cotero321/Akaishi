@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -37,7 +39,7 @@ import java.util.function.Supplier;
  * 产出装备携带已选基础升级并初始拥有 4 个升级槽位（高级升级由赤红升级台提供）。
  * 重铸配方：下界合金装备 → 对应赤石装备 + 消耗锭数（头盔 5 / 胸甲 8 / 护腿 7 / 靴子 4 / 剑 2）。
  */
-public class ChishiEquipmentForgerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiEquipmentForgerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
 
     public static final int INPUT_GEAR_SLOT = 0;
     public static final int INPUT_INGOT_SLOT = 1;

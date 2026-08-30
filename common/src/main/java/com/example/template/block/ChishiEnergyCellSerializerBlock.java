@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -29,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * 26 个赤能源储存单元环绕成型（formed=true）后，将全部单元容量聚合为单一存储。
  * 中心方块被外壳包围无法直接点击，右键任一储存单元外壳可代理打开本界面。
  */
-public class ChishiEnergyCellSerializerBlock extends BaseEntityBlock {
+public class ChishiEnergyCellSerializerBlock extends ChishiMachineBlock {
 
     /** 结构是否完整（激活状态） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");

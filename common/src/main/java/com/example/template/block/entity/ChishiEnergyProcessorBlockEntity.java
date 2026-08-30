@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -42,7 +44,7 @@ import java.util.List;
  * 槽位：0 = 输入槽（生命固态物，只进不出）。
  */
 public class ChishiEnergyProcessorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier {
 
     /** 每 tick 赤能源输入率 */
     public static final long CHISHI_RATE = 1_000_000L;

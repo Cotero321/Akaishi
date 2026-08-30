@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.api.item.IItemPipeDevice;
 import com.example.template.fluid.FluidTank;
@@ -35,7 +37,7 @@ import java.util.List;
  * 槽位：0 = 空/半满燃料罐（只进），1 = 满燃料罐成品（只出）。
  */
 public class ChishiFuelCannerBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IFluidPipeDevice, IItemPipeDevice {
+        ExtendedMenuProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier {
 
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
@@ -140,6 +142,10 @@ public class ChishiFuelCannerBlockEntity extends BlockEntity implements
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         buf.writeBlockPos(worldPosition);
+        // 当前输入液体注册名（空串 = 无液体），客户端据此显示燃料名称
+        Fluid fluid = liquidTank.getFluid();
+        buf.writeUtf(fluid == null || fluid.isSame(net.minecraft.world.level.material.Fluids.EMPTY)
+                ? "" : net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(fluid).toString());
     }
 
     // ===== 容器委托（管道/漏斗访问） =====

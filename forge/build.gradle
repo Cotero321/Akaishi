@@ -144,9 +144,9 @@ dependencies {
 
     // ===== 可选依赖（compileOnly 编译 + 运行时检测，不强制玩家安装） =====
 
-    // Curios API：饰品槽（编译用官方推荐 API artifact，运行时加载完整 jar）
+    // Curios API：饰品槽（编译用官方推荐 API artifact，运行时为硬依赖，玩家必须安装 Curios）
     modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
-    modLocalRuntime("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}")
+    modRuntimeOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}")
 
     // Patchouli：模组手册
     modCompileOnly("vazkii.patchouli:Patchouli:${rootProject.patchouli_version}")

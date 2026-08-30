@@ -1,12 +1,11 @@
 package com.example.template.item;
 
+import com.example.template.TemplateMod;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Blocks;
 
 /**
  * 赤石盔甲材料：基础防御与韧性均为下界合金的 1.25 倍。
@@ -47,7 +46,9 @@ public final class ChishiArmorMaterial {
 
         @Override
         public String getName() {
-            return "chishi";
+            // 返回带命名空间的名字，使 Forge 默认 getArmorTexture 定位到
+            // template_mod:textures/models/armor/chishi_layer_1/2.png
+            return TemplateMod.MOD_ID + ":chishi";
         }
 
         @Override

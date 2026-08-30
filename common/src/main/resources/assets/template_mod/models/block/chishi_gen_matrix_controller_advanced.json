@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "template_mod:block/chishi_gen_matrix_controller_advanced"
+  }
+}

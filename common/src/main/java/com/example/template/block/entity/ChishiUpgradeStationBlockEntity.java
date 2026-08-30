@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -31,7 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 吸血 / 击退抗性 / 移动速度 / 火焰抗性 / 爆炸伤害保护 / 摔落伤害保护。
  * 升级选项由 GUI 按钮选择（clickMenuButton），执行由按钮触发。
  */
-public class ChishiUpgradeStationBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiUpgradeStationBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
 
     public static final int INPUT_GEAR_SLOT = 0;
     public static final int INPUT_TEMPLATE_SLOT = 1;

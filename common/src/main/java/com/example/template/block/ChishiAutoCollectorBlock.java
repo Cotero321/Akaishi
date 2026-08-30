@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * 并将其产物（赤石精华）存入内部 27 槽容器（箱子一样，支持漏斗 / AE2 / MEK 物流管道）。
  * 4 级（初/中/高/终）共用本方块类与方块实体，等级参数由构造器传入。
  */
-public class ChishiAutoCollectorBlock extends BaseEntityBlock {
+public class ChishiAutoCollectorBlock extends ChishiMachineBlock {
 
     /** 收集器等级：收集范围边长（与催化器分级一致）/ 每方块收集耗时 tick / 每 tick 耗能（2 的 1-4 次方） */
     public enum CollectorTier {

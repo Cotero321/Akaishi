@@ -16,15 +16,26 @@ public class ChishiFuelCannerMenu extends AbstractContainerMenu {
 
     private final Container container;
     private final net.minecraft.world.inventory.ContainerData data;
+    /** 当前输入液体注册名（空串 = 无液体），客户端据此显示燃料名称 */
+    private final String fuelId;
 
     public ChishiFuelCannerMenu(int id, Inventory inv, ChishiFuelCannerBlockEntity be) {
-        this(id, inv, be.inventory(), be.data());
+        this(id, inv, be.inventory(), be.data(), "");
+    }
+
+    public ChishiFuelCannerMenu(int id, Inventory inv, ChishiFuelCannerBlockEntity be, String fuelId) {
+        this(id, inv, be.inventory(), be.data(), fuelId);
     }
 
     public ChishiFuelCannerMenu(int id, Inventory inv, Container container, net.minecraft.world.inventory.ContainerData data) {
+        this(id, inv, container, data, "");
+    }
+
+    public ChishiFuelCannerMenu(int id, Inventory inv, Container container, net.minecraft.world.inventory.ContainerData data, String fuelId) {
         super(ModMenus.CHISHI_FUEL_CANNER.get(), id);
         this.container = container;
         this.data = data;
+        this.fuelId = fuelId;
 
         // 空/半满燃料罐输入槽（位置对齐 GUI 纹理槽位图形）
         addSlot(new Slot(container, ChishiFuelCannerBlockEntity.INPUT_SLOT, 62, 35));
@@ -48,6 +59,10 @@ public class ChishiFuelCannerMenu extends AbstractContainerMenu {
 
     public long getFluidMax() {
         return data.get(ChishiFuelCannerBlockEntity.DATA_FLUID_CAPACITY);
+    }
+
+    public String getFuelId() {
+        return fuelId;
     }
 
     @Override

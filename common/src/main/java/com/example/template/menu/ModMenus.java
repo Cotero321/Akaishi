@@ -1,7 +1,7 @@
 package com.example.template.menu;
 
 import com.example.template.TemplateMod;
-import com.example.template.block.entity.ChishiEnergyAssemblyBlockEntity;
+import com.example.template.block.ChishiGenMatrixTier;
 import com.example.template.block.entity.ChishiAutoCollectorBlockEntity;
 import com.example.template.block.entity.ChishiEnergyAggregatorBlockEntity;
 import com.example.template.block.entity.ChishiEnergyCellBlockEntity;
@@ -14,12 +14,22 @@ import com.example.template.block.entity.ChishiFuelCannerBlockEntity;
 import com.example.template.block.entity.ChishiFuelMixerBlockEntity;
 import com.example.template.block.entity.ChishiFluidTankBlockEntity;
 import com.example.template.block.entity.ChishiEquipmentForgerBlockEntity;
-import com.example.template.block.entity.ChishiLifeAggregationConverterBlockEntity;
-import com.example.template.block.entity.ChishiLifeConversionArchitectureBlockEntity;
+import com.example.template.block.entity.ChishiGeneAnalyzerBlockEntity;
+import com.example.template.block.entity.ChishiGenMatrixControllerBlockEntity;
+import com.example.template.block.entity.ChishiCultivatorBlockEntity;
+import com.example.template.block.entity.ChishiLifeStructBlockEntity;
+import com.example.template.block.entity.ChishiSurgeryBlockEntity;
+import com.example.template.block.entity.ChishiPotionTableBlockEntity;
+import com.example.template.block.entity.ChishiOrganVaultBlockEntity;
+import com.example.template.block.entity.ChishiPotionCabinetBlockEntity;
+import com.example.template.block.entity.ChishiSampleVaultBlockEntity;
+import com.example.template.block.entity.ChishiLifeMatrixControllerBlockEntity;
 import com.example.template.block.entity.ChishiLifePurifierBlockEntity;
 import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
-import com.example.template.block.entity.ChishiSuperGeneratorCoreBlockEntity;
+import com.example.template.block.entity.ChishiReactorEnergyOutputBlockEntity;
+import com.example.template.block.entity.ChishiReactorFuelPortBlockEntity;
 import com.example.template.block.entity.ChishiPurifierBlockEntity;
+import com.example.template.block.entity.ChishiPurifierMatrixControllerBlockEntity;
 import com.example.template.block.entity.ChishiUpgradeStationBlockEntity;
 import dev.architectury.registry.menu.MenuRegistry;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -48,12 +58,8 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<ChishiEnergyCellMenu>> CHISHI_ENERGY_CELL;
     /** 赤能源发生机菜单类型 */
     public static RegistrySupplier<MenuType<ChishiEnergyGeneratorMenu>> CHISHI_ENERGY_GENERATOR;
-    /** 小型赤能源组合结构（多方块主方块）菜单类型 */
-    public static RegistrySupplier<MenuType<ChishiEnergyAssemblyMenu>> CHISHI_ENERGY_ASSEMBLY;
     /** 赤能源储存串联器（多方块主方块）菜单类型 */
     public static RegistrySupplier<MenuType<ChishiEnergyCellSerializerMenu>> CHISHI_ENERGY_CELL_SERIALIZER;
-    /** 超级发生器架构核心（5×5×5 多方块主方块）菜单类型 */
-    public static RegistrySupplier<MenuType<ChishiSuperGeneratorMenu>> CHISHI_SUPER_GENERATOR_CORE;
     /** 生命转换菜单类型（生命聚合转换器 / 生命转换架构共用） */
     public static RegistrySupplier<MenuType<ChishiLifeConverterMenu>> CHISHI_LIFE_CONVERTER;
     /** 赤石能量聚合器菜单类型 */
@@ -80,6 +86,32 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<ChishiReactorControllerMenu>> CHISHI_REACTOR_CONTROLLER;
     /** 衰竭保存桶菜单类型 */
     public static RegistrySupplier<MenuType<ChishiExhaustedBarrelMenu>> CHISHI_EXHAUSTED_BARREL;
+    /** 反应堆燃料投放口菜单类型（27 格燃料罐缓冲） */
+    public static RegistrySupplier<MenuType<ChishiReactorFuelPortMenu>> CHISHI_REACTOR_FUEL_PORT;
+    /** 反应堆能量输出口菜单类型（能量缓冲展示） */
+    public static RegistrySupplier<MenuType<ChishiReactorEnergyOutputMenu>> CHISHI_REACTOR_ENERGY_OUTPUT;
+    /** 躯体检查仪菜单类型（纯展示面板，无槽位） */
+    public static RegistrySupplier<MenuType<ChishiBodyScannerMenu>> CHISHI_BODY_SCANNER;
+    /** 生命分析台菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiGeneAnalyzerMenu>> CHISHI_GENE_ANALYZER;
+    /** 部件培养舱菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiCultivatorMenu>> CHISHI_CULTIVATOR;
+    /** 生命结构台菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiLifeStructMenu>> CHISHI_LIFE_STRUCT;
+    /** 手术仓菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiSurgeryMenu>> CHISHI_SURGERY;
+    /** 药剂台菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiPotionTableMenu>> CHISHI_POTION_TABLE;
+    /** 器官储藏库菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiOrganVaultMenu>> CHISHI_ORGAN_VAULT;
+    /** 药剂库菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiPotionCabinetMenu>> CHISHI_POTION_CABINET;
+    /** 样本库菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiSampleVaultMenu>> CHISHI_SAMPLE_VAULT;
+    /** 发生器矩阵控制器菜单类型（低级/高级共用，等级由方块实例决定） */
+    public static RegistrySupplier<MenuType<ChishiGenMatrixControllerMenu>> CHISHI_GEN_MATRIX_CONTROLLER;
+    /** 提纯矩阵控制器菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiPurifierMatrixControllerMenu>> CHISHI_PURIFIER_MATRIX_CONTROLLER;
 
     private ModMenus() {
     }
@@ -142,24 +174,6 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(genType, ChishiEnergyGeneratorScreen::new));
 
-        // 小型赤能源组合结构：1 燃料槽 + 能量 + 结构状态同步
-        MenuType<ChishiEnergyAssemblyMenu> asmType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
-            BlockPos pos = buf.readBlockPos();
-            Level level = inv.player.level();
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ChishiEnergyAssemblyBlockEntity asm) {
-                return new ChishiEnergyAssemblyMenu(syncId, inv, asm);
-            }
-            return new ChishiEnergyAssemblyMenu(syncId, inv,
-                    new SimpleContainer(ChishiEnergyAssemblyBlockEntity.SLOT_COUNT),
-                    new SimpleContainerData(4));
-        });
-        CHISHI_ENERGY_ASSEMBLY = (RegistrySupplier<MenuType<ChishiEnergyAssemblyMenu>>) (Object) RegistrarManager
-                .get(TemplateMod.MOD_ID).get(Registries.MENU)
-                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_energy_assembly"), () -> asmType);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
-                MenuRegistry.registerScreenFactory(asmType, ChishiEnergyAssemblyScreen::new));
-
         // 赤能源储存串联器：无容器槽位，同步总能量/总容量（long 4 槽）+ 结构状态
         MenuType<ChishiEnergyCellSerializerMenu> serializerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
@@ -176,32 +190,13 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(serializerType, ChishiEnergyCellSerializerScreen::new));
 
-        // 超级发生器架构核心（5×5×5 多方块主方块）：1 个燃料槽 + 玩家背包
-        MenuType<ChishiSuperGeneratorMenu> superGenType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
-            BlockPos pos = buf.readBlockPos();
-            Level level = inv.player.level();
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ChishiSuperGeneratorCoreBlockEntity core) {
-                return new ChishiSuperGeneratorMenu(syncId, inv, core);
-            }
-            return new ChishiSuperGeneratorMenu(syncId, inv, new SimpleContainer(1), new SimpleContainerData(4));
-        });
-        CHISHI_SUPER_GENERATOR_CORE = (RegistrySupplier<MenuType<ChishiSuperGeneratorMenu>>) (Object) RegistrarManager
-                .get(TemplateMod.MOD_ID).get(Registries.MENU)
-                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_super_generator_core"), () -> superGenType);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
-                MenuRegistry.registerScreenFactory(superGenType, ChishiSuperGeneratorScreen::new));
-
-        // 生命转换（聚合转换器 / 转换架构共用）：无容器槽位，同步赤能源+生命能量+结构状态
+        // 生命转换（生命转换矩阵控制器）：无容器槽位，同步赤能源+生命能量+结构状态
         MenuType<ChishiLifeConverterMenu> lifeType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ChishiLifeAggregationConverterBlockEntity converter) {
-                return new ChishiLifeConverterMenu(syncId, inv, converter.data());
-            }
-            if (be instanceof ChishiLifeConversionArchitectureBlockEntity arch) {
-                return new ChishiLifeConverterMenu(syncId, inv, arch.data());
+            if (be instanceof ChishiLifeMatrixControllerBlockEntity controller) {
+                return new ChishiLifeConverterMenu(syncId, inv, controller.data());
             }
             return ChishiLifeConverterMenu.emptyMenu(syncId, inv);
         });
@@ -326,14 +321,15 @@ public final class ModMenus {
         // 燃料装罐机：1 空罐输入槽 + 1 满罐输出槽 + 输入液体量数据
         MenuType<ChishiFuelCannerMenu> cannerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
+            String fuelId = buf.readUtf();
             Level level = inv.player.level();
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof ChishiFuelCannerBlockEntity canner) {
-                return new ChishiFuelCannerMenu(syncId, inv, canner);
+                return new ChishiFuelCannerMenu(syncId, inv, canner, fuelId);
             }
             return new ChishiFuelCannerMenu(syncId, inv,
                     new SimpleContainer(ChishiFuelCannerBlockEntity.SLOT_COUNT),
-                    new SimpleContainerData(ChishiFuelCannerBlockEntity.DATA_SLOTS));
+                    new SimpleContainerData(ChishiFuelCannerBlockEntity.DATA_SLOTS), fuelId);
         });
         CHISHI_FUEL_CANNER = (RegistrySupplier<MenuType<ChishiFuelCannerMenu>>) (Object) RegistrarManager
                 .get(TemplateMod.MOD_ID).get(Registries.MENU)
@@ -407,5 +403,222 @@ public final class ModMenus {
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_exhausted_barrel"), () -> barrelType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(barrelType, ChishiExhaustedBarrelScreen::new));
+
+        // 反应堆燃料投放口：27 格燃料罐缓冲槽 + 玩家背包
+        MenuType<ChishiReactorFuelPortMenu> fuelPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            if (level.getBlockEntity(pos) instanceof ChishiReactorFuelPortBlockEntity port) {
+                return new ChishiReactorFuelPortMenu(syncId, inv, port.buffer());
+            }
+            return ChishiReactorFuelPortMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_REACTOR_FUEL_PORT = (RegistrySupplier<MenuType<ChishiReactorFuelPortMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_fuel_port"), () -> fuelPortType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(fuelPortType, ChishiReactorFuelPortScreen::new));
+
+        // 反应堆能量输出口：无机器槽位，能量/容量数据展示
+        MenuType<ChishiReactorEnergyOutputMenu> energyOutputType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            if (level.getBlockEntity(pos) instanceof ChishiReactorEnergyOutputBlockEntity output) {
+                return new ChishiReactorEnergyOutputMenu(syncId, inv, output.data());
+            }
+            return ChishiReactorEnergyOutputMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_REACTOR_ENERGY_OUTPUT = (RegistrySupplier<MenuType<ChishiReactorEnergyOutputMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_reactor_energy_output"), () -> energyOutputType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(energyOutputType, ChishiReactorEnergyOutputScreen::new));
+
+        // 躯体检查仪：无机器槽位，纯展示玩家躯体状态（数据由 S2C 同步包推送）
+        MenuType<ChishiBodyScannerMenu> bodyScannerType = MenuRegistry.ofExtended((syncId, inv, buf) ->
+                new ChishiBodyScannerMenu(syncId, inv));
+        CHISHI_BODY_SCANNER = (RegistrySupplier<MenuType<ChishiBodyScannerMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_body_scanner"), () -> bodyScannerType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(bodyScannerType, ChishiBodyScannerScreen::new));
+
+        // 生命分析台：输入（纯度 100 样本）+ 输出（基因序列片段）+ 生命能量/进度数据
+        MenuType<ChishiGeneAnalyzerMenu> geneAnalyzerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiGeneAnalyzerBlockEntity analyzer) {
+                return new ChishiGeneAnalyzerMenu(syncId, inv, analyzer.inventory(), analyzer.data(), pos);
+            }
+            return new ChishiGeneAnalyzerMenu(syncId, inv,
+                    new SimpleContainer(ChishiGeneAnalyzerBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiGeneAnalyzerBlockEntity.DATA_SLOTS), pos);
+        });
+        CHISHI_GENE_ANALYZER = (RegistrySupplier<MenuType<ChishiGeneAnalyzerMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_gene_analyzer"), () -> geneAnalyzerType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(geneAnalyzerType, ChishiGeneAnalyzerScreen::new));
+
+        // 部件培养舱：输入（样本/器官）+ 材料（固态物）+ 生命能量/进度/模式数据
+        MenuType<ChishiCultivatorMenu> cultivatorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiCultivatorBlockEntity cultivator) {
+                return new ChishiCultivatorMenu(syncId, inv, cultivator.inventory(), cultivator.data(), pos);
+            }
+            return new ChishiCultivatorMenu(syncId, inv,
+                    new SimpleContainer(ChishiCultivatorBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiCultivatorBlockEntity.DATA_SLOTS), pos);
+        });
+        CHISHI_CULTIVATOR = (RegistrySupplier<MenuType<ChishiCultivatorMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_cultivator"), () -> cultivatorType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(cultivatorType, ChishiCultivatorScreen::new));
+
+        // 生命结构台：基因序列 + 固态物 → 器官（目标槽位界面选择）
+        MenuType<ChishiLifeStructMenu> lifeStructType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiLifeStructBlockEntity struct) {
+                return new ChishiLifeStructMenu(syncId, inv, struct.inventory(), struct.data(), struct.getBlockPos());
+            }
+            return new ChishiLifeStructMenu(syncId, inv,
+                    new SimpleContainer(ChishiLifeStructBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiLifeStructBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_LIFE_STRUCT = (RegistrySupplier<MenuType<ChishiLifeStructMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_struct"), () -> lifeStructType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeStructType, ChishiLifeStructScreen::new));
+
+        // 手术仓：器官移植/摘除（消耗固态 + 生命能量，带进度）
+        MenuType<ChishiSurgeryMenu> surgeryType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiSurgeryBlockEntity surgery) {
+                return new ChishiSurgeryMenu(syncId, inv, surgery.inventory(), surgery.data(), surgery.getBlockPos());
+            }
+            return new ChishiSurgeryMenu(syncId, inv,
+                    new SimpleContainer(ChishiSurgeryBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiSurgeryBlockEntity.DATA_SLOTS), pos);
+        });
+        CHISHI_SURGERY = (RegistrySupplier<MenuType<ChishiSurgeryMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_surgery"), () -> surgeryType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(surgeryType, ChishiSurgeryScreen::new));
+
+        // 药剂台：样本+固态+生命能量 → 永久/突破药剂（模板选择走 C2S 包）
+        MenuType<ChishiPotionTableMenu> potionTableType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiPotionTableBlockEntity potionTable) {
+                return new ChishiPotionTableMenu(syncId, inv, potionTable.inventory(), potionTable.data(), potionTable.getBlockPos());
+            }
+            return new ChishiPotionTableMenu(syncId, inv,
+                    new SimpleContainer(ChishiPotionTableBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiPotionTableBlockEntity.DATA_SLOTS), pos);
+        });
+        CHISHI_POTION_TABLE = (RegistrySupplier<MenuType<ChishiPotionTableMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_potion_table"), () -> potionTableType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(potionTableType, ChishiPotionTableScreen::new));
+
+        // 器官储藏库：按躯体槽位分页的器官仓库（选页为客户端本地状态，无需网络包）
+        MenuType<ChishiOrganVaultMenu> organVaultType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiOrganVaultBlockEntity vault) {
+                return new ChishiOrganVaultMenu(syncId, inv, vault);
+            }
+            return new ChishiOrganVaultMenu(syncId, inv,
+                    new SimpleContainer(ChishiOrganVaultBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiOrganVaultBlockEntity.DATA_SLOTS), pos);
+        });
+        CHISHI_ORGAN_VAULT = (RegistrySupplier<MenuType<ChishiOrganVaultMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_organ_vault"), () -> organVaultType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(organVaultType, ChishiOrganVaultScreen::new));
+
+        // 药剂库：大容量药剂仓库（筛选为客户端本地状态，无需网络包）
+        MenuType<ChishiPotionCabinetMenu> potionCabinetType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiPotionCabinetBlockEntity cabinet) {
+                return new ChishiPotionCabinetMenu(syncId, inv, cabinet);
+            }
+            return new ChishiPotionCabinetMenu(syncId, inv,
+                    new SimpleContainer(ChishiPotionCabinetBlockEntity.CABINET_SLOTS));
+        });
+        CHISHI_POTION_CABINET = (RegistrySupplier<MenuType<ChishiPotionCabinetMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_potion_cabinet"), () -> potionCabinetType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(potionCabinetType, ChishiPotionCabinetScreen::new));
+
+        // 样本库：大容量样本仓库（同 NBT 自动合并）
+        MenuType<ChishiSampleVaultMenu> sampleVaultType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiSampleVaultBlockEntity vault) {
+                return new ChishiSampleVaultMenu(syncId, inv, vault);
+            }
+            return new ChishiSampleVaultMenu(syncId, inv,
+                    new SimpleContainer(ChishiSampleVaultBlockEntity.SAMPLE_SLOTS));
+        });
+        CHISHI_SAMPLE_VAULT = (RegistrySupplier<MenuType<ChishiSampleVaultMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_sample_vault"), () -> sampleVaultType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(sampleVaultType, ChishiSampleVaultScreen::new));
+
+        // 发生器矩阵控制器：1 燃料槽 + 10 升级槽 + 5 数据槽（能量/燃烧/总量/成型/升级数）
+        MenuType<ChishiGenMatrixControllerMenu> genMatrixType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiGenMatrixControllerBlockEntity controller) {
+                return new ChishiGenMatrixControllerMenu(syncId, inv, controller);
+            }
+            return new ChishiGenMatrixControllerMenu(syncId, inv,
+                    new SimpleContainer(ChishiGenMatrixControllerBlockEntity.TOTAL_SLOTS),
+                    new SimpleContainerData(5), ChishiGenMatrixTier.BASIC);
+        });
+        CHISHI_GEN_MATRIX_CONTROLLER = (RegistrySupplier<MenuType<ChishiGenMatrixControllerMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_gen_matrix_controller"), () -> genMatrixType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(genMatrixType, ChishiGenMatrixControllerScreen::new));
+
+        // 提纯矩阵控制器：2 槽（输入/输出）+ 3 数据槽（能量/进度/成型）
+        MenuType<ChishiPurifierMatrixControllerMenu> purifierMatrixType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiPurifierMatrixControllerBlockEntity controller) {
+                return new ChishiPurifierMatrixControllerMenu(syncId, inv, controller);
+            }
+            return new ChishiPurifierMatrixControllerMenu(syncId, inv,
+                    new SimpleContainer(ChishiPurifierMatrixControllerBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(ChishiPurifierMatrixControllerBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_PURIFIER_MATRIX_CONTROLLER = (RegistrySupplier<MenuType<ChishiPurifierMatrixControllerMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_purifier_matrix_controller"), () -> purifierMatrixType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(purifierMatrixType, ChishiPurifierMatrixControllerScreen::new));
     }
 }

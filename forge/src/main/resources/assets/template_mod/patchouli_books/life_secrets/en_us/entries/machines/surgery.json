@@ -1,0 +1,17 @@
+{
+  "name": "Surgery Chamber",
+  "icon": "template_mod:chishi_surgery",
+  "category": "template_mod:machines",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_surgery",
+      "text": "Implant organs into the body.$(br2)$(bold)Implant$(): target slot free + organ matches the slot; costs $(bold)3 solids + 20,000 life energy$(), 4 seconds.$(bold)Extract$(): costs $(bold)1 solid + 5,000 energy$(), the organ returns to your inventory.$(br)Don't leave or lose resources mid-operation."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Rejection$() is the price of implantation: base value comes from gene quality, creature group and integrity; native organs are 0.$(br2)Rejection $(bold)grows over time$(): rate × 100/adaptation, doubled below adaptation 60, and ×1.6 for strong genes (End/Dragon).$(br2)Enemy pairs lock rejection to max, disable the organ and backfire with an explosion - $(2)synergistic organs and the Life Set$() are the future."
+    }
+  ]
+}

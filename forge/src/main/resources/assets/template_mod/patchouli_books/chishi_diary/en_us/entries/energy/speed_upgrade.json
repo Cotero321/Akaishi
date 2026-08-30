@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(bold)Energy Generation Upgrade$(): install into the upgrade slots of the $(bold)Chishi Generator$() (single), $(bold)Assembly$() or $(bold)Super Architecture$() GUI to boost output.$(br)$(li)Each doubles output speed$(li)Each reduces yield by 1%$(li)Up to 10 installed"
+      "text": "$(bold)Energy Generation Upgrade$(): install into the upgrade slots of the $(bold)Chishi Generator$() (single), $(bold)Assembly$() or $(bold)Super Architecture$() GUI to boost output.$(br)$(li)Each boosts output speed x1.75$(li)Each reduces yield by 1%$(li)Up to 10 installed, one per slot"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Multiplier (n items = 2^n x (1 - 1% x n)):$(br)$(li)1: x1.98$(li)2: x3.92$(li)3: x7.76$(li)5: x30.4$(li)10: x921.6$(br)$(bold)Note:$() A single generator makes 75 E/t; with 10 upgrades it reaches ~69k E/t. The multiblock upgrade slots live in the core GUI; shell slots proxy to the core when formed."
+      "text": "$(bold)Multiplier (n items = 1.75^n x (1 - 1% x n)):$(br)$(li)1: x1.73$(li)2: x3.00$(li)3: x5.20$(li)5: x15.6$(li)10: x241.6$(br)$(bold)Note:$() A single generator makes 75 E/t; with 10 upgrades it reaches ~18k E/t. The multiblock upgrade slots live in the core GUI; shell slots proxy to the core when formed."
     }
   ]
 }

@@ -2,8 +2,10 @@ package com.example.template.block;
 
 import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
 import com.example.template.block.entity.ModBlockEntities;
+import com.example.template.decay.DecayZoneManager;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * 仅控制器可打开界面，且仅在结构成型（{@link #FORMED}）后允许打开。
  * 服务端 tick 驱动结构扫描与燃烧结算。
  */
-public class ChishiReactorControllerBlock extends BaseEntityBlock {
+public class ChishiReactorControllerBlock extends ChishiMachineBlock {
 
     /** 结构成型标记：成型时启用燃烧逻辑并切换外观 */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
@@ -70,10 +72,20 @@ public class ChishiReactorControllerBlock extends BaseEntityBlock {
         // 仅控制器可开 GUI（外壳/燃料棒/核心等部件不可）；未成型时也可打开以查看成型状态
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ChishiReactorControllerBlockEntity controller
                 && player instanceof ServerPlayer serverPlayer) {
-            controller.restart(); // 停机状态下手动重启
             MenuRegistry.openExtendedMenu(serverPlayer, controller);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        // 满热量时被挖掘 → 触发普通衰竭区域（燃料泄漏）
+        if (!state.is(newState.getBlock()) && level instanceof ServerLevel serverLevel
+                && level.getBlockEntity(pos) instanceof ChishiReactorControllerBlockEntity controller
+                && controller.isAtFullHeat()) {
+            DecayZoneManager.createZone(serverLevel, pos, 0, false);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

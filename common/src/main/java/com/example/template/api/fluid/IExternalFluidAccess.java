@@ -36,8 +36,9 @@ public interface IExternalFluidAccess {
 
     /** 平台桥注册点：Forge 初始化时设置，管道据此访问第三方液体 */
     final class FluidBridge {
+        /** volatile 保证跨线程可见；平台初始化时仅注入一次，运行期不再变更 */
         @Nullable
-        public static IExternalFluidAccess INSTANCE;
+        public static volatile IExternalFluidAccess INSTANCE;
 
         private FluidBridge() {
         }

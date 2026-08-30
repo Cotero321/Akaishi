@@ -33,8 +33,8 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
     public static final int MODE_PUSH = 1;
     public static final int MODE_PULL = 2;
 
-    /** 网络规模上限，防止极端情况 BFS 性能问题 */
-    private static final int MAX_NETWORK = 256;
+    /** 网络规模上限：防止超大网络 BFS 遍历过多节点拖慢主线程（超出则截断，远端设备可能无法接入） */
+    private static final int MAX_NETWORK = 1024;
 
     /** 本段管道缓冲罐容量（承接外部注入的落点） */
     public static final long BUFFER_CAPACITY = 8000;
@@ -43,6 +43,12 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
     private int mode = MODE_NORMAL;
     /** 被配置器断开的连接面（bit 0-5 对应 Direction.ordinal()） */
     private int disconnectedMask;
+
+    // ===== 网络拓扑缓存：仅在结构变化时重扫，避免每 tick 全网络 BFS（与能量管道一致）=====
+    /** 网络结构是否可能已变化（放置/拆除/断开时置位，经邻居管道逐 tick 传播至代表） */
+    private boolean networkDirty = true;
+    /** 代表节点缓存的本网络管道列表（BFS 结果）；null 表示尚无缓存 */
+    private List<BlockPos> cachedPipes;
 
     public ChishiFluidPipeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -87,26 +93,61 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
     @Override
     public boolean toggleDisconnected(Direction dir) {
         disconnectedMask ^= (1 << dir.ordinal());
+        networkDirty = true; // 连接拓扑变化 → 缓存失效
         setChanged();
         return isDisconnected(dir);
     }
 
+    /** 网络拓扑可能已变化，通知本管道缓存失效（方块放置/拆除/断开连接时调用） */
+    public void markDirty() {
+        networkDirty = true;
+    }
+
     private void tickServer() {
         // 快速裁剪：存在坐标更小的相邻液体管道时，本节点非网络代表，交由代表统一传输
+        if (!isNetworkRepresentative()) {
+            // 非代表：若自身缓存标记脏，把标记传播给相邻管道（逐 tick 泛洪至代表），并清除自身标记
+            if (networkDirty) {
+                networkDirty = false;
+                for (Direction dir : Direction.values()) {
+                    if (isDisconnected(dir)) {
+                        continue;
+                    }
+                    BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
+                    if (neighbor instanceof ChishiFluidPipeBlockEntity np) {
+                        np.markDirty();
+                    }
+                }
+            }
+            return;
+        }
+        // 代表：无缓存时先做轻量邻居检查，孤立管道无需处理
+        if (cachedPipes == null && !hasNetworkNeighbor()) {
+            return;
+        }
+        // 拓扑变化或无缓存 → 重扫网络并刷新缓存
+        if (networkDirty || cachedPipes == null) {
+            refreshNetwork();
+        }
+        if (cachedPipes.isEmpty()) {
+            return;
+        }
+        transferNetwork();
+    }
+
+    /** 是否本网络代表：不存在坐标更小的相邻管道（局部最小唯一，等于网络坐标最小节点） */
+    private boolean isNetworkRepresentative() {
         for (Direction dir : Direction.values()) {
             if (isDisconnected(dir)) {
                 continue;
             }
             BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-            if (neighbor instanceof ChishiFluidPipeBlockEntity np
+            if (neighbor instanceof ChishiFluidPipeBlockEntity
                     && neighbor.getBlockPos().compareTo(worldPosition) < 0) {
-                return;
+                return false;
             }
         }
-        if (!hasNetworkNeighbor()) {
-            return;
-        }
-        transferNetwork();
+        return true;
     }
 
     /** 是否存在相邻的液体管道或可接入液体罐 */
@@ -126,8 +167,8 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
         return false;
     }
 
-    /** 沿管道 BFS 收集网络成员，并执行一次液体传输 */
-    private void transferNetwork() {
+    /** 沿管道 BFS 收集全部连通管道并刷新缓存（仅代表在拓扑变化时调用）；同时清除网络内所有管道的脏标记 */
+    private void refreshNetwork() {
         List<BlockPos> pipes = new ArrayList<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
         Set<BlockPos> visitedPipes = new HashSet<>();
@@ -137,6 +178,9 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
             BlockPos cur = queue.poll();
             pipes.add(cur);
             ChishiFluidPipeBlockEntity curPipe = level.getBlockEntity(cur) instanceof ChishiFluidPipeBlockEntity p ? p : null;
+            if (curPipe != null) {
+                curPipe.networkDirty = false; // 缓存已刷新，清除脏标记
+            }
             for (Direction dir : Direction.values()) {
                 if (curPipe != null && curPipe.isDisconnected(dir)) {
                     continue;
@@ -150,6 +194,13 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                 }
             }
         }
+        this.cachedPipes = pipes;
+        this.networkDirty = false;
+    }
+
+    /** 基于缓存的网络成员执行一次液体传输（代表每 tick 调用，正常 tick 零 BFS） */
+    private void transferNetwork() {
+        List<BlockPos> pipes = cachedPipes;
 
         // 收集源与汇罐。推模式：相连设备只作汇；拉模式：只作源；正常模式双向。
         List<TankHandle> sources = new ArrayList<>();

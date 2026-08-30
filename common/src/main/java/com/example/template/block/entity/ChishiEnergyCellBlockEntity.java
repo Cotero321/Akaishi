@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.block.ChishiEnergyCellBlock;
@@ -29,7 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 额外提供 1 个便携单元充能槽：放入便捷赤能源储存单元后自动注入能量。
  * 服务端驱动 tick 同步能量数据，客户端经 Menu 展示。
  */
-public class ChishiEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider {
+public class ChishiEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
     /** data 布局：0/1=能量低/高位，2/3=容量低/高位，4/5=便携单元能量低/高位，6/7=便携单元容量低/高位 */
     public static final int DATA_SIZE = 8;

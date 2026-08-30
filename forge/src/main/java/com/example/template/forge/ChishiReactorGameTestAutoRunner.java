@@ -24,9 +24,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * 0. 稳定燃烧：2 燃料棒 + 4 散热片（劣质 1%）+ 1 核心，注入满罐终极混合燃料 →
  *    成型、温度平衡约 363℃（2 棒产热 80 / 散热 22%）、能量产出、废品生成、散热片耐久消耗
- * 1. 拆件停机：拆除一角外壳 → 结构失效，立即停机、温度回落、能量停增
- * 2. 超温停机：重建 10 燃料棒 + 0 散热 → 温度冲过 850℃ → 触发保护性停机（停止燃烧）
- * 3. 停机保持：温度回落后仍保持停机，不自动恢复（需手动重启）
+ * 1. 拆件停机：拆除一角外壳 → 结构失效，立即停止燃烧、温度回落、能量停增
+ * 2. 超温警告：重建 10 燃料棒 + 0 散热 → 温度冲过 850℃ 警告线并直达 1000℃ 满热量
+ *    → 进入高温警告（不停机、继续燃烧减产）并启动 10 秒爆炸倒计时
+ * 3. 倒计时继续：爆炸倒计时应持续递减且反应堆保持运行（本测试在爆炸前结束）
  * <p>
  * 全部通过打印 PASS，存在失败打印 FAIL 明细，随后自动关闭服务端（便于脚本检查日志）。
  */
@@ -69,7 +70,7 @@ public final class ChishiReactorGameTestAutoRunner {
     // 阶段间传递的快照
     private static int phase0Temp;
     private static long phase0Energy;
-    private static int phase2Temp;
+    private static int phase2Countdown;
 
     private ChishiReactorGameTestAutoRunner() {
     }
@@ -185,7 +186,7 @@ public final class ChishiReactorGameTestAutoRunner {
         }
     }
 
-    /** 阶段 D：10 燃料棒 + 0 散热 + 1 核心（用于超温停机） */
+    /** 阶段 D：10 燃料棒 + 0 散热 + 1 核心（用于超温警告 + 爆炸倒计时） */
     private static void buildPhaseD() {
         buildShell(); // 补回阶段 1 拆掉的墙角
         // 清空内腔（含旧棒/散热/核心）
@@ -287,7 +288,7 @@ public final class ChishiReactorGameTestAutoRunner {
         buildPhaseD();
         phase = 2;
         ticks = 0;
-        LOGGER.info("[ReactorTest] 阶段2：超温停机（10 棒 + 0 散热），等待 {} tick 结算", TICKS_PHASE2);
+        LOGGER.info("[ReactorTest] 阶段2：超温警告 + 爆炸倒计时（10 棒 + 0 散热），等待 {} tick 结算", TICKS_PHASE2);
     }
 
     private static void runPhase2() {
@@ -297,18 +298,22 @@ public final class ChishiReactorGameTestAutoRunner {
             finish();
             return;
         }
-        LOGGER.info("[ReactorTest] ===== 阶段2 断言（超温停机） =====");
-        check(c.isShutdown(), "[停机] 10 棒 0 散热应超温触发停机");
-        check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 0,
-                "[停机] 停机后活跃槽应为 0，实际 " + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
+        LOGGER.info("[ReactorTest] ===== 阶段2 断言（超温警告 + 爆炸倒计时） =====");
         int temp = c.data().get(ChishiReactorControllerBlockEntity.DATA_TEMP);
-        check(temp < ChishiReactorControllerBlockEntity.TEMP_OVERHEAT,
-                "[停机] 停机后温度应回落到超温线以下，当前 " + temp);
+        check(c.isWarning(), "[警告] 10 棒 0 散热应进入高温警告，当前温度 " + temp);
+        check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 10,
+                "[警告] 警告期间应继续燃烧（不停机），活跃槽应为 10，实际 "
+                        + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
+        check(temp >= ChishiReactorControllerBlockEntity.TEMP_WARN,
+                "[警告] 温度应超过警告线（850），实际 " + temp);
+        int countdown = c.getExplosionCountdown();
+        check(countdown > 0 && countdown < ChishiReactorControllerBlockEntity.EXPLOSION_DELAY_TICKS,
+                "[爆炸] 满热量后应启动爆炸倒计时，剩余 " + countdown + " tick");
 
-        phase2Temp = temp;
+        phase2Countdown = countdown;
         phase = 3;
         ticks = 0;
-        LOGGER.info("[ReactorTest] 阶段3：等待温度回落验证停机保持，等待 {} tick 结算", TICKS_PHASE3);
+        LOGGER.info("[ReactorTest] 阶段3：验证爆炸倒计时继续递减，等待 {} tick 结算", TICKS_PHASE3);
     }
 
     private static void runPhase3() {
@@ -318,13 +323,14 @@ public final class ChishiReactorGameTestAutoRunner {
             finish();
             return;
         }
-        LOGGER.info("[ReactorTest] ===== 阶段3 断言（停机保持，不自动恢复） =====");
-        check(c.isShutdown(), "[停机] 温度回落后停机状态应保持（不自动恢复）");
-        check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 0,
-                "[停机] 停机期间活跃槽应保持 0，实际 " + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
-        int temp = c.data().get(ChishiReactorControllerBlockEntity.DATA_TEMP);
-        check(temp < phase2Temp,
-                "[停机] 温度应继续回落（阶段2 " + phase2Temp + "，当前 " + temp + "）");
+        LOGGER.info("[ReactorTest] ===== 阶段3 断言（倒计时继续，未提前爆炸） =====");
+        int countdown = c.getExplosionCountdown();
+        check(countdown > 0, "[爆炸] 倒计时应仍大于 0（本测试应在爆炸前结束），剩余 " + countdown);
+        check(countdown < phase2Countdown,
+                "[爆炸] 倒计时应持续递减（阶段2 " + phase2Countdown + "，当前 " + countdown + "）");
+        check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 10,
+                "[警告] 爆炸前反应堆应保持运行，活跃槽应为 10，实际 "
+                        + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
         finish();
     }
 

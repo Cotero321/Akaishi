@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 内插 1 片散热片，品质决定散热效率；反应堆运行期间散热片消耗耐久。
  * 手持散热片右键插入，空手右键取出。
  */
-public class ChishiReactorCoolerBlock extends BaseEntityBlock {
+public class ChishiReactorCoolerBlock extends ChishiMachineBlock {
 
     public ChishiReactorCoolerBlock() {
         super(Properties.of()

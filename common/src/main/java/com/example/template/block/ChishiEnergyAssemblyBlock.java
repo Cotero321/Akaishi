@@ -10,7 +10,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -30,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * 当 8 个水平邻居均为赤能源发生机时激活（formed=true），以 9 倍速率集中产能；
  * 结构不完整时失活，并将外壳发生机恢复为独立工作状态。
  */
-public class ChishiEnergyAssemblyBlock extends BaseEntityBlock {
+public class ChishiEnergyAssemblyBlock extends ChishiMachineBlock {
 
     /** 结构是否完整（激活状态） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
@@ -68,13 +67,8 @@ public class ChishiEnergyAssemblyBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ChishiEnergyAssemblyBlockEntity assembly) {
-                MenuRegistry.openExtendedMenu(serverPlayer, assembly);
-            }
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        // 已停用为纯合成材料：不提供任何交互界面
+        return InteractionResult.PASS;
     }
 
     @Override

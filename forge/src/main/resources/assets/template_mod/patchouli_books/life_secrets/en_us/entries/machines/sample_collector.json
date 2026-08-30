@@ -1,0 +1,17 @@
+{
+  "name": "Sample Collector",
+  "icon": "template_mod:chishi_sample_collector",
+  "category": "template_mod:machines",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_sample_collector",
+      "text": "A portable life-energy vessel.$(br2)$(bold)Right-click a creature$() to extract its life sample; $(bold)right-click a life-energy block/pipe$() to recharge.$(br2)Weaker creatures are easier to extract: success = base of the creature group + HP bonus (≤50% HP +10%, ≤25% +10% more, capped 95%)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Purity$() decides a sample's value and leans low:$(li)60% chance of 0-49$(li)25% chance of 50-74$(li)15% chance of 75-100$(br2)Creature groups also set a gene factor affecting future organ rejection: Warm 0.8 / Undead 1.0 / Explosive 1.1 / End 1.3 / Dragon 1.6."
+    }
+  ]
+}

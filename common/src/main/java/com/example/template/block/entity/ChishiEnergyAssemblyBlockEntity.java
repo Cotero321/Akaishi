@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.block.ChishiEnergyAssemblyBlock;
@@ -7,19 +9,13 @@ import com.example.template.block.ChishiEnergyGeneratorBlock;
 import com.example.template.energy.ChishiEnergyStorage;
 import com.example.template.energy.ChishiEnergyType;
 import com.example.template.energy.ChishiFuels;
-import com.example.template.menu.ChishiEnergyAssemblyMenu;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
@@ -28,11 +24,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 小型赤能源组合结构方块实体：3x3 多方块结构主方块。
- * 验证 8 个水平邻居均为赤能源发生机后激活，以单方块的 45 倍速率集中产能并统一输出；
- * 结构不完整时失活并解除外壳休眠。数据槽：0=能量，1=剩余燃料能量，2=燃料总能量，3=结构状态。
+ * 小型赤能源组合结构方块实体：已停用为纯材料（发生器矩阵取代），不再形成多方块结构、不再提供界面。
+ * 保留能量/燃料存储（NBT 持久化），作为合成材料时无实际功能。
  */
-public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container {
+public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements IEnergyProvider, Container, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -75,10 +70,10 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         this.data = new SimpleContainerData(5);
     }
 
-    /** 加速倍率：n 个组件 → 2^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 922 倍 */
+    /** 加速倍率：n 个组件 → 1.75^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 242 倍 */
     public static double getBoostMultiplier(int upgradeCount) {
         int n = Math.max(0, Math.min(upgradeCount, ChishiEnergyAssemblyBlockEntity.UPGRADE_SLOTS));
-        return Math.pow(2, n) * (1.0 - 0.01 * n);
+        return Math.pow(1.75, n) * (1.0 - 0.01 * n);
     }
 
     /** 统计装配的能源产生升级组件数量（0-10，最多 10 个） */
@@ -130,7 +125,7 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
                 // 每 tick 产出并消耗 min(剩余, 3375)，按能量精确消耗，低档燃料不再被取整吞掉
                 int consume = Math.min(GENERATE_RATE, burnEnergy);
                 burnEnergy -= consume;
-                // 升级组件：翻倍产出速度、减少 1% 产出（净倍率 2^n × (1-0.01n)）
+                // 升级组件：每个 ×1.75 倍产出速度、减少 1% 产出（净倍率 1.75^n × (1-0.01n)）
                 energy.addEnergy((long) (consume * getBoostMultiplier(upgrades)), false);
                 changed = true;
             }
@@ -141,22 +136,9 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         }
     }
 
-    /** 结构校验：3x3x3 立方体，中心之外 26 个位置均为赤能源发生机 */
+    /** 结构校验：已停用（3×3×3 发生器矩阵取代），恒返回 false 不触发成型 */
     private boolean isStructureValid() {
-        BlockPos pos = worldPosition;
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue;
-                    }
-                    if (!(level.getBlockState(pos.offset(dx, dy, dz)).getBlock() instanceof ChishiEnergyGeneratorBlock)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     /** 切换结构状态：同步自身与 26 个外壳发生机的 formed 标记 */
@@ -251,21 +233,6 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
     }
 
     @Override
-    public Component getDisplayName() {
-        return Component.translatable("block.template_mod.chishi_energy_assembly");
-    }
-
-    @Override
-    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
-        return new ChishiEnergyAssemblyMenu(id, inv, this);
-    }
-
-    @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
-        buf.writeBlockPos(worldPosition);
-    }
-
-    @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putLong("Energy", energy.getEnergyStored());
@@ -289,5 +256,11 @@ public class ChishiEnergyAssemblyBlockEntity extends BlockEntity implements Exte
         for (int i = 0; i < TOTAL_SLOTS; i++) {
             inventory.setItem(i, items.get(i));
         }
+    }
+
+    /** 挖掘保留数据：内部物品已由 onRemove 倒出，排除 Items 防止放置时复制 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items"};
     }
 }

@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.fluid.FluidTank;
 import com.example.template.fluid.ModFluids;
@@ -26,7 +28,7 @@ import java.util.List;
  * 仅接受衰竭燃料，管道可注可抽，NBT 持久化液体。
  * 数据槽：0=液体量 1=容量（供界面显示）。
  */
-public class ChishiExhaustedBarrelBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice {
+public class ChishiExhaustedBarrelBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
     public static final long CAPACITY = 1_000_000;
     public static final int DATA_SLOTS = 2;

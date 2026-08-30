@@ -87,6 +87,10 @@ public class ChishiItemPipeBlock extends BaseEntityBlock {
         super.neighborChanged(state, level, pos, neighbor, neighborPos, isMoving);
         // 仅服务端重算并落盘，客户端经区块同步获得一致状态
         if (!level.isClientSide) {
+            // 邻居方块变化（管道放置/拆除/设备增减）→ 网络拓扑可能变化，标记缓存失效
+            if (level.getBlockEntity(pos) instanceof ChishiItemPipeBlockEntity be) {
+                be.markDirty();
+            }
             BlockState computed = computeConnections(state, level, pos);
             if (computed != state) {
                 level.setBlock(pos, computed, 3);

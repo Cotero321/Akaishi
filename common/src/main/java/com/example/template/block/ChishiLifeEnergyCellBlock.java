@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * 生命能量储存器：大容量生命能量存储方块，可被生命能量管道接入充放。
  * 单方块电池，无多方块结构。
  */
-public class ChishiLifeEnergyCellBlock extends BaseEntityBlock {
+public class ChishiLifeEnergyCellBlock extends ChishiMachineBlock {
 
     public ChishiLifeEnergyCellBlock() {
         super(Properties.of()

@@ -1,0 +1,54 @@
+package com.example.template.block;
+
+import com.example.template.block.entity.ChishiGenEnergyOutputPortBlockEntity;
+import com.example.template.block.entity.ModBlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * 发生器矩阵能量输出口：赤能源输出端口（仅管道抽取，无手动界面）。
+ * 结构成型后从控制器拉取赤能源缓存，供能量管道/第三方物流抽取。
+ */
+public class ChishiGenEnergyOutputPortBlock extends ChishiMachineBlock {
+
+    public ChishiGenEnergyOutputPortBlock() {
+        super(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_RED)
+                .strength(3.5F)
+                .sound(SoundType.METAL));
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return ModBlockEntities.CHISHI_GEN_ENERGY_OUTPUT.get().create(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) {
+            return null;
+        }
+        if (type != ModBlockEntities.CHISHI_GEN_ENERGY_OUTPUT.get()) {
+            return null;
+        }
+        return createTickerHelper(type, ModBlockEntities.CHISHI_GEN_ENERGY_OUTPUT.get(),
+                ChishiGenEnergyOutputPortBlockEntity::serverTick);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+}

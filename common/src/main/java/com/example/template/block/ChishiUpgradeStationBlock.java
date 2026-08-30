@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 赤红升级台：消耗升级模板 + 赤能源 + 升级槽位，为赤石装备应用升级。
  */
-public class ChishiUpgradeStationBlock extends BaseEntityBlock {
+public class ChishiUpgradeStationBlock extends ChishiMachineBlock {
 
     public ChishiUpgradeStationBlock() {
         super(Properties.of().mapColor(MapColor.COLOR_RED).strength(5.0F, 6.0F).sound(SoundType.METAL));

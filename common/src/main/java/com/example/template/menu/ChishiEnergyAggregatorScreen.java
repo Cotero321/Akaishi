@@ -16,7 +16,9 @@ public class ChishiEnergyAggregatorScreen extends AbstractContainerScreen<Chishi
     private static final ResourceLocation TEXTURE = new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_energy_cell.png");
 
     private static final int BAR_X = 20, BAR_Y = 16, BAR_W = 136, BAR_H = 8;
-    private static final int PROGRESS_X = 80, PROGRESS_Y = 30, PROGRESS_W = 28, PROGRESS_H = 16;
+    private static final int PROGRESS_X = 80, PROGRESS_Y = 34, PROGRESS_W = 28, PROGRESS_H = 16;
+    /** 机器槽位数量（输入槽 + 输出槽，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = 2;
 
     public ChishiEnergyAggregatorScreen(ChishiEnergyAggregatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -30,13 +32,21 @@ public class ChishiEnergyAggregatorScreen extends AbstractContainerScreen<Chishi
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
+        // 机器槽位框（贴图无图形，自绘补齐）
+        for (int i = 0; i < MACHINE_SLOTS; i++) {
+            var slot = menu.slots.get(i);
+            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
+        }
+
         // 赤能源条（红色）
+        GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
         long max = Math.max(1, menu.getMaxEnergy());
         int energyWidth = (int) (BAR_W * Math.max(0, Math.min(menu.getEnergy(), menu.getMaxEnergy())) / max);
         if (energyWidth > 0) {
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + energyWidth, y + BAR_Y + BAR_H, 0xFFE03030);
         }
         // 聚合进度条（黄色）
+        GuiWidgets.track(gui, x + PROGRESS_X, y + PROGRESS_Y, PROGRESS_W, PROGRESS_H);
         int progressWidth = (int) (PROGRESS_W * menu.getProgress() / 100.0F);
         if (progressWidth > 0) {
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, 0xFFFFD030);
@@ -45,7 +55,7 @@ public class ChishiEnergyAggregatorScreen extends AbstractContainerScreen<Chishi
 
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
-        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFF, false);
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
 
         // 能量数值文本
         gui.drawString(this.font,

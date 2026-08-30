@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * 自带 GUI（能量条/进度条/燃料槽），服务端持有方块实体驱动逻辑。
  * 被 26 个高级提纯构建方块环绕时（formed=true）作为"提纯矩阵"中心，以 30 倍效率集中提纯。
  */
-public class ChishiPurifierBlock extends BaseEntityBlock {
+public class ChishiPurifierBlock extends ChishiMachineBlock {
 
     /** 是否为提纯矩阵中心（成型标记，由自身结构校验写入） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");

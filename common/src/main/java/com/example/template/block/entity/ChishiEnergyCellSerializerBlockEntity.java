@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.block.ChishiEnergyCellBlock;
@@ -30,7 +32,7 @@ import java.util.List;
  * 26 个赤能源储存单元环绕成型（formed=true）后，将全部单元容量聚合为单一存储，
  * 管道连接任一外壳单元即可对整体充放能量。数据槽：0/1=总能量低/高位，2/3=总容量低/高位，4=结构状态。
  */
-public class ChishiEnergyCellSerializerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider {
+public class ChishiEnergyCellSerializerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
     /** 串联器自身基础容量（成型后总容量 = 该值 + 26 个外壳单元容量之和） */
     public static final long BASE_CAPACITY = 1_000_000_000L;

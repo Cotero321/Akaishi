@@ -1,5 +1,7 @@
 package com.example.template.block.entity;
 
+import com.example.template.api.IDataCarrier;
+
 import com.example.template.api.energy.IEnergyProvider;
 import com.example.template.api.energy.IEnergyStorage;
 import com.example.template.api.energy.IEnergyType;
@@ -24,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 生命能量储存器方块实体：纯生命能量存储（双向缓冲，可充可放）。
  * 复用生命转换菜单/界面（数据槽 2/3 = 生命能量/容量），赤槽恒为 0。
  */
-public class ChishiLifeEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider {
+public class ChishiLifeEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
     /** 存储容量 */
     public static final long LIFE_CAPACITY = 1_000_000L;

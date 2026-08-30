@@ -3,14 +3,17 @@ package com.example.template.forge.jei;
 import com.example.template.TemplateMod;
 import com.example.template.block.ModBlocks;
 import com.example.template.item.ModItems;
+import com.example.template.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +23,7 @@ import java.util.List;
 
 /**
  * JEI 展示的"赤石提纯"配方类别：粗制赤石块 + 燃料 → 赤石精华。
- * 提纯逻辑目前为硬编码，此处以展示用配方列表呈现给玩家。
+ * 背景使用提纯机 GUI 贴图，槽位坐标与游戏内一致（输入 56,17 / 输出 116,35 / 燃料 56,53）。
  */
 public class PurificationRecipeCategory implements IRecipeCategory<PurificationRecipeCategory.PurificationRecipe> {
 
@@ -29,13 +32,13 @@ public class PurificationRecipeCategory implements IRecipeCategory<PurificationR
             RecipeType.create(TemplateMod.MOD_ID, "purification", PurificationRecipe.class);
 
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/jei_purification.png");
+            new ResourceLocation(TemplateMod.MOD_ID, "textures/gui/chishi_purifier.png");
 
     private final IDrawable background;
     private final IDrawable icon;
 
     public PurificationRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 116, 60);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 72);
         this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_PURIFIER.get()));
     }
 
@@ -61,10 +64,18 @@ public class PurificationRecipeCategory implements IRecipeCategory<PurificationR
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PurificationRecipe recipe, IFocusGroup focuses) {
-        // 输入：粗制赤石块 + 燃料（赤石晶或粗制块），输出：赤石精华
-        builder.addSlot(RecipeIngredientRole.INPUT, 8, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.input());
-        builder.addSlot(RecipeIngredientRole.INPUT, 37, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.fuel());
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 92, 23).addIngredient(VanillaTypes.ITEM_STACK, recipe.output());
+        // 槽位坐标与游戏内提纯机一致：输入 56,17 / 输出 116,35 / 燃料 56,53
+        builder.addSlot(RecipeIngredientRole.INPUT, 56, 17).addIngredient(VanillaTypes.ITEM_STACK, recipe.input());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 116, 35).addIngredient(VanillaTypes.ITEM_STACK, recipe.output());
+        builder.addSlot(RecipeIngredientRole.INPUT, 56, 53).addIngredient(VanillaTypes.ITEM_STACK, recipe.fuel());
+    }
+
+    @Override
+    public void draw(PurificationRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        // 与游戏内一致自绘槽位框
+        GuiWidgets.slotBox(guiGraphics, 56, 17);
+        GuiWidgets.slotBox(guiGraphics, 116, 35);
+        GuiWidgets.slotBox(guiGraphics, 56, 53);
     }
 
     /** 提纯配方展示数据 */

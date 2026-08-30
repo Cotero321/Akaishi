@@ -18,4 +18,10 @@ public class SpeedUpgradeSlot extends Slot {
     public boolean mayPlace(ItemStack stack) {
         return stack.is(ModItems.chishiSpeedUpgrade.get());
     }
+
+    @Override
+    public int getMaxStackSize() {
+        // 升级组件每个槽位最多放 1 个（防堆叠，倍率按槽位数统计）
+        return 1;
+    }
 }

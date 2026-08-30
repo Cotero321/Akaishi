@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 赤能源储存单元：大容量赤能源存储方块，可被赤能源管道接入。
  * 按 {@link EnergyCellTier} 参数化，同一方块实体类型承载不同等级。
  */
-public class ChishiEnergyCellBlock extends BaseEntityBlock {
+public class ChishiEnergyCellBlock extends ChishiMachineBlock {
 
     private final EnergyCellTier tier;
 

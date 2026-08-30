@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    " H ",
+    "C C"
+  ],
+  "key": {
+    "C": { "item": "template_mod:chishi_purifier_matrix_casing" },
+    "H": { "item": "minecraft:hopper" }
+  },
+  "result": {
+    "item": "template_mod:chishi_purifier_item_input"
+  }
+}
