@@ -5,6 +5,7 @@ import com.example.template.life.body.IPlayerBodyState;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -125,11 +126,12 @@ public final class OrganEffectResolver {
         return count;
     }
 
-    /** 器官属性集：特色覆盖优先，否则回退槽位模板 */
+    /** 器官属性集：特色覆盖优先，否则回退槽位模板（槽位无模板时返回空列表，避免 NPE） */
     public static List<OrganTemplate.AttributeBonus> bonusesOf(ItemStack organ, BodySlot slot, OrganEffect effect) {
         if (effect != null && effect.attributes() != null) {
             return effect.attributes();
         }
-        return OrganRegistry.get(slot).bonuses();
+        OrganTemplate template = OrganRegistry.get(slot);
+        return template != null ? template.bonuses() : Collections.emptyList();
     }
 }

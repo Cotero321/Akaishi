@@ -79,10 +79,10 @@ public class ChishiReactorControllerBlock extends ChishiMachineBlock {
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        // 满热量时被挖掘 → 触发普通衰竭区域（燃料泄漏）
+        // 满热量时被挖掘 → 触发普通衰竭区域（燃料泄漏）；爆炸清空结构（exploded 已置位）不重复触发
         if (!state.is(newState.getBlock()) && level instanceof ServerLevel serverLevel
                 && level.getBlockEntity(pos) instanceof ChishiReactorControllerBlockEntity controller
-                && controller.isAtFullHeat()) {
+                && controller.isAtFullHeat() && !controller.exploded()) {
             DecayZoneManager.createZone(serverLevel, pos, 0, false);
         }
         super.onRemove(state, level, pos, newState, isMoving);

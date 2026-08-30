@@ -229,10 +229,9 @@ public class ChishiOrganItem extends Item {
             tooltip.add(Component.translatable("gui.template_mod.organ.purity", purity));
         }
         double compatFactor = compat / 100.0;
-        // 生物特色效果（未注册时回退槽位模板属性）
+        // 生物特色效果（未注册时回退槽位模板属性，槽位无模板返回空列表）
         OrganEffect effect = OrganEffectRegistry.get(getEntityId(stack), slot);
-        List<OrganTemplate.AttributeBonus> bonuses = effect != null && effect.attributes() != null
-                ? effect.attributes() : OrganRegistry.get(slot).bonuses();
+        List<OrganTemplate.AttributeBonus> bonuses = OrganEffectResolver.bonusesOf(stack, slot, effect);
         // 属性加成（基础值 × 品质倍率 × 适配度 × 突破倍率）
         for (OrganTemplate.AttributeBonus bonus : bonuses) {
             double value = bonus.base() * tier.getMultiplier() * compatFactor * boost;

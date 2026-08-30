@@ -97,6 +97,8 @@ public class ChishiReactorControllerBlockEntity extends BlockEntity implements E
     private int explosionCountdown = -1;
     /** 高温警告已广播标记（防止刷屏） */
     private boolean warnBroadcast;
+    /** 爆炸已完成标记：清空结构时置位，阻止 onRemove 按"满热量被挖"重复触发衰竭区域 */
+    private boolean exploded;
     private int activeSlots;
     private double fuelDrainPerTick;
     private long energyPerTick;
@@ -325,6 +327,8 @@ public class ChishiReactorControllerBlockEntity extends BlockEntity implements E
         }
         // 爆炸触发的衰竭区域施加衰竭五效果（等级 5 = amplifier 4）
         DecayZoneManager.createZone((ServerLevel) level, worldPosition, 4, true);
+        // 置位后清空结构：控制器 onRemove 不再重复触发衰竭区域
+        exploded = true;
         // 爆炸视觉与音效（不破坏方块，结构由下方手动清空）
         level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
                 6.0f, Level.ExplosionInteraction.NONE);
@@ -445,6 +449,11 @@ public class ChishiReactorControllerBlockEntity extends BlockEntity implements E
     /** 是否已达满热量（被破坏/拆结构触发泄漏的前提） */
     public boolean isAtFullHeat() {
         return temp >= TEMP_MAX;
+    }
+
+    /** 爆炸是否已完成（供方块 onRemove 判定是否为爆炸清空，避免重复触发区域） */
+    public boolean exploded() {
+        return exploded;
     }
 
     /** 当前温度（供方块 onRemove 判定泄漏） */
