@@ -11,11 +11,13 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.function.Supplier;
+
 /**
  * 液体注册（Forge 平台）。
  * 液体必须注册在 Forge 端：FluidType 是 Forge 专属概念，Architectury 在 Forge 平台
  * 将 {@link ArchitecturyFlowingFluid} 替换为 ForgeFlowingFluid 实现，自动为液体创建 FluidType。
- * 4 种液体均不注册液体方块与桶（block/bucket 属性默认为空气），因此不会在世界中流动/放置，
+ * 所有液体均不注册液体方块与桶（block/bucket 属性默认为空气），因此不会在世界中流动/放置，
  * 只能通过机器与液体管道传输——符合"能量/燃料液体"的定位。
  * common 模块通过 {@link ModFluids#get(String)} 按注册表 ID 取用。
  * attributes 用惰性方法创建：其 supplier 前向引用同类的液体注册对象，字段初始化器中
@@ -152,18 +154,154 @@ public final class ModFluidsImpl {
         return sculkLifeFuelAttrs;
     }
 
-    // ===== 衰竭的生命燃料：反应堆燃烧废品（灰褐废料，无光泽） =====
-    private static SimpleArchitecturyFluidAttributes exhaustedLifeFuelAttrs;
+    // ===== 衰竭燃料（7 种）：反应堆燃烧废品（共用废料贴图 + 各自去饱和着色，稠重无光） =====
 
-    private static SimpleArchitecturyFluidAttributes exhaustedLifeFuelAttrs() {
-        if (exhaustedLifeFuelAttrs == null) {
-            exhaustedLifeFuelAttrs = SimpleArchitecturyFluidAttributes.ofSupplier(() -> EXHAUSTED_LIFE_FUEL_FLOWING, () -> EXHAUSTED_LIFE_FUEL)
-                    .color(ModFluids.COLOR_EXHAUSTED_LIFE_FUEL)
-                    .density(1400).viscosity(2600).temperature(200).luminosity(0)
-                    .sourceTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/exhausted_life_fuel_still"))
-                    .flowingTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/exhausted_life_fuel_flow"));
+    /** 统一构建衰竭燃料 attributes：物理属性一致，仅颜色区分（贴图复用同一废料纹理） */
+    private static SimpleArchitecturyFluidAttributes exhaustedAttrs(Supplier<RegistryObject<Fluid>> flowing, Supplier<RegistryObject<Fluid>> source, int color) {
+        return SimpleArchitecturyFluidAttributes.ofSupplier(flowing, source)
+                .color(color)
+                .density(1400).viscosity(2600).temperature(200).luminosity(0)
+                .sourceTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/exhausted_life_fuel_still"))
+                .flowingTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/exhausted_life_fuel_flow"));
+    }
+
+    // ===== 活化衰竭液体（7 种）：生命活化器无害化产物（共用活化贴图 + 各自复苏着色，澄清微光） =====
+
+    /** 统一构建活化衰竭液体 attributes：物理属性一致，仅颜色区分（贴图复用同一活化纹理） */
+    private static SimpleArchitecturyFluidAttributes activatedAttrs(Supplier<RegistryObject<Fluid>> flowing, Supplier<RegistryObject<Fluid>> source, int color) {
+        return SimpleArchitecturyFluidAttributes.ofSupplier(flowing, source)
+                .color(color)
+                .density(1050).viscosity(1200).temperature(300).luminosity(3)
+                .sourceTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/activated_life_fuel_still"))
+                .flowingTexture(new ResourceLocation(TemplateMod.MOD_ID, "block/fluid/activated_life_fuel_flow"));
+    }
+
+    // 各衰竭燃料的惰性 attrs（方法体内引用字段合法，规避字段初始化期"非法前向引用"）
+    private static SimpleArchitecturyFluidAttributes sculkExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes sculkExhaustedFuelAttrs() {
+        if (sculkExhaustedFuelAttrs == null) {
+            sculkExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_SCULK_FUEL_FLOWING, () -> EXHAUSTED_SCULK_FUEL, ModFluids.COLOR_EXHAUSTED_SCULK_FUEL);
         }
-        return exhaustedLifeFuelAttrs;
+        return sculkExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes netherCompoundExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes netherCompoundExhaustedFuelAttrs() {
+        if (netherCompoundExhaustedFuelAttrs == null) {
+            netherCompoundExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_NETHER_COMPOUND_FUEL_FLOWING, () -> EXHAUSTED_NETHER_COMPOUND_FUEL, ModFluids.COLOR_EXHAUSTED_NETHER_COMPOUND_FUEL);
+        }
+        return netherCompoundExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes endMixtureExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes endMixtureExhaustedFuelAttrs() {
+        if (endMixtureExhaustedFuelAttrs == null) {
+            endMixtureExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_END_MIXTURE_FUEL_FLOWING, () -> EXHAUSTED_END_MIXTURE_FUEL, ModFluids.COLOR_EXHAUSTED_END_MIXTURE_FUEL);
+        }
+        return endMixtureExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes advancedMixtureExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes advancedMixtureExhaustedFuelAttrs() {
+        if (advancedMixtureExhaustedFuelAttrs == null) {
+            advancedMixtureExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_ADVANCED_MIXTURE_FUEL_FLOWING, () -> EXHAUSTED_ADVANCED_MIXTURE_FUEL, ModFluids.COLOR_EXHAUSTED_ADVANCED_MIXTURE_FUEL);
+        }
+        return advancedMixtureExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes pureExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes pureExhaustedFuelAttrs() {
+        if (pureExhaustedFuelAttrs == null) {
+            pureExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_PURE_FUEL_FLOWING, () -> EXHAUSTED_PURE_FUEL, ModFluids.COLOR_EXHAUSTED_PURE_FUEL);
+        }
+        return pureExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes dragonExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes dragonExhaustedFuelAttrs() {
+        if (dragonExhaustedFuelAttrs == null) {
+            dragonExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_DRAGON_FUEL_FLOWING, () -> EXHAUSTED_DRAGON_FUEL, ModFluids.COLOR_EXHAUSTED_DRAGON_FUEL);
+        }
+        return dragonExhaustedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes ultimateMixtureExhaustedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes ultimateMixtureExhaustedFuelAttrs() {
+        if (ultimateMixtureExhaustedFuelAttrs == null) {
+            ultimateMixtureExhaustedFuelAttrs = exhaustedAttrs(() -> EXHAUSTED_ULTIMATE_MIXTURE_FUEL_FLOWING, () -> EXHAUSTED_ULTIMATE_MIXTURE_FUEL, ModFluids.COLOR_EXHAUSTED_ULTIMATE_MIXTURE_FUEL);
+        }
+        return ultimateMixtureExhaustedFuelAttrs;
+    }
+
+    // 各活化衰竭液体的惰性 attrs（同衰竭燃料模式）
+    private static SimpleArchitecturyFluidAttributes sculkActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes sculkActivatedFuelAttrs() {
+        if (sculkActivatedFuelAttrs == null) {
+            sculkActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_SCULK_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_SCULK_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_SCULK_FUEL);
+        }
+        return sculkActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes netherCompoundActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes netherCompoundActivatedFuelAttrs() {
+        if (netherCompoundActivatedFuelAttrs == null) {
+            netherCompoundActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL);
+        }
+        return netherCompoundActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes endMixtureActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes endMixtureActivatedFuelAttrs() {
+        if (endMixtureActivatedFuelAttrs == null) {
+            endMixtureActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL);
+        }
+        return endMixtureActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes advancedMixtureActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes advancedMixtureActivatedFuelAttrs() {
+        if (advancedMixtureActivatedFuelAttrs == null) {
+            advancedMixtureActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL);
+        }
+        return advancedMixtureActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes pureActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes pureActivatedFuelAttrs() {
+        if (pureActivatedFuelAttrs == null) {
+            pureActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_PURE_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_PURE_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_PURE_FUEL);
+        }
+        return pureActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes dragonActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes dragonActivatedFuelAttrs() {
+        if (dragonActivatedFuelAttrs == null) {
+            dragonActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_DRAGON_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_DRAGON_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_DRAGON_FUEL);
+        }
+        return dragonActivatedFuelAttrs;
+    }
+
+    private static SimpleArchitecturyFluidAttributes ultimateMixtureActivatedFuelAttrs;
+
+    private static SimpleArchitecturyFluidAttributes ultimateMixtureActivatedFuelAttrs() {
+        if (ultimateMixtureActivatedFuelAttrs == null) {
+            ultimateMixtureActivatedFuelAttrs = activatedAttrs(() -> ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_FLOWING, () -> ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL, ModFluids.COLOR_ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL);
+        }
+        return ultimateMixtureActivatedFuelAttrs;
     }
 
     public static final RegistryObject<Fluid> NETHER_PURE_ENERGY =
@@ -211,10 +349,76 @@ public final class ModFluidsImpl {
     public static final RegistryObject<Fluid> ULTIMATE_MIXTURE_FUEL_FLOWING =
             FLUIDS.register(ModFluids.ULTIMATE_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(ultimateMixtureFuelAttrs()));
 
-    public static final RegistryObject<Fluid> EXHAUSTED_LIFE_FUEL =
-            FLUIDS.register(ModFluids.EXHAUSTED_LIFE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(exhaustedLifeFuelAttrs()));
-    public static final RegistryObject<Fluid> EXHAUSTED_LIFE_FUEL_FLOWING =
-            FLUIDS.register(ModFluids.EXHAUSTED_LIFE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(exhaustedLifeFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_SCULK_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_SCULK_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(sculkExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_SCULK_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_SCULK_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(sculkExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_NETHER_COMPOUND_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_NETHER_COMPOUND_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(netherCompoundExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_NETHER_COMPOUND_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_NETHER_COMPOUND_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(netherCompoundExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_END_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_END_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(endMixtureExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_END_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_END_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(endMixtureExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_ADVANCED_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(advancedMixtureExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_ADVANCED_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(advancedMixtureExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_PURE_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_PURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(pureExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_PURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_PURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(pureExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_DRAGON_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_DRAGON_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(dragonExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_DRAGON_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_DRAGON_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(dragonExhaustedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> EXHAUSTED_ULTIMATE_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(ultimateMixtureExhaustedFuelAttrs()));
+    public static final RegistryObject<Fluid> EXHAUSTED_ULTIMATE_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(ultimateMixtureExhaustedFuelAttrs()));
+
+    // ===== 活化衰竭液体（7 种，与衰竭燃料一一对应） =====
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_SCULK_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_SCULK_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(sculkActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_SCULK_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_SCULK_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(sculkActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(netherCompoundActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(netherCompoundActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(endMixtureActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(endMixtureActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(advancedMixtureActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(advancedMixtureActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_PURE_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_PURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(pureActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_PURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_PURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(pureActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_DRAGON_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(dragonActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_DRAGON_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(dragonActivatedFuelAttrs()));
+
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID, () -> new ArchitecturyFlowingFluid.Source(ultimateMixtureActivatedFuelAttrs()));
+    public static final RegistryObject<Fluid> ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_FLOWING =
+            FLUIDS.register(ModFluids.ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID + "_flowing", () -> new ArchitecturyFlowingFluid.Flowing(ultimateMixtureActivatedFuelAttrs()));
 
     private ModFluidsImpl() {
     }

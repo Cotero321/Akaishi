@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "PCP",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "template_mod:chishi_wireless_component"
+    },
+    "P": {
+      "item": "template_mod:chishi_energy_pipe"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_wireless_input_port"
+  }
+}

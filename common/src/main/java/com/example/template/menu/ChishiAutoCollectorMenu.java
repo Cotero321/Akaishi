@@ -30,18 +30,18 @@ public class ChishiAutoCollectorMenu extends AbstractContainerMenu {
         // 存储槽 9×3
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(container, col + row * 9, 8 + col * 18, 17 + row * 18));
+                addSlot(new Slot(container, col + row * 9, 8 + col * 18, 46 + row * 18));
             }
         }
-        // 玩家背包 3×9
+        // 玩家背包 3×9（198 高 GUI：y=124 起，与 chishi_auto_collector.png 槽位图案对齐）
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 124 + row * 18));
             }
         }
         // 快捷栏 1×9
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inv, col, 8 + col * 18, 142));
+            addSlot(new Slot(inv, col, 8 + col * 18, 180));
         }
 
         addDataSlots(data);
@@ -60,6 +60,11 @@ public class ChishiAutoCollectorMenu extends AbstractContainerMenu {
     /** 当前收集进度百分比（GUI 进度条用） */
     public int getProgress() {
         return data.get(2);
+    }
+
+    /** 工作状态：0=待机 1=能量不足 2=工作中 */
+    public int getStatus() {
+        return data.get(3);
     }
 
     @Override

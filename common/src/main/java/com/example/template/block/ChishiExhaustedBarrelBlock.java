@@ -3,10 +3,12 @@ package com.example.template.block;
 import com.example.template.block.entity.ChishiExhaustedBarrelBlockEntity;
 import com.example.template.block.entity.ModBlockEntities;
 import com.example.template.decay.DecayZoneManager;
+import com.example.template.sound.ModSounds;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -73,6 +75,8 @@ public class ChishiExhaustedBarrelBlock extends ChishiMachineBlock {
             if (amount > 0) {
                 int amp = 1 + (int) (3 * amount / (double) barrel.tank().getCapacity());
                 DecayZoneManager.createZone(serverLevel, pos, Math.min(3, amp), false);
+                // 泄漏警示音效（就地播放，警示附近玩家）
+                level.playSound(null, pos, ModSounds.DECAY_LEAK.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);

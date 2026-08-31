@@ -2,7 +2,10 @@ package com.example.template.forge;
 
 import com.example.template.TemplateMod;
 import com.example.template.block.ModBlocks;
+import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
 import com.example.template.command.ModCommands;
+import com.example.template.forge.config.ChishiConfig;
+import com.example.template.forge.config.ChishiConfigSync;
 import com.example.template.forge.fluid.ForgeFluidBridge;
 import com.example.template.forge.fluid.ModFluidsImpl;
 import com.example.template.forge.life.ChishiLifeInteraction;
@@ -41,8 +44,10 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.ModLoadingContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +82,10 @@ public final class TemplateModForge {
     public TemplateModForge() {
         // 将 Forge 的 Mod 事件总线交给 Architectury，使内容在正确的时机加载
         EventBuses.registerModEventBus(TemplateMod.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+
+        // 注册数值配置（common.toml）：加载/重载时同步到 common ModConfig
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ChishiConfig.SPEC);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ChishiConfigSync::onModConfig);
 
         // 注册 4 种液体（下界至纯/复合能量 + 至纯/复合燃料）到 Forge 注册表
         ModFluidsImpl.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -321,6 +330,8 @@ public final class TemplateModForge {
      */
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
+        // 反应堆结构扫描缓存失效：结构内方块被玩家破坏 → 立即重扫（成型后另有 20 tick 兜底）
+        ChishiReactorControllerBlockEntity.invalidateNearby((Level) event.getLevel(), event.getPos());
         Player player = event.getPlayer();
         if (player == null || player.level().isClientSide) {
             return;
@@ -350,6 +361,16 @@ public final class TemplateModForge {
         if (broken > 0) {
             main.hurtAndBreak(broken / 4 + 1, player, e -> {
             });
+        }
+    }
+
+    /**
+     * 反应堆结构扫描缓存失效：结构内方块被放置 → 立即重扫（搭建时快速成型反馈）。
+     */
+    @SubscribeEvent
+    public void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
+        if (!event.getLevel().isClientSide()) {
+            ChishiReactorControllerBlockEntity.invalidateNearby((Level) event.getLevel(), event.getPos());
         }
     }
 

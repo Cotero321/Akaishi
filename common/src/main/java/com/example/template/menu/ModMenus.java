@@ -3,6 +3,7 @@ package com.example.template.menu;
 import com.example.template.TemplateMod;
 import com.example.template.block.ChishiGenMatrixTier;
 import com.example.template.block.entity.ChishiAutoCollectorBlockEntity;
+import com.example.template.block.entity.ChishiCatalystBlockEntity;
 import com.example.template.block.entity.ChishiEnergyAggregatorBlockEntity;
 import com.example.template.block.entity.ChishiEnergyCellBlockEntity;
 import com.example.template.block.entity.ChishiEnergyCellSerializerBlockEntity;
@@ -24,6 +25,7 @@ import com.example.template.block.entity.ChishiOrganVaultBlockEntity;
 import com.example.template.block.entity.ChishiPotionCabinetBlockEntity;
 import com.example.template.block.entity.ChishiSampleVaultBlockEntity;
 import com.example.template.block.entity.ChishiLifeMatrixControllerBlockEntity;
+import com.example.template.block.entity.ChishiLifeActivatorBlockEntity;
 import com.example.template.block.entity.ChishiLifePurifierBlockEntity;
 import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
 import com.example.template.block.entity.ChishiReactorEnergyOutputBlockEntity;
@@ -31,6 +33,8 @@ import com.example.template.block.entity.ChishiReactorFuelPortBlockEntity;
 import com.example.template.block.entity.ChishiPurifierBlockEntity;
 import com.example.template.block.entity.ChishiPurifierMatrixControllerBlockEntity;
 import com.example.template.block.entity.ChishiUpgradeStationBlockEntity;
+import com.example.template.block.entity.ChishiWirelessTerminalBlockEntity;
+import com.example.template.wireless.IWirelessPortHost;
 import dev.architectury.registry.menu.MenuRegistry;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -70,6 +74,7 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<ChishiUpgradeStationMenu>> CHISHI_UPGRADE_STATION;
     /** 自动收集器菜单类型 */
     public static RegistrySupplier<MenuType<ChishiAutoCollectorMenu>> CHISHI_AUTO_COLLECTOR;
+    public static RegistrySupplier<MenuType<ChishiCatalystMenu>> CHISHI_CATALYST;
     /** 生命能量提纯器菜单类型 */
     public static RegistrySupplier<MenuType<ChishiLifePurifierMenu>> CHISHI_LIFE_PURIFIER;
     /** 能量液化装置菜单类型 */
@@ -112,6 +117,14 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<ChishiGenMatrixControllerMenu>> CHISHI_GEN_MATRIX_CONTROLLER;
     /** 提纯矩阵控制器菜单类型 */
     public static RegistrySupplier<MenuType<ChishiPurifierMatrixControllerMenu>> CHISHI_PURIFIER_MATRIX_CONTROLLER;
+    /** 生命活化器菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiLifeActivatorMenu>> CHISHI_LIFE_ACTIVATOR;
+    /** 无线赤能源终端菜单类型（终端方块主界面，四页互斥） */
+    public static RegistrySupplier<MenuType<ChishiWirelessTerminalMenu>> CHISHI_WIRELESS_TERMINAL;
+    /** 无线赤能源输入口/输出口菜单类型（共用） */
+    public static RegistrySupplier<MenuType<ChishiWirelessPortMenu>> CHISHI_WIRELESS_PORT;
+    /** 无线能源便捷终端菜单类型（手持物品，无方块实体） */
+    public static RegistrySupplier<MenuType<ChishiWirelessPortableTerminalMenu>> CHISHI_WIRELESS_PORTABLE_TERMINAL;
 
     private ModMenus() {
     }
@@ -263,6 +276,21 @@ public final class ModMenus {
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_auto_collector"), () -> collectorType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(collectorType, ChishiAutoCollectorScreen::new));
+
+        // 赤石催化器：无机器槽，仅玩家背包 + 能量/工作状态数据同步
+        MenuType<ChishiCatalystMenu> catalystType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            return level.getBlockEntity(pos) instanceof ChishiCatalystBlockEntity be
+                    ? new ChishiCatalystMenu(syncId, inv, be.data())
+                    : new ChishiCatalystMenu(syncId, inv,
+                            new net.minecraft.world.inventory.SimpleContainerData(ChishiCatalystBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_CATALYST = (RegistrySupplier<MenuType<ChishiCatalystMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_catalyst"), () -> catalystType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(catalystType, ChishiCatalystScreen::new));
 
         // 生命能量提纯器：1 输出槽 + 赤能源/生命能量/进度数据同步
         MenuType<ChishiLifePurifierMenu> lifePurifierType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -620,5 +648,67 @@ public final class ModMenus {
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_purifier_matrix_controller"), () -> purifierMatrixType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(purifierMatrixType, ChishiPurifierMatrixControllerScreen::new));
+
+        // 生命活化器：无机器槽位（纯液体无害化），7 数据槽（生命能量/输入/输出/累计活化量）
+        MenuType<ChishiLifeActivatorMenu> activatorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiLifeActivatorBlockEntity activator) {
+                return new ChishiLifeActivatorMenu(syncId, inv, activator);
+            }
+            return new ChishiLifeActivatorMenu(syncId, inv,
+                    new SimpleContainerData(ChishiLifeActivatorBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_LIFE_ACTIVATOR = (RegistrySupplier<MenuType<ChishiLifeActivatorMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_activator"), () -> activatorType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(activatorType, ChishiLifeActivatorScreen::new));
+
+        // ===== 无线赤能源 =====
+        // 终端（外墙主方块）：15 数据槽（储能 long/成型/口统计/授权卡数/组件状态/终端ID），
+        // 1 授权槽（仅安全页显示）；网络缓冲 = 方块坐标 + 初始页（安全方块直达安全卡认证页）
+        MenuType<ChishiWirelessTerminalMenu> terminalType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            int page = buf.readInt();
+            Level level = inv.player.level();
+            ChishiWirelessTerminalMenu menu = level.getBlockEntity(pos) instanceof ChishiWirelessTerminalBlockEntity t
+                    ? new ChishiWirelessTerminalMenu(syncId, inv, t)
+                    : ChishiWirelessTerminalMenu.emptyMenu(syncId, inv);
+            menu.setInitialPage(page);
+            return menu;
+        });
+        CHISHI_WIRELESS_TERMINAL = (RegistrySupplier<MenuType<ChishiWirelessTerminalMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_wireless_terminal"), () -> terminalType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(terminalType, ChishiWirelessTerminalScreen::new));
+
+        // 端口（输入口/输出口共用）：9 数据槽（缓冲储能 long + 卡/终端短 ID + 认证态 + 速率 long），无机器槽
+        MenuType<ChishiWirelessPortMenu> wirelessPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof IWirelessPortHost host) {
+                return new ChishiWirelessPortMenu(syncId, inv, host);
+            }
+            return new ChishiWirelessPortMenu(syncId, inv,
+                    new SimpleContainerData(com.example.template.block.entity.ChishiWirelessInputPortBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_WIRELESS_PORT = (RegistrySupplier<MenuType<ChishiWirelessPortMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_wireless_port"), () -> wirelessPortType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(wirelessPortType, ChishiWirelessPortScreen::new));
+
+        // 便捷终端（手持物品）：无方块实体，服务端每 tick broadcastChanges 扫背包身份卡刷新数据槽
+        MenuType<ChishiWirelessPortableTerminalMenu> portableType = MenuRegistry.ofExtended((syncId, inv, buf) ->
+                new ChishiWirelessPortableTerminalMenu(syncId, inv, inv.player));
+        CHISHI_WIRELESS_PORTABLE_TERMINAL = (RegistrySupplier<MenuType<ChishiWirelessPortableTerminalMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_wireless_portable_terminal"), () -> portableType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(portableType, ChishiWirelessPortableTerminalScreen::new));
     }
 }

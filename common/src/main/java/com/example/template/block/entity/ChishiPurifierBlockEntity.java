@@ -9,12 +9,14 @@ import com.example.template.energy.ChishiEnergyStorage;
 import com.example.template.energy.ChishiEnergyType;
 import com.example.template.item.ModItems;
 import com.example.template.menu.ChishiPurifierMenu;
+import com.example.template.sound.ModSounds;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -71,6 +73,8 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
     private int burnTimeTotal;
     /** 已投入提纯能量（能量池模式，满 {@link #needed()} 完成一次） */
     private long progressEnergy;
+    /** 运转音播放冷却（tick） */
+    private int humCooldown;
     /** 提纯矩阵成型缓存（每 tick 仅读缓存，仅邻居方块变化时重扫） */
     private boolean matrixFormed;
     /** 矩阵结构待重扫标记（外壳放置/移除、区块加载时置位） */
@@ -135,6 +139,11 @@ public class ChishiPurifierBlockEntity extends BlockEntity implements ExtendedMe
             if (extract > 0) {
                 energy.extractEnergy(extract, false);
                 progressEnergy += extract;
+                // 运转声（循环）：每 15 tick 重播短音
+                if (--humCooldown <= 0) {
+                    level.playSound(null, worldPosition, ModSounds.MACHINE_HUM.get(), SoundSource.BLOCKS, 0.4f, 1.0f);
+                    humCooldown = 15;
+                }
                 if (progressEnergy >= needed()) {
                     progressEnergy -= needed();
                     inventory.removeItem(INPUT_SLOT, 1);

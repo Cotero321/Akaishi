@@ -244,6 +244,10 @@ public final class ModCreativeTabs {
                                     if (ModItems.chishiLifeEssenceSolid != null) {
                                         output.accept(new ItemStack(ModItems.chishiLifeEssenceSolid.get()));
                                     }
+                                    // 生命活化器（生命科技：消耗生命能量无害化衰竭燃料）
+                                    if (ModBlocks.CHISHI_LIFE_ACTIVATOR != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_ACTIVATOR.get()));
+                                    }
                                     // 创造模式能量源（测试用，无限输出）
                                     if (ModBlocks.CHISHI_CREATIVE_ENERGY_CELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_ENERGY_CELL.get()));
@@ -251,9 +255,15 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_CREATIVE_LIFE_CELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_LIFE_CELL.get()));
                                     }
-                                    // 液体管道 + 液体储罐（3 级）
+                                    // 液体管道 + 液体储罐（3 级）+ 废料专用管道
                                     if (ModBlocks.CHISHI_FLUID_PIPE != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_PIPE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_EXHAUSTED_PIPE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_EXHAUSTED_PIPE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_MULTI_FLUID_WASTE_PIPE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_MULTI_FLUID_WASTE_PIPE.get()));
                                     }
                                     if (ModBlocks.CHISHI_FLUID_TANK_BASIC != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_TANK_BASIC.get()));
@@ -380,6 +390,9 @@ public final class ModCreativeTabs {
                                     if (ModItems.heatSinkExquisite != null) {
                                         output.accept(new ItemStack(ModItems.heatSinkExquisite.get()));
                                     }
+                                    if (ModItems.heatSinkUltimate != null) {
+                                        output.accept(new ItemStack(ModItems.heatSinkUltimate.get()));
+                                    }
                                     // 赤石饰品（Curios 槽位：charm/ring/hands/necklace/body/bracelet/belt）
                                     if (ModItems.satiationCharm != null) {
                                         output.accept(new ItemStack(ModItems.satiationCharm.get()));
@@ -434,6 +447,10 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_ORGAN_VAULT != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ORGAN_VAULT.get()));
                                     }
+                                    // 样本库（生命科技：大容量样本仓库，自动合并）
+                                    if (ModBlocks.CHISHI_SAMPLE_VAULT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_SAMPLE_VAULT.get()));
+                                    }
                                     // 药剂库（生命科技：大容量药剂仓库，自动合并）
                                     if (ModBlocks.CHISHI_POTION_CABINET != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_POTION_CABINET.get()));
@@ -441,6 +458,9 @@ public final class ModCreativeTabs {
                                     // 生命科技：样本采集器 + 生命样本 + 基因序列片段
                                     if (ModItems.sampleCollector != null) {
                                         output.accept(new ItemStack(ModItems.sampleCollector.get()));
+                                    }
+                                    if (ModItems.lifeSample != null) {
+                                        output.accept(new ItemStack(ModItems.lifeSample.get()));
                                     }
                                     if (ModItems.geneSequence != null) {
                                         output.accept(new ItemStack(ModItems.geneSequence.get()));
@@ -455,6 +475,54 @@ public final class ModCreativeTabs {
                                     output.accept(new ItemStack(ModItems.chishiOrganRightArm.get()));
                                     output.accept(new ItemStack(ModItems.chishiOrganLeftLeg.get()));
                                     output.accept(new ItemStack(ModItems.chishiOrganRightLeg.get()));
+                                    // 无线赤能源体系：外壳/终端核心/控制器/输入口/输出口
+                                    if (ModBlocks.CHISHI_WIRELESS_SHELL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_SHELL.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_TERMINAL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_TERMINAL.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_SECURITY != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_SECURITY.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_CORE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CORE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_CONTROLLER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CONTROLLER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_INPUT_PORT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_INPUT_PORT.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get()));
+                                    }
+                                    // 无线赤能源体系：内腔功能组件（跨维/区块加载/区块扩展/入损/出损抑制）
+                                    if (ModBlocks.CHISHI_WIRELESS_DIM_BRIDGE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_DIM_BRIDGE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_CHUNK_RANGE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CHUNK_RANGE.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_INPUT_LOSS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_INPUT_LOSS.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_WIRELESS_OUTPUT_LOSS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_OUTPUT_LOSS.get()));
+                                    }
+                                    // 无线赤能源体系：便捷组件/便捷终端/身份卡
+                                    if (ModItems.chishiWirelessComponent != null) {
+                                        output.accept(new ItemStack(ModItems.chishiWirelessComponent.get()));
+                                    }
+                                    if (ModItems.chishiWirelessPortableTerminal != null) {
+                                        output.accept(new ItemStack(ModItems.chishiWirelessPortableTerminal.get()));
+                                    }
+                                    if (ModItems.chishiWirelessIdentityCard != null) {
+                                        output.accept(new ItemStack(ModItems.chishiWirelessIdentityCard.get()));
+                                    }
                                     // 手册“赤石研究日记”由帕秋莉按 creative_tab 自动加入，此处不重复添加
                                 })
                                 .build());

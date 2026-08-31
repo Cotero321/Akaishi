@@ -31,8 +31,8 @@ import java.util.List;
 
 /**
  * 燃料混合器方块实体（仅服务端驱动逻辑）。
- * 消耗赤能源，将两种燃料液体按 1:1:1 调和为高阶混合燃料：
- * - 高级混合燃料：1000mb 末地混合燃料 + 1000mb 下界复合燃料 → 1000mb 高级混合燃料
+ * 消耗赤能源，将两种燃料液体按比例调和为高阶混合燃料：
+ * - 高级混合燃料：1000mb 末地混合燃料 + 1000mb 下界复合燃料 → 1500mb 高级混合燃料
  * - 终极混合燃料：50mb 末地巨龙燃料 + 50mb 至纯燃料 → 50mb 终极混合燃料
  * 2 个通用输入罐（顺序无关，任意摆放）+ 1 个通用输出罐；配方按两罐液体组合判定，
  * 输入量不足 / 输出罐不可容纳 / 组合不匹配时停机。输入罐只可注入、输出罐只可抽取。
@@ -68,8 +68,9 @@ public class ChishiFuelMixerBlockEntity extends BlockEntity implements
         Fluid end = ModFluids.get(ModFluids.END_MIXTURE_FUEL_ID);
         Fluid compound = ModFluids.get(ModFluids.NETHER_COMPOUND_FUEL_ID);
         if ((f1 == end && f2 == compound) || (f1 == compound && f2 == end)) {
+            // 高级混合：1000+1000 → 1500mb（混合增值 50%）
             return new Recipe(end, 1000L, compound, 1000L,
-                    ModFluids.get(ModFluids.ADVANCED_MIXTURE_FUEL_ID), 1000L);
+                    ModFluids.get(ModFluids.ADVANCED_MIXTURE_FUEL_ID), 1500L);
         }
         Fluid dragon = ModFluids.get(ModFluids.DRAGON_FUEL_ID);
         Fluid pure = ModFluids.get(ModFluids.PURE_FUEL_ID);

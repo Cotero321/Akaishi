@@ -63,6 +63,10 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<ChishiLifePurifierBlockEntity>> CHISHI_LIFE_PURIFIER;
     /** 液体管道方块实体类型 */
     public static RegistrySupplier<BlockEntityType<ChishiFluidPipeBlockEntity>> CHISHI_FLUID_PIPE;
+    /** 封闭性衰竭管道方块实体类型（废料专用，单缓冲） */
+    public static RegistrySupplier<BlockEntityType<ChishiExhaustedPipeBlockEntity>> CHISHI_EXHAUSTED_PIPE;
+    /** 多流体废料管道方块实体类型（废料专用，多缓冲） */
+    public static RegistrySupplier<BlockEntityType<ChishiMultiFluidWastePipeBlockEntity>> CHISHI_MULTI_FLUID_WASTE_PIPE;
     /** 能量液化装置方块实体类型 */
     public static RegistrySupplier<BlockEntityType<ChishiEnergyLiquefierBlockEntity>> CHISHI_ENERGY_LIQUEFIER;
     /** 能量加工器方块实体类型 */
@@ -71,6 +75,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<ChishiFuelCannerBlockEntity>> CHISHI_FUEL_CANNER;
     /** 燃料混合器方块实体 */
     public static RegistrySupplier<BlockEntityType<ChishiFuelMixerBlockEntity>> CHISHI_FUEL_MIXER;
+    /** 生命活化器方块实体 */
+    public static RegistrySupplier<BlockEntityType<ChishiLifeActivatorBlockEntity>> CHISHI_LIFE_ACTIVATOR;
     /** 液体储罐方块实体类型（基础/高级/超级共用） */
     public static RegistrySupplier<BlockEntityType<ChishiFluidTankBlockEntity>> CHISHI_FLUID_TANK;
     /** 反应堆控制器方块实体类型（主方块，持有全部反应堆状态） */
@@ -123,6 +129,14 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<ChishiLifeMatrixEnergyInputPortBlockEntity>> CHISHI_LIFE_MATRIX_ENERGY_INPUT;
     /** 生命转换矩阵能量输出口方块实体类型 */
     public static RegistrySupplier<BlockEntityType<ChishiLifeMatrixEnergyOutputPortBlockEntity>> CHISHI_LIFE_MATRIX_ENERGY_OUTPUT;
+    /** 无线赤能源终端方块实体类型（外墙主方块，网络能量中枢） */
+    public static RegistrySupplier<BlockEntityType<ChishiWirelessTerminalBlockEntity>> CHISHI_WIRELESS_TERMINAL;
+    /** 无线赤能源输入口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiWirelessInputPortBlockEntity>> CHISHI_WIRELESS_INPUT_PORT;
+    /** 无线赤能源输出口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<ChishiWirelessOutputPortBlockEntity>> CHISHI_WIRELESS_OUTPUT_PORT;
+    /** 区块加载构架方块实体：锁所属终端结构控制器区块（弱加载） */
+    public static RegistrySupplier<BlockEntityType<ChishiWirelessChunkLoaderBlockEntity>> CHISHI_WIRELESS_CHUNK_LOADER;
 
     private ModBlockEntities() {
     }
@@ -210,6 +224,12 @@ public final class ModBlockEntities {
         // 液体管道（传输下界能量/燃料液体）
         CHISHI_FLUID_PIPE = be("chishi_fluid_pipe", ChishiFluidPipeBlockEntity::new,
                 ModBlocks.CHISHI_FLUID_PIPE);
+        // 封闭性衰竭管道（废料专用，单缓冲）
+        CHISHI_EXHAUSTED_PIPE = be("chishi_exhausted_pipe", ChishiExhaustedPipeBlockEntity::new,
+                ModBlocks.CHISHI_EXHAUSTED_PIPE);
+        // 多流体废料管道（废料专用，多缓冲）
+        CHISHI_MULTI_FLUID_WASTE_PIPE = be("chishi_multi_fluid_waste_pipe", ChishiMultiFluidWastePipeBlockEntity::new,
+                ModBlocks.CHISHI_MULTI_FLUID_WASTE_PIPE);
         // 能量液化装置（赤能源驱动，产出下界能量液体）
         CHISHI_ENERGY_LIQUEFIER = be("chishi_energy_liquefier", ChishiEnergyLiquefierBlockEntity::new,
                 ModBlocks.CHISHI_ENERGY_LIQUEFIER);
@@ -222,6 +242,9 @@ public final class ModBlockEntities {
         // 燃料混合器（燃料液体 1:1:1 调和 → 高级/终极混合燃料）
         CHISHI_FUEL_MIXER = be("chishi_fuel_mixer", ChishiFuelMixerBlockEntity::new,
                 ModBlocks.CHISHI_FUEL_MIXER);
+        // 生命活化器（生命能量无害化衰竭燃料）
+        CHISHI_LIFE_ACTIVATOR = be("chishi_life_activator", ChishiLifeActivatorBlockEntity::new,
+                ModBlocks.CHISHI_LIFE_ACTIVATOR);
         // 液体储罐（一个方块实体类型承载 基础/高级/超级 三个等级）
         CHISHI_FLUID_TANK = be("chishi_fluid_tank", ChishiFluidTankBlockEntity::new,
                 ModBlocks.CHISHI_FLUID_TANK_BASIC, ModBlocks.CHISHI_FLUID_TANK_ADVANCED,
@@ -304,5 +327,18 @@ public final class ModBlockEntities {
         // 能量输出口（生命能量缓冲，仅管道抽取）
         CHISHI_LIFE_MATRIX_ENERGY_OUTPUT = be("chishi_life_matrix_energy_output",
                 ChishiLifeMatrixEnergyOutputPortBlockEntity::new, ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT);
+        // ===== 无线赤能源 =====
+        // 终端（外墙主方块：注册网络、授权卡、绑定储能、中转口能量）
+        CHISHI_WIRELESS_TERMINAL = be("chishi_wireless_terminal", ChishiWirelessTerminalBlockEntity::new,
+                ModBlocks.CHISHI_WIRELESS_TERMINAL);
+        // 输入口（能量管道 → 终端网络的发送端）
+        CHISHI_WIRELESS_INPUT_PORT = be("chishi_wireless_input_port", ChishiWirelessInputPortBlockEntity::new,
+                ModBlocks.CHISHI_WIRELESS_INPUT_PORT);
+        // 输出口（无线频道 → 能量管道的接收端）
+        CHISHI_WIRELESS_OUTPUT_PORT = be("chishi_wireless_output_port", ChishiWirelessOutputPortBlockEntity::new,
+                ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT);
+        // 区块加载构架（内腔功能件，持有 BE：自持中枢区块弱加载 ticket）
+        CHISHI_WIRELESS_CHUNK_LOADER = be("chishi_wireless_chunk_loader", ChishiWirelessChunkLoaderBlockEntity::new,
+                ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER);
     }
 }

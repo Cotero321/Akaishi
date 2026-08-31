@@ -4,7 +4,9 @@ import com.example.template.api.IDataCarrier;
 
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.fluid.FluidTank;
+import com.example.template.config.ModConfig;
 import com.example.template.fluid.ModFluids;
+import com.example.template.fluid.MultiFluidTank;
 import com.example.template.menu.ChishiExhaustedBarrelMenu;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -24,27 +26,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 /**
- * 衰竭保存桶方块实体：专储衰竭的生命燃料（容量 1000L，带 GUI 液位显示）。
- * 仅接受衰竭燃料，管道可注可抽，NBT 持久化液体。
- * 数据槽：0=液体量 1=容量（供界面显示）。
+ * 衰竭保存桶方块实体：专储衰竭燃料（容量 1000L，带 GUI 液位显示）。
+ * 仅接受衰竭燃料（7 种），管道可注可抽，NBT 持久化液体。
+ * 数据槽：0=总液体量 1=容量（供界面显示）。
  */
 public class ChishiExhaustedBarrelBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
-    public static final long CAPACITY = 1_000_000;
     public static final int DATA_SLOTS = 2;
     public static final int DATA_AMOUNT = 0;
     public static final int DATA_CAPACITY = 1;
 
-    private final FluidTank tank;
+    private final MultiFluidTank tank;
     private final SimpleContainerData data;
 
     public ChishiExhaustedBarrelBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_EXHAUSTED_BARREL.get(), pos, state);
-        this.tank = new FluidTank(CAPACITY) {
+        this.tank = new MultiFluidTank(ModConfig.exhaustedBarrelCapacity) {
             @Override
             public long fill(FluidStack resource, boolean simulate) {
-                // 专用储液：只接受衰竭的生命燃料
-                if (resource == null || resource.isEmpty() || resource.getFluid() != ModFluids.get(ModFluids.EXHAUSTED_LIFE_FUEL_ID)) {
+                // 专用储液：只接受衰竭燃料
+                if (resource == null || !ModFluids.isExhaustedFuel(resource.getFluid())) {
                     return 0;
                 }
                 return super.fill(resource, simulate);
@@ -71,7 +72,7 @@ public class ChishiExhaustedBarrelBlockEntity extends BlockEntity implements Ext
         return data;
     }
 
-    public FluidTank tank() {
+    public MultiFluidTank tank() {
         return tank;
     }
 
@@ -80,6 +81,11 @@ public class ChishiExhaustedBarrelBlockEntity extends BlockEntity implements Ext
     @Override
     public List<FluidTank> getFluidTanks() {
         return List.of(tank);
+    }
+
+    @Override
+    public boolean isWasteOnlyDevice() {
+        return true;
     }
 
     @Override

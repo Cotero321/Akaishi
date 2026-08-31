@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "template_mod:heat_sink_exquisite",
-      "text": "Right-click a Cooler (interior block) with a Heat Sink to install it, empty hand to remove. Only coolers$(bold)adjacent to a Fuel Rod$() count: each burns 1 durability per tick while active, and shatters when it runs out (unrepairable).$(br2)$(bold)Five qualities:$()$(li)Poor: 1% cooling, 36,000 ticks$(li)Normal: 2%, 72,000 ticks$(li)Good: 3%, 108,000 ticks$(li)Fine: 4%, 144,000 ticks$(li)Exquisite: 5%, 180,000 ticks$(br2)20 Normal sinks total 40% efficiency; 20 Exquisite reach 100%."
+      "text": "Right-click a Cooler (interior block) with a Heat Sink to install it, empty hand to remove. Only coolers$(bold)adjacent to a Fuel Rod$() count: each burns 1 durability per tick while active, and shatters when it runs out (unrepairable).$(br2)$(bold)Six qualities:$()$(li)Poor: 1% cooling, 36,000 ticks$(li)Normal: 2%, 72,000 ticks$(li)Good: 3%, 108,000 ticks$(li)Fine: 4%, 144,000 ticks$(li)Exquisite: 5%, 180,000 ticks$(li)Ultimate: 7%, 180,000 ticks$(br2)20 Normal sinks total 40% efficiency; 20 Exquisite reach 100%; 20 Ultimate reach 140% (cooling efficiency has no cap - the more you stack, the lower the temperature)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Temperature:$() each tick temp += (total heat − temp × (passive 0.2 + 0.5 × efficiency)) × 0.1, clamped to 0-1000℃.$(li)0-400℃: output coefficient 0.5→1.0$(li)400-700℃: optimal, coefficient 1.0$(li)700-1000℃: coefficient falls to 0.1$(br2)Above 850℃ the reactor enters an overheat warning (no shutdown, but output drops hard); at 1000℃ full heat it explodes after 10 seconds.$(bold)Match fuel and heat sinks wisely to stay in the optimal band, or the explosion will leave a 5-chunk decay wasteland.$()"
+      "text": "$(bold)Temperature:$() raw temperature = base 300℃ + sum of rod heat values (see Fuel entry); actual = raw × (1 − passive 0.2 − sink 0.7 × efficiency), cooling efficiency uncapped, clamped to 0-1000℃.$(li)0-400℃: output coefficient 1.0→1.4 (+10% per 100℃ lower, no cap) $(li)400-700℃: optimal, coefficient 1.0$(li)700-1000℃: coefficient falls to 0.1$(br2)Any fuel with 10 rods and no cooling exceeds 1000℃ and explodes (base fuel 1200℃, ultimate 3800℃) - cooling is mandatory. Above 850℃ the reactor enters an overheat warning (no shutdown, but output drops hard); at 1000℃ full heat it explodes after 10 seconds.$(bold)Match fuel and heat sinks: with uncapped cooling you can push the temperature below 400℃ for higher output (base fuel needs ~8 Normal sinks to enter the zone; more sinks raise utilization further), or the explosion will leave a 5-chunk decay wasteland.$()"
     }
   ]
 }

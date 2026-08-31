@@ -3,7 +3,9 @@ package com.example.template.block.entity;
 import com.example.template.api.fluid.IExternalFluidAccess;
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.block.ChishiFluidPipeBlock;
+import com.example.template.config.ModConfig;
 import com.example.template.fluid.FluidTank;
+import com.example.template.fluid.ModFluids;
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,8 +38,7 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
     /** 网络规模上限：防止超大网络 BFS 遍历过多节点拖慢主线程（超出则截断，远端设备可能无法接入） */
     private static final int MAX_NETWORK = 1024;
 
-    /** 本段管道缓冲罐容量（承接外部注入的落点） */
-    public static final long BUFFER_CAPACITY = 8000;
+    /** 本段管道缓冲罐容量（承接外部注入的落点），由 {@link ModConfig#fluidPipeBufferCapacity} 提供 */
 
     private final FluidTank buffer;
     private int mode = MODE_NORMAL;
@@ -52,7 +53,25 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
 
     public ChishiFluidPipeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        this.buffer = new FluidTank(BUFFER_CAPACITY) {
+        this.buffer = createBuffer();
+    }
+
+    public ChishiFluidPipeBlockEntity(BlockPos pos, BlockState state) {
+        this(ModBlockEntities.CHISHI_FLUID_PIPE.get(), pos, state);
+    }
+
+    /** 缓冲罐工厂：子类（废料管道）可覆写为废料专用罐/多液体罐。
+     *  基类（普通管道）缓冲拒收衰竭燃料，防止外部罐混入废料时被普通管道缓存（绕过泄漏机制） */
+    protected FluidTank createBuffer() {
+        return new FluidTank(ModConfig.fluidPipeBufferCapacity) {
+            @Override
+            public long fill(FluidStack resource, boolean simulate) {
+                if (resource != null && ModFluids.isExhaustedFuel(resource.getFluid())) {
+                    return 0; // 废料仅限废料管道家族运输
+                }
+                return super.fill(resource, simulate);
+            }
+
             @Override
             protected void onChanged() {
                 setChanged();
@@ -60,8 +79,14 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
         };
     }
 
-    public ChishiFluidPipeBlockEntity(BlockPos pos, BlockState state) {
-        this(ModBlockEntities.CHISHI_FLUID_PIPE.get(), pos, state);
+    /** 是否废料管道家族：废料管道仅与废料管道互连，仅对接废料专用设备 */
+    public boolean isWasteFamily() {
+        return false;
+    }
+
+    /** 邻居是否为同家族管道（普通管道 ↔ 普通管道、废料管道 ↔ 废料管道，两族网络物理隔离） */
+    private boolean sameFamilyPipe(BlockEntity be) {
+        return be instanceof ChishiFluidPipeBlockEntity p && p.isWasteFamily() == isWasteFamily();
     }
 
     public FluidTank buffer() {
@@ -106,7 +131,7 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
     private void tickServer() {
         // 快速裁剪：存在坐标更小的相邻液体管道时，本节点非网络代表，交由代表统一传输
         if (!isNetworkRepresentative()) {
-            // 非代表：若自身缓存标记脏，把标记传播给相邻管道（逐 tick 泛洪至代表），并清除自身标记
+            // 非代表：若自身缓存标记脏，把标记传播给相邻同家族管道（逐 tick 泛洪至代表），并清除自身标记
             if (networkDirty) {
                 networkDirty = false;
                 for (Direction dir : Direction.values()) {
@@ -114,7 +139,7 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                         continue;
                     }
                     BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-                    if (neighbor instanceof ChishiFluidPipeBlockEntity np) {
+                    if (sameFamilyPipe(neighbor) && neighbor instanceof ChishiFluidPipeBlockEntity np) {
                         np.markDirty();
                     }
                 }
@@ -135,29 +160,28 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
         transferNetwork();
     }
 
-    /** 是否本网络代表：不存在坐标更小的相邻管道（局部最小唯一，等于网络坐标最小节点） */
+    /** 是否本网络代表：不存在坐标更小的相邻同家族管道（局部最小唯一，等于网络坐标最小节点） */
     private boolean isNetworkRepresentative() {
         for (Direction dir : Direction.values()) {
             if (isDisconnected(dir)) {
                 continue;
             }
             BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-            if (neighbor instanceof ChishiFluidPipeBlockEntity
-                    && neighbor.getBlockPos().compareTo(worldPosition) < 0) {
+            if (sameFamilyPipe(neighbor) && neighbor.getBlockPos().compareTo(worldPosition) < 0) {
                 return false;
             }
         }
         return true;
     }
 
-    /** 是否存在相邻的液体管道或可接入液体罐 */
+    /** 是否存在相邻的同家族管道或可接入液体罐 */
     private boolean hasNetworkNeighbor() {
         for (Direction dir : Direction.values()) {
             if (isDisconnected(dir)) {
                 continue;
             }
             BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-            if (neighbor instanceof ChishiFluidPipeBlockEntity) {
+            if (sameFamilyPipe(neighbor)) {
                 return true;
             }
             if (hasFluidTank(neighbor, dir)) {
@@ -189,7 +213,7 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                 if (!visitedPipes.add(next)) {
                     continue;
                 }
-                if (level.getBlockEntity(next) instanceof ChishiFluidPipeBlockEntity) {
+                if (sameFamilyPipe(level.getBlockEntity(next))) {
                     queue.add(next);
                 }
             }
@@ -270,9 +294,18 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                 continue;
             }
             FluidStack taken = source.drain(take);
+            // 家族液体过滤：普通管道不传输废料（外部罐若混入废料，立即放回，防止绕过本 mod 泄漏机制）
+            if (!isWasteFamily() && ModFluids.isExhaustedFuel(taken.getFluid())) {
+                source.fill(taken);
+                continue;
+            }
             for (TankHandle sink : sinks) {
                 if (taken.isEmpty()) {
                     break;
+                }
+                // 跳过与源同底层罐的汇：自循环只消耗配额，且无效标记方块
+                if (sink.identity() == source.identity()) {
+                    continue;
                 }
                 long moved = sink.fill(taken);
                 if (moved > 0) {
@@ -291,15 +324,23 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
         }
     }
 
-    /** 收集邻居方块暴露的全部液体罐（模组设备或外部能力），并标记其输入/输出权限 */
+    /** 收集邻居方块暴露的全部液体罐（模组设备或外部能力），并标记其输入/输出权限。
+     *  家族隔离：普通管道只取普通罐、废料管道只取废料罐（按罐级 {@link IFluidPipeDevice#isWasteTank}），
+     *  混合接入设备（如生命活化器）因此可同时接两族管道；废料管道不接外部液体能力 */
     private List<TankHandle> collectTanks(BlockPos pos, Direction side) {
         List<TankHandle> result = new ArrayList<>();
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof IFluidPipeDevice device) {
             for (FluidTank tank : device.getFluidTanks()) {
+                if (device.isWasteTank(tank) != isWasteFamily()) {
+                    continue; // 罐级家族过滤：本管道只与家族匹配的罐对接
+                }
                 result.add(TankHandle.of(tank, device.canPipeExtract(tank), device.canPipeInsert(tank)));
             }
             return result;
+        }
+        if (isWasteFamily()) {
+            return result; // 废料管道只传废料，不接外部液体能力（MEK 等）
         }
         if (IExternalFluidAccess.FluidBridge.INSTANCE != null) {
             IExternalFluidAccess.ExternalFluidTank tank = IExternalFluidAccess.FluidBridge.INSTANCE.getTank(level, pos, side);
@@ -310,12 +351,17 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
         return result;
     }
 
-    /** 邻居方块是否存在可对接的液体罐（模组设备或外部液体能力） */
+    /** 邻居方块是否存在可对接的液体罐（模组设备或外部液体能力），按罐级家族过滤 */
     private boolean hasFluidTank(BlockEntity be, Direction side) {
         if (be instanceof IFluidPipeDevice device) {
-            return !device.getFluidTanks().isEmpty();
+            for (FluidTank tank : device.getFluidTanks()) {
+                if (device.isWasteTank(tank) == isWasteFamily()) {
+                    return true;
+                }
+            }
+            return false;
         }
-        return IExternalFluidAccess.FluidBridge.INSTANCE != null
+        return !isWasteFamily() && IExternalFluidAccess.FluidBridge.INSTANCE != null
                 && IExternalFluidAccess.FluidBridge.INSTANCE.getTank(level, be.getBlockPos(), side) != null;
     }
 
@@ -334,6 +380,9 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
 
         /** 注入液体，返回实际注入量 */
         long fill(FluidStack stack);
+
+        /** 底层罐身份：同一罐同时被标记为源与汇时跳过，防止自循环挤占配额饿死真实传输 */
+        Object identity();
 
         static TankHandle of(FluidTank tank) {
             return of(tank, true, true);
@@ -370,6 +419,11 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                 public long fill(FluidStack stack) {
                     return tank.fill(stack, false);
                 }
+
+                @Override
+                public Object identity() {
+                    return tank;
+                }
             };
         }
 
@@ -403,6 +457,11 @@ public class ChishiFluidPipeBlockEntity extends BlockEntity implements ChishiPip
                 @Override
                 public long fill(FluidStack stack) {
                     return tank.fill(stack, false);
+                }
+
+                @Override
+                public Object identity() {
+                    return tank;
                 }
             };
         }

@@ -1,0 +1,6 @@
+{
+  "name": "Wireless Transmission",
+  "description": "Remote wireless Chishi Energy network authenticated by identity cards",
+  "icon": "template_mod:chishi_wireless_terminal",
+  "sortnum": 7
+}

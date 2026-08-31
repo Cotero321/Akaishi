@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "template_mod:block/chishi_wireless_controller_top",
+    "front": "template_mod:block/chishi_wireless_controller_front",
+    "side": "template_mod:block/chishi_wireless_controller_side",
+    "bottom": "template_mod:block/chishi_wireless_controller_bottom"
+  }
+}

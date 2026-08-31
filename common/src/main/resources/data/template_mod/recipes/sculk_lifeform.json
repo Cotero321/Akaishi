@@ -6,7 +6,7 @@
     "ESE"
   ],
   "key": {
-    "E": { "item": "minecraft:echo_shard" },
+    "E": { "item": "minecraft:golden_carrot" },
     "G": { "item": "template_mod:chishi_essence_block" },
     "S": { "item": "minecraft:sculk" },
     "A": { "item": "minecraft:golden_apple" }

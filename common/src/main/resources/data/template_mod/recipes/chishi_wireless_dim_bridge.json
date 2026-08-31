@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "EPE",
+    "PCP",
+    "EPE"
+  ],
+  "key": {
+    "E": { "item": "template_mod:chishi_essence_compressed" },
+    "P": { "item": "minecraft:ender_pearl" },
+    "C": { "item": "template_mod:chishi_advanced_component" }
+  },
+  "result": {
+    "item": "template_mod:chishi_wireless_dim_bridge"
+  }
+}

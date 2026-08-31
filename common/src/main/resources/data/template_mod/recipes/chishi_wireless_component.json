@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ECE",
+    "CAC",
+    "ECE"
+  ],
+  "key": {
+    "E": {
+      "item": "template_mod:chishi_essence_compressed"
+    },
+    "C": {
+      "item": "template_mod:chishi_machine_component"
+    },
+    "A": {
+      "item": "template_mod:chishi_advanced_component"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_wireless_component",
+    "count": 2
+  }
+}

@@ -2,7 +2,12 @@ package com.example.template.block;
 
 import com.example.template.block.entity.ChishiCatalystBlockEntity;
 import com.example.template.block.entity.ModBlockEntities;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -14,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -76,5 +82,16 @@ public class ChishiCatalystBlock extends BaseEntityBlock {
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        // 右键打开工作界面：显示是否工作 + 能量槽
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+            if (level.getBlockEntity(pos) instanceof ChishiCatalystBlockEntity catalyst) {
+                MenuRegistry.openExtendedMenu(serverPlayer, catalyst);
+            }
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

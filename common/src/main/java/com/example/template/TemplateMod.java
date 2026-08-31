@@ -13,6 +13,7 @@ import com.example.template.menu.ChishiLifeStructSync;
 import com.example.template.menu.ChishiSurgerySync;
 import com.example.template.menu.ChishiPotionSync;
 import com.example.template.menu.ModMenus;
+import com.example.template.sound.ModSounds;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
@@ -47,5 +48,7 @@ public final class TemplateMod {
         ChishiSurgerySync.register();
         // 药剂台模板选择包（C2S 接收器）
         ChishiPotionSync.register();
+        // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
+        ModSounds.touch();
     }
 }

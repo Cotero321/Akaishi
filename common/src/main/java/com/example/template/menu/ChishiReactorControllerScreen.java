@@ -1,6 +1,7 @@
 package com.example.template.menu;
 
 import com.example.template.TemplateMod;
+import com.example.template.config.ModConfig;
 import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -200,11 +201,15 @@ public class ChishiReactorControllerScreen extends AbstractContainerScreen<Chish
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
 
-        // 悬停提示：废品条（状态页）
+        // 悬停提示：废品条（状态页），含衰竭燃料种类数
         if (menu.getPage() == 2 && isHovering(WASTE_X, WASTE_Y, WASTE_W, WASTE_H, mouseX, mouseY)) {
-            gui.renderTooltip(this.font, Component.translatable("gui.template_mod.reactor.waste",
-                    EnergyFormat.format(menu.getWasteAmount()), EnergyFormat.format(menu.getWasteMax())),
-                    mouseX, mouseY);
+            Component tip = Component.translatable("gui.template_mod.reactor.waste",
+                    EnergyFormat.format(menu.getWasteAmount()), EnergyFormat.format(menu.getWasteMax()));
+            int types = menu.getWasteTypes();
+            if (types > 0) {
+                tip = tip.copy().append(Component.translatable("gui.template_mod.reactor.waste_types", types));
+            }
+            gui.renderTooltip(this.font, tip, mouseX, mouseY);
         }
     }
 
@@ -238,14 +243,14 @@ public class ChishiReactorControllerScreen extends AbstractContainerScreen<Chish
     }
 
     private static int clampTemp(int temp) {
-        return Math.max(0, Math.min(ChishiReactorControllerBlockEntity.TEMP_MAX, temp));
+        return Math.max(0, Math.min(ModConfig.reactorTempMax, temp));
     }
 
     /** 温度分档着色：正常绿 / 偏高黄 / 危险红 */
     private static int tempColor(int temp) {
-        if (temp >= ChishiReactorControllerBlockEntity.TEMP_WARN) return BAD;
-        if (temp >= ChishiReactorControllerBlockEntity.TEMP_OPT_MIN
-                && temp <= ChishiReactorControllerBlockEntity.TEMP_OPT_MAX) return OK;
+        if (temp >= ModConfig.reactorTempWarn) return BAD;
+        if (temp >= ModConfig.reactorTempOptMin
+                && temp <= ModConfig.reactorTempOptMax) return OK;
         return WARN;
     }
 }

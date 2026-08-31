@@ -6,6 +6,7 @@ import com.example.template.block.entity.ChishiReactorCoolerBlockEntity;
 import com.example.template.block.entity.ChishiReactorEnergyOutputBlockEntity;
 import com.example.template.block.entity.ChishiReactorFuelPortBlockEntity;
 import com.example.template.block.entity.ChishiReactorWastePortBlockEntity;
+import com.example.template.config.ModConfig;
 import com.example.template.fluid.ModFluids;
 import com.example.template.item.ChishiFuelCellItem;
 import com.example.template.item.ModItems;
@@ -22,8 +23,8 @@ import org.slf4j.LoggerFactory;
  * dev 环境反应堆体系端到端自动测试（以 -Dchishi.gametest.reactor=1 启动服务端触发）。
  * 在出生点区块搭建 5×5×5 单层封闭长方体反应堆（控制器顶面中心），分 4 阶段验证：
  * <p>
- * 0. 稳定燃烧：2 燃料棒 + 4 散热片（劣质 1%）+ 1 核心，注入满罐终极混合燃料 →
- *    成型、温度平衡约 363℃（2 棒产热 80 / 散热 22%）、能量产出、废品生成、散热片耐久消耗
+ * 0. 稳定燃烧：2 燃料棒 + 4 散热片（劣质 1%）+ 1 核心，注入满罐世界基础燃料 →
+ *    成型、温度平衡约 417℃（2 棒基础热值 120 / 散热 4%）、能量产出、废品生成、散热片耐久消耗
  * 1. 拆件停机：拆除一角外壳 → 结构失效，立即停止燃烧、温度回落、能量停增
  * 2. 超温警告：重建 10 燃料棒 + 0 散热 → 温度冲过 850℃ 警告线并直达 1000℃ 满热量
  *    → 进入高温警告（不停机、继续燃烧减产）并启动 10 秒爆炸倒计时
@@ -178,11 +179,11 @@ public final class ChishiReactorGameTestAutoRunner {
                 c.insertHeatSink(new ItemStack(ModItems.heatSinkPoor.get()));
             }
         }
-        // 通过燃料投放口注入 2 个满罐（验证自动分配逻辑）
+        // 通过燃料投放口注入 2 个满罐世界基础燃料（验证自动分配逻辑）
         ChishiReactorFuelPortBlockEntity port = asFuelPort();
         if (port != null) {
-            port.insertCell(fullCell());
-            port.insertCell(fullCell());
+            port.insertCell(fullCell(ModFluids.SCULK_LIFE_FUEL_ID));
+            port.insertCell(fullCell(ModFluids.SCULK_LIFE_FUEL_ID));
         }
     }
 
@@ -201,11 +202,11 @@ public final class ChishiReactorGameTestAutoRunner {
             }
         }
         setBlock(new BlockPos(1, 2, 1), ModBlocks.CHISHI_REACTOR_FUEL_ROD.get());
-        // 直接注入控制器燃料槽
+        // 直接注入控制器燃料槽（10 棒终极混合 → 无散热必爆）
         ChishiReactorControllerBlockEntity controller = asController();
         if (controller != null) {
             for (int i = 0; i < 10; i++) {
-                controller.fuelSlots().setItem(i, fullCell());
+                controller.fuelSlots().setItem(i, fullCell(ModFluids.ULTIMATE_MIXTURE_FUEL_ID));
             }
         }
     }
@@ -228,8 +229,8 @@ public final class ChishiReactorGameTestAutoRunner {
                 "[成型] 散热百分比应为 4%，实际 " + c.data().get(ChishiReactorControllerBlockEntity.DATA_COOLING_PERCENT));
 
         int temp = c.data().get(ChishiReactorControllerBlockEntity.DATA_TEMP);
-        check(temp >= 300 && temp <= 400,
-                "[燃烧] 温度应平衡在约 363℃，实际 " + temp);
+        check(temp >= 400 && temp <= 470,
+                "[燃烧] 温度应平衡在约 417℃（世界基础燃料热值 120 × 2 + 散热 4%），实际 " + temp);
         check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 2,
                 "[燃烧] 活跃槽应为 2，实际 " + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
 
@@ -239,8 +240,8 @@ public final class ChishiReactorGameTestAutoRunner {
                 "[燃烧] 能量输出口应有产出，实际 " + stored);
         ChishiReactorWastePortBlockEntity waste = asWasteOut();
         long wasteAmt = waste == null ? 0 : waste.wasteTank().getAmount();
-        check(waste != null && wasteAmt > 100,
-                "[燃烧] 废品输出口应有衰竭燃料，实际 " + wasteAmt);
+        check(waste != null && wasteAmt > 0,
+                "[燃烧] 废品输出口应有衰竭燃料（5mb→1mb），实际 " + wasteAmt);
 
         ItemStack cell = c.fuelSlots().getItem(0);
         int amount = ChishiFuelCellItem.getAmount(cell);
@@ -304,10 +305,10 @@ public final class ChishiReactorGameTestAutoRunner {
         check(c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS) == 10,
                 "[警告] 警告期间应继续燃烧（不停机），活跃槽应为 10，实际 "
                         + c.data().get(ChishiReactorControllerBlockEntity.DATA_ACTIVE_SLOTS));
-        check(temp >= ChishiReactorControllerBlockEntity.TEMP_WARN,
+        check(temp >= ModConfig.reactorTempWarn,
                 "[警告] 温度应超过警告线（850），实际 " + temp);
         int countdown = c.getExplosionCountdown();
-        check(countdown > 0 && countdown < ChishiReactorControllerBlockEntity.EXPLOSION_DELAY_TICKS,
+        check(countdown > 0 && countdown < ModConfig.reactorExplosionDelayTicks,
                 "[爆炸] 满热量后应启动爆炸倒计时，剩余 " + countdown + " tick");
 
         phase2Countdown = countdown;
@@ -336,10 +337,9 @@ public final class ChishiReactorGameTestAutoRunner {
 
     // ===== 工具 =====
 
-    private static ItemStack fullCell() {
+    private static ItemStack fullCell(String fluidId) {
         ItemStack cell = new ItemStack(ModItems.fuelCell.get());
-        ChishiFuelCellItem.setFluid(cell, ModFluids.get(ModFluids.ULTIMATE_MIXTURE_FUEL_ID),
-                ChishiFuelCellItem.CAPACITY);
+        ChishiFuelCellItem.setFluid(cell, ModFluids.get(fluidId), ChishiFuelCellItem.CAPACITY);
         return cell;
     }
 

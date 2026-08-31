@@ -39,11 +39,11 @@ import java.util.List;
 /**
  * 能量液化装置方块实体（仅服务端驱动逻辑）。
  * 投入高能量材料，消耗赤能源液化出对应燃料/能量液体：
- * - 下界之星 → 下界至纯能量（高级档，2000mb/个，耗 50M 赤能源）
- * - 凋零玫瑰 → 下界复合能量（低级档，4000mb/个，耗 5M 赤能源）
- * - 末地混合物 → 末地混合燃料（低级档，1000mb/个，耗 10M 赤能源）
- * - 幽匿生命体 → 幽匿生命燃料（低级档，1000mb/个，耗 10M 赤能源）
- * - 巨龙混合物 → 末地巨龙燃料（高级档，50mb/个，耗 50M 赤能源）
+ * - 下界之星 → 下界至纯能量（高级档，1000mb/个，耗 50M 赤能源）
+ * - 凋零玫瑰 → 下界复合能量（低级档，400mb/个，耗 5M 赤能源）
+ * - 末地混合物 → 末地混合燃料（中级档，500mb/个，耗 10M 赤能源）
+ * - 幽匿生命体 → 幽匿生命燃料（最低档，100mb/个，耗 10M 赤能源）
+ * - 巨龙混合物 → 末地巨龙燃料（高级档，500mb/个，耗 50M 赤能源）
  * 产物存于单个通用输出罐（一次处理一种输入），由液体管道抽取，输入槽可接物品管道/漏斗。
  * 槽位：0 = 材料输入槽（下界之星/凋零玫瑰/各混合物，只进不出）；1 = 生命能量固态物槽
  * （末地/幽匿/巨龙燃料液化时消耗 1 个固态物，下界能量液化无需固态物）。
@@ -77,26 +77,28 @@ public class ChishiEnergyLiquefierBlockEntity extends BlockEntity implements
     /** 根据输入物品匹配液化配方；无匹配返回 null */
     public static Recipe recipeFor(ItemStack stack) {
         if (stack.is(Items.NETHER_STAR)) {
-            return new Recipe(new ItemStack(Items.NETHER_STAR), 50_000_000L, 2000L,
+            // 高级档：1 颗星 → 1000mb 至纯能量（处理器浓缩为 500mb 至纯燃料）
+            return new Recipe(new ItemStack(Items.NETHER_STAR), 50_000_000L, 1000L,
                     ModFluids.get(ModFluids.NETHER_PURE_ENERGY_ID), false);
         }
         if (stack.is(Items.WITHER_ROSE)) {
-            return new Recipe(new ItemStack(Items.WITHER_ROSE), 5_000_000L, 4000L,
+            // 低级档：1 朵玫瑰 → 400mb 复合能量（大幅缩减产出，需积攒多朵加工）
+            return new Recipe(new ItemStack(Items.WITHER_ROSE), 5_000_000L, 400L,
                     ModFluids.get(ModFluids.NETHER_COMPOUND_ENERGY_ID), false);
         }
         if (stack.is(ModItems.endMixture.get())) {
-            // 低级档：规格对齐下界复合燃料（1 固态物 → 1000mb）
-            return new Recipe(new ItemStack(ModItems.endMixture.get()), 10_000_000L, 1000L,
+            // 中级档：浓缩燃料（1 固态物 → 500mb 末地混合燃料）
+            return new Recipe(new ItemStack(ModItems.endMixture.get()), 10_000_000L, 500L,
                     ModFluids.get(ModFluids.END_MIXTURE_FUEL_ID), true);
         }
         if (stack.is(ModItems.dragonMixture.get())) {
-            // 高级档：规格对齐下界之星（1 固态物 → 50mb，浓缩）
-            return new Recipe(new ItemStack(ModItems.dragonMixture.get()), 50_000_000L, 50L,
+            // 高级档：浓缩燃料（1 固态物 → 500mb，利用率 7 约可燃烧 42 分钟，与合成成本匹配）
+            return new Recipe(new ItemStack(ModItems.dragonMixture.get()), 50_000_000L, 500L,
                     ModFluids.get(ModFluids.DRAGON_FUEL_ID), true);
         }
         if (stack.is(ModItems.sculkLifeform.get())) {
-            // 低级档：规格对齐下界复合燃料（1 固态物 → 1000mb）
-            return new Recipe(new ItemStack(ModItems.sculkLifeform.get()), 10_000_000L, 1000L,
+            // 最低级档：1 个幽匿生命体 → 100mb（大幅缩减产出，利用率 3 约可燃烧 4 分钟）
+            return new Recipe(new ItemStack(ModItems.sculkLifeform.get()), 10_000_000L, 100L,
                     ModFluids.get(ModFluids.SCULK_LIFE_FUEL_ID), true);
         }
         return null;

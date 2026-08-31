@@ -9,11 +9,33 @@ import java.util.List;
  * 液体管道扫描相邻方块时通过本接口统一获取液体罐，实现发送/接收与链式转发。
  * 设备通过 {@link #canPipeExtract}/{@link #canPipeInsert} 精确控制每个罐的流向，
  * 防止原料罐被抽空、产物罐被灌回（类似 IItemPipeDevice 的槽位控制）。
+ * 废料专用设备（废品口/保存桶）通过 {@link #isWasteOnlyDevice()} 声明，仅废料管道可对接。
  */
 public interface IFluidPipeDevice {
 
     /** 该设备暴露给液体管道的全部液体罐（顺序固定，与 GUI 显示一致） */
     List<FluidTank> getFluidTanks();
+
+    /** 是否废料专用设备：true 时仅"废料管道家族"可对接，普通液体管道不可接入 */
+    default boolean isWasteOnlyDevice() {
+        return false;
+    }
+
+    /**
+     * 是否混合接入设备：废料管道与普通液体管道均可连接，罐级家族由 {@link #isWasteTank} 区分。
+     * 如生命活化器：废料罐接废料管道（进）、产物罐接普通管道（出）。
+     */
+    default boolean acceptsBothFluidFamilies() {
+        return false;
+    }
+
+    /**
+     * 指定罐是否废料专用罐（仅废料管道可注入/抽取）；默认与整体 {@link #isWasteOnlyDevice()} 一致。
+     * 混合接入设备应覆写：废料罐返回 true、普通罐返回 false。
+     */
+    default boolean isWasteTank(FluidTank tank) {
+        return isWasteOnlyDevice();
+    }
 
     /** 液体管道是否可从该罐抽取液体（产物罐应为 true，原料罐应为 false） */
     default boolean canPipeExtract(FluidTank tank) {

@@ -70,6 +70,8 @@ public final class ModItems {
     public static final String HEAT_SINK_FINE_ID = "heat_sink_fine";
     /** 精良散热片：散热效率 5%，耐久 180k tick */
     public static final String HEAT_SINK_EXQUISITE_ID = "heat_sink_exquisite";
+    /** 终极散热片：散热效率 7%，耐久 180k tick（最高档） */
+    public static final String HEAT_SINK_ULTIMATE_ID = "heat_sink_ultimate";
     /** 赤石饱食护符（charm 槽）：消耗赤能源补充饱和度 */
     public static final String SATIATION_CHARM_ID = "chishi_satiation_charm";
     /** 赤石狩猎指环（ring 槽）：击杀生物概率掉落赤石晶 */
@@ -102,6 +104,12 @@ public final class ModItems {
     public static final String ORGAN_RIGHT_ARM_ID = "chishi_organ_right_arm";
     public static final String ORGAN_LEFT_LEG_ID = "chishi_organ_left_leg";
     public static final String ORGAN_RIGHT_LEG_ID = "chishi_organ_right_leg";
+    /** 无线能源便捷组件 ID */
+    public static final String WIRELESS_COMPONENT_ID = "chishi_wireless_component";
+    /** 无线能源便捷终端 ID */
+    public static final String WIRELESS_PORTABLE_TERMINAL_ID = "chishi_wireless_portable_terminal";
+    /** 终端身份卡 ID（无线网络认证钥匙） */
+    public static final String WIRELESS_IDENTITY_CARD_ID = "chishi_wireless_identity_card";
     /** 赤石晶延迟注册引用（注册完成后可用） */
     public static RegistrySupplier<Item> chishiCrystal;
     /** 赤石精华延迟注册引用 */
@@ -162,6 +170,8 @@ public final class ModItems {
     public static RegistrySupplier<Item> heatSinkFine;
     /** 精良散热片 */
     public static RegistrySupplier<Item> heatSinkExquisite;
+    /** 终极散热片 */
+    public static RegistrySupplier<Item> heatSinkUltimate;
     /** 赤石饱食护符 */
     public static RegistrySupplier<Item> satiationCharm;
     /** 赤石狩猎指环 */
@@ -194,6 +204,12 @@ public final class ModItems {
     public static RegistrySupplier<Item> chishiOrganRightArm;
     public static RegistrySupplier<Item> chishiOrganLeftLeg;
     public static RegistrySupplier<Item> chishiOrganRightLeg;
+    /** 无线能源便捷组件：无线终端体系通用合成材料 */
+    public static RegistrySupplier<Item> chishiWirelessComponent;
+    /** 无线能源便捷终端：手持频道遥控面板（查看/切换频道） */
+    public static RegistrySupplier<Item> chishiWirelessPortableTerminal;
+    /** 终端身份卡（无线网络认证钥匙） */
+    public static RegistrySupplier<Item> chishiWirelessIdentityCard;
 
     private ModItems() {
     }
@@ -300,6 +316,9 @@ public final class ModItems {
         heatSinkExquisite = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_EXQUISITE_ID),
                         () -> new ChishiHeatSinkItem(HeatSinkQuality.EXQUISITE));
+        heatSinkUltimate = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, HEAT_SINK_ULTIMATE_ID),
+                        () -> new ChishiHeatSinkItem(HeatSinkQuality.ULTIMATE));
         // 赤石饰品（Curios 槽位：charm/ring/hands/necklace/body/bracelet/belt）
         satiationCharm = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, SATIATION_CHARM_ID),
@@ -364,5 +383,16 @@ public final class ModItems {
         chishiOrganRightLeg = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, ORGAN_RIGHT_LEG_ID),
                         () -> new ChishiOrganItem(BodySlot.RIGHT_LEG, new Item.Properties().stacksTo(1)));
+        // 无线赤能源体系：便捷组件（合成材料）/ 便捷终端（手持遥控面板）
+        chishiWirelessComponent = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, WIRELESS_COMPONENT_ID),
+                        () -> new Item(new Item.Properties()));
+        chishiWirelessPortableTerminal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, WIRELESS_PORTABLE_TERMINAL_ID),
+                        () -> new ChishiWirelessPortableTerminalItem(new Item.Properties().stacksTo(1)));
+        // 终端身份卡：无线网络认证钥匙（唯一 UUID + 等级，单格堆叠）
+        chishiWirelessIdentityCard = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, WIRELESS_IDENTITY_CARD_ID),
+                        () -> new ChishiWirelessIdentityCardItem(new Item.Properties().stacksTo(1)));
     }
 }

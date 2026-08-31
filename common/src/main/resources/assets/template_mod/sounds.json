@@ -1,0 +1,44 @@
+{
+  "reactor_hum": {
+    "subtitle": "subtitles.template_mod.reactor_hum",
+    "sounds": [
+      { "name": "template_mod:reactor_hum", "stream": true }
+    ]
+  },
+  "reactor_warn": {
+    "subtitle": "subtitles.template_mod.reactor_warn",
+    "sounds": [
+      "template_mod:reactor_warn"
+    ]
+  },
+  "reactor_explosion": {
+    "subtitle": "subtitles.template_mod.reactor_explosion",
+    "sounds": [
+      "template_mod:reactor_explosion"
+    ]
+  },
+  "machine_hum": {
+    "subtitle": "subtitles.template_mod.machine_hum",
+    "sounds": [
+      { "name": "template_mod:machine_hum", "stream": true }
+    ]
+  },
+  "activator_bubble": {
+    "subtitle": "subtitles.template_mod.activator_bubble",
+    "sounds": [
+      { "name": "template_mod:activator_bubble", "stream": true }
+    ]
+  },
+  "multiblock_activate": {
+    "subtitle": "subtitles.template_mod.multiblock_activate",
+    "sounds": [
+      "template_mod:multiblock_activate"
+    ]
+  },
+  "decay_leak": {
+    "subtitle": "subtitles.template_mod.decay_leak",
+    "sounds": [
+      "template_mod:decay_leak"
+    ]
+  }
+}

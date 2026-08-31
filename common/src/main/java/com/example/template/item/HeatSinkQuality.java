@@ -2,7 +2,7 @@ package com.example.template.item;
 
 /**
  * 散热片品质：决定单片的散热效率（%）与耐久上限。
- * 高级散热片效率更高且更耐用，单片效率 1%~5%，满配 20 片可达 100%。
+ * 高级散热片效率更高且更耐用，单片效率 1%~7%，满配 20 片终极 = 140%（散热效率无上限）。
  */
 public enum HeatSinkQuality {
 
@@ -15,9 +15,11 @@ public enum HeatSinkQuality {
     /** 优质：散热 4% */
     FINE(4, 144_000),
     /** 精良：散热 5%，耐久最长 */
-    EXQUISITE(5, 180_000);
+    EXQUISITE(5, 180_000),
+    /** 终极：散热 7%，最高档散热片 */
+    ULTIMATE(7, 180_000);
 
-    /** 散热效率（%），满配 20 片普通品质 = 40%，精良 = 100% */
+    /** 散热效率（%），满配 20 片普通品质 = 40%，终极 = 140%（无封顶，效率越高温度压得越低） */
     public final int coolingPercent;
     /** 耐久上限（tick），仅反应堆运行燃烧时消耗 */
     public final int durability;

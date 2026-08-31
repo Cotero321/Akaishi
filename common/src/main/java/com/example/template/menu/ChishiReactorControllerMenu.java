@@ -171,6 +171,11 @@ public class ChishiReactorControllerMenu extends AbstractContainerMenu {
         return data.get(ChishiReactorControllerBlockEntity.DATA_WASTE_FULL) == 1;
     }
 
+    /** 废品罐内衰竭燃料种类数（tooltip 展示） */
+    public int getWasteTypes() {
+        return data.get(ChishiReactorControllerBlockEntity.DATA_WASTE_TYPES);
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;

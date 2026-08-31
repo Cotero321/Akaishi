@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "template_mod:block/chishi_wireless_terminal"
+    },
+    "formed=true": {
+      "model": "template_mod:block/chishi_wireless_terminal_formed"
+    }
+  }
+}

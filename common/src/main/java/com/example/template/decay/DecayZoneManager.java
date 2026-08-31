@@ -1,5 +1,6 @@
 package com.example.template.decay;
 
+import com.example.template.config.ModConfig;
 import com.example.template.effect.ModEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -42,8 +43,6 @@ public final class DecayZoneManager extends SavedData {
     public static final String DATA_NAME = "chishi_decay_zones";
     /** 半径 5 区块 = 80 格 */
     public static final int RADIUS_BLOCKS = 5 * 16;
-    /** 区域持续 30 小时（tick） */
-    public static final long DURATION_TICKS = 30L * 60 * 60 * 20;
     /** 每 tick 环境采样次数（分批转化防止卡顿） */
     private static final int ENV_SAMPLES_PER_TICK = 256;
     /** 生物转化判定周期（tick） */
@@ -85,7 +84,7 @@ public final class DecayZoneManager extends SavedData {
     public static void createZone(ServerLevel level, BlockPos center, int amplifier, boolean explosion) {
         DecayZoneManager mgr = get(level);
         mgr.zones.add(new DecayZone(center, RADIUS_BLOCKS, amplifier,
-                level.dimension().location().toString(), DURATION_TICKS));
+                level.dimension().location().toString(), ModConfig.decayZoneDurationTicks));
         mgr.setDirty();
     }
 

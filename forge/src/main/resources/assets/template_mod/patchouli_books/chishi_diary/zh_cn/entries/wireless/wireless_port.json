@@ -1,0 +1,17 @@
+{
+  "name": "无线输入口 / 输出口",
+  "icon": "template_mod:chishi_wireless_input_port",
+  "category": "template_mod:wireless",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_wireless_input_port",
+      "text": "输入口与输出口是无线网络的远程收发设备，$(bold)不需要$()安装在终端外墙上——它们本质是远程信号中继，可放置在世界任意位置（跨区块、跨维度）。$(bold)输入口：$()将接入的能量管道中的赤能源推送进网络，存入终端绑定储能；$(bold)输出口：$()从终端绑定储能拉取能量，供给接入的机器或能量管道。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)使用：$()$(br)1. 手持已授权身份卡右键口绑定（再次右键持卡可查看绑定卡号）$(br)2. 口每 tick 按卡反查授权终端，认证成功自动上线$(br)3. 口界面（运行情况/传输情况两页）显示缓冲储能、绑定卡、认证状态与速率$(br)$(bold)解绑：$()在口界面点击「解绑」按钮断开所有连接。$(br2)$(bold)损耗：$()传输存在距离损耗（同维随距离增加，跨维固定损耗），输入口实扣能量含损耗部分，输出口拉取时多扣覆盖损耗。"
+    }
+  ]
+}

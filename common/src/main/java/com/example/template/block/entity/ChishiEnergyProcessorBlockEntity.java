@@ -56,9 +56,9 @@ public class ChishiEnergyProcessorBlockEntity extends BlockEntity implements
     public static final long CHISHI_COST = 5_000_000L;
     /** 复合加工：1 固态物 + 1000mb 复合能量 → 1000mb 复合燃料 */
     public static final long COMPOUND_AMOUNT = 1000L;
-    /** 至纯加工：1 固态物 + 100mb 至纯能量 → 50mb 至纯燃料（产出减半，至纯燃料更浓缩） */
+    /** 至纯加工：1 固态物 + 100mb 至纯能量 → 75mb 至纯燃料（轻度浓缩，减轻固态物负担） */
     public static final long PURE_INPUT_AMOUNT = 100L;
-    public static final long PURE_OUTPUT_AMOUNT = 50L;
+    public static final long PURE_OUTPUT_AMOUNT = 75L;
 
     public static final int INPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;

@@ -32,4 +32,18 @@ public final class GuiWidgets {
         gui.fill(x, y + h - 1, x + w, y + h, COLOR_SLOT_LIGHT);
         gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
     }
+
+    /** 绘制 30×12 原版风格小按钮（内凹灰体），供频道切换等操作按钮复用 */
+    public static void button(GuiGraphics gui, int x, int y) {
+        button(gui, x, y, 30, 12);
+    }
+
+    /** 绘制指定尺寸的原版风格按钮（内凹灰体），供页面切换/操作按钮复用 */
+    public static void button(GuiGraphics gui, int x, int y, int w, int h) {
+        gui.fill(x, y, x + w, y + h, COLOR_SLOT);
+        gui.fill(x, y, x + w, y + 1, COLOR_SLOT_DARK);
+        gui.fill(x, y, x + 1, y + h, COLOR_SLOT_DARK);
+        gui.fill(x, y + h - 1, x + w, y + h, COLOR_SLOT_LIGHT);
+        gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
+    }
 }

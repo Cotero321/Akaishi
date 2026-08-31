@@ -4,6 +4,7 @@ import com.example.template.TemplateMod;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 /**
  * 液体常量：注册表 ID 与 GUI 渲染颜色。
@@ -24,14 +25,28 @@ public final class ModFluids {
     public static final String END_MIXTURE_FUEL_ID = "end_mixture_fuel";
     /** 末地巨龙燃料：巨龙混合物液化产物（龙息+末地水晶+黑曜石合成） */
     public static final String DRAGON_FUEL_ID = "dragon_fuel";
-    /** 幽匿生命燃料：幽匿生命体液化产物（回响碎片+幽匿块+金苹果+赤石精华块合成） */
+    /** 世界基础燃料（原幽匿生命燃料）：世界基础燃料物品液化产物（金萝卜+幽匿块+金苹果+赤石精华块合成） */
     public static final String SCULK_LIFE_FUEL_ID = "sculk_life_fuel";
     /** 高级混合燃料：末地混合燃料 + 下界复合燃料 1:1:1 混合 */
     public static final String ADVANCED_MIXTURE_FUEL_ID = "advanced_mixture_fuel";
     /** 终极混合燃料：末地巨龙燃料 + 至纯燃料 1:1:1 混合 */
     public static final String ULTIMATE_MIXTURE_FUEL_ID = "ultimate_mixture_fuel";
-    /** 衰竭的生命燃料：反应堆燃烧后的废品（1mb 燃料 → 3mb 废品），仅反应堆废品口/保存桶可储 */
-    public static final String EXHAUSTED_LIFE_FUEL_ID = "exhausted_life_fuel";
+    /** 衰竭燃料（7 种，与燃料一一对应）：反应堆燃烧废品（5mb 燃料 → 1mb 废品），仅反应堆废品口/保存桶可储 */
+    public static final String EXHAUSTED_SCULK_FUEL_ID = "exhausted_sculk_fuel";
+    public static final String EXHAUSTED_NETHER_COMPOUND_FUEL_ID = "exhausted_nether_compound_fuel";
+    public static final String EXHAUSTED_END_MIXTURE_FUEL_ID = "exhausted_end_mixture_fuel";
+    public static final String EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID = "exhausted_advanced_mixture_fuel";
+    public static final String EXHAUSTED_PURE_FUEL_ID = "exhausted_pure_fuel";
+    public static final String EXHAUSTED_DRAGON_FUEL_ID = "exhausted_dragon_fuel";
+    public static final String EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID = "exhausted_ultimate_mixture_fuel";
+    /** 活化衰竭液体（7 种，对应 7 种衰竭燃料）：生命活化器缓慢无害化产物，可安全储存、普通液体管道可抽取 */
+    public static final String ACTIVATED_EXHAUSTED_SCULK_FUEL_ID = "activated_exhausted_sculk_fuel";
+    public static final String ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID = "activated_exhausted_nether_compound_fuel";
+    public static final String ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID = "activated_exhausted_end_mixture_fuel";
+    public static final String ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID = "activated_exhausted_advanced_mixture_fuel";
+    public static final String ACTIVATED_EXHAUSTED_PURE_FUEL_ID = "activated_exhausted_pure_fuel";
+    public static final String ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID = "activated_exhausted_dragon_fuel";
+    public static final String ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID = "activated_exhausted_ultimate_mixture_fuel";
 
     // GUI 液体条 / 液体纹理着色（ARGB）
     public static final int COLOR_NETHER_PURE_ENERGY = 0xFF7FE8C8;
@@ -45,8 +60,22 @@ public final class ModFluids {
     public static final int COLOR_ADVANCED_MIXTURE_FUEL = 0xFFE08090;
     /** 终极混合燃料：巨龙青 + 至纯金调和（炽金） */
     public static final int COLOR_ULTIMATE_MIXTURE_FUEL = 0xFFFFB040;
-    /** 衰竭的生命燃料：灰褐废料色 */
-    public static final int COLOR_EXHAUSTED_LIFE_FUEL = 0xFF80705A;
+    /** 衰竭燃料色：原燃料色去饱和（保留色相、灰化提暗，呈现废料观感） */
+    public static final int COLOR_EXHAUSTED_SCULK_FUEL = ashen(COLOR_SCULK_LIFE_FUEL);
+    public static final int COLOR_EXHAUSTED_NETHER_COMPOUND_FUEL = ashen(COLOR_NETHER_COMPOUND_FUEL);
+    public static final int COLOR_EXHAUSTED_END_MIXTURE_FUEL = ashen(COLOR_END_MIXTURE_FUEL);
+    public static final int COLOR_EXHAUSTED_ADVANCED_MIXTURE_FUEL = ashen(COLOR_ADVANCED_MIXTURE_FUEL);
+    public static final int COLOR_EXHAUSTED_PURE_FUEL = ashen(COLOR_PURE_FUEL);
+    public static final int COLOR_EXHAUSTED_DRAGON_FUEL = ashen(COLOR_DRAGON_FUEL);
+    public static final int COLOR_EXHAUSTED_ULTIMATE_MIXTURE_FUEL = ashen(COLOR_ULTIMATE_MIXTURE_FUEL);
+    /** 活化衰竭液体色：原燃料色向生命青绿调和（复苏生机观感，区别于灰暗废料） */
+    public static final int COLOR_ACTIVATED_EXHAUSTED_SCULK_FUEL = revived(COLOR_SCULK_LIFE_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL = revived(COLOR_NETHER_COMPOUND_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL = revived(COLOR_END_MIXTURE_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL = revived(COLOR_ADVANCED_MIXTURE_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_PURE_FUEL = revived(COLOR_PURE_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_DRAGON_FUEL = revived(COLOR_DRAGON_FUEL);
+    public static final int COLOR_ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL = revived(COLOR_ULTIMATE_MIXTURE_FUEL);
 
     private ModFluids() {
     }
@@ -54,5 +83,101 @@ public final class ModFluids {
     /** 按注册表 ID 获取液体（注册在 Forge 平台完成，运行时必然存在） */
     public static Fluid get(String id) {
         return BuiltInRegistries.FLUID.get(new ResourceLocation(TemplateMod.MOD_ID, id));
+    }
+
+    /** 判断液体是否为衰竭燃料（反应堆废品） */
+    public static boolean isExhaustedFuel(Fluid fluid) {
+        if (fluid == null || fluid == Fluids.EMPTY) {
+            return false;
+        }
+        return fluid == get(EXHAUSTED_SCULK_FUEL_ID)
+                || fluid == get(EXHAUSTED_NETHER_COMPOUND_FUEL_ID)
+                || fluid == get(EXHAUSTED_END_MIXTURE_FUEL_ID)
+                || fluid == get(EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID)
+                || fluid == get(EXHAUSTED_PURE_FUEL_ID)
+                || fluid == get(EXHAUSTED_DRAGON_FUEL_ID)
+                || fluid == get(EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+    }
+
+    /** 燃料 → 对应衰竭燃料；非反应堆燃料返回空液体 */
+    public static Fluid exhaustedFuelFor(Fluid fuel) {
+        if (fuel == get(SCULK_LIFE_FUEL_ID)) {
+            return get(EXHAUSTED_SCULK_FUEL_ID);
+        }
+        if (fuel == get(NETHER_COMPOUND_FUEL_ID)) {
+            return get(EXHAUSTED_NETHER_COMPOUND_FUEL_ID);
+        }
+        if (fuel == get(END_MIXTURE_FUEL_ID)) {
+            return get(EXHAUSTED_END_MIXTURE_FUEL_ID);
+        }
+        if (fuel == get(ADVANCED_MIXTURE_FUEL_ID)) {
+            return get(EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID);
+        }
+        if (fuel == get(PURE_FUEL_ID)) {
+            return get(EXHAUSTED_PURE_FUEL_ID);
+        }
+        if (fuel == get(DRAGON_FUEL_ID)) {
+            return get(EXHAUSTED_DRAGON_FUEL_ID);
+        }
+        if (fuel == get(ULTIMATE_MIXTURE_FUEL_ID)) {
+            return get(EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+        }
+        return Fluids.EMPTY;
+    }
+
+    /** 判断液体是否为活化衰竭液体（生命活化器无害化产物） */
+    public static boolean isActivatedFuel(Fluid fluid) {
+        if (fluid == null || fluid == Fluids.EMPTY) {
+            return false;
+        }
+        return fluid == get(ACTIVATED_EXHAUSTED_SCULK_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_PURE_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID)
+                || fluid == get(ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+    }
+
+    /** 衰竭燃料 → 对应活化衰竭液体；非衰竭燃料返回空液体 */
+    public static Fluid activatedFuelFor(Fluid exhausted) {
+        if (exhausted == get(EXHAUSTED_SCULK_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_SCULK_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_NETHER_COMPOUND_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_END_MIXTURE_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_PURE_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_PURE_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_DRAGON_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID);
+        }
+        if (exhausted == get(EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID)) {
+            return get(ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+        }
+        return Fluids.EMPTY;
+    }
+
+    /** 颜色去饱和：向 0x78 灰度混合 55%，使衰竭燃料呈现"暗淡废料"质感 */
+    private static int ashen(int argb) {
+        int r = (argb >> 16) & 0xFF, g = (argb >> 8) & 0xFF, b = argb & 0xFF;
+        return 0xFF000000 | ((r * 45 + 120 * 55) / 100 << 16)
+                | ((g * 45 + 120 * 55) / 100 << 8)
+                | ((b * 45 + 120 * 55) / 100);
+    }
+
+    /** 颜色复苏：向生命青绿（0x40E0C0）混合 30%，使活化液体呈现"被生命能量净化"的观感 */
+    private static int revived(int argb) {
+        int r = (argb >> 16) & 0xFF, g = (argb >> 8) & 0xFF, b = argb & 0xFF;
+        return 0xFF000000 | ((r * 70 + 0x40 * 30) / 100 << 16)
+                | ((g * 70 + 0xE0 * 30) / 100 << 8)
+                | ((b * 70 + 0xC0 * 30) / 100);
     }
 }

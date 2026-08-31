@@ -1,0 +1,13 @@
+{
+  "name": "Portable Terminal",
+  "icon": "template_mod:chishi_wireless_portable_terminal",
+  "category": "template_mod:wireless",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_wireless_portable_terminal",
+      "text": "The portable terminal is a handheld $(bold)remote panel$(): right-click to open it. It reads the identity card in your inventory and shows that card's authorized terminal status (card ID, terminal ID, port stats) and energy storage (bar, amount, capacity).$(br2)It is read-only — it cannot authorize cards or manage ports, but it is the most convenient way to inspect network health on the go."
+    }
+  ]
+}

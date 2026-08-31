@@ -41,8 +41,11 @@ public class ChishiAutoCollectorBlockEntity extends BlockEntity implements Exten
     public static final int STORAGE_SIZE = 27;
     /** 能量缓冲容量 */
     public static final int MAX_ENERGY = 50000;
-    /** 与 Menu 同步的数据槽数量（0=能量 1=容量 2=收集进度%） */
-    public static final int DATA_SLOTS = 3;
+    /** 与 Menu 同步的数据槽数量（0=能量 1=容量 2=收集进度% 3=状态） */
+    public static final int DATA_SLOTS = 4;
+    public static final int DATA_STATUS_IDLE = 0;    // 范围内无水晶簇，待机
+    public static final int DATA_STATUS_NO_ENERGY = 1; // 能量不足，暂停
+    public static final int DATA_STATUS_WORKING = 2; // 正在收集
 
     private final ChishiAutoCollectorBlock.CollectorTier tier;
     private final ChishiEnergyStorage energy;
@@ -71,30 +74,32 @@ public class ChishiAutoCollectorBlockEntity extends BlockEntity implements Exten
     }
 
     private void tickServer() {
+        // 状态判定：0=待机（无目标） 1=能量不足 2=工作中
+        BlockPos cluster = findCluster();
+        int status;
+        if (cluster == null) {
+            status = DATA_STATUS_IDLE;
+            progressTicks = 0;
+        } else if (energy.getEnergyStored() < tier.energyCost) {
+            status = DATA_STATUS_NO_ENERGY;
+        } else {
+            status = DATA_STATUS_WORKING;
+            energy.extractEnergy(tier.energyCost, false);
+            progressTicks++;
+            if (progressTicks >= tier.workTicks) {
+                progressTicks = 0;
+                // 收获：精华入容器成功才移除方块（容器满则不破坏，方块保留）
+                int count = 1 + level.random.nextInt(2); // 1-2 个，与原版战利品表一致
+                if (addEssence(count)) {
+                    level.removeBlock(cluster, false);
+                }
+            }
+            setChanged();
+        }
         data.set(0, (int) energy.getEnergyStored());
         data.set(1, MAX_ENERGY);
         data.set(2, (int) (progressTicks * 100L / tier.workTicks));
-
-        // 范围内无水晶簇：空闲不耗能，进度归零
-        BlockPos cluster = findCluster();
-        if (cluster == null) {
-            progressTicks = 0;
-            return;
-        }
-        if (energy.getEnergyStored() < tier.energyCost) {
-            return; // 能量不足，收集暂停
-        }
-        energy.extractEnergy(tier.energyCost, false);
-        progressTicks++;
-        if (progressTicks >= tier.workTicks) {
-            progressTicks = 0;
-            // 收获：精华入容器成功才移除方块（容器满则不破坏，方块保留）
-            int count = 1 + level.random.nextInt(2); // 1-2 个，与原版战利品表一致
-            if (addEssence(count)) {
-                level.removeBlock(cluster, false);
-            }
-        }
-        setChanged();
+        data.set(3, status);
     }
 
     /** 在 3×3×3 范围内查找第一颗水晶簇 */

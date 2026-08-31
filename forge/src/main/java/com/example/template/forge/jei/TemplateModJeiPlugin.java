@@ -112,10 +112,21 @@ public class TemplateModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, ModBlocks.CHISHI_ENERGY_PROCESSOR.get(), "jei.template_mod.energy_processor");
         addIngredientInfo(registration, ModBlocks.CHISHI_FUEL_CANNER.get(), "jei.template_mod.fuel_canner");
         addIngredientInfo(registration, ModBlocks.CHISHI_FUEL_MIXER.get(), "jei.template_mod.fuel_mixer");
+
+        // ===== 无线赤能源体系：身份卡认证 + 多方块终端 + 无线口（参考 MEK 量子传输/Flux） =====
+        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_TERMINAL.get(), "jei.template_mod.wireless");
+        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_SECURITY.get(), "jei.template_mod.wireless");
+        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_CORE.get(), "jei.template_mod.wireless");
+        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_INPUT_PORT.get(), "jei.template_mod.wireless");
+        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get(), "jei.template_mod.wireless");
+    }
+
+    private static void addIngredientInfo(IRecipeRegistration registration, net.minecraft.world.level.block.Block block, String langKey, Object... args) {
+        registration.addIngredientInfo(new ItemStack(block), VanillaTypes.ITEM_STACK, Component.translatable(langKey, args));
     }
 
     private static void addIngredientInfo(IRecipeRegistration registration, net.minecraft.world.level.block.Block block, String langKey) {
-        registration.addIngredientInfo(new ItemStack(block), VanillaTypes.ITEM_STACK, Component.translatable(langKey));
+        addIngredientInfo(registration, block, langKey, new Object[0]);
     }
 
     private static void addIngredientInfo(IRecipeRegistration registration, net.minecraft.world.item.Item item, String langKey) {

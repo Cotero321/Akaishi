@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "G G",
+    "IBI",
+    "G G"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "B": {
+      "item": "template_mod:chishi_fluid_pipe"
+    }
+  },
+  "result": {
+    "item": "template_mod:chishi_exhausted_pipe",
+    "count": 4
+  }
+}

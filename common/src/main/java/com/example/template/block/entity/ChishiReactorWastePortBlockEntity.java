@@ -4,7 +4,9 @@ import com.example.template.api.IDataCarrier;
 
 import com.example.template.api.fluid.IFluidPipeDevice;
 import com.example.template.fluid.FluidTank;
+import com.example.template.config.ModConfig;
 import com.example.template.fluid.ModFluids;
+import com.example.template.fluid.MultiFluidTank;
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -21,19 +23,18 @@ import java.util.List;
  */
 public class ChishiReactorWastePortBlockEntity extends BlockEntity implements IFluidPipeDevice, IDataCarrier {
 
-    /** 缓冲容量：足以容纳控制器废品罐（64L）的一次性清空 */
-    public static final long BUFFER_CAPACITY = 64_000;
+    /** 缓冲容量由 {@link ModConfig#wastePortBufferCapacity} 提供 */
 
-    private final FluidTank wasteTank;
+    private final MultiFluidTank wasteTank;
     private BlockPos controllerPos;
 
     public ChishiReactorWastePortBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_REACTOR_WASTE_PORT.get(), pos, state);
-        this.wasteTank = new FluidTank(BUFFER_CAPACITY) {
+        this.wasteTank = new MultiFluidTank(ModConfig.wastePortBufferCapacity) {
             @Override
             public long fill(FluidStack resource, boolean simulate) {
-                // 只接受衰竭的生命燃料
-                if (resource == null || resource.isEmpty() || resource.getFluid() != ModFluids.get(ModFluids.EXHAUSTED_LIFE_FUEL_ID)) {
+                // 只接受衰竭燃料
+                if (resource == null || !ModFluids.isExhaustedFuel(resource.getFluid())) {
                     return 0;
                 }
                 return super.fill(resource, simulate);
@@ -66,22 +67,27 @@ public class ChishiReactorWastePortBlockEntity extends BlockEntity implements IF
     }
 
     /** 控制器灌入衰竭燃料，返回实际接收量 */
-    public long acceptWaste(long amount) {
-        if (amount <= 0) {
+    public long acceptWaste(FluidStack stack) {
+        if (stack == null || stack.isEmpty()) {
             return 0;
         }
-        return wasteTank.fill(FluidStack.create(ModFluids.get(ModFluids.EXHAUSTED_LIFE_FUEL_ID), amount), false);
+        return wasteTank.fill(stack, false);
     }
 
-    public FluidTank wasteTank() {
+    public MultiFluidTank wasteTank() {
         return wasteTank;
     }
 
-    // ===== IFluidPipeDevice：唯一液体罐，只可抽取（废品输出） =====
+    // ===== IFluidPipeDevice：唯一液体罐，只可抽取（废品输出）；仅废料管道可对接 =====
 
     @Override
     public List<FluidTank> getFluidTanks() {
         return List.of(wasteTank);
+    }
+
+    @Override
+    public boolean isWasteOnlyDevice() {
+        return true;
     }
 
     @Override

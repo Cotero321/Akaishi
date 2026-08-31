@@ -121,6 +121,10 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_PURIFIER;
     /** 液体管道：传输下界能量/燃料液体，可对接 MEK 等外部液体方块 */
     public static RegistrySupplier<Block> CHISHI_FLUID_PIPE;
+    /** 封闭性衰竭管道：废料专用（单缓冲） */
+    public static RegistrySupplier<Block> CHISHI_EXHAUSTED_PIPE;
+    /** 多流体废料管道：废料专用（多缓冲） */
+    public static RegistrySupplier<Block> CHISHI_MULTI_FLUID_WASTE_PIPE;
     /** 能量液化装置（赤能源驱动，下界之星/凋零玫瑰 → 下界能量液体） */
     public static RegistrySupplier<Block> CHISHI_ENERGY_LIQUEFIER;
     /** 能量加工器（赤能源驱动，生命固态物 + 下界能量液体 → 反应堆燃料） */
@@ -129,6 +133,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_FUEL_CANNER;
     /** 燃料混合器：两种燃料液体 1:1:1 调和为高阶混合燃料 */
     public static RegistrySupplier<Block> CHISHI_FUEL_MIXER;
+    /** 生命活化器：消耗生命能量缓慢无害化衰竭燃料（废料进、活化液出） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ACTIVATOR;
     /** 液体储罐（基础/高级/超级：16k/64k/256k mb，管道存取液体） */
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_BASIC;
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_ADVANCED;
@@ -197,6 +203,30 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_ENERGY_INPUT;
     /** 生命转换矩阵能量输出口（生命能量输出，仅管道抽取） */
     public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_ENERGY_OUTPUT;
+    /** 无线赤能源终端外壳：无线终端多方块（5×5×5）墙面填充方块 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_SHELL;
+    /** 无线赤能源终端方块：外墙主方块（GUI 入口，成型后为网络能量中枢） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_TERMINAL;
+    /** 无线赤能源终端安全方块：外墙方块 + 安全卡认证页直达入口 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_SECURITY;
+    /** 无线赤能源终端核心：内腔中心方块（恰 1 个），拆掉结构即失效 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_CORE;
+    /** 无线赤能源控制器：外墙纯结构件（无 GUI 无 BE） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_CONTROLLER;
+    /** 无线赤能源输入口：能量管道 → 无线频道的发送端 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_INPUT_PORT;
+    /** 无线赤能源输出口：无线频道 → 能量管道的接收端 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_OUTPUT_PORT;
+    /** 终端跨维组件：内腔 ≥1 个解锁跨维度传输 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_DIM_BRIDGE;
+    /** 区块加载构架：内腔 ≥1 个使网络区块弱加载（离线运转） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_CHUNK_LOADER;
+    /** 区块加载扩展组件：内腔 ≥1 个使弱加载范围扩为 3×3 区块（终端与口） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_CHUNK_RANGE;
+    /** 输入损耗抑制组件：内腔每个降低输入口方向损耗（可叠加） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_INPUT_LOSS;
+    /** 输出损耗抑制组件：内腔每个降低输出口方向损耗（可叠加） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_OUTPUT_LOSS;
 
     private ModBlocks() {
     }
@@ -395,6 +425,20 @@ public final class ModBlocks {
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fluid_pipe"),
                         () -> new BlockItem(CHISHI_FLUID_PIPE.get(), new Item.Properties()));
 
+        // 封闭性衰竭管道（废料专用，单缓冲；与普通液体管道网络隔离）
+        CHISHI_EXHAUSTED_PIPE = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_exhausted_pipe"),
+                ChishiExhaustedPipeBlock::new);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_exhausted_pipe"),
+                        () -> new BlockItem(CHISHI_EXHAUSTED_PIPE.get(), new Item.Properties()));
+
+        // 多流体废料管道（废料专用，多缓冲，多种废料可混输）
+        CHISHI_MULTI_FLUID_WASTE_PIPE = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_multi_fluid_waste_pipe"),
+                ChishiMultiFluidWastePipeBlock::new);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_multi_fluid_waste_pipe"),
+                        () -> new BlockItem(CHISHI_MULTI_FLUID_WASTE_PIPE.get(), new Item.Properties()));
+
         // 能量液化装置（赤能源驱动，下界之星 → 至纯能量 / 凋零玫瑰 → 复合能量）
         CHISHI_ENERGY_LIQUEFIER = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_energy_liquefier"),
                 ChishiEnergyLiquefierBlock::new);
@@ -422,6 +466,13 @@ public final class ModBlocks {
         RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_fuel_mixer"),
                         () -> new BlockItem(CHISHI_FUEL_MIXER.get(), new Item.Properties()));
+
+        // 生命活化器（生命能量无害化衰竭燃料：废料管道进、普通管道抽活化液）
+        CHISHI_LIFE_ACTIVATOR = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_activator"),
+                ChishiLifeActivatorBlock::new);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_activator"),
+                        () -> new BlockItem(CHISHI_LIFE_ACTIVATOR.get(), new Item.Properties()));
 
         // 液体储罐（基础/高级/超级，容量递增，可被液体管道注入/抽取）
         CHISHI_FLUID_TANK_BASIC = registerFluidTank(blockRegistrar, "chishi_fluid_tank_basic", FluidTankTier.BASIC);
@@ -485,6 +536,20 @@ public final class ModBlocks {
         CHISHI_LIFE_MATRIX_CONTROLLER = registerReactorBlock(blockRegistrar, "chishi_life_matrix_controller", ChishiLifeMatrixControllerBlock::new);
         CHISHI_LIFE_MATRIX_ENERGY_INPUT = registerReactorBlock(blockRegistrar, "chishi_life_matrix_energy_input", ChishiLifeMatrixEnergyInputPortBlock::new);
         CHISHI_LIFE_MATRIX_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "chishi_life_matrix_energy_output", ChishiLifeMatrixEnergyOutputPortBlock::new);
+
+        // ===== 无线赤能源（无线终端多方块体系）=====
+        CHISHI_WIRELESS_SHELL = registerReactorBlock(blockRegistrar, "chishi_wireless_shell", ChishiWirelessShellBlock::new);
+        CHISHI_WIRELESS_TERMINAL = registerReactorBlock(blockRegistrar, "chishi_wireless_terminal", ChishiWirelessTerminalBlock::new);
+        CHISHI_WIRELESS_SECURITY = registerReactorBlock(blockRegistrar, "chishi_wireless_security", ChishiWirelessSecurityBlock::new);
+        CHISHI_WIRELESS_CORE = registerReactorBlock(blockRegistrar, "chishi_wireless_core", ChishiWirelessCoreBlock::new);
+        CHISHI_WIRELESS_CONTROLLER = registerReactorBlock(blockRegistrar, "chishi_wireless_controller", ChishiWirelessControllerBlock::new);
+        CHISHI_WIRELESS_INPUT_PORT = registerReactorBlock(blockRegistrar, "chishi_wireless_input_port", ChishiWirelessInputPortBlock::new);
+        CHISHI_WIRELESS_OUTPUT_PORT = registerReactorBlock(blockRegistrar, "chishi_wireless_output_port", ChishiWirelessOutputPortBlock::new);
+        CHISHI_WIRELESS_DIM_BRIDGE = registerReactorBlock(blockRegistrar, "chishi_wireless_dim_bridge", ChishiWirelessDimBridgeBlock::new);
+        CHISHI_WIRELESS_CHUNK_LOADER = registerReactorBlock(blockRegistrar, "chishi_wireless_chunk_loader", ChishiWirelessChunkLoaderBlock::new);
+        CHISHI_WIRELESS_CHUNK_RANGE = registerReactorBlock(blockRegistrar, "chishi_wireless_chunk_range", ChishiWirelessChunkRangeBlock::new);
+        CHISHI_WIRELESS_INPUT_LOSS = registerReactorBlock(blockRegistrar, "chishi_wireless_input_loss", ChishiWirelessInputLossBlock::new);
+        CHISHI_WIRELESS_OUTPUT_LOSS = registerReactorBlock(blockRegistrar, "chishi_wireless_output_loss", ChishiWirelessOutputLossBlock::new);
     }
 
     /** 注册一个指定等级的赤能源储存单元及其 BlockItem */
