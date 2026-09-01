@@ -6,7 +6,7 @@
     "SSS"
   ],
   "key": {
-    "C": { "item": "akaishi:akaishi_crystal" },
+    "C": { "item": "akaishi:akaishi_crystal_block" },
     "S": { "item": "minecraft:cobblestone" }
   },
   "result": { "item": "akaishi:akaishi_geode_flawed", "count": 1 }

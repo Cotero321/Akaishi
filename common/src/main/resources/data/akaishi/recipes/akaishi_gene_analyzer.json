@@ -7,8 +7,8 @@
   ],
   "key": {
     "G": { "item": "minecraft:glass" },
-    "L": { "item": "minecraft:lapis_lazuli" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "L": { "item": "akaishi:lapis_dust" },
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_gene_analyzer", "count": 1 }
 }

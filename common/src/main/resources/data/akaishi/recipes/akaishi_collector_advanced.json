@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " D ",
-    "DCD",
-    " D "
+    "DBD",
+    "BCB",
+    "DBD"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "B": { "item": "akaishi:lapis_ore_base" },
+    "D": { "item": "akaishi:diamond_dust" },
     "C": { "item": "akaishi:akaishi_collector_medium" }
   },
   "result": { "item": "akaishi:akaishi_collector_advanced", "count": 1 }

@@ -6,8 +6,8 @@
     "IGI"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "I": { "item": "minecraft:iron_block" }
+    "G": { "item": "akaishi:gold_dust" },
+    "I": { "item": "akaishi:akaishi_essence_block" }
   },
   "result": { "item": "akaishi:akaishi_reactor_shell", "count": 8 }
 }

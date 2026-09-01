@@ -6,7 +6,7 @@
     "D D"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "C": { "item": "minecraft:crafting_table" }
   },
   "result": { "item": "akaishi:akaishi_item_reconstructor", "count": 1 }

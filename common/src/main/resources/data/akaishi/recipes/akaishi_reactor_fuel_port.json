@@ -9,7 +9,7 @@
     "G": { "item": "minecraft:glass" },
     "R": { "item": "akaishi:akaishi_reactor_fuel_rod" },
     "F": { "item": "akaishi:fuel_cell" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_reactor_fuel_port", "count": 1 }
 }

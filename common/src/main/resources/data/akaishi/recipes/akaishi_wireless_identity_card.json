@@ -6,10 +6,10 @@
     "IGI"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
+    "G": { "item": "akaishi:gold_dust" },
     "W": { "item": "akaishi:akaishi_wireless_component" },
     "C": { "item": "minecraft:paper" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_wireless_identity_card", "count": 1 }
 }

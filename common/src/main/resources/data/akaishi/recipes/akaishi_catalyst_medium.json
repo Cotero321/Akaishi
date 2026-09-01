@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "GGG",
-    "GCG",
-    "GGG"
+    "GBG",
+    "BCB",
+    "GBG"
   ],
   "key": {
+    "B": { "item": "akaishi:gold_ore_base" },
     "C": { "item": "akaishi:akaishi_catalyst_basic" },
-    "G": { "item": "minecraft:gold_ingot" }
+    "G": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:akaishi_catalyst_medium", "count": 1 }
 }

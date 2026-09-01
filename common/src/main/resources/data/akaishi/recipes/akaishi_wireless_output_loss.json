@@ -10,7 +10,7 @@
     "W": { "item": "akaishi:akaishi_wireless_component" },
     "P": { "item": "minecraft:dropper" },
     "C": { "item": "minecraft:chest" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_wireless_output_loss", "count": 1 }
 }

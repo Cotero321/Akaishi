@@ -6,7 +6,7 @@
     "D D"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "C": { "item": "akaishi:akaishi_gen_matrix_controller_basic" }
   },
   "result": { "item": "akaishi:akaishi_gen_matrix_controller_advanced", "count": 1 }

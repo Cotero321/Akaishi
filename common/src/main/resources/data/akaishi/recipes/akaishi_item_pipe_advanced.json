@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     { "item": "akaishi:akaishi_item_pipe" },
-    { "item": "minecraft:copper_ingot" }
+    { "item": "akaishi:copper_dust" }
   ],
   "result": { "item": "akaishi:akaishi_item_pipe_advanced", "count": 1 }
 }

@@ -7,7 +7,7 @@
   ],
   "key": {
     "S": { "item": "minecraft:smooth_stone" },
-    "I": { "item": "minecraft:iron_block" }
+    "I": { "item": "akaishi:akaishi_essence_block" }
   },
   "result": { "item": "akaishi:akaishi_fusion_shell", "count": 8 }
 }

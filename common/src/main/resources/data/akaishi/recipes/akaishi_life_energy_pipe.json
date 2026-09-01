@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     { "item": "akaishi:akaishi_energy_pipe" },
-    { "item": "minecraft:lapis_lazuli" }
+    { "item": "akaishi:lapis_dust" }
   ],
   "result": { "item": "akaishi:akaishi_life_energy_pipe", "count": 1 }
 }

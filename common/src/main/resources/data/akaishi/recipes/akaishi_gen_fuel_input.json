@@ -9,7 +9,7 @@
     "G": { "item": "minecraft:glass" },
     "P": { "item": "akaishi:fuel_cell" },
     "F": { "item": "minecraft:coal_block" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_gen_fuel_input", "count": 1 }
 }

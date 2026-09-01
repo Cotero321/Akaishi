@@ -6,8 +6,8 @@
     "G G"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "L": { "item": "minecraft:lapis_lazuli" },
+    "G": { "item": "akaishi:gold_dust" },
+    "L": { "item": "akaishi:lapis_dust" },
     "S": { "item": "akaishi:sculk_lifeform" }
   },
   "result": { "item": "akaishi:akaishi_life_activator", "count": 1 }

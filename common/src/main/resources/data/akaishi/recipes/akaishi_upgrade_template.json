@@ -6,7 +6,7 @@
     "P P"
   ],
   "key": {
-    "R": { "item": "minecraft:redstone" },
+    "R": { "item": "akaishi:akaishi_dust" },
     "P": { "item": "minecraft:paper" }
   },
   "result": { "item": "akaishi:akaishi_upgrade_template", "count": 1 }

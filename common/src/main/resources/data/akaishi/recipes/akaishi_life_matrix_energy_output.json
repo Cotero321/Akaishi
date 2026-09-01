@@ -6,8 +6,8 @@
     "LGL"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "L": { "item": "minecraft:lapis_lazuli" },
+    "G": { "item": "akaishi:gold_dust" },
+    "L": { "item": "akaishi:lapis_dust" },
     "P": { "item": "akaishi:akaishi_life_energy_pipe" },
     "E": { "item": "akaishi:akaishi_life_energy_cell" }
   },

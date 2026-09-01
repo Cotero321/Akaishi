@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     { "item": "akaishi:akaishi_item_pipe_advanced" },
-    { "item": "minecraft:gold_ingot" }
+    { "item": "akaishi:gold_dust" }
   ],
   "result": { "item": "akaishi:akaishi_item_pipe_elite", "count": 1 }
 }

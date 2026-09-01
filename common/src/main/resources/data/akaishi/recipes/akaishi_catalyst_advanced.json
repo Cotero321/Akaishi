@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "DDD",
-    "DCD",
-    "DDD"
+    "DBD",
+    "BCB",
+    "DBD"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "B": { "item": "akaishi:diamond_ore_base" },
+    "D": { "item": "akaishi:diamond_dust" },
     "C": { "item": "akaishi:akaishi_catalyst_medium" }
   },
   "result": { "item": "akaishi:akaishi_catalyst_advanced", "count": 1 }

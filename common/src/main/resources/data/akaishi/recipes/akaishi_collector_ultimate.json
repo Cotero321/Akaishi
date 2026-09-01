@@ -6,7 +6,7 @@
     " O "
   ],
   "key": {
-    "O": { "item": "minecraft:netherite_ingot" },
+    "O": { "item": "akaishi:netherite_ore_base" },
     "C": { "item": "akaishi:akaishi_collector_advanced" }
   },
   "result": { "item": "akaishi:akaishi_collector_ultimate", "count": 1 }

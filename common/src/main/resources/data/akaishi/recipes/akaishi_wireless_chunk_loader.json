@@ -6,7 +6,7 @@
     "WDW"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "W": { "item": "akaishi:akaishi_wireless_component" },
     "C": { "item": "minecraft:lodestone" }
   },

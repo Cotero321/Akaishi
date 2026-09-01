@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": { "item": "akaishi:akaishi_crystal" },
-    "G": { "item": "minecraft:gold_nugget" }
+    "G": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:akaishi_satiation_charm", "count": 1 }
 }

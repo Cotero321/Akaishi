@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "minecraft:book" },
+    { "item": "akaishi:akaishi_essence" },
     { "item": "akaishi:akaishi_life_essence_solid" },
-    { "item": "minecraft:lapis_lazuli" }
+    { "item": "akaishi:lapis_dust" }
   ],
   "result": { "item": "akaishi:akaishi_life_book", "count": 1 }
 }

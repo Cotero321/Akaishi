@@ -7,8 +7,8 @@
   ],
   "key": {
     "C": { "item": "akaishi:fuel_cell" },
-    "R": { "item": "minecraft:redstone" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "R": { "item": "akaishi:akaishi_dust" },
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_reactor_fuel_rod", "count": 1 }
 }

@@ -7,7 +7,7 @@
   ],
   "key": {
     "N": { "item": "akaishi:heat_sink_normal" },
-    "Q": { "item": "minecraft:gold_ingot" }
+    "Q": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:heat_sink_good", "count": 1 }
 }

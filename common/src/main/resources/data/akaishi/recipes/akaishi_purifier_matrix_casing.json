@@ -6,8 +6,8 @@
     "IGI"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "G": { "item": "akaishi:gold_dust" },
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_purifier_matrix_casing", "count": 8 }
 }

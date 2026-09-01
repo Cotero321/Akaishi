@@ -6,9 +6,9 @@
     "ISI"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
+    "G": { "item": "akaishi:gold_dust" },
     "S": { "item": "akaishi:akaishi_speed_upgrade" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_miner_speed_upgrade_block", "count": 1 }
 }

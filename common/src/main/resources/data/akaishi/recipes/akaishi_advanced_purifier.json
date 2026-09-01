@@ -6,7 +6,7 @@
     "DAD"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "P": { "item": "akaishi:akaishi_purifier" },
     "A": { "item": "akaishi:akaishi_advanced_component" }
   },

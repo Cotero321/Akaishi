@@ -7,8 +7,8 @@
   ],
   "key": {
     "C": { "item": "akaishi:akaishi_crystal" },
-    "R": { "item": "minecraft:redstone" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "R": { "item": "akaishi:akaishi_crystal" },
+    "I": { "item": "akaishi:iron_dust" }
   },
   "result": { "item": "akaishi:akaishi_energy_cell_basic", "count": 1 }
 }

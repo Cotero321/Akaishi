@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "C C",
-    "CMC",
-    "C C"
+    "IBI",
+    "BCB",
+    "IBI"
   ],
   "key": {
-    "C": { "item": "minecraft:copper_ingot" },
-    "M": { "item": "akaishi:akaishi_machine_component" }
+    "B": { "item": "akaishi:copper_ore_base" },
+    "C": { "item": "akaishi:akaishi_machine_component" },
+    "I": { "item": "minecraft:iron_ingot" }
   },
   "result": { "item": "akaishi:akaishi_collector_basic", "count": 1 }
 }

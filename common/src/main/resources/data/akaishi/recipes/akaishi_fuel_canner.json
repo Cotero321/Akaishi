@@ -6,10 +6,10 @@
     "ICI"
   ],
   "key": {
-    "C": { "item": "minecraft:coal_block" },
+    "C": { "item": "akaishi:coal_ore_base" },
     "M": { "item": "akaishi:akaishi_machine_component" },
     "F": { "item": "akaishi:fuel_cell" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_fuel_canner", "count": 1 }
 }

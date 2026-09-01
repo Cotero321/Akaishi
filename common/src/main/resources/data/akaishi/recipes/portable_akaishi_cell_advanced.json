@@ -7,7 +7,7 @@
   ],
   "key": {
     "B": { "item": "akaishi:portable_akaishi_cell_basic" },
-    "G": { "item": "minecraft:gold_ingot" }
+    "G": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_advanced", "count": 1 }
 }

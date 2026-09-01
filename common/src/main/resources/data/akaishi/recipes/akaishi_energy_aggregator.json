@@ -6,7 +6,7 @@
     "LCL"
   ],
   "key": {
-    "C": { "item": "minecraft:copper_ingot" },
+    "C": { "item": "akaishi:copper_dust" },
     "L": { "item": "minecraft:lapis_block" },
     "A": { "item": "akaishi:akaishi_energy_assembly" }
   },

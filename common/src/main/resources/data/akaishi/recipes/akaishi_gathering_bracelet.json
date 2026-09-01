@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": { "item": "akaishi:akaishi_crystal" },
-    "L": { "item": "minecraft:lapis_lazuli" }
+    "L": { "item": "akaishi:lapis_dust" }
   },
   "result": { "item": "akaishi:akaishi_gathering_bracelet", "count": 1 }
 }

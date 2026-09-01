@@ -7,7 +7,7 @@
   ],
   "key": {
     "H": { "item": "akaishi:heat_sink_good" },
-    "C": { "item": "minecraft:copper_ingot" }
+    "C": { "item": "akaishi:copper_dust" }
   },
   "result": { "item": "akaishi:akaishi_fusion_cooler_frame", "count": 4 }
 }

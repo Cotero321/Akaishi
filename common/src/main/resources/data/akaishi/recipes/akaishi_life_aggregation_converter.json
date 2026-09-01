@@ -6,8 +6,8 @@
     "LCL"
   ],
   "key": {
-    "C": { "item": "minecraft:copper_ingot" },
-    "L": { "item": "minecraft:lapis_lazuli" },
+    "C": { "item": "akaishi:copper_dust" },
+    "L": { "item": "akaishi:lapis_dust" },
     "A": { "item": "akaishi:akaishi_life_energy_cell" }
   },
   "result": { "item": "akaishi:akaishi_life_aggregation_converter", "count": 1 }

@@ -7,7 +7,7 @@
   ],
   "key": {
     "H": { "item": "minecraft:honey_bottle" },
-    "I": { "item": "minecraft:iron_nugget" }
+    "I": { "item": "akaishi:iron_dust" }
   },
   "result": { "item": "akaishi:akaishi_antidote_bracelet", "count": 1 }
 }

@@ -6,9 +6,9 @@
     "GRG"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
+    "G": { "item": "akaishi:gold_dust" },
     "W": { "item": "akaishi:akaishi_wireless_chunk_loader" },
-    "R": { "item": "minecraft:redstone" }
+    "R": { "item": "akaishi:akaishi_dust" }
   },
   "result": { "item": "akaishi:akaishi_wireless_chunk_range", "count": 1 }
 }

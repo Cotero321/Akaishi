@@ -8,7 +8,7 @@
   "key": {
     "P": { "item": "akaishi:akaishi_energy_pipe" },
     "M": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "B": { "item": "minecraft:redstone_block" }
+    "B": { "item": "akaishi:raw_akaishi_block" }
   },
   "result": { "item": "akaishi:akaishi_energy_cell_serializer", "count": 1 }
 }

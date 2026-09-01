@@ -7,7 +7,7 @@
   ],
   "key": {
     "H": { "item": "minecraft:hopper" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_sample_vault", "count": 1 }
 }

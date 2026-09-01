@@ -6,8 +6,8 @@
     "M G"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "C": { "item": "minecraft:diamond" },
+    "G": { "item": "akaishi:akaishi_ingot" },
+    "C": { "item": "akaishi:diamond_dust" },
     "M": { "item": "akaishi:akaishi_machine_component" }
   },
   "result": { "item": "akaishi:akaishi_advanced_component", "count": 1 }

@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "III",
-    "OCO",
-    "III"
+    "IBI",
+    "BCB",
+    "IBI"
   ],
   "key": {
-    "O": { "item": "akaishi:iron_ore_base" },
+    "B": { "item": "akaishi:iron_ore_base" },
     "C": { "item": "akaishi:akaishi_machine_component" },
     "I": { "item": "minecraft:iron_ingot" }
   },

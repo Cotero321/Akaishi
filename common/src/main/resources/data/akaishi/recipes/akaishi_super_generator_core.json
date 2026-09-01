@@ -6,9 +6,9 @@
     "DGD"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond_block" },
+    "D": { "item": "akaishi:diamond_dust" },
     "E": { "item": "akaishi:akaishi_energy_assembly" },
-    "G": { "item": "minecraft:gold_block" }
+    "G": { "item": "akaishi:netherite_dust" }
   },
   "result": { "item": "akaishi:akaishi_super_generator_core", "count": 1 }
 }

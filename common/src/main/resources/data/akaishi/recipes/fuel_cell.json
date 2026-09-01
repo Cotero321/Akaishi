@@ -6,9 +6,9 @@
     "ICI"
   ],
   "key": {
-    "C": { "item": "minecraft:coal" },
+    "C": { "item": "akaishi:coal_dust" },
     "E": { "item": "akaishi:akaishi_essence" },
-    "I": { "item": "akaishi:akaishi_ingot" }
+    "I": { "item": "minecraft:iron_ingot" }
   },
   "result": { "item": "akaishi:fuel_cell", "count": 1 }
 }

@@ -7,8 +7,8 @@
   ],
   "key": {
     "G": { "item": "minecraft:glass" },
-    "L": { "item": "minecraft:lapis_lazuli" },
-    "I": { "item": "minecraft:iron_block" }
+    "L": { "item": "akaishi:lapis_dust" },
+    "I": { "item": "akaishi:akaishi_essence_block" }
   },
   "result": { "item": "akaishi:akaishi_surgery", "count": 1 }
 }

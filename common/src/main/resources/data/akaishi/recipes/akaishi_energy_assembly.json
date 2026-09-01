@@ -6,7 +6,7 @@
     "CEC"
   ],
   "key": {
-    "C": { "item": "minecraft:copper_block" },
+    "C": { "item": "akaishi:akaishi_ore_base" },
     "E": { "item": "akaishi:akaishi_energy_cell_basic" },
     "M": { "item": "akaishi:akaishi_machine_component" }
   },

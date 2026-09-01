@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Map;
 
 /**
- * 赤石压缩机方块实体：粉末压缩为对应块、赤石精华压缩为浓缩赤石精华。
+ * 赤石压缩机方块实体：粉末压缩为对应块、赤石粉压缩为赤石精华。
  * 压缩消耗多个输入（inputCount），进度满一次性扣除并产出 1 个块；
  * 速度升级加快压缩、能量升级扩容。
  */
@@ -32,8 +32,7 @@ public class AkaishiCompressorBlockEntity extends AkaishiSingleSlotMachineBlockE
             Map.entry(ModItems.quartzDust.get(), new MachineRecipe(ModItems.quartzDust.get(), 9, Items.QUARTZ_BLOCK, 1)),
             Map.entry(ModItems.netheriteDust.get(), new MachineRecipe(ModItems.netheriteDust.get(), 9, Items.NETHERITE_INGOT, 1)),
             Map.entry(ModItems.obsidianDust.get(), new MachineRecipe(ModItems.obsidianDust.get(), 4, Items.OBSIDIAN, 1)),
-            Map.entry(ModItems.akaishiDust.get(), new MachineRecipe(ModItems.akaishiDust.get(), 9, ModItems.akaishiEssence.get(), 1)),
-            Map.entry(ModItems.akaishiEssence.get(), new MachineRecipe(ModItems.akaishiEssence.get(), 9, ModItems.akaishiEssenceCompressed.get(), 1))
+            Map.entry(ModItems.akaishiDust.get(), new MachineRecipe(ModItems.akaishiDust.get(), 9, ModItems.akaishiEssence.get(), 1))
     );
 
     public AkaishiCompressorBlockEntity(BlockPos pos, BlockState state) {

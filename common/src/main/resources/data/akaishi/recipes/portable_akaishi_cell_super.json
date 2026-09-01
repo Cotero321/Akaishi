@@ -6,7 +6,7 @@
     " D "
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "B": { "item": "akaishi:portable_akaishi_cell_advanced" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_super", "count": 1 }

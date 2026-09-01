@@ -6,7 +6,7 @@
     "LLL"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond" },
+    "D": { "item": "akaishi:diamond_dust" },
     "L": { "item": "minecraft:lapis_block" },
     "S": { "item": "akaishi:akaishi_life_purifier" }
   },

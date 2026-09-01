@@ -8,7 +8,7 @@
   "key": {
     "L": { "item": "minecraft:lapis_block" },
     "S": { "item": "akaishi:akaishi_energy_cell_advanced" },
-    "I": { "item": "minecraft:gold_ingot" }
+    "I": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:akaishi_life_energy_cell", "count": 1 }
 }

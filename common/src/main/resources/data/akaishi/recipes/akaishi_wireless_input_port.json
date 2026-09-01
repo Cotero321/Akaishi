@@ -9,7 +9,7 @@
     "G": { "item": "minecraft:glass" },
     "W": { "item": "akaishi:akaishi_wireless_component" },
     "P": { "item": "akaishi:akaishi_item_pipe" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_wireless_input_port", "count": 1 }
 }

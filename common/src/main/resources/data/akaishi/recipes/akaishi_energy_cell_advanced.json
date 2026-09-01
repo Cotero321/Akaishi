@@ -7,7 +7,7 @@
   ],
   "key": {
     "E": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "G": { "item": "minecraft:gold_ingot" }
+    "G": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:akaishi_energy_cell_advanced", "count": 1 }
 }

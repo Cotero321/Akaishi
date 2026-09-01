@@ -6,10 +6,10 @@
     "IGI"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
+    "G": { "item": "akaishi:gold_dust" },
     "S": { "item": "akaishi:akaishi_speed_upgrade" },
     "C": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_miner_controller_basic", "count": 1 }
 }

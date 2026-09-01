@@ -7,7 +7,7 @@
   ],
   "key": {
     "P": { "item": "minecraft:piston" },
-    "I": { "item": "minecraft:iron_block" }
+    "I": { "item": "minecraft:iron_ingot" }
   },
   "result": { "item": "akaishi:akaishi_compressor", "count": 1 }
 }

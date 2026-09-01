@@ -6,8 +6,8 @@
     "CIC"
   ],
   "key": {
-    "C": { "item": "minecraft:copper_ingot" },
-    "R": { "item": "minecraft:redstone" },
+    "C": { "item": "minecraft:iron_ingot" },
+    "R": { "item": "akaishi:akaishi_crystal" },
     "I": { "item": "minecraft:iron_ingot" }
   },
   "result": { "item": "akaishi:akaishi_machine_component", "count": 1 }

@@ -8,7 +8,7 @@
   "key": {
     "G": { "item": "minecraft:glass" },
     "S": { "item": "minecraft:brewing_stand" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_potion_table", "count": 1 }
 }

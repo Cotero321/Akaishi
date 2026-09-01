@@ -1,0 +1,13 @@
+{
+  "name": "Akaishi Trinkets",
+  "icon": "akaishi:akaishi_hunting_ring",
+  "category": "akaishi:advanced",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_hunting_ring",
+      "text": "Seven trinkets forged from Akaishi power:$(li)Hunting Ring: combat boost$(li)Gathering Bracelet: better yields$(li)Fire Necklace: fire resistance$(li)Antidote Bracelet: poison cure$(li)Blast Charm: explosion reduction$(li)Wither Charm: wither defense$(li)Satiation Charm: feeding bonus"
+    }
+  ]
+}

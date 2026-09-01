@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": { "item": "minecraft:netherite_ingot" },
-    "R": { "item": "minecraft:redstone_block" },
+    "R": { "item": "akaishi:raw_akaishi_block" },
     "F": { "item": "akaishi:akaishi_reactor_fuel_rod" }
   },
   "result": { "item": "akaishi:akaishi_reactor_core", "count": 1 }

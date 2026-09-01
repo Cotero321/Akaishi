@@ -7,7 +7,7 @@
   ],
   "key": {
     "T": { "item": "akaishi:akaishi_fluid_tank_basic" },
-    "G": { "item": "minecraft:gold_ingot" }
+    "G": { "item": "akaishi:gold_dust" }
   },
   "result": { "item": "akaishi:akaishi_fluid_tank_advanced", "count": 1 }
 }

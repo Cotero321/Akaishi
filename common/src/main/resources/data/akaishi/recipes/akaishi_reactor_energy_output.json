@@ -9,7 +9,7 @@
     "G": { "item": "minecraft:glass" },
     "E": { "item": "akaishi:akaishi_energy_cell_advanced" },
     "P": { "item": "akaishi:akaishi_energy_pipe" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_reactor_energy_output", "count": 1 }
 }

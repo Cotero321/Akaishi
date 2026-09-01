@@ -6,9 +6,9 @@
     "LGL"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
-    "L": { "item": "minecraft:lapis_lazuli" },
-    "R": { "item": "minecraft:redstone" },
+    "G": { "item": "akaishi:gold_dust" },
+    "L": { "item": "akaishi:lapis_dust" },
+    "R": { "item": "akaishi:akaishi_dust" },
     "P": { "item": "akaishi:akaishi_purifier" }
   },
   "result": { "item": "akaishi:akaishi_life_purifier", "count": 1 }

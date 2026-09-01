@@ -6,7 +6,7 @@
     " P "
   ],
   "key": {
-    "Q": { "item": "minecraft:quartz" },
+    "Q": { "item": "akaishi:quartz_dust" },
     "P": { "item": "minecraft:ender_pearl" },
     "M": { "item": "akaishi:akaishi_machine_component" }
   },

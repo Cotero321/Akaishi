@@ -8,7 +8,7 @@
   "key": {
     "P": { "item": "akaishi:akaishi_item_pipe" },
     "F": { "item": "minecraft:crafting_table" },
-    "I": { "item": "minecraft:iron_ingot" },
+    "I": { "item": "akaishi:akaishi_ingot" },
     "H": { "item": "minecraft:hopper" }
   },
   "result": { "item": "akaishi:akaishi_fusion_item_input", "count": 1 }

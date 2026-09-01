@@ -6,7 +6,7 @@
     " I "
   ],
   "key": {
-    "R": { "item": "minecraft:redstone" },
+    "R": { "item": "akaishi:akaishi_dust" },
     "I": { "item": "minecraft:iron_nugget" }
   },
   "result": { "item": "akaishi:akaishi_hunting_ring", "count": 1 }

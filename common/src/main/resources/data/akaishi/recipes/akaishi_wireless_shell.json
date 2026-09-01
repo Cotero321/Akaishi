@@ -8,7 +8,7 @@
   "key": {
     "G": { "item": "minecraft:glass" },
     "Q": { "item": "minecraft:quartz" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_wireless_shell", "count": 4 }
 }

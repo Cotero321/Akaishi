@@ -6,7 +6,7 @@
     "OTO"
   ],
   "key": {
-    "O": { "item": "minecraft:obsidian" },
+    "O": { "item": "akaishi:obsidian_dust" },
     "T": { "item": "akaishi:akaishi_plasma_tank" },
     "P": { "item": "akaishi:akaishi_plasma_pipe" },
     "F": { "item": "akaishi:akaishi_fusion_fuel_aggregator" }

@@ -7,7 +7,7 @@
   ],
   "key": {
     "H": { "item": "akaishi:heat_sink_normal" },
-    "Q": { "item": "minecraft:quartz_block" }
+    "Q": { "item": "akaishi:quartz_ore_base" }
   },
   "result": { "item": "akaishi:akaishi_fusion_insulation", "count": 8 }
 }

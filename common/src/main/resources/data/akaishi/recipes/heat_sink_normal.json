@@ -6,7 +6,7 @@
     " C "
   ],
   "key": {
-    "C": { "item": "minecraft:copper_ingot" },
+    "C": { "item": "akaishi:copper_dust" },
     "S": { "item": "akaishi:heat_sink_poor" }
   },
   "result": { "item": "akaishi:heat_sink_normal", "count": 1 }

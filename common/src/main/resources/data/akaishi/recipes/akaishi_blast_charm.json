@@ -6,7 +6,7 @@
     " G "
   ],
   "key": {
-    "O": { "item": "minecraft:obsidian" },
+    "O": { "item": "akaishi:obsidian_dust" },
     "G": { "item": "minecraft:gunpowder" }
   },
   "result": { "item": "akaishi:akaishi_blast_charm", "count": 1 }

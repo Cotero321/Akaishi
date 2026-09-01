@@ -6,7 +6,7 @@
     "D D"
   ],
   "key": {
-    "D": { "item": "minecraft:diamond_block" },
+    "D": { "item": "akaishi:diamond_dust" },
     "C": { "item": "akaishi:akaishi_reactor_controller" }
   },
   "result": { "item": "akaishi:akaishi_fusion_controller", "count": 1 }

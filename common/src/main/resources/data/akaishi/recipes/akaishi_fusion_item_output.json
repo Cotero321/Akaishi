@@ -8,7 +8,7 @@
   "key": {
     "C": { "item": "minecraft:barrel" },
     "P": { "item": "akaishi:akaishi_item_pipe" },
-    "I": { "item": "minecraft:iron_ingot" },
+    "I": { "item": "akaishi:akaishi_ingot" },
     "H": { "item": "minecraft:chest" }
   },
   "result": { "item": "akaishi:akaishi_fusion_item_output", "count": 1 }

@@ -1,0 +1,18 @@
+{
+  "name": "Fuel & Cooling",
+  "icon": "akaishi:fuel_cell",
+  "category": "akaishi:tech",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:fuel_cell",
+      "text": "Fuel Cells: burnable cells crafted from Akaishi ingots - the reactor fuel.$(li)The Fuel Canner fills cells$(li)The Fuel Mixer blends end/dragon/world-base mixtures$(li)Fusion Fuel Aggregator builds fusion rods from rods$(li)The Plasma Filler loads plasma into rods -> Plasma Fuel Rods"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:heat_sink_poor",
+      "text": "Heat sinks come in 6 tiers (poor -> exquisite), plus fusion sinks (tier 1-5 + life).$(br)Crafted step by step from Cooling Base and powders - both reactor and fusion depend on them."
+    }
+  ]
+}

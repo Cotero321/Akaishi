@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": { "item": "akaishi:akaishi_crystal" },
-    "B": { "item": "minecraft:redstone_block" }
+    "B": { "item": "akaishi:raw_akaishi_block" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_basic", "count": 1 }
 }

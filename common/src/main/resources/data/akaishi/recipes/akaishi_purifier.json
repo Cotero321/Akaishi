@@ -6,7 +6,7 @@
     "BGF"
   ],
   "key": {
-    "G": { "item": "minecraft:gold_ingot" },
+    "G": { "item": "minecraft:iron_ingot" },
     "C": { "item": "akaishi:raw_akaishi_block" },
     "M": { "item": "akaishi:akaishi_machine_component" },
     "F": { "item": "minecraft:furnace" },

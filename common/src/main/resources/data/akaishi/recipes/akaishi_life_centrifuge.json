@@ -7,8 +7,8 @@
   ],
   "key": {
     "G": { "item": "minecraft:glass" },
-    "C": { "item": "minecraft:lapis_block" },
-    "I": { "item": "minecraft:iron_ingot" }
+    "C": { "item": "akaishi:emerald_ore_base" },
+    "I": { "item": "akaishi:akaishi_ingot" }
   },
   "result": { "item": "akaishi:akaishi_life_centrifuge", "count": 1 }
 }

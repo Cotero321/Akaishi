@@ -7,7 +7,7 @@
   ],
   "key": {
     "C": { "item": "akaishi:cooling_base" },
-    "S": { "item": "minecraft:iron_ingot" }
+    "S": { "item": "minecraft:copper_ingot" }
   },
   "result": { "item": "akaishi:heat_sink_poor", "count": 1 }
 }

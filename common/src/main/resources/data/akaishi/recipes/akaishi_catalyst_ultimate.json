@@ -6,7 +6,7 @@
     "NNN"
   ],
   "key": {
-    "N": { "item": "minecraft:netherite_ingot" },
+    "N": { "item": "akaishi:netherite_ore_base" },
     "C": { "item": "akaishi:akaishi_catalyst_advanced" }
   },
   "result": { "item": "akaishi:akaishi_catalyst_ultimate", "count": 1 }

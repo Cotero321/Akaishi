@@ -5,7 +5,7 @@
     "B"
   ],
   "key": {
-    "B": { "item": "minecraft:redstone_block" },
+    "B": { "item": "akaishi:raw_akaishi_block" },
     "T": { "item": "akaishi:akaishi_upgrade_template" }
   },
   "result": { "item": "akaishi:akaishi_machine_energy_upgrade", "count": 1 }
