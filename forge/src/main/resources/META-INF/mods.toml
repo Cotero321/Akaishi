@@ -6,10 +6,10 @@ license = "MIT"
 [[mods]]
 modId = "template_mod"
 version = "${mod_version}"
-displayName = "Template Mod"
+displayName = "赤石 Akaishi"
 authors = "Template Author"
-description = '''Template Mod for Architectury
-本模组仅支持 Forge 加载器，不支持 Fabric。'''
+description = '''以「赤石」为核心的科技与生物改造模组
+采集赤石矿脉与赤水晶，构筑赤能源网络，搭建矩阵反应堆发电；移植生物器官强化自身，调配药剂，建立自动化生产线。仅支持 Forge 加载器。'''
 
 [[dependencies.template_mod]]
 modId = "forge"
