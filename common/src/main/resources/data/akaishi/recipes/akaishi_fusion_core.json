@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "HFH",
+    "FNF",
+    "HFH"
+  ],
+  "key": {
+    "F": { "item": "akaishi:akaishi_fusion_rod" },
+    "N": { "item": "minecraft:netherite_ingot" },
+    "H": { "item": "akaishi:fusion_heat_sink_tier3" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_core", "count": 1 }
+}

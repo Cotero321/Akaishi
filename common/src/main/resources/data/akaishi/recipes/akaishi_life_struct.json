@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LDL",
+    "LSL",
+    "LLL"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "L": { "item": "minecraft:lapis_block" },
+    "S": { "item": "akaishi:akaishi_life_purifier" }
+  },
+  "result": { "item": "akaishi:akaishi_life_struct", "count": 1 }
+}

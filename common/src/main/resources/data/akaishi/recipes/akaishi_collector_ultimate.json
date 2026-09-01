@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "OCO",
+    " O "
+  ],
+  "key": {
+    "O": { "item": "minecraft:netherite_ingot" },
+    "C": { "item": "akaishi:akaishi_collector_advanced" }
+  },
+  "result": { "item": "akaishi:akaishi_collector_ultimate", "count": 1 }
+}

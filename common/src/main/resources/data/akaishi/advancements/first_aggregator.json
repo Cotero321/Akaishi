@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "akaishi:akaishi_energy_aggregator"
+    },
+    "title": {
+      "translate": "advancements.akaishi.first_aggregator.title"
+    },
+    "description": {
+      "translate": "advancements.akaishi.first_aggregator.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "akaishi:first_purifier",
+  "criteria": {
+    "has_akaishi_energy_aggregator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "akaishi:akaishi_energy_aggregator"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

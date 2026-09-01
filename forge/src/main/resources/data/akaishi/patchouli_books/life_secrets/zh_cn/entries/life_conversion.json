@@ -1,0 +1,23 @@
+{
+  "name": "生命转换",
+  "icon": "akaishi:akaishi_life_conversion_architecture",
+  "category": "akaishi:life_intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_aggregation_converter",
+      "text": "生命聚合转换器：以赤能源聚合生命能量的小型设备，是生命能量的第一来源。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_conversion_architecture",
+      "text": "生命转换架构：围成 3×3×3 封闭空间后以 45 倍效率转换赤能源 → 生命能量，配合生命转换矩阵可实现大规模产能。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_controller",
+      "text": "生命转换矩阵：矩阵外壳围成 3×3×3 封闭空间，能源输入口供能、能源输出口输出生命能量，是全自动产线的理想方案。"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Collector",
+  "icon": "akaishi:akaishi_collector_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_collector_basic",
+      "text": "Harvests mature crystal clusters automatically into a 27-slot buffer:$(li)Basic: 3x3x3, 30 t/block, 2 e/t$(li)Medium: 5x5x5, 15 t/block, 4 e/t$(li)Advanced: 9x9x9, 7 t/block, 8 e/t$(li)Ultimate: 16x16x16, 2 t/block, 16 e/t$(br2)Supports hoppers and item pipes."
+    }
+  ]
+}

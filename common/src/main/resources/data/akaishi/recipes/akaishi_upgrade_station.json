@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "UUU",
+    "UCU",
+    "UUU"
+  ],
+  "key": {
+    "U": { "item": "akaishi:akaishi_upgrade_template" },
+    "C": { "item": "minecraft:smithing_table" }
+  },
+  "result": { "item": "akaishi:akaishi_upgrade_station", "count": 1 }
+}

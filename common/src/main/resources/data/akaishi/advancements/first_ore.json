@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "akaishi:akaishi_crystal"
+    },
+    "title": {
+      "translate": "advancements.akaishi.first_ore.title"
+    },
+    "description": {
+      "translate": "advancements.akaishi.first_ore.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "akaishi:akaishi_root",
+  "criteria": {
+    "has_akaishi_crystal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "akaishi:akaishi_crystal"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

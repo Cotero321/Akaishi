@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OTO",
+    "PFP",
+    "OTO"
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "T": { "item": "akaishi:akaishi_plasma_tank" },
+    "P": { "item": "akaishi:akaishi_plasma_pipe" },
+    "F": { "item": "akaishi:akaishi_fusion_fuel_aggregator" }
+  },
+  "result": { "item": "akaishi:akaishi_plasma_filler", "count": 1 }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    "FEF",
+    " F "
+  ],
+  "key": {
+    "F": { "item": "akaishi:fuel_cell" },
+    "E": { "item": "akaishi:akaishi_essence_compressed" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_rod", "count": 1 }
+}

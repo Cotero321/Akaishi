@@ -1,0 +1,17 @@
+{
+  "name": "Akaishi Energy Aggregator",
+  "icon": "akaishi:akaishi_energy_aggregator",
+  "category": "akaishi:equipment",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_aggregator",
+      "text": "The Akaishi Energy Aggregator condenses vast amounts of Chi Energy into Akaishi Ingots, the origin of Akaishi equipment:$(br2)$(li)Consumes 10M Chi Energy$(li)1 Netherite Ingot input$(li)1 Akaishi Ingot output$(br2)$(bold)Geode Upgrading$(): feed in a geode block and spend 10M Chi Energy to raise it to the next tier (Flawed → Normal → Pristine → Perfect), boosting geode production.$(br2)Holds up to 200M energy, can be fed by pipes, and exposes a vanilla container for logistics automation."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_energy_aggregator"
+    }
+  ]
+}

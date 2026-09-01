@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "akaishi:block/machine_bottom",
+    "top": "akaishi:block/akaishi_potion_table_top",
+    "side": "akaishi:block/akaishi_potion_table_side"
+  }
+}

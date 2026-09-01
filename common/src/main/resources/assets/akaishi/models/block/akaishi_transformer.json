@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_transformer_bottom",
+    "top": "akaishi:block/akaishi_transformer_top",
+    "side": "akaishi:block/akaishi_transformer_side"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "赤石催化器",
+  "icon": "akaishi:akaishi_catalyst_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_catalyst_basic",
+      "text": "消耗赤能源催生范围内水晶母岩生长赤石水晶簇，是赤石晶自动化的关键。$(li)基础：3×3×3，成功率 20%，5 能/t$(li)中级：5×5×5，成功率 30%，25 能/t$(li)高级：9×9×9，成功率 40%，125 能/t$(li)超级：16×16×16，成功率 50%，625 能/t"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_geode_pristine",
+      "text": "水晶母岩有瑕疵/普通/完好/完美 4 种品质，是水晶簇的载体。$(br)催化器与收集器配合，即可实现赤石晶的全自动生产。"
+    }
+  ]
+}

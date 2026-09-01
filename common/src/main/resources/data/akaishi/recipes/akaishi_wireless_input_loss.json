@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "PWP",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "W": { "item": "akaishi:akaishi_wireless_component" },
+    "P": { "item": "minecraft:hopper" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_input_loss", "count": 1 }
+}

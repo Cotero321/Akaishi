@@ -1,0 +1,31 @@
+{
+  "name": "矿机结构",
+  "icon": "akaishi:akaishi_miner_controller_basic",
+  "category": "akaishi:miner",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:multiblock",
+      "name": "赤石矿机（9×9×3）",
+      "multiblock": {
+        "pattern": [
+          ["....F....", ".FUU.FUU.", ".U..U..U.", ".U..U..U.", "FFUUPUUFF", ".U..U..U.", ".U..U..U.", ".FUU.FUU.", "....F...."],
+          ["....F....", ".........", ".........", ".........", "F...C...F", ".........", ".........", ".........", "....F...."],
+          ["....F....", ".FUU.FUU.", ".U..U..U.", ".U..U..U.", "FFUUPUUFF", ".U..U..U.", ".U..U..U.", ".FUU.FUU.", "....F...."]
+        ],
+        "mapping": {
+          "F": "akaishi:akaishi_miner_frame",
+          "U": "akaishi:akaishi_miner_upgrade_frame",
+          "P": "akaishi:akaishi_miner_port",
+          "C": "akaishi:akaishi_miner_controller_basic"
+        },
+        "symmetrical": false
+      },
+      "text": "控制器位于中间层中心。底层与顶层各有 1 个转口（共 2 个）。U 位置可替换为升级模块方块。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)搭建要点$(0)$(li)9×9 横截面 × 3 层（高）$(li)先放置中间层中心的控制器，再补齐其余方块$(li)升级框架位置 U：放置空升级框架或直接安装升级模块$(li)上下两层中心各放 1 个转口 P$(br2)结构成型后控制器会广播到转口，产出的矿物自动送入转口缓冲。"
+    }
+  ]
+}

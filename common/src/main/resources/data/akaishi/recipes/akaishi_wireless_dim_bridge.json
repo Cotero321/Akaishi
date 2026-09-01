@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OEO",
+    "OEO",
+    "OEO"
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "E": { "item": "minecraft:ender_pearl" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_dim_bridge", "count": 1 }
+}

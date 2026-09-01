@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "akaishi:akaishi_crystal_block" }
+  ],
+  "result": { "item": "akaishi:akaishi_crystal", "count": 9 }
+}

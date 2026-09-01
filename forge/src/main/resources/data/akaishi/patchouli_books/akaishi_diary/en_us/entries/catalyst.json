@@ -1,0 +1,18 @@
+{
+  "name": "Catalyst",
+  "icon": "akaishi:akaishi_catalyst_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_catalyst_basic",
+      "text": "Consumes Akaishi Energy to grow crystal clusters on geodes - the key to crystal automation.$(li)Basic: 3x3x3, 20% chance, 5 e/t$(li)Medium: 5x5x5, 30%, 25 e/t$(li)Advanced: 9x9x9, 40%, 125 e/t$(li)Ultimate: 16x16x16, 50%, 625 e/t"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_geode_pristine",
+      "text": "Geodes come in flawed/normal/pristine/perfect quality.$(br)Pair catalysts with collectors for fully automatic crystals."
+    }
+  ]
+}

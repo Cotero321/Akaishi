@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " D ",
+    "DCD",
+    " D "
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "C": { "item": "akaishi:akaishi_collector_medium" }
+  },
+  "result": { "item": "akaishi:akaishi_collector_advanced", "count": 1 }
+}

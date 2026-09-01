@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_overworld",
-  "features": "template_mod:deepslate_chishi_ore_low",
-  "step": "underground_ores"
-}

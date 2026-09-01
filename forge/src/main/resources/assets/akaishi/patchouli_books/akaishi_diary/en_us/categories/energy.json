@@ -1,0 +1,10 @@
+{
+  "name": "Chi Energy",
+  "description": "The energy system that powers Akaishi technology",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "sortnum": 3,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_purifier"
+  }
+}

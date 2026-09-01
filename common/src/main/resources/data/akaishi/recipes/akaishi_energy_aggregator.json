@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LCL",
+    "CAC",
+    "LCL"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "L": { "item": "minecraft:lapis_block" },
+    "A": { "item": "akaishi:akaishi_energy_assembly" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_aggregator", "count": 1 }
+}

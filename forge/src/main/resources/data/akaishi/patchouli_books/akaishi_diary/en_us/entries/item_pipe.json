@@ -1,0 +1,13 @@
+{
+  "name": "Item Pipes",
+  "icon": "akaishi:akaishi_item_pipe_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_pipe",
+      "text": "Move items along a chained network:$(li)Basic: 1 item/tick$(li)Intermediate: 4/tick$(li)Elite: 16/tick$(li)Ultimate: 64/tick$(br2)Use the Configurator to switch push/pull mode or disconnect one side."
+    }
+  ]
+}

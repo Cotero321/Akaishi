@@ -1,0 +1,105 @@
+package com.example.akaishi.menu;
+
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+
+/**
+ * 赤石矿机控制器界面（vanilla 灰色风格，198 高）：
+ * - 赤能源条（红）
+ * - 产物暂存 3×2（自绘槽框）
+ * - 三类升级统计 + 挖矿进度条 + 结构成型状态
+ * 悬停能量/进度条显示数值详情。
+ */
+public class AkaishiMinerControllerScreen extends AbstractContainerScreen<AkaishiMinerControllerMenu> {
+
+    private static final int TEXT = 0xFF3F3F3F;
+    private static final int GREEN = 0xFF2E7D32;
+    private static final int RED = 0xFFC62828;
+    private static final int BAR_H = 8;
+
+    public AkaishiMinerControllerScreen(AkaishiMinerControllerMenu menu, Inventory inv, Component title) {
+        super(menu, inv, title);
+        this.imageWidth = 176;
+        this.imageHeight = 198;
+    }
+
+    private static String formatEnergy(long v) {
+        if (v >= 1_000_000L) {
+            return trim(v / 1.0e6) + "M";
+        }
+        if (v >= 1_000L) {
+            return trim(v / 1.0e3) + "K";
+        }
+        return String.valueOf(v);
+    }
+
+    private static String trim(double d) {
+        if (Math.abs(d - Math.round(d)) < 0.05) {
+            return String.valueOf((long) Math.round(d));
+        }
+        return String.format(java.util.Locale.ROOT, "%.1f", d);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
+        int x = this.leftPos;
+        int y = this.topPos;
+        // 产物暂存 3×2
+        int[] cols = {26, 44, 62};
+        int[] rows = {40, 58};
+        for (int r : rows) {
+            for (int c : cols) {
+                GuiWidgets.slotBox(gui, x + c, y + r);
+            }
+        }
+        // 能量条
+        GuiWidgets.track(gui, x + 20, y + 22, 136, BAR_H);
+        long max = Math.max(1, menu.getCapacity());
+        int width = (int) (136L * Math.max(0, Math.min(menu.getEnergy(), max)) / max);
+        if (width > 0) {
+            gui.fill(x + 20, y + 22, x + 20 + width, y + 22 + BAR_H, 0xFFE03030);
+        }
+        // 挖矿进度条
+        GuiWidgets.track(gui, x + 26, y + 92, 90, BAR_H);
+        long required = Math.max(1, menu.getRequired());
+        int pWidth = (int) (90 * Math.min(menu.getProgress(), required) / required);
+        if (pWidth > 0) {
+            gui.fill(x + 26, y + 92, x + 26 + pWidth, y + 92 + BAR_H, 0xFFFFD030);
+        }
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT, false);
+        // 产物暂存 / 升级统计 / 成型状态
+        gui.drawString(this.font, Component.translatable("gui.akaishi.miner.output"),
+                36, 32, 0xFF707070, false);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.miner.speed", menu.getSpeedCount()),
+                26, 80, 0xFF707070, false);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.miner.fortune", menu.getFortuneCount()),
+                62, 80, 0xFF707070, false);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.miner.storage", menu.getStorageCount()),
+                98, 80, 0xFF707070, false);
+        if (menu.isFormed()) {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.formed"), 26, 108, GREEN, false);
+        } else {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.not_formed"), 26, 108, RED, false);
+        }
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        int x = this.leftPos;
+        int y = this.topPos;
+        if (mouseX >= x + 20 && mouseX < x + 156 && mouseY >= y + 22 && mouseY < y + 30) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.energy",
+                    formatEnergy(menu.getEnergy()), formatEnergy(menu.getCapacity())), mouseX, mouseY);
+        } else if (mouseX >= x + 26 && mouseX < x + 116 && mouseY >= y + 92 && mouseY < y + 100) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.miner.progress",
+                    menu.getProgress(), menu.getRequired()), mouseX, mouseY);
+        }
+    }
+}

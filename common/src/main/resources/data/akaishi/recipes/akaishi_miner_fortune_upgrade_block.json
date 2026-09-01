@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IEI",
+    "EGE",
+    "IEI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "E": { "item": "minecraft:emerald" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_fortune_upgrade_block", "count": 1 }
+}

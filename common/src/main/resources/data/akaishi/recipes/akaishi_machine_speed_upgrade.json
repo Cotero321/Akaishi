@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "T",
+    "I"
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "T": { "item": "akaishi:akaishi_speed_upgrade" }
+  },
+  "result": { "item": "akaishi:akaishi_machine_speed_upgrade", "count": 1 }
+}

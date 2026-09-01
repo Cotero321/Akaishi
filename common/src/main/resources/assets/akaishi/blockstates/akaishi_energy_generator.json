@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "akaishi:block/akaishi_energy_generator"
+    },
+    "formed=true": {
+      "model": "akaishi:block/akaishi_energy_generator_formed"
+    }
+  }
+}

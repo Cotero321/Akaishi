@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N N",
+    "NAN",
+    "N N"
+  ],
+  "key": {
+    "N": { "item": "minecraft:netherite_ingot" },
+    "A": { "item": "akaishi:akaishi_miner_controller_super" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_controller_ultimate", "count": 1 }
+}

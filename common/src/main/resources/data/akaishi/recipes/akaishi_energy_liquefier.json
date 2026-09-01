@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BTB",
+    "TMT",
+    "BTB"
+  ],
+  "key": {
+    "T": { "item": "akaishi:akaishi_energy_cell_basic" },
+    "M": { "item": "akaishi:akaishi_energy_processor" },
+    "B": { "item": "minecraft:glass_bottle" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_liquefier", "count": 1 }
+}

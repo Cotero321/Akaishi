@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "SGS",
+    "ISI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "S": { "item": "akaishi:akaishi_speed_upgrade" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_speed_upgrade_block", "count": 1 }
+}

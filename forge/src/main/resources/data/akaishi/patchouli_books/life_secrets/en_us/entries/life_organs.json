@@ -1,0 +1,23 @@
+{
+  "name": "Organ Construction",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:life_organs",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_struct",
+      "text": "The Life Struct builds organs: 1 sequence + 5 solids + 80,000 Life Energy, 6 seconds, no failure risk.$(br)Completeness = sequence purity - random loss (0-20): 100->III, 50-99->II, <50->I."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_surgery",
+      "text": "The Surgery Chamber implants or extracts organs (9 slots).$(br)Implant: 3 solids + 20,000 energy; extract: 1 solid + 5,000 energy.$(br2)Rejection = quality x group factor x completeness modifier and grows over time - predator combos lock rejection and explode!"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_cultivator",
+      "text": "The Cultivator purifies samples (+10 purity/step, four success tiers) and upgrades organs (quality I->IV, 85/75/65% success)."
+    }
+  ]
+}

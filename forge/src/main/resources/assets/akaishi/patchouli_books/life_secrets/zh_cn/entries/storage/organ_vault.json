@@ -1,0 +1,21 @@
+{
+  "name": "器官储藏库",
+  "icon": "akaishi:akaishi_organ_vault",
+  "category": "akaishi:storage",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_vault",
+      "text": "按躯体槽位分页的器官冰库：$(bold)9 页 × 9 格 = 81 格$() + 9 格管道暂存区。$(br2)器官放入时会$(bold)自动归类$()到所属躯体槽位页（眼→眼页、心脏→心脏页……），从界面中永远知道什么器官放在哪里。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "器官需要生命能量维持活性：每 tick 消耗 1 点。能量耗尽器官进入$(bold)休眠$()（界面警示，不影响存取），补充能量后恢复。$(br2)输入需匹配所属页，输出走暂存区供管道抽取。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_organ_vault"
+    }
+  ]
+}

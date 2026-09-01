@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "akaishi:akaishi_energy_pipe_advanced" },
+    { "item": "minecraft:gold_ingot" }
+  ],
+  "result": { "item": "akaishi:akaishi_energy_pipe_elite", "count": 1 }
+}

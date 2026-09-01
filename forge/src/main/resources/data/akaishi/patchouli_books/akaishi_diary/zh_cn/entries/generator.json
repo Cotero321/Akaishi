@@ -1,0 +1,23 @@
+{
+  "name": "赤能源发生机",
+  "icon": "akaishi:akaishi_energy_generator",
+  "category": "akaishi:energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_generator",
+      "text": "赤能源发生机燃烧燃料产生赤能源。$(br)它拥有 10 个升级槽，装入$(2,4)能源产生升级组件$(0)可提升产能（每个 ×1.75，最多 10 个）。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_assembly",
+      "text": "小型组合赤能源发生机：由 26 台发生机围成 3×3×3 的多方块结构，解锁 45 倍处理速度与 1.5 倍总产能。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_super_generator_core",
+      "text": "超级发生器架构核心：以 124 台发生机围成 5×5×5 的巨型结构，200 倍燃烧速度、燃料总产能为单台 3 倍，是中期能量主力。"
+    }
+  ]
+}

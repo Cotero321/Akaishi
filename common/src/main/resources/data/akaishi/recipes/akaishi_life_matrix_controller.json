@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DLD",
+    "LCL",
+    "DLD"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "L": { "item": "minecraft:lapis_block" },
+    "C": { "item": "akaishi:akaishi_life_conversion_architecture" }
+  },
+  "result": { "item": "akaishi:akaishi_life_matrix_controller", "count": 1 }
+}

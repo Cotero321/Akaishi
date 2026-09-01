@@ -1,0 +1,12 @@
+{
+  "name": "赤石矿簇",
+  "icon": "akaishi:akaishi_ore_low",
+  "category": "akaishi:ores",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤石矿簇埋藏于主世界、深板岩、下界与末地之中。$(br)开采可获得赤石晶，矿簇浓度越高，掉落越丰富。"
+    }
+  ]
+}

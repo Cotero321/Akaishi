@@ -1,0 +1,13 @@
+{
+  "name": "无线能源便捷终端",
+  "icon": "akaishi:akaishi_wireless_portable_terminal",
+  "category": "akaishi:wireless",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_portable_terminal",
+      "text": "便捷终端是手持的$(bold)遥控面板$()：手持右键即可打开，自动读取背包中的身份卡，并显示该卡认证终端的运行情况（卡号、终端 ID、输入/输出口统计）与能量储存（储能条、数值、容量）。$(br2)它是只读面板，不能授权卡或管理口——日常巡检网络状态用它最方便。"
+    }
+  ]
+}

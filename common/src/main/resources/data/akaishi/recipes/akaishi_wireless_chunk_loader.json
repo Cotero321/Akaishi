@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WDW",
+    "DCD",
+    "WDW"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "W": { "item": "akaishi:akaishi_wireless_component" },
+    "C": { "item": "minecraft:lodestone" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_chunk_loader", "count": 1 }
+}

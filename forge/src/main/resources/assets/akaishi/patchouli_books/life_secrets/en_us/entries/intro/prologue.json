@@ -1,0 +1,16 @@
+{
+  "name": "Prologue",
+  "icon": "akaishi:akaishi_life_aggregation_converter",
+  "category": "akaishi:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This diary is nearly blank - only a scrawled line on the flyleaf:$(br)$(2)\"The end of Akaishi power is the beginning of life.\"$(br2)Every page has been filled since the first life energy was aggregated.$(br2)$(bold)Current contents:$(li)Life Energy Purifier$(li)Life Essence Solid$(li)Machines (Gene Analyzer / Cultivator / Life Structure Table / Surgery Chamber / Potion Table)$(li)Storage & Linking (Sample / Organ / Potion vaults)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A companion book to the Akaishi Research Diary, covering the life-energy chapter beyond Akaishi:$(li)Life Aggregation Converter$(li)Life Conversion Architecture$(li)Life Energy Pipe$(li)Life Energy Cell$(li)Life Energy Purifier$(br2)New chapters unfold with each step of research - just like the Akaishi path."
+    }
+  ]
+}

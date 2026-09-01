@@ -1,0 +1,21 @@
+{
+  "name": "活化分馏器",
+  "icon": "akaishi:akaishi_activated_fractionator",
+  "category": "akaishi:life_energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_activated_fractionator",
+      "text": "活化结晶的$(bold)深度拆分$()：活化分馏器把活化结晶再次分离为对应燃料的$(bold)活化成分$()（7 种），并副产 1 枚$(bold)衰竭结晶$()。$(br)结晶在此被压榨到最纯粹的形态——活化成分是更精纯的提纯原料。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)工作方式：$()$(li)输入：1 个活化结晶（7 种任一）$(li)加工：耗时 $(bold)5 秒$()，每次消耗 $(bold)2000 赤能源$()$(li)产出：1 对应活化成分 + 1 衰竭结晶$(br2)$(bold)经济意义：$()分馏器是衰竭燃料处理链的末端——反应堆废料经活化、离心、分馏后沉淀为两种固体结晶，循环彻底闭合。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_activated_fractionator"
+    }
+  ]
+}

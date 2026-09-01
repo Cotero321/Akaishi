@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "G M",
+    "MCM",
+    "M G"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "C": { "item": "minecraft:diamond" },
+    "M": { "item": "akaishi:akaishi_machine_component" }
+  },
+  "result": { "item": "akaishi:akaishi_advanced_component", "count": 1 }
+}

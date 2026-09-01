@@ -1,0 +1,18 @@
+{
+  "name": "Energy Pipes",
+  "icon": "akaishi:akaishi_energy_pipe_ultimate",
+  "category": "akaishi:energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_pipe",
+      "text": "Transport energy from producers to consumers. Four tiers: basic, intermediate, elite and ultimate."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_debug_tool",
+      "text": "The Akaishi Configurator: right-click a pipe to switch push/pull mode, shift-right-click to disconnect one side."
+    }
+  ]
+}

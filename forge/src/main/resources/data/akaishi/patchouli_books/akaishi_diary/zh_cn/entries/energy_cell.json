@@ -1,0 +1,23 @@
+{
+  "name": "赤能源储存",
+  "icon": "akaishi:akaishi_energy_cell_super",
+  "category": "akaishi:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_basic",
+      "text": "赤能源储存单元有三个等级：基础、高级、超级，容量逐级提升，是搭建能量网络的基础。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_serializer",
+      "text": "赤能源储存串联器：将 26 台储存单元围成 3×3×3 结构，把全部单元的能量汇总为一体，总容量大幅提升。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:portable_akaishi_cell_super",
+      "text": "便捷赤能源储存单元：随身携带的能量包。手持时自动为身上赤石装备补充耐久，右键打开可查看能量。"
+    }
+  ]
+}

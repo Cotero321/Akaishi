@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WQW",
+    "QEQ",
+    "WQW"
+  ],
+  "key": {
+    "Q": { "item": "minecraft:quartz_block" },
+    "W": { "item": "akaishi:akaishi_wireless_component" },
+    "E": { "item": "minecraft:ender_pearl" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_core", "count": 1 }
+}

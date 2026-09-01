@@ -1,0 +1,24 @@
+{
+  "name": "赤能源觉醒",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "category": "akaishi:energy",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)日记残页：$()\"赤石晶只是沉睡的燃料。把它投入提纯器，那些'力'才会真正醒来——我们称之为$(2)赤能源$()。\"$(br2)赤能源是赤石科技的血液：提纯器产生并消耗它，储存单元囤积它，能量管道把它送到每一台机器。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "本章将依次介绍：$(li)赤石提纯器：第一台赤能源机器$(li)赤能源储存单元：能量仓库$(li)赤能源管道：能量动脉$(li)加速组件与多方块：规模化的发电与提纯$(br2)后续章节的每一台机器都离不开赤能源，先把这套体系搭建起来吧。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy/purifier",
+        "akaishi:energy/energy_cell",
+        "akaishi:energy/energy_pipe"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "akaishi:block/akaishi_crystal_cluster"
+  },
+  "ambientocclusion": false
+}

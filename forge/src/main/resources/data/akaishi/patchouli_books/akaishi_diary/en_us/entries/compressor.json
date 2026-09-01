@@ -1,0 +1,13 @@
+{
+  "name": "Compressor",
+  "icon": "akaishi:akaishi_compressor",
+  "category": "akaishi:machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_compressor",
+      "text": "Compression processing:$(li)powders -> blocks$(li)Akaishi Essence -> Compressed Essence$(br2)Single input, single output, powered by Akaishi Energy."
+    }
+  ]
+}

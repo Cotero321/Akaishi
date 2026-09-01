@@ -1,0 +1,10 @@
+{
+  "name": "Akaishi Equipment",
+  "description": "Semi-custom equipment forged from Akaishi Ingots and its upgrade system",
+  "icon": "akaishi:akaishi_sword",
+  "sortnum": 5,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_aggregator"
+  }
+}

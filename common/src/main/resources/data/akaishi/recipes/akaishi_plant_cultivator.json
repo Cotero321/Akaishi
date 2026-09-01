@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GCG",
+    "GPG",
+    "GCG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "P": { "item": "minecraft:piston" },
+    "C": { "item": "akaishi:akaishi_machine_component" }
+  },
+  "result": { "item": "akaishi:akaishi_plant_cultivator", "count": 1 }
+}

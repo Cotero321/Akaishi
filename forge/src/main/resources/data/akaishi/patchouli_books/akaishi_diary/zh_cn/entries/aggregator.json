@@ -1,0 +1,13 @@
+{
+  "name": "赤石能量聚合器",
+  "icon": "akaishi:akaishi_energy_aggregator",
+  "category": "akaishi:advanced",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_aggregator",
+      "text": "将大量赤能源凝练成赤石锭的机器。$(br)消耗 10M 赤能源 + 粗制赤石块，产出赤石锭——赤石科技从矿石走向工业的分水岭。"
+    }
+  ]
+}

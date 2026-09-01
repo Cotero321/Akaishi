@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I I",
+    "III",
+    "III"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_chestplate", "count": 1 }
+}

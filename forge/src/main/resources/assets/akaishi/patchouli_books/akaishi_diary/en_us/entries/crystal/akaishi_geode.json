@@ -1,0 +1,17 @@
+{
+  "name": "Akaishi Geodes",
+  "category": "akaishi:crystal",
+  "icon": "akaishi:akaishi_geode_flawed",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_geode_flawed",
+      "text": "Akaishi geodes generate underground, filled with Akaishi crystal blocks and clusters, wrapped in four tiers of geode blocks:$(br)$(li)Flawed / Normal / Pristine / Perfect (about 55% / 30% / 12% / 3% share)$(li)Geode blocks grow clusters on top at a tier-based chance; higher tiers produce faster (Perfect ~one per 30s)$(br2)Place them in a chunk that random-ticks to keep producing."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Akaishi Crystal Cluster$(): drops 1-2 Akaishi Essence when broken$(br)$(bold)Akaishi Crystal Block$(): the geode core, purifies into 4 Essence in the Purifier$(br2)$(bold)Geode Upgrading$(): spend 10M Chi Energy in the Aggregator to raise the geode tier (Flawed → Normal → Pristine → Perfect). Perfect geode blocks grow fastest."
+    }
+  ]
+}

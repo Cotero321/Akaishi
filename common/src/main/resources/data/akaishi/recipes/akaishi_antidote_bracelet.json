@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "IHI",
+    " I "
+  ],
+  "key": {
+    "H": { "item": "minecraft:honey_bottle" },
+    "I": { "item": "minecraft:iron_nugget" }
+  },
+  "result": { "item": "akaishi:akaishi_antidote_bracelet", "count": 1 }
+}

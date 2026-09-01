@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "akaishi:block/akaishi_wireless_dim_bridge"
+    }
+  }
+}

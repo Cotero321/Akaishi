@@ -1,0 +1,13 @@
+{
+  "name": "Akaishi Ore Clusters",
+  "icon": "akaishi:akaishi_ore_medium",
+  "category": "akaishi:intro",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ore_medium",
+      "text": "Akaishi crystals generate as ore clusters in the Overworld (stone/deepslate), Nether and End.$(br)Four concentrations exist: flawless, low, medium and perfect - higher concentration drops more crystals."
+    }
+  ]
+}

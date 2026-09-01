@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "akaishi:akaishi_item_pipe_elite" },
+    { "item": "minecraft:diamond" }
+  ],
+  "result": { "item": "akaishi:akaishi_item_pipe_ultimate", "count": 1 }
+}

@@ -4,21 +4,21 @@ loaderVersion = "[47,)"
 license = "MIT"
 
 [[mods]]
-modId = "template_mod"
+modId = "akaishi"
 version = "${mod_version}"
 displayName = "赤石 Akaishi"
-authors = "Template Author"
+authors = "Akaishi Author"
 description = '''以「赤石」为核心的科技与生物改造模组
 采集赤石矿脉与赤水晶，构筑赤能源网络，搭建矩阵反应堆发电；移植生物器官强化自身，调配药剂，建立自动化生产线。仅支持 Forge 加载器。'''
 
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "forge"
 mandatory = true
 versionRange = "[47,48)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1,1.21)"
@@ -26,7 +26,7 @@ ordering = "NONE"
 side = "BOTH"
 
 # 硬依赖：Cloth Config（配置系统 GUI 基础）
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "cloth_config"
 mandatory = true
 versionRange = "[11,12)"
@@ -34,28 +34,28 @@ ordering = "NONE"
 side = "BOTH"
 
 # 硬依赖：Curios（饰品系统核心，玩家必须安装）
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "curios"
 mandatory = true
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "patchouli"
 mandatory = false
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "jei"
 mandatory = false
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.template_mod]]
+[[dependencies.akaishi]]
 modId = "kubejs"
 mandatory = false
 versionRange = "[1.20.1,)"

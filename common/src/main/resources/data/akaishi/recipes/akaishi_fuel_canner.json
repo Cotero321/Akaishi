@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "FMF",
+    "ICI"
+  ],
+  "key": {
+    "C": { "item": "minecraft:coal_block" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "F": { "item": "akaishi:fuel_cell" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_fuel_canner", "count": 1 }
+}

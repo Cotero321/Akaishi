@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "OCO",
+    "III"
+  ],
+  "key": {
+    "O": { "item": "akaishi:iron_ore_base" },
+    "C": { "item": "akaishi:akaishi_machine_component" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_catalyst_basic", "count": 1 }
+}

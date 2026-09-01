@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "akaishi:akaishi_item_pipe"
+    },
+    "title": {
+      "translate": "advancements.akaishi.first_item_pipe.title"
+    },
+    "description": {
+      "translate": "advancements.akaishi.first_item_pipe.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "akaishi:first_purifier",
+  "criteria": {
+    "has_akaishi_item_pipe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "akaishi:akaishi_item_pipe"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

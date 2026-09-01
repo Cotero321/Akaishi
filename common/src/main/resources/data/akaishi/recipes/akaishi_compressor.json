@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IPI",
+    "III"
+  ],
+  "key": {
+    "P": { "item": "minecraft:piston" },
+    "I": { "item": "minecraft:iron_block" }
+  },
+  "result": { "item": "akaishi:akaishi_compressor", "count": 1 }
+}

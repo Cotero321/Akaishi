@@ -9,24 +9,24 @@ architectury {
 
 loom {
     forge {
-        mixinConfig "template_mod.mixins.json"
+        mixinConfig "akaishi.mixins.json"
     }
     runs {
         client {
             client()
             name "Forge Client"
             runDir "run/client"
-            vmArgs "-Dneoforge.enabledGameTestNamespace=template_mod"
+            vmArgs "-Dneoforge.enabledGameTestNamespace=akaishi"
             programArgs "--username", "Player1"
         }
         server {
             server()
             name "Forge Server"
             runDir "run/server"
-            vmArgs "-Dneoforge.enabledGameTestNamespace=template_mod"
+            vmArgs "-Dneoforge.enabledGameTestNamespace=akaishi"
             // 转发测试开关：Gradle --system-prop 仅写入 Gradle JVM，JavaExec 子进程不继承，
-            // 需显式将 chishi.* 系统属性注入服务器 JVM（chishi.gametest / chishi.gametest.reactor 等）
-            System.getProperties().stringPropertyNames().findAll { it.startsWith("chishi.") }
+            // 需显式将 akaishi.* 系统属性注入服务器 JVM（akaishi.gametest / akaishi.gametest.reactor 等）
+            System.getProperties().stringPropertyNames().findAll { it.startsWith("akaishi.") }
                     .each { key -> vmArgs "-D$key=${System.getProperty(key)}" }
         }
     }
@@ -72,12 +72,12 @@ jar {
 	
 	manifest {
 		attributes([
-			'Specification-Title'     : 'Template Mod',
-			'Specification-Vendor'    : 'Template Author',
+			'Specification-Title'     : 'Akaishi Mod',
+			'Specification-Vendor'    : 'Akaishi Author',
 			'Specification-Version'   : '1',
 			'Implementation-Title'    : project.name,
 			'Implementation-Version'  : project.version,
-			'Implementation-Vendor'   : 'Template Author'
+			'Implementation-Vendor'   : 'Akaishi Author'
 		])
 	}
 }
@@ -113,11 +113,11 @@ tasks.named('processResources', ProcessResources).configure {
         forge_version: project.forge_version,
         forge_version_range: '[47,48)',
         loader_version_range: '[47,)',
-        mod_id: 'template_mod',
-        mod_name: 'Template Mod',
+        mod_id: 'akaishi',
+        mod_name: 'Akaishi Mod',
         mod_version: project.version,
-        mod_authors: 'Template Author',
-        mod_description: 'Template Mod for Architectury'
+        mod_authors: 'Akaishi Author',
+        mod_description: 'Akaishi Mod for Architectury'
     ]
 
     inputs.properties replaceProperties

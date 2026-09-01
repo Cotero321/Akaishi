@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DCD",
+    "CAC",
+    "DCD"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "C": { "item": "minecraft:gold_block" },
+    "A": { "item": "akaishi:akaishi_advanced_purifier" }
+  },
+  "result": { "item": "akaishi:akaishi_purifier_matrix_controller", "count": 1 }
+}

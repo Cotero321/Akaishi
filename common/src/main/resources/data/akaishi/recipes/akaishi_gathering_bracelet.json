@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    "LCL",
+    " L "
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_crystal" },
+    "L": { "item": "minecraft:lapis_lazuli" }
+  },
+  "result": { "item": "akaishi:akaishi_gathering_bracelet", "count": 1 }
+}

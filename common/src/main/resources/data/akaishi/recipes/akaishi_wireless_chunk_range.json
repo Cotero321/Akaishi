@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRG",
+    "RWR",
+    "GRG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "W": { "item": "akaishi:akaishi_wireless_chunk_loader" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_chunk_range", "count": 1 }
+}

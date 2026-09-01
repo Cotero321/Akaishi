@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "IPI",
+    "III"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gravel" },
+    "P": { "item": "minecraft:stonecutter" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_pulverizer", "count": 1 }
+}

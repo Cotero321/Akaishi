@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CBC",
+    " C "
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_crystal" },
+    "B": { "item": "minecraft:redstone_block" }
+  },
+  "result": { "item": "akaishi:portable_akaishi_cell_basic", "count": 1 }
+}

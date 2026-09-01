@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NBN",
+    " N "
+  ],
+  "key": {
+    "N": { "item": "minecraft:gold_nugget" },
+    "B": { "item": "minecraft:blaze_powder" }
+  },
+  "result": { "item": "akaishi:akaishi_fire_necklace", "count": 1 }
+}

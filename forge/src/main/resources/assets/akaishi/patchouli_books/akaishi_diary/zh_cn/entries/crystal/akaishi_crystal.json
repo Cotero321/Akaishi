@@ -1,0 +1,25 @@
+{
+  "name": "赤石晶",
+  "category": "akaishi:crystal",
+  "icon": "akaishi:akaishi_crystal",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_crystal",
+      "text": "开采赤石矿簇获得的红色晶体，是赤石之力的载体。$(br2)赤石水晶簇破坏时会掉落 1-2 个赤石精华，是稳定的精华来源。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:raw_akaishi_block"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:crystal/akaishi_geode",
+        "akaishi:energy/purifier"
+      ],
+      "text": "粗制赤石块是提纯器的原料。把赤石晶投入$(bold)提纯器$()，赤能源之路就此开启。"
+    }
+  ]
+}

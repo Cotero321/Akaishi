@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    "WCW",
+    "WWW"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_wireless_core" },
+    "W": { "item": "akaishi:akaishi_wireless_component" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_controller", "count": 1 }
+}

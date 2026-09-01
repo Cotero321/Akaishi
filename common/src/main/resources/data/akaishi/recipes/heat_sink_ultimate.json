@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "OEO",
+    " O "
+  ],
+  "key": {
+    "O": { "item": "minecraft:netherite_ingot" },
+    "E": { "item": "akaishi:heat_sink_exquisite" }
+  },
+  "result": { "item": "akaishi:heat_sink_ultimate", "count": 1 }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "便携赤能源储存单元",
+  "icon": "akaishi:portable_akaishi_cell_basic",
+  "category": "akaishi:energy",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:portable_akaishi_cell_basic",
+      "text": "把能量装进口袋——$(bold)便携赤能源储存单元$()是随身携带的能量库。$(br2)只要把它放在$(bold)主手或副手$()，它就会自动消耗赤能源修复你身上所有赤石装备的耐久（每点耐久消耗 100 赤能源）。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "便携单元分三级：$(li)$(bold)基础$()：容量 5000 万，修复 10 耐久/tick$(li)$(bold)中级$()：容量 2 亿，修复 20 耐久/tick$(li)$(bold)高级$()：容量 10 亿，修复 40 耐久/tick$(br2)能量用尽后，将便携单元放入$(bold)赤能源储存单元$()的充能槽即可自动充电。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:portable_akaishi_cell_basic",
+      "recipe2": "akaishi:portable_akaishi_cell_advanced"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:portable_akaishi_cell_super",
+      "text": "高级便携单元需要浓缩赤石精华块。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy/energy_cell",
+        "akaishi:equipment/equipment_intro"
+      ]
+    }
+  ]
+}

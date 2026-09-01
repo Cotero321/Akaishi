@@ -1,0 +1,23 @@
+{
+  "name": "Vaults",
+  "icon": "akaishi:akaishi_organ_vault",
+  "category": "akaishi:life_machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_vault",
+      "text": "Sample Vault: 54-slot storage for life samples only, auto-merging same source+purity.$(br)Place within 3 blocks of analyzer/potion table for linked access."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_vault",
+      "text": "Organ Vault: 9 pages x 9 slots + 9 stash, organs auto-sorted by body slot.$(br)Consumes 1 Life Energy per tick to keep organs active."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_cabinet",
+      "text": "Potion Cabinet: 54-slot storage for potions, merging same template+purity with template filter.$(br)Place within 3 blocks of the potion table."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GBG",
+    "GGG"
+  ],
+  "key": {
+    "B": { "item": "minecraft:barrel" },
+    "G": { "item": "minecraft:glass" }
+  },
+  "result": { "item": "akaishi:akaishi_potion_cabinet", "count": 1 }
+}

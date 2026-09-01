@@ -1,0 +1,23 @@
+{
+  "name": "Samples & Genes",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:life_organs",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_collector",
+      "text": "Right-click mobs to extract life samples.$(li)Right-click life blocks/pipes to charge$(li)Weaker mobs yield higher success (+10% at half HP, +10% at quarter, cap 95%)$(li)Purity: 60% chance 0-49, 25% 50-74, 15% 75-100"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_analyzer",
+      "text": "The Analyzer breaks samples of purity >=25 into gene sequences: 5000 Life Energy, 5 seconds; success scales with purity (25->70%, 100->95%), failure loses the sample."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_sequence",
+      "text": "Gene sequences keep the sample purity and build organs in the Life Struct.$(br)Purity drives sequence purity -> organ completeness -> rejection correction."
+    }
+  ]
+}

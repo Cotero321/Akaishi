@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "akaishi:block/end_akaishi_ore_low"
+  }
+}

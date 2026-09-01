@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "akaishi:block/akaishi_super_generator_core"
+    },
+    "formed=true": {
+      "model": "akaishi:block/akaishi_super_generator_core_formed"
+    }
+  }
+}

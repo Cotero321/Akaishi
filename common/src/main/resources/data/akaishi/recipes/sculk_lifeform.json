@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SES",
+    "SSS"
+  ],
+  "key": {
+    "S": { "item": "minecraft:sculk" },
+    "E": { "item": "akaishi:akaishi_life_essence_solid" }
+  },
+  "result": { "item": "akaishi:sculk_lifeform", "count": 1 }
+}

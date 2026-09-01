@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "WEW",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "W": { "item": "akaishi:akaishi_exhausted_barrel" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "E": { "item": "akaishi:akaishi_exhausted_pipe" }
+  },
+  "result": { "item": "akaishi:akaishi_reactor_waste_port", "count": 1 }
+}

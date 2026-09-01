@@ -1,0 +1,13 @@
+{
+  "name": "Akaishi Ingot",
+  "icon": "akaishi:akaishi_ingot",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ingot",
+      "text": "Smelted from the Compressed Essence Block.$(br)It is the cornerstone of equipment, machines and advanced multiblocks."
+    }
+  ]
+}

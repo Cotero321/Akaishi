@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GTG",
+    "GGG"
+  ],
+  "key": {
+    "T": { "item": "akaishi:akaishi_fluid_tank_basic" },
+    "G": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_fluid_tank_advanced", "count": 1 }
+}

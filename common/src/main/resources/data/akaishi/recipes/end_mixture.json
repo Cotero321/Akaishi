@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PEP",
+    " P "
+  ],
+  "key": {
+    "E": { "item": "akaishi:akaishi_essence" },
+    "P": { "item": "minecraft:chorus_fruit" }
+  },
+  "result": { "item": "akaishi:end_mixture", "count": 1 }
+}

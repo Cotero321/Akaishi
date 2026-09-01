@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OEO",
+    "E E",
+    "OEO"
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "E": { "item": "akaishi:akaishi_essence_compressed" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_efficiency_frame", "count": 4 }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "生命药剂",
+  "icon": "akaishi:akaishi_potion",
+  "category": "akaishi:life_organs",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_table",
+      "text": "药剂台：纯度 ≥25 样本 + 固态物 + 生命能量 → 赤石药剂。$(br2)$(2,4)永久药剂$(0)：已移植器官适配度永久 +15，无副作用。$(br)$(2,4)突破药剂$(0)：器官效果 ×1.5，但排斥增加并附带随机副作用（纯度越低副作用越强）。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion",
+      "text": "赤石药剂继承样本的来源与纯度，饮用后作用于已移植的非原生器官。$(br)突破药剂只能生效一次，低纯度样本慎用！"
+    }
+  ]
+}

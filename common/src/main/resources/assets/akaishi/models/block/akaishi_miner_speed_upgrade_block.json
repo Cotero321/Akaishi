@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_miner_speed_upgrade_block_bottom",
+    "top": "akaishi:block/akaishi_miner_speed_upgrade_block_top",
+    "side": "akaishi:block/akaishi_miner_speed_upgrade_block_side"
+  }
+}

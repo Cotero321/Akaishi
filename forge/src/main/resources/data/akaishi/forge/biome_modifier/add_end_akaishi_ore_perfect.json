@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_end",
+  "features": "akaishi:end_akaishi_ore_perfect",
+  "step": "underground_ores"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Akaishi Miner",
+  "description": "A huge 9x9x3 multiblock that yields all vanilla ores by chance.",
+  "icon": "akaishi:akaishi_miner_controller_basic",
+  "sortnum": 4
+}

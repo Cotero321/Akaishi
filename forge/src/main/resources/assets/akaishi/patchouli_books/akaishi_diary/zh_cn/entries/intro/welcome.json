@@ -1,0 +1,22 @@
+{
+  "name": "开篇：拾起日记",
+  "icon": "akaishi:akaishi_crystal",
+  "category": "akaishi:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)我在矿洞深处拾到一本日记。$()$(br2)前主人留下的字迹潦草却充满狂热：$(br)\"这些红色的石头……在呼吸。它们结成的晶体能储存某种看不见的'力'。\"$(br2)我合上日记，决定亲自验证。而验证的第一步，是找到第一块$(bold)赤石矿簇$()。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "赤石矿簇分布在世界各地——$(bold)主世界、深板岩层、下界与末地$()均有踪迹。$(br2)矿簇浓度越高越稀有，掉落的$(bold)赤石晶$()也越多。$(br2)带上镐子出发吧。挖到的第一块赤石晶，就是这条研究之路的起点。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ores/overview"
+      ]
+    }
+  ]
+}

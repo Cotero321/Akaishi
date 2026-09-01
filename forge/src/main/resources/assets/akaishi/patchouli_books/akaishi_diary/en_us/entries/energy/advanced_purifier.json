@@ -1,0 +1,22 @@
+{
+  "name": "Advanced Purifier",
+  "icon": "akaishi:akaishi_advanced_purifier",
+  "category": "akaishi:energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_advanced_purifier",
+      "text": "The upgraded purifier: no more fuel burning. It draws $(bold)Chi Energy directly$(), working at $(bold)2x$() the speed and energy cost of a normal purifier."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_advanced_purifier",
+      "text": "Crafted around a Akaishi Purifier with Akaishi Ingots, Machine Components, Akaishi Crystals and an Advanced Component."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Standalone:$(br)Draws 10 Chi Energy per tick, finishes a purification in ~50 ticks. Outputs match the normal purifier.$(br)$(bold)Purification Matrix shell:$(br)It is the building block of the 3x3x3 \"Purification Matrix\" - place 26 around a central purifier to form the structure."
+    }
+  ]
+}

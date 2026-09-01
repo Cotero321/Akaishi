@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NSN",
+    " N "
+  ],
+  "key": {
+    "N": { "item": "minecraft:coal" },
+    "S": { "item": "minecraft:soul_sand" }
+  },
+  "result": { "item": "akaishi:akaishi_wither_charm", "count": 1 }
+}

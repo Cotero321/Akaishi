@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " D ",
+    "DGD",
+    " D "
+  ],
+  "key": {
+    "D": { "item": "akaishi:diamond_dust" },
+    "G": { "item": "akaishi:heat_sink_good" }
+  },
+  "result": { "item": "akaishi:heat_sink_fine", "count": 1 }
+}

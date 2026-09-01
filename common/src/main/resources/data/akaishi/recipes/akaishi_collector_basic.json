@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "CMC",
+    "C C"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "M": { "item": "akaishi:akaishi_machine_component" }
+  },
+  "result": { "item": "akaishi:akaishi_collector_basic", "count": 1 }
+}

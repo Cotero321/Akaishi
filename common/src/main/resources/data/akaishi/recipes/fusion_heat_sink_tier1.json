@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SHS",
+    "HCH",
+    "SHS"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "S": { "item": "akaishi:heat_sink_poor" },
+    "H": { "item": "akaishi:cooling_base" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_tier1", "count": 1 }
+}

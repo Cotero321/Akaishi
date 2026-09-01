@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PBP",
+    "BMB",
+    "PBP"
+  ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_energy_pipe" },
+    "M": { "item": "akaishi:akaishi_energy_cell_basic" },
+    "B": { "item": "minecraft:redstone_block" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_cell_serializer", "count": 1 }
+}

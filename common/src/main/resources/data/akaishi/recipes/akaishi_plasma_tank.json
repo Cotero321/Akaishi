@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "O O",
+    "PTP",
+    "O O"
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "T": { "item": "akaishi:akaishi_fluid_tank_advanced" },
+    "P": { "item": "akaishi:akaishi_plasma_pipe" }
+  },
+  "result": { "item": "akaishi:akaishi_plasma_tank", "count": 1 }
+}

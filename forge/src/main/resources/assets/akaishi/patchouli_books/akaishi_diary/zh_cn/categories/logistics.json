@@ -1,0 +1,10 @@
+{
+  "name": "物流革命",
+  "description": "用物品管道构建自动化的物资网络",
+  "icon": "akaishi:akaishi_item_pipe",
+  "sortnum": 4,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_item_pipe"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "G G",
+    "GAG",
+    "G G"
+  ],
+  "key": {
+    "A": { "item": "akaishi:akaishi_miner_controller_basic" },
+    "G": { "item": "minecraft:gold_block" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_controller_advanced", "count": 1 }
+}

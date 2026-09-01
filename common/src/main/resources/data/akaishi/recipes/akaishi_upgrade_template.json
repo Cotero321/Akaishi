@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "P P",
+    " R ",
+    "P P"
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone" },
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": { "item": "akaishi:akaishi_upgrade_template", "count": 1 }
+}

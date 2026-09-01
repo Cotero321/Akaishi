@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " D ",
+    "DTD",
+    " D "
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "T": { "item": "akaishi:fusion_heat_sink_tier2" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_tier3", "count": 1 }
+}

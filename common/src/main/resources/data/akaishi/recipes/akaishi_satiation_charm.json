@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "GCG",
+    " G "
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_crystal" },
+    "G": { "item": "minecraft:gold_nugget" }
+  },
+  "result": { "item": "akaishi:akaishi_satiation_charm", "count": 1 }
+}

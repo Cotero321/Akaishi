@@ -1,0 +1,23 @@
+{
+  "name": "仓库体系",
+  "icon": "akaishi:akaishi_organ_vault",
+  "category": "akaishi:life_machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_vault",
+      "text": "样本库：54 格大容量仓库，只收生命样本，相同来源与纯度自动合并堆叠。$(br)摆放于分析台/药剂台 3 格内可联动存取。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_vault",
+      "text": "器官储藏库：按躯体槽位分页的器官冰库（9 页 × 9 格 + 9 暂存）。$(br)器官自动归入所属槽位页，每 tick 消耗 1 生命能量维持活性。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_cabinet",
+      "text": "药剂库：54 格大容量仓库，只收药剂，同模板同纯度自动合并，支持模板筛选。$(br)摆放于药剂台 3 格内可联动存取。"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " B ",
+    "BMB",
+    " B "
+  ],
+  "key": {
+    "M": { "item": "akaishi:end_mixture" },
+    "B": { "item": "minecraft:dragon_breath" }
+  },
+  "result": { "item": "akaishi:dragon_mixture", "count": 1 }
+}

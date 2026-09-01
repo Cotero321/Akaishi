@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "OTO",
+    " O "
+  ],
+  "key": {
+    "O": { "item": "minecraft:netherite_ingot" },
+    "T": { "item": "akaishi:fusion_heat_sink_tier4" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_tier5", "count": 1 }
+}

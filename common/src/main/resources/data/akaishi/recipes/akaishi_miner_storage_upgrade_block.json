@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IRI",
+    "RBR",
+    "IRI"
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone_block" },
+    "B": { "item": "minecraft:barrel" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_storage_upgrade_block", "count": 1 }
+}

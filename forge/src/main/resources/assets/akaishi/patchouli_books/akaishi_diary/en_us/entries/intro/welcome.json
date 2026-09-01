@@ -1,0 +1,22 @@
+{
+  "name": "Prologue: The Diary",
+  "icon": "akaishi:akaishi_crystal",
+  "category": "akaishi:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)In the depths of a mine, I found a diary.$(br2)Its previous owner wrote with hasty, feverish strokes:$(br)\"These red stones... they breathe. The crystals they form can store some invisible 'force'.\"$(br2)I closed the diary and decided to test it myself. The first step: find a$(bold) Akaishi ore cluster$()."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Akaishi ore clusters can be found across the world - in the$(bold) Overworld, Deepslate layers, the Nether and the End$().$(br2)The rarer the cluster's concentration, the more$(bold) Akaishi Crystals$() it drops.$(br2)Grab a pickaxe and head out. Your first Akaishi Crystal is where this research journey begins."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ores/overview"
+      ]
+    }
+  ]
+}

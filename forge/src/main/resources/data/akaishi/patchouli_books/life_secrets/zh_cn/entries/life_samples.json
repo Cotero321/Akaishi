@@ -1,0 +1,23 @@
+{
+  "name": "样本与基因",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:life_organs",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_collector",
+      "text": "样本采集器：右键生物抽取生命样本。$(li)右键生命能量方块/管道充能$(li)生物越虚弱成功率越高（半血 +10%、四分之一血 +10%，封顶 95%）$(li)纯度 60% 概率 0-49、25% 概率 50-74、15% 概率 75-100"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_analyzer",
+      "text": "生命分析台：将纯度 ≥25 的样本解构为基因序列。$(br)消耗 5000 生命能量，耗时 5 秒；成功率随纯度浮动（25→70%、100→95%），失败损失样本。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_sequence",
+      "text": "基因序列片段保留样本的纯度，在生命结构台中构造为完整器官。$(br)纯度决定序列纯度 → 器官完整度 → 排斥修正的整条链路。"
+    }
+  ]
+}

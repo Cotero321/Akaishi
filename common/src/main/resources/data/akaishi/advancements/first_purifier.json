@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "akaishi:akaishi_purifier"
+    },
+    "title": {
+      "translate": "advancements.akaishi.first_purifier.title"
+    },
+    "description": {
+      "translate": "advancements.akaishi.first_purifier.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "akaishi:first_refine",
+  "criteria": {
+    "has_akaishi_purifier": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "akaishi:akaishi_purifier"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

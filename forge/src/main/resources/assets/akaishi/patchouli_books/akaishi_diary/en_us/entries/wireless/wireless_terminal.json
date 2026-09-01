@@ -1,0 +1,21 @@
+{
+  "name": "Wireless Terminal",
+  "icon": "akaishi:akaishi_wireless_terminal",
+  "category": "akaishi:wireless",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_terminal",
+      "text": "The terminal is the hub of the wireless network. It must be built as a 5x5x5 multiblock to form and operate:$(br)$(bold)Walls:$() a terminal block (main block, provides the GUI), a security block, a controller (decorative), and terminal shells filling the rest; all six faces closed.$(br)$(bold)Interior:$() exactly one terminal core, plus functional components (Dim Bridge, Chunk Loader, etc.)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Forming:$() a closed 5x5x5 box whose walls are terminal/security/controller/shell and whose interior holds a core plus components counts as formed. Right-click the terminal block to open its GUI with four mutually exclusive pages:$(li)Status: formation, network online, port stats$(li)Energy: bound storage bar and capacity$(li)Security: authorize / revoke identity cards$(li)Transfer: network throughput stats"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Bound storage:$() a formed terminal automatically pools the Akaishi Energy cells within its 5x5x5 radius as the network's charge buffer.$(bold)Serializer support:$() a serially-linked cell array is treated as one aggregate storage if any shell lies in range — no per-cell binding needed.$(br2)$(bold)Chunk loading:$() the terminal softly loads the chunk of every online port, keeping remote transfer running while players are away."
+    }
+  ]
+}

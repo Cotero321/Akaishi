@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NTN",
+    " N "
+  ],
+  "key": {
+    "N": { "item": "minecraft:netherite_scrap" },
+    "T": { "item": "akaishi:fusion_heat_sink_tier3" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_tier4", "count": 1 }
+}

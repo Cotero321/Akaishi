@@ -5,6 +5,8 @@
 repositories {
     // Curios API 官方仓库（Loom 项目级仓库会忽略 settings 声明，需在此补充）
     maven { url "https://maven.theillusivec4.top/" }
+    // Patchouli 手册 API（blamejared 仓库）
+    maven { url "https://maven.blamejared.com/" }
 }
 
 dependencies {
@@ -16,6 +18,8 @@ dependencies {
 
     // Curios API：饰品系统硬依赖。饰品基类实现 ICurioItem 接口需要编译期 API（运行时由 Forge 侧提供完整 jar）
     modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
+    // Patchouli 手册 API（可选依赖，mods.toml mandatory=false；运行时未安装经 LinkageError 防御降级）
+    modCompileOnly("vazkii.patchouli:Patchouli:${rootProject.patchouli_version}")
 }
  
 sourceSets {

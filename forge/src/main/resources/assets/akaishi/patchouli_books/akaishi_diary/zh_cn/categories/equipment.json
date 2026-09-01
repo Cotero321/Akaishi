@@ -1,0 +1,10 @@
+{
+  "name": "赤石装备",
+  "description": "以赤石锭锻造的半定制装备与升级体系",
+  "icon": "akaishi:akaishi_sword",
+  "sortnum": 5,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_aggregator"
+  }
+}

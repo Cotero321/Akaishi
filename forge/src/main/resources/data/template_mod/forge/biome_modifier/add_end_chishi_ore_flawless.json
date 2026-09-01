@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_end",
-  "features": "template_mod:end_chishi_ore_flawless",
-  "step": "underground_ores"
-}

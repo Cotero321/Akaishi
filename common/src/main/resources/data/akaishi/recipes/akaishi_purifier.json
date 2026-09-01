@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BGF",
+    "MCM",
+    "BGF"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "C": { "item": "akaishi:raw_akaishi_block" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "F": { "item": "minecraft:furnace" },
+    "B": { "item": "minecraft:blast_furnace" }
+  },
+  "result": { "item": "akaishi:akaishi_purifier", "count": 1 }
+}

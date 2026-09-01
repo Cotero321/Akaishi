@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ILI",
+    "L L",
+    "ILI"
+  ],
+  "key": {
+    "L": { "item": "minecraft:lead" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_exhausted_pipe", "count": 8 }
+}

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "akaishi:akaishi_life_aggregation_converter"
+    },
+    "title": {
+      "translate": "advancements.akaishi.first_life_energy.title"
+    },
+    "description": {
+      "translate": "advancements.akaishi.first_life_energy.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "akaishi:first_aggregator",
+  "criteria": {
+    "has_life_converter": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "akaishi:akaishi_life_aggregation_converter"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

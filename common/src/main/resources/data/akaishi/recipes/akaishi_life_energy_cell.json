@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LIL",
+    "I S",
+    "LIL"
+  ],
+  "key": {
+    "L": { "item": "minecraft:lapis_block" },
+    "S": { "item": "akaishi:akaishi_energy_cell_advanced" },
+    "I": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_life_energy_cell", "count": 1 }
+}

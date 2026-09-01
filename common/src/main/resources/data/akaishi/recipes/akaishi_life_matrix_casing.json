@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LGL",
+    "G G",
+    "LGL"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "L": { "item": "minecraft:lapis_lazuli" }
+  },
+  "result": { "item": "akaishi:akaishi_life_matrix_casing", "count": 8 }
+}

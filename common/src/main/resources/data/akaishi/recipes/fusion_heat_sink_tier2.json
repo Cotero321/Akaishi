@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "GTG",
+    " G "
+  ],
+  "key": {
+    "T": { "item": "akaishi:fusion_heat_sink_tier1" },
+    "G": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_tier2", "count": 1 }
+}

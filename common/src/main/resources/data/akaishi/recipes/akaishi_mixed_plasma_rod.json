@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " Q ",
+    "QRQ",
+    " Q "
+  ],
+  "key": {
+    "R": { "item": "akaishi:akaishi_fusion_rod" },
+    "Q": { "item": "minecraft:quartz" }
+  },
+  "result": { "item": "akaishi:akaishi_mixed_plasma_rod", "count": 1 }
+}

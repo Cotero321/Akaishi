@@ -1,0 +1,23 @@
+{
+  "name": "Waste Neutralization",
+  "icon": "akaishi:akaishi_life_activator",
+  "category": "akaishi:life_advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_activator",
+      "text": "The Life Activator neutralizes exhausted fuel (100 Life Energy per mb), 1:1 into activated exhausted liquid.$(br)Waste pipes feed the input tank; normal liquid pipes pull from the output tank."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_centrifuge",
+      "text": "The Life Centrifuge separates activated fuel into main product and byproduct.$(br)The Activated Fractionator further refines activated components - the path to plasma and fusion."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_reconstructor",
+      "text": "The Item Reconstructor rebuilds items from exhausted crystals - waste becomes useful again."
+    }
+  ]
+}

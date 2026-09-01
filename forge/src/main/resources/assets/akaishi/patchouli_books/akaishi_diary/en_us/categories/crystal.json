@@ -1,0 +1,10 @@
+{
+  "name": "Akaishi Crystal",
+  "description": "The vessel of Akaishi power",
+  "icon": "akaishi:akaishi_crystal",
+  "sortnum": 2,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_refine"
+  }
+}

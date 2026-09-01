@@ -1,0 +1,18 @@
+{
+  "name": "Crystal & Essence",
+  "icon": "akaishi:akaishi_crystal",
+  "category": "akaishi:intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_crystal",
+      "text": "The crystal is the main product of ore clusters and the most basic material.$(br)9 crystals craft a Raw Akaishi Block, which the Purifier turns into Essence."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_essence",
+      "text": "Essence can be further processed:$(li)9 essence -> Compressed Essence$(li)9 compressed -> Essence Block$(li)Smelt essence block -> Akaishi Ingot"
+    }
+  ]
+}

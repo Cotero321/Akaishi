@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "CEC",
+    "ICI"
+  ],
+  "key": {
+    "C": { "item": "minecraft:coal" },
+    "E": { "item": "akaishi:akaishi_essence" },
+    "I": { "item": "akaishi:akaishi_ingot" }
+  },
+  "result": { "item": "akaishi:fuel_cell", "count": 1 }
+}

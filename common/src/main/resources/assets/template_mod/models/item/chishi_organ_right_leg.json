@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "template_mod:item/chishi_organ_right_leg"
-  }
-}

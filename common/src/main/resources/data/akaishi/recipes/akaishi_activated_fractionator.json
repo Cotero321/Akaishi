@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LCL",
+    "CAC",
+    "LCL"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "L": { "item": "minecraft:lapis_block" },
+    "A": { "item": "akaishi:akaishi_life_centrifuge" }
+  },
+  "result": { "item": "akaishi:akaishi_activated_fractionator", "count": 1 }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "超级发生器架构核心",
+  "icon": "akaishi:akaishi_super_generator_core",
+  "category": "akaishi:energy",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_super_generator_core",
+      "text": "超级发生器架构核心是赤能源发生机的 5×5×5 大型多方块结构：$(br)在中心放置架构核心，用 124 台赤能源发生机环绕成 5×5×5，结构即成型。$(br)成型后以单台 200 倍速率（15000/tick）集中产能，燃料总产能精确为单台的 3 倍。$(br)右键任意外壳发生机或中心即可操作，管道连接任意外壳即可导出能量。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_super_generator_core"
+    }
+  ]
+}

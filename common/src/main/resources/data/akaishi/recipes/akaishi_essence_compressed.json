@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "EE",
+    "EE"
+  ],
+  "key": {
+    "E": { "item": "akaishi:akaishi_essence" }
+  },
+  "result": { "item": "akaishi:akaishi_essence_compressed", "count": 1 }
+}

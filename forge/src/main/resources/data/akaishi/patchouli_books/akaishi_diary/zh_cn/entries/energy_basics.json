@@ -1,0 +1,12 @@
+{
+  "name": "赤能源基础",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "category": "akaishi:energy",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤能源是本模组的核心能量单位，几乎所有机器都依赖它运转。$(br2)能量体系一览：$(li)$(2,4)产生$(0)：赤能源发生机、组合结构、超级架构、反应堆、聚变堆$(li)$(2,4)储存$(0)：赤能源储存单元、串联器$(li)$(2,4)传输$(0)：赤能源管道$(li)$(2,4)携带$(0)：便捷赤能源储存单元"
+    }
+  ]
+}

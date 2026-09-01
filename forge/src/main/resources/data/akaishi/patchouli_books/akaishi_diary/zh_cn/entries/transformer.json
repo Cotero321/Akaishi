@@ -1,0 +1,18 @@
+{
+  "name": "赤石变化器",
+  "icon": "akaishi:akaishi_transformer",
+  "category": "akaishi:machines",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_transformer",
+      "text": "将一些物质进行改变：$(li)$(2,4)青金石粉 → 冷却基底$(0)$(li)矿物（锭/块）→ 对应矿石基底$(br2)矿石基底是催化剂与聚变散热片的进阶原料。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:cooling_base",
+      "text": "冷却基底是散热体系的起点：与粉末逐级合成可制成从铁粉到下界合金锭的多级散热片。"
+    }
+  ]
+}

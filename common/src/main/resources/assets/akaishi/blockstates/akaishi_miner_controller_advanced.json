@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "akaishi:block/akaishi_miner_controller_advanced"
+    }
+  }
+}

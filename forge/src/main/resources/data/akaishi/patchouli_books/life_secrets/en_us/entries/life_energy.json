@@ -1,0 +1,18 @@
+{
+  "name": "Life Energy",
+  "icon": "akaishi:akaishi_life_energy_cell",
+  "category": "akaishi:life_intro",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_essence_solid",
+      "text": "Life Energy is derived from Akaishi Energy through the Conversion Architecture (10M -> 10 Life Energy, 45x conversion).$(br)Life Essence Solids are the cornerstone of life research."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_energy_cell",
+      "text": "Life Energy Cells and Pipes handle storage and transport.$(br)Life Energy powers sampling, organ construction and all life research machines."
+    }
+  ]
+}

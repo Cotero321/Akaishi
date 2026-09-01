@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I I",
+    "IMI",
+    "III"
+  ],
+  "key": {
+    "M": { "item": "akaishi:akaishi_energy_cell_basic" },
+    "I": { "item": "minecraft:iron_block" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_processor", "count": 1 }
+}

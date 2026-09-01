@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "akaishi:block/akaishi_fusion_controller_top",
+    "front": "akaishi:block/akaishi_fusion_controller_formed_front",
+    "side": "akaishi:block/akaishi_fusion_controller_side",
+    "bottom": "akaishi:block/akaishi_fusion_controller_bottom"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Activated Fractionator",
+  "icon": "akaishi:akaishi_activated_fractionator",
+  "category": "akaishi:life_energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_activated_fractionator",
+      "text": "The $(bold)deep split$() of activated crystals: the Activated Fractionator separates an activated crystal into the $(bold)activated component$() of its fuel (7 kinds), with 1 $(bold)exhausted crystal$() as a byproduct.$(br)Crystals are pressed to their purest form here - components are refined materials for further processing."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)How it works:$()$(li)Input: 1 activated crystal (any of 7)$(li)Process: $(bold)5 seconds$(), costing $(bold)2,000 Akaishi Energy$() per craft$(li)Output: 1 matching activated component + 1 exhausted crystal$(br2)$(bold)Economy:$()the fractionator closes the exhausted-fuel chain - reactor waste ends as two solid crystals after activation, separation and fractionating."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_activated_fractionator"
+    }
+  ]
+}

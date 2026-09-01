@@ -1,0 +1,17 @@
+{
+  "name": "赤石矿簇概览",
+  "category": "akaishi:ores",
+  "icon": "akaishi:akaishi_crystal",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤石矿簇以矿簇形式生成于地下，共 $(bold)16$() 种变体：$(li)4 种浓度：低浓度、中浓度、完美、无暇$(li)4 种环境：主世界、深板岩层、下界、末地$(br2)浓度越高，矿簇越稀有，但蕴含的赤石晶也越多。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ore_low",
+      "text": "主世界浅层的低浓度赤石矿簇，最常见的变体。"
+    }
+  ]
+}

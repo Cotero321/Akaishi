@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IAI",
+    "III"
+  ],
+  "key": {
+    "A": { "item": "minecraft:anvil" },
+    "I": { "item": "minecraft:iron_block" }
+  },
+  "result": { "item": "akaishi:akaishi_equipment_forger", "count": 1 }
+}

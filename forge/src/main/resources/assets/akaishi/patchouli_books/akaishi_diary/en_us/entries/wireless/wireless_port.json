@@ -1,0 +1,17 @@
+{
+  "name": "Wireless Input / Output Port",
+  "icon": "akaishi:akaishi_wireless_input_port",
+  "category": "akaishi:wireless",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_input_port",
+      "text": "Input and output ports are the remote transceivers of the wireless network and do $(bold)not$() need to sit on the terminal wall — they are remote signal relays, placeable anywhere in the world (cross-chunk, cross-dimension).$(bold)Input port:$() pushes energy from attached energy pipes into the network, storing it in the terminal's bound storage; $(bold)output port:$() pulls energy from the bound storage to supply attached machines or pipes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Usage:$(br)1. Hold an authorized card and right-click the port to bind$(br)2. The port looks up the terminal by card every tick; once authenticated it goes online automatically$(br)3. The port GUI (Status / Transfer pages) shows buffer storage, bound card, auth status and rate$(br)$(bold)Unbind:$() press the Unbind button in the port GUI to cut all connections.$(br2)$(bold)Loss:$() transfer suffers distance loss (same-dimension grows with distance, cross-dimension is fixed); the input port pays the loss in full, the output port overdraws to cover it."
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "O O",
+    "O O"
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" }
+  },
+  "result": { "item": "akaishi:akaishi_plasma_pipe", "count": 8 }
+}

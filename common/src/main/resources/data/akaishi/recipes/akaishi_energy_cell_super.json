@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DDD",
+    "DED",
+    "DDD"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "E": { "item": "akaishi:akaishi_energy_cell_advanced" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_cell_super", "count": 1 }
+}

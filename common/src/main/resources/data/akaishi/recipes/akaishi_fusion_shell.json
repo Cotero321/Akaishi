@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "S S",
+    "ISI"
+  ],
+  "key": {
+    "S": { "item": "minecraft:smooth_stone" },
+    "I": { "item": "minecraft:iron_block" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_shell", "count": 8 }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Wireless Transmission",
+  "description": "Remote wireless Akaishi Energy network authenticated by identity cards",
+  "icon": "akaishi:akaishi_wireless_terminal",
+  "sortnum": 7
+}

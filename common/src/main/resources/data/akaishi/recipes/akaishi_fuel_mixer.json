@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CGC",
+    "FEF",
+    "CGC"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_machine_component" },
+    "E": { "item": "akaishi:akaishi_energy_cell_basic" },
+    "G": { "item": "minecraft:glass" },
+    "F": { "item": "akaishi:fuel_cell" }
+  },
+  "result": { "item": "akaishi:akaishi_fuel_mixer", "count": 1 }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Life Centrifuge",
+  "icon": "akaishi:akaishi_life_centrifuge",
+  "category": "akaishi:life_energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_centrifuge",
+      "text": "The $(bold)consumer$() of activated fluid: the Life Centrifuge separates activated fuel into $(bold)activated crystals$() (one per fuel type) plus one $(bold)Exhausted Crystal$() by-product.$(br)Fluid becomes stackable solid crystals - no more endless stockpiling, and breaking never leaks waste."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)How it works:$()$(li)Input: activated fluid via normal fluid pipes (only activated fluid accepted)$(li)Separate: $(bold)50 Akaishi Energy$() per mB, at $(bold)8 mB/tick$()$(li)Output: every $(bold)100 mB$() -> 1 matching activated crystal + 1 Exhausted Crystal$(br2)$(bold)Crystal uses:$() activated crystals upgrade identity cards (see \"Wireless Identity Card\"); Exhausted Crystals are the cost of the Item Reconstructor (see \"Item Reconstructor\")."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_life_centrifuge"
+    }
+  ]
+}

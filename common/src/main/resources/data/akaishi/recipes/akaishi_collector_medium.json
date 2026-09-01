@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    "FCF",
+    " F "
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_collector_basic" },
+    "F": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_collector_medium", "count": 1 }
+}

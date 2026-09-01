@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GPG",
+    "PCP",
+    "GPG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "P": { "item": "akaishi:akaishi_energy_pipe" },
+    "C": { "item": "akaishi:akaishi_energy_cell_advanced" }
+  },
+  "result": { "item": "akaishi:akaishi_miner_port", "count": 2 }
+}

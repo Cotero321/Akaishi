@@ -1,0 +1,23 @@
+{
+  "name": "衰竭燃料无害化",
+  "icon": "akaishi:akaishi_life_activator",
+  "category": "akaishi:life_advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_activator",
+      "text": "生命活化器：消耗生命能量无害化衰竭燃料（每 1mb 消耗 100 生命能量），1:1 转化为活化的衰竭液体。$(br)废料管道接入输入罐，普通液体管道从输出罐抽取。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_centrifuge",
+      "text": "生命离心机：将活化燃料分离为主产物与副产物。$(br)活化分馏器进一步提纯出活化成分——这些成分将被聚合为等离子体，通往聚变之路。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_reconstructor",
+      "text": "物品重构仪：以衰竭结晶重构物品，把废料重新变为可用资源，形成完整的闭环。"
+    }
+  ]
+}

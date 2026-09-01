@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "akaishi:block/akaishi_wireless_terminal"
+    },
+    "formed=true": {
+      "model": "akaishi:block/akaishi_wireless_terminal_formed"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "G G",
+    "GCG",
+    "G G"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_energy_generator" },
+    "G": { "item": "minecraft:gold_block" }
+  },
+  "result": { "item": "akaishi:akaishi_gen_matrix_controller_basic", "count": 1 }
+}

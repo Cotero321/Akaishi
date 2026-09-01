@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IFI",
+    "F F",
+    "IFI"
+  ],
+  "key": {
+    "F": { "item": "akaishi:akaishi_fusion_rod" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_fuel_frame", "count": 4 }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_energy_processor_bottom",
+    "top": "akaishi:block/akaishi_energy_processor_top",
+    "side": "akaishi:block/akaishi_energy_processor_side"
+  }
+}

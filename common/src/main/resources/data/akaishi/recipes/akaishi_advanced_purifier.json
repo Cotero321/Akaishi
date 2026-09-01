@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DAD",
+    "APA",
+    "DAD"
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "P": { "item": "akaishi:akaishi_purifier" },
+    "A": { "item": "akaishi:akaishi_advanced_component" }
+  },
+  "result": { "item": "akaishi:akaishi_advanced_purifier", "count": 1 }
+}

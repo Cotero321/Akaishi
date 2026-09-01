@@ -1,0 +1,23 @@
+{
+  "name": "Miner Upgrades",
+  "icon": "akaishi:akaishi_miner_speed_upgrade_block",
+  "category": "akaishi:miner",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_speed_upgrade_block",
+      "text": "Speed Upgrade: +12.5% rate but +10% energy cost per module, up to 10. Right-click an upgrade frame slot to install."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_fortune_upgrade_block",
+      "text": "Fortune Upgrade: +1 ore per roll, up to 4 modules."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_storage_upgrade_block",
+      "text": "Storage Upgrade: +50% energy capacity per module, up to 10.$(br2)Modules can be swapped in place; the controller tallies them every 20 ticks."
+    }
+  ]
+}

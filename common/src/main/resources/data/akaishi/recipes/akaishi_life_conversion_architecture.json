@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "LAL",
+    "LLL"
+  ],
+  "key": {
+    "A": { "item": "akaishi:akaishi_life_aggregation_converter" },
+    "L": { "item": "minecraft:lapis_block" }
+  },
+  "result": { "item": "akaishi:akaishi_life_conversion_architecture", "count": 1 }
+}

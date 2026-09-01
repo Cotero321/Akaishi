@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IFI",
+    "FCF",
+    "IFI"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_machine_component" },
+    "F": { "item": "minecraft:furnace" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_generator", "count": 1 }
+}

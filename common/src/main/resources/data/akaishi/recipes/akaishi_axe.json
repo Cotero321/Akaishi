@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "II",
+    "IS",
+    " S"
+  ],
+  "key": {
+    "S": { "item": "minecraft:stick" },
+    "I": { "item": "akaishi:akaishi_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_axe", "count": 1 }
+}

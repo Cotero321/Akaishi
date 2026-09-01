@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "I I",
+    "I I"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_leggings", "count": 1 }
+}

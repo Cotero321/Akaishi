@@ -1,0 +1,18 @@
+{
+  "name": "赤石打粉机",
+  "icon": "akaishi:akaishi_pulverizer",
+  "category": "akaishi:machines",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_pulverizer",
+      "text": "将各种原料打成粉末：$(li)原版矿物 → 对应矿物粉$(li)赤石 → 赤石粉$(li)$(2,4)黑曜石 → 黑曜石粉$(0)$(br2)粉末是散热片与高级合成的重要材料。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:obsidian_dust",
+      "text": "黑曜石粉是特殊产物之一。$(br)全套粉末清单见「粉末」条目。"
+    }
+  ]
+}

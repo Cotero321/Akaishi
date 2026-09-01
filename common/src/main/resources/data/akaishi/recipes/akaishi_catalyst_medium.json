@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GCG",
+    "GGG"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_catalyst_basic" },
+    "G": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_catalyst_medium", "count": 1 }
+}

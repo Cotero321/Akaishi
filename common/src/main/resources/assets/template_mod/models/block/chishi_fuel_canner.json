@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "bottom": "template_mod:block/chishi_fuel_canner_bottom",
-    "top": "template_mod:block/chishi_fuel_canner_top",
-    "side": "template_mod:block/chishi_fuel_canner_side"
-  }
-}

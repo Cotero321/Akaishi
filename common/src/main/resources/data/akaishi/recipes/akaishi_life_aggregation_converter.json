@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LCL",
+    "CAC",
+    "LCL"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "L": { "item": "minecraft:lapis_lazuli" },
+    "A": { "item": "akaishi:akaishi_life_energy_cell" }
+  },
+  "result": { "item": "akaishi:akaishi_life_aggregation_converter", "count": 1 }
+}

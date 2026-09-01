@@ -1,0 +1,18 @@
+{
+  "name": "赤石提纯器",
+  "icon": "akaishi:akaishi_purifier",
+  "category": "akaishi:intro",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier",
+      "text": "赤石提纯器将粗制赤石块提纯为赤石精华。$(br)它是赤能源的第一位消费者，投入赤能源即可运转，产物精华自动存入输出槽。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_advanced_purifier",
+      "text": "高级提纯构建方块是提纯矩阵的墙面方块。$(br)用提纯矩阵外壳围成 3×3×3 封闭空间并放置控制器与端口，可将提纯速度提升 30 倍。详见「高级科技」篇的矩阵章节。"
+    }
+  ]
+}

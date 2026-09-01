@@ -1,0 +1,17 @@
+{
+  "name": "Akaishi Reactor",
+  "icon": "akaishi:akaishi_reactor_controller",
+  "category": "akaishi:energy",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_reactor_controller",
+      "text": "A multiblock generator that turns liquid fuel into enormous amounts of Chi Energy.$(br2)$(bold)Building:$() surround a closed box of side length 5 or 7 with Reactor Shells (1-block thick walls, all six faces complete), placing the Controller, Fuel Port, Energy Output and Waste Port on the walls; the interior may only hold Fuel Rods, Coolers and exactly one Reactor Core.$(br2)Up to 10 fuel rods (each unlocks one fuel slot) and 20 coolers. The controller forms once the structure is complete."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Operation:$() put Fuel Cells with liquid fuel into the controller's fuel slots to start burning. Output peaks at 400-700℃; above 850℃ it enters an overheat warning with reduced output (no shutdown). At 1000℃ full heat it WILL explode after 10 seconds - destroying the reactor and spawning a 5-chunk decay zone. Breaking the reactor or dismantling its structure at full heat leaks a decay zone too.$(br2)$(bold)Waste:$() every 5 mb of fuel produces 1 mb of exhausted fuel, split into 7 kinds matching the source fuel (World Base / Nether Compound / End Mixture / Advanced Mixture / Pure / Dragon / Ultimate Mixture), stored mixed in the built-in 64,000 mb tank - full tank halts all slots. The Waste Port only exports and accepts ONLY waste pipes (Sealed Exhausted Pipe / Multi-Fluid Waste Pipe); normal fluid pipes cannot connect. The waste pipe network is physically isolated from normal fluid pipes, and exhausted fuel is$(bold)handled by this mod's systems only$(): other mods' pipes/tanks cannot connect directly to this mod's machines, and normal fluid pipes never carry waste - it can only travel via waste pipes into an Exhausted Barrel (1,000,000 mb) for long-term storage, or into a Life Activator for slow neutralization (100 Life Energy per mb, converting 1:1 into the matching activated exhausted fuel). Activated fuel is a safe intermediate liquid extractable by normal fluid pipes.$(bold)Warning:$() breaking a Life Activator, waste pipe or barrel that still holds exhausted fuel leaks a decay zone - wear protection when handling waste."
+    }
+  ]
+}

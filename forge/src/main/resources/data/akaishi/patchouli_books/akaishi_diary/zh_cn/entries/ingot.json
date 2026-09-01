@@ -1,0 +1,13 @@
+{
+  "name": "赤石锭",
+  "icon": "akaishi:akaishi_ingot",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ingot",
+      "text": "赤石锭由浓缩赤石精华块熔炼获得，是装备、机器与多方块结构的高级材料。$(br)全套赤石装备、赤红升级模板与众多高级机器都以它为基石。"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NFN",
+    " N "
+  ],
+  "key": {
+    "N": { "item": "minecraft:netherite_scrap" },
+    "F": { "item": "akaishi:heat_sink_fine" }
+  },
+  "result": { "item": "akaishi:heat_sink_exquisite", "count": 1 }
+}

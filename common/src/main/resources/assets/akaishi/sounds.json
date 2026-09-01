@@ -1,0 +1,44 @@
+{
+  "reactor_hum": {
+    "subtitle": "subtitles.akaishi.reactor_hum",
+    "sounds": [
+      { "name": "akaishi:reactor_hum", "stream": true }
+    ]
+  },
+  "reactor_warn": {
+    "subtitle": "subtitles.akaishi.reactor_warn",
+    "sounds": [
+      "akaishi:reactor_warn"
+    ]
+  },
+  "reactor_explosion": {
+    "subtitle": "subtitles.akaishi.reactor_explosion",
+    "sounds": [
+      "akaishi:reactor_explosion"
+    ]
+  },
+  "machine_hum": {
+    "subtitle": "subtitles.akaishi.machine_hum",
+    "sounds": [
+      { "name": "akaishi:machine_hum", "stream": true }
+    ]
+  },
+  "activator_bubble": {
+    "subtitle": "subtitles.akaishi.activator_bubble",
+    "sounds": [
+      { "name": "akaishi:activator_bubble", "stream": true }
+    ]
+  },
+  "multiblock_activate": {
+    "subtitle": "subtitles.akaishi.multiblock_activate",
+    "sounds": [
+      "akaishi:multiblock_activate"
+    ]
+  },
+  "decay_leak": {
+    "subtitle": "subtitles.akaishi.decay_leak",
+    "sounds": [
+      "akaishi:decay_leak"
+    ]
+  }
+}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "template_mod:block/chishi_wireless_shell"
-  }
-}

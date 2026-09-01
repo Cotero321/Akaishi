@@ -1,0 +1,6 @@
+{
+  "name": "Storage & Linking",
+  "description": "Vaults for samples, organs and potions, plus machine linking",
+  "icon": "akaishi:akaishi_sample_vault",
+  "sortnum": 2
+}

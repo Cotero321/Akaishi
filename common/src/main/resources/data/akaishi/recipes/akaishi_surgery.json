@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "GLG",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "L": { "item": "minecraft:lapis_lazuli" },
+    "I": { "item": "minecraft:iron_block" }
+  },
+  "result": { "item": "akaishi:akaishi_surgery", "count": 1 }
+}

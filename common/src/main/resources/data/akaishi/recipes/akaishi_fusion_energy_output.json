@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "PEP",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "E": { "item": "akaishi:akaishi_energy_cell_super" },
+    "P": { "item": "akaishi:akaishi_energy_pipe" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_energy_output", "count": 1 }
+}

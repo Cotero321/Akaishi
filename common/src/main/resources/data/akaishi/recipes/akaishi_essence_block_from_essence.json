@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "EEE",
+    "EEE",
+    "EEE"
+  ],
+  "key": {
+    "E": { "item": "akaishi:akaishi_essence" }
+  },
+  "result": { "item": "akaishi:akaishi_essence_block", "count": 1 }
+}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "template_mod:block/end_chishi_ore_perfect"
-  }
-}

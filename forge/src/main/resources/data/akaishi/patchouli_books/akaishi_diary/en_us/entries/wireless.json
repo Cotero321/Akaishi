@@ -1,0 +1,18 @@
+{
+  "name": "Wireless Energy",
+  "icon": "akaishi:akaishi_wireless_terminal",
+  "category": "akaishi:tech",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_terminal",
+      "text": "Build a closed 5x5x5 box with Terminal Shell, place the terminal, controller and security block on walls, and put 1 Core in the middle.$(br)The terminal auto-binds a nearby formed Serializer as network storage."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_identity_card",
+      "text": "Register an Identity Card in the security page, then right-click ports with the same card to bind them.$(br)Dimensional bridge enables cross-dimension, chunk loaders keep the network alive, loss suppressors reduce transfer loss."
+    }
+  ]
+}

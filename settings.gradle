@@ -59,7 +59,7 @@ dependencyResolutionManagement {
 		}
 	}
 }
-rootProject.name = 'template_mod'
+rootProject.name = 'akaishi'
 // 包含子项目（仅 Forge 平台）
 include 'common'
 include 'forge'

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "akaishi:block/akaishi_gen_matrix_controller_advanced"
+    },
+    "formed=true": {
+      "model": "akaishi:block/akaishi_gen_matrix_controller_advanced_formed"
+    }
+  }
+}

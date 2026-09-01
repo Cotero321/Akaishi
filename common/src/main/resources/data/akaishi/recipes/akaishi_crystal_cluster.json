@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CCC",
+    " C "
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_crystal" }
+  },
+  "result": { "item": "akaishi:akaishi_crystal_cluster", "count": 1 }
+}

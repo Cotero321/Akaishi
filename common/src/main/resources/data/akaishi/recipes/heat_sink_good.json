@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " Q ",
+    "QNQ",
+    " Q "
+  ],
+  "key": {
+    "N": { "item": "akaishi:heat_sink_normal" },
+    "Q": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:heat_sink_good", "count": 1 }
+}

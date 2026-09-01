@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SCS",
+    "SSS"
+  ],
+  "key": {
+    "C": { "item": "akaishi:akaishi_crystal" },
+    "S": { "item": "minecraft:cobblestone" }
+  },
+  "result": { "item": "akaishi:akaishi_geode_flawed", "count": 1 }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    "LTL",
+    " L "
+  ],
+  "key": {
+    "T": { "item": "akaishi:fusion_heat_sink_tier3" },
+    "L": { "item": "akaishi:akaishi_life_essence_solid" }
+  },
+  "result": { "item": "akaishi:fusion_heat_sink_life", "count": 1 }
+}

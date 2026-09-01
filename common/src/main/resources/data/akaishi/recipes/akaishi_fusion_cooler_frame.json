@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CHC",
+    "H H",
+    "CHC"
+  ],
+  "key": {
+    "H": { "item": "akaishi:heat_sink_good" },
+    "C": { "item": "minecraft:copper_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_cooler_frame", "count": 4 }
+}

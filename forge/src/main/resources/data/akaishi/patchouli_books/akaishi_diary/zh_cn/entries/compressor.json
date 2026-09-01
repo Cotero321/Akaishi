@@ -1,0 +1,13 @@
+{
+  "name": "赤石压缩机",
+  "icon": "akaishi:akaishi_compressor",
+  "category": "akaishi:machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_compressor",
+      "text": "进行物品上的压缩加工：$(li)各种粉末 → 对应块$(li)赤石精华 → 浓缩赤石精华$(br2)单格输入、单格输出，消耗赤能源运转。"
+    }
+  ]
+}

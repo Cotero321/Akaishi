@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "QQQ",
+    "QHQ",
+    "QQQ"
+  ],
+  "key": {
+    "H": { "item": "akaishi:heat_sink_normal" },
+    "Q": { "item": "minecraft:quartz_block" }
+  },
+  "result": { "item": "akaishi:akaishi_fusion_insulation", "count": 8 }
+}

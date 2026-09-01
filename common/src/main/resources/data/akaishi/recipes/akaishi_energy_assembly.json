@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CEC",
+    "EME",
+    "CEC"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_block" },
+    "E": { "item": "akaishi:akaishi_energy_cell_basic" },
+    "M": { "item": "akaishi:akaishi_machine_component" }
+  },
+  "result": { "item": "akaishi:akaishi_energy_assembly", "count": 1 }
+}

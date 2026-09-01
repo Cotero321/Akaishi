@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IBI",
+    "FMF",
+    "IBI"
+  ],
+  "key": {
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "B": { "item": "minecraft:blaze_rod" },
+    "F": { "item": "minecraft:furnace" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_transformer", "count": 1 }
+}

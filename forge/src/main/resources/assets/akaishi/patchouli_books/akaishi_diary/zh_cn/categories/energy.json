@@ -1,0 +1,10 @@
+{
+  "name": "赤能源",
+  "description": "驱动赤石科技的能量体系",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "sortnum": 3,
+  "lock": {
+    "type": "patchouli:advancement",
+    "advancement": "akaishi:first_purifier"
+  }
+}

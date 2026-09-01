@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_nether",
-  "features": "template_mod:nether_chishi_ore_low",
-  "step": "underground_ores"
-}

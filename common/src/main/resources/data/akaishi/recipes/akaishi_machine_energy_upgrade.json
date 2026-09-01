@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "T",
+    "B"
+  ],
+  "key": {
+    "B": { "item": "minecraft:redstone_block" },
+    "T": { "item": "akaishi:akaishi_upgrade_template" }
+  },
+  "result": { "item": "akaishi:akaishi_machine_energy_upgrade", "count": 1 }
+}

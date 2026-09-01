@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "T",
+    "G"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glowstone_dust" },
+    "T": { "item": "akaishi:akaishi_upgrade_template" }
+  },
+  "result": { "item": "akaishi:akaishi_speed_upgrade", "count": 1 }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SGS",
+    "SSS"
+  ],
+  "key": {
+    "S": { "item": "minecraft:deepslate" },
+    "G": { "item": "akaishi:akaishi_geode_normal" }
+  },
+  "result": { "item": "akaishi:akaishi_geode_pristine", "count": 1 }
+}

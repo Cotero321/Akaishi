@@ -1,0 +1,21 @@
+{
+  "name": "Item Reconstructor",
+  "icon": "akaishi:akaishi_item_reconstructor",
+  "category": "akaishi:life_energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_reconstructor",
+      "text": "The $(bold)consumer$() of Exhausted Crystals: the Item Reconstructor transmutes items into rarities in exchange for crystals - the endpoint of the $(bold)waste economy$().$(br)Each crystal costs $(bold)50 Akaishi Energy$() and processes $(bold)1 crystal/tick$(); switching the input resets progress and a full output pauses the machine."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Recipe samples (crystal cost in brackets):$()$(li)Amethyst Shard ×8 -> Echo Shard$(li)Quartz ×16 -> Prismarine Shard$(li)Leather ×16 -> Phantom Membrane$(li)Golden Apple ×16 -> Enchanted Golden Apple$(li)Snowball ×32 -> Ghast Tear$(li)Skeleton Skull ×32 -> Wither Skeleton Skull$(li)Wither Skeleton Skull ×32 -> Nether Star$(br2)$(bold)Note:$() 11 recipes in total; see the JEI \"Item Reconstruct\" category for the full list. Higher cost, rarer result."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_item_reconstructor"
+    }
+  ]
+}

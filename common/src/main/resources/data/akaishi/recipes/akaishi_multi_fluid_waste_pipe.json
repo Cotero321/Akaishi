@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IFI",
+    "F F",
+    "IFI"
+  ],
+  "key": {
+    "F": { "item": "akaishi:akaishi_exhausted_pipe" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_multi_fluid_waste_pipe", "count": 4 }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "生命能量",
+  "icon": "akaishi:akaishi_life_aggregation_converter",
+  "category": "akaishi:life_energy",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)日记最后一页：$()\"赤能源并不是终点。当聚合器的能量达到某种阈值，我触碰到了更本质的力量——$(2)生命能量$()。它温润、沉稳，仿佛矿石中沉睡的灵魂。\"$(br2)这是赤石之章的最高成就，也是新的开始。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_aggregation_converter",
+      "text": "生命能量是赤能源的高级衍生物。生命聚合转换器消耗赤能源聚合出生命能量：$(br)每次消耗 $(bold)10M 赤能源$()，产出 $(bold)10 生命能量$()。$(br)单方块每秒聚合 10 次（10 生命/tick）。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_conversion_architecture",
+      "text": "以 $(bold)26 台生命聚合转换器$()环绕中心「生命转换架构」（3×3×3）可成型：$(br)$(li)转换提速至 $(bold)45 倍$()（450 生命/tick，消耗 450M 赤能源/tick）$(li)赤能源经外壳注入，生命能量经外壳输出$(li)右键任意外壳打开架构界面"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_life_aggregation_converter"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_life_conversion_architecture"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_energy_pipe",
+      "text": "生命能量管道单独传输生命能量，与赤能源管道互不连通（能量类型隔离）。$(br)生命聚合转换器接入生命管道后自动向外输出，接入赤能源管道则持续补充赤能源。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_life_energy_pipe"
+    }
+  ]
+}

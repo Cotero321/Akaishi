@@ -1,0 +1,23 @@
+{
+  "name": "Chi Energy Cell",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "category": "akaishi:energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_basic",
+      "text": "Energy Cells store Chi Energy in bulk, capacity grows with tier (large numbers are shown with M/B/T suffixes):$(br)$(li)Basic: 500M (500 million)$(br)$(li)Advanced: 2B (2 billion)$(br)$(li)Super: 20B (20 billion)$(br)Right-click to inspect the stored energy; connect pipes to charge and discharge."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_energy_cell_basic",
+      "recipe2": "akaishi:akaishi_energy_cell_advanced"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_energy_cell_super",
+      "text": "Upgrade an Advanced Cell with Compressed Akaishi Essence Blocks to craft the Super Cell."
+    }
+  ]
+}
