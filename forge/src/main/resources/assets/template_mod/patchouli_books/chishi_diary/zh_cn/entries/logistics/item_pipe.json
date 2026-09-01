@@ -11,7 +11,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "管道共分四级，等级越高每 tick 传输的物品越多：$(li)$(bold)基础$()：1 个/tick$(li)$(bold)高级$()：4 个/tick$(li)$(bold)精英$()：16 个/tick$(li)$(bold)终极$()：64 个/tick$(br2)网络每 tick 总运力等于所有管道速率之和，由代表节点（坐标最小的管道）统一调度。"
+      "text": "管道共分四级，等级越高每 tick 传输的物品越多：$(li)$(bold)基础$()：1 个/tick$(li)$(bold)中级$()：4 个/tick$(li)$(bold)高级$()：16 个/tick$(li)$(bold)超级$()：64 个/tick$(br2)网络每 tick 总运力等于所有管道速率之和，由代表节点（坐标最小的管道）统一调度。"
     },
     {
       "type": "patchouli:crafting",
@@ -22,7 +22,7 @@
       "type": "patchouli:crafting",
       "recipe": "template_mod:chishi_item_pipe_advanced",
       "recipe2": "template_mod:chishi_item_pipe_elite",
-      "text": "高级 / 精英管道由下级管道升级而来；终极管道还需要浓缩赤石精华块。"
+      "text": "中级 / 高级管道由下级管道升级而来；超级管道还需要浓缩赤石精华块。"
     },
     {
       "type": "patchouli:crafting",

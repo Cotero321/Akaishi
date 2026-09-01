@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "The Gene Analyzer and Potion Table both consume samples - place the vault next to them to $(bold)link access$() (see \"Storage & Linking\") and avoid backpack trips."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_sample_vault"
     }
   ]
 }

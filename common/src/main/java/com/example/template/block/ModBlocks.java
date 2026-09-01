@@ -135,6 +135,10 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_FUEL_MIXER;
     /** 生命活化器：消耗生命能量缓慢无害化衰竭燃料（废料进、活化液出） */
     public static RegistrySupplier<Block> CHISHI_LIFE_ACTIVATOR;
+    /** 生命离心机：分离活化燃料为活化结晶 + 衰竭结晶 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_CENTRIFUGE;
+    /** 物品重构仪：以衰竭结晶为代价嬗变物品 */
+    public static RegistrySupplier<Block> CHISHI_ITEM_RECONSTRUCTOR;
     /** 液体储罐（基础/高级/超级：16k/64k/256k mb，管道存取液体） */
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_BASIC;
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_ADVANCED;
@@ -473,6 +477,20 @@ public final class ModBlocks {
         RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_activator"),
                         () -> new BlockItem(CHISHI_LIFE_ACTIVATOR.get(), new Item.Properties()));
+
+        // 生命离心机（赤能源分离活化燃料：活化结晶 + 衰竭结晶）
+        CHISHI_LIFE_CENTRIFUGE = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_centrifuge"),
+                ChishiLifeCentrifugeBlock::new);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_centrifuge"),
+                        () -> new BlockItem(CHISHI_LIFE_CENTRIFUGE.get(), new Item.Properties()));
+
+        // 物品重构仪（以衰竭结晶为代价嬗变物品）
+        CHISHI_ITEM_RECONSTRUCTOR = blockRegistrar.register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_item_reconstructor"),
+                ChishiItemReconstructorBlock::new);
+        RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_item_reconstructor"),
+                        () -> new BlockItem(CHISHI_ITEM_RECONSTRUCTOR.get(), new Item.Properties()));
 
         // 液体储罐（基础/高级/超级，容量递增，可被液体管道注入/抽取）
         CHISHI_FLUID_TANK_BASIC = registerFluidTank(blockRegistrar, "chishi_fluid_tank_basic", FluidTankTier.BASIC);

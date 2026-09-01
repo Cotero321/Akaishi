@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "分析台与药剂台都消耗样本，将样本库摆放在机器旁即可$(bold)联动存取$()（见「存储联动」章节），无需频繁往返背包。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_sample_vault"
     }
   ]
 }

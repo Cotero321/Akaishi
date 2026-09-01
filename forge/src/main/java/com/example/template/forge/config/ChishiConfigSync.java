@@ -46,6 +46,14 @@ public final class ChishiConfigSync {
         ModConfig.lifeActivatorInputCapacity = ChishiConfig.LIFE_ACTIVATOR_INPUT_CAPACITY.get();
         ModConfig.lifeActivatorOutputCapacity = ChishiConfig.LIFE_ACTIVATOR_OUTPUT_CAPACITY.get();
         ModConfig.lifeActivatorConvertRate = ChishiConfig.LIFE_ACTIVATOR_CONVERT_RATE.get();
+        // 生命离心机
+        ModConfig.lifeCentrifugeEnergyCapacity = ChishiConfig.LIFE_CENTRIFUGE_ENERGY_CAPACITY.get();
+        ModConfig.lifeCentrifugeInputCapacity = ChishiConfig.LIFE_CENTRIFUGE_INPUT_CAPACITY.get();
+        ModConfig.lifeCentrifugeConvertRate = ChishiConfig.LIFE_CENTRIFUGE_CONVERT_RATE.get();
+        ModConfig.lifeCentrifugeCostPerMb = ChishiConfig.LIFE_CENTRIFUGE_COST_PER_MB.get();
+        // 物品重构仪
+        ModConfig.reconstructorEnergyCapacity = ChishiConfig.RECONSTRUCTOR_ENERGY_CAPACITY.get();
+        ModConfig.reconstructorCostPerCrystal = ChishiConfig.RECONSTRUCTOR_COST_PER_CRYSTAL.get();
         // 衰竭区域
         ModConfig.decayZoneDurationTicks = ChishiConfig.DECAY_ZONE_DURATION_TICKS.get();
         // 无线赤能源

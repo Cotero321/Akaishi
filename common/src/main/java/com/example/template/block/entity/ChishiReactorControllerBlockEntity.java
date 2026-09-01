@@ -273,7 +273,7 @@ public class ChishiReactorControllerBlockEntity extends BlockEntity implements E
                 continue;
             }
             active++;
-            // 燃料消耗恒定（与利用率无关）：利用率只决定产率与每 mb 能量密度，消耗固定 10 秒 1mb
+            // 燃料消耗恒定（与利用率无关）：利用率只决定产率与每 mb 能量密度，消耗固定每 2.5 秒 1mb（0.02 mb/tick）
             double drain = ModConfig.reactorDrainBase;
             totalDrain += drain;
             drainAccumulator[i] += drain;

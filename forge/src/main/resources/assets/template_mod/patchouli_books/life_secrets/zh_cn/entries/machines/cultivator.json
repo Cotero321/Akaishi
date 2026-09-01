@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "$(bold)升级$()：提升器官品质档位（I→IV），失败$(bold)器官保留$()、仅消耗材料：$(li)I→II：85% · 1 固 · 20K$(li)II→III：75% · 4 固 · 80K$(li)III→IV：65% · 16 固 · 300K$(br2)材料为生命能量固态物，能量由生命管道供应。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_cultivator"
     }
   ]
 }

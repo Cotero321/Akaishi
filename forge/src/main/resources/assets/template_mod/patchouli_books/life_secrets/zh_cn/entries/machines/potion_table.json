@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "$(bold)永久药剂$()：稳定的增益，无副作用。$(bold)突破药剂$()：效果 ×1.5，但放大缺点并产生排斥等副作用。$(br2)副作用强度与样本纯度相关——$(2)低纯度样本副作用更强$()。不同生物的药剂效果各有差异，多收集样本以解锁最优配方。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_potion_table"
     }
   ]
 }

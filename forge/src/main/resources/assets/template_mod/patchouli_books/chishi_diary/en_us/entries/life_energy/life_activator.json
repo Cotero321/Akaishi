@@ -1,0 +1,21 @@
+{
+  "name": "Life Activator",
+  "icon": "template_mod:chishi_life_activator",
+  "category": "template_mod:life_energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_life_activator",
+      "text": "Burning fuel in the reactor produces $(bold)Exhausted Fuel$() - hazardous waste that must travel the waste-pipe system. The Life Activator is the $(bold)first neutralization step$(): it slowly activates exhausted fuel into the matching $(bold)activated fluid$().$(br)Activated fluid is no longer waste and can be safely moved by normal fluid pipes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)How it works:$()$(li)Input: waste pipes (only exhausted fuel accepted, 7 types can mix)$(li)Convert: $(bold)100 Life Energy$() per mB, at $(bold)4 mB/tick$()$(li)Output: normal fluid pipes (7 activated fluids match their source fuels)$(br2)$(bold)Note:$() activation makes waste safe but does not remove it - activated fluid still needs a consumer (see \"Life Centrifuge\")."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_life_activator"
+    }
+  ]
+}

@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "Organs need life energy to stay active: 1 per tick. When depleted they go $(bold)dormant$() (UI warning; access still works) and wake once recharged.$(br2)Inputs must match their page; output is drawn from the buffer by pipes."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_organ_vault"
     }
   ]
 }

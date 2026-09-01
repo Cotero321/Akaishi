@@ -1,0 +1,21 @@
+{
+  "name": "生命活化器",
+  "icon": "template_mod:chishi_life_activator",
+  "category": "template_mod:life_energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "template_mod:chishi_life_activator",
+      "text": "反应堆燃烧燃料会产出$(bold)衰竭燃料$()——危险废料，只能走废料管道系统。生命活化器是$(bold)无害化第一步$()：把衰竭燃料缓慢活化为对应的$(bold)活化液体$()。$(br)活化液体不再属于废料，可用普通液体管道安全运输。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)工作方式：$()$(li)输入：废料管道接入（仅接纳衰竭燃料，7 种可混储）$(li)转化：每 1mb 消耗 $(bold)100 生命能量$()，速率 $(bold)4 mb/tick$()$(li)输出：普通液体管道抽出（7 种活化液体对应原燃料）$(br2)$(bold)提示：$()活化处理不会消除废料，只是让它安全化——活化液体仍需要消费端（见「生命离心机」）。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_life_activator"
+    }
+  ]
+}

@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "Organ $(bold)integrity = sequence purity − random loss (0-20)$(), setting quality:$(li)integrity 100 → tier III$(li)50-99 → tier II$(li)<50 → tier I$(br2)Higher integrity pushes adaptation toward the top of the creature group range."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_life_struct"
     }
   ]
 }

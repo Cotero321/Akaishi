@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IBI",
+    "MCM",
+    "ILI"
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "B": { "item": "template_mod:chishi_life_energy_cell" },
+    "M": { "item": "template_mod:chishi_machine_component" },
+    "C": { "item": "template_mod:chishi_life_essence_solid" },
+    "L": { "item": "template_mod:chishi_ingot" }
+  },
+  "result": {
+    "item": "template_mod:chishi_surgery"
+  }
+}

@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "$(bold)Rejection$() is the price of implantation: base value comes from gene quality, creature group and integrity; native organs are 0.$(br2)Rejection $(bold)grows over time$(): rate × 100/adaptation, doubled below adaptation 60, and ×1.6 for strong genes (End/Dragon).$(br2)Enemy pairs lock rejection to max, disable the organ and backfire with an explosion - $(2)synergistic organs and the Life Set$() are the future."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_surgery"
     }
   ]
 }

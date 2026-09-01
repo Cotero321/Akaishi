@@ -210,6 +210,16 @@ public final class ModItems {
     public static RegistrySupplier<Item> chishiWirelessPortableTerminal;
     /** 终端身份卡（无线网络认证钥匙） */
     public static RegistrySupplier<Item> chishiWirelessIdentityCard;
+    /** 衰竭结晶：生命离心机分离活化燃料的通用副产物 */
+    public static RegistrySupplier<Item> exhaustedCrystal;
+    /** 活化结晶（7 种）：对应七种活化燃料的分离主产物 */
+    public static RegistrySupplier<Item> activatedSculkCrystal;
+    public static RegistrySupplier<Item> activatedNetherCompoundCrystal;
+    public static RegistrySupplier<Item> activatedEndMixtureCrystal;
+    public static RegistrySupplier<Item> activatedAdvancedMixtureCrystal;
+    public static RegistrySupplier<Item> activatedPureCrystal;
+    public static RegistrySupplier<Item> activatedDragonCrystal;
+    public static RegistrySupplier<Item> activatedUltimateMixtureCrystal;
 
     private ModItems() {
     }
@@ -394,5 +404,30 @@ public final class ModItems {
         chishiWirelessIdentityCard = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(TemplateMod.MOD_ID, WIRELESS_IDENTITY_CARD_ID),
                         () -> new ChishiWirelessIdentityCardItem(new Item.Properties().stacksTo(1)));
+        // 离心结晶：生命离心机分离活化燃料的产物（1 通用衰竭结晶 + 7 对应活化结晶）
+        exhaustedCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_exhausted_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedSculkCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_sculk_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedNetherCompoundCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_nether_compound_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedEndMixtureCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_end_mixture_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedAdvancedMixtureCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_advanced_mixture_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedPureCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_pure_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedDragonCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_dragon_crystal"),
+                        () -> new Item(new Item.Properties()));
+        activatedUltimateMixtureCrystal = RegistrarManager.get(TemplateMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_activated_ultimate_mixture_crystal"),
+                        () -> new Item(new Item.Properties()));
     }
 }

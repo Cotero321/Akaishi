@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GEG",
+    "LCL",
+    "GEG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "E": { "item": "template_mod:chishi_machine_component" },
+    "L": { "item": "template_mod:chishi_life_energy_cell" },
+    "C": { "item": "template_mod:chishi_ingot" }
+  },
+  "result": {
+    "item": "template_mod:chishi_body_scanner"
+  }
+}

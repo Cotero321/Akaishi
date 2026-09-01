@@ -13,6 +13,7 @@ import com.example.template.menu.ChishiLifeStructSync;
 import com.example.template.menu.ChishiSurgerySync;
 import com.example.template.menu.ChishiPotionSync;
 import com.example.template.menu.ModMenus;
+import com.example.template.recipe.ModRecipeSerializers;
 import com.example.template.sound.ModSounds;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
@@ -33,6 +34,7 @@ public final class TemplateMod {
         ModBlockEntities.register();
         ModCreativeTabs.register();
         ModMenus.register();
+        ModRecipeSerializers.register();
         // 自定义状态效果（衰变）
         ModEffects.register();
         // 衰竭区域：服务端每 tick 结算减益/环境转化/生物转化

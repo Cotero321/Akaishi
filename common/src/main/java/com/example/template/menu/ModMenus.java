@@ -26,6 +26,8 @@ import com.example.template.block.entity.ChishiPotionCabinetBlockEntity;
 import com.example.template.block.entity.ChishiSampleVaultBlockEntity;
 import com.example.template.block.entity.ChishiLifeMatrixControllerBlockEntity;
 import com.example.template.block.entity.ChishiLifeActivatorBlockEntity;
+import com.example.template.block.entity.ChishiLifeCentrifugeBlockEntity;
+import com.example.template.block.entity.ChishiItemReconstructorBlockEntity;
 import com.example.template.block.entity.ChishiLifePurifierBlockEntity;
 import com.example.template.block.entity.ChishiReactorControllerBlockEntity;
 import com.example.template.block.entity.ChishiReactorEnergyOutputBlockEntity;
@@ -119,6 +121,10 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<ChishiPurifierMatrixControllerMenu>> CHISHI_PURIFIER_MATRIX_CONTROLLER;
     /** 生命活化器菜单类型 */
     public static RegistrySupplier<MenuType<ChishiLifeActivatorMenu>> CHISHI_LIFE_ACTIVATOR;
+    /** 生命离心机菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiLifeCentrifugeMenu>> CHISHI_LIFE_CENTRIFUGE;
+    /** 物品重构仪菜单类型 */
+    public static RegistrySupplier<MenuType<ChishiItemReconstructorMenu>> CHISHI_ITEM_RECONSTRUCTOR;
     /** 无线赤能源终端菜单类型（终端方块主界面，四页互斥） */
     public static RegistrySupplier<MenuType<ChishiWirelessTerminalMenu>> CHISHI_WIRELESS_TERMINAL;
     /** 无线赤能源输入口/输出口菜单类型（共用） */
@@ -665,6 +671,40 @@ public final class ModMenus {
                 .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_activator"), () -> activatorType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(activatorType, ChishiLifeActivatorScreen::new));
+
+        // 生命离心机：2 机器输出槽 + 5 数据槽（能量/罐量/进度）
+        MenuType<ChishiLifeCentrifugeMenu> centrifugeType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiLifeCentrifugeBlockEntity centrifuge) {
+                return new ChishiLifeCentrifugeMenu(syncId, inv, centrifuge);
+            }
+            return new ChishiLifeCentrifugeMenu(syncId, inv, new SimpleContainer(2),
+                    new SimpleContainerData(ChishiLifeCentrifugeBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_LIFE_CENTRIFUGE = (RegistrySupplier<MenuType<ChishiLifeCentrifugeMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_life_centrifuge"), () -> centrifugeType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(centrifugeType, ChishiLifeCentrifugeScreen::new));
+
+        // 物品重构仪：3 机器槽（原料/结晶/产物）+ 5 数据槽（能量/进度/所需/结晶数）
+        MenuType<ChishiItemReconstructorMenu> reconstructorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ChishiItemReconstructorBlockEntity reconstructor) {
+                return new ChishiItemReconstructorMenu(syncId, inv, reconstructor);
+            }
+            return new ChishiItemReconstructorMenu(syncId, inv, new SimpleContainer(3),
+                    new SimpleContainerData(ChishiItemReconstructorBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_ITEM_RECONSTRUCTOR = (RegistrySupplier<MenuType<ChishiItemReconstructorMenu>>) (Object) RegistrarManager
+                .get(TemplateMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(TemplateMod.MOD_ID, "chishi_item_reconstructor"), () -> reconstructorType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(reconstructorType, ChishiItemReconstructorScreen::new));
 
         // ===== 无线赤能源 =====
         // 终端（外墙主方块）：15 数据槽（储能 long/成型/口统计/授权卡数/组件状态/终端ID），

@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "器官需要生命能量维持活性：每 tick 消耗 1 点。能量耗尽器官进入$(bold)休眠$()（界面警示，不影响存取），补充能量后恢复。$(br2)输入需匹配所属页，输出走暂存区供管道抽取。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_organ_vault"
     }
   ]
 }

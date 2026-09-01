@@ -77,6 +77,10 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<ChishiFuelMixerBlockEntity>> CHISHI_FUEL_MIXER;
     /** 生命活化器方块实体 */
     public static RegistrySupplier<BlockEntityType<ChishiLifeActivatorBlockEntity>> CHISHI_LIFE_ACTIVATOR;
+    /** 生命离心机方块实体 */
+    public static RegistrySupplier<BlockEntityType<ChishiLifeCentrifugeBlockEntity>> CHISHI_LIFE_CENTRIFUGE;
+    /** 物品重构仪方块实体 */
+    public static RegistrySupplier<BlockEntityType<ChishiItemReconstructorBlockEntity>> CHISHI_ITEM_RECONSTRUCTOR;
     /** 液体储罐方块实体类型（基础/高级/超级共用） */
     public static RegistrySupplier<BlockEntityType<ChishiFluidTankBlockEntity>> CHISHI_FLUID_TANK;
     /** 反应堆控制器方块实体类型（主方块，持有全部反应堆状态） */
@@ -245,6 +249,12 @@ public final class ModBlockEntities {
         // 生命活化器（生命能量无害化衰竭燃料）
         CHISHI_LIFE_ACTIVATOR = be("chishi_life_activator", ChishiLifeActivatorBlockEntity::new,
                 ModBlocks.CHISHI_LIFE_ACTIVATOR);
+        // 生命离心机（赤能源分离活化燃料为结晶产物）
+        CHISHI_LIFE_CENTRIFUGE = be("chishi_life_centrifuge", ChishiLifeCentrifugeBlockEntity::new,
+                ModBlocks.CHISHI_LIFE_CENTRIFUGE);
+        // 物品重构仪（以衰竭结晶为代价嬗变物品）
+        CHISHI_ITEM_RECONSTRUCTOR = be("chishi_item_reconstructor", ChishiItemReconstructorBlockEntity::new,
+                ModBlocks.CHISHI_ITEM_RECONSTRUCTOR);
         // 液体储罐（一个方块实体类型承载 基础/高级/超级 三个等级）
         CHISHI_FLUID_TANK = be("chishi_fluid_tank", ChishiFluidTankBlockEntity::new,
                 ModBlocks.CHISHI_FLUID_TANK_BASIC, ModBlocks.CHISHI_FLUID_TANK_ADVANCED,

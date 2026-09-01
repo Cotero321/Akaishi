@@ -62,6 +62,22 @@ public final class ModConfig {
     /** 每 tick 最大转化量（mb） */
     public static volatile long lifeActivatorConvertRate = 4L;
 
+    // ==================== 生命离心机 ====================
+    /** 离心机赤能源存储容量 */
+    public static volatile long lifeCentrifugeEnergyCapacity = 100_000L;
+    /** 输入罐（活化燃料）容量（mb） */
+    public static volatile long lifeCentrifugeInputCapacity = 64_000L;
+    /** 每 tick 最大分离量（mb） */
+    public static volatile long lifeCentrifugeConvertRate = 8L;
+    /** 每 1mb 活化燃料分离消耗的赤能源 */
+    public static volatile long lifeCentrifugeCostPerMb = 50L;
+
+    // ==================== 物品重构仪 ====================
+    /** 重构仪赤能源存储容量 */
+    public static volatile long reconstructorEnergyCapacity = 100_000L;
+    /** 每消耗 1 衰竭结晶重构消耗的赤能源 */
+    public static volatile long reconstructorCostPerCrystal = 50L;
+
     // ==================== 衰竭区域 ====================
     /** 衰竭区域持续时长（tick，默认 30 小时） */
     public static volatile long decayZoneDurationTicks = 30L * 60 * 60 * 20;

@@ -11,7 +11,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Binding ports:$() hold an authorized card and right-click an input/output port to bind it to the card's UUID; the port then checks the terminal by card every tick.$(br2)$(bold)Tier:$() only the Basic card exists for now. The tier sets the transfer rate; higher tiers will unlock stronger transfer in the future.$(br2)$(bold)Note:$() revoking a card or dismantling the terminal halts every port bound to it; re-authorizing restores them."
+      "text": "$(bold)Binding ports:$() hold an authorized card and right-click an input/output port to bind it to the card's UUID; the port then checks the terminal by card every tick.$(br2)$(bold)Upgrade:$() craft the card with the matching activated crystal in a crafting table to upgrade it (card ID is kept):$(li)Basic card + Activated Nether Compound Crystal → Intermediate (rate ×2)$(li)Intermediate card + Activated Pure Crystal → Advanced (rate ×4)$(li)Advanced card + Activated Ultimate Mixture Crystal → Ultimate (rate ×8)$(br2)$(bold)Note:$() revoking a card or dismantling the terminal halts every port bound to it; re-authorizing restores them. Ports snapshot the card ID, so re-bind after upgrading to enjoy the new rate."
     }
   ]
 }

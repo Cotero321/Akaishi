@@ -248,6 +248,14 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_LIFE_ACTIVATOR != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_ACTIVATOR.get()));
                                     }
+                                    // 生命离心机（分离活化燃料为结晶产物）
+                                    if (ModBlocks.CHISHI_LIFE_CENTRIFUGE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_CENTRIFUGE.get()));
+                                    }
+                                    // 物品重构仪（以衰竭结晶为代价嬗变物品）
+                                    if (ModBlocks.CHISHI_ITEM_RECONSTRUCTOR != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_RECONSTRUCTOR.get()));
+                                    }
                                     // 创造模式能量源（测试用，无限输出）
                                     if (ModBlocks.CHISHI_CREATIVE_ENERGY_CELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_ENERGY_CELL.get()));
@@ -328,6 +336,31 @@ public final class ModCreativeTabs {
                                     }
                                     if (ModBlocks.CHISHI_EXHAUSTED_BARREL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_EXHAUSTED_BARREL.get()));
+                                    }
+                                    // 离心结晶（衰竭燃料处理体系产物：通用副产物 + 7 种活化结晶）
+                                    if (ModItems.exhaustedCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.exhaustedCrystal.get()));
+                                    }
+                                    if (ModItems.activatedSculkCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedSculkCrystal.get()));
+                                    }
+                                    if (ModItems.activatedNetherCompoundCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedNetherCompoundCrystal.get()));
+                                    }
+                                    if (ModItems.activatedEndMixtureCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedEndMixtureCrystal.get()));
+                                    }
+                                    if (ModItems.activatedAdvancedMixtureCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedAdvancedMixtureCrystal.get()));
+                                    }
+                                    if (ModItems.activatedPureCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedPureCrystal.get()));
+                                    }
+                                    if (ModItems.activatedDragonCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedDragonCrystal.get()));
+                                    }
+                                    if (ModItems.activatedUltimateMixtureCrystal != null) {
+                                        output.accept(new ItemStack(ModItems.activatedUltimateMixtureCrystal.get()));
                                     }
                                     // 发生器矩阵体系（类反应堆式：外壳/控制器/能量输出口/燃料输入口）
                                     if (ModBlocks.CHISHI_GEN_MATRIX_CASING != null) {

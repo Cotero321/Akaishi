@@ -12,6 +12,10 @@
     {
       "type": "patchouli:text",
       "text": "$(bold)Permanent potions$() grant stable effects with no side effects. $(bold)Breakthrough potions$() multiply effects ×1.5 but amplify flaws and cause rejection-like side effects.$(br2)Side-effect strength scales with purity - $(2)low-purity samples hit harder$(). Effects differ per creature; collect many samples to find the best recipes."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "template_mod:chishi_potion_table"
     }
   ]
 }

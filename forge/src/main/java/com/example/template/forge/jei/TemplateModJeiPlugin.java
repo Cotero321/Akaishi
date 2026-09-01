@@ -34,7 +34,9 @@ public class TemplateModJeiPlugin implements IModPlugin {
                 // 燃料生产链：液化 → 加工 → 调和（燃料产生展示）
                 new LiquefactionRecipeCategory(helper),
                 new FuelProcessingRecipeCategory(helper),
-                new FuelMixingRecipeCategory(helper));
+                new FuelMixingRecipeCategory(helper),
+                // 物品重构：衰竭结晶为代价的嬗变配方
+                new ReconstructRecipeCategory(helper));
     }
 
     @Override
@@ -47,6 +49,8 @@ public class TemplateModJeiPlugin implements IModPlugin {
         registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll());
         registration.addRecipes(FuelProcessingRecipeCategory.TYPE, FuelProcessingRecipeCategory.FuelProcessingRecipe.getAll());
         registration.addRecipes(FuelMixingRecipeCategory.TYPE, FuelMixingRecipeCategory.FuelMixingRecipe.getAll());
+        // 物品重构配方（衰竭结晶嬗变）
+        registration.addRecipes(ReconstructRecipeCategory.TYPE, ReconstructRecipeCategory.ReconstructRecipe.getAll());
 
         // 催化器与收集器不是合成机器，用物品信息说明其功能与等级数值
         addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_BASIC.get(), "jei.template_mod.catalyst_basic");

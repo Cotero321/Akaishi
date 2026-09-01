@@ -11,7 +11,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Four tiers of pipes, higher tiers transfer more items per tick:$(li)$(bold)Basic$(): 1 item/tick$(li)$(bold)Advanced$(): 4 items/tick$(li)$(bold)Elite$(): 16 items/tick$(li)$(bold)Ultimate$(): 64 items/tick$(br2)Network throughput equals the sum of all pipe rates, scheduled by the representative node (the pipe with the smallest coordinates)."
+      "text": "Four tiers of pipes, higher tiers transfer more items per tick:$(li)$(bold)Basic$(): 1 item/tick$(li)$(bold)Intermediate$(): 4 items/tick$(li)$(bold)Advanced$(): 16 items/tick$(li)$(bold)Ultimate$(): 64 items/tick$(br2)Network throughput equals the sum of all pipe rates, scheduled by the representative node (the pipe with the smallest coordinates)."
     },
     {
       "type": "patchouli:crafting",
@@ -22,7 +22,7 @@
       "type": "patchouli:crafting",
       "recipe": "template_mod:chishi_item_pipe_advanced",
       "recipe2": "template_mod:chishi_item_pipe_elite",
-      "text": "Advanced / Elite pipes are upgraded from lower tiers; the Ultimate pipe also needs Condensed Chishi Essence Blocks."
+      "text": "Intermediate / Advanced pipes are upgraded from lower tiers; the Ultimate pipe also needs Condensed Chishi Essence Blocks."
     },
     {
       "type": "patchouli:crafting",

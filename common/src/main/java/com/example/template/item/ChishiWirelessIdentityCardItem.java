@@ -1,6 +1,7 @@
 package com.example.template.item;
 
 import com.example.template.config.ModConfig;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,6 +36,28 @@ public class ChishiWirelessIdentityCardItem extends Item {
 
     public ChishiWirelessIdentityCardItem(Properties properties) {
         super(properties);
+    }
+
+    /**
+     * 升级需求：所需活化结晶（惰性 Supplier，避免类初始化时解析注册表——
+     * 结晶在 ModItems 中晚于身份卡注册，静态立即 .get() 会命中未注册条目）→ 升级后的等级。
+     */
+    public record UpgradeRequirement(RegistrySupplier<Item> crystal, IdentityCardTier nextTier) {
+    }
+
+    /**
+     * 等级升级链（活化结晶为升级材料，合成保留卡 UUID）：
+     * 基础 → 中级（活化下界复合结晶）→ 高级（活化至纯结晶）→ 超级（活化终极混合结晶）。
+     */
+    private static final Map<IdentityCardTier, UpgradeRequirement> UPGRADES = Map.of(
+            IdentityCardTier.BASIC, new UpgradeRequirement(ModItems.activatedNetherCompoundCrystal, IdentityCardTier.ADVANCED),
+            IdentityCardTier.ADVANCED, new UpgradeRequirement(ModItems.activatedPureCrystal, IdentityCardTier.ELITE),
+            IdentityCardTier.ELITE, new UpgradeRequirement(ModItems.activatedUltimateMixtureCrystal, IdentityCardTier.ULTIMATE)
+    );
+
+    /** 下一级升级需求；已达最高级返回 null（工作台合成配方按此动态匹配） */
+    public static UpgradeRequirement nextUpgrade(IdentityCardTier tier) {
+        return UPGRADES.get(tier);
     }
 
     /**
@@ -75,27 +99,37 @@ public class ChishiWirelessIdentityCardItem extends Item {
         return u == null ? "----" : u.toString().substring(0, 8).toUpperCase();
     }
 
-    /** 右键激活卡片并显示身份信息（仅服务端广播） */
+    /**
+     * 右键交互（仅服务端）：显示当前身份信息（卡号/等级/速率）。
+     * 卡升级走工作台合成（{@link com.example.template.recipe.IdentityCardUpgradeRecipe}），保留卡号 NBT。
+     */
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide) {
             ItemStack stack = player.getItemInHand(hand);
+            IdentityCardTier tier = tierOf(stack);
             player.displayClientMessage(Component.translatable("message.template_mod.identity_card.activated",
                     shortId(stack),
-                    Component.translatable("tier.template_mod." + tierOf(stack).name().toLowerCase()),
-                    ModConfig.wirelessPortTransferRate * tierOf(stack).rateMultiplier()), false);
+                    Component.translatable("tier.template_mod." + tier.name().toLowerCase()),
+                    ModConfig.wirelessPortTransferRate * tier.rateMultiplier()), false);
         }
         return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        // 短悬浮：卡号（编号）高亮 + 等级 + 速率，避免长文案撑大悬浮框
+        // 短悬浮：卡号（编号）高亮 + 等级 + 速率 + 下一级升级需求，避免长文案撑大悬浮框
+        IdentityCardTier tier = tierOf(stack);
         tooltip.add(Component.translatable("item.template_mod.chishi_wireless_identity_card.id",
                 shortId(stack)));
         tooltip.add(Component.translatable("item.template_mod.chishi_wireless_identity_card.tier",
-                Component.translatable("tier.template_mod." + tierOf(stack).name().toLowerCase())));
+                Component.translatable("tier.template_mod." + tier.name().toLowerCase())));
         tooltip.add(Component.translatable("item.template_mod.chishi_wireless_identity_card.rate",
-                ModConfig.wirelessPortTransferRate * tierOf(stack).rateMultiplier()));
+                ModConfig.wirelessPortTransferRate * tier.rateMultiplier()));
+        UpgradeRequirement next = nextUpgrade(tier);
+        if (next != null) {
+            tooltip.add(Component.translatable("item.template_mod.chishi_wireless_identity_card.next",
+                    next.crystal().get().getDescription()));
+        }
     }
 }

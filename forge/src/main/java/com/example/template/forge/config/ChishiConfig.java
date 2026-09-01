@@ -41,6 +41,12 @@ public final class ChishiConfig {
     public static final ForgeConfigSpec.LongValue LIFE_ACTIVATOR_INPUT_CAPACITY;
     public static final ForgeConfigSpec.LongValue LIFE_ACTIVATOR_OUTPUT_CAPACITY;
     public static final ForgeConfigSpec.LongValue LIFE_ACTIVATOR_CONVERT_RATE;
+    public static final ForgeConfigSpec.LongValue LIFE_CENTRIFUGE_ENERGY_CAPACITY;
+    public static final ForgeConfigSpec.LongValue LIFE_CENTRIFUGE_INPUT_CAPACITY;
+    public static final ForgeConfigSpec.LongValue LIFE_CENTRIFUGE_CONVERT_RATE;
+    public static final ForgeConfigSpec.LongValue LIFE_CENTRIFUGE_COST_PER_MB;
+    public static final ForgeConfigSpec.LongValue RECONSTRUCTOR_ENERGY_CAPACITY;
+    public static final ForgeConfigSpec.LongValue RECONSTRUCTOR_COST_PER_CRYSTAL;
 
     // ==================== 衰竭区域 ====================
     public static final ForgeConfigSpec.LongValue DECAY_ZONE_DURATION_TICKS;
@@ -111,6 +117,24 @@ public final class ChishiConfig {
                 .defineInRange("outputCapacity", 16_000L, 1L, Long.MAX_VALUE);
         LIFE_ACTIVATOR_CONVERT_RATE = b.comment("Max conversion per tick (mb)")
                 .defineInRange("convertRate", 4L, 1L, Long.MAX_VALUE);
+        b.pop();
+
+        b.push("life_centrifuge");
+        LIFE_CENTRIFUGE_ENERGY_CAPACITY = b.comment("Chishi energy storage capacity")
+                .defineInRange("energyCapacity", 100_000L, 1L, Long.MAX_VALUE);
+        LIFE_CENTRIFUGE_INPUT_CAPACITY = b.comment("Input tank (activated liquid) capacity (mb)")
+                .defineInRange("inputCapacity", 64_000L, 1L, Long.MAX_VALUE);
+        LIFE_CENTRIFUGE_CONVERT_RATE = b.comment("Max separation per tick (mb)")
+                .defineInRange("convertRate", 8L, 1L, Long.MAX_VALUE);
+        LIFE_CENTRIFUGE_COST_PER_MB = b.comment("Chishi energy consumed per mb separated")
+                .defineInRange("costPerMb", 50L, 1L, Long.MAX_VALUE);
+        b.pop();
+
+        b.push("item_reconstructor");
+        RECONSTRUCTOR_ENERGY_CAPACITY = b.comment("Chishi energy storage capacity")
+                .defineInRange("energyCapacity", 100_000L, 1L, Long.MAX_VALUE);
+        RECONSTRUCTOR_COST_PER_CRYSTAL = b.comment("Chishi energy consumed per exhausted crystal")
+                .defineInRange("costPerCrystal", 50L, 1L, Long.MAX_VALUE);
         b.pop();
 
         b.push("decay_zone");
