@@ -39,9 +39,10 @@ public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽上方避开能量条）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 116, 17));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 134, 17));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）。
+        // 置于输入槽(56,17)正下方空地，避开右下成型状态文字区与输出槽(116,35)
+        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 56, 53));
+        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 74, 53));
 
         // 输入槽：仅接受提纯原料（粗制赤石块 / 赤石水晶块）
         addSlot(new Slot(container, AkaishiPurifierMatrixControllerBlockEntity.INPUT_SLOT, 56, 17) {

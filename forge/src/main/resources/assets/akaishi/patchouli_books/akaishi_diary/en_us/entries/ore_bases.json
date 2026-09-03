@@ -1,0 +1,12 @@
+{
+  "name": "Ore Bases",
+  "icon": "akaishi:akaishi_ore_base",
+  "category": "akaishi:machines",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Transformer products — one base per mineral, the \"mineral ID card\":$(li)Coal / Iron / Copper Ore Bases$(li)Gold / Redstone / Lapis Ore Bases$(li)Diamond / Emerald Ore Bases$(li)Nether Quartz / Ancient Debris / Akaishi Ore Bases$(br2)These bases are the core materials for Catalyst tiers — without them, your crystal line stays stuck in the stone age."
+    }
+  ]
+}

@@ -46,6 +46,8 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
     protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
+        // 不透明背景面板（修复此前透明背景）
+        GuiWidgets.panel(gui, x, y, this.imageWidth, this.imageHeight);
         // 产物暂存 3×2
         int[] cols = {26, 44, 62};
         int[] rows = {40, 58};
@@ -54,6 +56,8 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
                 GuiWidgets.slotBox(gui, x + c, y + r);
             }
         }
+        // 玩家背包 + 快捷栏槽框
+        GuiWidgets.playerInventory(gui, x, y);
         // 能量条
         GuiWidgets.track(gui, x + 20, y + 22, 136, BAR_H);
         long max = Math.max(1, menu.getCapacity());
@@ -87,6 +91,8 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
         } else {
             gui.drawString(this.font, Component.translatable("gui.akaishi.miner.not_formed"), 26, 108, RED, false);
         }
+        // 玩家背包标题
+        gui.drawString(this.font, Component.translatable("container.inventory"), 8, 116, TEXT, false);
     }
 
     @Override

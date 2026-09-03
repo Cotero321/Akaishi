@@ -1,0 +1,18 @@
+{
+  "name": "赤能源管道",
+  "icon": "akaishi:akaishi_energy_pipe_ultimate",
+  "category": "akaishi:energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_pipe",
+      "text": "赤能源管道，电网的血管，共 4 级：基础、中级、高级、超级，传输速率一级比一级猛。$(br)想造大机器？先把管道铺明白，否则电堵在路上比堵车还气人。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_debug_tool",
+      "text": "赤能源配置器，管道的「遥控器」：$(li)右键管道：切换推/拉模式$(li)Shift 右键：断开/恢复单侧连接$(br2)接错方向？别慌，掏出它，一键救场。"
+    }
+  ]
+}

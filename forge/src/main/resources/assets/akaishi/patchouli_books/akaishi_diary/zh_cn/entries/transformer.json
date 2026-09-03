@@ -1,0 +1,18 @@
+{
+  "name": "赤石变化器",
+  "icon": "akaishi:akaishi_transformer",
+  "category": "akaishi:machines",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_transformer",
+      "text": "赤石变化器，一台「指鹿为马」的机器：$(li)$(2,4)青金石粉 → 冷却基底$(0)$(li)矿物（锭/块）→ 对应矿石基底$(br2)把普通矿物改头换面成进阶原料，催化剂和聚变散热片都得靠它铺路。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:cooling_base",
+      "text": "冷却基底是散热体系的起点：跟粉末逐级合成，一路从铁粉堆到下界合金锭的多级散热片。$(br)温度再高，散热片都得从这里起家。"
+    }
+  ]
+}

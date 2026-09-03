@@ -1,0 +1,28 @@
+{
+  "name": "样本与基因",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:life_organs",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_collector",
+      "text": "样本采集器：右键生物抽生命样本。$(li)右键生命能量方块/管道充能$(li)生物越虚弱成功率越高（半血 +10%、四分之一血 +10%，封顶 95%）$(li)纯度 60% 概率 0-49、25% 概率 50-74、15% 概率 75-100$(br2)简言之：先把怪揍到残血，再上去「抽血」。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "生物分组",
+      "text": "样本按基因强度分 7 组：$(li)温血（家畜/水生动物）→ I 品$(li)亡灵（僵尸/骷髅等）→ II 品$(li)爆炸（苦力怕）→ II 品$(li)异变体（蜘蛛/史莱姆/烈焰人/守卫者/铁傀儡/悦灵）→ II 品$(li)末影（末影人/潜影贝/末影螨）→ III 品$(li)首领（凋灵）→ IV 品$(li)龙（末影龙）→ IV 品$(br2)组别越强：基础纯度越高、采集成功率越低、移植适配越难、排斥增长越快——越强的怪，越难「薅」。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_analyzer",
+      "text": "生命分析台：把纯度 ≥25 的样本解构为基因序列。$(br)耗 5000 生命能量、5 秒；成功率随纯度浮动（25→70%、100→95%），失败样本直接报废。$(br)纯度太低别硬上，白给。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_sequence",
+      "text": "基因序列片段保留样本纯度，之后在生命结构台里构造为完整器官。$(br)纯度决定序列纯度 → 器官完整度 → 排斥修正，整条链路一环扣一环。纯度，就是生命的「含金量」。"
+    }
+  ]
+}

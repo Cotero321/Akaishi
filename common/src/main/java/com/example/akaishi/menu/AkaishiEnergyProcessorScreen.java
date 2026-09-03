@@ -55,17 +55,20 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
         return String.format(Locale.ROOT, "%.1f", d);
     }
 
-    /** 条内左侧固定标签区宽度（px），填充从标签区右端开始避免覆盖文字 */
-    private static final int LABEL_W = 40;
+    /** 条内左侧固定标签区宽度（px），标签置于轨道左侧，填充从轨道右端开始避免覆盖文字 */
+    private static final int LABEL_W = 46;
 
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
-        GuiWidgets.track(gui, x, y, BAR_W, BAR_H);
+        // 标签置于轨道左侧（x+2 起），轨道整体右移，文字不再压在进度条上
         gui.drawString(this.font, Component.translatable(labelKey), x + 2, y + 1, 0xFF3F3F3F, false);
+        int trackX = x + LABEL_W;
+        int trackW = BAR_W - LABEL_W;
+        GuiWidgets.track(gui, trackX, y, trackW, BAR_H);
         long clamped = Math.max(0, Math.min(energy, max));
         long cap = Math.max(1, max);
-        int barWidth = (int) ((BAR_W - LABEL_W) * clamped / cap);
+        int barWidth = (int) (trackW * clamped / cap);
         if (barWidth > 0) {
-            gui.fill(x + LABEL_W, y, x + LABEL_W + barWidth, y + BAR_H, color);
+            gui.fill(trackX, y, trackX + barWidth, y + BAR_H, color);
         }
     }
 
@@ -99,10 +102,10 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
         // 复合燃料输出条（橙）
         drawBar(gui, x + CHISHI_BAR_X, y + COMPOUND_OUT_BAR_Y, "gui.akaishi.proc.compound_out",
                 menu.getCompoundOutAmount(), menu.getCompoundOutMax(), ModFluids.COLOR_NETHER_COMPOUND_FUEL);
-        // 加工进度条（亮黄，标签区固定，填充从标签区右端开始）
-        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + PROGRESS_Y, BAR_W, BAR_H);
+        // 加工进度条（亮黄，标签置于轨道左侧，填充从轨道右端开始）
         gui.drawString(this.font, Component.translatable("gui.akaishi.proc.progress"),
                 x + CHISHI_BAR_X + 2, y + PROGRESS_Y + 1, 0xFF3F3F3F, false);
+        GuiWidgets.track(gui, x + CHISHI_BAR_X + LABEL_W, y + PROGRESS_Y, BAR_W - LABEL_W, BAR_H);
         int progressWidth = (int) ((BAR_W - LABEL_W) * menu.getProgress() / 100.0F);
         if (progressWidth > 0) {
             gui.fill(x + CHISHI_BAR_X + LABEL_W, y + PROGRESS_Y,

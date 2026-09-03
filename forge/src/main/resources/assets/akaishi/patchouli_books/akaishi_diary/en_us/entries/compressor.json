@@ -1,0 +1,13 @@
+{
+  "name": "Compressor",
+  "icon": "akaishi:akaishi_compressor",
+  "category": "akaishi:machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_compressor",
+      "text": "The Compressor, the \"reforge\" machine for dust:$(li)Various dusts → matching blocks$(li)Akaishi Essence → Concentrated Essence$(br2)One slot in, one slot out, power it and go. Loose powder in, solid blocks out."
+    }
+  ]
+}

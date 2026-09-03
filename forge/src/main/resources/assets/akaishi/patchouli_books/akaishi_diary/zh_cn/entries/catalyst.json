@@ -1,0 +1,18 @@
+{
+  "name": "赤石催化器",
+  "icon": "akaishi:akaishi_catalyst_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_catalyst_basic",
+      "text": "赤石催化器，赤石晶自动化的「播种机」：烧赤能源，催生范围内水晶母岩长赤石水晶簇。$(li)基础：3×3×3，成功率 20%，5 能/t$(li)中级：5×5×5，成功率 30%，25 能/t$(li)高级：9×9×9，成功率 40%，125 能/t$(li)超级：16×16×16，成功率 50%，625 能/t$(br2)越大越猛，电费也越大，量力而行。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_geode_pristine",
+      "text": "水晶母岩分 4 档：瑕疵/普通/完好/完美，是水晶簇的温床。$(br)催化器负责「种」，收集器负责「收」，你负责躺平数晶。"
+    }
+  ]
+}

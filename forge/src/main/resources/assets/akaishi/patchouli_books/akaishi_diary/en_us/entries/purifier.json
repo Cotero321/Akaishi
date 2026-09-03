@@ -1,0 +1,18 @@
+{
+  "name": "Akaishi Purifier",
+  "icon": "akaishi:akaishi_purifier",
+  "category": "akaishi:intro",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier",
+      "text": "The Akaishi Purifier, the \"juicer\" that squeezes rough akaishi blocks into akaishi essence.$(br)It's the very first consumer of energy — feed it a block, power it up, and essence rolls into the output slot. Your first power-hungry machine starts right here."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_advanced_purifier",
+      "text": "The Advanced Purifier block is a wall block of the Purifier Matrix.$(br)Enclose a 3×3×3 space with matrix casings, add a controller and ports, and purifying speed jumps 30×. The full matrix recipe is in the \"Advanced Tech\" chapter."
+    }
+  ]
+}

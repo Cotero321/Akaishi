@@ -1,0 +1,23 @@
+{
+  "name": "Miner Upgrades",
+  "icon": "akaishi:akaishi_miner_speed_upgrade_block",
+  "category": "akaishi:miner",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_speed_upgrade_block",
+      "text": "Speed Upgrade Module: mining efficiency takes off — and so does the power bill.$(br)Each block adds +12.5% rate and +10% energy cost, $(2,4)up to 10 blocks$(0). Right-click to install onto the structure's upgrade-frame slots; it runs like a cheat code."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_fortune_upgrade_block",
+      "text": "Fortune Upgrade Module: makes your mineral yield fatter.$(br)Each block adds +1 to a single drop, $(2,4)up to 4 blocks$(0). Once installed, every swing is \"the joy of harvest\"."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_storage_upgrade_block",
+      "text": "Storage Upgrade Module: expands the miner's \"belly\".$(br)Each block adds +50% energy capacity, $(2,4)up to 10 blocks$(0).$(br2)Modules can be swapped or removed right on the upgrade-frame slots; the controller re-sums every 20 ticks. Add them anytime — the miner never sleeps."
+    }
+  ]
+}

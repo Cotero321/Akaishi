@@ -13,7 +13,9 @@ public enum OrganSpecial {
     /** 凋灵核心（满级）：攻击时发射凋零骷髅头弹射物（不破坏方块，伤害较低） */
     WITHER_SKULL("wither_skull"),
     /** 龙之心（满级）：攻击时喷吐龙息弹射物（伤害较低） */
-    DRAGON_BREATH("dragon_breath");
+    DRAGON_BREATH("dragon_breath"),
+    /** 监守者核心（满级）：攻击时沿视线释放直线穿透音爆（无视护甲） */
+    SONIC_BOOM("sonic_boom");
 
     private final String id;
 

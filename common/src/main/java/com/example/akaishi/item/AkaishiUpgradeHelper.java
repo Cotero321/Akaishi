@@ -159,11 +159,12 @@ public final class AkaishiUpgradeHelper {
         return stack.getTagElement(TAG) != null;
     }
 
-    /** 物品是否为赤石装备（护甲/剑/工具） */
+    /** 物品是否为赤石装备（护甲/剑/工具，含生命融合护甲） */
     public static boolean isAkaishiEquipment(ItemStack stack) {
         return stack.getItem() instanceof AkaishiArmorItem || stack.getItem() instanceof AkaishiSwordItem
                 || stack.getItem() instanceof AkaishiShovelItem || stack.getItem() instanceof AkaishiAxeItem
-                || stack.getItem() instanceof AkaishiPickaxeItem;
+                || stack.getItem() instanceof AkaishiPickaxeItem
+                || stack.getItem() instanceof AkaishiLifeFusionArmorItem;
     }
 
     /** 是否支持效率升级的挖掘类工具（铲/斧/镐） */

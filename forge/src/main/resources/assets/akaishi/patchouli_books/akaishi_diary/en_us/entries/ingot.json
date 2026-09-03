@@ -1,0 +1,13 @@
+{
+  "name": "Akaishi Ingot",
+  "icon": "akaishi:akaishi_ingot",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ingot",
+      "text": "The Akaishi Ingot: the \"hard currency\" of akaishi tech.$(br)Toss a Netherite Ingot into the Energy Aggregator, pour in 10M energy, and out pops a shiny Akaishi Ingot.$(br)Every piece of akaishi gear, the upgrade templates, and a whole pile of advanced machines are built on this thing."
+    }
+  ]
+}

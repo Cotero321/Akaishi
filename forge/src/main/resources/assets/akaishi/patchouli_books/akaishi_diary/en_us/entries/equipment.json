@@ -1,0 +1,23 @@
+{
+  "name": "Equipment",
+  "icon": "akaishi:akaishi_sword",
+  "category": "akaishi:advanced",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sword",
+      "text": "The full akaishi gear set: helmet / chestplate / leggings / boots / sword / pickaxe / shovel / axe.$(br)Forged from Akaishi Ingots with solid base stats. Heads up: this set has already $(2,4)lost its crafting-table recipes$(0) — stop staring at a table full of materials, their front door is the Forger below."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_equipment_forger",
+      "text": "The Equipment Forger: spend energy and upgrade points (forging grants 4 points, 10M energy each) to assign base stats to gear — attack speed / damage / efficiency / health / armor / toughness.$(br)Want to be a hexagon warrior? Start assigning your talents here."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_upgrade_station",
+      "text": "The Upgrade Station: spend 1 upgrade slot, 1 Upgrade Template, and 20M energy to raise a chosen special ability (lifesteal, knockback, haste, fire protection, blast protection, fall protection, etc.) by 1 level.$(br)General abilities cap at level 3; body-part-specific abilities only go to level 1 — don't bite off more than you can chew."
+    }
+  ]
+}

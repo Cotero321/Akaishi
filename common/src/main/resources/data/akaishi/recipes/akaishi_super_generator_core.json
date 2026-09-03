@@ -1,14 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "DGD",
-    "GEG",
-    "DGD"
+    "AAA",
+    "AEA",
+    "AAA"
   ],
   "key": {
-    "D": { "item": "akaishi:diamond_dust" },
-    "E": { "item": "akaishi:akaishi_energy_assembly" },
-    "G": { "item": "akaishi:netherite_dust" }
+    "A": { "item": "akaishi:akaishi_advanced_component" },
+    "E": { "item": "akaishi:akaishi_energy_assembly" }
   },
   "result": { "item": "akaishi:akaishi_super_generator_core", "count": 1 }
 }

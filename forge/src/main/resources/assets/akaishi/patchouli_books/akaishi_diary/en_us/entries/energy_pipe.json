@@ -1,0 +1,18 @@
+{
+  "name": "Energy Pipes",
+  "icon": "akaishi:akaishi_energy_pipe_ultimate",
+  "category": "akaishi:energy",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_pipe",
+      "text": "Energy pipes, the veins of your grid, come in 4 tiers: basic, intermediate, advanced, ultimate — transfer rates climb tier by tier.$(br)Building something big? Route your pipes right first, or the power will jam up worse than rush-hour traffic."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_debug_tool",
+      "text": "The Configurator is your pipe remote control:$(li)Right-click a pipe: toggle push/pull mode$(li)Sneak + right-click: break/restore one side of the connection$(br2)Wired it backwards? Don't panic, whip this out and save the day."
+    }
+  ]
+}

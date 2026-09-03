@@ -6,15 +6,16 @@ import java.util.Map;
 
 /**
  * 药剂模板注册表（初始两种模板）：
- * - 永久药剂：饮用后已移植非原生器官适配度永久 +15，无副作用（无风险）
- * - 突破药剂：饮用后已移植非原生器官效果 ×1.5，同时放大缺点——排斥 + 随机 debuff（有风险）
+ * - 永久药剂：将该生物基因型吸收进身体 → 该来源所有器官有效适配 +2~10（纯度五档），无副作用
+ * - 突破药剂：对已吸收基因型发动 30 分钟临时激活——基础数值 +10~40%（纯度四档）+ 额外适配 +2~+8，
+ *   负基础值词条期内失效；同一时间最多 1 种，到期/卸载后可再次激活
  * 模板以 id 索引，药剂台界面与服务端按 id 查询。
  */
 public final class PotionRegistry {
 
-    /** 永久药剂：提升适配度（无风险） */
+    /** 永久药剂：吸收基因型提升适配度（无风险） */
     public static final String PERMANENT_ID = "permanent";
-    /** 突破药剂：效果增强 + 随机副作用（有风险） */
+    /** 突破药剂：临时激活基因强化（同一时间最多 1 种） */
     public static final String BREAKTHROUGH_ID = "breakthrough";
 
     private static final Map<String, PotionTemplate> TEMPLATES = new LinkedHashMap<>();

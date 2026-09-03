@@ -51,6 +51,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiEquipmentForgerBlockEntity>> CHISHI_EQUIPMENT_FORGER;
     /** 赤红升级台方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiUpgradeStationBlockEntity>> CHISHI_UPGRADE_STATION;
+    /** 生命的融合砧方块实体类型（赤石护甲 + 融合锭 → 生命融合护甲） */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeFusionAnvilBlockEntity>> CHISHI_LIFE_FUSION_ANVIL;
     /** 创造模式能量源（赤/生命两种方块共用，无限输出） */
     public static RegistrySupplier<BlockEntityType<CreativeEnergySourceBlockEntity>> CREATIVE_ENERGY_SOURCE;
     /** 赤石催化器方块实体类型（4 级共用，等级由方块决定） */
@@ -119,12 +121,18 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiExhaustedBarrelBlockEntity>> CHISHI_EXHAUSTED_BARREL;
     /** 躯体检查仪方块实体类型（无 tick 纯展示） */
     public static RegistrySupplier<BlockEntityType<AkaishiBodyScannerBlockEntity>> CHISHI_BODY_SCANNER;
+    /** 基因管理器方块实体类型（无 tick 纯管理面板） */
+    public static RegistrySupplier<BlockEntityType<AkaishiGeneManagerBlockEntity>> CHISHI_GENE_MANAGER;
     /** 生命分析台方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiGeneAnalyzerBlockEntity>> CHISHI_GENE_ANALYZER;
     /** 部件培养舱方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiCultivatorBlockEntity>> CHISHI_CULTIVATOR;
     /** 生命结构台方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiLifeStructBlockEntity>> CHISHI_LIFE_STRUCT;
+    /** 生命培育器方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeBreederBlockEntity>> CHISHI_LIFE_BREEDER;
+    /** 词条重铸仪方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiTraitReforgerBlockEntity>> CHISHI_TRAIT_REFORGER;
     /** 手术仓方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiSurgeryBlockEntity>> CHISHI_SURGERY;
     /** 药剂台方块实体类型 */
@@ -137,6 +145,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiSampleVaultBlockEntity>> CHISHI_SAMPLE_VAULT;
     /** 衰变净化塔方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiDecayPurifierBlockEntity>> CHISHI_DECAY_PURIFIER;
+    /** 母神祭坛（无 GUI 供奉位，NBT 识别 + 供奉物悬浮展示） */
+    public static RegistrySupplier<BlockEntityType<AkaishiMotherAltarBlockEntity>> CHISHI_MOTHER_ALTAR;
     /** 发生器矩阵控制器方块实体类型（低级/高级共用，等级由方块决定） */
     public static RegistrySupplier<BlockEntityType<AkaishiGenMatrixControllerBlockEntity>> CHISHI_GEN_MATRIX_CONTROLLER;
     /** 发生器矩阵能量输出口方块实体类型 */
@@ -241,6 +251,9 @@ public final class ModBlockEntities {
         // 赤红升级台
         CHISHI_UPGRADE_STATION = be("akaishi_upgrade_station", AkaishiUpgradeStationBlockEntity::new,
                 ModBlocks.CHISHI_UPGRADE_STATION);
+        // 生命的融合砧（赤石护甲 + 融合锭 → 生命融合护甲）
+        CHISHI_LIFE_FUSION_ANVIL = be("akaishi_life_fusion_anvil", AkaishiLifeFusionAnvilBlockEntity::new,
+                ModBlocks.CHISHI_LIFE_FUSION_ANVIL);
         // 创造模式能量源（赤能源 / 生命能量两种方块共用，无限输出测试）
         CREATIVE_ENERGY_SOURCE = be("creative_energy_source", CreativeEnergySourceBlockEntity::new,
                 ModBlocks.CHISHI_CREATIVE_ENERGY_CELL, ModBlocks.CHISHI_CREATIVE_LIFE_CELL);
@@ -349,6 +362,9 @@ public final class ModBlockEntities {
         // 躯体检查仪（纯展示，无 tick）
         CHISHI_BODY_SCANNER = be("akaishi_body_scanner", AkaishiBodyScannerBlockEntity::new,
                 ModBlocks.CHISHI_BODY_SCANNER);
+        // 基因管理器（已吸收基因强化管理，无 tick）
+        CHISHI_GENE_MANAGER = be("akaishi_gene_manager", AkaishiGeneManagerBlockEntity::new,
+                ModBlocks.CHISHI_GENE_MANAGER);
         // 生命分析台（纯度 100 样本解构）
         CHISHI_GENE_ANALYZER = be("akaishi_gene_analyzer", AkaishiGeneAnalyzerBlockEntity::new,
                 ModBlocks.CHISHI_GENE_ANALYZER);
@@ -358,6 +374,12 @@ public final class ModBlockEntities {
         // 生命结构台（基因序列 → 器官）
         CHISHI_LIFE_STRUCT = be("akaishi_life_struct", AkaishiLifeStructBlockEntity::new,
                 ModBlocks.CHISHI_LIFE_STRUCT);
+        // 生命培育器（器官 + 同源序列 + 衰竭结晶 → 突变器官）
+        CHISHI_LIFE_BREEDER = be("akaishi_life_breeder", AkaishiLifeBreederBlockEntity::new,
+                ModBlocks.CHISHI_LIFE_BREEDER);
+        // 词条重铸仪（器官 + 衰竭结晶 → 原位替换指定突变词条）
+        CHISHI_TRAIT_REFORGER = be("akaishi_trait_reforger", AkaishiTraitReforgerBlockEntity::new,
+                ModBlocks.CHISHI_TRAIT_REFORGER);
         // 手术仓（器官移植/摘除）
         CHISHI_SURGERY = be("akaishi_surgery", AkaishiSurgeryBlockEntity::new, ModBlocks.CHISHI_SURGERY);
         // 药剂台（永久/突破药剂制作）
@@ -375,6 +397,9 @@ public final class ModBlockEntities {
         // 衰变净化塔（消耗赤能源净化衰竭区域）
         CHISHI_DECAY_PURIFIER = be("akaishi_decay_purifier", AkaishiDecayPurifierBlockEntity::new,
                 ModBlocks.CHISHI_DECAY_PURIFIER);
+        // 母神祭坛（黑山羊之母：NBT 识别供奉 + 供奉物悬浮展示）
+        CHISHI_MOTHER_ALTAR = be("akaishi_mother_altar", AkaishiMotherAltarBlockEntity::new,
+                ModBlocks.CHISHI_MOTHER_ALTAR);
         // ===== 发生器矩阵 =====
         // 控制器（低级/高级两个方块共用一个方块实体类型，等级由方块实例决定）
         CHISHI_GEN_MATRIX_CONTROLLER = be("akaishi_gen_matrix_controller", AkaishiGenMatrixControllerBlockEntity::new,

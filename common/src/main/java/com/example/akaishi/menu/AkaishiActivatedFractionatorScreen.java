@@ -22,13 +22,13 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_wireless_terminal.png");
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    private static final int ENERGY_Y = 22;
-    private static final int SLOT_Y = 40;
-    private static final int PROGRESS_Y = 60;
-    private static final int LABEL_Y = 32;
+    private static final int ENERGY_Y = 26;
+    private static final int SLOT_Y = 52;
+    private static final int PROGRESS_Y = 88;
+    private static final int LABEL_Y = 44;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输入/输出槽行右侧） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 40;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 40;
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 52;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 52;
 
     public AkaishiActivatedFractionatorScreen(AkaishiActivatedFractionatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);

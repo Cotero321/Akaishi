@@ -12,8 +12,10 @@ import com.example.akaishi.item.curio.AkaishiWitherCharm;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.potion.AkaishiPotionItem;
+import com.example.akaishi.life.potion.AkaishiRejectionSerumItem;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.life.sample.AkaishiSampleCollectorItem;
+import com.example.akaishi.life.sample.AkaishiLifeEmbryoItem;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -139,10 +141,21 @@ public final class ModItems {
     public static final String LIFE_SAMPLE_ID = "akaishi_life_sample";
     /** 基因序列片段：纯度 100 样本在分析台解构的产物，生命结构台原料 */
     public static final String GENE_SEQUENCE_ID = "akaishi_gene_sequence";
+    /** 生命胚胎：八份生命固态 + 一枚鸡蛋 */
+    public static final String LIFE_EMBRYO_ID = "akaishi_life_embryo";
+    /** 生命的融合锭：母神祭坛仪式的产物 */
+    public static final String LIFE_FUSION_INGOT_ID = "akaishi_life_fusion_ingot";
+    /** 生命融合护甲（4 件）：赤石护甲 2 倍基础数值，保留升级数据，穿齐触发套装效果 */
+    public static final String LIFE_FUSION_HELMET_ID = "akaishi_life_fusion_helmet";
+    public static final String LIFE_FUSION_CHESTPLATE_ID = "akaishi_life_fusion_chestplate";
+    public static final String LIFE_FUSION_LEGGINGS_ID = "akaishi_life_fusion_leggings";
+    public static final String LIFE_FUSION_BOOTS_ID = "akaishi_life_fusion_boots";
     /** 器官物品 ID（9 槽位各一），基因来源/品质存 NBT */
     public static final String ORGAN_EYE_ID = "akaishi_organ_eye";
     /** 药剂（单物品承载永久/突破模板，模板 id 与纯度写 NBT） */
     public static final String POTION_ID = "akaishi_potion";
+    /** 排异中和剂：消耗品，减轻已移植非原生器官的排斥 */
+    public static final String REJECTION_SERUM_ID = "akaishi_rejection_serum";
     public static final String ORGAN_HEART_ID = "akaishi_organ_heart";
     public static final String ORGAN_LUNGS_ID = "akaishi_organ_lungs";
     public static final String ORGAN_VISCERA_ID = "akaishi_organ_viscera";
@@ -239,8 +252,19 @@ public final class ModItems {
     public static RegistrySupplier<Item> lifeSample;
     /** 基因序列片段 */
     public static RegistrySupplier<Item> geneSequence;
+    /** 生命胚胎 */
+    public static RegistrySupplier<Item> lifeEmbryo;
+    /** 生命的融合锭 */
+    public static RegistrySupplier<Item> lifeFusionIngot;
+    /** 生命融合护甲（4 件） */
+    public static RegistrySupplier<Item> lifeFusionHelmet;
+    public static RegistrySupplier<Item> lifeFusionChestplate;
+    public static RegistrySupplier<Item> lifeFusionLeggings;
+    public static RegistrySupplier<Item> lifeFusionBoots;
     /** 药剂（永久/突破模板共用） */
     public static RegistrySupplier<Item> akaishiPotion;
+    /** 排异中和剂（消耗品） */
+    public static RegistrySupplier<Item> rejectionSerum;
     /** 器官物品（9 槽位各一） */
     public static RegistrySupplier<Item> akaishiOrganEye;
     public static RegistrySupplier<Item> akaishiOrganHeart;
@@ -463,10 +487,35 @@ public final class ModItems {
         geneSequence = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, GENE_SEQUENCE_ID),
                         () -> new AkaishiGeneSequenceItem(new Item.Properties()));
+        // 生命胚胎（8 生命固态 + 鸡蛋：无 NBT 铭刻的生命之始，献给母神祭坛）
+        lifeEmbryo = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_EMBRYO_ID),
+                        () -> new AkaishiLifeEmbryoItem(new Item.Properties()));
+        // 生命的融合锭（母神祭坛仪式产物，无 NBT 的纯粹生命结晶）
+        lifeFusionIngot = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_FUSION_INGOT_ID),
+                        () -> new Item(new Item.Properties()));
+        // 生命融合护甲（赤石护甲 2 倍基础数值，融合砧产出，保留升级数据）
+        lifeFusionHelmet = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_FUSION_HELMET_ID),
+                        () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.HELMET, new Item.Properties()));
+        lifeFusionChestplate = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_FUSION_CHESTPLATE_ID),
+                        () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+        lifeFusionLeggings = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_FUSION_LEGGINGS_ID),
+                        () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties()));
+        lifeFusionBoots = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_FUSION_BOOTS_ID),
+                        () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.BOOTS, new Item.Properties()));
         // 药剂（永久/突破模板，模板 id + 纯度写 NBT，可堆叠）
         akaishiPotion = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, POTION_ID),
                         () -> new AkaishiPotionItem(new Item.Properties().stacksTo(16)));
+        // 排异中和剂（消耗品，可堆叠）
+        rejectionSerum = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, REJECTION_SERUM_ID),
+                        () -> new AkaishiRejectionSerumItem(new Item.Properties().stacksTo(16)));
         // 器官物品（9 槽位各一，不可堆叠）
         akaishiOrganEye = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, ORGAN_EYE_ID),

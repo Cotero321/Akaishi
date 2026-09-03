@@ -1,0 +1,23 @@
+{
+  "name": "Energy Storage",
+  "icon": "akaishi:akaishi_energy_cell_super",
+  "category": "akaishi:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_basic",
+      "text": "Energy cells, your power piggy bank, come in three tiers: basic, advanced, super — capacity goes sky-high as you climb.$(br)Your base can lack walls, but the grid can't lack these."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_serializer",
+      "text": "The Energy Cell Serializer: arrange 26 cells into a 3×3×3 and let them \"fuse\" into one behemoth.$(br)Total capacity explodes, so say goodbye to the nightmare of \"power low\" warnings."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:portable_akaishi_cell_super",
+      "text": "The portable cell is a power bank for your backpack.$(br)Carry it to auto-repair akaishi gear, right-click to check the juice — it's your lifeline when you head out to roam."
+    }
+  ]
+}

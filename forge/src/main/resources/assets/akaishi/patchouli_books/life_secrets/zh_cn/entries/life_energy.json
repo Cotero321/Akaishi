@@ -1,0 +1,18 @@
+{
+  "name": "生命能量",
+  "icon": "akaishi:akaishi_life_energy_cell",
+  "category": "akaishi:life_intro",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_essence_solid",
+      "text": "生命能量由赤能源经生命转换矩阵聚合而来（每次 10M 赤能源 → 10 生命能量，每 tick 45 次转换）。$(br)生命能量固态物是生命研究的基石材料——玩命，先得「炼命」。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_energy_cell",
+      "text": "生命能量储存器与生命能量管道，负责生命能量的存与传。$(br)样本采集、器官构造……一切生命研究设备都得靠它续命。能量到位，方能「偷天换日」。"
+    }
+  ]
+}

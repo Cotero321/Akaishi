@@ -1,0 +1,12 @@
+{
+  "name": "Energy Basics",
+  "icon": "akaishi:akaishi_energy_cell_basic",
+  "category": "akaishi:energy",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Welcome to akaishi tech — the home of \"Akaishi Energy\", the red cousin of electricity.$(br2)In short, you have to feed it before you can do anything useful. Remember this food chain:$(li)$(2,4)Generate$(0): Energy Generator, Assembly, Super Architecture, Reactor, Fusion Reactor (each step costs more hair)$(li)$(2,4)Store$(0): Energy Cells, Serializer (the piggy bank itself)$(li)$(2,4)Transport$(0): Energy Pipes (the grid — don't wire it backwards)$(li)$(2,4)Carry$(0): Portable Cells (a power bank with legs)$(br2)One line to live by: power first, ores second, and only then your fortune."
+    }
+  ]
+}

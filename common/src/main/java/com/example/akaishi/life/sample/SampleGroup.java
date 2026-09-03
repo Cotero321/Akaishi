@@ -1,5 +1,6 @@
 package com.example.akaishi.life.sample;
 
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ambient.AmbientCreature;
@@ -13,8 +14,8 @@ import net.minecraft.world.entity.monster.Shulker;
 
 /**
  * 生命样本生物分组：决定样本的基因来源与基础纯度。
- * 采集器对生物右键时按优先级匹配（龙 > 爆炸 > 末影 > 亡灵 > 温血），
- * 未命中的生物（如村民、蜘蛛）视为无样本价值，不可采集。
+ * 采集器对生物右键时按优先级匹配（龙 > 首领 > 爆炸 > 异变 > 末影 > 亡灵 > 温血），
+ * 未命中的生物（如村民）视为无样本价值，不可采集。
  */
 public enum SampleGroup {
 
@@ -24,8 +25,12 @@ public enum SampleGroup {
     UNDEAD("undead", 55, 70, 60, 85, 1.0, "life.akaishi.sample_group.undead"),
     /** 爆炸性生物（苦力怕） */
     EXPLOSIVE("explosive", 60, 55, 45, 70, 1.1, "life.akaishi.sample_group.explosive"),
+    /** 异变体（蜘蛛/史莱姆/烈焰人/守卫者/铁傀儡/悦灵等非自然强敌） */
+    ABERRATION("aberration", 65, 45, 45, 70, 1.15, "life.akaishi.sample_group.aberration"),
     /** 末影生物（末影人/末影螨/潜影贝） */
     ENDER("ender", 70, 40, 35, 60, 1.3, "life.akaishi.sample_group.ender"),
+    /** 首领级（凋灵）：Boss 基因，仅次龙族 */
+    BOSS("boss", 85, 20, 30, 55, 1.5, "life.akaishi.sample_group.boss"),
     /** 龙族（末影龙，顶级样本） */
     DRAGON("dragon", 90, 25, 25, 50, 1.6, "life.akaishi.sample_group.dragon");
 
@@ -101,11 +106,23 @@ public enum SampleGroup {
 
     /** 匹配实体所属分组，无样本价值返回 null */
     public static SampleGroup of(LivingEntity entity) {
+        EntityType<?> type = entity.getType();
         if (entity instanceof EnderDragon) {
             return DRAGON;
         }
+        // 首领级 Boss：凋灵（mobType 为 UNDEAD）与循声守卫（隐藏于远古城市的顶级强敌）
+        if (type == EntityType.WITHER || type == EntityType.WARDEN) {
+            return BOSS;
+        }
         if (entity instanceof Creeper) {
             return EXPLOSIVE;
+        }
+        // 异变体：非自然强敌（节肢/软泥/元素/构装/精灵），无法归入常规生态组
+        if (type == EntityType.SPIDER || type == EntityType.CAVE_SPIDER || type == EntityType.SLIME || type == EntityType.BLAZE
+                || type == EntityType.GUARDIAN || type == EntityType.ELDER_GUARDIAN || type == EntityType.IRON_GOLEM
+                || type == EntityType.SNOW_GOLEM || type == EntityType.ALLAY
+                || type == EntityType.GHAST || type == EntityType.VINDICATOR) {
+            return ABERRATION;
         }
         if (entity instanceof EnderMan || entity instanceof Endermite || entity instanceof Shulker) {
             return ENDER;

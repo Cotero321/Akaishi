@@ -1,0 +1,18 @@
+{
+  "name": "Body & Decay",
+  "icon": "akaishi:akaishi_body_scanner",
+  "category": "akaishi:life_advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_body_scanner",
+      "text": "The Body Scanner reads the transplant status, rejection, and overall stability of all 9 organ slots at a glance.$(br)Body modding is a craft — get a checkup before you cut, and always keep an eye on this body's ledger."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_decay_purifier",
+      "text": "The Decay Purifier burns energy to cleanse waste zones in range, letting the decay debuffs left by explosions fade away.$(br)Accidents happen — plant a tower and slowly wipe the mess clean."
+    }
+  ]
+}

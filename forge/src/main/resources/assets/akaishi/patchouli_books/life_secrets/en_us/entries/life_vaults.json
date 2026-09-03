@@ -1,0 +1,23 @@
+{
+  "name": "Vaults",
+  "icon": "akaishi:akaishi_organ_vault",
+  "category": "akaishi:life_machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_vault",
+      "text": "The Sample Vault: a 54-slot warehouse that only takes life samples, auto-merging same-source, same-purity stacks.$(br)Place it within 3 blocks of an Analyzer or Potion Table for linked access — mountains of samples, zero mess."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_vault",
+      "text": "The Organ Vault: an organ freezer paged by body slot (9 pages × 9 slots + 9 staging).$(br)Organs auto-file into their slot page, consuming 1 life energy per tick to stay viable. Freeze them well and transplanting is a breeze."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_cabinet",
+      "text": "The Potion Cabinet: a 54-slot warehouse that only takes potions, auto-merging same-template same-purity, with template filtering.$(br)Place it within 3 blocks of a Potion Table for linked access — a potion collector's paradise."
+    }
+  ]
+}

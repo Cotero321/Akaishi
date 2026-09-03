@@ -1,8 +1,13 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "akaishi:akaishi_item_pipe_advanced" },
-    { "item": "akaishi:gold_dust" }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PGP",
+    " P "
   ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_item_pipe_advanced" },
+    "G": { "item": "akaishi:gold_dust" }
+  },
   "result": { "item": "akaishi:akaishi_item_pipe_elite", "count": 1 }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "黑山羊之母祭坛",
+  "icon": "akaishi:akaishi_mother_altar",
+  "category": "akaishi:life_advanced",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mother_altar",
+      "text": "黑山羊之母祭坛：克苏鲁风味拉满的供奉台。$(br)它没有 GUI，全靠 NBT 识别你塞进去的供品，再把供品悬浮在祭坛上空供「那位」享用。$(br)献上合适的祭品，可能换来意想不到的恩赐；献错了……祝你好运。"
+    }
+  ]
+}

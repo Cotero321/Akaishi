@@ -1,13 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "SSS",
-    "SES",
-    "SSS"
+    "GSG",
+    "OEO",
+    "GSG"
   ],
   "key": {
+    "G": { "item": "minecraft:golden_carrot" },
     "S": { "item": "minecraft:sculk" },
-    "E": { "item": "akaishi:akaishi_life_essence_solid" }
+    "O": { "item": "minecraft:golden_apple" },
+    "E": { "item": "akaishi:akaishi_essence_block" }
   },
   "result": { "item": "akaishi:sculk_lifeform", "count": 1 }
 }

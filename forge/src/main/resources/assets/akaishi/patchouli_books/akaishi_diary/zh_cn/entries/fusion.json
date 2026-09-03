@@ -1,0 +1,64 @@
+{
+  "name": "聚变堆",
+  "icon": "akaishi:akaishi_fusion_controller",
+  "category": "akaishi:tech",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:multiblock",
+      "name": "聚变堆（7×7×7）",
+      "multiblock": {
+        "pattern": [
+          ["SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI   IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI 0 IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI   IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS"]
+        ],
+        "mapping": {
+          "S": "akaishi:akaishi_fusion_shell",
+          "I": "akaishi:akaishi_fusion_insulation",
+          "0": "akaishi:akaishi_fusion_core"
+        },
+        "symmetrical": false
+      },
+      "text": "洋葱式多层结构：外层 7×7×7 外壳 → 中层 5×5×5 隔热层 → 内层 3×3×3 框架 → 中心聚变核心。控制器必须搁墙面上，别塞核心位，否则它不认。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)搭建要点$(0)$(li)外壳墙可替换为：聚变控制器 / 能量输出口 / 物品输入口 / 物品输出口$(li)框架层空格处放：燃料框架 / 散热框架 / 效率框架$(li)上限：燃料 4、散热 10、效率 12$(li)核心恰好 1 个，坐正中心$(br2)成型后控制器每 20 tick 校验一次，缺块或放错直接失效。聚变堆是精细活，别手滑。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_controller",
+      "text": "聚变控制器是核心大脑：投入等离子体燃料棒即开烧。$(br)$(2,4)温度机制$(0)$(li)基础目标温度 50M$(li)产热超出散热越多温度越高$(li)100M~130M 产率 ×1.0 最佳$(li)低于 100M 产率线性爬升 0.5~1.0$(li)130M~160M 产率衰减到 0.5$(li)≥160M 过热宕机，降到 80M 自动恢复（不爆炸，别怕）"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_fuel_aggregator",
+      "text": "聚变燃料聚合器：耗 2000 赤能源 + 1 个活化成分，产出 1000mb 等离子体。$(br)三种等离子体（混合/下界/末地）得存进对应专用储罐，再经等离子体管道送进等离子体填装器。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_filler",
+      "text": "等离子体填装器：1 根聚变反应棒 + 1000mb 等离子体 → 1 根对应等离子体燃料棒（耗时 100 tick）。$(br)优先加工存量最多的等离子体罐，同类连续加工——机器也有自己的「贪心」。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mixed_plasma_rod",
+      "text": "三种等离子体燃料棒，各 6 万亿能量：$(li)$(bold)混合等离子体棒$(0)：基础产率 400万/t、热值 2700万——均衡之选，配合效率框架叠产量$(li)$(bold)下界等离子体棒$(0)：基础产率 400万/t、热值 4000万——高产高热，散热得给足压力$(li)$(bold)末地等离子体棒$(0)：基础产率 260万/t、热值 1500万——低产低热，4 根无散热即入最佳温区"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:fusion_heat_sink_tier5",
+      "text": "聚变散热片共 6 档（1~5 级 + 生命级），散热效率 5% / 7% / 9% / 12% / 15% / 20%。$(br)装进散热框架，每 5 秒耗 1 点耐久（8000 点），归零就碎。$(br)散热公式：冷却% × (1 + 0.1×散热框架数) × 200万 + 燃料棒散热加成。温度压不住？散热片多塞几档。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_ash",
+      "text": "烧的同时攒生命灰烬：每耗 1000 亿能量得 1 个灰烬。$(br)灰烬经聚变物品输出口自动取出，是生命散热片与高阶生命科技的关键材料。$(br2)产物赤能源均分到所有能量输出口（每口 200 亿缓冲，只出不进）。"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Reactor",
+  "icon": "akaishi:akaishi_reactor_controller",
+  "category": "akaishi:tech",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_reactor_controller",
+      "text": "The Reactor, the beating heart of thermal power.$(br)Enclose a sealed box of side 5 or 7 with reactor casings, put the controller and ports on the walls, and inside place 1 reactor core, fuel rods (≤10), and cooling components (≤20).$(br)Feed in fuel cells to start burning — 400-700℃ gives the best output. Temperature control is a craft."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_reactor_fuel_rod",
+      "text": "Fuel rods unlock fuel slots (up to 10); cooling components hold heat sinks and only work when adjacent to a fuel rod.$(br2)$(2,4)Life-saving warning$(0): above 850℃ output drops; once heat hits 1000℃ it explodes after 10 seconds and leaks a waste zone! Max your heat sinks and keep waste handling ready — don't gamble with your base."
+    }
+  ]
+}

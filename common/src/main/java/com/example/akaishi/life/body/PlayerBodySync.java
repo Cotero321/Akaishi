@@ -36,9 +36,16 @@ public final class PlayerBodySync {
         });
     }
 
-    /** 服务端：向指定玩家发送其躯体状态（打开检查仪时调用） */
+    /** 服务端：向指定玩家发送其躯体状态（打开检查仪/基因管理器时调用） */
     public static void sendToPlayer(ServerPlayer player, IPlayerBodyState state) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        // 基因强化列表（来源 → 适配加成）
+        java.util.Map<String, Integer> genes = state.getGeneBonuses();
+        buf.writeVarInt(genes.size());
+        for (java.util.Map.Entry<String, Integer> entry : genes.entrySet()) {
+            buf.writeUtf(entry.getKey());
+            buf.writeInt(entry.getValue());
+        }
         for (BodySlot slot : BodySlot.values()) {
             buf.writeUtf(slot.getId());
             ItemStack organ = state.getOrgan(slot);
@@ -47,6 +54,14 @@ public final class PlayerBodySync {
                 buf.writeItem(organ);
             }
             buf.writeInt(state.getRejection(slot));
+        }
+        // 突破激活（单条：来源 + 额外适配 + 基础% + 截止时刻；无激活写 false）
+        buf.writeBoolean(state.hasActiveBreakthrough());
+        if (state.hasActiveBreakthrough()) {
+            buf.writeUtf(state.getBreakthroughEntity());
+            buf.writeInt(state.getBreakthroughExtra());
+            buf.writeInt(state.getBreakthroughPct());
+            buf.writeLong(state.getBreakthroughUntil());
         }
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }

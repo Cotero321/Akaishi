@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IEI",
+    "EAE",
+    "IEI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_life_fusion_ingot" },
+    "E": { "item": "akaishi:akaishi_life_embryo" },
+    "A": { "item": "minecraft:anvil" }
+  },
+  "result": { "item": "akaishi:akaishi_life_fusion_anvil", "count": 1 }
+}

@@ -2,11 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " P ",
-    "PEP",
+    "SCS",
     " P "
   ],
   "key": {
-    "E": { "item": "akaishi:akaishi_essence" },
+    "C": { "item": "minecraft:ender_eye" },
+    "S": { "item": "minecraft:shulker_shell" },
     "P": { "item": "minecraft:chorus_fruit" }
   },
   "result": { "item": "akaishi:end_mixture", "count": 1 }

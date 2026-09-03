@@ -12,6 +12,8 @@ import com.example.akaishi.life.body.PlayerBodySync;
 import com.example.akaishi.menu.AkaishiLifeStructSync;
 import com.example.akaishi.menu.AkaishiSurgerySync;
 import com.example.akaishi.menu.AkaishiPotionSync;
+import com.example.akaishi.menu.AkaishiTraitReforgerSync;
+import com.example.akaishi.menu.AkaishiGeneManagerSync;
 import com.example.akaishi.menu.ModMenus;
 import com.example.akaishi.recipe.ModRecipeSerializers;
 import com.example.akaishi.sound.ModSounds;
@@ -48,8 +50,12 @@ public final class AkaishiMod {
         AkaishiLifeStructSync.register();
         // 手术仓手术开始包（C2S 接收器）
         AkaishiSurgerySync.register();
+        // 基因管理器卸载包（C2S 接收器）
+        AkaishiGeneManagerSync.register();
         // 药剂台模板选择包（C2S 接收器）
         AkaishiPotionSync.register();
+        // 词条重铸仪目标词条选择包（C2S 接收器）
+        AkaishiTraitReforgerSync.register();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
         ModSounds.touch();
     }

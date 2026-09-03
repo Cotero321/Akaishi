@@ -1,5 +1,6 @@
 package com.example.akaishi.forge.life;
 
+import com.example.akaishi.life.body.BodyGeneHelper;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
@@ -11,8 +12,14 @@ import com.example.akaishi.life.organ.OrganPassive;
 import com.example.akaishi.life.organ.OrganSpecial;
 import com.example.akaishi.life.organ.OrganTemplate;
 import com.example.akaishi.life.organ.QualityTier;
+import com.example.akaishi.life.sample.SampleGroup;
+import com.example.akaishi.item.AkaishiLifeFusionSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,8 +35,11 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -80,6 +90,17 @@ public final class AkaishiBodyPassiveHandler {
     private static final int COMPAT_SEVERE = 60;
     /** 天敌反噬间隔（tick） */
     private static final int CONFLICT_PUNISH_INTERVAL = 100;
+    /** 天敌反噬每次对玩家自身造成的伤害（爆炸伤害源，吃护甲减伤） */
+    private static final float CONFLICT_PUNISH_DAMAGE = 5.0F;
+    /** 长臂被动：每臂近战攻击距离加成（格） */
+    private static final double REACH_PER_ARM = 0.75;
+    /** 攻击距离修饰符固定 UUID（akaishi:long_reach） */
+    private static final UUID REACH_UUID = UUID.nameUUIDFromBytes(
+            "akaishi:long_reach".getBytes(StandardCharsets.UTF_8));
+    /** 已挂攻击距离加成记录：玩家 → 当前加成（变化时才重建修饰符） */
+    private static final Map<Player, Double> REACH_CACHE = new WeakHashMap<>();
+    /** 生命融合套装飞行状态缓存：玩家 → 是否已授予飞行（变化时才同步，避免每 tick 刷包） */
+    private static final Map<Player, Boolean> FLIGHT_CACHE = new WeakHashMap<>();
 
     private record AppliedAttr(String key, Attribute attribute) {
     }
@@ -100,19 +121,49 @@ public final class AkaishiBodyPassiveHandler {
         if (state == null) {
             return;
         }
+        // 突破激活到期（30 分钟计时到）：结束并提示（actionbar，与药剂/管理器提示一致），属性随后自动重建回落
+        if (state.tickBreakthrough(player.level().getGameTime())) {
+            player.displayClientMessage(Component.translatable("message.akaishi.potion.breakthrough_end"), true);
+        }
         rebuildAttributes(player, state);
+        applyLifeFusionSet(player);
         applyPassives(player, state);
+        applySynergy(player, state);
         tickRejection(player, state);
         tickConflict(player, state);
+        applyOverload(player, state);
         applySlotDebuffs(player, state);
         tickSpecial(player, state);
+    }
+
+    /** 进食增强（鸡砂囊·食物恢复）：食物饥饿与饱和 +25% */
+    @SubscribeEvent
+    public void onItemEaten(LivingEntityUseItemEvent.Finish event) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) {
+            return;
+        }
+        IPlayerBodyState state = PlayerBodyHelper.of(player);
+        if (state == null || !OrganEffectResolver.hasPassive(state, OrganPassive.FOOD_BOOST)) {
+            return;
+        }
+        ItemStack stack = event.getItem();
+        if (!stack.isEdible()) {
+            return;
+        }
+        FoodProperties food = stack.getFoodProperties(player);
+        if (food == null) {
+            return;
+        }
+        // 补 25% 饥饿值并按原食物饱和模数结算（饱和度系统自带封顶）
+        int bonus = Math.max(1, (int) Math.ceil(food.getNutrition() * 0.25F));
+        player.getFoodData().eat(bonus, food.getSaturationModifier());
     }
 
     // ===== 属性重建 =====
 
     /** 移植/摘除/适配度/排斥变化时重建器官属性修饰（摘要相同直接跳过） */
     private static void rebuildAttributes(Player player, IPlayerBodyState state) {
-        String digest = digestOf(state);
+        String digest = digestOf(state, player);
         String last = ATTRIBUTE_DIGEST.get(player);
         if (digest.equals(last)) {
             return;
@@ -133,18 +184,29 @@ public final class AkaishiBodyPassiveHandler {
                 healthPct -= slot.getLifeWeight();
             }
         }
-        // 2) 生效器官：MAX_HEALTH 按百分比聚合，其余属性按基础值 × 倍率 × 适配度 × 突破倍率
+        // 2) 生效器官：MAX_HEALTH 按百分比聚合，其余属性按基础值 × 倍率 × 适配度（突破激活时正数基础值
+        //    再 ×(1+pct%)，负数基础值词条暂时失效）——适配度含基因加成与突破额外适配，可临时超 100
+        // 生命融合套装加成：全基因适配（每件 +2）与器官强度倍率（全套 ×1.2）
+        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
+        double strengthMult = AkaishiLifeFusionSet.isFullSet(player)
+                ? AkaishiLifeFusionSet.ORGAN_STRENGTH_MULTIPLIER : 1.0;
         for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
-            double compatFactor = AkaishiOrganItem.getCompat(organ.stack()) / 100.0;
-            double boost = AkaishiOrganItem.getBoost(organ.stack());
+            double compatFactor = BodyGeneHelper.effectiveCompat(state, organ.stack(), gearCompat) / 100.0;
+            // 突破激活且来源匹配：正数基础值乘 (1+pct/100)，负数基础值词条期间跳过
+            boolean btActive = state.isBreakthroughActive(AkaishiOrganItem.getEntityId(organ.stack()));
+            double breakthroughFactor = btActive ? 1.0 + state.getBreakthroughPct() / 100.0 : 1.0;
             List<OrganTemplate.AttributeBonus> bonuses = OrganEffectResolver.bonusesOf(organ.stack(), organ.slot(), organ.effect());
             for (OrganTemplate.AttributeBonus b : bonuses) {
+                double base = b.base();
+                if (btActive && base < 0) {
+                    continue; // 负基础值词条：突破激活期内暂时失效
+                }
+                double value = base * breakthroughFactor * organ.tier().getMultiplier() * compatFactor * strengthMult;
                 if (b.attribute() == Attributes.MAX_HEALTH) {
-                    // 生命加成按基础生命百分比计算：base/20 即 +base×5%
-                    healthPct += (b.base() / BASE_HEALTH) * organ.tier().getMultiplier() * compatFactor * boost;
+                    // 生命加成按基础生命百分比计算：value/20 即 +value×5%
+                    healthPct += value / BASE_HEALTH;
                     continue;
                 }
-                double value = b.base() * organ.tier().getMultiplier() * compatFactor * boost;
                 AttributeInstance inst = player.getAttribute(b.attribute());
                 if (inst == null || value == 0.0) {
                     continue;
@@ -153,6 +215,10 @@ public final class AkaishiBodyPassiveHandler {
                         "Akaishi organ", value, ADD));
                 next.add(new AppliedAttr(organ.slot().name(), b.attribute()));
             }
+        }
+        // 生命融合套装·BOSS/龙肢体：移植 BOSS 或龙族来源器官时额外 +10 最大生命
+        if (AkaishiLifeFusionSet.isFullSet(player) && AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state)) {
+            healthPct += AkaishiLifeFusionSet.BOSS_DRAGON_HEALTH_BONUS / BASE_HEALTH;
         }
         // 3) 生命上限 = 20 × (1 + 加成% − 空槽权重%)
         double healthDelta = BASE_HEALTH * (1.0 + healthPct) - BASE_HEALTH;
@@ -172,9 +238,11 @@ public final class AkaishiBodyPassiveHandler {
         return UUID.nameUUIDFromBytes((key + ":" + attribute.getDescriptionId()).getBytes(StandardCharsets.UTF_8));
     }
 
-    /** 摘要：各槽位器官来源/品质/适配度 + 排斥值 + 空槽（变化才触发重建） */
-    private static String digestOf(IPlayerBodyState state) {
+    /** 摘要：各槽位器官来源/品质/适配度 + 排斥值 + 空槽 + 基因强化 + 突破激活 + 生命融合装备（变化才触发重建） */
+    private static String digestOf(IPlayerBodyState state, Player player) {
         StringBuilder sb = new StringBuilder();
+        // 基因强化（吸收/卸载后立即触发属性重建）
+        sb.append(state.getGeneBonuses()).append(';');
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             sb.append(slot).append('|');
@@ -184,26 +252,93 @@ public final class AkaishiBodyPassiveHandler {
                 } else {
                     sb.append(AkaishiOrganItem.getEntityId(organ)).append(':')
                             .append(AkaishiOrganItem.getTier(organ)).append(':')
-                            .append(AkaishiOrganItem.getCompat(organ)).append(':')
-                            .append(AkaishiOrganItem.getBoost(organ));
+                            .append(AkaishiOrganItem.getCompat(organ))
+                            // 突变词条参与摘要：突变变更需触发属性重建
+                            .append(':').append(AkaishiOrganItem.getMutations(organ));
                 }
             }
             sb.append(':').append(state.getRejection(slot)).append(';');
         }
+        // 突破激活（激活开始/结束/数值变化时触发属性重建，属性随激活生效/回落）
+        sb.append("BT").append(state.getBreakthroughEntity()).append(':')
+                .append(state.getBreakthroughExtra()).append(':')
+                .append(state.getBreakthroughPct()).append(':')
+                .append(state.getBreakthroughUntil()).append(';');
+        // 生命融合装备穿戴件数（+2 全基因适配 / 全套器官强度与 +10 生命随穿脱即时触发重建）
+        sb.append("LF").append(AkaishiLifeFusionSet.countWorn(player)).append(';');
         return sb.toString();
     }
 
     // ===== 被动技能（常驻/被动触发） =====
 
     private static void applyPassives(Player player, IPlayerBodyState state) {
+        // 长臂被动走 Forge 专属属性（ENTITY_REACH），无条件同步以防摘除后残留
+        syncReach(player, state);
         for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
-            if (organ.effect() == null || organ.effect().passives() == null) {
-                continue;
-            }
-            for (OrganPassive passive : organ.effect().passives()) {
+            // 突变词条被动与生物被动统一生效（passivesOf 合并去重）
+            for (OrganPassive passive : OrganEffectResolver.passivesOf(organ.stack(), organ.effect())) {
                 applyPassive(player, state, passive);
             }
         }
+    }
+
+    // ===== 生态套装 =====
+
+    /** 生态套装·纯温血：小共鸣再生 I / 大共鸣再生 II（纯种构筑奖励） */
+    private static void applySynergy(Player player, IPlayerBodyState state) {
+        OrganEffectResolver.Synergy synergy = OrganEffectResolver.synergyOf(state, player.level());
+        if (synergy.group() == SampleGroup.WARM_BLOODED) {
+            applyPotion(player, MobEffects.REGENERATION, synergy.isMajor() ? 1 : 0);
+        }
+    }
+
+    /**
+     * 生命融合套装飞行：穿齐 4 件授予无消耗飞行（mayfly，不扣经验/食物），
+     * 脱下后若非创造/旁观则撤销飞行能力。状态变化才同步，避免每 tick 刷包。
+     */
+    private static void applyLifeFusionSet(Player player) {
+        boolean full = AkaishiLifeFusionSet.isFullSet(player);
+        Boolean last = FLIGHT_CACHE.get(player);
+        if (last != null && last == full) {
+            return;
+        }
+        FLIGHT_CACHE.put(player, full);
+        if (full) {
+            player.getAbilities().mayfly = true;
+        } else if (!player.isCreative() && !player.isSpectator()) {
+            player.getAbilities().mayfly = false;
+            player.getAbilities().flying = false;
+        }
+        player.onUpdateAbilities();
+    }
+
+    /**
+     * 同步近战攻击距离：统计 LONG_REACH 数量 × 每臂加成，挂到 ForgeMod.ENTITY_REACH。
+     * 数量无变化跳过；摘除全部后移除修饰符，避免属性残留。
+     */
+    private static void syncReach(Player player, IPlayerBodyState state) {
+        int arms = 0;
+        for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
+            if (OrganEffectResolver.passivesOf(organ.stack(), organ.effect()).contains(OrganPassive.LONG_REACH)) {
+                arms++;
+            }
+        }
+        double amount = arms * REACH_PER_ARM;
+        Double last = REACH_CACHE.get(player);
+        if (last != null && Math.abs(last - amount) < 1e-9) {
+            return;
+        }
+        AttributeInstance inst = player.getAttribute(ForgeMod.ENTITY_REACH.get());
+        if (inst != null) {
+            if (last != null) {
+                inst.removeModifier(REACH_UUID);
+            }
+            if (amount > 0.0) {
+                inst.addTransientModifier(new AttributeModifier(REACH_UUID,
+                        "Akaishi long reach", amount, AttributeModifier.Operation.ADDITION));
+            }
+        }
+        REACH_CACHE.put(player, amount);
     }
 
     private static void applyPassive(Player player, IPlayerBodyState state, OrganPassive passive) {
@@ -228,6 +363,26 @@ public final class AkaishiBodyPassiveHandler {
             case AUTO_PICKUP -> {
                 if (player.tickCount % 10 == 0) {
                     pickupNearbyItems(player);
+                }
+            }
+            case GLIDE -> applyPotion(player, MobEffects.SLOW_FALLING, 0);
+            case ANTIDOTE -> {
+                if (player.tickCount % 100 == 0) {
+                    removeEffect(player, MobEffects.POISON);
+                }
+            }
+            case ANTIFREEZE -> {
+                // 寒髓：免疫细雪冻结并清除缓慢（流浪者冰箭/细雪/冰冻）
+                if (player.getTicksFrozen() > 0) {
+                    player.setTicksFrozen(0);
+                }
+                removeEffect(player, MobEffects.MOVEMENT_SLOWDOWN);
+            }
+            case FIRE_IMMUNE -> {
+                // 烈焰之心/末影龙之心：免疫火焰——每 tick 清除着火状态
+                // （火焰/岩浆伤害本身由战斗处理器的受害方分支按来源拦截）
+                if (player.isOnFire()) {
+                    player.clearFire();
                 }
             }
             default -> {
@@ -275,6 +430,8 @@ public final class AkaishiBodyPassiveHandler {
     // ===== 排斥增长 + 负面效果 =====
 
     private static void tickRejection(Player player, IPlayerBodyState state) {
+        // 生命融合装备全基因适配加成（每件 +2，减缓排斥）
+        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             // 原生器官与身体完全契合，不产生排斥
@@ -285,14 +442,23 @@ public final class AkaishiBodyPassiveHandler {
             if (tier == null) {
                 continue;
             }
-            // 排斥速率 × 100/适配度：适配度越低排斥涨得越快；<60 重度排异再翻倍
-            int compat = AkaishiOrganItem.getCompat(organ);
+            // 排斥速率 × 100/有效适配度：适配度越低排斥涨得越快；<60 重度排异再翻倍
+            // 有效适配度含身体基因加成与装备全基因适配（吸收基因药剂/穿戴生命融合装备可减缓排斥）
+            int compat = BodyGeneHelper.effectiveCompat(state, organ, gearCompat);
             double factor = 100.0 / Math.max(1, compat);
             if (compat < COMPAT_SEVERE) {
                 factor *= 2.0;
             }
+            // 同源套装：同一来源 ≥2 枚已移植器官 → 排斥增速 -20%（身体"认可"这套基因）
+            if (BodyGeneHelper.sameSourceCount(state, AkaishiOrganItem.getEntityId(organ)) >= 2) {
+                factor *= 0.8;
+            }
             // 基因强度联动：强基因（末影/龙）排斥增长更快（OrganLinkage.rejectionFactorOf）
             factor *= OrganLinkage.rejectionFactorOf(organ);
+            // 生命融合套装：排斥增长速度 -25%
+            if (AkaishiLifeFusionSet.isFullSet(player)) {
+                factor *= AkaishiLifeFusionSet.REJECTION_SLOW_FACTOR;
+            }
             int interval = (int) Math.max(1, tier.getGrowthIntervalSeconds() * 20.0 / factor);
             if (player.tickCount % interval == 0) {
                 state.addRejection(slot, 1);
@@ -315,6 +481,30 @@ public final class AkaishiBodyPassiveHandler {
         }
     }
 
+    // ===== 躯体超载（排斥预算） =====
+
+    /** 全身总排斥 ≥ 此值：躯体超载 I（移动缓慢） */
+    private static final int OVERLOAD_LIGHT = 320;
+    /** 全身总排斥 ≥ 此值：躯体超载 II（移动缓慢 II + 虚弱） */
+    private static final int OVERLOAD_HEAVY = 450;
+
+    /** 躯体超载：排斥预算（全身总排斥）过高 → 施加持续负面（缓慢/虚弱），每 5 秒刷新一次 */
+    private static void applyOverload(Player player, IPlayerBodyState state) {
+        if (player.tickCount % 100 != 0) {
+            return;
+        }
+        int total = 0;
+        for (BodySlot slot : BodySlot.values()) {
+            total += state.getRejection(slot);
+        }
+        if (total >= OVERLOAD_HEAVY) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 0, false, false));
+        } else if (total >= OVERLOAD_LIGHT) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 0, false, false));
+        }
+    }
+
     // ===== 部位 debuff（按适配度分级）=====
 
     /**
@@ -326,12 +516,14 @@ public final class AkaishiBodyPassiveHandler {
         if (player.tickCount % 120 != 0) {
             return;
         }
+        // 生命融合装备全基因适配加成（每件 +2，抬高部位 debuff 判定阈值）
+        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             if (!(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)) {
                 continue;
             }
-            int compat = AkaishiOrganItem.getCompat(organ);
+            int compat = BodyGeneHelper.effectiveCompat(state, organ, gearCompat);
             if (compat >= COMPAT_CLEAN) {
                 continue; // 完全适应
             }
@@ -372,10 +564,15 @@ public final class AkaishiBodyPassiveHandler {
         for (BodySlot slot : conflicts) {
             state.setRejection(slot, PlayerBodyState.MAX_REJECTION);
         }
-        // 周期性天敌反噬：小型爆炸（不破坏方块）+ 提示
+        // 周期性天敌反噬：仅对玩家自身结算爆炸伤害 + 爆炸视觉，避免误伤同队/宠物
         if (player.tickCount % CONFLICT_PUNISH_INTERVAL == 0) {
-            player.level().explode(player, player.getX(), player.getY(), player.getZ(),
-                    2.0F, Level.ExplosionInteraction.NONE);
+            player.hurt(player.damageSources().explosion(null), CONFLICT_PUNISH_DAMAGE);
+            if (player.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
+                        player.getX(), player.getY() + 0.5, player.getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
             player.sendSystemMessage(Component.translatable("message.akaishi.body.conflict"));
         }
     }
@@ -394,19 +591,33 @@ public final class AkaishiBodyPassiveHandler {
         }
     }
 
-    /** 随机瞬移：尝试 16 次找无碰撞且不浸水的落点 */
+    /** 随机瞬移：尝试 16 次找无碰撞、不浸水且不落入危险方块（熔岩/火/岩浆块/仙人掌）的落点 */
     private static boolean teleportRandomly(Player player) {
+        Level level = player.level();
         for (int i = 0; i < 16; i++) {
             double x = player.getX() + (player.getRandom().nextDouble() - 0.5) * 12.0;
             double y = player.getY() + player.getRandom().nextInt(7) - 3;
             double z = player.getZ() + (player.getRandom().nextDouble() - 0.5) * 12.0;
-            if (player.level().noCollision(player.getBoundingBox().move(x - player.getX(), y - player.getY(), z - player.getZ()))
-                    && !player.level().getFluidState(BlockPos.containing(x, y, z)).is(FluidTags.WATER)) {
+            if (level.noCollision(player.getBoundingBox().move(x - player.getX(), y - player.getY(), z - player.getZ()))
+                    && !level.getFluidState(BlockPos.containing(x, y, z)).is(FluidTags.WATER)
+                    && isSafeLanding(level, x, y, z)) {
                 player.teleportTo(x, y, z);
                 return true;
             }
         }
         return false;
+    }
+
+    /** 落点安全判定：身体/脚下无熔岩，且脚下方块非火、岩浆块、仙人掌 */
+    private static boolean isSafeLanding(Level level, double x, double y, double z) {
+        BlockPos pos = BlockPos.containing(x, y, z);
+        BlockPos below = pos.below();
+        return !level.getFluidState(pos).is(FluidTags.LAVA)
+                && !level.getFluidState(below).is(FluidTags.LAVA)
+                && !level.getBlockState(pos).is(Blocks.FIRE)
+                && !level.getBlockState(below).is(Blocks.FIRE)
+                && !level.getBlockState(below).is(Blocks.MAGMA_BLOCK)
+                && !level.getBlockState(below).is(Blocks.CACTUS);
     }
 
     // ===== 独特机制（进食类：牛胃） =====

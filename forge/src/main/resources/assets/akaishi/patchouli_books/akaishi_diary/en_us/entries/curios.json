@@ -1,0 +1,13 @@
+{
+  "name": "Akaishi Trinkets",
+  "icon": "akaishi:akaishi_hunting_ring",
+  "category": "akaishi:advanced",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_hunting_ring",
+      "text": "Seven trinkets forged from akaishi power (worn in the trinket slots), each a \"cheat code\":$(li)Hunting Ring: combat buffs$(li)Fortune Bracelet: boosted harvest$(li)Flame Necklace: fire resistance$(li)Antidote Bracelet: neutralizes poison$(li)Blast Charm: reduced explosion damage$(li)Wither Charm: wards off withering$(li)Saturation Charm: eating buffs$(br2)Put them all on and you're a walking fortress."
+    }
+  ]
+}

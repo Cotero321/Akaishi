@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " D ",
-    "DBD",
-    " D "
+    " A ",
+    "ASA",
+    " A "
   ],
   "key": {
-    "D": { "item": "akaishi:diamond_dust" },
-    "B": { "item": "akaishi:portable_akaishi_cell_advanced" }
+    "A": { "item": "akaishi:akaishi_advanced_component" },
+    "S": { "item": "akaishi:akaishi_energy_cell_super" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_super", "count": 1 }
 }

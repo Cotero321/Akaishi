@@ -1,0 +1,13 @@
+{
+  "name": "Life Purifier",
+  "icon": "akaishi:akaishi_life_purifier",
+  "category": "akaishi:life_machines",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_purifier",
+      "text": "A life-energy solidifier that freezes \"flowing life\" into \"solid life\".$(br)Each run costs 10M energy + 1000 life energy to produce 1 Life Energy Solid.$(br2)Its output slot supports hoppers, AE2, and item pipes — full automation, hoard all the solids you like."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Energy Aggregator",
+  "icon": "akaishi:akaishi_energy_aggregator",
+  "category": "akaishi:advanced",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_aggregator",
+      "text": "The Energy Aggregator, the alchemy furnace that condenses a mountain of energy into an Akaishi Ingot.$(br)Feed it a Netherite Ingot and pour in 10M energy, and out comes an Akaishi Ingot — the milestone where ore civilization crosses into industrial civilization, all in one smelt."
+    }
+  ]
+}

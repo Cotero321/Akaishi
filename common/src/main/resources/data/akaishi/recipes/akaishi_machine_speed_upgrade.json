@@ -1,12 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "T",
-    "I"
+    "EME",
+    "MGM",
+    "EME"
   ],
   "key": {
-    "I": { "item": "minecraft:iron_ingot" },
-    "T": { "item": "akaishi:akaishi_speed_upgrade" }
+    "E": { "item": "akaishi:akaishi_essence" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "G": { "item": "akaishi:akaishi_speed_upgrade" }
   },
   "result": { "item": "akaishi:akaishi_machine_speed_upgrade", "count": 1 }
 }

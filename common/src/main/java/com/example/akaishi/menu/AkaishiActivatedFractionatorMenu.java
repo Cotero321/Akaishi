@@ -42,24 +42,24 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 40));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 40));
+        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 52));
+        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 52));
 
         // 输入槽：仅 7 种活化结晶可放入
-        addSlot(new Slot(input, 0, 44, 40) {
+        addSlot(new Slot(input, 0, 44, 52) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return AkaishiActivatedFractionatorBlockEntity.isActivatedCrystal(stack);
             }
         });
         // 输出槽只读：防止放入杂物卡死机器
-        addSlot(new Slot(output, 0, 80, 40) {
+        addSlot(new Slot(output, 0, 80, 52) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         });
-        addSlot(new Slot(output, 1, 116, 40) {
+        addSlot(new Slot(output, 1, 116, 52) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;

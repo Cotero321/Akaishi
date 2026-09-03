@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "EEE",
+    "EGE",
+    "EEE"
+  ],
+  "key": {
+    "E": {
+      "item": "akaishi:akaishi_life_essence_solid"
+    },
+    "G": {
+      "item": "minecraft:egg"
+    }
+  },
+  "result": {
+    "item": "akaishi:akaishi_life_embryo",
+    "count": 1
+  }
+}

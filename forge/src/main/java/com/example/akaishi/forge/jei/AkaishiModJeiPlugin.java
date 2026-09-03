@@ -36,7 +36,12 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 new FuelProcessingRecipeCategory(helper),
                 new FuelMixingRecipeCategory(helper),
                 // 物品重构：衰竭结晶为代价的嬗变配方
-                new ReconstructRecipeCategory(helper));
+                new ReconstructRecipeCategory(helper),
+                // 单输入单输出处理机器：压缩机 / 打粉机 / 变化器 / 植物培养机
+                new CompressorRecipeCategory(helper),
+                new PulverizerRecipeCategory(helper),
+                new TransformerRecipeCategory(helper),
+                new PlantCultivatorRecipeCategory(helper));
     }
 
     @Override
@@ -51,6 +56,11 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(FuelMixingRecipeCategory.TYPE, FuelMixingRecipeCategory.FuelMixingRecipe.getAll());
         // 物品重构配方（衰竭结晶嬗变）
         registration.addRecipes(ReconstructRecipeCategory.TYPE, ReconstructRecipeCategory.ReconstructRecipe.getAll());
+        // 单输入单输出处理机器配方
+        registration.addRecipes(CompressorRecipeCategory.TYPE, CompressorRecipeCategory.getAll());
+        registration.addRecipes(PulverizerRecipeCategory.TYPE, PulverizerRecipeCategory.getAll());
+        registration.addRecipes(TransformerRecipeCategory.TYPE, TransformerRecipeCategory.getAll());
+        registration.addRecipes(PlantCultivatorRecipeCategory.TYPE, PlantCultivatorRecipeCategory.getAll());
 
         // 催化器与收集器不是合成机器，用物品信息说明其功能与等级数值
         addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_BASIC.get(), "jei.akaishi.catalyst_basic");

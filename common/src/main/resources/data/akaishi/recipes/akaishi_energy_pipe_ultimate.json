@@ -1,8 +1,13 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "akaishi:akaishi_energy_pipe_elite" },
-    { "item": "akaishi:diamond_dust" }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PDP",
+    " P "
   ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_energy_pipe_elite" },
+    "D": { "item": "akaishi:diamond_dust" }
+  },
   "result": { "item": "akaishi:akaishi_energy_pipe_ultimate", "count": 1 }
 }

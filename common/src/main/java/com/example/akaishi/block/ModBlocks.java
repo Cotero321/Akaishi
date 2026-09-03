@@ -14,6 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
 import java.util.ArrayList;
@@ -77,6 +79,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_EQUIPMENT_FORGER;
     /** 赤红升级台（模板 + 槽位 → 升级赤石装备） */
     public static RegistrySupplier<Block> CHISHI_UPGRADE_STATION;
+    /** 生命的融合砧（赤石护甲 + 生命的融合锭 → 生命融合护甲） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_FUSION_ANVIL;
     /** 创造赤能源储存原件（无限输出测试方块） */
     public static RegistrySupplier<Block> CHISHI_CREATIVE_ENERGY_CELL;
     /** 创造生命能量储存原件（无限输出测试方块） */
@@ -201,12 +205,18 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_EXHAUSTED_BARREL;
     /** 躯体检查仪：展示玩家躯体状态（9 槽位器官/肢体 + 排斥值） */
     public static RegistrySupplier<Block> CHISHI_BODY_SCANNER;
+    /** 基因管理器：管理已吸收基因强化（最多 4 种来源，可卸载） */
+    public static RegistrySupplier<Block> CHISHI_GENE_MANAGER;
     /** 生命分析台：纯度 100 样本解构为基因序列片段（有失败率） */
     public static RegistrySupplier<Block> CHISHI_GENE_ANALYZER;
     /** 部件培养舱：样本提纯 + 器官品质升级（双模式） */
     public static RegistrySupplier<Block> CHISHI_CULTIVATOR;
     /** 生命结构台：基因序列解析为指定槽位器官 */
     public static RegistrySupplier<Block> CHISHI_LIFE_STRUCT;
+    /** 生命培育器：器官 + 同源序列 + 衰竭结晶 → 突变器官（成功率由纯度决定） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_BREEDER;
+    /** 词条重铸仪：衰竭结晶 + 生命能量 → 原位替换指定第 N 条突变词条（确定性必成） */
+    public static RegistrySupplier<Block> CHISHI_TRAIT_REFORGER;
     /** 手术仓：移植/摘除玩家躯体器官（消耗固态 + 生命能量，带进度） */
     public static RegistrySupplier<Block> CHISHI_SURGERY;
     /** 药剂台：样本（纯度 ≥25）+ 固态 + 生命能量 → 永久/突破药剂 */
@@ -219,6 +229,10 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_SAMPLE_VAULT;
     /** 衰变净化塔：消耗赤能源净化范围内衰竭区域（加速区域消散） */
     public static RegistrySupplier<Block> CHISHI_DECAY_PURIFIER;
+    /** 母神祭坛：生命线终局多方块祭坛核心（黑山羊之母，NBT 献祭识别 + 悬浮供奉） */
+    public static RegistrySupplier<Block> CHISHI_MOTHER_ALTAR;
+    /** 母神祭坛石：祭坛结构件（5×5 底座 + 四角柱，铺设成型后母神驻留） */
+    public static RegistrySupplier<Block> CHISHI_ALTAR_STONE;
     /** 发生器矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
     public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CASING;
     /** 发生器矩阵控制器（低级 3×3×3，45 倍，沿用组合结构数据） */
@@ -437,6 +451,13 @@ public final class ModBlocks {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_upgrade_station"),
                         () -> new BlockItem(CHISHI_UPGRADE_STATION.get(), new Item.Properties()));
 
+        // 生命的融合砧（赤石护甲 + 生命的融合锭 → 生命融合护甲，保留升级数据）
+        CHISHI_LIFE_FUSION_ANVIL = blockRegistrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_fusion_anvil"),
+                AkaishiLifeFusionAnvilBlock::new);
+        RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_fusion_anvil"),
+                        () -> new BlockItem(CHISHI_LIFE_FUSION_ANVIL.get(), new Item.Properties()));
+
         // 赤石水晶母岩（4 级）：晶洞外层自然生成，放置后生长水晶簇，聚合器可升级
         CHISHI_GEODE_FLAWED = registerGeode(blockRegistrar, "akaishi_geode_flawed", AkaishiGeodeBlock.GeodeTier.FLAWED, MapColor.COLOR_LIGHT_GRAY);
         CHISHI_GEODE_NORMAL = registerGeode(blockRegistrar, "akaishi_geode_normal", AkaishiGeodeBlock.GeodeTier.NORMAL, MapColor.COLOR_RED);
@@ -649,15 +670,24 @@ public final class ModBlocks {
 
         // ===== 生命科技 =====
         CHISHI_BODY_SCANNER = registerReactorBlock(blockRegistrar, "akaishi_body_scanner", AkaishiBodyScannerBlock::new);
+        // 基因管理器（生命科技：已吸收基因强化管理）
+        CHISHI_GENE_MANAGER = registerReactorBlock(blockRegistrar, "akaishi_gene_manager", AkaishiGeneManagerBlock::new);
         CHISHI_GENE_ANALYZER = registerReactorBlock(blockRegistrar, "akaishi_gene_analyzer", AkaishiGeneAnalyzerBlock::new);
         CHISHI_CULTIVATOR = registerReactorBlock(blockRegistrar, "akaishi_cultivator", AkaishiCultivatorBlock::new);
         CHISHI_LIFE_STRUCT = registerReactorBlock(blockRegistrar, "akaishi_life_struct", AkaishiLifeStructBlock::new);
+        CHISHI_LIFE_BREEDER = registerReactorBlock(blockRegistrar, "akaishi_life_breeder", AkaishiLifeBreederBlock::new);
+        CHISHI_TRAIT_REFORGER = registerReactorBlock(blockRegistrar, "akaishi_trait_reforger", AkaishiTraitReforgerBlock::new);
         CHISHI_SURGERY = registerReactorBlock(blockRegistrar, "akaishi_surgery", AkaishiSurgeryBlock::new);
         CHISHI_POTION_TABLE = registerReactorBlock(blockRegistrar, "akaishi_potion_table", AkaishiPotionTableBlock::new);
         CHISHI_ORGAN_VAULT = registerReactorBlock(blockRegistrar, "akaishi_organ_vault", AkaishiOrganVaultBlock::new);
         CHISHI_POTION_CABINET = registerReactorBlock(blockRegistrar, "akaishi_potion_cabinet", AkaishiPotionCabinetBlock::new);
         CHISHI_SAMPLE_VAULT = registerReactorBlock(blockRegistrar, "akaishi_sample_vault", AkaishiSampleVaultBlock::new);
         CHISHI_DECAY_PURIFIER = registerReactorBlock(blockRegistrar, "akaishi_decay_purifier", AkaishiDecayPurifierBlock::new);
+
+        // ===== 母神祭坛（生命线终局多方块：黑山羊之母）=====
+        CHISHI_MOTHER_ALTAR = registerReactorBlock(blockRegistrar, "akaishi_mother_altar", AkaishiMotherAltarBlock::new);
+        // 母神祭坛石（结构件：5×5 底座 + 四角柱，铺设成型后母神驻留）
+        CHISHI_ALTAR_STONE = registerReactorBlock(blockRegistrar, "akaishi_altar_stone", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN)));
 
         // ===== 发生器矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
         CHISHI_GEN_MATRIX_CASING = registerReactorBlock(blockRegistrar, "akaishi_gen_matrix_casing", AkaishiGenMatrixCasingBlock::new);

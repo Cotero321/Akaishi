@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "GSG",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "S": { "item": "akaishi:akaishi_gene_analyzer" }
+  },
+  "result": { "item": "akaishi:akaishi_gene_manager", "count": 1 }
+}

@@ -83,23 +83,31 @@ public class AkaishiSampleCollectorItem extends Item {
 
     // ===== 采集逻辑（Forge EntityInteract 事件调用，仅服务端）=====
 
+    /** 结果码：未执行采集（物品无效/目标无样本组/能量不足），无需取消交互 */
+    public static final int RESULT_NONE = 0;
+    /** 结果码：采集失败（样本流失，仅扣一半能量），已消耗本次交互 */
+    public static final int RESULT_FAIL = 1;
+    /** 结果码：采集成功（生成样本并全额扣能量），已消耗本次交互 */
+    public static final int RESULT_SUCCESS = 2;
+
     /**
      * 尝试从生物抽取生命样本。
+     * 单个生物个体的成功采集次数上限由 Forge 调用侧以实体持久数据维护（见 AkaishiLifeInteraction）。
      *
-     * @return 是否成功执行采集（成功则取消该次交互，如喂食）
+     * @return 采集结果码 {@link #RESULT_NONE} / {@link #RESULT_FAIL} / {@link #RESULT_SUCCESS}
      */
-    public static boolean tryCollect(Player player, LivingEntity target, ItemStack collector) {
+    public static int tryCollect(Player player, LivingEntity target, ItemStack collector) {
         if (collector.isEmpty() || !(collector.getItem() instanceof AkaishiSampleCollectorItem)) {
-            return false;
+            return RESULT_NONE;
         }
         SampleGroup group = SampleGroup.of(target);
         if (group == null) {
-            return false;
+            return RESULT_NONE;
         }
         long stored = getEnergyStored(collector);
         if (stored < COST_PER_SAMPLE) {
             player.sendSystemMessage(Component.translatable("message.akaishi.sample.no_energy"));
-            return false;
+            return RESULT_NONE;
         }
         // 成功率 = 分组基础值 + 血量加成（血量每低于 50% 加成 10，封顶 95）
         int rate = Math.min(95, group.getBaseCollectRate()
@@ -115,13 +123,12 @@ public class AkaishiSampleCollectorItem extends Item {
             }
             player.sendSystemMessage(Component.translatable("message.akaishi.sample.collect",
                     Component.translatable(group.getNameKey()), AkaishiLifeSampleItem.getPurity(sample)));
-        } else {
-            // 失败：仅消耗一半能量，样本流失
-            setEnergy(collector, stored - COST_PER_SAMPLE / 2);
-            player.sendSystemMessage(Component.translatable("message.akaishi.sample.fail"));
+            return RESULT_SUCCESS;
         }
-        // 无论成败都取消该次交互（防止误触发喂食/交易等默认行为）
-        return true;
+        // 失败：仅消耗一半能量，样本流失
+        setEnergy(collector, stored - COST_PER_SAMPLE / 2);
+        player.sendSystemMessage(Component.translatable("message.akaishi.sample.fail"));
+        return RESULT_FAIL;
     }
 
     @Override

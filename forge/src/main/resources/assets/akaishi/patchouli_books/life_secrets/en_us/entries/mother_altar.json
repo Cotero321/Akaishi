@@ -1,0 +1,13 @@
+{
+  "name": "Altar of the Black Mother",
+  "icon": "akaishi:akaishi_mother_altar",
+  "category": "akaishi:life_advanced",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mother_altar",
+      "text": "Altar of the Black Mother: a full-on Lovecraftian offering stand.$(br)It has no GUI — it reads the offerings you slot in via NBT, then levitates them above the altar for 'Her' to enjoy.$(br)Offer the right tribute and you might earn an unexpected boon; offer the wrong one... good luck."
+    }
+  ]
+}

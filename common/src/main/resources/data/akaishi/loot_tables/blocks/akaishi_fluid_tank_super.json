@@ -1,0 +1,20 @@
+﻿{
+    "type":  "minecraft:block",
+    "pools":  [
+                  {
+                      "bonus_rolls":  0,
+                      "conditions":  [
+                                         {
+                                             "condition":  "minecraft:survives_explosion"
+                                         }
+                                     ],
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:item",
+                                          "name":  "akaishi:akaishi_fluid_tank_super"
+                                      }
+                                  ],
+                      "rolls":  1
+                  }
+              ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Item Pipes",
+  "icon": "akaishi:akaishi_item_pipe_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_pipe",
+      "text": "Item pipes, the relay of your logistics network, haul goods along a chained network to connected containers/machines.$(li)Basic: 1 per tick$(li)Intermediate: 4 per tick$(li)Advanced: 16 per tick$(li)Ultimate: 64 per tick$(br2)Directions a mess? Whip out the Configurator to toggle push/pull or break a single side — one click, done."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "矿机升级模块",
+  "icon": "akaishi:akaishi_miner_speed_upgrade_block",
+  "category": "akaishi:miner",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_speed_upgrade_block",
+      "text": "速度升级模块：挖矿效率起飞，但电费也跟着起飞。$(br)每块速率 +12.5%、能耗 +10%，$(2,4)最多 10 块$(0)。右键直接装到结构的升级框架位上，跑起来跟开挂一样。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_fortune_upgrade_block",
+      "text": "时运升级模块：让矿物产量更肥。$(br)每块单次产出 +1，$(2,4)最多 4 块$(0)。装上之后，每一下都是「丰收的喜悦」。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_storage_upgrade_block",
+      "text": "储能升级模块：给矿机扩充「肚子」。$(br)每块能量容量 +50%，$(2,4)最多 10 块$(0)。$(br2)模块可在升级框架位上直接替换/拆除，控制器每 20 tick 汇总一次，随时加装，矿机不眠不休。"
+    }
+  ]
+}

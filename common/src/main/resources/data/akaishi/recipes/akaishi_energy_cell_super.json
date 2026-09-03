@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "DDD",
-    "DED",
-    "DDD"
+    "DAD",
+    "AEA",
+    "DAD"
   ],
   "key": {
+    "A": { "item": "akaishi:akaishi_advanced_component" },
     "D": { "item": "akaishi:diamond_dust" },
     "E": { "item": "akaishi:akaishi_energy_cell_advanced" }
   },

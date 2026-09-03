@@ -1,0 +1,12 @@
+{
+  "name": "Dusts",
+  "icon": "akaishi:akaishi_dust",
+  "category": "akaishi:machines",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The Pulverizer's full menu — see if your favorite \"dust\" is here:$(li)Akaishi Dust$(li)Coal Dust$(li)Iron Dust$(li)Copper Dust$(li)Gold Dust$(li)Lapis Dust$(li)Diamond Dust$(li)Emerald Dust$(li)Quartz Dust$(li)Netherite Dust$(li)Obsidian Dust$(br2)Dust can be pressed back into blocks by the Compressor, and it's the base of the heat-sink chain and high-tier recipes. Shattered to bits, yet worth even more."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Life Conversion",
+  "icon": "akaishi:akaishi_life_matrix_controller",
+  "category": "akaishi:life_intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_controller",
+      "text": "The Life Conversion Matrix is currently the only thing that can \"brew\" life energy: form it automatically by enclosing a 3×3×3 sealed structure with the controller, matrix casings, and energy ports.$(br)Position it right and it's your life-energy money printer."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_energy_input",
+      "text": "Akaishi energy is injected through the energy input into the matrix center; once formed it runs up to 45 conversions per tick (10M energy each → 10 life energy).$(br)Feed it more power, and it brews life faster."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_energy_output",
+      "text": "Life energy exits through the energy output (pipe extraction only); pair it with life-energy pipes to drive sample collection, organ research, and the devices that follow.$(br)That output is the \"first drop\" of life tech."
+    }
+  ]
+}

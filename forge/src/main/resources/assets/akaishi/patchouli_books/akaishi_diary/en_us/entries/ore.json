@@ -1,0 +1,17 @@
+{
+  "name": "Akaishi Ore Clusters",
+  "icon": "akaishi:akaishi_ore_medium",
+  "category": "akaishi:intro",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ore_medium",
+      "text": "Akaishi crystals spawn as ore clusters in the Overworld (stone/deepslate), the Nether, and the End — its shadow reaches the very edge of the universe.$(br)Clusters come in 4 concentrations: flawless, low, medium, perfect. The richer the concentration, the fatter the drop per swing."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)Concentration = yield$(0): concentration decides how many crystals drop per break. Don't frown at the count — slap Fortune on your pickaxe to boost it further.$(br2)$(2,4)Want to count money while lying down?$(0)Remember two names: Catalyst + Collector. Together they make crystal farming fully automatic. The full play is in the \"Advanced Industry\" chapter."
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
@@ -65,5 +66,17 @@ public final class PlayerBodyCapability {
                         state.load(nbt);
                     }
                 });
+    }
+
+    /** 玩家重生克隆（含死亡）：移植器官跨死亡保留——躯体状态原样复制到新实体 */
+    @SubscribeEvent
+    public void onPlayerClone(PlayerEvent.Clone event) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide) {
+            return;
+        }
+        Player original = event.getOriginal();
+        original.getCapability(PLAYER_BODY).ifPresent(old ->
+                player.getCapability(PLAYER_BODY).ifPresent(next -> next.load(old.save())));
     }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "Upgrade Template",
+  "icon": "akaishi:akaishi_upgrade_template",
+  "category": "akaishi:advanced",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_upgrade_template",
+      "text": "The Upgrade Template, the \"ticket\" to gear enhancement.$(br)Every level of special ability at the Upgrade Station eats 1 upgrade slot + 1 template + 20M energy.$(br2)Base stats (attack speed / damage / efficiency / health / armor / toughness) are allocated by the Equipment Forger when forging. Want to get stronger? Stock up on tickets first."
+    }
+  ]
+}

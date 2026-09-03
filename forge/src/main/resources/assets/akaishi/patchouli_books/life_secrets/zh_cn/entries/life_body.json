@@ -1,0 +1,18 @@
+{
+  "name": "躯体检查与衰变",
+  "icon": "akaishi:akaishi_body_scanner",
+  "category": "akaishi:life_advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_body_scanner",
+      "text": "躯体检查仪：一眼看清 9 个器官槽位的移植状态、排斥值与整体稳定度。$(br)改造身体是门手艺，先体检再动刀，随时掌握「这副躯体」的账本。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_decay_purifier",
+      "text": "衰变净化塔：烧赤能源净化范围内的衰竭区域，让爆炸事故留下的衰变减益逐渐消退。$(br)出了事故别慌，立起一座塔，把「烂摊子」慢慢擦干净。"
+    }
+  ]
+}

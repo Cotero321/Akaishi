@@ -1,0 +1,31 @@
+{
+  "name": "Miner Structure",
+  "icon": "akaishi:akaishi_miner_controller_basic",
+  "category": "akaishi:miner",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:multiblock",
+      "name": "Akaishi Miner (9x9x3)",
+      "multiblock": {
+        "pattern": [
+          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "],
+          ["    F    ", "         ", "         ", "         ", "F   0   F", "         ", "         ", "         ", "    F    "],
+          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "]
+        ],
+        "mapping": {
+          "F": "akaishi:akaishi_miner_frame",
+          "U": "akaishi:akaishi_miner_upgrade_frame",
+          "P": "akaishi:akaishi_miner_port",
+          "0": "akaishi:akaishi_miner_controller_basic"
+        },
+        "symmetrical": false
+      },
+      "text": "The controller sits at the center of the middle layer. The bottom and top layers each have one port (2 total). U slots can be swapped for upgrade-module blocks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)Build tips$(0)$(li)9×9 cross-section × 3 layers tall$(li)Place the controller at the middle-layer center first, then fill in the rest$(li)Upgrade-frame slots U: put empty upgrade frames or install upgrade modules directly$(li)Put 1 port P at the center of both the top and bottom layers$(br2)Once formed, the controller broadcasts to the ports and produced minerals auto-flow into the port buffers. Get the positions right and the miner \"spits ore\" on its own."
+    }
+  ]
+}

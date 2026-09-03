@@ -1,0 +1,28 @@
+{
+  "name": "Liquid Fuel Chain",
+  "icon": "akaishi:akaishi_energy_liquefier",
+  "category": "akaishi:tech",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_liquefier",
+      "text": "Energy Liquefier: crushes solid akaishi energy down into 'Nether energy liquid'.$(br)Don't ask how energy fits in a can — the answer is always 'akaishi tech, that's how'. Each tick it gulps energy and spits liquid, purer than a lab beaker."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_processor",
+      "text": "Energy Processor: solid matter + Nether energy liquid, stirred into burnable fuel.$(br)Think of it as akaishi 'liquid bread' — solids in one side, liquid in the other, and out pops hard currency for your reactor."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fluid_tank_basic",
+      "text": "Fluid Tanks come in three tiers:$(li)Basic: for the homestead$(li)Advanced: for the workshop$(li)Super: until you question your life choices$(br)They store Nether energy / fuel liquid. Hook up a pipe and the liquid finds its own way home."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fluid_pipe",
+      "text": "Fluid Pipe: hauls liquid around, more reliable than any courier and never loses a package.$(br)Pair it with tanks, the liquefier and the processor to build a fully automatic liquid-fuel assembly line."
+    }
+  ]
+}

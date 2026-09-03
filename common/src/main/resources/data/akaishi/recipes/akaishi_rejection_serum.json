@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "akaishi:akaishi_life_essence_solid"
+    },
+    {
+      "item": "akaishi:akaishi_life_essence_solid"
+    },
+    {
+      "item": "akaishi:akaishi_life_essence_solid"
+    }
+  ],
+  "result": {
+    "item": "akaishi:akaishi_rejection_serum"
+  }
+}

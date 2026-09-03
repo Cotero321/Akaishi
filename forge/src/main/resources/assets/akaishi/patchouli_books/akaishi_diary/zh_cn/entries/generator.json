@@ -1,0 +1,18 @@
+{
+  "name": "赤能源发生机",
+  "icon": "akaishi:akaishi_energy_generator",
+  "category": "akaishi:energy",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_generator",
+      "text": "赤能源发生机，烧燃料产电的「第一口锅」。$(br)自带 10 个升级槽，塞进$(2,4)能源产生升级组件$(0)可提升产能（每个 ×1.75，最多 10 个）。燃料管够，电费管饱。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_basic",
+      "text": "$(2,4)想规模化发电？$(0)老的「小型组合」与「超级架构」已经退休，现在由$(2,4)发生器矩阵$(0)接手：矩阵外壳围成封闭空间，控制器与端口挂墙，产能翻着跟头涨。$(br)结构摆法去「矩阵结构」条目看。"
+    }
+  ]
+}

@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "D D",
-    "DCD",
-    "D D"
+    "AEA",
+    "ECE",
+    "AEA"
   ],
   "key": {
-    "D": { "item": "akaishi:diamond_dust" },
+    "A": { "item": "akaishi:akaishi_advanced_component" },
+    "E": { "item": "akaishi:akaishi_exhausted_crystal" },
     "C": { "item": "minecraft:crafting_table" }
   },
   "result": { "item": "akaishi:akaishi_item_reconstructor", "count": 1 }

@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "P P",
-    " R ",
-    "P P"
+    "PEP",
+    "ERE",
+    "PEP"
   ],
   "key": {
     "R": { "item": "akaishi:akaishi_dust" },
-    "P": { "item": "minecraft:paper" }
+    "P": { "item": "minecraft:paper" },
+    "E": { "item": "akaishi:akaishi_essence_compressed" }
   },
   "result": { "item": "akaishi:akaishi_upgrade_template", "count": 1 }
 }

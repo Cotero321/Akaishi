@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "LIL",
-    "I S",
-    "LIL"
+    "AIA",
+    "ISI",
+    "AIA"
   ],
   "key": {
-    "L": { "item": "minecraft:lapis_block" },
+    "A": { "item": "akaishi:akaishi_advanced_component" },
     "S": { "item": "akaishi:akaishi_energy_cell_advanced" },
     "I": { "item": "akaishi:gold_dust" }
   },

@@ -1,0 +1,25 @@
+{
+  "name": "Trait Codex - Safe Mutations",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:gene_mutations",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_breeder",
+      "text": "Mutation mechanics: when the Life Breeder cultivates an organ, it randomly applies mutation traits based on the culture-medium gene sequence's purity — below 60 only rolls tier 1, 60-84 rolls up to tier 2, 85 and above unlocks everything.$(br2)Each trait occupies 1 capacity slot: I-grade organs have 1, II-grade 2, III-grade 3, IV-grade 4.$(br2)Once attached a trait is bound to the organ and cannot be removed, and the same trait won't repeat; rolled something unwanted? Hand it to the Trait Reforger to swap it individually."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "【Tier 1 · Pure Safe Mutations】$(br2)Dense Tissue —— Armor +1$(br)Strong Muscle Fiber —— Attack Damage +1$(br)Active Marrow —— Max Health +3$(br)Reflex Neurons —— Attack Speed +0.4$(br)Springy Tendons —— Move Speed +0.015"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "【Tier 2 · Advanced Mutations · Safe】$(br2)Venom Gland —— attacks inflict poison$(br)Night-Vision Retina —— permanent night vision$(br)Gill Slits —— water breathing$(br)Fluorescent Cells —— self-glow$(br)Chitin Overgrowth —— Armor +2, Knockback Resistance +0.2"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "【Tier 3 · Rare Mutations · Safe】$(br2)Crystal Carapace —— Armor +1.5, reflect melee damage$(br)Shadow Veins —— chance to blink-dodge when hit$(br)Bouncy Tendons —— Move Speed +0.01, Jump Boost$(br)Stem-Cell Regeneration —— slow regeneration$(br)Sentinel Retina —— Armor +0.5, highlights hostile mobs"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Miner Tiers",
+  "icon": "akaishi:akaishi_miner_controller_ultimate",
+  "category": "akaishi:miner",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Akaishi Miners come in 4 tiers, and the tier is decided by the $(2,4)controller block$(0):$(li)Basic: mining rate ×1.0, energy capacity 1M$(li)Advanced: rate ×1.5, capacity 5M$(li)Elite: rate ×2.0, capacity 20M$(li)Ultimate: rate ×3.0, capacity 50M$(br2)The higher the tier, the higher the output weight of rare minerals (diamond, emerald, netherite scraps) too (× tier multiplier). Want rare drops? Upgrade the controller first."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)Mining mechanics$(0)$(li)Each tick burns 10 energy to advance progress (speed upgrades add +10% cost each)$(li)At 200 ticks of progress it rolls a random mineral$(li)Fortune upgrades boost single-drop count, storage upgrades expand capacity$(br2)$(2,4)Output weight table$(0)$(li)Coal 30 / Iron 24 / Copper 22 / Gold 12$(li)Redstone 8 / Lapis 6 / Quartz 6$(li)Diamond 3 / Emerald 2 / Netherite Scrap 1"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_port",
+      "text": "The Miner Port, the structure's \"transfer hub\".$(br)$(li)27-slot item buffer: receives minerals pushed by the controller, exportable via item pipes$(li)10M energy buffer: powered by external energy pipes, up to 2000 energy per tick to the controller$(br2)Each miner has one port at the center of the bottom and top layers — one in, one out, each doing its own job."
+    }
+  ]
+}

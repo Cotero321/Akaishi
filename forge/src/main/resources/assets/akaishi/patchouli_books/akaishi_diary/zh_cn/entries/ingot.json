@@ -1,0 +1,13 @@
+{
+  "name": "赤石锭",
+  "icon": "akaishi:akaishi_ingot",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ingot",
+      "text": "赤石锭，赤石科技的「硬通货」。$(br)把下界合金锭丢进赤石能量聚合器，再灌 10M 赤能源，出来就是亮闪闪的赤石锭。$(br)全套赤石装备、赤红升级模板、一票高级机器，全都得靠它打底。"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Life Fusion Anvil",
+  "icon": "akaishi:akaishi_life_fusion_anvil",
+  "category": "akaishi:life_machines",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_fusion_anvil",
+      "text": "Life Fusion Anvil: slam akaishi armor and a fusion ingot onto the anvil, and 'clang' — Life-fused Armor.$(br)Wear it and you stop being an ordinary miner; you become living, breathing akaishi battle plate — armor that finally has a pulse."
+    }
+  ]
+}

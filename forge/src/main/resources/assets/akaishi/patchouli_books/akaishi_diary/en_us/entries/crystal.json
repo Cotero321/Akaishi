@@ -1,0 +1,18 @@
+{
+  "name": "Crystal & Essence",
+  "icon": "akaishi:akaishi_crystal",
+  "category": "akaishi:intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_crystal",
+      "text": "Akaishi Crystals, the \"sweat money\" from ore clusters, are the source of everything in akaishi tech.$(br)9 crystals → a rough akaishi block, then into the Purifier → akaishi essence. From picking stones to building a fortune, it all runs on this line."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_essence",
+      "text": "Akaishi Essence is the refined stuff, and you can keep squeezing it:$(li)9 essence → concentrated essence$(li)9 concentrated essence → concentrated essence block$(li)smelt the block → akaishi ingot$(br2)Remember this upgrade chain — it's how your wallet gets fat."
+    }
+  ]
+}

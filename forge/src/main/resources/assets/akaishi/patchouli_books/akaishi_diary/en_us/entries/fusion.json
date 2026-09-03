@@ -1,0 +1,64 @@
+{
+  "name": "Fusion Reactor",
+  "icon": "akaishi:akaishi_fusion_controller",
+  "category": "akaishi:tech",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:multiblock",
+      "name": "Fusion Reactor (7x7x7)",
+      "multiblock": {
+        "pattern": [
+          ["SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI   IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI 0 IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SI   IS", "SI   IS", "SI   IS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SIIIIIS", "SSSSSSS"],
+          ["SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS", "SSSSSSS"]
+        ],
+        "mapping": {
+          "S": "akaishi:akaishi_fusion_shell",
+          "I": "akaishi:akaishi_fusion_insulation",
+          "0": "akaishi:akaishi_fusion_core"
+        },
+        "symmetrical": false
+      },
+      "text": "An onion-like layered structure: outer 7×7×7 shell → middle 5×5×5 insulation → inner 3×3×3 frame → central fusion core. The controller must sit on a wall, not in the core slot, or it won't register."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)Build tips$(0)$(li)Shell walls can be swapped for: Fusion Controller / Energy Output / Item Input / Item Output$(li)Frame-layer empty slots hold: Fuel Frames / Cooling Frames / Efficiency Frames$(li)Caps: fuel 4, cooling 10, efficiency 12$(li)Exactly 1 core, dead center$(br2)Once formed, the controller re-checks every 20 ticks — a missing block or a wrong block breaks it. The fusion reactor is precision work, don't fumble."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_controller",
+      "text": "The Fusion Controller is the brain: feed in a plasma fuel rod and it starts burning.$(br)$(2,4)Temperature mechanics$(0)$(li)Base target temperature 50M$(li)The more heat production exceeds cooling, the higher the temperature$(li)100M~130M yields ×1.0 — optimal$(li)Below 100M yield climbs linearly 0.5~1.0$(li)130M~160M yield decays to 0.5$(li)≥160M overheats and shuts down, recovers automatically at 80M (no explosion, don't panic)"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_fuel_aggregator",
+      "text": "The Fusion Fuel Aggregator: 2000 energy + 1 activated component → 1000mb of plasma.$(br)Three plasmas (mixed/nether/end) must be stored in their own dedicated tanks, then piped into the Plasma Filler via plasma pipes."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_filler",
+      "text": "The Plasma Filler: 1 fusion reaction rod + 1000mb plasma → 1 matching plasma fuel rod (100 ticks).$(br)It prioritizes the plasma tank with the most stock and processes the same kind in a row — even machines have their own \"greed\"."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mixed_plasma_rod",
+      "text": "Three plasma fuel rods, 6 trillion energy each:$(li)$(bold)Mixed Plasma Rod$(0): 4M/t base rate, 27M heat — the balanced pick, stack yield with efficiency frames$(li)$(bold)Nether Plasma Rod$(0): 4M/t base rate, 40M heat — high yield high heat, needs serious cooling to hold temperature$(li)$(bold)End Plasma Rod$(0): 2.6M/t base rate, 15M heat — low yield low heat, 4 rods with no cooling hit the sweet zone"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:fusion_heat_sink_tier5",
+      "text": "Fusion heat sinks come in 6 grades (tiers 1-5 + life-grade), cooling 5% / 7% / 9% / 12% / 15% / 20%.$(br)Install into cooling frames; every 5 seconds they lose 1 durability (8000 total) and shatter at zero.$(br)Cooling formula: cooling% × (1 + 0.1 × cooling-frame count) × 2M + fuel-rod cooling bonus. Can't hold temperature? Stuff in more heat-sink tiers."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_ash",
+      "text": "While burning it also banks Life Ash: 1 ash per 100 billion energy consumed.$(br)Ash is auto-extracted through the fusion item output and is a key material for life heat sinks and high-tier life tech.$(br2)Produced energy is split evenly across all energy outputs (200 billion buffer each, output only)."
+    }
+  ]
+}

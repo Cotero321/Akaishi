@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " G ",
-    "GBG",
-    " G "
+    " E ",
+    "ABA",
+    " E "
   ],
   "key": {
     "B": { "item": "akaishi:portable_akaishi_cell_basic" },
-    "G": { "item": "akaishi:gold_dust" }
+    "E": { "item": "akaishi:akaishi_energy_cell_advanced" },
+    "A": { "item": "akaishi:akaishi_advanced_component" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_advanced", "count": 1 }
 }

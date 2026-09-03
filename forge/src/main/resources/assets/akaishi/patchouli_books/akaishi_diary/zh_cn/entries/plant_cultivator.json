@@ -1,0 +1,17 @@
+{
+  "name": "赤石植物培养机",
+  "icon": "akaishi:akaishi_plant_cultivator",
+  "category": "akaishi:machines",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plant_cultivator",
+      "text": "赤石植物培养机，把种子「催熟」成作物的黑科技。$(br)GUI 就一格输入：放种子、通电，$(2,4)种子不消耗$(0)，能量烧完直接产出植物产物（但不吐种子，别指望白嫖循环）。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)产物示例$(0)$(li)小麦种子 → 小麦$(li)马铃薯 → 马铃薯$(li)下界疣 → 下界疣$(li)藤蔓/茎秆类$(br2)嫌慢？塞升级组件，速度蹭蹭往上涨。"
+    }
+  ]
+}

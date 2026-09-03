@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "LCL",
+    "HCH",
     "CAC",
-    "LCL"
+    "HCH"
   ],
   "key": {
     "C": { "item": "akaishi:copper_dust" },
-    "L": { "item": "minecraft:lapis_block" },
+    "H": { "item": "akaishi:akaishi_advanced_component" },
     "A": { "item": "akaishi:akaishi_life_centrifuge" }
   },
   "result": { "item": "akaishi:akaishi_activated_fractionator", "count": 1 }

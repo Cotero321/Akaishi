@@ -1,0 +1,23 @@
+{
+  "name": "Trait Reforger",
+  "icon": "akaishi:akaishi_trait_reforger",
+  "category": "akaishi:gene_mutations",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_trait_reforger",
+      "text": "How reforging works: pick the Nth mutation trait on an organ and reroll it into a random new trait from that tier's pool (it won't duplicate traits the organ already carries).$(br2)Each run costs: Exhausted Crystals × (2 × tier) + 120,000 life energy.$(br2)Deterministic success: if materials and energy are met it always succeeds, and the organ is never damaged — don't like the roll? Just reforge again."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_trait_reforger",
+      "text": "Crafting: eight Akaishi Ingots around one Exhausted Crystal."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_crystal",
+      "text": "How to use: insert an organ with mutation traits → click the index above to choose which trait to reforge → it auto-starts once crystals and energy are ready (about 30s).$(br2)You can switch targets mid-reforge (progress resets); grab the new organ from the output when done. Natural native organs cannot be reforged. Rerolling traits — simple and brutal."
+    }
+  ]
+}

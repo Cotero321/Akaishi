@@ -1,0 +1,18 @@
+{
+  "name": "反应堆",
+  "icon": "akaishi:akaishi_reactor_controller",
+  "category": "akaishi:tech",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_reactor_controller",
+      "text": "反应堆，火力发电的大心脏。$(br)用反应堆外壳围成边长 5 或 7 的封闭盒子，墙面放控制器与各端口，内腔放 1 个反应核心、燃料棒（≤10）与散热组件（≤20）。$(br)投入燃料罐即开烧，400-700℃ 产率最高——控温，是门手艺活。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_reactor_fuel_rod",
+      "text": "燃料棒解锁燃料槽（上限 10），散热组件装散热片且必须与燃料棒贴邻才生效。$(br2)$(2,4)保命警告$(0)：超 850℃ 产量下降；热量顶到 1000℃ 后 10 秒直接爆炸，还泄漏衰竭区域！散热片拉满、废料处理跟上，别拿基地开玩笑。"
+    }
+  ]
+}

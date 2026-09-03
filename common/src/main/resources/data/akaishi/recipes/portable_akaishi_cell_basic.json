@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " C ",
-    "CBC",
-    " C "
+    " M ",
+    "MBM",
+    " M "
   ],
   "key": {
-    "C": { "item": "akaishi:akaishi_crystal" },
-    "B": { "item": "akaishi:raw_akaishi_block" }
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "B": { "item": "akaishi:akaishi_energy_cell_basic" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_basic", "count": 1 }
 }

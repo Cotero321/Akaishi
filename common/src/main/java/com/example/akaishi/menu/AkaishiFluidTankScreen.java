@@ -70,7 +70,8 @@ public class AkaishiFluidTankScreen extends AbstractContainerScreen<AkaishiFluid
         }
         Component label = Component.literal(text);
         int w = this.font.width(label);
-        gui.drawString(this.font, label, this.leftPos + 88 - w / 2, this.topPos + BAR_Y - 2, 0xFF3F3F3F, false);
+        // 数值文本置于进度条上方（标题与条之间），避免压在条上
+        gui.drawString(this.font, label, this.leftPos + 88 - w / 2, this.topPos + BAR_Y - 12, 0xFF3F3F3F, false);
 
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,

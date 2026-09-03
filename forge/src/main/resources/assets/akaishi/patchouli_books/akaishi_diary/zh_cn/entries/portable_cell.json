@@ -1,0 +1,13 @@
+{
+  "name": "便捷赤能源单元",
+  "icon": "akaishi:portable_akaishi_cell_super",
+  "category": "akaishi:energy",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:portable_akaishi_cell_basic",
+      "text": "随身能量包，共 3 级：基础/高级/超级。$(br)揣在身上自动给赤石装备回耐久，右键查电量——施工探险两不误，真正的「行走充电宝」。"
+    }
+  ]
+}

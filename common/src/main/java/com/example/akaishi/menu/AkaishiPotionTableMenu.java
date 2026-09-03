@@ -1,6 +1,8 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiPotionCabinetBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPotionTableBlockEntity;
+import com.example.akaishi.block.entity.AkaishiSampleVaultBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
@@ -88,8 +90,10 @@ public class AkaishiPotionTableMenu extends AbstractContainerMenu {
             addSlot(new Slot(inv, col, 8 + col * 18, 142));
         }
         addDataSlots(data);
-        // 存储联动：3 格内存在存储库时注入联动槽
-        this.linkState = StorageLink.tryLink(this::addSlot, inv.player.level(), pos);
+        // 存储联动：仅匹配样本库（取样本原料）/药剂库（存成品药剂），避免误连同范围的其他库
+        this.linkState = StorageLink.tryLink(this::addSlot, inv.player.level(), pos,
+                vault -> vault instanceof AkaishiSampleVaultBlockEntity
+                        || vault instanceof AkaishiPotionCabinetBlockEntity);
     }
 
     public long getLifeEnergy() {

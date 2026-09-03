@@ -165,11 +165,9 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         if (!hasSolid(SOLID_COST) || life.getEnergyStored() < LIFE_COST) {
             return false;
         }
-        ItemStack out = inventory.getItem(OUTPUT_SLOT);
-        if (out.isEmpty()) {
-            return true;
-        }
-        return out.getItem() instanceof AkaishiOrganItem && out.getCount() < out.getMaxStackSize();
+        // 产物槽必须为空：每次产出的器官纯度/适配度 NBT 均随机生成，与旧产物无法正确合并，
+        // 强行 grow 会覆盖新产物 NBT 或复制旧产物（物品复制隐患）
+        return inventory.getItem(OUTPUT_SLOT).isEmpty();
     }
 
     private boolean availableContains(BodySlot target) {
@@ -196,13 +194,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         ItemStack organ = AkaishiOrganItem.create(target, group, entityId, purity);
         AkaishiOrganItem.setPurity(organ, purity);
         AkaishiOrganItem.setTier(organ, AkaishiGeneSequenceItem.tierOf(purity));
-
-        ItemStack out = inventory.getItem(OUTPUT_SLOT);
-        if (out.isEmpty()) {
-            inventory.setItem(OUTPUT_SLOT, organ);
-        } else {
-            out.grow(1);
-        }
+        // 输出槽已由 canProcess 保证为空（NBT 随机产物禁止堆叠合并）
+        inventory.setItem(OUTPUT_SLOT, organ);
     }
 
     private boolean hasSolid(int count) {
@@ -210,9 +203,18 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         return solid.is(ModItems.akaishiLifeEssenceSolid.get()) && solid.getCount() >= count;
     }
 
-    /** 界面选择目标槽位（服务端校验范围） */
+    /** 界面选择目标槽位（C2S 入口，服务端校验范围与可用性，拒绝非法/远程篡改） */
     public void setTargetSlot(int index) {
-        targetSlot = Math.max(0, Math.min(BodySlot.values().length - 1, index));
+        int clamped = Math.max(0, Math.min(BodySlot.values().length - 1, index));
+        ItemStack input = inventory.getItem(INPUT_SLOT);
+        if (input.getItem() instanceof AkaishiGeneSequenceItem) {
+            // 目标必须是当前序列已注册的可用槽位（GUI 只会发送可用项，此处拦截异常包）
+            BodySlot target = BodySlot.values()[clamped];
+            if (!OrganEffectRegistry.availableSlots(AkaishiGeneSequenceItem.getEntityId(input)).contains(target)) {
+                return;
+            }
+        }
+        targetSlot = clamped;
         data.set(DATA_TARGET, targetSlot);
         setChanged();
     }
@@ -265,6 +267,23 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
     @Override
     public void clearContent() {
         inventory.clearContent();
+    }
+
+    @Override
+    public boolean canPlaceItem(int index, ItemStack stack) {
+        // 自动化（漏斗/投掷器等）入口过滤：输入槽按类型收料，产物槽只出不进（防垃圾卡死输出）
+        return switch (index) {
+            case INPUT_SLOT -> stack.getItem() instanceof AkaishiGeneSequenceItem;
+            case SOLID_SLOT -> stack.is(ModItems.akaishiLifeEssenceSolid.get());
+            default -> false;
+        };
+    }
+
+    // ===== IDataCarrier：物品随方块破坏实体掉落，从掉落物 NBT 排除（防放置后复制） =====
+
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items"};
     }
 
     // ===== IItemPipeDevice：序列/固态入，器官出 =====

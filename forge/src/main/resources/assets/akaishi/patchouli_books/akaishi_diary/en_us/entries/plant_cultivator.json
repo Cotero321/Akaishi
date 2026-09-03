@@ -1,0 +1,17 @@
+{
+  "name": "Plant Cultivator",
+  "icon": "akaishi:akaishi_plant_cultivator",
+  "category": "akaishi:machines",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plant_cultivator",
+      "text": "The Plant Cultivator, black-tech that \"fast-forwards\" seeds into crops.$(br)Its GUI has a single input slot: drop in a seed and power it up — $(2,4)the seed is NOT consumed$(0). Once the energy finishes, it spits out the plant product (but no seeds, so don't expect an infinite loop)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)Example products$(0)$(li)Wheat Seeds → Wheat$(li)Potato → Potato$(li)Nether Wart → Nether Wart$(li)Vine / stem crops$(br2)Too slow? Stuff in upgrade components and watch it speed up."
+    }
+  ]
+}

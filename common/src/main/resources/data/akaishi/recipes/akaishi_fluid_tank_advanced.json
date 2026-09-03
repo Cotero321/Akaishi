@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "GGG",
-    "GTG",
-    "GGG"
+    "GMG",
+    "MTM",
+    "GMG"
   ],
   "key": {
     "T": { "item": "akaishi:akaishi_fluid_tank_basic" },
-    "G": { "item": "akaishi:gold_dust" }
+    "G": { "item": "akaishi:gold_dust" },
+    "M": { "item": "akaishi:akaishi_machine_component" }
   },
   "result": { "item": "akaishi:akaishi_fluid_tank_advanced", "count": 1 }
 }

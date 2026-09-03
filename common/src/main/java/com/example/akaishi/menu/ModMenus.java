@@ -20,6 +20,8 @@ import com.example.akaishi.block.entity.AkaishiGeneAnalyzerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiGenMatrixControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiCultivatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeStructBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeBreederBlockEntity;
+import com.example.akaishi.block.entity.AkaishiTraitReforgerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiSurgeryBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPotionTableBlockEntity;
 import com.example.akaishi.block.entity.AkaishiOrganVaultBlockEntity;
@@ -52,6 +54,7 @@ import com.example.akaishi.block.entity.AkaishiReactorFuelPortBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPurifierBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPurifierMatrixControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiUpgradeStationBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import dev.architectury.registry.menu.MenuRegistry;
@@ -91,6 +94,8 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiEquipmentForgerMenu>> CHISHI_EQUIPMENT_FORGER;
     /** 赤红升级台菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiUpgradeStationMenu>> CHISHI_UPGRADE_STATION;
+    /** 生命的融合砧菜单类型（赤石护甲 + 融合锭 → 生命融合护甲） */
+    public static RegistrySupplier<MenuType<AkaishiLifeFusionAnvilMenu>> CHISHI_LIFE_FUSION_ANVIL;
     /** 自动收集器菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiAutoCollectorMenu>> CHISHI_AUTO_COLLECTOR;
     public static RegistrySupplier<MenuType<AkaishiCatalystMenu>> CHISHI_CATALYST;
@@ -116,12 +121,18 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiReactorEnergyOutputMenu>> CHISHI_REACTOR_ENERGY_OUTPUT;
     /** 躯体检查仪菜单类型（纯展示面板，无槽位） */
     public static RegistrySupplier<MenuType<AkaishiBodyScannerMenu>> CHISHI_BODY_SCANNER;
+    /** 基因管理器菜单类型（纯管理面板，无槽位） */
+    public static RegistrySupplier<MenuType<AkaishiGeneManagerMenu>> CHISHI_GENE_MANAGER;
     /** 生命分析台菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiGeneAnalyzerMenu>> CHISHI_GENE_ANALYZER;
     /** 部件培养舱菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiCultivatorMenu>> CHISHI_CULTIVATOR;
     /** 生命结构台菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiLifeStructMenu>> CHISHI_LIFE_STRUCT;
+    /** 生命培育器菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiLifeBreederMenu>> CHISHI_LIFE_BREEDER;
+    /** 词条重铸仪菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiTraitReforgerMenu>> CHISHI_TRAIT_REFORGER;
     /** 手术仓菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiSurgeryMenu>> CHISHI_SURGERY;
     /** 药剂台菜单类型 */
@@ -311,6 +322,20 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_upgrade_station"), () -> upgradeType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(upgradeType, AkaishiUpgradeStationScreen::new));
+
+        // 生命的融合砧：赤石护甲 + 融合锭 → 生命融合护甲（无能量/进度数据，纯槽位合成）
+        MenuType<AkaishiLifeFusionAnvilMenu> fusionAnvilType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            return level.getBlockEntity(pos) instanceof AkaishiLifeFusionAnvilBlockEntity anvil
+                    ? new AkaishiLifeFusionAnvilMenu(syncId, inv, anvil)
+                    : new AkaishiLifeFusionAnvilMenu(syncId, inv, null);
+        });
+        CHISHI_LIFE_FUSION_ANVIL = (RegistrySupplier<MenuType<AkaishiLifeFusionAnvilMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_fusion_anvil"), () -> fusionAnvilType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(fusionAnvilType, AkaishiLifeFusionAnvilScreen::new));
 
         // 自动收集器：27 槽存储 + 能量/进度同步
         MenuType<AkaishiAutoCollectorMenu> collectorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -543,6 +568,16 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(bodyScannerType, AkaishiBodyScannerScreen::new));
 
+        // 基因管理器：无机器槽位，展示/卸载已吸收基因强化（数据 S2C 推送，卸载走 C2S）
+        // extraData 携带方块坐标（BE.saveExtraData 写入），客户端据此还原菜单绑定方块
+        MenuType<AkaishiGeneManagerMenu> geneManagerType = MenuRegistry.ofExtended((syncId, inv, buf) ->
+                new AkaishiGeneManagerMenu(syncId, inv, buf.readBlockPos()));
+        CHISHI_GENE_MANAGER = (RegistrySupplier<MenuType<AkaishiGeneManagerMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_gene_manager"), () -> geneManagerType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(geneManagerType, AkaishiGeneManagerScreen::new));
+
         // 生命分析台：输入（纯度 100 样本）+ 输出（基因序列片段）+ 生命能量/进度数据
         MenuType<AkaishiGeneAnalyzerMenu> geneAnalyzerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
@@ -601,6 +636,46 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_struct"), () -> lifeStructType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(lifeStructType, AkaishiLifeStructScreen::new));
+
+        // 生命培育器：器官 + 同源基因序列 + 衰竭结晶 → 突变器官（纯度决定成功率）
+        MenuType<AkaishiLifeBreederMenu> breederType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiLifeBreederBlockEntity breeder) {
+                return new AkaishiLifeBreederMenu(syncId, inv, breeder.inventory(), breeder.data(),
+                        breeder.getUpgradeSlots(), breeder.getBlockPos());
+            }
+            return new AkaishiLifeBreederMenu(syncId, inv,
+                    new SimpleContainer(AkaishiLifeBreederBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(AkaishiLifeBreederBlockEntity.DATA_SLOTS),
+                    new MachineUpgradeSlots(), pos);
+        });
+        CHISHI_LIFE_BREEDER = (RegistrySupplier<MenuType<AkaishiLifeBreederMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_breeder"), () -> breederType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(breederType, AkaishiLifeBreederScreen::new));
+
+        // 词条重铸仪：器官 + 衰竭结晶 → 原位替换指定第 N 条突变词条（确定性必成）
+        MenuType<AkaishiTraitReforgerMenu> traitReforgerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiTraitReforgerBlockEntity reforger) {
+                return new AkaishiTraitReforgerMenu(syncId, inv, reforger.inventory(), reforger.data(),
+                        reforger.getUpgradeSlots(), reforger.getBlockPos());
+            }
+            return new AkaishiTraitReforgerMenu(syncId, inv,
+                    new SimpleContainer(AkaishiTraitReforgerBlockEntity.SLOT_COUNT),
+                    new SimpleContainerData(AkaishiTraitReforgerBlockEntity.DATA_SLOTS),
+                    new MachineUpgradeSlots(), pos);
+        });
+        CHISHI_TRAIT_REFORGER = (RegistrySupplier<MenuType<AkaishiTraitReforgerMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_trait_reforger"), () -> traitReforgerType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(traitReforgerType, AkaishiTraitReforgerScreen::new));
 
         // 手术仓：器官移植/摘除（消耗固态 + 生命能量，带进度）
         MenuType<AkaishiSurgeryMenu> surgeryType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

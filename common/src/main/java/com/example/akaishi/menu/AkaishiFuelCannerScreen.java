@@ -15,36 +15,16 @@ public class AkaishiFuelCannerScreen extends AbstractContainerScreen<AkaishiFuel
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_fuel_canner.png");
 
-    /** 输入液体条区域（较原位置下移 18px，避开上方数值文字与燃料名称） */
-    private static final int FLUID_BAR_X = 20, FLUID_BAR_Y = 34, BAR_W = 136, BAR_H = 8;
+    /** 输入液体条区域（对齐贴图内已烘焙的进度条轨道 y=16） */
+    private static final int FLUID_BAR_X = 20, FLUID_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
     private static final int FLUID_COLOR = 0xFF40C8FF;
-    /** 数值文字固定行（保持原位不动） */
-    private static final int TEXT_Y = 14;
-    /** 燃料名称文字行（进度条上方） */
-    private static final int FUEL_NAME_Y = 24;
+    /** 燃料名称文字行（进度条下方、空罐/满罐槽位上方） */
+    private static final int FUEL_NAME_Y = 26;
 
     public AkaishiFuelCannerScreen(AkaishiFuelCannerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.imageWidth = 176;
         this.imageHeight = 166;
-    }
-
-    /** 大数值缩写 */
-    private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(java.util.Locale.ROOT, "%.1f", d);
     }
 
     private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
@@ -77,12 +57,6 @@ public class AkaishiFuelCannerScreen extends AbstractContainerScreen<AkaishiFuel
                 : Component.translatable(fuelKey(fuelId));
         gui.drawString(this.font, fuelName, FLUID_BAR_X, FUEL_NAME_Y,
                 fuelId.isEmpty() ? 0xFF808080 : 0xFF55E050, false);
-
-        // 液体数值（保持原位 TEXT_Y 不动，带参渲染，避免无参 translatable 输出 %s 占位字面乱码）
-        Component fluidText = Component.translatable("gui.akaishi.fluid",
-                formatEnergy(menu.getFluidAmount()), formatEnergy(menu.getFluidMax()));
-        int w = this.font.width(fluidText);
-        gui.drawString(this.font, fluidText, FLUID_BAR_X + BAR_W / 2 - w / 2, TEXT_Y, 0xFF3F3F3F, false);
     }
 
     /** fluid 注册名 → 本地化 key（fluid.akaishi.xxx，对应语言文件流体条目） */

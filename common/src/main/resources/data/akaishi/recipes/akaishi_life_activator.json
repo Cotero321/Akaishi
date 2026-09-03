@@ -1,14 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "G G",
+    "GAG",
     "LSL",
-    "G G"
+    "GAG"
   ],
   "key": {
     "G": { "item": "akaishi:gold_dust" },
     "L": { "item": "akaishi:lapis_dust" },
-    "S": { "item": "akaishi:sculk_lifeform" }
+    "S": { "item": "akaishi:akaishi_life_essence_solid" },
+    "A": { "item": "akaishi:akaishi_advanced_component" }
   },
   "result": { "item": "akaishi:akaishi_life_activator", "count": 1 }
 }

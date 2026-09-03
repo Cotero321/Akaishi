@@ -1,0 +1,13 @@
+{
+  "name": "赤石能量聚合器",
+  "icon": "akaishi:akaishi_energy_aggregator",
+  "category": "akaishi:advanced",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_aggregator",
+      "text": "赤石能量聚合器，把海量赤能源「凝」成赤石锭的炼金炉。$(br)塞入下界合金锭、灌 10M 赤能源，出炉即赤石锭——从矿石文明跨进工业文明的里程碑，就在这一炉。"
+    }
+  ]
+}

@@ -1,8 +1,13 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "akaishi:akaishi_item_pipe" },
-    { "item": "akaishi:copper_dust" }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PCP",
+    " P "
   ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_item_pipe" },
+    "C": { "item": "akaishi:copper_dust" }
+  },
   "result": { "item": "akaishi:akaishi_item_pipe_advanced", "count": 1 }
 }

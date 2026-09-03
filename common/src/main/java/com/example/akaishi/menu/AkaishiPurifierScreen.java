@@ -17,9 +17,9 @@ public class AkaishiPurifierScreen extends AbstractContainerScreen<AkaishiPurifi
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_purifier.png");
     /** 提纯矩阵成型版贴图：抹去燃料槽与火焰区域（矩阵由外部赤能源驱动，无燃料槽） */
     private static final ResourceLocation TEXTURE_MATRIX = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_purifier_matrix.png");
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，燃料槽行右侧避开右侧能量条） */
-    private static final int SPEED_SLOT_X = 116, SPEED_SLOT_Y = 53;
-    private static final int ENERGY_SLOT_X = 134, ENERGY_SLOT_Y = 53;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，置于燃料槽行左侧空地，标签不压输出槽） */
+    private static final int SPEED_SLOT_X = 8, SPEED_SLOT_Y = 53;
+    private static final int ENERGY_SLOT_X = 26, ENERGY_SLOT_Y = 53;
 
     public AkaishiPurifierScreen(AkaishiPurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);

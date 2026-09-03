@@ -1,0 +1,23 @@
+{
+  "name": "Organ Construction",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:life_organs",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_struct",
+      "text": "The Life Struct: 1 sequence + 5 solids + 80,000 life energy builds an organ in 6 seconds, no failure risk.$(br)Integrity = sequence purity − random loss (0-20): 100→III-grade, 50-99→II-grade, <50→I-grade. This step is rock-solid."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_surgery",
+      "text": "The Surgery Chamber transplants organs into the body (one per each of 9 slots) or removes them.$(br)Transplant: 3 solids + 20,000 energy; removal: 1 solid + 5,000 energy.$(br2)Rejection = quality × creature-group coefficient × integrity correction, and it grows over time; natural-enemy combos lock rejection to max and blow back! Before cutting, ask whether this organ truly \"fits\" you."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_cultivator",
+      "text": "The Part Cultivator handles sample purification (+10 purity per run, four success tiers) and organ upgrades (I→IV quality, 85/75/65% success).$(br)Want to grow great organs? This chamber is your \"organ gym\"."
+    }
+  ]
+}

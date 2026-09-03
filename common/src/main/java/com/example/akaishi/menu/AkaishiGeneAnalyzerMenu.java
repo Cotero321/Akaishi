@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiGeneAnalyzerBlockEntity;
+import com.example.akaishi.block.entity.AkaishiSampleVaultBlockEntity;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.core.BlockPos;
@@ -82,8 +83,9 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
             addSlot(new Slot(inv, col, 8 + col * 18, 142));
         }
         addDataSlots(data);
-        // 存储联动：3 格内存在存储库时注入联动槽（两侧工厂同世界状态，结果一致）
-        this.linkState = StorageLink.tryLink(this::addSlot, inv.player.level(), pos);
+        // 存储联动：仅匹配样本库（本机输入/输出均为生命样本相关），避免误连同范围的其他库
+        this.linkState = StorageLink.tryLink(this::addSlot, inv.player.level(), pos,
+                vault -> vault instanceof AkaishiSampleVaultBlockEntity);
     }
 
     public long getLifeEnergy() {

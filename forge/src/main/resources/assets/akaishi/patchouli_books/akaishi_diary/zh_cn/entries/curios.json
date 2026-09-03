@@ -1,0 +1,13 @@
+{
+  "name": "赤石饰品",
+  "icon": "akaishi:akaishi_hunting_ring",
+  "category": "akaishi:advanced",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_hunting_ring",
+      "text": "赤石之力打造的 7 件饰品（佩戴于饰品栏），件件都是「外挂」：$(li)狩猎戒指：战斗增益$(li)聚宝手镯：提升收获$(li)火焰项链：抗火$(li)抗毒手镯：中和毒素$(li)爆破护符：减免爆炸$(li)凋零护符：抵御凋零$(li)饱食护符：进食增益$(br2)戴上它们，你就是行走的移动堡垒。"
+    }
+  ]
+}

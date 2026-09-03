@@ -1,0 +1,23 @@
+{
+  "name": "生命转换",
+  "icon": "akaishi:akaishi_life_matrix_controller",
+  "category": "akaishi:life_intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_controller",
+      "text": "生命转换矩阵，当前唯一能「炼出」生命能量的家伙：控制器、矩阵外壳与能量端口围成 3×3×3 封闭结构后自动成型。$(br)摆对位置，它就是你的生命能量印钞机。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_energy_input",
+      "text": "赤能源经能量输入口注入矩阵中心，成型后每 tick 最多 45 次转换（每次耗 10M 赤能源、产 10 生命能量）。$(br)电喂得越饱，命炼得越快。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_matrix_energy_output",
+      "text": "生命能量经能量输出口输出（仅管道抽取），配合生命能量管道就能驱动样本采集、器官研究等后续设备。$(br)输出口就是生命科技的「第一滴水」。"
+    }
+  ]
+}

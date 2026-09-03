@@ -5,6 +5,7 @@ import com.example.akaishi.block.entity.ModBlockEntities;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -59,6 +60,15 @@ public class AkaishiLifeStructBlock extends AkaishiMachineBlock {
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        // 破坏时掉出 3 个机器槽物品（升级槽随 NBT 保留在方块掉落物中）
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof AkaishiLifeStructBlockEntity be) {
+            Containers.dropContents(level, pos, be.inventory());
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

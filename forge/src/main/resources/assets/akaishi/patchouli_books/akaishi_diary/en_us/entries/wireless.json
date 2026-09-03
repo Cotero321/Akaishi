@@ -1,0 +1,18 @@
+{
+  "name": "Wireless Energy",
+  "icon": "akaishi:akaishi_wireless_terminal",
+  "category": "akaishi:tech",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_terminal",
+      "text": "Wireless energy, the ultimate romance of ditching all the wires.$(br)Enclose a 5×5×5 sealed box with terminal casings, place terminal blocks, controller, and safety blocks on the walls, and put 1 Wireless Terminal Core at the center of the cavity.$(br)The terminal auto-binds a nearby formed Energy Cell Serializer as the network's storage hub."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wireless_identity_card",
+      "text": "Register an Identity Card on the terminal's \"Security\" page, then hold that same card and right-click an input/output port to bind it.$(br)Cross-dim components unlock cross-dimension transfer, chunk-loader frames weakly load network chunks, and loss-suppression components cut transmission loss.$(br2)Laying pipes? Not anymore — now you pull power straight out of thin air."
+    }
+  ]
+}

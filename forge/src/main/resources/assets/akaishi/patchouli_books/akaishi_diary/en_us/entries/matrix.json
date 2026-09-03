@@ -1,0 +1,18 @@
+{
+  "name": "Matrix Structures",
+  "icon": "akaishi:akaishi_gen_matrix_controller_basic",
+  "category": "akaishi:tech",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_basic",
+      "text": "The Generator Matrix: matrix casings enclose a sealed space (low tier 3×3×3 / high tier 5×5×5), with the controller and ports on the walls.$(li)Low tier: 45× burn speed, 1.5× single-unit output$(li)High tier: 200× burn speed, 3× single-unit output$(br2)Piece generators together into an array and your output climbs in leaps and bounds."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier_matrix_controller",
+      "text": "The Purifier Matrix: a 3×3×3 sealed space, 30× purifying speed, 150 energy per tick.$(br2)$(2,4)Life Conversion Matrix$(0): a 3×3×3 sealed space that converts energy into life energy at 45×. Want to cross over into life tech? Flip open the \"Book of Life\"."
+    }
+  ]
+}

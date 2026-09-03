@@ -1,0 +1,13 @@
+{
+  "name": "Collector",
+  "icon": "akaishi:akaishi_collector_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_collector_basic",
+      "text": "The Collector, the \"harvester\" of crystal automation: auto-harvests mature clusters in range, stashing essence into a 27-slot container.$(li)Basic: 3×3×3, 30 ticks/block, 2 energy/t$(li)Intermediate: 5×5×5, 15 ticks/block, 4 energy/t$(li)Advanced: 9×9×9, 7 ticks/block, 8 energy/t$(li)Ultimate: 16×16×16, 2 ticks/block, 16 energy/t$(br2)Supports hoppers and item pipes. Pair it with a Catalyst and you've got a fully automatic money printer."
+    }
+  ]
+}

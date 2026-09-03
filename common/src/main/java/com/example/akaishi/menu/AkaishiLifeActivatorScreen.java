@@ -25,11 +25,13 @@ public class AkaishiLifeActivatorScreen extends AbstractContainerScreen<AkaishiL
     private static final int LABEL_X = 20;
     /** 进度条轨道：位于标签右侧，整条填充 */
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    /** 四条状态条整体上移（间距 10），底缘避开物品栏文字（y72 起） */
-    private static final int IN_Y = 22;
-    private static final int OUT_Y = 32;
-    private static final int LIFE_Y = 42;
-    private static final int PROCESSED_Y = 52;
+    /** 四条状态条（间距 10），底缘避开下方说明文字与物品栏标签（y72 起） */
+    private static final int IN_Y = 20;
+    private static final int OUT_Y = 30;
+    private static final int LIFE_Y = 40;
+    private static final int PROCESSED_Y = 50;
+    /** 管道说明文字行：解释本机无物品槽（纯管道输送），填补状态条与物品栏之间的空档 */
+    private static final int HINT_Y = 64;
 
     public AkaishiLifeActivatorScreen(AkaishiLifeActivatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);

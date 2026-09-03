@@ -1,0 +1,16 @@
+{
+  "name": "Trait Codex - Aberrant Double-Edged",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:gene_mutations",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Double-edged warning: aberrant traits bring powerful positives but always carry a negative price.$(br2)Once an aberration appears during cultivation it cannot be refused — you can only grit your teeth and bear it, or later hand the organ to the Trait Reforger to wash it away. Note that when reforging, the new trait is still drawn from the same tier pool, so it might roll another aberration. If you gamble, gamble to win."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "【Tier 2 · Aberrations】$(br2)Berserker Gene —— Attack +2, Armor -1.5$(br)Glass Bones —— Attack Speed +0.8, Max Health -2$(br2)【Tier 3 · Aberrations】$(br2)Apex Predator —— Attack +3, Move Speed +0.02, Max Health -4$(br)Combustible Flesh —— Attack +3, Fire Damage Taken +50%"
+    }
+  ]
+}

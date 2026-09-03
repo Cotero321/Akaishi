@@ -1,0 +1,28 @@
+{
+  "name": "液体燃料链",
+  "icon": "akaishi:akaishi_energy_liquefier",
+  "category": "akaishi:tech",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_liquefier",
+      "text": "能量液化装置：把硬邦邦的赤能源强行压成「下界能量液体」。$(br)别问能量为什么能装罐，问就是赤石科技震撼人心——每 tick 吞赤能源、吐液体，纯度堪比实验室量杯。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_processor",
+      "text": "能量加工器：固态物 + 下界能量液体，搅拌成可燃烧的燃料。$(br)这大概就是赤石界的「液体面包」——左手倒固态，右手灌液体，出来就是能塞进反应堆的硬通货。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fluid_tank_basic",
+      "text": "液体储罐共三级：$(li)基础：装点家用$(li)高级：装点工坊用$(li)超级：装到怀疑人生$(br)专存下界能量 / 燃料液体，管道一接，液体自己找家。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fluid_pipe",
+      "text": "液体管道：把液体搬来搬去，比快递还靠谱，从不丢件。$(br)配合储罐、液化器、加工器，就能搭一条全自动「液体燃料流水线」。"
+    }
+  ]
+}

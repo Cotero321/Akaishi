@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    "RCR",
+    " R "
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone" },
+    "C": { "item": "akaishi:akaishi_crystal" }
+  },
+  "result": { "item": "akaishi:akaishi_debug_tool", "count": 1 }
+}

@@ -40,13 +40,8 @@ public final class ModCreativeTabs {
                                     if (ModItems.akaishiCrystal != null) {
                                         output.accept(new ItemStack(ModItems.akaishiCrystal.get()));
                                     }
-                                    // Patchouli 手册（赤石日记 / 生命之书）
-                                    if (ModItems.akaishiDiary != null) {
-                                        output.accept(new ItemStack(ModItems.akaishiDiary.get()));
-                                    }
-                                    if (ModItems.lifeBook != null) {
-                                        output.accept(new ItemStack(ModItems.lifeBook.get()));
-                                    }
+                                    // 手册（赤石日记 / 生命秘闻）由帕秋莉按 book.json 的
+                                    // crafting_recipe + creative_tab 自动加入，此处不重复添加
                                     // 粗制赤石块 + 赤石提纯器
                                     if (ModBlocks.RAW_CHISHI_BLOCK != null) {
                                         output.accept(new ItemStack(ModBlocks.RAW_CHISHI_BLOCK.get()));
@@ -520,6 +515,10 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_BODY_SCANNER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_BODY_SCANNER.get()));
                                     }
+                                    // 基因管理器（生命科技：已吸收基因强化管理/卸载）
+                                    if (ModBlocks.CHISHI_GENE_MANAGER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GENE_MANAGER.get()));
+                                    }
                                     // 生命分析台（生命科技：样本解构）
                                     if (ModBlocks.CHISHI_GENE_ANALYZER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_GENE_ANALYZER.get()));
@@ -531,6 +530,14 @@ public final class ModCreativeTabs {
                                     // 生命结构台（生命科技：基因序列 → 器官）
                                     if (ModBlocks.CHISHI_LIFE_STRUCT != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_STRUCT.get()));
+                                    }
+                                    // 生命培育器（生命科技：器官施加突变词条）
+                                    if (ModBlocks.CHISHI_LIFE_BREEDER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_BREEDER.get()));
+                                    }
+                                    // 词条重铸仪（生命科技：原位重铸指定突变词条）
+                                    if (ModBlocks.CHISHI_TRAIT_REFORGER != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_TRAIT_REFORGER.get()));
                                     }
                                     // 手术仓（生命科技：器官移植/摘除）
                                     if (ModBlocks.CHISHI_SURGERY != null) {
@@ -544,6 +551,9 @@ public final class ModCreativeTabs {
                                     if (ModItems.akaishiPotion != null) {
                                         output.accept(new ItemStack(ModItems.akaishiPotion.get()));
                                     }
+                                    if (ModItems.rejectionSerum != null) {
+                                        output.accept(new ItemStack(ModItems.rejectionSerum.get()));
+                                    }
                                     // 器官储藏库（生命科技：按槽位分页的器官仓库）
                                     if (ModBlocks.CHISHI_ORGAN_VAULT != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ORGAN_VAULT.get()));
@@ -556,6 +566,14 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_POTION_CABINET != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_POTION_CABINET.get()));
                                     }
+                                    // 黑山羊之母祭坛（生命线终局：献上生命造物，识别 NBT 的祭坛）
+                                    if (ModBlocks.CHISHI_MOTHER_ALTAR != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_MOTHER_ALTAR.get()));
+                                    }
+                                    // 母神祭坛石（祭坛结构件/装饰建材）
+                                    if (ModBlocks.CHISHI_ALTAR_STONE != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_ALTAR_STONE.get()));
+                                    }
                                     // 生命科技：样本采集器 + 生命样本 + 基因序列片段
                                     if (ModItems.sampleCollector != null) {
                                         output.accept(new ItemStack(ModItems.sampleCollector.get()));
@@ -563,8 +581,31 @@ public final class ModCreativeTabs {
                                     if (ModItems.lifeSample != null) {
                                         output.accept(new ItemStack(ModItems.lifeSample.get()));
                                     }
+                                    // 生命胚胎（8 生命固态 + 鸡蛋，母神祭坛祭品）
+                                    if (ModItems.lifeEmbryo != null) {
+                                        output.accept(new ItemStack(ModItems.lifeEmbryo.get()));
+                                    }
                                     if (ModItems.geneSequence != null) {
                                         output.accept(new ItemStack(ModItems.geneSequence.get()));
+                                    }
+                                    // 生命的融合锭 + 生命的融合砧 + 生命融合护甲（赤石护甲 2 倍基础数值）
+                                    if (ModItems.lifeFusionIngot != null) {
+                                        output.accept(new ItemStack(ModItems.lifeFusionIngot.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_LIFE_FUSION_ANVIL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_FUSION_ANVIL.get()));
+                                    }
+                                    if (ModItems.lifeFusionHelmet != null) {
+                                        output.accept(new ItemStack(ModItems.lifeFusionHelmet.get()));
+                                    }
+                                    if (ModItems.lifeFusionChestplate != null) {
+                                        output.accept(new ItemStack(ModItems.lifeFusionChestplate.get()));
+                                    }
+                                    if (ModItems.lifeFusionLeggings != null) {
+                                        output.accept(new ItemStack(ModItems.lifeFusionLeggings.get()));
+                                    }
+                                    if (ModItems.lifeFusionBoots != null) {
+                                        output.accept(new ItemStack(ModItems.lifeFusionBoots.get()));
                                     }
                                     // 生命科技：9 个槽位的基础器官物品
                                     output.accept(new ItemStack(ModItems.akaishiOrganEye.get()));

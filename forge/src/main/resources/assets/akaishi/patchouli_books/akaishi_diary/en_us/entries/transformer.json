@@ -1,0 +1,18 @@
+{
+  "name": "Transformer",
+  "icon": "akaishi:akaishi_transformer",
+  "category": "akaishi:machines",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_transformer",
+      "text": "The Transformer, a machine that calls a deer a horse:$(li)$(2,4)Lapis Dust → Cooling Base$(0)$(li)Minerals (ingots/blocks) → matching Ore Bases$(br2)It disguises ordinary minerals as advanced materials — the catalyst and fusion heat sinks both need it to pave the way."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:cooling_base",
+      "text": "The Cooling Base is the starting point of the cooling system: mix it with dusts tier by tier, from iron dust all the way to netherite ingots.$(br)No matter how hot it gets, every heat sink starts here."
+    }
+  ]
+}

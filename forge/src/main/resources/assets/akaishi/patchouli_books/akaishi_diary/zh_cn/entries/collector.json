@@ -1,0 +1,13 @@
+{
+  "name": "自动收集器",
+  "icon": "akaishi:akaishi_collector_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_collector_basic",
+      "text": "自动收集器，赤石晶自动化的「收割机」：自动收获范围内成熟水晶簇，精华入 27 槽容器。$(li)基础：3×3×3，30 tick/方块，2 能/t$(li)中级：5×5×5，15 tick/方块，4 能/t$(li)高级：9×9×9，7 tick/方块，8 能/t$(li)超级：16×16×16，2 tick/方块，16 能/t$(br2)支持漏斗与物品管道抽取，配合催化器=全自动印钞机。"
+    }
+  ]
+}

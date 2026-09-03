@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "I I",
-    "IMI",
-    "III"
+    "BMB",
+    "MEM",
+    "BMB"
   ],
   "key": {
-    "M": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "I": { "item": "akaishi:akaishi_essence_block" }
+    "B": { "item": "minecraft:glass_bottle" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
+    "E": { "item": "akaishi:akaishi_energy_cell_basic" }
   },
   "result": { "item": "akaishi:akaishi_energy_processor", "count": 1 }
 }

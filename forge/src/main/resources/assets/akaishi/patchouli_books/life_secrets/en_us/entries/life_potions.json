@@ -1,0 +1,23 @@
+{
+  "name": "Potions",
+  "icon": "akaishi:akaishi_potion",
+  "category": "akaishi:life_organs",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_table",
+      "text": "The Potion Table: sample ≥25 purity + solids + life energy → akaishi potion; the potion inherits the sample's creature source and purity.$(br2)$(2,4)Permanent Potion$(0): absorbs that creature's genotype (no side effects) — all organs of that source gain +2~+10 compatibility by purity; each genotype is absorbed once per lifetime, up to 4 at once, and can be re-absorbed after unloading in the Gene Manager.$(br)$(2,4)Breakthrough Potion$(0): requires that source's genotype already absorbed AND a non-native organ of that source transplanted; activates for 30 min — base stats +10%~40%, extra compatibility +2~+8 (tiered by purity), negative-base-value traits temporarily disabled. At most 1 active at a time, can end early, re-activatable after expiry."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion",
+      "text": "Purity tiers: 0-20 → permanent +2 / breakthrough +2 comp·+10%; 21-40 → +4 / +4·20%; 41-60 → +6 / +6·30%; 61-80 → +8 / +8·40%; 81-100 → permanent +10.$(br2)Drinking requires meeting the prerequisites (gene slots / absorbed genes / transplanted same-source organ); the potion is not consumed if unmet.$(br2)$(2,4)Effective compatibility$(0) = organ's own compatibility + that source's gene bonus (capped 100), plus extra compatibility during breakthrough that can temporarily exceed 100, falling back when it expires."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_manager",
+      "text": "The Gene Manager lists absorbed genotypes and the currently active breakthrough (with live remaining time and boosted-organ count).$(br2)Unload a gene: removes that source's bonus and frees a slot (re-absorb anytime by drinking the permanent potion); if it's powering a breakthrough, that breakthrough ends too.$(br)End button: ends the current breakthrough early without losing the gene, then you can reactivate right away. Want to \"change skins\"? Come unload here first."
+    }
+  ]
+}

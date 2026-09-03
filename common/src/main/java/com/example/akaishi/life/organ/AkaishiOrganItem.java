@@ -5,12 +5,16 @@ import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.linkage.OrganLinkage;
 import com.example.akaishi.life.sample.SampleGroup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -31,10 +35,12 @@ public class AkaishiOrganItem extends Item {
     public static final String TAG_COMPAT = "compat";
     /** 完整度（0-100）：结构台造器官时由基因序列纯度随机损耗 0-20 得到，决定品质档位 */
     public static final String TAG_PURITY = "purity";
-    /** 突破强化倍率（突破药剂写入 1.5，默认 1.0） */
-    public static final String TAG_BOOST = "boost";
     /** 原生部件标记：玩家初始 9 槽自动填充，与身体完全契合（适配度 100、无效果） */
     public static final String TAG_NATIVE = "native";
+    /** 突变词条列表（生命培育器施加，每条存 MutantTrait id，不可移除） */
+    public static final String TAG_MUTATIONS = "mutations";
+    /** 本次移植期间排异中和剂的清洗次数（移植时清零） */
+    public static final String TAG_WASH_USED = "wash_used";
     /** 适配度上限 */
     public static final int MAX_COMPAT = 100;
     /** 原生器官固定适配度 */
@@ -168,19 +174,15 @@ public class AkaishiOrganItem extends Item {
         stack.getOrCreateTag().putInt(TAG_PURITY, Math.max(0, Math.min(MAX_COMPAT, purity)));
     }
 
-    /** 突破强化倍率（默认 1.0，未强化器官恒为 1.0） */
-    public static double getBoost(ItemStack stack) {
-        if (stack.getTag() != null && stack.getTag().contains(TAG_BOOST)) {
-            return Math.max(1.0, stack.getTag().getDouble(TAG_BOOST));
-        }
-        return 1.0;
+    /** 本次移植期间已被排异中和剂清洗的次数（摘除重植自动清零） */
+    public static int getWashUsed(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.contains(TAG_WASH_USED) ? tag.getInt(TAG_WASH_USED) : 0;
     }
 
-    /** 写入突破倍率（仅接受 >1.0 的强化值） */
-    public static void setBoost(ItemStack stack, double boost) {
-        if (boost > 1.0) {
-            stack.getOrCreateTag().putDouble(TAG_BOOST, boost);
-        }
+    /** 写入清洗次数（排异中和剂效果结算） */
+    public static void setWashUsed(ItemStack stack, int count) {
+        stack.getOrCreateTag().putInt(TAG_WASH_USED, Math.max(0, count));
     }
 
     /**
@@ -189,6 +191,81 @@ public class AkaishiOrganItem extends Item {
      */
     public static int getBaseRejection(ItemStack stack) {
         return OrganLinkage.rejectionOf(stack);
+    }
+
+    // ===== 基因突变（生命培育器施加的词条） =====
+
+    /** 解析器官携带的突变词条（未知 id 容错跳过，保证旧存档/未来词条安全） */
+    public static List<MutantTrait> getMutations(ItemStack stack) {
+        List<MutantTrait> result = new ArrayList<>();
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(TAG_MUTATIONS, Tag.TAG_LIST)) {
+            return result;
+        }
+        ListTag list = tag.getList(TAG_MUTATIONS, Tag.TAG_STRING);
+        for (int i = 0; i < list.size(); i++) {
+            MutantTrait trait = MutantTrait.valueOfSafe(list.getString(i));
+            if (trait != null && !result.contains(trait)) {
+                result.add(trait);
+            }
+        }
+        return result;
+    }
+
+    /** 当前突变词条数量 */
+    public static int getMutationCount(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(TAG_MUTATIONS, Tag.TAG_LIST)) {
+            return 0;
+        }
+        return tag.getList(TAG_MUTATIONS, Tag.TAG_STRING).size();
+    }
+
+    /**
+     * 词条承载上限 = 品质档序数 + 1（I=1 / II=2 / III=3 / IV=4）。
+     * 品质越高基因越稳定，能容纳更多突变。未定型/原生器官不可突变。
+     */
+    public static int maxMutations(QualityTier tier) {
+        return tier == null ? 0 : tier.ordinal() + 1;
+    }
+
+    /** 是否还能再培养（非原生、已定型、未达上限） */
+    public static boolean canMutate(ItemStack stack) {
+        if (isNative(stack)) {
+            return false;
+        }
+        QualityTier tier = getTier(stack);
+        return tier != null && getMutationCount(stack) < maxMutations(tier);
+    }
+
+    /** 追加一条突变词条（仅在未达上限时允许，调用方负责校验；同词条去重防止计数虚高） */
+    public static void addMutation(ItemStack stack, MutantTrait trait) {
+        CompoundTag tag = stack.getOrCreateTag();
+        ListTag list = tag.contains(TAG_MUTATIONS, Tag.TAG_LIST)
+                ? tag.getList(TAG_MUTATIONS, Tag.TAG_STRING)
+                : new ListTag();
+        for (int i = 0; i < list.size(); i++) {
+            if (trait.getId().equals(list.getString(i))) {
+                return;
+            }
+        }
+        list.add(StringTag.valueOf(trait.getId()));
+        tag.put(TAG_MUTATIONS, list);
+    }
+
+    /** 原位替换第 index 条突变词条（词条重铸仪调用：保持顺序与承载数不变）；越界返回 false */
+    public static boolean replaceMutation(ItemStack stack, int index, MutantTrait trait) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(TAG_MUTATIONS, Tag.TAG_LIST)) {
+            return false;
+        }
+        ListTag list = tag.getList(TAG_MUTATIONS, Tag.TAG_STRING);
+        if (index < 0 || index >= list.size()) {
+            return false;
+        }
+        list.set(index, StringTag.valueOf(trait.getId()));
+        tag.put(TAG_MUTATIONS, list);
+        return true;
     }
 
     // ===== 显示 =====
@@ -212,11 +289,6 @@ public class AkaishiOrganItem extends Item {
                 Component.translatable("life.akaishi.organ_tier." + tier.name().toLowerCase())));
         tooltip.add(Component.translatable("gui.akaishi.organ.source",
                 Component.translatable(source.getNameKey())));
-        // 突破强化（突破药剂：效果 ×1.5）
-        double boost = getBoost(stack);
-        if (boost > 1.0) {
-            tooltip.add(Component.translatable("gui.akaishi.organ.boost", formatValue(boost)));
-        }
         // 适配度（按等级着色：≥80 绿 / 60-79 黄 / <60 红）
         int compat = getCompat(stack);
         String compatKey = compat >= 80 ? "gui.akaishi.organ.compat_high"
@@ -232,24 +304,35 @@ public class AkaishiOrganItem extends Item {
         // 生物特色效果（未注册时回退槽位模板属性，槽位无模板返回空列表）
         OrganEffect effect = OrganEffectRegistry.get(getEntityId(stack), slot);
         List<OrganTemplate.AttributeBonus> bonuses = OrganEffectResolver.bonusesOf(stack, slot, effect);
-        // 属性加成（基础值 × 品质倍率 × 适配度 × 突破倍率）
+        // 属性加成（基础值 × 品质倍率 × 适配度；实际生效还受身体基因加成，见 forge 处理）
         for (OrganTemplate.AttributeBonus bonus : bonuses) {
-            double value = bonus.base() * tier.getMultiplier() * compatFactor * boost;
+            double value = bonus.base() * tier.getMultiplier() * compatFactor;
             boolean negative = value < 0;
             tooltip.add(Component.translatable(negative ? "gui.akaishi.organ.attribute_neg" : "gui.akaishi.organ.attribute",
                     formatValue(value), Component.translatable(bonus.attribute().getDescriptionId())));
         }
-        // 被动技能（常驻/被动触发）
-        if (effect != null && effect.passives() != null) {
-            for (OrganPassive passive : effect.passives()) {
-                tooltip.add(Component.translatable("gui.akaishi.organ.passive",
-                        Component.translatable("life.akaishi.organ_passive." + passive.getId())));
-            }
+        // 被动技能（常驻/被动触发）：生物特色被动 + 突变词条被动合并去重
+        for (OrganPassive passive : OrganEffectResolver.passivesOf(stack, effect)) {
+            tooltip.add(Component.translatable("gui.akaishi.organ.passive",
+                    Component.translatable("life.akaishi.organ_passive." + passive.getId())));
         }
         // 独特机制
         if (effect != null && effect.special() != null) {
             tooltip.add(Component.translatable("gui.akaishi.organ.special",
                     Component.translatable("life.akaishi.organ_special." + effect.special().getId())));
+        }
+        // 基因突变词条（生命培育器施加，不可还原；畸变以警示色显示）
+        List<MutantTrait> mutations = getMutations(stack);
+        if (!mutations.isEmpty()) {
+            tooltip.add(Component.translatable("gui.akaishi.organ.mutations",
+                    mutations.size(), maxMutations(tier)));
+            for (MutantTrait mutation : mutations) {
+                tooltip.add(Component.translatable(mutation.isDual()
+                                ? "gui.akaishi.organ.mutation_dual"
+                                : "gui.akaishi.organ.mutation",
+                        Component.translatable(mutation.getNameKey())));
+            }
+            tooltip.add(Component.translatable("gui.akaishi.organ.mutation_hint"));
         }
         // 移植排斥（含分组系数与完整度修正的联动后数值）
         tooltip.add(Component.translatable("gui.akaishi.organ.rejection", getBaseRejection(stack)));

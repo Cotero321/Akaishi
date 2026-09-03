@@ -1,0 +1,18 @@
+{
+  "name": "燃料与散热",
+  "icon": "akaishi:fuel_cell",
+  "category": "akaishi:tech",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:fuel_cell",
+      "text": "燃料罐，赤石锭打造的可燃烧罐体，是反应堆的「饭盒」。$(li)燃料装罐机把燃烧质灌进去$(li)燃料混合器调配末地/巨龙/世界基础混合物$(li)燃料棒、融合棒经聚变燃料聚合器合成聚变反应棒$(li)等离子填装器把等离子体灌进反应棒 → 等离子体燃料棒$(br2)链条虽长，但每一环都通向更强的火。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:heat_sink_poor",
+      "text": "散热片共 6 级（粗糙→精致→优秀→优良→卓越→终极）逐级合成，外加聚变散热片（1-5 级 + 生命级）。$(br)散热片由冷却基底 + 粉末一步步堆出来。反应堆、聚变堆能不能稳住温度，全看它给不给力。"
+    }
+  ]
+}

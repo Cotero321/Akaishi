@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LQL",
+    "LSL",
+    "LLL"
+  ],
+  "key": {
+    "L": { "item": "minecraft:lapis_block" },
+    "Q": { "item": "akaishi:akaishi_life_essence_solid" },
+    "S": { "item": "akaishi:akaishi_life_struct" }
+  },
+  "result": { "item": "akaishi:akaishi_life_breeder", "count": 1 }
+}

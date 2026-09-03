@@ -29,7 +29,11 @@ public final class AkaishiLifeStructSync {
             // 调度到服务端主线程，避免并发访问方块实体
             context.queue(() -> {
                 Player player = context.getPlayer();
-                if (player != null && player.level().getBlockEntity(pos) instanceof AkaishiLifeStructBlockEntity be) {
+                // 必须打开对应机器菜单且坐标一致（参照手术台惯例），拦截非本机/远距离篡改包
+                if (player != null
+                        && player.containerMenu instanceof AkaishiLifeStructMenu menu
+                        && pos.equals(menu.getBlockPos())
+                        && player.level().getBlockEntity(pos) instanceof AkaishiLifeStructBlockEntity be) {
                     be.setTargetSlot(slotIndex);
                 }
             });

@@ -1,0 +1,18 @@
+{
+  "name": "赤石晶与精华",
+  "icon": "akaishi:akaishi_crystal",
+  "category": "akaishi:intro",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_crystal",
+      "text": "赤石晶，矿簇里的「血汗钱」，是赤石科技的万物之源。$(br)9 个赤石晶 → 粗制赤石块，再丢进赤石提纯器 → 赤石精华。从捡石头到攒家底，全靠这条流水线。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_essence",
+      "text": "赤石精华是提纯后的「精炼货」，还能继续榨：$(li)9 精华 → 浓缩赤石精华$(li)9 浓缩精华 → 浓缩赤石精华块$(li)精华块熔炼 → 赤石锭$(br2)记住这条升级链，钱包就是靠它鼓起来的。"
+    }
+  ]
+}

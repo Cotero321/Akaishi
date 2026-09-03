@@ -46,9 +46,9 @@ public enum QualityTier {
         }
         return switch (source) {
             case WARM_BLOODED -> I;
-            case UNDEAD, EXPLOSIVE -> II;
+            case UNDEAD, EXPLOSIVE, ABERRATION -> II;
             case ENDER -> III;
-            case DRAGON -> IV;
+            case BOSS, DRAGON -> IV;
         };
     }
 

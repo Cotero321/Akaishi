@@ -10,7 +10,7 @@ package com.example.akaishi.life.potion;
  * @param solidCost     制作消耗固态物数量
  * @param lifeCost      制作消耗生命能量
  * @param ticks         制作耗时（tick）
- * @param breakthrough  是否突破药剂（有副作用风险）
+ * @param breakthrough  是否突破药剂（临时激活基因强化，同一时间最多 1 种，到期后可再次激活）
  */
 public record PotionTemplate(
         String id,

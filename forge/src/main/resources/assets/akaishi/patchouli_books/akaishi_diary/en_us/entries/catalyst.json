@@ -1,0 +1,18 @@
+{
+  "name": "Catalyst",
+  "icon": "akaishi:akaishi_catalyst_ultimate",
+  "category": "akaishi:advanced",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_catalyst_basic",
+      "text": "The Catalyst, the \"seeder\" of crystal automation: burns energy to grow akaishi clusters on geodes in range.$(li)Basic: 3×3×3, 20% success, 5 energy/t$(li)Intermediate: 5×5×5, 30% success, 25 energy/t$(li)Advanced: 9×9×9, 40% success, 125 energy/t$(li)Ultimate: 16×16×16, 50% success, 625 energy/t$(br2)Bigger is stronger, but the power bill grows too — pace yourself."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_geode_pristine",
+      "text": "Geodes come in 4 grades: flawed / normal / intact / pristine, and they're the bed where clusters grow.$(br)Catalyst plants, Collector reaps, and you get to lie back and count crystals."
+    }
+  ]
+}

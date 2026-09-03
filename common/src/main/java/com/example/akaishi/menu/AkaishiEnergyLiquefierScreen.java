@@ -56,12 +56,20 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
         return String.format(Locale.ROOT, "%.1f", d);
     }
 
-    private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
-        long clamped = Math.max(0, Math.min(energy, max));
+    /** 条内左侧固定标签区宽度（px），标签置于轨道左侧，填充从轨道右端开始避免覆盖文字 */
+    private static final int LABEL_W = 46;
+
+    /** 带标签状态条：标签在轨道左侧，轨道整条填充不压字 */
+    private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long value, long max, int color) {
+        gui.drawString(this.font, Component.translatable(labelKey), x + 2, y + 1, 0xFF3F3F3F, false);
+        int trackX = x + LABEL_W;
+        int trackW = BAR_W - LABEL_W;
+        GuiWidgets.track(gui, trackX, y, trackW, BAR_H);
+        long clamped = Math.max(0, Math.min(value, max));
         long cap = Math.max(1, max);
-        int barWidth = (int) (BAR_W * clamped / cap);
+        int barWidth = (int) (trackW * clamped / cap);
         if (barWidth > 0) {
-            gui.fill(x, y, x + barWidth, y + BAR_H, color);
+            gui.fill(trackX, y, trackX + barWidth, y + BAR_H, color);
         }
     }
 
@@ -81,17 +89,14 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
                 x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
 
         // 赤能源条（红）
-        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, BAR_W, BAR_H);
-        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + FLUID_BAR_Y, BAR_W, BAR_H);
-        GuiWidgets.track(gui, x + CHISHI_BAR_X, y + PROGRESS_Y, BAR_W, BAR_H);
-        drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, menu.getAkaishiEnergy(), menu.getAkaishiMax(), 0xFFE03030);
+        drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, "gui.akaishi.energy.short",
+                menu.getAkaishiEnergy(), menu.getAkaishiMax(), 0xFFE03030);
         // 输出液体条（青，产物类型随输入物品而异）
-        drawBar(gui, x + CHISHI_BAR_X, y + FLUID_BAR_Y, menu.getFluidAmount(), menu.getFluidMax(), FLUID_COLOR);
+        drawBar(gui, x + CHISHI_BAR_X, y + FLUID_BAR_Y, "gui.akaishi.liquefier.fluid",
+                menu.getFluidAmount(), menu.getFluidMax(), FLUID_COLOR);
         // 液化进度条（黄）
-        int progressWidth = (int) (BAR_W * menu.getProgress() / 100.0F);
-        if (progressWidth > 0) {
-            gui.fill(x + CHISHI_BAR_X, y + PROGRESS_Y, x + CHISHI_BAR_X + progressWidth, y + PROGRESS_Y + BAR_H, 0xFFFFD030);
-        }
+        drawBar(gui, x + CHISHI_BAR_X, y + PROGRESS_Y, "gui.akaishi.liquefier.progress",
+                menu.getProgress(), 100L, 0xFFFFD030);
     }
 
     @Override

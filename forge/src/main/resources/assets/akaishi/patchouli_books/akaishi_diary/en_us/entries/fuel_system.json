@@ -1,0 +1,18 @@
+{
+  "name": "Fuel & Cooling",
+  "icon": "akaishi:fuel_cell",
+  "category": "akaishi:tech",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:fuel_cell",
+      "text": "The Fuel Cell, a burnable canister forged from Akaishi Ingots, is the reactor's \"lunchbox\".$(li)The Fuel Filler pours burnable mass into it$(li)The Fuel Mixer blends end / dragon / world-base mixtures$(li)Fuel rods and fusion rods combine in the Fusion Fuel Aggregator into fusion reaction rods$(li)The Plasma Filler loads plasma into rods → plasma fuel rods$(br2)It's a long chain, but every link leads to a hotter fire."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:heat_sink_poor",
+      "text": "Heat sinks come in 6 tiers (rough → refined → fine → good → excellent → ultimate) built tier by tier, plus fusion heat sinks (tiers 1-5 + life-grade).$(br)Heat sinks are stacked from a Cooling Base + dust step by step. Whether the reactor and fusion reactor hold their temperature is entirely up to them."
+    }
+  ]
+}

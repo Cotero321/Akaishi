@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "LCL",
-    "CAC",
-    "LCL"
+    "LML",
+    "MAM",
+    "LML"
   ],
   "key": {
-    "C": { "item": "akaishi:copper_dust" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
     "L": { "item": "akaishi:lapis_dust" },
     "A": { "item": "akaishi:akaishi_life_energy_cell" }
   },

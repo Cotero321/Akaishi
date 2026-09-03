@@ -5,21 +5,28 @@ import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiFluidPipeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
+import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
+import com.example.akaishi.forge.client.MotherAltarRenderer;
 import com.example.akaishi.forge.config.AkaishiConfig;
 import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.fluid.ForgeFluidBridge;
 import com.example.akaishi.forge.fluid.ForgeFluidHandler;
 import com.example.akaishi.forge.fluid.ModFluidsImpl;
+import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
+import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
 import com.example.akaishi.forge.life.AkaishiLifeInteraction;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
+import com.example.akaishi.forge.life.WardenBossHandler;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
+import com.example.akaishi.gametest.AkaishiLifeSystemTests;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -126,9 +133,12 @@ public final class AkaishiModForge {
             }
         });
 
-        // 注册燃料系统 GameTest（dev 环境 -Dakaishi.gametest=1 自动运行）
+        // 注册 GameTest（dev 环境 -Dakaishi.gametest=1 自动运行）
         FMLJavaModLoadingContext.get().getModEventBus()
-                .addListener((RegisterGameTestsEvent event) -> event.register(AkaishiFuelSystemTests.class));
+                .addListener((RegisterGameTestsEvent event) -> {
+                    event.register(AkaishiFuelSystemTests.class);
+                    event.register(AkaishiLifeSystemTests.class);
+                });
 
         // Curios 饰品集成：通用事件（击杀/挖掘/受伤）走游戏总线；装备与每 tick 由 Curios 自动驱动
         MinecraftForge.EVENT_BUS.register(AkaishiCurioIntegration.INSTANCE);
@@ -139,6 +149,13 @@ public final class AkaishiModForge {
 
         // 生命科技交互：手持样本采集器右键生物抽取样本
         MinecraftForge.EVENT_BUS.register(AkaishiLifeInteraction.INSTANCE);
+
+        // 器官运行时处理器：属性/被动/排斥/冲突 tick + 战斗效果（移植系统核心，必须注册才生效）
+        MinecraftForge.EVENT_BUS.register(AkaishiBodyPassiveHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(AkaishiBodyCombatHandler.INSTANCE);
+
+        // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（伤害上限/免疫击退/免疫负面）
+        MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
 
         // 调用通用初始化逻辑
         AkaishiMod.init();
@@ -154,6 +171,8 @@ public final class AkaishiModForge {
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定 cutout */
     private void onClientSetup(FMLClientSetupEvent event) {
         RenderTypeRegistry.register(RenderType.cutout(), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get());
+        // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
+        BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
     }
 
     /**

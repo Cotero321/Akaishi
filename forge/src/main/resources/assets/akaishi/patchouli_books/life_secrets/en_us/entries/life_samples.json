@@ -1,0 +1,28 @@
+{
+  "name": "Samples & Genes",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:life_organs",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_collector",
+      "text": "The Sample Collector: right-click a creature to draw a life sample.$(li)Right-click life-energy blocks/pipes to charge$(li)Weaker creatures = higher success (half HP +10%, quarter HP +10%, capped 95%)$(li)Purity: 60% chance 0-49, 25% chance 50-74, 15% chance 75-100$(br2)In short: beat the mob to near-death first, then go \"draw blood\"."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Creature Groups",
+      "text": "Samples fall into 7 groups by gene strength:$(li)Warm-blooded (livestock/aquatic) → I-grade$(li)Undead (zombie/skeleton etc.) → II-grade$(li)Explosive (creeper) → II-grade$(li)Mutants (spider/slime/blaze/guardian/iron golem/allay) → II-grade$(li)Ender (enderman/shulker/endermite) → III-grade$(li)Boss (wither) → IV-grade$(li)Dragon (ender dragon) → IV-grade$(br2)Stronger groups mean higher base purity, lower collection success, harder transplant compatibility, and faster rejection growth — the tougher the mob, the harder to \"farm\"."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_analyzer",
+      "text": "The Gene Analyzer deconstructs samples of purity ≥25 into gene sequences.$(br)Costs 5000 life energy and 5 seconds; success scales with purity (25→70%, 100→95%), and failure destroys the sample.$(br)Don't force it with low purity — that's just throwing it away."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gene_sequence",
+      "text": "Gene sequence fragments keep the sample's purity, and are later built into full organs at the Life Struct.$(br)Purity decides sequence purity → organ integrity → rejection correction, one link in a chain. Purity is the \"gold content\" of life."
+    }
+  ]
+}

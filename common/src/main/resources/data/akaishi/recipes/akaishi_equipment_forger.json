@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "III",
-    "IAI",
-    "III"
+    "ICI",
+    "CTC",
+    "ICI"
   ],
   "key": {
-    "A": { "item": "minecraft:anvil" },
-    "I": { "item": "akaishi:akaishi_essence_block" }
+    "I": { "item": "akaishi:akaishi_essence_block" },
+    "C": { "item": "akaishi:akaishi_advanced_component" },
+    "T": { "item": "akaishi:akaishi_upgrade_template" }
   },
   "result": { "item": "akaishi:akaishi_equipment_forger", "count": 1 }
 }

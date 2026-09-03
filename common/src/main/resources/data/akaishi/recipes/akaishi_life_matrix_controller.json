@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "DLD",
-    "LCL",
-    "DLD"
+    "DAD",
+    "ACA",
+    "DAD"
   ],
   "key": {
     "D": { "item": "akaishi:diamond_dust" },
-    "L": { "item": "minecraft:lapis_block" },
+    "A": { "item": "akaishi:akaishi_advanced_component" },
     "C": { "item": "akaishi:akaishi_life_conversion_architecture" }
   },
   "result": { "item": "akaishi:akaishi_life_matrix_controller", "count": 1 }

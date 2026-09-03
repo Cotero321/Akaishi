@@ -1,9 +1,8 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "akaishi:akaishi_essence" },
-    { "item": "akaishi:akaishi_crystal" },
-    { "item": "akaishi:akaishi_dust" }
+    { "item": "minecraft:book" },
+    { "item": "akaishi:akaishi_crystal" }
   ],
   "result": { "item": "akaishi:akaishi_diary", "count": 1 }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SES",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "akaishi:akaishi_altar_stone"
+    },
+    "E": {
+      "item": "akaishi:akaishi_life_essence_solid"
+    }
+  },
+  "result": {
+    "item": "akaishi:akaishi_mother_altar",
+    "count": 1
+  }
+}

@@ -2,11 +2,16 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
+import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 躯体检查仪界面：自绘"医学扫描"面板（无背包槽）。
@@ -100,7 +105,7 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
                     rowY - 4, rejectionColor(rej), false);
         }
 
-        // 底部汇总：总排斥 + 状况评级
+        // 底部汇总：总排斥 + 状况评级（160 行），同源套装摘要（169 行）
         int total = ClientBodyData.getTotalRejection();
         int occupied = ClientBodyData.getOccupiedCount();
         String statusKey;
@@ -118,11 +123,49 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             statusKey = "gui.akaishi.body_scanner.stable";
             statusColor = 0xFF2E7D32;
         }
-        int sumY = this.topPos + 164;
+        int sumY = this.topPos + 160;
         Component summary = Component.translatable("gui.akaishi.body_scanner.summary", occupied, BodySlot.values().length, total);
         gui.drawString(this.font, summary, this.leftPos + SLOT_NAME_X, sumY, 0xE0E0E0, false);
         Component status = Component.translatable(statusKey);
         gui.drawString(this.font, status, this.leftPos + PANEL_W - 8 - this.font.width(status), sumY, statusColor, false);
+        // 同源套装行：统计 ≥2 枚的同来源器官（增速 -20%；≥4 枚额外适配 +5）
+        String synergyText = synergySummary();
+        if (!synergyText.isEmpty()) {
+            gui.drawString(this.font, synergyText, this.leftPos + ROW_X, this.topPos + 169, 0x8B6F1E, false);
+        }
+    }
+
+    /** 汇总 ≥2 枚的同来源器官：如「同源套装：狼×3 · 猫×2」，无则返回空串 */
+    private String synergySummary() {
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        for (BodySlot slot : BodySlot.values()) {
+            ItemStack organ = ClientBodyData.getOrgan(slot);
+            if (organ.getItem() instanceof AkaishiOrganItem && !AkaishiOrganItem.isNative(organ)) {
+                String id = AkaishiOrganItem.getEntityId(organ);
+                if (!id.isEmpty()) {
+                    counts.merge(id, 1, Integer::sum);
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() < 2) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(" · ");
+            }
+            Component name = EntityType.byString(entry.getKey())
+                    .map(type -> (Component) type.getDescription())
+                    .orElse(Component.literal(entry.getKey()));
+            sb.append(name.getString()).append('×').append(entry.getValue());
+        }
+        if (sb.length() == 0) {
+            return "";
+        }
+        return this.font.plainSubstrByWidth(
+                Component.translatable("gui.akaishi.body_scanner.synergy", sb.toString()).getString(),
+                PANEL_W - ROW_X - 14);
     }
 
     /** 排斥值 → 颜色（绿/黄/橙/红） */

@@ -1,0 +1,17 @@
+{
+  "name": "赤石矿簇",
+  "icon": "akaishi:akaishi_ore_medium",
+  "category": "akaishi:intro",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_ore_medium",
+      "text": "赤石晶以矿簇形式藏在主世界（石质/深板岩）、下界和末地——宇宙尽头都有它的影子。$(br)矿簇分 4 种浓度：无暇、低浓度、中浓度、完美，浓度越高，一镐下去掉的越肥。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(2,4)浓度=产量$(0)：浓度决定每次挖掘掉落的赤石晶数量区间，别嫌少，附上时运的镐能再抬一手。$(br2)$(2,4)想躺着数钱？$(0)记住两个名字：赤石催化器 + 自动收集器。这二位合体，赤石晶从此全自动入袋，具体玩法在「进阶工业」篇见分晓。"
+    }
+  ]
+}

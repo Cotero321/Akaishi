@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "T",
-    "B"
+    "EME",
+    "MTM",
+    "EME"
   ],
   "key": {
-    "B": { "item": "akaishi:raw_akaishi_block" },
+    "E": { "item": "akaishi:akaishi_essence" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
     "T": { "item": "akaishi:akaishi_upgrade_template" }
   },
   "result": { "item": "akaishi:akaishi_machine_energy_upgrade", "count": 1 }

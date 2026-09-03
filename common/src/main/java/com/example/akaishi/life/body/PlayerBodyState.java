@@ -8,7 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -23,6 +25,8 @@ public class PlayerBodyState implements IPlayerBodyState {
 
     /** 排斥值上限（达到上限器官失效） */
     public static final int MAX_REJECTION = 100;
+    /** 最多可吸收的基因型数量（不同生物来源各一次） */
+    public static final int GENE_CAPACITY = 4;
 
     /** NBT 键 */
     private static final String TAG_ORGANS = "organs";
@@ -30,11 +34,25 @@ public class PlayerBodyState implements IPlayerBodyState {
     private static final String TAG_STACK = "stack";
     private static final String TAG_REJECTION = "rejection";
     private static final String TAG_INITIALIZED = "initialized";
+    private static final String TAG_GENE_BONUSES = "gene_bonuses";
+    private static final String TAG_GENE_ENTITY = "entity";
+    private static final String TAG_GENE_BONUS = "bonus";
+    private static final String TAG_BT_ENTITY = "bt_entity";
+    private static final String TAG_BT_EXTRA = "bt_extra";
+    private static final String TAG_BT_PCT = "bt_pct";
+    private static final String TAG_BT_UNTIL = "bt_until";
 
     /** 槽位 → 器官物品 */
     private final Map<BodySlot, ItemStack> organs = new EnumMap<>(BodySlot.class);
     /** 槽位 → 排斥值 */
     private final Map<BodySlot, Integer> rejection = new EnumMap<>(BodySlot.class);
+    /** 已吸收基因强化：生物来源 → 适配加成（插入序即吸收顺序，上限 GENE_CAPACITY） */
+    private final Map<String, Integer> geneBonuses = new LinkedHashMap<>();
+    /** 突破激活：单一来源（该来源器官 30 分钟内额外适配 + 基础数值百分比强化；结束后可再次激活） */
+    private String btEntity = "";
+    private int btExtra;
+    private int btPct;
+    private long btUntil = -1L;
     /** 是否已完成原生器官填充（旧存档无此标记时自动补位） */
     private boolean initialized;
 
@@ -69,8 +87,9 @@ public class PlayerBodyState implements IPlayerBodyState {
             return false;
         }
         organs.put(slot, organ.copy());
-        // 移植即产生基础排斥（原生器官为 0）
+        // 移植即产生基础排斥（原生器官为 0），并重置排异中和剂清洗额度
         setRejection(slot, AkaishiOrganItem.getBaseRejection(organ));
+        AkaishiOrganItem.setWashUsed(organs.get(slot), 0);
         return true;
     }
 
@@ -109,6 +128,117 @@ public class PlayerBodyState implements IPlayerBodyState {
         setRejection(slot, getRejection(slot) + amount);
     }
 
+    // ===== 基因强化 =====
+
+    @Override
+    public Map<String, Integer> getGeneBonuses() {
+        return Collections.unmodifiableMap(geneBonuses);
+    }
+
+    @Override
+    public boolean hasGene(String entityId) {
+        return entityId != null && !entityId.isEmpty() && geneBonuses.containsKey(entityId);
+    }
+
+    @Override
+    public int getGeneBonus(String entityId) {
+        return geneBonuses.getOrDefault(entityId, 0);
+    }
+
+    @Override
+    public boolean canAddGene() {
+        return geneBonuses.size() < GENE_CAPACITY;
+    }
+
+    @Override
+    public boolean addGene(String entityId, int bonus) {
+        if (entityId == null || entityId.isEmpty() || hasGene(entityId) || !canAddGene()) {
+            return false;
+        }
+        geneBonuses.put(entityId, Math.max(1, bonus));
+        return true;
+    }
+
+    @Override
+    public boolean removeGene(String entityId) {
+        if (entityId == null || geneBonuses.remove(entityId) == null) {
+            return false;
+        }
+        // 卸载的基因正被突破激活 → 突破一并结束（该来源加成整体撤销；重新吸收后可再次突破）
+        if (entityId.equals(btEntity)) {
+            endBreakthrough();
+        }
+        return true;
+    }
+
+    // ===== 突破强化 =====
+
+    @Override
+    public boolean hasActiveBreakthrough() {
+        return !btEntity.isEmpty();
+    }
+
+    @Override
+    public boolean isBreakthroughActive(String entityId) {
+        return entityId != null && !entityId.isEmpty() && entityId.equals(btEntity);
+    }
+
+    @Override
+    public String getBreakthroughEntity() {
+        return btEntity;
+    }
+
+    @Override
+    public int getBreakthroughExtra() {
+        return btExtra;
+    }
+
+    @Override
+    public int getBreakthroughPct() {
+        return btPct;
+    }
+
+    @Override
+    public long getBreakthroughUntil() {
+        return btUntil;
+    }
+
+    @Override
+    public boolean startBreakthrough(String entityId, int extra, int pct, long untilGameTime) {
+        if (entityId == null || entityId.isEmpty() || hasActiveBreakthrough()) {
+            return false;
+        }
+        btEntity = entityId;
+        btExtra = Math.max(0, extra);
+        btPct = Math.max(0, pct);
+        btUntil = untilGameTime;
+        return true;
+    }
+
+    @Override
+    public boolean endBreakthrough() {
+        if (btEntity.isEmpty()) {
+            return false;
+        }
+        btEntity = "";
+        btExtra = 0;
+        btPct = 0;
+        btUntil = -1L;
+        return true;
+    }
+
+    @Override
+    public boolean tickBreakthrough(long gameTime) {
+        if (btEntity.isEmpty() || btUntil < 0L) {
+            return false;
+        }
+        if (gameTime >= btUntil) {
+            endBreakthrough();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
@@ -133,6 +263,22 @@ public class PlayerBodyState implements IPlayerBodyState {
             rejectionList.add(entryTag);
         }
         tag.put(TAG_REJECTION, rejectionList);
+        // 基因强化列表（来源 → 加成，保持吸收顺序）
+        ListTag geneList = new ListTag();
+        for (Map.Entry<String, Integer> entry : geneBonuses.entrySet()) {
+            CompoundTag entryTag = new CompoundTag();
+            entryTag.putString(TAG_GENE_ENTITY, entry.getKey());
+            entryTag.putInt(TAG_GENE_BONUS, entry.getValue());
+            geneList.add(entryTag);
+        }
+        tag.put(TAG_GENE_BONUSES, geneList);
+        // 突破激活（仅激活时写入）
+        if (!btEntity.isEmpty()) {
+            tag.putString(TAG_BT_ENTITY, btEntity);
+            tag.putInt(TAG_BT_EXTRA, btExtra);
+            tag.putInt(TAG_BT_PCT, btPct);
+            tag.putLong(TAG_BT_UNTIL, btUntil);
+        }
         tag.putBoolean(TAG_INITIALIZED, initialized);
         return tag;
     }
@@ -157,6 +303,27 @@ public class PlayerBodyState implements IPlayerBodyState {
             if (slot != null) {
                 rejection.put(slot, entryTag.getInt(TAG_REJECTION));
             }
+        }
+        // 基因强化（截断到上限，防止 NBT 篡改超载）
+        geneBonuses.clear();
+        ListTag geneList = tag.getList(TAG_GENE_BONUSES, Tag.TAG_COMPOUND);
+        for (int i = 0; i < geneList.size() && geneBonuses.size() < GENE_CAPACITY; i++) {
+            CompoundTag entryTag = geneList.getCompound(i);
+            String entityId = entryTag.getString(TAG_GENE_ENTITY);
+            if (!entityId.isEmpty()) {
+                geneBonuses.put(entityId, entryTag.getInt(TAG_GENE_BONUS));
+            }
+        }
+        // 突破状态：激活单条（键缺失时保持默认空值；可重复激活，无一生使用记录）
+        btEntity = tag.getString(TAG_BT_ENTITY);
+        if (!btEntity.isEmpty()) {
+            btExtra = tag.getInt(TAG_BT_EXTRA);
+            btPct = tag.getInt(TAG_BT_PCT);
+            btUntil = tag.getLong(TAG_BT_UNTIL);
+        } else {
+            btExtra = 0;
+            btPct = 0;
+            btUntil = -1L;
         }
         initialized = tag.getBoolean(TAG_INITIALIZED);
         // 加载后立即补位（旧存档/新玩家），保证躯体始终满位

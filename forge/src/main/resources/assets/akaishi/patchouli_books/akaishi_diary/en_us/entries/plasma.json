@@ -1,0 +1,28 @@
+{
+  "name": "Plasma Chain",
+  "icon": "akaishi:akaishi_activated_fractionator",
+  "category": "akaishi:tech",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_activated_fractionator",
+      "text": "Activated Fractionator: splits activated crystal in two —$(li)Activated component: feeds the Fusion Fuel Aggregator, heading toward plasma$(li)Exhausted crystal: waste, but don't toss it; the Item Reconstructor loves it$(br)One process, two destinies — the akaishi 'indecision ender'."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_pipe",
+      "text": "Plasma Pipe: the third transport family, and it only accepts plasma.$(br)Other liquids want a ride? Not a chance. Aloof, faithful, never mixes flavors."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_tank",
+      "text": "Plasma Fuel Tank: the exclusive mansion for plasma, storing nothing but plasma.$(br)With pipes and the aggregator, plasma flows from production to filling without spilling a single drop."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_barrel",
+      "text": "Exhausted Fuel Barrel: the dedicated 'hazardous waste bin' for spent fuel.$(br)Whether your reactor stays in one piece is half cooling, half remembering to dump the waste in here."
+    }
+  ]
+}

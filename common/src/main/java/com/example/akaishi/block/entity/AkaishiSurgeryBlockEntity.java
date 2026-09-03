@@ -14,6 +14,7 @@ import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
 import com.example.akaishi.life.body.PlayerBodySync;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.menu.AkaishiSurgeryMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
@@ -169,6 +170,11 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
                 return;
             }
             if (state.isOccupied(target)) {
+                return;
+            }
+            // 天敌冲突预检：构成天敌对会导致排斥锁满 + 周期性反噬，移植前直接拒绝并说明
+            if (OrganEffectResolver.wouldConflict(state, AkaishiOrganItem.getEntityId(organ))) {
+                player.sendSystemMessage(Component.translatable("message.akaishi.surgery.conflict_warn"));
                 return;
             }
             if (!hasResources(IMPLANT_SOLID_COST, IMPLANT_LIFE_COST)) {

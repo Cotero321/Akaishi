@@ -1,0 +1,28 @@
+{
+  "name": "Waste Neutralization",
+  "icon": "akaishi:akaishi_life_activator",
+  "category": "akaishi:life_advanced",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_activator",
+      "text": "The Life Activator burns life energy to neutralize exhausted fuel (100 life energy per mb), 1:1 into activated exhausted liquid.$(br)Waste pipes feed the input tank; normal liquid pipes pull from the output tank — waste in, safe liquid out."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_centrifuge",
+      "text": "The Life Centrifuge splits activated fuel into a main product and a byproduct.$(br)The Activated Fractionator then refines the activated components — these get polymerized into plasma on the road to fusion. Waste isn't the end, it's the start."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_item_reconstructor",
+      "text": "The Item Reconstructor rebuilds items from exhausted crystals, turning waste back into usable resources.$(br)Trash in, treasure out — truly \"turning trash into treasure\"."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_pipe",
+      "text": "Exhausted waste pipes come in two flavors:$(li)Sealed Exhausted Pipe: single buffer, steady as a rock$(li)Multi-Fluid Waste Pipe: multi-buffer, bulk and then some$(br)They haul waste and nothing else — the dedicated waste courier feeding your Activator's input."
+    }
+  ]
+}

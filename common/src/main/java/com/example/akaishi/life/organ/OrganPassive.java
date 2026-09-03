@@ -47,7 +47,19 @@ public enum OrganPassive {
     /** 水下攻击伤害 +50% */
     WATER_ATTACK_BOOST("water_attack_boost"),
     /** 弹射物伤害 +25% */
-    PROJECTILE_BOOST("projectile_boost");
+    PROJECTILE_BOOST("projectile_boost"),
+    /** 近战攻击距离提升（每臂 +0.75 格，长臂生物） */
+    LONG_REACH("long_reach"),
+    /** 受击概率喷墨隐身（25%，4 秒，鱿鱼墨雾脱身） */
+    INK_CLOUD("ink_cloud"),
+    /** 滑翔：空中缓降（鹦鹉羽肺等飞行生物） */
+    GLIDE("glide"),
+    /** 排毒代谢：每 5 秒清除自身中毒（肾脏系） */
+    ANTIDOTE("antidote"),
+    /** 命中附加挖掘疲劳（10 秒 I 级，克制采矿——远古守卫者激光眼） */
+    FATIGUE_ON_HIT("fatigue_on_hit"),
+    /** 寒髓代谢：免疫冰冻并清除缓慢（雪傀儡肾脏） */
+    ANTIFREEZE("antifreeze");
 
     private final String id;
 

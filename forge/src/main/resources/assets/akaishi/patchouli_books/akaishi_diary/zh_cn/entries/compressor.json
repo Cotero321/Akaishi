@@ -1,0 +1,13 @@
+{
+  "name": "赤石压缩机",
+  "icon": "akaishi:akaishi_compressor",
+  "category": "akaishi:machines",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_compressor",
+      "text": "赤石压缩机，粉末的「回炉重造」机：$(li)各种粉末 → 对应块$(li)赤石精华 → 浓缩赤石精华$(br2)单格进单格出，通电就干。散装货进去，整块出来。"
+    }
+  ]
+}

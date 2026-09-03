@@ -17,7 +17,6 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         extends AbstractContainerScreen<T> {
 
     private static final int TEXT = 0xFF3F3F3F;
-    private static final int COLOR_BG = 0xFFC6C6C6;
 
     // 布局坐标（与 Menu 槽位一致）
     protected static final int ENERGY_X = 20, ENERGY_Y = 22, ENERGY_W = 136, BAR_H = 8;
@@ -35,13 +34,15 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
     protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        // 背景面板（vanilla 灰）
-        gui.fill(x, y, x + this.imageWidth, y + this.imageHeight, COLOR_BG);
-        // 槽框（输入/输出/升级，纹理无图案需自绘）
+        // 不透明背景面板（vanilla 灰，含四周内凹边框）
+        GuiWidgets.panel(gui, x, y, this.imageWidth, this.imageHeight);
+        // 机器槽框（输入/输出/升级，纹理无图案需自绘）
         GuiWidgets.slotBox(gui, x + INPUT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + OUTPUT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + SLOT_Y);
+        // 玩家背包 + 快捷栏槽框（解决物品栏背景看不到槽位的问题）
+        GuiWidgets.playerInventory(gui, x, y);
         // 赤能源条（红）
         drawBar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, BAR_H,
                 (float) menu.getEnergy() / Math.max(1, menu.getEnergyCapacity()), 0xFFE03030);
@@ -67,6 +68,8 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         gui.drawString(this.font, Component.translatable("gui.akaishi.single_slot.output"), OUTPUT_X, 30, TEXT, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
                 SPEED_SLOT_X, SLOT_Y + 20, 0xFF707070, false);
+        // 玩家背包标题（背包槽起点 y=124，标签置于其上方 8px）
+        gui.drawString(this.font, Component.translatable("container.inventory"), 8, 116, TEXT, false);
     }
 
     @Override

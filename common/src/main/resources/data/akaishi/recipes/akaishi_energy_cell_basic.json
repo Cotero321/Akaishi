@@ -2,12 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "III",
-    "RCR",
+    "MCM",
     "III"
   ],
   "key": {
     "C": { "item": "akaishi:akaishi_crystal" },
-    "R": { "item": "akaishi:akaishi_crystal" },
+    "M": { "item": "akaishi:akaishi_machine_component" },
     "I": { "item": "akaishi:iron_dust" }
   },
   "result": { "item": "akaishi:akaishi_energy_cell_basic", "count": 1 }

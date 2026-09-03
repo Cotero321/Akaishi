@@ -1,0 +1,18 @@
+{
+  "name": "赤石提纯器",
+  "icon": "akaishi:akaishi_purifier",
+  "category": "akaishi:intro",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier",
+      "text": "赤石提纯器，把粗制赤石块榨成赤石精华的「榨汁机」。$(br)它是赤能源的第一个消费者——塞块、通电，精华自动滚进输出槽。人生第一台耗电机器，就从它开始。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_advanced_purifier",
+      "text": "高级提纯构建方块，提纯矩阵的墙面。$(br)用提纯矩阵外壳围成 3×3×3 密闭空间，再放上控制器和端口，提纯速度直飙 30 倍。详细矩阵配方，去「高级科技」篇翻。"
+    }
+  ]
+}

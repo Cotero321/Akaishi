@@ -1,0 +1,23 @@
+{
+  "name": "词条重铸仪",
+  "icon": "akaishi:akaishi_trait_reforger",
+  "category": "akaishi:gene_mutations",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_trait_reforger",
+      "text": "重铸原理：把器官上选定的第 N 条突变词条，重铸为该档位词条池里的随机新词条（不会与器官已携带的词条重复）。$(br2)每次消耗：衰竭结晶 ×（2 × 档位） + 生命能量 120,000。$(br2)确定性成功：材料与能量齐了就必然成功，器官绝不损坏——洗到不满意，尽管反复洗。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_trait_reforger",
+      "text": "合成：八枚赤石锭环绕一枚衰竭结晶。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_crystal",
+      "text": "操作流程：放入带突变词条的器官 → 点上方序号选要重铸的词条 → 衰竭结晶与生命能量就绪后自动开始（约 30 秒）。$(br2)重铸中可随时切目标（进度会重置）；完成后从输出口取回新器官。天然原生器官无法重铸。洗词条，就是这么简单粗暴。"
+    }
+  ]
+}

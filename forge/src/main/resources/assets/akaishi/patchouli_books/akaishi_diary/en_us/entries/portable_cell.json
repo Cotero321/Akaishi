@@ -1,0 +1,13 @@
+{
+  "name": "Portable Cells",
+  "icon": "akaishi:portable_akaishi_cell_super",
+  "category": "akaishi:energy",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:portable_akaishi_cell_basic",
+      "text": "A pocket power pack in 3 tiers: basic / advanced / super.$(br)Carry it around to auto-repair your akaishi gear's durability, right-click to check the charge — a true walking power bank for builds and adventures alike."
+    }
+  ]
+}

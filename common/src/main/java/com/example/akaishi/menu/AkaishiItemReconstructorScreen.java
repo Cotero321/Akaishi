@@ -58,6 +58,10 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
+        // 机器槽（原料 26 / 衰竭结晶 62 / 产物 98）自绘框：贴图为通用终端贴图，无机器槽图案
+        GuiWidgets.slotBox(gui, x + 26, y + SLOT_Y);
+        GuiWidgets.slotBox(gui, x + 62, y + SLOT_Y);
+        GuiWidgets.slotBox(gui, x + 98, y + SLOT_Y);
         // 升级槽（速度/能量，机器槽行右侧，纹理无图案需自绘框；标签置于槽位下方避让产物槽）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
