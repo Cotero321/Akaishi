@@ -92,6 +92,7 @@ public final class AkaishiConfigSync {
         ModConfig.fusionCoolingPerPercent = AkaishiConfig.FUSION_COOLING_PER_PERCENT.get();
         ModConfig.fusionBaseTemp = AkaishiConfig.FUSION_BASE_TEMP.get();
         ModConfig.fusionTempMax = AkaishiConfig.FUSION_TEMP_MAX.get();
+        ModConfig.fusionTempTrip = AkaishiConfig.FUSION_TEMP_TRIP.get();
         ModConfig.fusionTempOptMin = AkaishiConfig.FUSION_TEMP_OPT_MIN.get();
         ModConfig.fusionTempOptMax = AkaishiConfig.FUSION_TEMP_OPT_MAX.get();
         ModConfig.fusionTempResume = AkaishiConfig.FUSION_TEMP_RESUME.get();
@@ -103,7 +104,6 @@ public final class AkaishiConfigSync {
         ModConfig.wirelessBaseLoss = AkaishiConfig.WIRELESS_BASE_LOSS.get();
         ModConfig.wirelessLossPerBlock = AkaishiConfig.WIRELESS_LOSS_PER_BLOCK.get();
         ModConfig.wirelessMaxLoss = AkaishiConfig.WIRELESS_MAX_LOSS.get();
-        ModConfig.wirelessPortTransferRate = AkaishiConfig.WIRELESS_PORT_TRANSFER_RATE.get();
         ModConfig.wirelessCrossDimLoss = AkaishiConfig.WIRELESS_CROSS_DIM_LOSS.get();
         ModConfig.wirelessLossReductionPerModule = AkaishiConfig.WIRELESS_LOSS_REDUCTION_PER_MODULE.get();
         ModConfig.wirelessChunkTaxPerChunk = AkaishiConfig.WIRELESS_CHUNK_TAX_PER_CHUNK.get();

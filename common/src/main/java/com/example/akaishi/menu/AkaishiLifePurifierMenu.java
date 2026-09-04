@@ -39,8 +39,8 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
 
         // 输出槽：只出不进
         addSlot(new Slot(container, AkaishiLifePurifierBlockEntity.OUTPUT_SLOT, 116, 30) {

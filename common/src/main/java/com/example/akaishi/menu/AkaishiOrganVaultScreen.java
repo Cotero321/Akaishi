@@ -129,6 +129,8 @@ public class AkaishiOrganVaultScreen extends AbstractContainerScreen<AkaishiOrga
                 int by = this.topPos + BTN_Y + (i / 3) * BTN_STEP;
                 if (mouseX >= bx && mouseX < bx + 18 && mouseY >= by && mouseY < by + 18) {
                     menu.setCurrentPage(i);
+                    // 切页为服务端存储映射依据，须同步服务端（否则存取落在第 0 页）
+                    AkaishiOrganVaultSync.sendPageSelect(menu.containerId, i);
                     return true;
                 }
             }

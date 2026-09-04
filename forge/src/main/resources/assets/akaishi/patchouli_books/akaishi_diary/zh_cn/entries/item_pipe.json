@@ -7,7 +7,20 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_item_pipe",
-      "text": "物品管道，物流网络的中继，把货物沿管道链式搬运到相连容器/机器。$(li)基础：1 个/tick$(li)中级：4 个/tick$(li)高级：16 个/tick$(li)超级：64 个/tick$(br2)方向乱了？掏出赤能源配置器切推/拉模式或断单侧连接，一键搞定。"
+      "text": "物品管道把货物沿管道网自动搬到相连的容器/机器，是自动化物流的血管。$(br2)$(bold)四档速率$(0)（每 tick 传输数）：$(li)$(4)物品管道$(0)：1 个/tick$(li)中级物品管道（_advanced）：4 个/tick$(li)高级物品管道（_elite）：16 个/tick$(li)超级物品管道（_ultimate）：64 个/tick$(br2)管道只对接$(bold)容器与本模组机器$(0)（支持管道交互的那批）。默认双向判定，可用配置器把某段切成「推/拉」或断开单侧，精确控制流向。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)物流组合拳：$(0)$(li)运电用「$(l:akaishi:energy_pipe)能量管道$(/l)」$(li)运物品用物品管道$(li)运液体用流体管道（见「$(l:akaishi:liquid_fuel)液体燃料链$(/l)」）$(br2)三条管道互不干扰，可并排走线。经典产线：收集器收货 → 物品管道运精华 → 机器加工。$(br2)「$(l:akaishi:plant_cultivator)植物培育机$(/l)」这类机器同样支持管道对接，种田也能全自动。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:collector",
+        "akaishi:energy_pipe",
+        "akaishi:plant_cultivator"
+      ],
+      "text": "与「$(l:akaishi:collector)自动收集器$(/l)」配套组成自动化线；输电部分补读「$(l:akaishi:energy_pipe)能量管道$(/l)」。"
     }
   ]
 }

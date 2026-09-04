@@ -7,7 +7,26 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_fusion_anvil",
-      "text": "Life Fusion Anvil: slam akaishi armor and a fusion ingot onto the anvil, and 'clang' — Life-fused Armor.$(br)Wear it and you stop being an ordinary miner; you become living, breathing akaishi battle plate — armor that finally has a pulse."
+      "text": "$(bold)What it does:$(0) forges Akaishi armor into $(4)Life Fusion Armor$(0).$(li)Input: one Akaishi Helmet/Chestplate/Leggings/Boots + one $(4)Life Fusion Ingot$(0)$(li)Costs $(bold)no energy$(0)$(li)The result $(4)keeps every upgrade on the original piece$(0) — active upgrades and free slots carry over intact$(br2)The anvil only accepts the four akaishi pieces; anything else is ignored."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Where Fusion Ingots Come From",
+      "text": "$(bold)One source only$(0): the Life Fusion Ingot has no crafting recipe — it can only be produced by the ritual at the $(l:akaishi:mother_altar)Altar of the Black Mother$(/l).$(br2)$(bold)Four results:$(0) Life Fusion Helmet, Chestplate, Leggings and Boots.$(br2)Ingots are precious — plan which piece to upgrade first. The chestplate usually pays off fastest."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_fusion_chestplate",
+      "text": "$(bold)Twice the strength:$(0) Life Fusion Armor doubles the base stats of akaishi armor.$(li)Armor (boots/legs/chest/helm) $(4)8 / 14 / 20 / 8$(0), toughness $(4)8$(0), knockback resistance 0.2, enchantability 25$(li)Each piece worn: $(4)+2$(0) gene compatibility across all genes$(li)Full set (4 pieces): organ strength ×1.2, rejection grows ×0.75, damage can be offset by energy from portable cells (100 akaishi per point), and $(4)free flight$(0) — revoked when you take it off or leave creative/spectator mode$(br2)This is the life line's endgame armor — start planning at the Mother Altar."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_vaults",
+        "akaishi:mother_altar",
+        "akaishi:life_organs"
+      ],
+      "text": "Stock transplant materials in the Organ Vault, earn fusion ingots at the Mother Altar, then feed your character organs and traits."
     }
   ]
 }

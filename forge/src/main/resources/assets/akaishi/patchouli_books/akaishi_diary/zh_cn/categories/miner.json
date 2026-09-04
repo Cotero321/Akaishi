@@ -1,6 +1,6 @@
 {
   "name": "赤石矿机",
-  "description": "一座占地 9×9×3 的巨型多方块结构，按概率产出全部原版矿物。",
+  "description": "用 9×9×3 的巨型多方块矿机替代手动挖矿，按概率产出全原版矿物。$(br)矿机等级越高能耗越大，请先备好电网。",
   "icon": "akaishi:akaishi_miner_controller_basic",
   "sortnum": 4
 }

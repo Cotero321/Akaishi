@@ -1048,7 +1048,7 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(terminalType, AkaishiWirelessTerminalScreen::new));
 
-        // 端口（输入口/输出口共用）：9 数据槽（缓冲储能 long + 卡/终端短 ID + 认证态 + 速率 long），无机器槽
+        // 端口（输入口/输出口共用）：8 数据槽（缓冲储能 long + 卡/终端短 ID + 认证态 + 方向），无机器槽
         MenuType<AkaishiWirelessPortMenu> wirelessPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
@@ -1075,7 +1075,7 @@ public final class ModMenus {
                 MenuRegistry.registerScreenFactory(portableType, AkaishiWirelessPortableTerminalScreen::new));
 
         // ===== 聚变堆 =====
-        // 控制器：4 燃料槽 + 13 数据槽（温度/成型/框架数/冷却/宕机/耐久/效率/灰烬），三页界面
+        // 控制器：4 燃料槽 + 10 散热片槽 + 13 数据槽，三页界面（散热片槽直连控制器容器）
         MenuType<AkaishiFusionControllerMenu> fusionType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();

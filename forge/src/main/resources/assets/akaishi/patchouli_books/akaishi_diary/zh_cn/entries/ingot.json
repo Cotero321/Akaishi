@@ -2,12 +2,25 @@
   "name": "赤石锭",
   "icon": "akaishi:akaishi_ingot",
   "category": "akaishi:intro",
-  "sortnum": 4,
+  "sortnum": 5,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_ingot",
-      "text": "赤石锭，赤石科技的「硬通货」。$(br)把下界合金锭丢进赤石能量聚合器，再灌 10M 赤能源，出来就是亮闪闪的赤石锭。$(br)全套赤石装备、赤红升级模板、一票高级机器，全都得靠它打底。"
+      "text": "赤石锭是中后期机器与装备的$(bold)核心材料$(0)。$(br2)$(bold)唯一获取途径：$(0)在「$(l:akaishi:aggregator)赤石能量聚合器$(/l)」里灌入$(4)10M 赤能源 + 1 下界合金锭$(0)，凝成 1 锭。$(br2)没有熔炉捷径——$(e)没攒出 10M 级储能就别想量产$(0)。挖到的远古残骸先留着别烧，它是锭的前置原料。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "锭是$(bold)上游材料之王$(0)：赤红升级模板、反应堆燃料棒与外壳、燃料罐装机、聚变与无线部件……一票高级配方都拿它打底；「$(l:akaishi:equipment)赤石装备$(/l)」同样靠它喂养。$(br2)$(bold)消费建议$(0)：先保证装备打造器与升级模板的份额——$(4)锭永远不嫌多$(0)。电网撑得住就开着聚合器慢慢凝，$(e)一块锭就是一块下界合金的增值$(0)。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:crystal",
+        "akaishi:aggregator",
+        "akaishi:equipment"
+      ],
+      "text": "怎么走到这一步：晶→块→精华（见「赤石晶与精华」）赚出家底 → 电网攒出 10M 级储能 → 聚合器开工凝锭 → 锭再流向装备打造器。先读聚合器怎么摆，再谈暴富。"
     }
   ]
 }

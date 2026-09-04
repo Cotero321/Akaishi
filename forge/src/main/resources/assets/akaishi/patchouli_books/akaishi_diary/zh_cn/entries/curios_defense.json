@@ -1,0 +1,26 @@
+{
+  "name": "赤石防御饰品",
+  "icon": "akaishi:akaishi_fire_necklace",
+  "category": "akaishi:advanced",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fire_necklace",
+      "text": "$(4)赤石防火吊坠$(0)（necklace 槽，容量 100 万）：每 tick 花 $(4)20$(0) 能量维持防火 I，岩浆里洗澡也不怕。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_blast_charm",
+      "text": "$(4)赤石防爆护符$(0)（body 槽，容量 100 万）：爆炸伤害按「1 点 = 100 能量」抵消。$(br2)能量扣光前，你就是站撸的移动堡垒。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "饰品共通机制与槽位见「$(l:akaishi:curios)赤石饰品$(/l)」总览；怕续航告急就多备「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
+    }
+  ]
+}

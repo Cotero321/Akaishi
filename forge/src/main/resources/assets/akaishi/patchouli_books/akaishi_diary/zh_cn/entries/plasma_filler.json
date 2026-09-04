@@ -1,0 +1,26 @@
+{
+  "name": "等离子体填装器",
+  "icon": "akaishi:akaishi_plasma_filler",
+  "category": "akaishi:tech",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_filler",
+      "text": "等离子体填装器：$(4)聚变反应棒 + 1000mb 对应等离子体 → 1 根等离子体燃料棒$(0)，耗时 100 tick。$(br2)它是聚变燃料的最后一站：棒到手，直接塞进「$(l:akaishi:fusion)聚变堆$(/l)」开烧。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)别填错棒：$(0)反应棒必须配$(bold)对应种类$(0)的等离子体——混合成分填混合棒、下界成分填下界棒、末地成分填末地棒。$(br2)三种棒的参数对比见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」，聚变堆的摆放见「$(l:akaishi:fusion)聚变堆$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma",
+        "akaishi:plasma_aggregator",
+        "akaishi:plasma_rods"
+      ],
+      "text": "上游等离子体来自「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」；产线总览见「$(l:akaishi:plasma)等离子体链$(/l)」。"
+    }
+  ]
+}

@@ -7,22 +7,31 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sample_collector",
-      "text": "The Sample Collector: right-click a creature to draw a life sample.$(li)Right-click life-energy blocks/pipes to charge$(li)Weaker creatures = higher success (half HP +10%, quarter HP +10%, capped 95%)$(li)Purity: 60% chance 0-49, 25% chance 50-74, 15% chance 75-100$(br2)In short: beat the mob to near-death first, then go \"draw blood\"."
+      "text": "The Sample Collector is the $(4)starting point$(0) of the whole line: hold it and right-click a creature to draw a Life Sample.$(br2)$(bold)How to use:$(0)$(li)Right-click a life-energy block/pipe to charge: it stores 100,000 and each draw costs 5,000 — 20 draws per full charge$(li)Success = the creature group's base rate + a wounded bonus: +10 below 50% HP, another +10 below 25%, capped at 95%$(li)On failure you keep half the energy, but the sample is lost$(li)Each creature yields at most 3 successful samples$(br2)$(bold)Purity:$(0) draws are skewed — 60% land in the 0-49 bracket. Mediocre blood is the norm, but the Cultivator can $(4)refine$(0) it later.$(br2)Golden rule: beat them near death first, then draw."
     },
     {
       "type": "patchouli:text",
       "title": "Creature Groups",
-      "text": "Samples fall into 7 groups by gene strength:$(li)Warm-blooded (livestock/aquatic) → I-grade$(li)Undead (zombie/skeleton etc.) → II-grade$(li)Explosive (creeper) → II-grade$(li)Mutants (spider/slime/blaze/guardian/iron golem/allay) → II-grade$(li)Ender (enderman/shulker/endermite) → III-grade$(li)Boss (wither) → IV-grade$(li)Dragon (ender dragon) → IV-grade$(br2)Stronger groups mean higher base purity, lower collection success, harder transplant compatibility, and faster rejection growth — the tougher the mob, the harder to \"farm\"."
+      "text": "$(bold)Your group decides a sample's potential:$(0)$(br2)$(li)$(4)Warm-blooded$(0) (farm animals, fish...): base purity 45, collect rate 85%$(li)$(4)Undead$(0) (zombies, skeletons...): 55 / 70%$(li)$(4)Explosive$(0) (creeper): 60 / 55%$(li)$(4)Aberrant$(0) (spiders, slimes, blazes...): 65 / 45%$(li)$(4)Ender$(0) (endermen, shulkers...): 70 / 40%$(li)$(4)Boss$(0) (wither, warden): 85 / 20%$(li)$(4)Dragon$(0) (ender dragon): 90 / 25%$(br2)Matching order: Dragon ＞ Boss ＞ Explosive ＞ Aberrant ＞ Ender ＞ Undead ＞ Warm-blooded.$(br2)Low purity can only grow low-grade organs — hunt stronger prey for high purity, or feed samples into the Cultivator."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_gene_analyzer",
-      "text": "The Gene Analyzer deconstructs samples of purity ≥25 into gene sequences.$(br)Costs 5000 life energy and 5 seconds; success scales with purity (25→70%, 100→95%), and failure destroys the sample.$(br)Don't force it with low purity — that's just throwing it away."
+      "text": "The Gene Analyzer $(4)deconstructs$(0) a sample of purity 25+ into a Gene Sequence Fragment.$(br2)$(bold)Costs:$(0)$(li)100 ticks (5 seconds) and 5,000 life energy$(li)Success scales linearly with purity: roughly 70% at purity 25, up to about 95% at purity 100$(li)Win or lose, the sample is always consumed$(br2)Below purity 25 it cannot even be fed in — refine low-purity stock at the Cultivator first.$(br2)This machine is the bottleneck of the line: no sequences, no organs."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_gene_sequence",
-      "text": "Gene sequence fragments keep the sample's purity, and are later built into full organs at the Life Struct.$(br)Purity decides sequence purity → organ integrity → rejection correction, one link in a chain. Purity is the \"gold content\" of life."
+      "text": "A Gene Sequence Fragment is the feedstock of the Structuring Table, and it $(4)keeps the creature source and purity$(0).$(br2)Hand it to the \"$(l:akaishi:life_struct)Life Structuring Table$(/l)\" to forge an organ.$(br2)$(bold)Purity is value:$(0) higher purity means higher organ integrity, while samples and sequences below 25 are barely worth keeping.$(br2)Keep extra stock in the \"Sample Vault\" described under \"$(l:akaishi:life_vaults)Vaults$(/l)\"; purity also unlocks trait tiers — see \"$(l:akaishi:trait_safe)Safe Mutations$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_struct",
+        "akaishi:life_vaults",
+        "akaishi:trait_safe"
+      ],
+      "text": "Suggested order: read \"$(l:akaishi:life_struct)Life Structuring Table$(/l)\" to forge sequences into organs; vault your spare samples and sequences; trait play is left to the Mutations chapter."
     }
   ]
 }

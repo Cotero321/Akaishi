@@ -7,7 +7,20 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_item_pipe",
-      "text": "Item pipes, the relay of your logistics network, haul goods along a chained network to connected containers/machines.$(li)Basic: 1 per tick$(li)Intermediate: 4 per tick$(li)Advanced: 16 per tick$(li)Ultimate: 64 per tick$(br2)Directions a mess? Whip out the Configurator to toggle push/pull or break a single side — one click, done."
+      "text": "Item Pipes haul goods across a pipe network to connected containers and machines — the veins of automation.$(br2)$(bold)Four speeds$(0) (items per tick):$(li)$(4)Item Pipe$(0): 1/t$(li)Intermediate Item Pipe (_advanced): 4/t$(li)Advanced Item Pipe (_elite): 16/t$(li)Ultimate Item Pipe (_ultimate): 64/t$(br2)Pipes only link to $(bold)containers and this mod's machines$(0) (those that support pipe access). By default each end is two-way; the Configurator can switch a section to Push/Pull or sever one side for precise flow."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Logistics combo:$(0)$(li)power rides the \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\"$(li)items ride Item Pipes$(li)liquids ride fluid pipes (see \"$(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l)\")$(br2)The three networks never clash — run them side by side. Classic line: Collector reaps -> Item Pipes move the Essence -> a machine processes it.$(br2)Machines like the \"$(l:akaishi:plant_cultivator)Plant Cultivator$(/l)\" take pipes too, so farming goes fully automatic."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:collector",
+        "akaishi:energy_pipe",
+        "akaishi:plant_cultivator"
+      ],
+      "text": "Pair them with the \"$(l:akaishi:collector)Auto Collector$(/l)\" for a full automation line; catch up on \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" for the power side."
     }
   ]
 }

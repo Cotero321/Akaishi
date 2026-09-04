@@ -1,0 +1,27 @@
+{
+  "name": "Purifier Matrix",
+  "icon": "akaishi:akaishi_purifier_matrix_controller",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier_matrix_controller",
+      "text": "The Purifier Matrix is a $(4)standalone bulk-refining multiblock$(0) — $(bold)not$(0) a Purifier boxed inside walls. Frame a fresh 3×3×3 sealed cavity out of Purifier Matrix Casing.$(br2)$(bold)Wall checklist:$(0)$(li)Casing: fill walls, floor and ceiling with Purifier Matrix Casing$(li)Put the $(bold)controller$(0) on any face$(li)Add an $(bold)Energy Input Port$(0)$(li)Add an $(bold)Item Input Port$(0) and $(bold)Item Output Port$(0)$(li)$(4)The cavity must stay empty$(0)$(br2)Once formed, the controller refines in bulk: Raw Akaishi Block → $(bold)1 essence$(0), Akaishi Crystal Block → $(bold)4 essence$(0), all at $(4)30x speed$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)How it shares the workload with the Purifier:$(0)$(li)The single-block Purifier has its own fuel slot — $(bold)it can run without a grid$(0)$(li)The Purifier Matrix has $(4)no fuel slot$(0) — it lives entirely on power from the Energy Input Port, so build the grid first$(li)Feedstock enters through the Item Input Port and essence exits via the Item Output Port — hook up Item Pipes and the line runs itself$(br2)$(bold)When to upgrade:$(0) when raw blocks start queueing in front of your single Purifier, that is the signal to build the matrix. Each batch costs 500 energy, and its throughput dwarfs any single machine."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:purifier",
+        "akaishi:matrix",
+        "akaishi:energy_pipe",
+        "akaishi:item_pipe"
+      ],
+      "text": "Start with the single-block $(l:akaishi:purifier)Akaishi Purifier$(/l); the shared sealed-cavity rules live in $(l:akaishi:matrix)Matrix Structures$(/l); power and logistics come from $(l:akaishi:energy_pipe)Energy Pipes$(/l) and $(l:akaishi:item_pipe)Item Pipes$(/l)."
+    }
+  ]
+}

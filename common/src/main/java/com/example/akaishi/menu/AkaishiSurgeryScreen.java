@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Locale;
+
 /**
  * 手术仓界面（自绘医学面板）：
  * - 左侧 3×3 躯体槽位：占用显示器官图标 + 排斥数值，点击选中目标（黄框）
@@ -31,8 +33,10 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
     private static final int ENERGY_X = 16, ENERGY_Y = 16, ENERGY_W = 96, ENERGY_H = 8;
     /** 手术进度条 */
     private static final int PROGRESS_X = 16, PROGRESS_Y = 104, PROGRESS_W = 136, PROGRESS_H = 8;
-    /** 移植/摘除按钮 */
-    private static final int IMPLANT_X = 118, EXTRACT_X = 150, BTN_Y = 82, BTN_W = 28, BTN_H = 12;
+    /** 移植/摘除按钮（两按钮并排收窄，右缘须落在 176 宽面板内） */
+    private static final int IMPLANT_X = 118, EXTRACT_X = 144, BTN_Y = 82, BTN_W = 24, BTN_H = 12;
+    /** 按钮下方所需生命能量小字行（常驻可见，绿=足够/红=不足） */
+    private static final int COST_Y = BTN_Y + BTN_H + 1;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，3×3 区右侧中部空位；标签置于槽位下方避开能量条） */
     private static final int SPEED_SLOT_X = 86, SPEED_SLOT_Y = 30;
     private static final int ENERGY_SLOT_X = 104, ENERGY_SLOT_Y = 30;
@@ -174,6 +178,13 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         // 移植/摘除按钮
         drawButton(gui, x + IMPLANT_X, y + BTN_Y, "gui.akaishi.surgery.implant", canImplant());
         drawButton(gui, x + EXTRACT_X, y + BTN_Y, "gui.akaishi.surgery.extract", canExtract());
+        // 按钮下方常驻显示所需生命能量（绿=能量足够/红=不足，悬停另有完整明细）；手术中隐藏让位进度条
+        if (!isOperating()) {
+            drawCost(gui, x + IMPLANT_X, y + COST_Y, AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST,
+                    menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST);
+            drawCost(gui, x + EXTRACT_X, y + COST_Y, AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST,
+                    menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST);
+        }
 
         // 背包槽位框（菜单槽位坐标；联动槽仅浮层打开时激活）
         drawLinkedSlots(gui, x, y);
@@ -184,11 +195,11 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         }
     }
 
-    /** 绘制背包/联动槽位框（浮层打开时联动槽激活可见） */
+    /** 绘制背包/联动槽位框（浮层打开时联动槽激活可见；从机器区末尾起画，避免主 UI 机器槽框叠在浮层上） */
     private void drawLinkedSlots(GuiGraphics gui, int x, int y) {
-        for (int i = AkaishiSurgeryBlockEntity.SLOT_COUNT; i < this.menu.slots.size(); i++) {
+        for (int i = AkaishiSurgeryMenu.MACHINE_SLOT_END; i < this.menu.slots.size(); i++) {
             var slot = this.menu.slots.get(i);
-            if (i >= AkaishiSurgeryBlockEntity.SLOT_COUNT + 36 && !slot.isActive()) {
+            if (i >= AkaishiSurgeryMenu.MACHINE_SLOT_END + 36 && !slot.isActive()) {
                 continue;
             }
             drawSlotBox(gui, x + slot.x, y + slot.y);
@@ -235,6 +246,31 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
                 enabled ? 0xFF2E7D32 : 0xFF6F6F6F, false);
     }
 
+    /** 按钮下方所需生命能量小字（绿=能量足够/红=不足，颜色随当前能量实时变化） */
+    private void drawCost(GuiGraphics gui, int x, int y, long cost, boolean enough) {
+        Component costText = Component.translatable("gui.akaishi.surgery.cost", formatEnergy(cost));
+        gui.drawString(this.font, costText, x + (BTN_W - this.font.width(costText)) / 2, y,
+                enough ? 0xFF2E7D32 : 0xFFD64545, false);
+    }
+
+    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出（与其他机器界面一致，避免"20000K"式错读） */
+    private static String formatEnergy(long v) {
+        if (v >= 1_000_000L) {
+            return trim(v / 1.0e6) + "M";
+        }
+        if (v >= 1_000L) {
+            return trim(v / 1.0e3) + "K";
+        }
+        return String.valueOf(v);
+    }
+
+    private static String trim(double d) {
+        if (Math.abs(d - Math.round(d)) < 0.05) {
+            return String.valueOf((long) Math.round(d));
+        }
+        return String.format(Locale.ROOT, "%.1f", d);
+    }
+
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         gui.drawString(this.font, this.title, this.titleLabelX, 4, 0xFF3F3F3F, false);
@@ -276,7 +312,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         // 悬停提示：能量条 / 槽位 / 按钮
         if (isHovering(ENERGY_X, ENERGY_Y, ENERGY_W, ENERGY_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
-                    Component.translatable("gui.akaishi.life", menu.getLifeEnergy(), menu.getLifeMax()),
+                    Component.translatable("gui.akaishi.life", formatEnergy(menu.getLifeEnergy()),
+                            formatEnergy(menu.getLifeMax())),
                     mouseX, mouseY);
         }
         // 升级槽悬停提示（速度/能量倍率随组件数量提升）
@@ -309,13 +346,15 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         if (mouseX >= this.leftPos + IMPLANT_X && mouseX < this.leftPos + IMPLANT_X + BTN_W
                 && mouseY >= this.topPos + BTN_Y && mouseY < this.topPos + BTN_Y + BTN_H) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.surgery.implant_tip",
-                    AkaishiSurgeryBlockEntity.IMPLANT_SOLID_COST, AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST),
+                    AkaishiSurgeryBlockEntity.IMPLANT_SOLID_COST,
+                    formatEnergy(AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST)),
                     mouseX, mouseY);
         }
         if (mouseX >= this.leftPos + EXTRACT_X && mouseX < this.leftPos + EXTRACT_X + BTN_W
                 && mouseY >= this.topPos + BTN_Y && mouseY < this.topPos + BTN_Y + BTN_H) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.surgery.extract_tip",
-                    AkaishiSurgeryBlockEntity.EXTRACT_SOLID_COST, AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST),
+                    AkaishiSurgeryBlockEntity.EXTRACT_SOLID_COST,
+                    formatEnergy(AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST)),
                     mouseX, mouseY);
         }
     }

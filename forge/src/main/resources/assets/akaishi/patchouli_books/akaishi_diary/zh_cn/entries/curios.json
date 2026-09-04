@@ -2,12 +2,25 @@
   "name": "赤石饰品",
   "icon": "akaishi:akaishi_hunting_ring",
   "category": "akaishi:advanced",
-  "sortnum": 7,
+  "sortnum": 9,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_hunting_ring",
-      "text": "赤石之力打造的 7 件饰品（佩戴于饰品栏），件件都是「外挂」：$(li)狩猎戒指：战斗增益$(li)聚宝手镯：提升收获$(li)火焰项链：抗火$(li)抗毒手镯：中和毒素$(li)爆破护符：减免爆炸$(li)凋零护符：抵御凋零$(li)饱食护符：进食增益$(br2)戴上它们，你就是行走的移动堡垒。"
+      "type": "patchouli:text",
+      "text": "每件赤石饰品都内置能量池，靠共同机制运转：$(li)触发效果时先扣自身能量池$(li)池空后会自动从背包里的「$(l:akaishi:portable_cell)便捷单元$(/l)」抽电续命$(li)出门挂饰品时，包里备一个便携单元就够撑全场$(br2)按用途分三组，各自有专条：$(l:akaishi:curios_income)生财饰品$(/l) 掉晶、$(l:akaishi:curios_defense)防御饰品$(/l) 扛伤、$(l:akaishi:curios_survival)续航饰品$(/l) 回饱食解 debuff。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)槽位对应（Curios 槽）：$(0)$(li)指环 → ring$(li)手环 → hands$(li)吊坠 → necklace$(li)护符 → charm$(li)胸饰 → body$(li)手镯 → bracelet$(li)腰带件 → belt$(br2)槽位不对装不上，戴之前先看准自己解锁了哪个槽。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios_income",
+        "akaishi:curios_defense",
+        "akaishi:curios_survival",
+        "akaishi:portable_cell"
+      ],
+      "text": "三组饰品专条：$(l:akaishi:curios_income)生财$(/l) / $(l:akaishi:curios_defense)防御$(/l) / $(l:akaishi:curios_survival)续航$(/l)；续电的电池见「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
     }
   ]
 }

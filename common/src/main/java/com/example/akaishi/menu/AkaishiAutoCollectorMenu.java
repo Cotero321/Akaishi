@@ -39,8 +39,8 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；顶部右侧避开状态行/能量条）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
         // 存储槽 9×3
         for (int row = 0; row < 3; row++) {

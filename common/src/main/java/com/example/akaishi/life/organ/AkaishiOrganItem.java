@@ -97,7 +97,7 @@ public class AkaishiOrganItem extends Item {
     }
 
     /** 槽位 → 物品实例（与 ModItems 注册对应） */
-    private static Item of(BodySlot slot) {
+    public static Item of(BodySlot slot) {
         return switch (slot) {
             case EYE -> ModItems.akaishiOrganEye.get();
             case HEART -> ModItems.akaishiOrganHeart.get();

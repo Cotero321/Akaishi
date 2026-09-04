@@ -2,17 +2,25 @@
   "name": "矩阵结构",
   "icon": "akaishi:akaishi_gen_matrix_controller_basic",
   "category": "akaishi:tech",
-  "sortnum": 4,
+  "sortnum": 17,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_gen_matrix_controller_basic",
-      "text": "发生器矩阵：矩阵外壳围成封闭空间（低级 3×3×3 / 高级 5×5×5），控制器与端口搁墙面上。$(li)低级：45 倍燃烧速度，产能为单台 1.5 倍$(li)高级：200 倍燃烧速度，产能为单台 3 倍$(br2)把一台台发生机「拼」成阵列，产能翻着跟头涨。"
+      "type": "patchouli:text",
+      "text": "赤石科技的「封闭腔体矩阵」，一句话：$(4)把一台台独立机器围进空箱，变成一台集中的大机器$(0)。$(br2)$(bold)通用规则：$(0)$(li)箱子是$(bold)奇数边长$(0)的空心封闭箱（3 或 5）$(li)外壳打底，端口与控制器贴墙，$(4)内腔必须全空$(0)$(li)成型后集中工作，拆掉任意一块外壳立刻失效$(br2)这套规则之下只造了两台矩阵：一台发电、一台精炼。点进下方专条即可看到各自的成型结构与参数。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_purifier_matrix_controller",
-      "text": "提纯矩阵：3×3×3 封闭空间，30 倍提纯速度，每 tick 耗 150 赤能源。$(br2)$(2,4)生命转换矩阵$(0)：3×3×3 封闭空间，把赤能源以 45 倍率转换成生命能量。想跨行搞生命科技？去翻「生命之书」。"
+      "type": "patchouli:text",
+      "text": "$(bold)赤石发生器矩阵（发电）：$(0)把赤能源发生机搬进封闭箱体，按固定倍率集中烧燃料。低级 3×3×3、高级 5×5×5 两档箱体，成型参数、燃料口与能量口接法全在「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」专条。$(br2)$(bold)赤石提纯矩阵（精炼）：$(0)3×3×3 空腔的集中精炼流水线，$(4)30 倍速$(0)把粗块/晶块批量榨成精华。它吃电网、不带燃料槽，详见「$(l:akaishi:purifier_matrix)赤石提纯矩阵$(/l)」专条。$(br2)两台矩阵都是上方通用规则的实例：先读本总览再点进专条，摆位不会乱。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gen_matrix",
+        "akaishi:purifier_matrix",
+        "akaishi:generator",
+        "akaishi:purifier"
+      ],
+      "text": "单块小机器是矩阵的起点：「$(l:akaishi:generator)赤能源发生机$(/l)」与「$(l:akaishi:purifier)赤石提纯器$(/l)」各有专条；两台矩阵在其基础上各自成篇。"
     }
   ]
 }

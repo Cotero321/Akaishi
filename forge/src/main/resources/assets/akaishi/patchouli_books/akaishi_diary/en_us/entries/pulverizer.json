@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_pulverizer",
-      "text": "The Pulverizer grinds hard minerals into dust:$(li)Vanilla ores → matching dust$(li)Akaishi → Akaishi Dust$(li)$(2,4)Obsidian → Obsidian Dust$(0)$(br2)Dust is the key to heat sinks and high-tier crafting — the machine world's \"grinder\"."
+      "text": "The Akaishi Pulverizer $(4)grinds ores down into dust$(0) — the first stop of any ore-processing line. Each grind takes 100 ticks at 15 energy/tick, with a 100k internal buffer; deepslate ores give the same result as normal ones.$(li)Coal / Iron / Gold / Diamond / Emerald / Quartz ore → x2 matching dust$(li)Copper ore → x3 Copper Dust$(li)Lapis ore → x4 Lapis Dust$(li)Redstone ore → x4 vanilla Redstone$(li)Ancient Debris → 1 Netherite Dust$(li)Obsidian → 1 Obsidian Dust$(li)Akaishi ore → x2 Akaishi Dust"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:obsidian_dust",
-      "text": "Obsidian Dust is one of its signature outputs.$(br)For the full dust list, head over to the \"Dusts\" entry."
+      "text": "Dust is the machine line's $(4)universal middleman$(0): press it back into blocks with the Compressor, or turn it into bases with the Transformer.$(br2)$(bold)Two things to remember:$(0)$(li)Obsidian Dust and Netherite Dust have $(e)no vanilla smelting route$(0) — to recover Obsidian or Netherite Ingots you must pulverize first and then compress$(li)Lapis, copper and redstone give the fattest yields (3-4 per ore) — feed those ores here first$(br2)Connect item pipes to auto-feed ores and pull dust out, and you've got a hands-off ore-processing start."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:compressor",
+        "akaishi:dusts",
+        "akaishi:transformer",
+        "akaishi:ore"
+      ],
+      "text": "After pulverizing: press blocks with $(l:akaishi:compressor)Compressor$(/l), make bases with $(l:akaishi:transformer)Transformer$(/l), or browse the list in $(l:akaishi:dusts)Dusts$(/l). Ore sources are covered in $(l:akaishi:ore)Akaishi Ore Clusters$(/l)."
     }
   ]
 }

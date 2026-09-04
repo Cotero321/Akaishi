@@ -1,0 +1,26 @@
+{
+  "name": "Defense Trinkets",
+  "icon": "akaishi:akaishi_fire_necklace",
+  "category": "akaishi:advanced",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fire_necklace",
+      "text": "$(4)Akaishi Fire Necklace$(0) (necklace slot, 1M buffer): spends $(4)20$(0) energy/tick to keep Fire Resistance I up — bathe in lava if you like."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_blast_charm",
+      "text": "$(4)Akaishi Blast Charm$(0) (body slot, 1M buffer): cancels explosion damage at \"1 point = 100 energy\".$(br2)Until the buffer runs dry, you're a walking fortress."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "Shared mechanics and the slot map live in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; carry spare $(l:akaishi:portable_cell)Portable Cells$(/l) when your armor of energy runs thin."
+    }
+  ]
+}

@@ -47,6 +47,8 @@ public final class DecayZoneManager extends SavedData {
     private static final int ENV_SAMPLES_PER_TICK = 256;
     /** 生物转化判定周期（tick） */
     private static final int CONVERT_INTERVAL = 40;
+    /** 区域剩余时间落盘间隔（tick）：衰减/净化递减需周期保存，防重启后剩余时间回滚 */
+    private static final int SAVE_INTERVAL = 600;
 
     /** 环境替换映射：表层生息方块 → 砂土 */
     private static final Map<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.Block> REPLACE_MAP = Map.of(
@@ -161,6 +163,11 @@ public final class DecayZoneManager extends SavedData {
                 continue;
             }
             mgr.tickZone(level, zone, now);
+        }
+        // 剩余时间（自然衰减/净化削减）非创建/移除事件不落盘，此处周期标记一次保存，
+        // 使区域内剩余时间随世界 autosave 持久化（否则重启后回滚到上次事件保存值）
+        if (!mgr.zones.isEmpty() && now % SAVE_INTERVAL == 0) {
+            mgr.setDirty();
         }
     }
 

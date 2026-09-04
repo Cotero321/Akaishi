@@ -5,19 +5,30 @@
   "sortnum": 2,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_life_struct",
-      "text": "The Life Struct: 1 sequence + 5 solids + 80,000 life energy builds an organ in 6 seconds, no failure risk.$(br)Integrity = sequence purity − random loss (0-20): 100→III-grade, 50-99→II-grade, <50→I-grade. This step is rock-solid."
+      "type": "patchouli:text",
+      "text": "$(bold)Organ catalog$(0) - nine items, one per slot:$(li)$(4)Eyes Organ$(0) (eye) -> eye slot$(li)$(4)Heart Organ$(0) (heart) -> heart slot$(li)$(4)Lungs Organ$(0) (lungs) -> lungs slot$(li)$(4)Viscera Organ$(0) (viscera) -> viscera slot$(li)$(4)Kidneys Organ$(0) (kidneys) -> kidneys slot$(li)$(4)Left/Right Arm Organ$(0) (left_arm / right_arm) -> limb slots$(li)$(4)Left/Right Leg Organ$(0) (left_leg / right_leg) -> limb slots$(br2)The first five fill \"organ\" slots, the four limbs fill \"limb\" slots - the $(bold)slot type$(0) sets the rules for rejection and side effects."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_surgery",
-      "text": "The Surgery Chamber transplants organs into the body (one per each of 9 slots) or removes them.$(br)Transplant: 3 solids + 20,000 energy; removal: 1 solid + 5,000 energy.$(br2)Rejection = quality × creature-group coefficient × integrity correction, and it grows over time; natural-enemy combos lock rejection to max and blow back! Before cutting, ask whether this organ truly \"fits\" you."
+      "type": "patchouli:text",
+      "title": "Bonuses & Grades",
+      "text": "$(bold)Default template bonuses$(0) (base values, before grade):$(li)Eyes: +0.5 attack$(li)Heart: +2 max health$(li)Lungs: +0.5 armor toughness$(li)Viscera: +0.5 luck$(li)Kidneys: +0.5 attack$(li)Each arm: +0.75 attack and +0.05 knockback resistance$(li)Each leg: +0.015 move speed$(br2)$(bold)Grade I-IV multipliers: 1.25 / 1.5 / 1.75 / 2.0$(0) - higher grades give bigger bonuses but also $(4)higher starting rejection and faster rejection growth$(0): stronger organs are pickier about their host."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_cultivator",
-      "text": "The Part Cultivator handles sample purification (+10 purity per run, four success tiers) and organ upgrades (I→IV quality, 85/75/65% success).$(br)Want to grow great organs? This chamber is your \"organ gym\"."
+      "type": "patchouli:text",
+      "title": "One Pipeline, Three Machines",
+      "text": "$(li)1. $(l:akaishi:life_struct)Life Structuring Table$(/l): forge organs from gene sequences (always succeeds; integrity follows purity)$(li)2. $(l:akaishi:surgery)Surgery Chamber$(/l): implant or extract them (costs essence and life energy)$(li)3. $(l:akaishi:cultivator)Organ Cultivator$(/l): purify samples and upgrade organ grades$(br2)Organs also feed the $(l:akaishi:mother_altar)Altar of the Black Mother$(/l) as tributes; rejection control lives in $(l:akaishi:life_potions)Life Potions$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_struct",
+        "akaishi:surgery",
+        "akaishi:cultivator",
+        "akaishi:life_potions",
+        "akaishi:life_vaults"
+      ],
+      "text": "Reading order: samples make sequences -> Structuring Table forges organs -> Surgery Chamber implants -> Cultivator purifies and upgrades. Store fine organs in the Vaults; potions handle rejection."
     }
   ]
 }

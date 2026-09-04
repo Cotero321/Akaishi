@@ -1,0 +1,26 @@
+{
+  "name": "能量加工器",
+  "icon": "akaishi:akaishi_energy_processor",
+  "category": "akaishi:tech",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_processor",
+      "text": "加工器把「能量液体」升级成「燃料液体」，两种配方：$(li)$(bold)下界复合燃料$(0)：固态物 + 1000mb 下界复合能量 → 1000mb，耗电 500万/次$(li)$(bold)至纯燃料$(0)：固态物 + 100mb 下界至纯能量 → 75mb，轻浓缩、省固态物$(br2)至纯燃料虽小，但它是混合器的顶级原料之一，浓缩这步别省。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)使用要点：$(0)单槽单配方，换料会清空进度——认准一条线跑到底。$(br2)两条线怎么选：$(li)要量大管饱：走下界复合燃料，1:1 兑出$(li)要纯度高：走至纯燃料，供「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」兑终极混合$(br2)加工的燃料液体直接交给「$(l:akaishi:fuel_canner)燃料装罐机$(/l)」灌罐即可进反应堆。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_liquefier",
+        "akaishi:fuel_canner"
+      ],
+      "text": "上游原料出自「$(l:akaishi:fuel_liquefier)能量液化装置$(/l)」，下游把成品兑高级料的看「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」。"
+    }
+  ]
+}

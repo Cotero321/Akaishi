@@ -7,11 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_plant_cultivator",
-      "text": "The Plant Cultivator, black-tech that \"fast-forwards\" seeds into crops.$(br)Its GUI has a single input slot: drop in a seed and power it up — $(2,4)the seed is NOT consumed$(0). Once the energy finishes, it spits out the plant product (but no seeds, so don't expect an infinite loop)."
+      "text": "The Akaishi Plant Cultivator $(4)fast-forwards seeds and stalks into crops$(0) — the seed stays in its slot and is $(bold)never consumed$(0), so one machine can farm forever.$(br2)$(bold)How to use:$(0) drop a seed into the input slot and feed it Akaishi Energy. Each grow takes 200 ticks at 10 energy/tick, with a 100k internal buffer.$(li)Wheat / Beetroot / Melon / Pumpkin Seeds → their crop$(li)Carrot, Potato → themselves$(li)Sugar Cane, Cactus, Bamboo, Cocoa Beans, Nether Wart → themselves$(li)Mushrooms, Crimson & Warped Fungus → themselves$(br2)Outputs only land in the output slot — never seeds. Hook up item pipes for a fully hands-off farm, or slot in upgrades to speed it up."
     },
     {
-      "type": "patchouli:text",
-      "text": "$(2,4)Example products$(0)$(li)Wheat Seeds → Wheat$(li)Potato → Potato$(li)Nether Wart → Nether Wart$(li)Vine / stem crops$(br2)Too slow? Stuff in upgrade components and watch it speed up."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:compressor",
+        "akaishi:pulverizer",
+        "akaishi:crystal"
+      ],
+      "text": "The Cultivator grows, the Pulverizer grinds, the Compressor presses — gather this chapter's machines for a fully automated farm. For crystal materials, revisit $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

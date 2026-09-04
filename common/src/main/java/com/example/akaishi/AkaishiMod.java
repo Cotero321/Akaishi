@@ -14,8 +14,8 @@ import com.example.akaishi.menu.AkaishiSurgerySync;
 import com.example.akaishi.menu.AkaishiPotionSync;
 import com.example.akaishi.menu.AkaishiTraitReforgerSync;
 import com.example.akaishi.menu.AkaishiGeneManagerSync;
+import com.example.akaishi.menu.AkaishiOrganVaultSync;
 import com.example.akaishi.menu.ModMenus;
-import com.example.akaishi.recipe.ModRecipeSerializers;
 import com.example.akaishi.sound.ModSounds;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
@@ -36,7 +36,6 @@ public final class AkaishiMod {
         ModBlockEntities.register();
         ModCreativeTabs.register();
         ModMenus.register();
-        ModRecipeSerializers.register();
         // 自定义状态效果（衰变）
         ModEffects.register();
         // 衰竭区域：服务端每 tick 结算减益/环境转化/生物转化
@@ -56,6 +55,8 @@ public final class AkaishiMod {
         AkaishiPotionSync.register();
         // 词条重铸仪目标词条选择包（C2S 接收器）
         AkaishiTraitReforgerSync.register();
+        // 器官储藏库切页包（C2S 接收器）
+        AkaishiOrganVaultSync.register();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
         ModSounds.touch();
     }

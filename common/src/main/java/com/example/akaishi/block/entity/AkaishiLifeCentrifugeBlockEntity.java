@@ -47,7 +47,7 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     /** 每批产出所需的活化燃料量（mb） */
-    public static final long BATCH_MB = 100L;
+    public static final long BATCH_MB = 1000L;
 
     // ===== 数据槽 =====
     public static final int DATA_SLOTS = 5;

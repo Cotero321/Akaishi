@@ -1,0 +1,27 @@
+{
+  "name": "Equipment Forger",
+  "icon": "akaishi:akaishi_equipment_forger",
+  "category": "akaishi:advanced",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_equipment_forger",
+      "text": "The Akaishi Equipment Forger $(4)recasts Netherite gear into Akaishi gear$(0) — gear can no longer be crafted at a table; this is the only front door.$(br2)$(bold)Ingot cost:$(0)$(li)helmet 5, chestplate 8, leggings 7, boots 4$(li)sword 2, pickaxe 3, shovel 1, axe 3$(br2)One machine covers the whole set: drop in the matching Netherite piece and order up."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Energy:$(0)$(4)50M$(0) Akaishi Energy + $(4)10M$(0) per assigned upgrade point.$(br2)The result starts with $(4)4 upgrade points$(0) to spend:$(li)+0.15 attack speed per point$(li)+1 attack damage per point$(li)+2 max health per point$(li)+1 armor per point$(li)+1 toughness per point$(li)pickaxes/shovels/axes can also take: +20 efficiency per point$(br2)At most 4 points per recast; you can undo and reassign before confirming, so a wrong click is never final."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:equipment",
+        "akaishi:ingot",
+        "akaishi:aggregator",
+        "akaishi:portable_cell"
+      ],
+      "text": "The recasting fuel $(l:akaishi:ingot)Akaishi Ingots$(/l) are condensed by the $(l:akaishi:aggregator)Energy Aggregator$(/l); this machine is hungry, so bring $(l:akaishi:portable_cell)Portable Cell$(/l)-scale storage. Final stats: $(l:akaishi:equipment)Equipment$(/l)."
+    }
+  ]
+}

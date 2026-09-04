@@ -1,6 +1,6 @@
 {
   "name": "Machines",
-  "description": "Plant growing, powder processing and material transformation.",
+  "description": "The basic production line: pulverizing, pressing, transforming and growing.$(br)Dusts and bases made here feed cooling sinks and advanced recipes — have power ready.",
   "icon": "akaishi:akaishi_plant_cultivator",
   "sortnum": 3
 }

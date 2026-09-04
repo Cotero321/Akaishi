@@ -2,17 +2,31 @@
   "name": "Fuel & Cooling",
   "icon": "akaishi:fuel_cell",
   "category": "akaishi:tech",
-  "sortnum": 5,
+  "sortnum": 1,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:fuel_cell",
-      "text": "The Fuel Cell, a burnable canister forged from Akaishi Ingots, is the reactor's \"lunchbox\".$(li)The Fuel Filler pours burnable mass into it$(li)The Fuel Mixer blends end / dragon / world-base mixtures$(li)Fuel rods and fusion rods combine in the Fusion Fuel Aggregator into fusion reaction rods$(li)The Plasma Filler loads plasma into rods → plasma fuel rods$(br2)It's a long chain, but every link leads to a hotter fire."
+      "text": "$(bold)The Fuel Cell$(0) is the reactor's \"lunchbox\": liquid fuel must be canned in metal before it can be stuffed into a fuel slot.$(li)Capacity: $(bold)10 L = 10,000 mb$(0)$(li)Filled by the $(bold)Fuel Canner$(0); an empty cell can be reused over and over$(li)What's inside decides everything — the same can performs very differently (see page 3)$(br2)For the full liquid-to-can line, see \"$(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l)\"."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:heat_sink_poor",
-      "text": "Heat sinks come in 6 tiers (rough → refined → fine → good → excellent → ultimate) built tier by tier, plus fusion heat sinks (tiers 1-5 + life-grade).$(br)Heat sinks are stacked from a Cooling Base + dust step by step. Whether the reactor and fusion reactor hold their temperature is entirely up to them."
+      "text": "$(bold)Heat Sinks$(0) are the reactor's main cooling muscle — six grades: $(bold)Poor → Normal → Good → Fine → Exquisite → Ultimate$(0), crafted up tier by tier.$(li)Heat removal climbs from about 1% to 7%; higher grades cool harder and last longer$(li)Fit them into the reactor's cooling components, and they only work $(4)touching a fuel rod$(0)$(li)$(4)Consumables$(0): they wear down while the reactor runs — swap in fresh ones when they break$(br2)Starter recipe: 1 Cooling Base + 4 Copper Ingots = 1 Poor Heat Sink."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Picking fuel = picking profit:$(0) the liquid inside sets the energy utilization multiplier — World Base Fuel 3 / Nether Compound Fuel 4 / End Mixture Fuel 4 / Advanced Mixture Fuel 5 / Pure Fuel 8 / End Dragon Fuel 7 / $(4)Ultimate Mixture Fuel 14$(0).$(br2)Higher multiplier means far more power from the same can — the burn rate never changes, only the output soars. Choose fuel before lighting up: lesson one of the reactor.$(br2)Temperature is still the line between life and boom: $(4)400-700℃$(0) full output, $(e)850℃$(0) warning, $(c)1000℃$(0) explosion countdown — details in \"$(l:akaishi:reactor)The Reactor$(/l)\". Craving higher-tier fuel? Read on to the Liquid Fuel Chain and the Plasma Chain."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:reactor",
+        "akaishi:liquid_fuel",
+        "akaishi:plasma",
+        "akaishi:transformer"
+      ],
+      "text": "Suggested reading order: master how fuel and cooling cooperate in \"The Reactor\" → refine better fuel along the Liquid Fuel Chain → finally graduate to the Plasma Chain."
     }
   ]
 }

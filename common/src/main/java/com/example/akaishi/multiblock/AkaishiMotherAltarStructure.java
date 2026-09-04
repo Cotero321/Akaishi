@@ -21,7 +21,7 @@ import java.util.Set;
  * 母神祭坛仪式结构检测（17×17×2，锚点为中央祭坛）。
  * 第一层（y-1）：哭泣黑曜石构成菱形外环与十字中线，菱形内部四象限填仪式石。
  * 第二层（y=0）：8 个灵魂营火 + 17 个黑山羊祭坛（中央 1 + 内圈 8 器官 + 外围 4 胚胎 + 4 灰烬）。
- * 供奉物校验：中央=心脏（适配度 100）、内圈=8 种互不相同的非心脏器官（适配度 100）、
+ * 供奉物校验：中央=心脏（适配度 ≥50）、内圈=8 种互不相同的非心脏器官（适配度 ≥50）、
  * 十字外围=生命胚胎、对角外围=生命灰烬。
  */
 public final class AkaishiMotherAltarStructure {
@@ -36,6 +36,9 @@ public final class AkaishiMotherAltarStructure {
 
     /** 半宽：17 = 2×8+1，锚点位于矩阵中心 */
     private static final int HALF = 8;
+
+    /** 供奉器官最低适配度门槛：≥50 即被母神接纳（放宽低阶器官的献祭门槛） */
+    private static final int REQUIRED_ORGAN_COMPAT = 50;
 
     private static final int[][] LAYER_BOTTOM = {
             {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -162,14 +165,14 @@ public final class AkaishiMotherAltarStructure {
                 }
             }
         }
-        // 供奉物校验：中央心脏
+        // 供奉物校验：中央心脏（适配度 ≥50）
         ItemStack heart = offeringAt(level, center);
         if (!(heart.getItem() instanceof AkaishiOrganItem heartOrgan)
                 || heartOrgan.slot != BodySlot.HEART
-                || AkaishiOrganItem.getCompat(heart) != AkaishiOrganItem.MAX_COMPAT) {
+                || AkaishiOrganItem.getCompat(heart) < REQUIRED_ORGAN_COMPAT) {
             return null;
         }
-        // 供奉物校验：内圈 8 种互不相同的非心脏器官，适配度 100
+        // 供奉物校验：内圈 8 种互不相同的非心脏器官（适配度 ≥50）
         Set<BodySlot> seen = new HashSet<>();
         for (int[] off : ORGAN_OFFSETS) {
             BlockPos p = center.offset(off[0], 0, off[1]);
@@ -180,7 +183,7 @@ public final class AkaishiMotherAltarStructure {
             if (organ.slot == BodySlot.HEART) {
                 return null;
             }
-            if (AkaishiOrganItem.getCompat(stack) != AkaishiOrganItem.MAX_COMPAT) {
+            if (AkaishiOrganItem.getCompat(stack) < REQUIRED_ORGAN_COMPAT) {
                 return null;
             }
             if (!seen.add(organ.slot)) {

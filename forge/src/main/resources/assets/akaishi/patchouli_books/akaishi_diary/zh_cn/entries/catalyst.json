@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_catalyst_basic",
-      "text": "赤石催化器，赤石晶自动化的「播种机」：烧赤能源，催生范围内水晶母岩长赤石水晶簇。$(li)基础：3×3×3，成功率 20%，5 能/t$(li)中级：5×5×5，成功率 30%，25 能/t$(li)高级：9×9×9，成功率 40%，125 能/t$(li)超级：16×16×16，成功率 50%，625 能/t$(br2)越大越猛，电费也越大，量力而行。"
+      "text": "赤石催化器是水晶农场的第一步：$(4)烧赤能源催熟水晶母岩$(0)，让水晶簇自己长出来。$(br2)$(bold)四档规格$(0)（范围边长 / 单次成功率 / 每 tick 能耗）：$(li)$(4)基础$(0)：3×3×3，成功率 20%，5 能/tick$(li)中级：5×5×5，成功率 30%，25 能/tick$(li)高级：9×9×9，成功率 40%，125 能/tick$(li)超级：16×16×16，成功率 50%，625 能/tick$(br2)档位越高越猛、电费越高。开工前记得先给它接上能量管道。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_geode_pristine",
-      "text": "水晶母岩分 4 档：瑕疵/普通/完好/完美，是水晶簇的温床。$(br)催化器负责「种」，收集器负责「收」，你负责躺平数晶。"
+      "text": "水晶簇只长在「赤石水晶母岩」边上。母岩分四档：$(4)瑕疵 → 普通 → 完好 → 完美$(0)，档级越高，自己长得越快。$(br2)$(bold)催化器干的活：$(0)每 tick 让范围内每颗母岩尝试长一次簇——长出的赤石水晶簇，挖落 1-2 个赤石精华。$(br2)$(bold)母岩想升档？$(0)交给「$(l:akaishi:aggregator)赤石能量聚合器$(/l)」：灌 10M 赤能源升一级。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:aggregator",
+        "akaishi:collector",
+        "akaishi:crystal",
+        "akaishi:pulverizer"
+      ],
+      "text": "母岩与赤石晶的来源见「$(l:akaishi:crystal)赤石晶与精华$(/l)」；想挂机自动产晶，接着读「$(l:akaishi:collector)自动收集器$(/l)」。"
     }
   ]
 }

@@ -2,27 +2,24 @@
   "name": "Liquid Fuel Chain",
   "icon": "akaishi:akaishi_energy_liquefier",
   "category": "akaishi:tech",
-  "sortnum": 6,
+  "sortnum": 2,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_liquefier",
-      "text": "Energy Liquefier: crushes solid akaishi energy down into 'Nether energy liquid'.$(br)Don't ask how energy fits in a can — the answer is always 'akaishi tech, that's how'. Each tick it gulps energy and spits liquid, purer than a lab beaker."
+      "type": "patchouli:text",
+      "text": "The liquid fuel line in one sentence: $(4)liquefy → process → mix → can → burn$(0).$(br2)$(li)$(l:akaishi:fuel_liquefier)Energy Liquefier$(/l): squeezes solid ingredients into liquid energy$(li)$(l:akaishi:fuel_processor)Energy Processor$(/l): turns liquid energy into burnable fuel$(li)$(l:akaishi:fuel_mixer)Fuel Mixer$(/l): blends low-tier fuel into high-tier fuel$(li)$(l:akaishi:fuel_canner)Fuel Canner$(/l): pours liquid into fuel cells$(br2)Hand the filled cells to \"$(l:akaishi:reactor)The Reactor$(/l)\"; the very top fuel keeps climbing into \"$(l:akaishi:plasma)Plasma Chain$(/l)\". Recipes and stats for each machine live in their own entries — click through above."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_processor",
-      "text": "Energy Processor: solid matter + Nether energy liquid, stirred into burnable fuel.$(br)Think of it as akaishi 'liquid bread' — solids in one side, liquid in the other, and out pops hard currency for your reactor."
+      "type": "patchouli:text",
+      "text": "$(bold)Line logistics:$(0)$(li)Fluid Tanks: Basic 16,000 mb / Advanced 64,000 mb / Super 256,000 mb — let output settle in a tank before feeding the next stage so machines never wait$(li)Fluid Pipe: moves $(4)4,000 mb/tick$(0) of any liquid — no discrimination$(br2)$(bold)Exception:$(0) exhausted fuel is corrosive and must ride the dedicated $(bold)Sealed Exhausted Pipe$(0); normal pipes refuse that cargo.$(br2)Its recycling route lives in \"Secrets of Life\" — until then, remember: $(4)don't dump it$(0)."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fluid_tank_basic",
-      "text": "Fluid Tanks come in three tiers:$(li)Basic: for the homestead$(li)Advanced: for the workshop$(li)Super: until you question your life choices$(br)They store Nether energy / fuel liquid. Hook up a pipe and the liquid finds its own way home."
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fluid_pipe",
-      "text": "Fluid Pipe: hauls liquid around, more reliable than any courier and never loses a package.$(br)Pair it with tanks, the liquefier and the processor to build a fully automatic liquid-fuel assembly line."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:fuel_system",
+        "akaishi:reactor",
+        "akaishi:plasma"
+      ],
+      "text": "Upstream sits \"$(l:akaishi:fuel_system)Fuel & Cooling$(/l)\", downstream \"$(l:akaishi:reactor)The Reactor$(/l)\"; this line's top product keeps condensing onward into the Plasma Chain."
     }
   ]
 }

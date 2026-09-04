@@ -7,17 +7,26 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_controller",
-      "text": "The Life Conversion Matrix is currently the only thing that can \"brew\" life energy: form it automatically by enclosing a 3×3×3 sealed structure with the controller, matrix casings, and energy ports.$(br)Position it right and it's your life-energy money printer."
+      "text": "The flagship production line: the $(4)only source$(0) that refines Life Energy out of Akaishi Energy.$(br2)$(bold)Building it:$(0)$(li)Frame a $(4)3×3×3$(0) hollow sealed box with Life Conversion Matrix Casings$(li)Put an Energy Input Port and a Life Output Port into the walls$(li)Mount the controller $(4)on a wall$(0) — once the structure forms it runs itself; break any casing and it stops instantly$(br2)$(bold)Rates:$(0) up to $(4)45$(0) conversions per tick, each burning $(4)10M Akaishi Energy$(0) for $(4)10 Life Energy$(0) — about 450 Life/tick at full speed, demanding ~450M akaishi/tick. $(bold)Feed the grid first, then switch it on$(0)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_energy_input",
-      "text": "Akaishi energy is injected through the energy input into the matrix center; once formed it runs up to 45 conversions per tick (10M energy each → 10 life energy).$(br)Feed it more power, and it brews life faster."
+      "text": "$(bold)Energy Input Port$(0): a $(4)100M$(0) buffer that feeds the controller every tick, smoothing out the 10M gulps of each conversion.$(br2)$(bold)Life Output Port$(0): pulls up to $(4)450$(0) Life Energy per tick (at full output) into its own 5,000 buffer for Life Energy Pipes to drain.$(br2)Remember the pipe rule: $(bold)akaishi goes in, life comes out$(0) — don't swap them."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_life_matrix_energy_output",
-      "text": "Life energy exits through the energy output (pipe extraction only); pair it with life-energy pipes to drive sample collection, organ research, and the devices that follow.$(br)That output is the \"first drop\" of life tech."
+      "type": "patchouli:text",
+      "title": "About the Old Machines",
+      "text": "$(bold)Beware outdated blueprints$(0): the old $(4)Life Aggregation Converter$(0) and $(4)Life Conversion Architecture$(0) have $(bold)been replaced by the Matrix$(0). They are now just $(4)crafting materials$(0) with an energy buffer — they never run or form a structure on their own.$(br2)Fine as components, but if you expect them to refine life? $(bold)Build the Matrix$(0)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_energy",
+        "akaishi:life_path",
+        "akaishi:life_purifier"
+      ],
+      "text": "Storage and transport: \"$(l:akaishi:life_energy)Life Energy$(/l)\". The refined energy next becomes currency at the \"$(l:akaishi:life_purifier)Life Energy Purifier$(/l)\"."
     }
   ]
 }

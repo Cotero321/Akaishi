@@ -42,8 +42,8 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 52));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 52));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 52));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 52));
 
         // 输入槽：仅 7 种活化结晶可放入
         addSlot(new Slot(input, 0, 44, 52) {

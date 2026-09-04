@@ -2,12 +2,26 @@
   "name": "便捷赤能源单元",
   "icon": "akaishi:portable_akaishi_cell_super",
   "category": "akaishi:energy",
-  "sortnum": 5,
+  "sortnum": 7,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:portable_akaishi_cell_basic",
-      "text": "随身能量包，共 3 级：基础/高级/超级。$(br)揣在身上自动给赤石装备回耐久，右键查电量——施工探险两不误，真正的「行走充电宝」。"
+      "text": "便携赤能源单元 = 把电$(4)装进口袋$(0)的移动电源。$(br2)$(bold)三档参数$(0)（容量 / 每 tick 充放上限）：$(li)基础：5000 万 / 50 万$(li)高级：2 亿 / 100 万$(li)超级：10 亿 / 400 万$(br2)$(bold)用法$(0)：揣进背包即可。赤石饰品能量耗尽时，会$(4)自动从背包里的便携单元抽取$(0)；它还会顺手为身上与手上的赤石装备补耐久、为饰品续能，见下页。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)自动修复$(0)：背包任意位置放着便携单元，它就会持续修复身上护甲与主副手里的赤石装备：$(li)基础：每 tick 10 点耐久$(li)高级：每 tick 20 点$(li)超级：每 tick 40 点$(br2)每修复 1 点耐久耗 $(bold)100 赤能源$(0)。多带几个单元可以$(4)叠加供能$(0)，一个没电会自动换下一个。$(br2)$(bold)怎么回电$(0)：把便携单元放进「$(l:akaishi:energy_cell)储存单元$(/l)」界面的便携充能槽即可。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_cell",
+        "akaishi:energy_basics",
+        "akaishi:equipment",
+        "akaishi:curios"
+      ],
+      "text": "它负责出门、方块储存单元负责守家——容量体系见「$(l:akaishi:energy_basics)赤能源基础$(/l)」与「$(l:akaishi:energy_cell)储存单元$(/l)」。搭配「$(l:akaishi:equipment)赤石装备$(/l)」与「$(l:akaishi:curios)赤石饰品$(/l)」效果最佳。"
     }
   ]
 }

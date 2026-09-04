@@ -1,0 +1,39 @@
+{
+  "name": "Akaishi Journey Overview",
+  "icon": "akaishi:akaishi_diary",
+  "category": "akaishi:intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This diary is your $(bold)main quest guide$(0): follow the 7 stages and you'll never lose your way.$(br2)$(bold)1. Mine ore → 2. Refine essence → 3. Build the energy grid → 4. Mass-produce with machines → 5. Automate with the Miner → 6. Advanced industry (ingots/gear/catalysts/logistics) → 7. Reactor & Fusion.$(br2)$(bold)How to read it:$(0) each page tells you \"what to do first and why,\" then points you to the entry with the details; $(bold)blue text$(0) is clickable. Don't skip the $(c)red warnings$(0) — they're the lessons that explode."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stage 1 · Mining:$(0) head underground for \"$(l:akaishi:ore)Akaishi Ore Clusters$(/l)\" — the Overworld, Nether and End all host them, and one swing drops a few crystals. That's your first fortune.$(br2)$(bold)Stage 2 · Processing:$(0) craft 9 crystals into a Raw Akaishi Block, feed it to the Purifier to squeeze out essence, then concentrate it further. The full \"crystal → block → essence → concentrate\" chain and its fuel value live in \"$(l:akaishi:crystal)Crystal & Essence$(/l)\".$(br2)As for the hard currency to come, \"$(l:akaishi:ingot)Akaishi Ingot$(/l)\" — give it a quick look so you know the face.$(br2)$(4)Start hoarding Raw Akaishi Blocks now$(0) — generators and the purifier both eat them."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stage 3 · The Akaishi Energy grid:$(0) a lone machine spins for nothing — automation needs power first. Read \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\", build the \"$(l:akaishi:generator)Energy Generator$(/l)\" to burn fuel into power, store it in Energy Cells, then pipe it to every machine.$(br2)$(bold)Stage 4 · Machine production:$(0) run the \"$(l:akaishi:pulverizer)Pulverizer$(/l)\" to grind ores into dust, press dust back into blocks with the Compressor, and round out materials with the Transformer and Plant Cultivator.$(br2)Why the basic machines first? Pulverizing and pressing are prerequisites for a whole pile of recipes — $(4)get the grid humming before you automate$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stage 5 · Miner automation:$(0) once materials allow, build the \"$(l:akaishi:miner_structure)Miner Structure$(/l)\" — a massive multiblock that mines vanilla ores for you. No more hand mining.$(br2)$(bold)Stage 6 · Advanced industry:$(0) condense Netherite Ingots into Akaishi Ingots with the Energy Aggregator, grow crystals on autopilot with the \"$(l:akaishi:catalyst)Catalyst$(/l)\" while a Collector harvests, move goods through Item Pipes, then forge your \"$(l:akaishi:equipment)Equipment$(/l)\" at the Equipment Forger.$(br2)This stage devours materials — $(e)expand the grid before you start$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stage 7 · Advanced power:$(0) when your grid can't feed the big machines, swap the heart. Study \"$(l:akaishi:fuel_system)Fuel & Cooling$(/l)\" first, then take on the \"$(l:akaishi:reactor)Reactor$(/l)\" — one unit outshines dozens of generators, at the price of mastering heat.$(br2)Past the reactor lie the \"$(l:akaishi:fusion)Fusion Reactor$(/l)\", the liquid-fuel and plasma chains, and wireless energy for cross-dimension transmission.$(br2)$(c)Remember: reactors explode$(0) — overheating starts a 10-second countdown, so always keep an escape route.$(4)Fusion is the endgame of power$(0). Take it slow."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ore",
+        "akaishi:energy_basics",
+        "akaishi:pulverizer",
+        "akaishi:miner_structure",
+        "akaishi:reactor"
+      ],
+      "text": "$(bold)Progress check$(0): if you can answer \"where to mine, where power comes from, how dust is made, and how the Miner is built,\" you're safe to push on; for the late game, finish the reactor's heat-control lesson first.$(br2)$(4)Beyond Akaishi Energy lies Life Energy$(0) — craft the Book of Life and we'll meet in that manual."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "Akaishi Generator Matrix",
+  "icon": "akaishi:akaishi_gen_matrix_controller_basic",
+  "category": "akaishi:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The Akaishi Generator Matrix scales the standalone generator into a $(4)sealed-chamber multiblock$(0) that burns fuel at a fixed multiplier.$(br2)$(bold)Anatomy:$(0)$(li)Seal a $(4)closed box$(0) out of Generator Matrix Casings — the shell is an $(bold)odd-size hollow box$(0)$(li)Mount the $(bold)Matrix Controller$(0) in a wall$(li)Mount an $(bold)Energy Output Port$(0) and a $(bold)Fuel Input Port$(0)$(li)$(4)The inside must be completely empty$(0) — no internal parts needed$(br2)No sealed box, no work; break any casing and it shuts down instantly.$(br2)Two shell sizes follow: 3×3×3 (Basic) and 5×5×5 (Advanced). The controller block you mount decides the tier."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_basic",
+      "text": "Your first step into scale: the $(4)Basic Generator Matrix$(0), a sealed 3×3×3 shell.$(br2)$(bold)Once formed:$(0)$(li)Output multiplier $(bold)×45$(0)$(li)Generation $(bold)3375 AE/tick$(0)$(li)Energy storage $(bold)5 million$(0)$(li)Fuel coefficient ×9/8: the same fuel yields about 1.13× more power$(br2)Don't forget an Energy Output Port in the wall — it carries a $(bold)100 million$(0) buffer that feeds your grid.$(br2)Building tips live in the \"$(l:akaishi:matrix)Matrix Structures$(/l)\" entry."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_advanced",
+      "text": "The endgame heavy hitter: the $(4)Advanced Generator Matrix$(0), a sealed 5×5×5 shell.$(br2)$(bold)Once formed:$(0)$(li)Output multiplier $(bold)×200$(0)$(li)Generation $(bold)15000 AE/tick$(0)$(li)Energy storage $(bold)50 million$(0)$(li)Fuel coefficient ×9/4: the same fuel yields about 2.25× more power$(br2)Both tiers share: the Fuel Input Port buffers $(4)27 stacks$(0) and feeds the controller on its own (item-pipe friendly); upgrade components push it further.$(br2)Still short on power? That's when the \"$(l:akaishi:reactor)Reactor$(/l)\" and the \"$(l:akaishi:fusion)Fusion Reactor$(/l)\" take over."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_basics",
+        "akaishi:energy_cell",
+        "akaishi:energy_pipe",
+        "akaishi:generator",
+        "akaishi:matrix"
+      ],
+      "text": "Suggested reading: master fuels in \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\", then wire up the grid with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" and \"$(l:akaishi:energy_cell)Energy Cells$(/l)\"; the standalone \"$(l:akaishi:generator)Energy Generator$(/l)\" is the cheap alternative. General multiblock layout rules: \"$(l:akaishi:matrix)Matrix Structures$(/l)\"."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "赤石续航饰品",
+  "icon": "akaishi:akaishi_satiation_charm",
+  "category": "akaishi:advanced",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_satiation_charm",
+      "text": "$(4)赤石饱食护符$(0)（charm 槽，容量 50 万）：饱和度低于 5 时每 tick 自动 +0.1。管饱第一件。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_antidote_bracelet",
+      "text": "$(4)赤石净化手镯$(0)（bracelet 槽，容量 20 万）：中毒立即清除，$(4)500 能量/次$(0)。$(br2)$(bold)赤石凋零护符$(0)（belt 槽，容量 20 万）：凋零立即清除，$(4)1000 能量/次$(0)。$(br2)两件专治难缠的 debuff，中了秒解。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "饰品共通机制与槽位见「$(l:akaishi:curios)赤石饰品$(/l)」总览；续电的电池见「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
+    }
+  ]
+}

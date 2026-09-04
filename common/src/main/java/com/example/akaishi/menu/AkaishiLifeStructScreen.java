@@ -2,11 +2,13 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.life.body.BodySlot;
+import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +16,7 @@ import java.util.Locale;
 /**
  * 生命结构台界面：
  * - 生命能量条（绿）+ 构造进度条（黄）
- * - 3×3 目标槽位选择区：可用槽位绿框、选中槽位黄框、不可用灰框，点击发送 C2S 包
+ * - 3×3 器官模型选择区：图标 + 可用绿框、选中黄框、不可用灰罩（禁选），点选可用模型后才开始构造
  * - 顶部显示当前基因序列的来源生物
  * 数据来自 {@link AkaishiLifeStructMenu} 的 ContainerData。
  */
@@ -28,8 +30,6 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
     private static final int PROGRESS_X = 34, PROGRESS_Y = 112, PROGRESS_W = 80, PROGRESS_H = 8;
     /** 目标槽位按钮区（3×3，每个 16×16；槽位行 y=30..48 之下） */
     private static final int BTN_X = 34, BTN_Y = 52, BTN_SPACING = 20, BTN_SIZE = 16;
-    /** 机器槽位数量（输入 + 材料 + 输出，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = 3;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，按钮区右侧空位；标签置于槽位上方） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 56;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 56;
@@ -76,11 +76,12 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
             return;
         }
 
-        // 机器槽位框（贴图无图形，自绘补齐）
-        for (int i = 0; i < MACHINE_SLOTS; i++) {
-            var slot = menu.slots.get(i);
-            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
-        }
+        // 输入/材料/输出槽已烘焙于贴图（30/56/116），无需自绘；
+        // 升级槽（134/152）贴图无图形，需自绘框 + 标签（槽位上方）
+        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
+        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
+                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
         // 生命能量条（绿）
         GuiWidgets.track(gui, x + LIFE_BAR_X, y + LIFE_BAR_Y, BAR_W, BAR_H);
         long life = menu.getLifeEnergy();
@@ -95,7 +96,7 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
         if (progressWidth > 0) {
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, 0xFFFFD030);
         }
-        // 目标槽位选择区（3×3）
+        // 目标器官模型选择区（3×3）：绿框=可用，黄框=选中，灰框=该生物无此类器官（禁选）
         List<BodySlot> available = menu.getAvailableSlots();
         int selected = menu.getTargetSlot();
         BodySlot[] slots = BodySlot.values();
@@ -109,12 +110,12 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
             // 外框（选中槽位 2px 高亮，其余 1px）
             gui.fill(bx - 1, by - 1, bx + BTN_SIZE + 1, by + BTN_SIZE + 1, color);
             gui.fill(bx, by, bx + BTN_SIZE, by + BTN_SIZE, 0xFF8B8B8B);
+            // 渲染该器官模型的贴图（器官物品注册贴图）；不可用的压半透明灰罩表示禁选
+            gui.renderItem(new ItemStack(AkaishiOrganItem.of(slots[i])), bx, by);
+            if (!usable) {
+                gui.fill(bx, by, bx + BTN_SIZE, by + BTN_SIZE, 0x803F3F3F);
+            }
         }
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方标签）
-        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
     }
 
     /** 右上角"存储"开关按钮 */
@@ -179,7 +180,8 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
             }
         }
         if (button == 0 && menu.getBlockPos() != null) {
-            // 命中 3×3 槽位按钮 → 发送目标槽位选择
+            // 命中 3×3 器官模型按钮：仅可用项才发送选择请求，不可用（灰罩）按钮点击被吞掉
+            List<BodySlot> available = menu.getAvailableSlots();
             for (int i = 0; i < BodySlot.values().length; i++) {
                 int col = i % 3;
                 int row = i / 3;
@@ -187,7 +189,9 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
                 int by = this.topPos + BTN_Y + row * BTN_SPACING;
                 if (mouseX >= bx - 1 && mouseX < bx + BTN_SIZE + 1
                         && mouseY >= by - 1 && mouseY < by + BTN_SIZE + 1) {
-                    AkaishiLifeStructSync.sendSelect(menu.getBlockPos(), i);
+                    if (available.contains(BodySlot.values()[i])) {
+                        AkaishiLifeStructSync.sendSelect(menu.getBlockPos(), i);
+                    }
                     return true;
                 }
             }
@@ -223,6 +227,10 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
             if (entityId != null) {
                 tip.add(Component.translatable("gui.akaishi.life_struct.gene",
                         Component.translatable("entity." + entityId.replace(':', '.'))));
+            }
+            // 序列已放入但未点选器官模型：给出操作指引
+            if (menu.getTargetSlot() < 0 && entityId != null) {
+                tip.add(Component.translatable("gui.akaishi.life_struct.choose_hint"));
             }
             tip.add(Component.translatable("gui.akaishi.life_struct.cost"));
             gui.renderComponentTooltip(this.font, tip, mouseX, mouseY);

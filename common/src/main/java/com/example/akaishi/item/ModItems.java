@@ -82,7 +82,7 @@ public final class ModItems {
     public static final String END_PLASMA_ROD_ID = "akaishi_end_plasma_rod";
     /** 生命灰烬：聚变堆燃烧副产物，生命散热片合成材料 */
     public static final String LIFE_ASH_ID = "akaishi_life_ash";
-    /** 聚变散热片（5 档 + 生命）：插入聚变散热框架，散热效率 5%~20%，耐久 8000（5 秒 1 点） */
+    /** 聚变散热片（5 档 + 生命）：经控制器热量页 GUI 放入，散热效率 5%~20%，耐久 8000（5 秒 1 点） */
     public static final String FUSION_HEAT_SINK_TIER1_ID = "fusion_heat_sink_tier1";
     public static final String FUSION_HEAT_SINK_TIER2_ID = "fusion_heat_sink_tier2";
     public static final String FUSION_HEAT_SINK_TIER3_ID = "fusion_heat_sink_tier3";
@@ -620,7 +620,7 @@ public final class ModItems {
         lifeAsh = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_ASH_ID),
                         () -> new Item(new Item.Properties()));
-        // 聚变散热片（6 档）：插入聚变散热框架的消耗品，效率 5%~20%，耐久 8000
+        // 聚变散热片（6 档）：放入控制器热量页的消耗品，效率 5%~20%，耐久 8000
         fusionHeatSinkTier1 = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, FUSION_HEAT_SINK_TIER1_ID),
                         () -> new AkaishiFusionHeatSinkItem(FusionHeatSinkQuality.TIER1));

@@ -1,6 +1,6 @@
 {
   "name": "Akaishi Miner",
-  "description": "A huge 9x9x3 multiblock that yields all vanilla ores by chance.",
+  "description": "Replace hand mining with a 9x9x3 multiblock miner that yields every vanilla ore by weight.$(br)Higher tiers cost more power — build your grid first.",
   "icon": "akaishi:akaishi_miner_controller_basic",
   "sortnum": 4
 }

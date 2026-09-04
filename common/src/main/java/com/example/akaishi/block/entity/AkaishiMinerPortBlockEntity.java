@@ -88,23 +88,32 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         }
     }
 
-    /** 接收控制器推送的产物（整格移动，缓冲满则拒绝） */
-    public boolean receiveOutput(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return true;
+    /** 接收控制器推送的产物（支持部分合并：尽量并入同种槽/空槽，返回未放入的剩余部分） */
+    public ItemStack receivePartial(ItemStack incoming) {
+        if (incoming.isEmpty()) {
+            return ItemStack.EMPTY;
         }
-        for (int i = 0; i < BUFFER_SLOTS; i++) {
+        ItemStack remaining = incoming.copy();
+        // 1) 尽量并入已有同种物品槽（允许部分空间）
+        for (int i = 0; i < BUFFER_SLOTS && !remaining.isEmpty(); i++) {
             ItemStack s = buffer.getItem(i);
-            if (s.isEmpty()) {
-                buffer.setItem(i, stack.copy());
-                return true;
-            }
-            if (s.is(stack.getItem()) && s.getCount() + stack.getCount() <= s.getMaxStackSize()) {
-                s.grow(stack.getCount());
-                return true;
+            if (s.is(remaining.getItem()) && s.getCount() < s.getMaxStackSize()) {
+                int add = Math.min(remaining.getCount(), s.getMaxStackSize() - s.getCount());
+                s.grow(add);
+                remaining.shrink(add);
             }
         }
-        return false;
+        // 2) 剩余放入空槽
+        for (int i = 0; i < BUFFER_SLOTS && !remaining.isEmpty(); i++) {
+            if (buffer.getItem(i).isEmpty()) {
+                int put = Math.min(remaining.getCount(), remaining.getMaxStackSize());
+                buffer.setItem(i, remaining.split(put));
+            }
+        }
+        if (remaining.getCount() != incoming.getCount()) {
+            setChanged();
+        }
+        return remaining;
     }
 
     public SimpleContainer buffer() {

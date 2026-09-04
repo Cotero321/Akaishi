@@ -6,16 +6,29 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Akaishi Miners come in 4 tiers, and the tier is decided by the $(2,4)controller block$(0):$(li)Basic: mining rate ×1.0, energy capacity 1M$(li)Advanced: rate ×1.5, capacity 5M$(li)Elite: rate ×2.0, capacity 20M$(li)Ultimate: rate ×3.0, capacity 50M$(br2)The higher the tier, the higher the output weight of rare minerals (diamond, emerald, netherite scraps) too (× tier multiplier). Want rare drops? Upgrade the controller first."
+      "text": "A Miner's tier is decided by the $(bold)controller block$(0) at its heart — four tiers in total. The build and size are identical across them; the tier only changes how hard the machine works.$(br2)$(li)$(4)Basic$(0): progress rate ×1.0, energy capacity 1M — roughly 200 ticks per haul on full power$(li)$(4)Advanced$(0): rate ×1.5, capacity 5M — ~133 ticks per haul$(li)$(4)Super$(0): rate ×2.0, capacity 20M — 100 ticks per haul$(li)$(4)Ultimate$(0): rate ×3.0, capacity 50M — ~67 ticks per haul$(br2)\"Capacity\" is the controller's internal power buffer; every tier burns a base of 10 energy per tick (speed modules add a surcharge)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(2,4)Mining mechanics$(0)$(li)Each tick burns 10 energy to advance progress (speed upgrades add +10% cost each)$(li)At 200 ticks of progress it rolls a random mineral$(li)Fortune upgrades boost single-drop count, storage upgrades expand capacity$(br2)$(2,4)Output weight table$(0)$(li)Coal 30 / Iron 24 / Copper 22 / Gold 12$(li)Redstone 8 / Lapis 6 / Quartz 6$(li)Diamond 3 / Emerald 2 / Netherite Scrap 1"
+      "text": "$(bold)What it digs:$(0) all four tiers share one fixed roster — ten vanilla materials: coal, raw iron, raw copper, raw gold, redstone, lapis lazuli, quartz, diamond, emerald and netherite scrap.$(br2)Base weights, high to low: coal 30 / iron 24 / copper 22 / gold 12 / redstone 8 / lapis 6 / quartz 6 / diamond 3 / emerald 2 / scrap 1.$(br2)$(bold)The tier's hidden perk:$(0) the three \"rare\" minerals (diamond, emerald, netherite scrap) have their weight multiplied by $(4)×1.0 / ×1.5 / ×2.0 / ×3.0$(0). A tier never changes the ore list or unlocks deeper ores or special biomes — it just rolls the good stuff more often."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Switching tiers?$(0) Break the controller at the center and put in the tier you want — $(4)the rest of the miner stays untouched$(0).$(br2)The new controller re-checks the structure on its own, forms again, re-links the ports and takes over on the spot.$(br2)$(c)Heads-up:$(0) removing the controller stalls the whole miner — clear the output buffer and the ports first, and confirm the \"formed\" state in its UI after the swap."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_port",
-      "text": "The Miner Port, the structure's \"transfer hub\".$(br)$(li)27-slot item buffer: receives minerals pushed by the controller, exportable via item pipes$(li)10M energy buffer: powered by external energy pipes, up to 2000 energy per tick to the controller$(br2)Each miner has one port at the center of the bottom and top layers — one in, one out, each doing its own job."
+      "text": "The Miner Port is your power inlet and product outlet in one. Each miner has two, sitting at the $(bold)dead center of the bottom and top layers$(0), on the same axis as the controller.$(br2)$(bold)Feeding power:$(0) each port carries a $(4)10M$(0) energy buffer for your pipes; once formed it forwards up to $(4)2000 energy/tick$(0) to the controller.$(br2)$(bold)Collecting loot:$(0) the controller pushes ores into the port's $(4)27-slot$(0) buffer, and hoppers or item pipes can pull from any slot. Both ports are identical — wire them however you like."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:miner_structure",
+        "akaishi:miner_upgrades",
+        "akaishi:generator"
+      ],
+      "text": "Forgot the build? Head back to \"Miner Structure\". Want more performance? Read \"Miner Upgrades\". Grid running dry? Retake \"Energy Generator\" first."
     }
   ]
 }

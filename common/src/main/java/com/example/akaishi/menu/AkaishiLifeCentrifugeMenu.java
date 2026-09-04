@@ -40,8 +40,8 @@ public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；产物槽右侧）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 56));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 56));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 56));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 56));
 
         addSlot(new Slot(output, 0, 62, 56) {
             @Override

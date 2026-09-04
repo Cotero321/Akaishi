@@ -2,11 +2,15 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.entity.AkaishiLifeBreederBlockEntity;
+import com.example.akaishi.item.ModItems;
+import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +28,21 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
     private static final int PANEL_W = 176;
 
     private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
-    /** 培养进度条区域（机器槽行下方空档） */
-    private static final int PROGRESS_X = 60, PROGRESS_Y = 58, PROGRESS_W = 56, PROGRESS_H = 8;
+    /** 培养进度条区域（机器槽行下方空档；避开槽名行，下方留给状态行） */
+    private static final int PROGRESS_X = 60, PROGRESS_Y = 60, PROGRESS_W = 56, PROGRESS_H = 8;
     /** 机器区槽数（升级槽 2 + 器官/序列/结晶/产物槽 4） */
     private static final int MACHINE_SLOTS = 6;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，产物槽右侧同行） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 菜单槽位索引（Menu 先加 2 升级槽，再按器官/序列/结晶/产物顺序加业务槽） */
+    private static final int IDX_ORGAN = 2, IDX_SEQUENCE = 3, IDX_CRYSTAL = 4, IDX_OUTPUT = 5;
+    /** 机器槽行下方布局：槽位底 y48 → 槽名 y49、进度条 y60、状态行 y70（与背包区 y84 不重叠） */
+    private static final int CAPTION_Y = 49;
+    private static final int STATUS_Y = 70;
+    private static final int STATUS_X = 8;
+    /** 状态行文案最大宽度 */
+    private static final int STATUS_MAX_W = PANEL_W - STATUS_X - 6;
 
     public AkaishiLifeBreederScreen(AkaishiLifeBreederMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -56,6 +68,57 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
         return String.format(Locale.ROOT, "%.1f", d);
     }
 
+    /** 状态行内容 + 颜色（金=培养中 / 绿=材料齐备 / 灰=等待缺料） */
+    private record BreederStatus(Component text, int color) {
+    }
+
+    /** 在槽位下方居中绘制一行短说明（槽宽 18，超宽自动截断） */
+    private void drawCaption(GuiGraphics gui, int slotX, int textY, String key) {
+        Component c = Component.translatable(key);
+        int w = Math.min(this.font.width(c), 18);
+        gui.drawString(this.font, c, slotX + (18 - w) / 2, textY, 0xFF3F3F3F, false);
+    }
+
+    /** 汇总当前培养状态：运行中成功率 / 材料齐备 / 等待缺料原因（客户端按已同步槽位与数据判断） */
+    private BreederStatus statusOf() {
+        if (menu.getProgress() > 0) {
+            return new BreederStatus(clip(
+                    Component.translatable("gui.akaishi.life_breeder.status_run", menu.getSuccessRate())), 0xFF8B6F1E);
+        }
+        ItemStack organ = menu.slots.get(IDX_ORGAN).getItem();
+        if (!(organ.getItem() instanceof AkaishiOrganItem) || !AkaishiOrganItem.canMutate(organ)) {
+            return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_organ"), 0xFF707070);
+        }
+        ItemStack seq = menu.slots.get(IDX_SEQUENCE).getItem();
+        if (!(seq.getItem() instanceof AkaishiGeneSequenceItem)
+                || menu.getPurity() < AkaishiLifeBreederBlockEntity.MIN_PURITY
+                || AkaishiGeneSequenceItem.getGroup(seq) != AkaishiOrganItem.getSource(organ)) {
+            return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_seq"), 0xFF707070);
+        }
+        ItemStack crystal = menu.slots.get(IDX_CRYSTAL).getItem();
+        if (!crystal.is(ModItems.exhaustedCrystal.get())
+                || crystal.getCount() < AkaishiLifeBreederBlockEntity.CRYSTAL_COST) {
+            return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_crystal",
+                    AkaishiLifeBreederBlockEntity.CRYSTAL_COST), 0xFF707070);
+        }
+        if (menu.getLifeEnergy() < AkaishiLifeBreederBlockEntity.LIFE_COST) {
+            return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_energy",
+                    formatEnergy(AkaishiLifeBreederBlockEntity.LIFE_COST)), 0xFF707070);
+        }
+        if (!menu.slots.get(IDX_OUTPUT).getItem().isEmpty()) {
+            return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_output"), 0xFF707070);
+        }
+        return new BreederStatus(clip(Component.translatable("gui.akaishi.life_breeder.status_ready",
+                menu.getSuccessRate(), menu.getPurity())), 0xFF2E7D32);
+    }
+
+    /** 状态行超宽截断（保留尾部不溢出面板） */
+    private Component clip(Component text) {
+        return this.font.width(text) <= STATUS_MAX_W
+                ? text
+                : Component.literal(this.font.plainSubstrByWidth(text.getString(), STATUS_MAX_W));
+    }
+
     @Override
     protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
@@ -74,6 +137,11 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
         }
+        // 机器业务槽说明（槽位下方一行，避免空槽无法辨认功能）
+        drawCaption(gui, x + menu.slots.get(IDX_ORGAN).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_organ");
+        drawCaption(gui, x + menu.slots.get(IDX_SEQUENCE).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_seq");
+        drawCaption(gui, x + menu.slots.get(IDX_CRYSTAL).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_crystal");
+        drawCaption(gui, x + menu.slots.get(IDX_OUTPUT).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_out");
         // 升级槽标签（槽位下方，避开上方能量条）
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
                 x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
@@ -91,6 +159,9 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
         if (progressWidth > 0) {
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, 0xFFFFD030);
         }
+        // 状态行：培养中成功率 / 材料齐备 / 缺料原因（颜色随状态，让机器功能与缺料一目了然）
+        BreederStatus status = statusOf();
+        gui.drawString(this.font, status.text(), x + STATUS_X, y + STATUS_Y, status.color(), false);
     }
 
     /** 右上角"存储"开关按钮 */

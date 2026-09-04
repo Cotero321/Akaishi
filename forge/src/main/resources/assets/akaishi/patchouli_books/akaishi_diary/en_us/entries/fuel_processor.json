@@ -1,0 +1,26 @@
+{
+  "name": "Energy Processor",
+  "icon": "akaishi:akaishi_energy_processor",
+  "category": "akaishi:tech",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_processor",
+      "text": "The Processor upgrades \"energy liquids\" into \"fuel liquids\", two recipes:$(li)$(bold)Nether Compound Fuel$(0): 1 solid + 1000 mb Nether Compound Energy → 1000 mb, 5M per batch$(li)$(bold)Pure Fuel$(0): 1 solid + 100 mb Nether Pure Energy → 75 mb — light concentration that sips solids$(br2)Pure Fuel is small, but it is one of the Mixer's top-tier ingredients — don't skip the concentration step."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)How to run it:$(0) one recipe at a time; switching materials wipes the progress, so pick one line and run it to the end.$(br2)Which line:$(li)volume first: Nether Compound Fuel, a straight 1:1 deal$(li)purity first: Pure Fuel, feeding the $(l:akaishi:fuel_mixer)Fuel Mixer$(/l) for Ultimate Mixture$(br2)Run either into the $(l:akaishi:fuel_canner)Fuel Canner$(/l) and it heads to the Reactor as canned fuel."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_liquefier",
+        "akaishi:fuel_canner"
+      ],
+      "text": "Feedstock comes from the $(l:akaishi:fuel_liquefier)Energy Liquefier$(/l); if you'd rather blend fuel up a tier, see $(l:akaishi:fuel_mixer)Fuel Mixer$(/l)."
+    }
+  ]
+}

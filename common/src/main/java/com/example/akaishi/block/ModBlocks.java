@@ -187,6 +187,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_PLASMA_TANK;
     /** 反应堆外壳：多方块外壁（控制器/投放口/输出口/废品口也属外壁），右键打开控制器 */
     public static RegistrySupplier<Block> CHISHI_REACTOR_SHELL;
+    /** 反应堆结构玻璃：半透明观察窗，可替代反应堆外壳 */
+    public static RegistrySupplier<Block> CHISHI_REACTOR_STRUCTURE_GLASS;
     /** 反应堆控制器：主方块，持有全部反应堆状态，右键打开控制界面 */
     public static RegistrySupplier<Block> CHISHI_REACTOR_CONTROLLER;
     /** 燃料投放口：燃料罐物品输入（管道+手动），自动分配到控制器空燃料槽 */
@@ -235,6 +237,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_ALTAR_STONE;
     /** 发生器矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
     public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CASING;
+    /** 发生器矩阵结构玻璃：半透明观察窗，可替代发生器矩阵外壳 */
+    public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_STRUCTURE_GLASS;
     /** 发生器矩阵控制器（低级 3×3×3，45 倍，沿用组合结构数据） */
     public static RegistrySupplier<Block> CHISHI_GEN_MATRIX_CONTROLLER_BASIC;
     /** 发生器矩阵控制器（高级 5×5×5，200 倍，沿用超级架构数据） */
@@ -245,6 +249,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_GEN_FUEL_INPUT;
     /** 提纯矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
     public static RegistrySupplier<Block> CHISHI_PURIFIER_MATRIX_CASING;
+    /** 提纯矩阵结构玻璃：半透明观察窗，可替代提纯矩阵外壳 */
+    public static RegistrySupplier<Block> CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS;
     /** 提纯矩阵控制器：主方块，结构成型后集中提纯 */
     public static RegistrySupplier<Block> CHISHI_PURIFIER_MATRIX_CONTROLLER;
     /** 提纯矩阵能量输入口（赤能源输入，仅管道供能） */
@@ -255,6 +261,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_PURIFIER_ITEM_OUTPUT;
     /** 生命转换矩阵外壳：类反应堆式矩阵外壁（端口可替代外壳） */
     public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_CASING;
+    /** 生命转换矩阵结构玻璃：半透明观察窗，可替代生命转换矩阵外壳 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_STRUCTURE_GLASS;
     /** 生命转换矩阵控制器：主方块，结构成型后 45 倍集中转换 */
     public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_CONTROLLER;
     /** 生命转换矩阵能量输入口（赤能源输入，仅管道供能） */
@@ -263,6 +271,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_MATRIX_ENERGY_OUTPUT;
     /** 无线赤能源终端外壳：无线终端多方块（5×5×5）墙面填充方块 */
     public static RegistrySupplier<Block> CHISHI_WIRELESS_SHELL;
+    /** 无线终端结构玻璃：半透明观察窗，可替代无线赤能源终端外壳 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_STRUCTURE_GLASS;
     /** 无线赤能源终端方块：外墙主方块（GUI 入口，成型后为网络能量中枢） */
     public static RegistrySupplier<Block> CHISHI_WIRELESS_TERMINAL;
     /** 无线赤能源终端安全方块：外墙方块 + 安全卡认证页直达入口 */
@@ -287,6 +297,8 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_WIRELESS_OUTPUT_LOSS;
     /** 耐高温聚变外壳：聚变堆多方块外壁（控制器/能量输出口/物品输入口/物品输出口也属外壁） */
     public static RegistrySupplier<Block> CHISHI_FUSION_SHELL;
+    /** 聚变结构玻璃：半透明观察窗，可替代耐高温聚变外壳（仅外壳层，隔热层不可替代） */
+    public static RegistrySupplier<Block> CHISHI_FUSION_STRUCTURE_GLASS;
     /** 聚变隔热层：外壳与框架层之间的第二层，必须全部填充 */
     public static RegistrySupplier<Block> CHISHI_FUSION_INSULATION;
     /** 聚变控制器：主方块，持有全部聚变状态，右键打开三页界面 */
@@ -299,7 +311,7 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_FUSION_ITEM_OUTPUT;
     /** 聚变核心：结构中心方块（恰 1 个），拆掉结构即失效 */
     public static RegistrySupplier<Block> CHISHI_FUSION_CORE;
-    /** 聚变散热框架：框架层结构件，内嵌 1 个散热片槽（上限 10） */
+    /** 聚变散热框架：框架层纯结构件，为控制器解锁散热片槽（上限 10） */
     public static RegistrySupplier<Block> CHISHI_FUSION_COOLER_FRAME;
     /** 聚变燃料框架：框架层结构件，每框架解锁 1 个燃料槽（上限 4） */
     public static RegistrySupplier<Block> CHISHI_FUSION_FUEL_FRAME;
@@ -659,6 +671,7 @@ public final class ModBlocks {
 
         // ===== 反应堆体系（9 方块）=====
         CHISHI_REACTOR_SHELL = registerReactorBlock(blockRegistrar, "akaishi_reactor_shell", AkaishiReactorShellBlock::new);
+        CHISHI_REACTOR_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_reactor_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_REACTOR_CONTROLLER = registerReactorBlock(blockRegistrar, "akaishi_reactor_controller", AkaishiReactorControllerBlock::new);
         CHISHI_REACTOR_FUEL_PORT = registerReactorBlock(blockRegistrar, "akaishi_reactor_fuel_port", AkaishiReactorFuelPortBlock::new);
         CHISHI_REACTOR_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "akaishi_reactor_energy_output", AkaishiReactorEnergyOutputBlock::new);
@@ -691,6 +704,7 @@ public final class ModBlocks {
 
         // ===== 发生器矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
         CHISHI_GEN_MATRIX_CASING = registerReactorBlock(blockRegistrar, "akaishi_gen_matrix_casing", AkaishiGenMatrixCasingBlock::new);
+        CHISHI_GEN_MATRIX_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_gen_matrix_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_GEN_MATRIX_CONTROLLER_BASIC = registerGenMatrixController(
                 blockRegistrar, "akaishi_gen_matrix_controller_basic", AkaishiGenMatrixTier.BASIC);
         CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED = registerGenMatrixController(
@@ -700,6 +714,7 @@ public final class ModBlocks {
 
         // ===== 提纯矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
         CHISHI_PURIFIER_MATRIX_CASING = registerReactorBlock(blockRegistrar, "akaishi_purifier_matrix_casing", AkaishiPurifierMatrixCasingBlock::new);
+        CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_purifier_matrix_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_PURIFIER_MATRIX_CONTROLLER = registerReactorBlock(blockRegistrar, "akaishi_purifier_matrix_controller", AkaishiPurifierMatrixControllerBlock::new);
         CHISHI_PURIFIER_ENERGY_INPUT = registerReactorBlock(blockRegistrar, "akaishi_purifier_energy_input", AkaishiPurifierEnergyInputPortBlock::new);
         CHISHI_PURIFIER_ITEM_INPUT = registerReactorBlock(blockRegistrar, "akaishi_purifier_item_input", AkaishiPurifierItemInputPortBlock::new);
@@ -707,12 +722,14 @@ public final class ModBlocks {
 
         // ===== 生命转换矩阵（类反应堆式：立方体外壁成型，端口可替代外壳）=====
         CHISHI_LIFE_MATRIX_CASING = registerReactorBlock(blockRegistrar, "akaishi_life_matrix_casing", AkaishiLifeMatrixCasingBlock::new);
+        CHISHI_LIFE_MATRIX_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_life_matrix_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_LIFE_MATRIX_CONTROLLER = registerReactorBlock(blockRegistrar, "akaishi_life_matrix_controller", AkaishiLifeMatrixControllerBlock::new);
         CHISHI_LIFE_MATRIX_ENERGY_INPUT = registerReactorBlock(blockRegistrar, "akaishi_life_matrix_energy_input", AkaishiLifeMatrixEnergyInputPortBlock::new);
         CHISHI_LIFE_MATRIX_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "akaishi_life_matrix_energy_output", AkaishiLifeMatrixEnergyOutputPortBlock::new);
 
         // ===== 无线赤能源（无线终端多方块体系）=====
         CHISHI_WIRELESS_SHELL = registerReactorBlock(blockRegistrar, "akaishi_wireless_shell", AkaishiWirelessShellBlock::new);
+        CHISHI_WIRELESS_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_wireless_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_WIRELESS_TERMINAL = registerReactorBlock(blockRegistrar, "akaishi_wireless_terminal", AkaishiWirelessTerminalBlock::new);
         CHISHI_WIRELESS_SECURITY = registerReactorBlock(blockRegistrar, "akaishi_wireless_security", AkaishiWirelessSecurityBlock::new);
         CHISHI_WIRELESS_CORE = registerReactorBlock(blockRegistrar, "akaishi_wireless_core", AkaishiWirelessCoreBlock::new);
@@ -727,6 +744,7 @@ public final class ModBlocks {
 
         // ===== 聚变堆（10 方块）=====
         CHISHI_FUSION_SHELL = registerReactorBlock(blockRegistrar, "akaishi_fusion_shell", AkaishiFusionShellBlock::new);
+        CHISHI_FUSION_STRUCTURE_GLASS = registerReactorBlock(blockRegistrar, "akaishi_fusion_structure_glass", AkaishiStructureGlassBlock::new);
         CHISHI_FUSION_INSULATION = registerReactorBlock(blockRegistrar, "akaishi_fusion_insulation", AkaishiFusionInsulationBlock::new);
         CHISHI_FUSION_CONTROLLER = registerReactorBlock(blockRegistrar, "akaishi_fusion_controller", AkaishiFusionControllerBlock::new);
         CHISHI_FUSION_ENERGY_OUTPUT = registerReactorBlock(blockRegistrar, "akaishi_fusion_energy_output", AkaishiFusionEnergyOutputBlock::new);

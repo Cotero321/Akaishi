@@ -6,7 +6,20 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "The Pulverizer's full menu — see if your favorite \"dust\" is here:$(li)Akaishi Dust$(li)Coal Dust$(li)Iron Dust$(li)Copper Dust$(li)Gold Dust$(li)Lapis Dust$(li)Diamond Dust$(li)Emerald Dust$(li)Quartz Dust$(li)Netherite Dust$(li)Obsidian Dust$(br2)Dust can be pressed back into blocks by the Compressor, and it's the base of the heat-sink chain and high-tier recipes. Shattered to bits, yet worth even more."
+      "text": "Every dust in this chapter comes from the Akaishi Pulverizer: ores in, dust out, and the downstream machines decide what happens next. Dust is the $(4)universal middleman$(0) for the Compressor and the Transformer — press it into blocks or turn it into bases, depending on what you're short of.$(br2)To stock up, set up a power grid and one Pulverizer: it eats normal and deepslate ores alike, and even Akaishi ore and Obsidian."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)The full dust menu:$(0)$(li)Akaishi Dust: 9 press into 1 Akaishi Essence$(li)Coal Dust: 9 press into 1 Coal Block$(li)Iron Dust / Gold Dust: 9 press into the matching block$(li)Copper Dust: 9 press into 1 Copper Block$(li)Lapis Dust: 9 press into 1 Lapis Block — or turn 1 into a Cooling Base$(li)Diamond Dust / Emerald Dust: 9 press into the matching block$(li)Quartz Dust: 9 press into 1 Quartz Block$(li)Netherite Dust: 9 press into 1 Netherite Ingot$(li)Obsidian Dust: $(4)4 press into 1 Obsidian$(0)$(br2)For the pressing details, see the Compressor — feed the Pulverizer the ore that matches the dust you need."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:pulverizer",
+        "akaishi:compressor",
+        "akaishi:ingot"
+      ],
+      "text": "Dust is made by the $(l:akaishi:pulverizer)Pulverizer$(/l) and consumed by the $(l:akaishi:compressor)Compressor$(/l); for the journey from mineral to metal, read $(l:akaishi:ingot)Akaishi Ingot$(/l)."
     }
   ]
 }

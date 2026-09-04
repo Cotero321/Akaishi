@@ -19,6 +19,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -109,8 +110,8 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
     /** 运转/警告音效播放冷却（tick）：避免每 tick 播放导致音效叠加过密 */
     private int humCooldown;
     private int warnCooldown;
-    /** 活跃控制器注册表（维度 → 控制器位置）：供方块变更事件定位并失效对应控制器缓存 */
-    private static final Map<Level, Set<BlockPos>> ACTIVE = new ConcurrentHashMap<>();
+    /** 活跃控制器注册表（维度 key → 控制器位置）：供方块变更事件定位并失效对应控制器缓存 */
+    private static final Map<ResourceKey<Level>, Set<BlockPos>> ACTIVE = new ConcurrentHashMap<>();
 
     public AkaishiReactorControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_REACTOR_CONTROLLER.get(), pos, state);
@@ -145,7 +146,7 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
 
     private void tickServer() {
         // 注册到活跃控制器集合（事件失效扫描缓存用）；惰性清理由 invalidateNearby 完成
-        ACTIVE.computeIfAbsent(level, k -> ConcurrentHashMap.newKeySet()).add(worldPosition);
+        ACTIVE.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet()).add(worldPosition);
 
         // 结构扫描缓存：成型期间方块几乎不变，定时兜底重扫 + 方块变更事件立即失效
         ReactorStructure.Result scanned;
@@ -207,7 +208,7 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
      * 误报无害（仅触发一次重扫），漏报会导致结构变化不生效。
      */
     public static void invalidateNearby(Level level, BlockPos changedPos) {
-        Set<BlockPos> controllers = ACTIVE.get(level);
+        Set<BlockPos> controllers = ACTIVE.get(level.dimension());
         if (controllers == null || controllers.isEmpty()) {
             return;
         }
@@ -219,6 +220,10 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
                     be.structureDirty = true;
                 } else {
                     controllers.remove(c);
+                    // 集合清空时回收维度条目，防止陈旧 Level/坐标持续占用
+                    if (controllers.isEmpty()) {
+                        ACTIVE.remove(level.dimension());
+                    }
                 }
             }
         }

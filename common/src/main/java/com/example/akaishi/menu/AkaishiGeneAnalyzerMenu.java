@@ -51,9 +51,9 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
         // 置于输出槽右侧同行，避开右上角存储按钮；浮层打开时失活让位）
-        addSlot(new OverlayHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30,
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30,
                 () -> linkState != null && linkState.open));
-        addSlot(new OverlayHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30,
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30,
                 () -> linkState != null && linkState.open));
 
         // 输入槽：仅接受纯度 ≥25 的生命样本（未达解构门槛只能用于药剂）
@@ -139,8 +139,9 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
                         MACHINE_SLOT_END + 36, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else {
+            } else if (linkState == null || !linkState.open) {
                 // 玩家背包：升级组件按槽位类型自动过滤入升级槽，合格样本入输入槽（其余物品进不去不回收）
+                // 浮层打开时机器槽失活隐藏，moveItemStackTo 不校验 isActive → 禁止 Shift 塞入不可见槽
                 if (!this.moveItemStackTo(current, 0, MACHINE_SLOT_END, false)) {
                     return ItemStack.EMPTY;
                 }

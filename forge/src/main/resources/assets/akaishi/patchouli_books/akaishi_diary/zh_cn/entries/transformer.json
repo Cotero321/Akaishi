@@ -7,12 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transformer",
-      "text": "赤石变化器，一台「指鹿为马」的机器：$(li)$(2,4)青金石粉 → 冷却基底$(0)$(li)矿物（锭/块）→ 对应矿石基底$(br2)把普通矿物改头换面成进阶原料，催化剂和聚变散热片都得靠它铺路。"
+      "text": "赤石变化器：把原矿或青金石粉$(4)转成统一的「基底」$(0)，一次消耗 1 个、产出 1 个。变化耗时 100 tick、每 tick 耗 15 点赤能源，内置储能上限 10 万。$(li)青金石粉 → 冷却基底$(li)煤/铁/铜/金/红石/青金石/钻石/绿宝石/石英（原矿或深层矿）→ 对应矿石基底$(li)远古残骸 → 远古残骸基底$(li)赤石矿 → 赤石矿石基底"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:cooling_base",
-      "text": "冷却基底是散热体系的起点：跟粉末逐级合成，一路从铁粉堆到下界合金锭的多级散热片。$(br)温度再高，散热片都得从这里起家。"
+      "text": "基底不直接当材料用，它们是$(4)高阶配方的识别物$(0)，只认「出身」：$(li)冷却基底 + 铜锭 → 劣质散热片——整个散热片链从这里起家（详见「$(l:akaishi:fuel_system)燃料与散热$(/l)」）$(li)铁/金/钻石/远古残骸基底 → 赤石催化器四级升级链$(li)铜/红石/青金石基底 → 自动收集器升级链$(li)其余基底进入装罐机、无线核心等配方，具体查 JEI$(br2)每种基底的全套去向，见「矿石基底」条目。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:pulverizer",
+        "akaishi:ore_bases",
+        "akaishi:dusts"
+      ],
+      "text": "原料粉从哪里来见「$(l:akaishi:pulverizer)赤石打粉机$(/l)」与「$(l:akaishi:dusts)粉末$(/l)」；基底全家福与用途清单见「$(l:akaishi:ore_bases)矿石基底$(/l)」。"
     }
   ]
 }

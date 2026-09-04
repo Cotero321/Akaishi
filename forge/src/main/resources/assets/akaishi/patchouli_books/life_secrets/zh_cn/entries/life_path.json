@@ -1,0 +1,42 @@
+{
+  "name": "生命研究路线图",
+  "icon": "akaishi:akaishi_life_book",
+  "category": "akaishi:life_intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "这本《生命的奥秘》讲的是凌驾于赤能源之上的力量——$(4)生命能量$(0)，以及围绕它展开的躯体研究与改造。$(br2)$(bold)主线一句话：$(0)赤能源 → 生命能量 → 样本 → 基因 → 器官 → 移植与变异。$(br2)$(bold)动手前置：$(0)生命能量由赤能源转换而来，请先照《赤石研究日记》的能源章节搭好$(4)稳定电网$(0)（发电+储电+管道），再翻开本册。$(br2)书里蓝色文字可点击跳转，分类内条目序号即推荐阅读顺序。各阶段均按「$(bold)先做什么、为什么、下一步读哪条$(0)」展开。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "阶段一 · 发电：炼出生命能量",
+      "text": "$(bold)先做什么：$(0)搭「$(l:akaishi:life_conversion)生命转换矩阵$(/l)」把海量赤能源炼成生命能量；再造「$(l:akaishi:life_energy)生命能量储存器$(/l)」与生命能量管道，把能量囤起来、送到各台机器。$(br2)$(bold)为什么：$(0)矩阵是整条生命线$(4)唯一的生命能量来源$(0)，后方机器全靠它续命——发电环节不稳，后面全部停摆。$(br2)$(bold)下一步：$(0)流动能量不便交易，进入阶段二，把它固化成货币。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "阶段二 · 固化：把能量变成货币",
+      "text": "$(bold)先做什么：$(0)造「$(l:akaishi:life_purifier)生命能量提纯器$(/l)」，让流动的生命能量凝结成「$(4)生命能量固态物$(0)」。$(br2)$(bold)为什么：$(0)固态物是生命线的$(4)通用货币$(0)——造器官、移植、培养、调药全收它；能搬、能囤、能走管道，比能量本身好用得多。$(br2)$(bold)下一步：$(0)货币到位就去搜刮原材料，进入阶段三：从采集样本开始。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "阶段三 · 样本 → 基因 → 器官",
+      "text": "$(bold)先做什么：$(0)按「$(l:akaishi:life_samples)样本与基因$(/l)」采集样本、解出基因序列；再按「$(l:akaishi:life_organs)器官构造$(/l)」铸成器官并移植进躯体；「$(l:akaishi:life_potions)生命药剂$(/l)」负责吸收基因型与临时爆发。$(br2)$(bold)为什么：$(0)器官才是战力本体；移植务必盯紧排斥值，天敌组合会反噬。$(br2)$(bold)下一步：$(0)基础器官喂不饱你？进入阶段四，用变异词条突破上限。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "阶段四与五 · 变异与高阶",
+      "text": "$(bold)先做什么：$(0)用生命培育器给器官上随机词条，图鉴看「$(l:akaishi:trait_safe)常规变异$(/l)」与「$(l:akaishi:trait_dual)畸变双刃$(/l)」，洗词条用「$(l:akaishi:trait_reforger)词条重铸仪$(/l)」。$(br2)$(bold)高阶：$(0)躯体检查与衰变净化见「$(l:akaishi:life_body)躯体检查与衰变$(/l)」，衰竭燃料回收见「$(l:akaishi:life_waste)衰竭燃料无害化$(/l)」；顶点是「$(l:akaishi:mother_altar)黑山羊之母祭坛$(/l)」的融合锭，经「$(l:akaishi:life_fusion_anvil)生命的融合砧$(/l)」锻出毕业护甲。$(br2)$(bold)为什么：$(0)这两段都是资源无底洞，底子打牢再碰。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_energy",
+        "akaishi:life_conversion",
+        "akaishi:life_purifier",
+        "akaishi:life_samples"
+      ],
+      "text": "导航收尾：先让生命能量跑起来，再固化成币，随后从样本出发一路读完器官线。"
+    }
+  ]
+}

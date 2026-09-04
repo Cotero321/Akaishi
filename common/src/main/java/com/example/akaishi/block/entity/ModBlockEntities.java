@@ -177,8 +177,6 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiWirelessChunkLoaderBlockEntity>> CHISHI_WIRELESS_CHUNK_LOADER;
     /** 聚变控制器方块实体类型（主方块，持有全部聚变状态） */
     public static RegistrySupplier<BlockEntityType<AkaishiFusionControllerBlockEntity>> CHISHI_FUSION_CONTROLLER;
-    /** 聚变散热框架方块实体类型（单槽散热片） */
-    public static RegistrySupplier<BlockEntityType<AkaishiFusionCoolerFrameBlockEntity>> CHISHI_FUSION_COOLER_FRAME;
     /** 聚变能量输出口方块实体类型（赤能源缓冲，纯发电） */
     public static RegistrySupplier<BlockEntityType<AkaishiFusionEnergyOutputBlockEntity>> CHISHI_FUSION_ENERGY_OUTPUT;
     /** 聚变物品输入口方块实体类型（燃料棒缓冲 27 槽） */
@@ -447,12 +445,9 @@ public final class ModBlockEntities {
         CHISHI_WIRELESS_CHUNK_LOADER = be("akaishi_wireless_chunk_loader", AkaishiWirelessChunkLoaderBlockEntity::new,
                 ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER);
         // ===== 聚变堆 =====
-        // 控制器（多方块主方块）
+        // 控制器（多方块主方块，散热片也统一存放于此）
         CHISHI_FUSION_CONTROLLER = be("akaishi_fusion_controller", AkaishiFusionControllerBlockEntity::new,
                 ModBlocks.CHISHI_FUSION_CONTROLLER);
-        // 散热框架（单槽散热片）
-        CHISHI_FUSION_COOLER_FRAME = be("akaishi_fusion_cooler_frame", AkaishiFusionCoolerFrameBlockEntity::new,
-                ModBlocks.CHISHI_FUSION_COOLER_FRAME);
         // 能量输出口（赤能源缓冲，纯发电）
         CHISHI_FUSION_ENERGY_OUTPUT = be("akaishi_fusion_energy_output", AkaishiFusionEnergyOutputBlockEntity::new,
                 ModBlocks.CHISHI_FUSION_ENERGY_OUTPUT);

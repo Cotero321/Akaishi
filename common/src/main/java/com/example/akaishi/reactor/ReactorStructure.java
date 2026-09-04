@@ -8,6 +8,7 @@ import com.example.akaishi.block.AkaishiReactorFuelPortBlock;
 import com.example.akaishi.block.AkaishiReactorFuelRodBlock;
 import com.example.akaishi.block.AkaishiReactorShellBlock;
 import com.example.akaishi.block.AkaishiReactorWastePortBlock;
+import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiReactorCoolerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -201,12 +202,13 @@ public final class ReactorStructure {
                 rods, coolersEffective, cooling, energy, waste, fuel, shells, coolerList, coolerEff);
     }
 
-    /** 是否为合法墙面块（构成封闭壳体的方块） */
+    /** 是否为合法墙面块（构成封闭壳体的方块）：外壳 / 控制器 / 端口 / 结构玻璃 */
     public static boolean isWallBlock(Block b) {
         return b instanceof AkaishiReactorShellBlock
                 || b instanceof AkaishiReactorControllerBlock
                 || b instanceof AkaishiReactorFuelPortBlock
                 || b instanceof AkaishiReactorEnergyOutputBlock
-                || b instanceof AkaishiReactorWastePortBlock;
+                || b instanceof AkaishiReactorWastePortBlock
+                || b == ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get();
     }
 }

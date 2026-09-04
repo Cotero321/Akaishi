@@ -7,19 +7,32 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_breeder",
-      "text": "Mutation mechanics: when the Life Breeder cultivates an organ, it randomly applies mutation traits based on the culture-medium gene sequence's purity — below 60 only rolls tier 1, 60-84 rolls up to tier 2, 85 and above unlocks everything.$(br2)Each trait occupies 1 capacity slot: I-grade organs have 1, II-grade 2, III-grade 3, IV-grade 4.$(br2)Once attached a trait is bound to the organ and cannot be removed, and the same trait won't repeat; rolled something unwanted? Hand it to the Trait Reforger to swap it individually."
+      "text": "The Life Breeder is where you $(4)roll traits$(0) onto an organ.$(br2)$(bold)Requirements:$(0) the organ must be $(bold)non-native and set$(0), with room left below the trait cap.$(br2)$(bold)Cost:$(0) 1 same-source gene sequence, 2 Exhausted Crystals and 60,000 life energy, over 1,000 ticks (50 seconds).$(br2)$(bold)Success rate:$(0) scales linearly with sequence purity — about 35% at purity 25, up to 70% at purity 100.$(br2)Success duplicates the organ and attaches 1 random trait; failure keeps the organ, but $(4)materials are still consumed$(0)."
     },
     {
       "type": "patchouli:text",
-      "text": "【Tier 1 · Pure Safe Mutations】$(br2)Dense Tissue —— Armor +1$(br)Strong Muscle Fiber —— Attack Damage +1$(br)Active Marrow —— Max Health +3$(br)Reflex Neurons —— Attack Speed +0.4$(br)Springy Tendons —— Move Speed +0.015"
+      "text": "$(bold)Traits come in tiers 1-3$(0); which tiers can roll is set by the breeding sequence's purity:$(li)purity <60: tier 1 only$(li)60-84: tiers 1-2$(li)≥85: every tier unlocked$(br2)Each roll is roughly $(4)70% benign / 30% aberrant$(0) — seven in ten are pure gains, three in ten come with a price tag (see \"$(l:akaishi:trait_dual)Aberrant Traits$(/l)\").$(br2)After high-tier traits? Secure a steady supply of high-purity sequences — that's exactly what the Cultivator is for."
     },
     {
       "type": "patchouli:text",
-      "text": "【Tier 2 · Advanced Mutations · Safe】$(br2)Venom Gland —— attacks inflict poison$(br)Night-Vision Retina —— permanent night vision$(br)Gill Slits —— water breathing$(br)Fluorescent Cells —— self-glow$(br)Chitin Overgrowth —— Armor +2, Knockback Resistance +0.2"
+      "text": "$(bold)【Tier 1 · Safe traits】$(0)$(br2)$(li)Dense Tissue (dense_tissue): +1 armor$(li)Muscle Fiber (muscle_fiber): +1 attack damage$(li)Hyperactive Marrow (marrow_hyper): +3 max health$(li)Reflex Neurons (reflex_neuron): +0.4 attack speed$(li)Elastic Tendon (elastic_tendon): +0.015 move speed$(br2)All tier 1 traits are clean, purely positive little boosts — stable, no side effects, a great baseline."
     },
     {
       "type": "patchouli:text",
-      "text": "【Tier 3 · Rare Mutations · Safe】$(br2)Crystal Carapace —— Armor +1.5, reflect melee damage$(br)Shadow Veins —— chance to blink-dodge when hit$(br)Bouncy Tendons —— Move Speed +0.01, Jump Boost$(br)Stem-Cell Regeneration —— slow regeneration$(br)Sentinel Retina —— Armor +0.5, highlights hostile mobs"
+      "text": "$(bold)【Tier 2 · Safe traits】$(0)$(br2)$(li)Night-Vision Retina (night_retina): permanent night vision$(li)Gill Slits (gill_slit): water breathing$(li)Bioluminescent Cells (glow_cells): self-glow$(li)Carapace Growth (carapace_growth): +2 armor, +0.2 knockback resistance$(li)Venom Gland (venom_gland): attacks inflict poison$(br2)From tier 2 onward $(4)passive traits$(0) appear — traits are no longer just stat sticks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)【Tier 3 · Safe traits】$(0)$(br2)$(li)Crystal Carapace (crystal_carapace): +1.5 armor, reflects melee damage$(li)Shadow Vein (shadow_vein): chance to blink-dodge when hit$(li)Stem Cell Regeneration (stem_regen): continuous regeneration$(li)Jump Tendons (jump_tendons): jump boost$(br2)Tier 3 is the ceiling for safe traits — any stronger positive usually comes with the price of an \"$(l:akaishi:trait_dual)aberration$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:trait_dual",
+        "akaishi:trait_reforger",
+        "akaishi:life_organs"
+      ],
+      "text": "Suggested order: browse this page and \"Aberrant Traits\" for the trait catalogs; \"Trait Reforger\" fixes bad rolls; traits live on organs — see \"Organ Construction\" for where organs come from."
     }
   ]
 }

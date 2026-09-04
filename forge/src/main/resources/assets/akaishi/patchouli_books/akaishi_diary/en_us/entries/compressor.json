@@ -7,7 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_compressor",
-      "text": "The Compressor, the \"reforge\" machine for dust:$(li)Various dusts → matching blocks$(li)Akaishi Essence → Concentrated Essence$(br2)One slot in, one slot out, power it and go. Loose powder in, solid blocks out."
+      "text": "The Akaishi Compressor $(4)presses dust and crystals into solid blocks$(0): loose powder in, neat blocks out. One slot in, one out — just feed it power. Each press takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(br2)$(bold)Key recipes:$(0)$(li)Coal / Iron / Copper / Gold / Lapis / Diamond / Emerald / Quartz Dust → 9 press into the matching block$(li)$(4)9 Netherite Dust → 1 Netherite Ingot$(0) (an ingot, not a block!)$(li)$(4)4 Obsidian Dust → 1 Obsidian$(0)$(li)9 Akaishi Dust → 1 Akaishi Essence$(li)9 Akaishi Crystals → 1 Akaishi Crystal Block$(br2)Note: the Akaishi Crystal Block is pressed here only — 9 crystals in a crafting table make a Raw Akaishi Block instead. Don't mix the two up."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:pulverizer",
+        "akaishi:dusts",
+        "akaishi:crystal"
+      ],
+      "text": "Run your ores through the $(l:akaishi:pulverizer)Pulverizer$(/l) first, then press the dust here. The full dust list is in $(l:akaishi:dusts)Dusts$(/l), and crystal refining is covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

@@ -10,6 +10,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -30,6 +31,8 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 new PurificationRecipeCategory(helper),
                 new AggregationRecipeCategory(helper),
                 new ForgingRecipeCategory(helper),
+                // 生命融合锻台：赤石装备 + 生命融合锭 → 生命融合装备（获得途径展示）
+                new LifeFusionAnvilRecipeCategory(helper),
                 new UpgradeRecipeCategory(helper),
                 // 燃料生产链：液化 → 加工 → 调和（燃料产生展示）
                 new LiquefactionRecipeCategory(helper),
@@ -49,6 +52,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(PurificationRecipeCategory.TYPE, PurificationRecipeCategory.PurificationRecipe.getAll());
         registration.addRecipes(AggregationRecipeCategory.TYPE, AggregationRecipeCategory.AggregationRecipe.getAll());
         registration.addRecipes(ForgingRecipeCategory.TYPE, ForgingRecipeCategory.ForgingRecipe.getAll());
+        registration.addRecipes(LifeFusionAnvilRecipeCategory.TYPE, LifeFusionAnvilRecipeCategory.LifeFusionRecipe.getAll());
         registration.addRecipes(UpgradeRecipeCategory.TYPE, UpgradeRecipeCategory.UpgradeRecipe.getAll());
         // 燃料生产链配方
         registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll());
@@ -144,6 +148,36 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_CORE.get(), "jei.akaishi.wireless");
         addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_INPUT_PORT.get(), "jei.akaishi.wireless");
         addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get(), "jei.akaishi.wireless");
+
+        // ===== 活化产物系列获取说明：活化结晶（7）/ 活化成分（7）/ 衰竭结晶 / 生命灰烬 =====
+        // 活化结晶：7 种同机制（生命离心机分离活化衰竭液体，共用说明）
+        Item[] activatedCrystals = {
+                com.example.akaishi.item.ModItems.activatedSculkCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedNetherCompoundCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedEndMixtureCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedAdvancedMixtureCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedPureCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedDragonCrystal.get(),
+                com.example.akaishi.item.ModItems.activatedUltimateMixtureCrystal.get()};
+        for (Item item : activatedCrystals) {
+            addIngredientInfo(registration, item, "jei.akaishi.activated_crystal");
+        }
+        // 活化成分：7 种同机制（活化分馏器拆分对应活化结晶，共用说明）
+        Item[] activatedComponents = {
+                com.example.akaishi.item.ModItems.activatedSculkComponent.get(),
+                com.example.akaishi.item.ModItems.activatedNetherCompoundComponent.get(),
+                com.example.akaishi.item.ModItems.activatedEndMixtureComponent.get(),
+                com.example.akaishi.item.ModItems.activatedAdvancedMixtureComponent.get(),
+                com.example.akaishi.item.ModItems.activatedPureComponent.get(),
+                com.example.akaishi.item.ModItems.activatedDragonComponent.get(),
+                com.example.akaishi.item.ModItems.activatedUltimateMixtureComponent.get()};
+        for (Item item : activatedComponents) {
+            addIngredientInfo(registration, item, "jei.akaishi.activated_component");
+        }
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.exhaustedCrystal.get(), "jei.akaishi.exhausted_crystal");
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.lifeAsh.get(), "jei.akaishi.life_ash");
+        // 生命融合锭：无合成配方，为黑山羊之母祭坛仪式专属产物
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.lifeFusionIngot.get(), "jei.akaishi.life_fusion_ingot");
     }
 
     private static void addIngredientInfo(IRecipeRegistration registration, net.minecraft.world.level.block.Block block, String langKey, Object... args) {

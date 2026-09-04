@@ -8,7 +8,7 @@ import net.minecraft.world.inventory.ContainerData;
  */
 public interface IWirelessPortHost {
 
-    /** GUI 数据槽（缓冲储能/绑定卡/认证终端/速率） */
+    /** GUI 数据槽（缓冲储能/绑定卡/认证终端/方向） */
     ContainerData data();
 
     /** 解绑身份卡（GUI 按钮），断开与终端的所有连接 */

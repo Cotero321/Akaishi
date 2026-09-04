@@ -2,12 +2,25 @@
   "name": "Akaishi Trinkets",
   "icon": "akaishi:akaishi_hunting_ring",
   "category": "akaishi:advanced",
-  "sortnum": 7,
+  "sortnum": 9,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_hunting_ring",
-      "text": "Seven trinkets forged from akaishi power (worn in the trinket slots), each a \"cheat code\":$(li)Hunting Ring: combat buffs$(li)Fortune Bracelet: boosted harvest$(li)Flame Necklace: fire resistance$(li)Antidote Bracelet: neutralizes poison$(li)Blast Charm: reduced explosion damage$(li)Wither Charm: wards off withering$(li)Saturation Charm: eating buffs$(br2)Put them all on and you're a walking fortress."
+      "type": "patchouli:text",
+      "text": "Every Akaishi trinket runs on the same shared machinery:$(li)each effect drains its own internal energy buffer first$(li)when the buffer runs dry, the trinket sips power from the $(l:akaishi:portable_cell)Portable Cells$(/l) in your inventory$(li)carry one cell and the whole set stays alive on the go$(br2)They split into three roles, each with its own entry: $(l:akaishi:curios_income)Fortune Trinkets$(/l) drop crystals, $(l:akaishi:curios_defense)Defense Trinkets$(/l) shrug off damage, $(l:akaishi:curios_survival)Sustain Trinkets$(/l) feed you and cure debuffs."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Slot map (Curios):$(0)$(li)rings -> ring$(li)bracelets -> hands$(li)pendants -> necklace$(li)charms -> charm$(li)chest trinkets -> body$(li)bangles -> bracelet$(li)waist trinkets -> belt$(br2)Wrong slot? It won't equip. Check which slots you have unlocked before you wear anything."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios_income",
+        "akaishi:curios_defense",
+        "akaishi:curios_survival",
+        "akaishi:portable_cell"
+      ],
+      "text": "The three group entries: $(l:akaishi:curios_income)Fortune$(/l) / $(l:akaishi:curios_defense)Defense$(/l) / $(l:akaishi:curios_survival)Sustain$(/l); the battery that keeps them going is the $(l:akaishi:portable_cell)Portable Cell$(/l)."
     }
   ]
 }

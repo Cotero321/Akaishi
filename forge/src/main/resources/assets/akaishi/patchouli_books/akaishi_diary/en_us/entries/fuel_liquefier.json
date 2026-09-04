@@ -1,0 +1,26 @@
+{
+  "name": "Energy Liquefier",
+  "icon": "akaishi:akaishi_energy_liquefier",
+  "category": "akaishi:tech",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_liquefier",
+      "text": "Where liquefaction starts: squeeze solid ingredients into liquid energy (energy per ingredient):$(li)$(4)Nether Star → 1000 mb Nether Pure Energy: 50M$(0)$(li)Wither Rose → 400 mb Nether Compound Energy: 5M$(li)End Mixture + 1 solid → 500 mb End Mixture Fuel: 10M$(li)Dragon Mixture + 1 solid → 500 mb End Dragon Fuel: 50M$(li)the \"World Base Fuel\" ingredient (Golden Carrot + Sculk Block + Golden Apple + Akaishi Essence Block) + 1 solid → 100 mb World Base Fuel: 10M"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stock up first:$(0) the last three recipes demand a solid as a medium alongside the main ingredient.$(br2)Nether Stars and Wither Roses are renewable; the End / Dragon / World Base ingredients come from the mixture routes covered in \"Secrets of Life\".$(br2)Settle the liquids in a tank, then feed the $(l:akaishi:fuel_processor)Energy Processor$(/l) or the $(l:akaishi:fuel_mixer)Fuel Mixer$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_processor",
+        "akaishi:fuel_mixer"
+      ],
+      "text": "This is step one of the Liquid Fuel Chain — overview in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l); downstream processing and blending are linked above."
+    }
+  ]
+}

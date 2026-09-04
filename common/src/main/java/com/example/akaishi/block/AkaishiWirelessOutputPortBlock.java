@@ -60,9 +60,9 @@ public class AkaishiWirelessOutputPortBlock extends AkaishiMachineBlock {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof AkaishiWirelessOutputPortBlockEntity port
                 && player instanceof ServerPlayer serverPlayer) {
             ItemStack held = player.getItemInHand(hand);
-            // 手持身份卡右键 → 绑定到本口（覆盖旧绑定）
+            // 手持身份卡右键 → 绑定到本口（覆盖旧绑定）；服务端逻辑为卡生成唯一卡号
             if (held.getItem() instanceof AkaishiWirelessIdentityCardItem) {
-                port.bind(AkaishiWirelessIdentityCardItem.uuidOf(held), AkaishiWirelessIdentityCardItem.tierOf(held));
+                port.bind(AkaishiWirelessIdentityCardItem.ensureUuid(held));
                 serverPlayer.displayClientMessage(Component.translatable(
                         "message.akaishi.port.bound", AkaishiWirelessIdentityCardItem.shortId(held)), false);
                 return InteractionResult.sidedSuccess(false);

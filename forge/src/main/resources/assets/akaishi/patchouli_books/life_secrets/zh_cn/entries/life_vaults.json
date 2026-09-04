@@ -7,17 +7,26 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sample_vault",
-      "text": "样本库：54 格大仓库，只收生命样本，同来源同纯度自动合并堆叠。$(br)摆分析台/药剂台 3 格内可联动存取——样本堆成山也不怕乱。"
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_organ_vault",
-      "text": "器官储藏库：按躯体槽位分页的器官冰库（9 页 × 9 格 + 9 暂存）。$(br)器官自动归入所属槽位页，每 tick 耗 1 生命能量维持活性。器官冻得好，移植没烦恼。"
+      "text": "样本库：$(4)54 格$(0)样本专用仓。$(li)只收生命样本，管道同样只进样本（全槽可插管）$(li)每 10 tick 自动合并同 NBT 样本——同来源、同纯度不再各占一格$(br2)摆在分析台等机器 $(4)3 格内$(0)可联动存取。样本攒多了先入库，别在手边堆成山。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_potion_cabinet",
-      "text": "药剂库：54 格大仓库，只收药剂，同模板同纯度自动合并，还支持模板筛选。$(br)摆药剂台 3 格内可联动存取，药剂收藏家的天堂。"
+      "text": "药剂库：$(4)54 格$(0)药剂专用仓。$(li)只收药剂，全槽可插管$(li)每 10 tick 自动合并同 NBT 药剂（同模板、纯度与来源）$(li)界面可按模板筛选，翻药不用大海捞针$(br2)摆在药剂台 $(4)3 格内$(0)可联动存取——常备药剂随取随用。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_vault",
+      "text": "器官储藏库：按躯体 $(4)9 个槽位$(0)分页的器官冷库。$(li)$(4)9 页 × 9 格 + 9 格暂存$(0) = 90 格$(li)器官放入自动归入所属槽位页，管道输出走暂存区$(li)生命能量缓冲 $(4)10 万$(0)，每 tick 耗 1 维持活性——$(4)耗尽只警示、不锁存取$(0)$(br2)大规模囤器官前必建；配合手术仓 3 格内联动存取，记得$(bold)常给它续生命能量$(0)。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_organs",
+        "akaishi:life_potions"
+      ],
+      "text": "三类仓库分别对应器官线的三种存货——样本、器官、药剂，配合对应机器就近摆放最顺手。"
     }
   ]
 }

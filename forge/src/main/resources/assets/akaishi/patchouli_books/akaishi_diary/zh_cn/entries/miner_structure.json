@@ -9,9 +9,9 @@
       "name": "赤石矿机（9×9×3）",
       "multiblock": {
         "pattern": [
-          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "],
+          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "],
           ["    F    ", "         ", "         ", "         ", "F   0   F", "         ", "         ", "         ", "    F    "],
-          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "]
+          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "]
         ],
         "mapping": {
           "F": "akaishi:akaishi_miner_frame",
@@ -21,11 +21,21 @@
         },
         "symmetrical": false
       },
-      "text": "控制器坐在中间层正中心。底层与顶层各有一个转口（共 2 个）。U 位置可替换成升级模块方块。"
+      "text": "赤石矿机是固定的 $(bold)9×9×3$(0) 多方块结构：上下两层是十字框架、正中心各坐 1 个转口，中间层只有 4 根框架柱 + 中心控制器。$(br2)F=矿机架构，U=矿机升级框架（可换成升级模块），P=矿机转口，红块=控制器。四个角镂空，别填砖。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(2,4)搭建要点$(0)$(li)9×9 横截面 × 3 层（高）$(li)先放中间层中心的控制器，再补其余方块$(li)升级框架位 U：放空升级框架或直接装升级模块$(li)上下两层中心各放 1 个转口 P$(br2)结构成型后控制器会广播到转口，产出的矿物自动送入转口缓冲。摆对位置，矿机就自己会「吐矿」了。"
+      "text": "$(bold)搭建顺序$(0)$(li)定中间层：先在四个边中点立 4 根「矿机架构」柱，正中心放控制器——先放也行，它会自动认结构$(li)铺底层：以控制器脚下为中心，正中心放 1 个转口 P，十字梁放架构 F，梁间肋位放升级框架 U$(li)封顶层：照底层抄一层（中心同样放转口），完工$(br2)$(bold)成型判定：$(0)控制器持续自动校验结构——$(c)拆掉或放错任何一块，整机随即解散$(0)：升级统计清零、转口断连、挖矿冻结。$(br2)观感上它像两片悬空的十字星盘、四角镂空，建议找块开阔平地搭，方便日后加装「$(l:akaishi:miner_upgrades)升级模块$(/l)」与走线。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:miner_tiers",
+        "akaishi:miner_upgrades",
+        "akaishi:energy_pipe",
+        "akaishi:energy_cell"
+      ],
+      "text": "架子搭好后按序读：挑一台控制器定「等级」→ 塞「升级模块」→ 用能量管道把电从转口接回你的电网。"
     }
   ]
 }

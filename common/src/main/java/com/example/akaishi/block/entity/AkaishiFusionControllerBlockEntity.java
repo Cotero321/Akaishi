@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.block.AkaishiFusionControllerBlock;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fusion.FusionStructure;
+import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionControllerMenu;
@@ -13,6 +14,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -59,15 +61,27 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     public static final int DATA_COOLER_DURABILITY = 10;
     public static final int DATA_SPEED_X100 = 11;
     public static final int DATA_ASH_AMOUNT = 12;
-    public static final int DATA_SLOTS = 13;
+    /** 过热停产剩余冷却（秒，服务端写入） */
+    public static final int DATA_OVERHEAT_COOLDOWN = 13;
+    public static final int DATA_SLOTS = 14;
+
+    /** 过热停产时长：超温跳闸后强制冷却 5 分钟（20 tick/秒 × 300 秒），期间无法恢复燃烧 */
+    private static final int OVERHEAT_COOLDOWN_TICKS = 20 * 60 * 5;
+
+    /** 散热片槽上限（与结构散热框架上限一致；框架数量决定实际可用槽数） */
+    public static final int MAX_COOLER_SLOTS = FusionStructure.MAX_COOLER_FRAMES;
 
     private final SimpleContainer fuelSlots;
+    /** 散热片容器：散热片统一存放于控制器，结构内散热框架仅计数解锁槽位 */
+    private final SimpleContainer coolerSlots;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
 
-    /** 当前温度（M） */
-    private int temp;
-    /** 过热宕机标记：温度 ≥ 上限置位，降至一半解除 */
+    /** 当前温度（M）：double 存储，避免 int 截断使温度逼近上限时永久卡死无法触发跳闸 */
+    private double temp;
+    /** 过热宕机标记：温度 ≥ fusionTempTrip 置位，降至 fusionTempResume 解除 */
     private boolean overheated;
+    /** 过热停产冷却剩余 tick（超温后强制停机 5 分钟，归零且温度回落才允许重启） */
+    private int overheatCooldown;
     /** 灰烬计数（物品，输出口按个取出） */
     private long ashAmount;
     /** 灰烬累计器（double 精度累加） */
@@ -89,11 +103,18 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     private boolean structureDirty = true;
     private int scanCooldown;
     /** 活跃控制器注册表（维度 → 控制器位置）：供方块变更事件失效缓存 */
-    private static final Map<Level, Set<BlockPos>> ACTIVE = new ConcurrentHashMap<>();
+    private static final Map<ResourceKey<Level>, Set<BlockPos>> ACTIVE = new ConcurrentHashMap<>();
 
     public AkaishiFusionControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUSION_CONTROLLER.get(), pos, state);
         this.fuelSlots = new SimpleContainer(MAX_FUEL_SLOTS) {
+            @Override
+            public void setChanged() {
+                super.setChanged();
+                AkaishiFusionControllerBlockEntity.this.setChanged();
+            }
+        };
+        this.coolerSlots = new SimpleContainer(MAX_COOLER_SLOTS) {
             @Override
             public void setChanged() {
                 super.setChanged();
@@ -107,7 +128,7 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     }
 
     private void tickServer() {
-        ACTIVE.computeIfAbsent(level, k -> ConcurrentHashMap.newKeySet()).add(worldPosition);
+        ACTIVE.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet()).add(worldPosition);
 
         FusionStructure.Result scanned;
         if (structureDirty || --scanCooldown <= 0) {
@@ -129,24 +150,31 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
                 broadcastToParts();
             }
             if (overheated) {
-                // 宕机：停止燃烧，仅结算温度（降温）与散热片消耗
+                // 宕机：停止燃烧，仅结算温度（降温）与散热片消耗，并推进 5 分钟停产倒计时
                 activeSlots = 0;
                 yieldPerTick = 0;
+                if (overheatCooldown > 0) {
+                    overheatCooldown--;
+                }
                 tickTemperature();
                 consumeCoolerDurability();
-                if (temp <= ModConfig.fusionTempResume) {
+                // 恢复条件：温度回落至恢复线以下，且停产冷却时长已到
+                if (temp <= ModConfig.fusionTempResume && overheatCooldown <= 0) {
                     overheated = false;
                 }
             } else {
                 tickBurning();
                 tickTemperature();
-                if (temp >= ModConfig.fusionTempMax) {
+                if (temp >= ModConfig.fusionTempTrip) {
+                    // 超温跳闸：强制停产 5 分钟，防止反复过载
                     overheated = true;
+                    overheatCooldown = OVERHEAT_COOLDOWN_TICKS;
                 }
             }
         } else {
             // 结构失效：停止燃烧并重置状态（保留燃料槽，重新成型后继续使用），温度缓慢回落到基础值
             overheated = false;
+            overheatCooldown = 0;
             activeSlots = 0;
             yieldPerTick = 0;
             speedPercent = 0;
@@ -157,7 +185,7 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
 
     /** 方块变更事件入口：失效邻近活跃控制器的扫描缓存（参照反应堆） */
     public static void invalidateNearby(Level level, BlockPos changedPos) {
-        Set<BlockPos> controllers = ACTIVE.get(level);
+        Set<BlockPos> controllers = ACTIVE.get(level.dimension());
         if (controllers == null || controllers.isEmpty()) {
             return;
         }
@@ -169,6 +197,10 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
                     be.structureDirty = true;
                 } else {
                     controllers.remove(c);
+                    // 集合清空时回收维度条目，防止陈旧 Level/坐标持续占用
+                    if (controllers.isEmpty()) {
+                        ACTIVE.remove(level.dimension());
+                    }
                 }
             }
         }
@@ -192,11 +224,6 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         for (BlockPos p : structure.itemOutputPorts) {
             if (level.getBlockEntity(p) instanceof AkaishiFusionItemOutputPortBlockEntity o) {
                 o.setControllerPos(worldPosition);
-            }
-        }
-        for (BlockPos p : structure.coolerFrames) {
-            if (level.getBlockEntity(p) instanceof AkaishiFusionCoolerFrameBlockEntity c) {
-                c.setControllerPos(worldPosition);
             }
         }
     }
@@ -237,8 +264,9 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         activeSlots = active;
         yieldPerTick = (long) (consumed * temperatureCoefficient());
         heatValue *= speed; // 产热随效率系数同步放大
-        // 温度目标：基础 + 产热 − 散热（散热 = 片效率 × 框架乘数 × 每%抵消 + 末地棒散热加成）
-        double cooling = (structure.coolingPercent * (1 + ModConfig.fusionCoolerFrameBonus * structure.coolerFrames.size())
+        // 温度目标：基础 + 产热 − 散热（散热 = 控制器散热片总效率 × 框架乘数 × 每%抵消 + 末地棒散热加成）
+        int frameCount = structure.coolerFrames.size();
+        double cooling = (activeCoolingPercent() * (1 + ModConfig.fusionCoolerFrameBonus * frameCount)
                 + coolingBonus) * ModConfig.fusionCoolingPerPercent;
         tempTarget = ModConfig.fusionBaseTemp + heatValue - cooling;
 
@@ -247,7 +275,7 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         consumeCoolerDurability();
     }
 
-    /** 温度系数：最佳稳定期 100~130M 产率 ×1.0；低温/高温线性下降（150M 时约 ×0.5） */
+    /** 温度系数：最佳稳定期 100~130M 产率 ×1.0；低温/高温线性下降（逼近 160M 时约 ×0.5） */
     private double temperatureCoefficient() {
         if (temp <= ModConfig.fusionTempOptMin) {
             return 0.5 + 0.5 * temp / (double) Math.max(1, ModConfig.fusionTempOptMin);
@@ -266,31 +294,43 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     private void tickTemperature() {
         if (!formedState() || overheated) {
             // 未成型或过热宕机：产热归零，目标 = 基础 − 散热（散热片继续生效降温）
-            int cooling = structure == null ? 0 : structure.coolingPercent;
-            double eff = (structure == null ? 0 : structure.coolerFrames.size());
-            double cool = (cooling * (1 + ModConfig.fusionCoolerFrameBonus * eff)) * ModConfig.fusionCoolingPerPercent;
+            int frameCount = structure == null ? 0 : structure.coolerFrames.size();
+            double cool = (activeCoolingPercent() * (1 + ModConfig.fusionCoolerFrameBonus * frameCount))
+                    * ModConfig.fusionCoolingPerPercent;
             tempTarget = ModConfig.fusionBaseTemp - cool;
         }
         double target = Math.max(0, Math.min(ModConfig.fusionTempMax, tempTarget));
-        double delta = (target - temp) * 0.02;
-        delta = Math.max(-ModConfig.fusionTempStep, Math.min(ModConfig.fusionTempStep, delta));
-        temp = (int) Math.max(0, Math.min(ModConfig.fusionTempMax, temp + delta));
+        double delta = Math.max(-ModConfig.fusionTempStep,
+                Math.min(ModConfig.fusionTempStep, (target - temp) * 0.02));
+        // 距目标足够近时直接吸附：2% 渐近趋近在浮点精度下会停滞在目标之前，吸附保证温度能精确抵达/越过停机阈值
+        if (Math.abs(target - temp) <= 0.5) {
+            temp = target;
+        } else {
+            temp = Math.max(0, Math.min(ModConfig.fusionTempMax, temp + delta));
+        }
     }
 
     private boolean formedState() {
         return getBlockState().getValue(AkaishiFusionControllerBlock.FORMED);
     }
 
-    /** 散热片耐久消耗：运行或宕机期间每 100 tick 全体散热片 -1 耐久 */
+    /** 散热片耐久消耗：运行或宕机期间每 100 tick 各散热片 -1 耐久（仅结算已解锁的散热片槽） */
     private void consumeCoolerDurability() {
         if (++durabilityTick < ModConfig.fusionCoolerDurabilityInterval || structure == null) {
             return;
         }
         durabilityTick = 0;
-        for (BlockPos p : structure.coolerFrames) {
-            if (level.getBlockEntity(p) instanceof AkaishiFusionCoolerFrameBlockEntity c) {
-                c.consumeDurability();
+        int count = Math.min(structure.coolerFrames.size(), MAX_COOLER_SLOTS);
+        for (int i = 0; i < count; i++) {
+            ItemStack sink = coolerSlots.getItem(i);
+            if (sink.isEmpty() || !sink.isDamageableItem()) {
+                continue;
             }
+            sink.setDamageValue(sink.getDamageValue() + 1);
+            if (sink.getDamageValue() >= sink.getMaxDamage()) {
+                coolerSlots.setItem(i, ItemStack.EMPTY); // 耐久耗尽破碎消失
+            }
+            setChanged();
         }
     }
 
@@ -334,12 +374,12 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     // ===== 数据同步 =====
 
     private void updateData() {
-        data.set(DATA_TEMP, temp);
+        data.set(DATA_TEMP, (int) temp);
         data.set(DATA_FORMED, formedState() ? 1 : 0);
         data.set(DATA_FUEL_FRAMES, structure == null ? 0 : structure.fuelFrames);
         data.set(DATA_EFFICIENCY_FRAMES, structure == null ? 0 : structure.efficiencyFrames);
         data.set(DATA_COOLER_COUNT, structure == null ? 0 : structure.coolerFrames.size());
-        data.set(DATA_COOLING_PERCENT, structure == null ? 0 : structure.coolingPercent);
+        data.set(DATA_COOLING_PERCENT, activeCoolingPercent());
         data.set(DATA_ACTIVE_SLOTS, activeSlots);
         data.set(DATA_YIELD_LOW, (int) yieldPerTick);
         data.set(DATA_YIELD_HIGH, (int) (yieldPerTick >>> 32));
@@ -347,21 +387,38 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         data.set(DATA_COOLER_DURABILITY, lowestCoolerDurability());
         data.set(DATA_SPEED_X100, speedPercent);
         data.set(DATA_ASH_AMOUNT, (int) Math.min(Integer.MAX_VALUE, ashAmount));
+        // 过热停产剩余秒（向上取整，供 GUI 倒计时显示）
+        data.set(DATA_OVERHEAT_COOLDOWN, (overheatCooldown + 19) / 20);
     }
 
-    /** 结构内散热片最低耐久百分比（0-100）；无散热片返回 100 */
-    private int lowestCoolerDurability() {
-        if (structure == null || structure.coolerFrames.isEmpty()) {
-            return 100;
-        }
-        int min = 100;
-        for (BlockPos p : structure.coolerFrames) {
-            int d = AkaishiFusionCoolerFrameBlockEntity.getDurabilityPercentAt(level, p);
-            if (d >= 0) {
-                min = Math.min(min, d);
+    /** 控制器散热片总冷却（%）：仅统计结构框架数解锁的前 count 个散热片槽 */
+    private int activeCoolingPercent() {
+        int count = structure == null ? 0 : Math.min(structure.coolerFrames.size(), MAX_COOLER_SLOTS);
+        int sum = 0;
+        for (int i = 0; i < count; i++) {
+            ItemStack sink = coolerSlots.getItem(i);
+            if (sink.getItem() instanceof AkaishiFusionHeatSinkItem h) {
+                sum += h.getQuality().coolingPercent;
             }
         }
-        return min;
+        return sum;
+    }
+
+    /** 散热片槽最低剩余耐久百分比（0-100）；无散热片返回 100 */
+    private int lowestCoolerDurability() {
+        int count = structure == null ? 0 : Math.min(structure.coolerFrames.size(), MAX_COOLER_SLOTS);
+        int min = 100;
+        boolean any = false;
+        for (int i = 0; i < count; i++) {
+            ItemStack sink = coolerSlots.getItem(i);
+            if (sink.isEmpty() || sink.getMaxDamage() <= 0) {
+                continue;
+            }
+            any = true;
+            int rem = (int) ((long) (sink.getMaxDamage() - sink.getDamageValue()) * 100 / sink.getMaxDamage());
+            min = Math.min(min, rem);
+        }
+        return any ? min : 100;
     }
 
     public ContainerData data() {
@@ -370,6 +427,10 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
 
     public SimpleContainer fuelSlots() {
         return fuelSlots;
+    }
+
+    public SimpleContainer coolerSlots() {
+        return coolerSlots;
     }
 
     public int getFuelSlotCount() {
@@ -405,14 +466,16 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
 
     @Override
     public String[] excludedKeys() {
-        return new String[]{"Items", "ControllerPos"};
+        return new String[]{"Items", "CoolerItems", "ControllerPos"};
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("Temp", temp);
+        tag.putDouble("Temp", temp);
         tag.putBoolean("Overheated", overheated);
+        // 持久化过热停产倒计时，防止存档重载后强制冷却被绕过
+        tag.putInt("OverheatCooldown", overheatCooldown);
         tag.putLong("Ash", ashAmount);
         tag.putDouble("AshAccum", ashAccumulator);
         NonNullList<ItemStack> items = NonNullList.withSize(MAX_FUEL_SLOTS, ItemStack.EMPTY);
@@ -420,19 +483,33 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
             items.set(i, fuelSlots.getItem(i));
         }
         ContainerHelper.saveAllItems(tag, items);
+        // 散热片槽用独立嵌套键保存，避免与燃料槽 "Items" 冲突
+        NonNullList<ItemStack> coolers = NonNullList.withSize(MAX_COOLER_SLOTS, ItemStack.EMPTY);
+        for (int i = 0; i < MAX_COOLER_SLOTS; i++) {
+            coolers.set(i, coolerSlots.getItem(i));
+        }
+        CompoundTag coolerTag = new CompoundTag();
+        ContainerHelper.saveAllItems(coolerTag, coolers);
+        tag.put("CoolerItems", coolerTag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        temp = tag.getInt("Temp");
+        temp = tag.getDouble("Temp");
         overheated = tag.getBoolean("Overheated");
+        overheatCooldown = tag.getInt("OverheatCooldown");
         ashAmount = tag.getLong("Ash");
         ashAccumulator = tag.getDouble("AshAccum");
         NonNullList<ItemStack> items = NonNullList.withSize(MAX_FUEL_SLOTS, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, items);
         for (int i = 0; i < MAX_FUEL_SLOTS; i++) {
             fuelSlots.setItem(i, items.get(i));
+        }
+        NonNullList<ItemStack> coolers = NonNullList.withSize(MAX_COOLER_SLOTS, ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(tag.getCompound("CoolerItems"), coolers);
+        for (int i = 0; i < MAX_COOLER_SLOTS; i++) {
+            coolerSlots.setItem(i, coolers.get(i));
         }
     }
 }

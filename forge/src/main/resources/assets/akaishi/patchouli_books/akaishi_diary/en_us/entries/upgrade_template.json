@@ -2,12 +2,26 @@
   "name": "Upgrade Template",
   "icon": "akaishi:akaishi_upgrade_template",
   "category": "akaishi:advanced",
-  "sortnum": 6,
+  "sortnum": 7,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_upgrade_template",
-      "text": "The Upgrade Template, the \"ticket\" to gear enhancement.$(br)Every level of special ability at the Upgrade Station eats 1 upgrade slot + 1 template + 20M energy.$(br2)Base stats (attack speed / damage / efficiency / health / armor / toughness) are allocated by the Equipment Forger when forging. Want to get stronger? Stock up on tickets first."
+      "text": "The Upgrade Template is the \"ticket\" for the Upgrade Station: at the \"$(l:akaishi:upgrade_station)Upgrade Station$(/l)\", every level of a special ability eats 1 template — plus $(4)20M$(0) energy and 1 upgrade slot on the gear.$(br2)Stock up before you tackle top-tier gear: templates are power."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Don't confuse it with this family of upgrades$(0) (each has its own job):$(li)$(4)Red Machine Component / Akaishi Advanced Mechanism$(0): shared machine crafting materials, upstream of dozens of recipes$(li)$(4)Energy Generation Upgrade$(0): fits the generator/matrix slots (max 10). Each level multiplies output by x1.75 but cuts yield by 1%, total = 1.75^n x (1 - 0.01n)$(li)$(4)Machine Speed / Machine Energy Upgrade$(0): go into the two upgrade slots of generic machines; +12.5% speed and +50% energy capacity per level, $(4)capped at 8$(0)$(br2)Templates buff gear; those buff machines. Don't buy the wrong ticket."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:upgrade_station",
+        "akaishi:equipment",
+        "akaishi:pulverizer",
+        "akaishi:transformer"
+      ],
+      "text": "How to spend templates: \"$(l:akaishi:equipment)Equipment$(/l)\". Where machine upgrades slot in: start with \"$(l:akaishi:pulverizer)Pulverizer$(/l)\" and \"$(l:akaishi:transformer)Transformer$(/l)\"."
     }
   ]
 }

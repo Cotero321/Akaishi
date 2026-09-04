@@ -7,12 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_essence_solid",
-      "text": "生命能量由赤能源经生命转换矩阵聚合而来（每次 10M 赤能源 → 10 生命能量，每 tick 45 次转换）。$(br)生命能量固态物是生命研究的基石材料——玩命，先得「炼命」。"
+      "text": "生命能量是独立于赤能源的高级能量：有自己的管道与储罐，$(4)不能和赤能源混用$(0)，只能由「$(l:akaishi:life_conversion)生命转换矩阵$(/l)」把赤能源聚合而来。$(br2)玩家自身的生命能量基准上限为 $(4)1000$(0)，且$(bold)不会自然再生$(0)——别拿它当随身油表，省着点花。$(br2)$(bold)核心用法：$(0)把它固化成物品「$(4)生命能量固态物$(0)」，当整条生命线的货币使——详见「$(l:akaishi:life_purifier)生命能量提纯器$(/l)」。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_energy_cell",
-      "text": "生命能量储存器与生命能量管道，负责生命能量的存与传。$(br)样本采集、器官构造……一切生命研究设备都得靠它续命。能量到位，方能「偷天换日」。"
+      "text": "$(bold)储存$(0)：「生命能量储存器」单台容量 $(4)100 万$(0)，双向缓冲、可充可放，是电网之外的「第二条命线」。$(br2)$(bold)传输$(0)：「生命能量管道」专传生命能量，与赤能源管道不互通，接错就不干活。$(br2)矩阵炼出的能量经输出口进管道、灌进储存器囤着——$(bold)先囤后用的产线$(0)，比边产边供稳得多。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_conversion",
+        "akaishi:life_path",
+        "akaishi:life_purifier"
+      ],
+      "text": "没看路线图先补「$(l:akaishi:life_path)生命研究路线图$(/l)」；能量怎么炼、怎么花，分别看转换矩阵与提纯器。"
     }
   ]
 }

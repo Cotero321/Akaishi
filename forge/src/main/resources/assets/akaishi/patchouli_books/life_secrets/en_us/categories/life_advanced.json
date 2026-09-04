@@ -1,6 +1,6 @@
 {
   "name": "Life Advanced",
-  "description": "Body scanning, decay purification and waste fuel neutralization.",
+  "description": "Advanced modification & cleanup: scan your implants, purify decay zones left by explosions, and turn reactor waste into resources.$(br)Finish the Organ Research line first.",
   "icon": "akaishi:akaishi_body_scanner",
   "sortnum": 4
 }

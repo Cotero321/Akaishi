@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEnergyLiquefierBlockEntity;
+import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,13 +36,23 @@ public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；置于输入槽行右侧，避开顶部条形区）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 58));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 58));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 58));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 58));
 
-        // 材料输入槽：只进不出（位于三条状态条下方，避开条形区域）
-        addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 58));
-        // 生命能量固态物输入槽（末地/幽匿/巨龙燃料液化消耗）
-        addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.SOLID_SLOT, 62, 58));
+        // 材料输入槽：只接受液化配方输入物（下界之星/凋零玫瑰/各混合物），防误塞无关物品
+        addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 58) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return AkaishiEnergyLiquefierBlockEntity.recipeFor(stack) != null;
+            }
+        });
+        // 生命能量固态物输入槽：仅接纳生命能量固态物，防止误放燃料罐等被配方吞掉
+        addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.SOLID_SLOT, 62, 58) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.is(ModItems.akaishiLifeEssenceSolid.get());
+            }
+        });
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {

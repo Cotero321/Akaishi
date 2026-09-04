@@ -10,8 +10,7 @@ import com.example.akaishi.block.AkaishiFusionInsulationBlock;
 import com.example.akaishi.block.AkaishiFusionItemInputPortBlock;
 import com.example.akaishi.block.AkaishiFusionItemOutputPortBlock;
 import com.example.akaishi.block.AkaishiFusionShellBlock;
-import com.example.akaishi.block.entity.AkaishiFusionCoolerFrameBlockEntity;
-import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
+import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -46,10 +45,8 @@ public final class FusionStructure {
         public final BlockPos min, max;
         public final int fuelFrames;
         public final int efficiencyFrames;
-        /** 全部散热框架位置（≤ {@link #MAX_COOLER_FRAMES}） */
+        /** 全部散热框架位置（≤ {@link #MAX_COOLER_FRAMES}）；框架仅决定可用散热片槽位数量，散热片存放于控制器 */
         public final List<BlockPos> coolerFrames;
-        /** Σ 散热片效率（%），未叠框架乘数 */
-        public final int coolingPercent;
         /** 墙面能量输出口 */
         public final List<BlockPos> energyPorts;
         /** 墙面物品输入口 */
@@ -58,48 +55,88 @@ public final class FusionStructure {
         public final List<BlockPos> itemOutputPorts;
 
         Result(BlockPos min, BlockPos max, int fuelFrames, int efficiencyFrames,
-               List<BlockPos> coolerFrames, int coolingPercent,
+               List<BlockPos> coolerFrames,
                List<BlockPos> energyPorts, List<BlockPos> itemInputPorts, List<BlockPos> itemOutputPorts) {
             this.min = min;
             this.max = max;
             this.fuelFrames = fuelFrames;
             this.efficiencyFrames = efficiencyFrames;
             this.coolerFrames = coolerFrames;
-            this.coolingPercent = coolingPercent;
             this.energyPorts = energyPorts;
             this.itemInputPorts = itemInputPorts;
             this.itemOutputPorts = itemOutputPorts;
         }
     }
 
-    /** 扫描以 controller 为墙面基准的结构，返回 {@link Result}；未成型返回 null */
+    /**
+     * 扫描以 controller 为墙面件的 7×7×7 结构，返回 {@link Result}；未成型返回 null。
+     * <p>
+     * 与反应堆同源算法：沿 3 轴双向数「连续墙面块」定位盒体（固定边长 {@link #EDGE}）。
+     * 控制器可以位于任意外墙面的任意一格（含棱、角），不再要求墙面中心：
+     * 面内两轴可直接数满定界，控制器法线轴（墙的里外方向）无法直接数出，枚举 2 种盒体朝向校验。
+     */
     public static Result scan(Level level, BlockPos controller) {
+        int[] neg = new int[3];
+        int[] pos = new int[3];
+        int unsolved = -1;
         for (int axis = 0; axis < 3; axis++) {
-            for (int dir : new int[]{-1, 1}) {
-                Result r = verify(level, boxFor(controller, axis, dir));
-                if (r != null) {
-                    return r;
+            neg[axis] = wallExtent(level, controller, axis, -1);
+            pos[axis] = wallExtent(level, controller, axis, 1);
+            if (neg[axis] + pos[axis] + 1 != EDGE) {
+                if (unsolved != -1) {
+                    return null; // 多于一轴无法闭合 → 结构必失效
                 }
+                unsolved = axis;
+            }
+        }
+        int candidates = unsolved == -1 ? 1 : 2;
+        for (int c = 0; c < candidates; c++) {
+            int dir = c == 0 ? -1 : 1;
+            int minX = controller.getX() - neg[0], maxX = controller.getX() + pos[0];
+            int minY = controller.getY() - neg[1], maxY = controller.getY() + pos[1];
+            int minZ = controller.getZ() - neg[2], maxZ = controller.getZ() + pos[2];
+            if (unsolved == 0) {
+                minX = dir < 0 ? controller.getX() - (EDGE - 1) : controller.getX();
+                maxX = dir < 0 ? controller.getX() : controller.getX() + (EDGE - 1);
+            } else if (unsolved == 1) {
+                minY = dir < 0 ? controller.getY() - (EDGE - 1) : controller.getY();
+                maxY = dir < 0 ? controller.getY() : controller.getY() + (EDGE - 1);
+            } else if (unsolved == 2) {
+                minZ = dir < 0 ? controller.getZ() - (EDGE - 1) : controller.getZ();
+                maxZ = dir < 0 ? controller.getZ() : controller.getZ() + (EDGE - 1);
+            }
+            Result r = verify(level, new BlockPos[]{new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ)});
+            if (r != null) {
+                return r;
             }
         }
         return null;
     }
 
-    /** 构造 6 种候选箱体：控制器位于 axis 轴 dir 方向墙面上（其余两轴以控制器为中心 ±3） */
-    private static BlockPos[] boxFor(BlockPos c, int axis, int dir) {
-        int minX = axis == 0 ? (dir < 0 ? c.getX() : c.getX() - (EDGE - 1)) : c.getX() - 3;
-        int maxX = axis == 0 ? (dir < 0 ? c.getX() + (EDGE - 1) : c.getX()) : c.getX() + 3;
-        int minY = axis == 1 ? (dir < 0 ? c.getY() : c.getY() - (EDGE - 1)) : c.getY() - 3;
-        int maxY = axis == 1 ? (dir < 0 ? c.getY() + (EDGE - 1) : c.getY()) : c.getY() + 3;
-        int minZ = axis == 2 ? (dir < 0 ? c.getZ() : c.getZ() - (EDGE - 1)) : c.getZ() - 3;
-        int maxZ = axis == 2 ? (dir < 0 ? c.getZ() + (EDGE - 1) : c.getZ()) : c.getZ() + 3;
-        return new BlockPos[]{new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ)};
+    /** 沿指定轴（0=x,1=y,2=z）与方向（-1/+1）数连续墙面块（控制器所在墙面上的延伸），最多数到盒边长 */
+    private static int wallExtent(Level level, BlockPos c, int axis, int dir) {
+        BlockPos.MutableBlockPos p = c.mutable();
+        int n = 0;
+        while (n < EDGE) {
+            if (axis == 0) {
+                p.move(dir, 0, 0);
+            } else if (axis == 1) {
+                p.move(0, dir, 0);
+            } else {
+                p.move(0, 0, dir);
+            }
+            if (!isWallBlock(level.getBlockState(p).getBlock())) {
+                break;
+            }
+            n++;
+        }
+        return n;
     }
 
     /** 校验一组箱体边界：四层洋葱结构 + 各层合法性 + 数量上限 */
     private static Result verify(Level level, BlockPos[] box) {
         BlockPos min = box[0], max = box[1];
-        int fuel = 0, efficiency = 0, cores = 0, cooling = 0;
+        int fuel = 0, efficiency = 0, cores = 0;
         List<BlockPos> coolers = new ArrayList<>();
         List<BlockPos> energy = new ArrayList<>();
         List<BlockPos> itemIn = new ArrayList<>();
@@ -142,8 +179,7 @@ public final class FusionStructure {
                         if (b instanceof AkaishiFusionFuelFrameBlock) {
                             fuel++;
                         } else if (b instanceof AkaishiFusionCoolerFrameBlock) {
-                            coolers.add(p);
-                            cooling += AkaishiFusionCoolerFrameBlockEntity.getQualityAt(level, p);
+                            coolers.add(p); // 散热框架只作槽位计数，散热片统一存放在控制器
                         } else if (b instanceof AkaishiFusionEfficiencyFrameBlock) {
                             efficiency++;
                         } else {
@@ -163,15 +199,16 @@ public final class FusionStructure {
                 || efficiency > MAX_EFFICIENCY_FRAMES) {
             return null;
         }
-        return new Result(min, max, fuel, efficiency, coolers, cooling, energy, itemIn, itemOut);
+        return new Result(min, max, fuel, efficiency, coolers, energy, itemIn, itemOut);
     }
 
-    /** 是否为合法墙面块（外壳层） */
+    /** 是否为合法墙面块（外壳层）：外壳 / 控制器 / 端口 / 结构玻璃 */
     public static boolean isWallBlock(Block b) {
         return b instanceof AkaishiFusionShellBlock
                 || b instanceof AkaishiFusionControllerBlock
                 || b instanceof AkaishiFusionEnergyOutputBlock
                 || b instanceof AkaishiFusionItemInputPortBlock
-                || b instanceof AkaishiFusionItemOutputPortBlock;
+                || b instanceof AkaishiFusionItemOutputPortBlock
+                || b == ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get();
     }
 }

@@ -94,6 +94,14 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
     }
 
     @Override
+    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(gui);
+        super.render(gui, mouseX, mouseY, partialTick);
+        // 显式触发 tooltip（与主流机器 render 模板一致），保证悬停提示能显示
+        this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    @Override
     protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
         super.renderTooltip(gui, mouseX, mouseY);
         if (isHovering(20, ENERGY_Y, 136, BAR_H, mouseX, mouseY)) {

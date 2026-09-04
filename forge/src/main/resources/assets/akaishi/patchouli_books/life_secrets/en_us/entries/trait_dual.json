@@ -6,11 +6,19 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Double-edged warning: aberrant traits bring powerful positives but always carry a negative price.$(br2)Once an aberration appears during cultivation it cannot be refused — you can only grit your teeth and bear it, or later hand the organ to the Trait Reforger to wash it away. Note that when reforging, the new trait is still drawn from the same tier pool, so it might roll another aberration. If you gamble, gamble to win."
+      "text": "$(bold)Aberrant traits are \"double-edged swords\": strong positives with a mandatory price.$(0)$(br2)$(bold)【Tier 2 · Aberrations】$(0)$(li)Berserker Gene (berserk_gene): +2 attack, −1.5 armor$(li)Glass Bones (glass_bone): +0.8 attack speed, −2 max health$(br2)$(bold)【Tier 3 · Aberrations】$(0)$(li)Predator Instinct (predator_instinct): +3 attack, +0.02 move speed, −4 max health$(li)Pyroblast Flesh (pyroblast_flesh): +3 attack, $(c)fears fire$(0) — fire damage against you is greatly amplified$(br2)The higher the tier, the more extreme it gets: $(4)the bigger the payoff, the deadlier the price$(0)."
     },
     {
       "type": "patchouli:text",
-      "text": "【Tier 2 · Aberrations】$(br2)Berserker Gene —— Attack +2, Armor -1.5$(br)Glass Bones —— Attack Speed +0.8, Max Health -2$(br2)【Tier 3 · Aberrations】$(br2)Apex Predator —— Attack +3, Move Speed +0.02, Max Health -4$(br)Combustible Flesh —— Attack +3, Fire Damage Taken +50%"
+      "text": "$(bold)Once attached, a trait cannot be removed$(0) — aberrations are no exception.$(br2)$(bold)Your two ways out:$(0)$(li)Hand the organ to the \"$(l:akaishi:trait_reforger)Trait Reforger$(/l)\" to swap that trait in place: it re-rolls within the same tier pool, so the aberration may vanish — or return$(li)Cut your losses and grow a fresh organ on the organ line$(br2)$(bold)Reminder:$(0) aberrations are not a bug — they are a high-risk, high-reward play. Building around them usually beats endlessly re-rolling. If you gamble, be ready to win or lose."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:trait_safe",
+        "akaishi:trait_reforger"
+      ],
+      "text": "Suggested order: aberrations roll from the same pool as safe traits — compare catalogs in \"Safe Mutations\"; use the \"Trait Reforger\" to swap an aberration away (or into) an organ."
     }
   ]
 }

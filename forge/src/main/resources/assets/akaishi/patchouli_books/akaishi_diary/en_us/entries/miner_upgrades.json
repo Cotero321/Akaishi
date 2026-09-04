@@ -7,17 +7,25 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_speed_upgrade_block",
-      "text": "Speed Upgrade Module: mining efficiency takes off — and so does the power bill.$(br)Each block adds +12.5% rate and +10% energy cost, $(2,4)up to 10 blocks$(0). Right-click to install onto the structure's upgrade-frame slots; it runs like a cheat code."
+      "text": "$(bold)Speed Upgrade Module:$(0) makes the miner faster — and hungrier.$(br2)$(li)Each block: mining progress $(4)+12.5%$(0), energy cost $(e)+10%$(0) per tick$(li)Cap: $(4)10 blocks$(0)$(br2)Maxed out, that's rate ×2.25 at double the power draw (the base 10 energy/tick climbs to 20). Make sure the grid can feed it before you floor it."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_fortune_upgrade_block",
-      "text": "Fortune Upgrade Module: makes your mineral yield fatter.$(br)Each block adds +1 to a single drop, $(2,4)up to 4 blocks$(0). Once installed, every swing is \"the joy of harvest\"."
+      "text": "$(bold)Fortune Upgrade Module:$(0) cures the \"one ore per haul\" stinginess.$(br2)$(li)Each block: $(4)+1$(0) item per haul$(li)Cap: $(4)4 blocks$(0)$(br2)Maxed out, every cycle yields a fixed $(4)5 items$(0) (the type is still rolled from the weight table). It adds no power cost — a great deal when stockpiling bulk ores like coal, iron and copper."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_storage_upgrade_block",
-      "text": "Storage Upgrade Module: expands the miner's \"belly\".$(br)Each block adds +50% energy capacity, $(2,4)up to 10 blocks$(0).$(br2)Modules can be swapped or removed right on the upgrade-frame slots; the controller re-sums every 20 ticks. Add them anytime — the miner never sleeps."
+      "text": "$(bold)Storage Upgrade Module:$(0) stretches the controller's fuel tank.$(br2)$(li)Each block: energy capacity $(4)+50%$(0) (multiplied onto the tier's base capacity)$(li)Cap: $(4)10 blocks$(0)$(br2)Maxed out, that's capacity ×6: Basic 1M → 6M, Ultimate 50M → 300M.$(br2)$(bold)Fitting them:$(0) modules are plain blocks — $(4)just place one into any U slot$(0) (upgrade-frame position), replacing an empty frame. The controller re-counts every 20 ticks, so adds and removals apply instantly. Modules don't care about tier — the same set and the same caps work on all four, and anything beyond the cap simply doesn't stack."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:miner_structure",
+        "akaishi:miner_tiers"
+      ],
+      "text": "For the details, look back at the U-slot layout in \"Miner Structure\" and the performance gap in \"Miner Tiers\" — modules are the icing; the cake is your tier and your power grid."
     }
   ]
 }

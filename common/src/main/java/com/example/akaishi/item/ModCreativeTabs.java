@@ -328,6 +328,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_REACTOR_SHELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_SHELL.get()));
                                     }
+                                    if (ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get()));
+                                    }
                                     if (ModBlocks.CHISHI_REACTOR_CONTROLLER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_CONTROLLER.get()));
                                     }
@@ -429,6 +432,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_GEN_MATRIX_CASING != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CASING.get()));
                                     }
+                                    if (ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get()));
+                                    }
                                     if (ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC.get()));
                                     }
@@ -445,6 +451,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_PURIFIER_MATRIX_CASING != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CASING.get()));
                                     }
+                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get()));
+                                    }
                                     if (ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER.get()));
                                     }
@@ -460,6 +469,9 @@ public final class ModCreativeTabs {
                                     // 生命转换矩阵体系（外壳/控制器/能源输入口/能源输出口）
                                     if (ModBlocks.CHISHI_LIFE_MATRIX_CASING != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CASING.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get()));
                                     }
                                     if (ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER.get()));
@@ -621,6 +633,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_WIRELESS_SHELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_SHELL.get()));
                                     }
+                                    if (ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get()));
+                                    }
                                     if (ModBlocks.CHISHI_WIRELESS_TERMINAL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_TERMINAL.get()));
                                     }
@@ -668,6 +683,9 @@ public final class ModCreativeTabs {
                                     // 聚变堆体系：外壳/隔热层/控制器/核心/框架（散热/燃料/效率）/接口（能量/物品输入/物品输出）
                                     if (ModBlocks.CHISHI_FUSION_SHELL != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_SHELL.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get()));
                                     }
                                     if (ModBlocks.CHISHI_FUSION_INSULATION != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_INSULATION.get()));
@@ -788,7 +806,9 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK.get()));
                                     }
-                                    // 手册“赤石研究日记”由帕秋莉按 creative_tab 自动加入，此处不重复添加
+                                    // 手册：赤石研究日记（akaishi_diary）+ 生命的奥秘（akaishi_life_book），作为 Patchouli 自定义书物品
+                                    accept(output, ModItems.akaishiDiary);
+                                    accept(output, ModItems.lifeBook);
                                 })
                                 .build());
     }

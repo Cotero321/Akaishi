@@ -7,7 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_trait_reforger",
-      "text": "How reforging works: pick the Nth mutation trait on an organ and reroll it into a random new trait from that tier's pool (it won't duplicate traits the organ already carries).$(br2)Each run costs: Exhausted Crystals × (2 × tier) + 120,000 life energy.$(br2)Deterministic success: if materials and energy are met it always succeeds, and the organ is never damaged — don't like the roll? Just reforge again."
+      "text": "The Trait Reforger replaces a $(4)chosen trait in place$(0) with a new one drawn from the same tier pool.$(br2)$(bold)Three iron rules:$(0)$(li)Deterministic success — with materials and energy ready it always succeeds, no gambling$(li)Never damages the organ$(li)Excludes traits the organ already carries, so it never rolls a duplicate$(br2)Requirements: the organ must be $(bold)non-native and set$(0), carrying at least 1 trait.$(br2)Rolled a bad trait? This is your only \"in-place respec\"."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Cost per reroll:$(0)$(li)Exhausted Crystals: tier × 2 — tier 1/2/3 traits need 2 / 4 / 6 respectively$(li)120,000 life energy$(li)600 ticks (30 seconds)$(br2)$(bold)Note:$(0) the new trait is drawn from the $(bold)same tier pool$(0) — rolling a tier-3 trait out of a tier-2 pool is impossible.$(br2)Carrying several traits? Pick the one that bothers you most: one reroll swaps one trait."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_crystal",
+      "text": "Exhausted Crystals are the $(4)hard currency$(0) of trait reforging.$(br2)$(bold)Where they come from:$(0) they are the common byproduct of the Activated Fractionator and the Life Centrifuge — the whole purification chain is under \"$(l:akaishi:life_waste)Waste Neutralization$(/l)\".$(br2)Each reroll eats 2-6 of them, so hoard them early: the sooner your waste pipe network is up, the sooner you stop worrying."
     },
     {
       "type": "patchouli:crafting",
@@ -15,9 +24,13 @@
       "text": "Crafting: eight Akaishi Ingots around one Exhausted Crystal."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_exhausted_crystal",
-      "text": "How to use: insert an organ with mutation traits → click the index above to choose which trait to reforge → it auto-starts once crystals and energy are ready (about 30s).$(br2)You can switch targets mid-reforge (progress resets); grab the new organ from the output when done. Natural native organs cannot be reforged. Rerolling traits — simple and brutal."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:trait_safe",
+        "akaishi:life_waste",
+        "akaishi:life_purifier"
+      ],
+      "text": "Suggested order: skim the \"Safe\" and \"Aberrant\" trait catalogs before reforging; the Exhausted Crystal line is under \"Waste Neutralization\"; essence and life energy come from the \"Life Purifier\" chain."
     }
   ]
 }

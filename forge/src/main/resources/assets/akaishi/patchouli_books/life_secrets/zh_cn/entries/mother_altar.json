@@ -7,7 +7,45 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_mother_altar",
-      "text": "黑山羊之母祭坛：克苏鲁风味拉满的供奉台。$(br)它没有 GUI，全靠 NBT 识别你塞进去的供品，再把供品悬浮在祭坛上空供「那位」享用。$(br)献上合适的祭品，可能换来意想不到的恩赐；献错了……祝你好运。"
+      "text": "$(bold)用途：$(0)生命线终局仪式——搭好圣坛、按规则供奉生命造物，换取唯一产出的$(4)生命融合锭$(0)。锭的去向见「$(l:akaishi:life_fusion_anvil)生命融合砧$(/l)」。$(br2)$(bold)交互（无 GUI）：$(0)$(li)手持生命造物右键：放入 1 件，供品悬浮于祭坛上方$(li)空手右键：取回供品$(br2)$(bold)认账的供品：$(0)生命器官（含原生）、生命样本、基因序列、生命胚胎、生命灰烬、生命精华——凡生命造物皆收。"
+    },
+    {
+      "type": "patchouli:multiblock",
+      "name": "黑山羊之母祭坛（17×17×2）",
+      "multiblock": {
+        "pattern": [
+          ["                 ", "        S        ", "                 ", "        T        ", "                 ", "     T  T  T     ", "      T   T      ", "       S S       ", " S T T  0  T T S ", "       S S       ", "      T   T      ", "     T  T  T     ", "                 ", "        T        ", "                 ", "        S        ", "                 "],
+          ["        C        ", "       CCC       ", "      CACAC      ", "     CAACAAC     ", "    CAAACAAAC    ", "   CAAAACAAAAC   ", "  CAAAAACAAAAAC  ", " CAAAAACCCAAAAAC ", "CCCCCCCCCCCCCCCCC", " CAAAAACCCAAAAAC ", "  CAAAAACAAAAAC  ", "   CAAAACAAAAC   ", "    CAAACAAAC    ", "     CAACAAC     ", "      CACAC      ", "       CCC       ", "        C        "]
+        ],
+        "mapping": {
+          "C": "minecraft:crying_obsidian",
+          "A": "akaishi:akaishi_altar_stone",
+          "S": "minecraft:soul_campfire",
+          "T": "akaishi:akaishi_mother_altar",
+          "0": "akaishi:akaishi_mother_altar"
+        },
+        "symmetrical": true
+      },
+      "text": "$(bold)上层（游戏地面 y=0）：$(0)0/T=黑山羊之母祭坛（红色 0 为中央锚），S=灵魂营火。$(bold)下层（y-1 垫层）：$(0)C=哭泣黑曜石（菱形外环+十字中线），A=母神祭坛石（四象限），其余留空。$(br2)整座圣坛围绕中心 90° 旋转对称，$(4)任意朝向摆均可$(0)；先整平 17×17 空地铺下层，再摆上层，放错一格仪式都不结算。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "祭坛坐标与供品",
+      "text": "$(bold)y=0 层坐标（中心为原点，每 20 tick 校验一次）：$(0)$(li)中心 (0,0)：心脏器官，$(4)适配度 ≥50$(0)$(li)内圈 8 座 (±3,0)(0,±3)(±2,±2)：除心脏外 8 个槽位各 1 枚，$(4)槽位不得重复$(0)、不含心脏、适配度均 ≥50$(li)对角 (±3,±3) 4 座：各放 1 个生命灰烬$(li)十字 (±5,0)(0,±5) 4 座：各放 1 个生命胚胎$(br2)祭坛只有摆在规定坐标才被计入；器官适配不足或槽位重复时，其余供品照常留在坛上。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "合成与成本",
+      "text": "$(bold)母神祭坛石：$(0)COC/OEO/COC（C=哭泣黑曜石，O=黑曜石，E=生命能量固态物）→ 8 块。$(bold)黑山羊之母祭坛：$(0)8 祭坛石围 1 固态物 → 1 座。$(br2)$(bold)整座圣坛成本：$(0)哭泣黑曜石 173（垫层 65 + 合成 108）、黑曜石 108、固态物 44（祭坛石 27 + 祭坛 17）、灵魂营火 8。$(br2)$(bold)结算：$(0)17 座供品齐备时当场清空，中心上方弹出 1 枚生命融合锭；32 格内玩家看到完成提示（附带 3 秒反胃 + 1 秒黑暗）。每场仪式烧掉 1 颗达标心脏、8 枚达标器官、胚胎与灰烬各 4——$(4)供品不会返还$(0)。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_organs",
+        "akaishi:life_purifier",
+        "akaishi:life_fusion_anvil"
+      ],
+      "text": "前置：按「器官研究」把器官适配度养到 50；固态物不足先去生命提纯器囤币。锭出炉后直奔生命融合砧。"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "name": "能量液化装置",
+  "icon": "akaishi:akaishi_energy_liquefier",
+  "category": "akaishi:tech",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_liquefier",
+      "text": "液化配方的起点：把固态原料压成液体能量（耗电按每个原料计）：$(li)$(4)下界之星 → 1000mb 下界至纯能量：5000万$(0)$(li)凋零玫瑰 → 400mb 下界复合能量：500万$(li)末地混合物 + 固态物 → 500mb 末地混合燃料：1000万$(li)巨龙混合物 + 固态物 → 500mb 末地巨龙燃料：5000万$(li)「世界基础燃料」原料（金萝卜+幽匿块+金苹果+赤石精华块合成）+ 固态物 → 100mb 世界基础燃料：1000万"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)备料提醒：$(0)后三类配方除了主料还要配 1 个固态物当介质，先备好料再开工。$(br2)下界之星与凋零玫瑰属原生矿物类、可直接量产；末地/巨龙/世界基础三类原料走的是《生命的奥秘》那边的混合物路线。$(br2)产出的液体能量与燃料先落储罐，再接「$(l:akaishi:fuel_processor)能量加工器$(/l)」或直接进「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_processor",
+        "akaishi:fuel_mixer"
+      ],
+      "text": "这台是液体燃料链的第一站，产线总览见「$(l:akaishi:liquid_fuel)液体燃料链$(/l)」；下游加工与混合的入口已在上方列出。"
+    }
+  ]
+}

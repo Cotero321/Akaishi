@@ -1,0 +1,25 @@
+{
+  "name": "燃料装罐机",
+  "icon": "akaishi:akaishi_fuel_canner",
+  "category": "akaishi:tech",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fuel_canner",
+      "text": "装罐机把液体灌进燃料罐：$(4)每罐 10000mb$(0)，灌装速率 1000mb/tick，$(bold)不耗电$(0)。$(br2)全自动流程：空罐进 → 灌满 → 满罐出。接好液体管道与物品管道就能无人值守。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)灌什么：$(0)「$(l:akaishi:fuel_processor)能量加工器$(/l)」出来的下界复合 / 至纯燃料、「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」兑好的高级 / 终极混合燃料都能灌。$(br2)满罐直接搬进「$(l:akaishi:reactor)反应堆$(/l)」开烧；追求顶配的，先把燃料送去混合器兑一兑再回来。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:reactor"
+      ],
+      "text": "产线总览见「$(l:akaishi:liquid_fuel)液体燃料链$(/l)」；烧罐的地方是「$(l:akaishi:reactor)反应堆$(/l)」。"
+    }
+  ]
+}

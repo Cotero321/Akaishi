@@ -1,0 +1,26 @@
+{
+  "name": "Fuel Mixer",
+  "icon": "akaishi:akaishi_fuel_mixer",
+  "category": "akaishi:tech",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fuel_mixer",
+      "text": "The Mixer blends low-tier fuel into high-tier fuel, two recipes (2M per batch; speed upgrades help):$(li)$(bold)Advanced Mixture Fuel$(0): 1000 mb End Mixture Fuel + 1000 mb Nether Compound Fuel → $(4)1500 mb$(0) — a free 50% bonus$(li)$(bold)Ultimate Mixture Fuel$(0): 50 mb End Dragon Fuel + 50 mb Pure Fuel → 50 mb$(br2)Ultimate Mixture sits at the top of the whole line — the fiercest heat value, reserved for builds that demand the best fuel."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Where the ingredients come from:$(0)$(li)End Mixture Fuel ← the $(l:akaishi:fuel_liquefier)Energy Liquefier$(/l)'s End Mixture recipe$(li)Nether Compound / Pure Fuel ← the $(l:akaishi:fuel_processor)Energy Processor$(/l)$(li)End Dragon Fuel ← the Liquefier's Dragon Mixture recipe$(br2)Blended Advanced / Ultimate fuel goes into the $(l:akaishi:fuel_canner)Fuel Canner$(/l), then straight into the $(l:akaishi:reactor)Reactor$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_canner",
+        "akaishi:reactor"
+      ],
+      "text": "Overview in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l); canning and burning are linked above."
+    }
+  ]
+}

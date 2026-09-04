@@ -141,13 +141,14 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
         }
     }
 
-    /** 墙块判定：矩阵外壳 / 三种端口 / 控制器自身（控制器在墙面上） */
+    /** 墙块判定：矩阵外壳 / 三种端口 / 控制器自身 / 结构玻璃（控制器在墙面上） */
     private boolean isWall(Block b) {
         return b instanceof AkaishiPurifierMatrixCasingBlock
                 || b instanceof AkaishiPurifierItemInputPortBlock
                 || b instanceof AkaishiPurifierItemOutputPortBlock
                 || b instanceof AkaishiPurifierEnergyInputPortBlock
-                || b instanceof AkaishiPurifierMatrixControllerBlock;
+                || b instanceof AkaishiPurifierMatrixControllerBlock
+                || b == ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get();
     }
 
     /** 结构检测节流计数（成型后每 10 tick 校验一次） */

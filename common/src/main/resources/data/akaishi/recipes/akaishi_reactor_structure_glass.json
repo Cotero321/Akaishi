@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GSG",
+    "S S",
+    "GSG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "S": { "item": "akaishi:akaishi_reactor_shell" }
+  },
+  "result": { "item": "akaishi:akaishi_reactor_structure_glass", "count": 4 }
+}

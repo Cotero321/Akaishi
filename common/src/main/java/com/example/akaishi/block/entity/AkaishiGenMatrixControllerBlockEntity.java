@@ -8,6 +8,7 @@ import com.example.akaishi.block.AkaishiGenFuelInputPortBlock;
 import com.example.akaishi.block.AkaishiGenMatrixCasingBlock;
 import com.example.akaishi.block.AkaishiGenMatrixControllerBlock;
 import com.example.akaishi.block.AkaishiGenMatrixTier;
+import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
@@ -150,12 +151,13 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
         }
     }
 
-    /** 墙块判定：矩阵外壳 / 能量输出口 / 燃料输入口 / 控制器自身（控制器在墙面上） */
+    /** 墙块判定：矩阵外壳 / 能量输出口 / 燃料输入口 / 控制器自身 / 结构玻璃（控制器在墙面上） */
     private boolean isWall(Block b) {
         return b instanceof AkaishiGenMatrixCasingBlock
                 || b instanceof AkaishiGenEnergyOutputPortBlock
                 || b instanceof AkaishiGenFuelInputPortBlock
-                || b instanceof AkaishiGenMatrixControllerBlock;
+                || b instanceof AkaishiGenMatrixControllerBlock
+                || b == ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get();
     }
 
     /** 结构检测节流计数（成型后每 10 tick 校验一次） */

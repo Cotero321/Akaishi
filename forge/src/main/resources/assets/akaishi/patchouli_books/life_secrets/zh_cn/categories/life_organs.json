@@ -1,6 +1,6 @@
 {
   "name": "器官研究",
-  "description": "采集样本、解析基因、构造器官——改造躯体之路。",
+  "description": "本书核心主线：样本 → 基因 → 器官 → 移植。$(br)先看懂排斥机制，再考虑给身体开刀。",
   "icon": "akaishi:akaishi_organ_heart",
   "sortnum": 3
 }

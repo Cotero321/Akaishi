@@ -2,12 +2,25 @@
   "name": "赤石能量聚合器",
   "icon": "akaishi:akaishi_energy_aggregator",
   "category": "akaishi:advanced",
-  "sortnum": 5,
+  "sortnum": 4,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_aggregator",
-      "text": "赤石能量聚合器，把海量赤能源「凝」成赤石锭的炼金炉。$(br)塞入下界合金锭、灌 10M 赤能源，出炉即赤石锭——从矿石文明跨进工业文明的里程碑，就在这一炉。"
+      "text": "赤石能量聚合器把海量赤能源「凝」成实物：$(br2)$(bold)两种用途：$(0)$(li)$(4)10M 赤能源 + 1 下界合金锭 → 1 赤石锭$(0)$(li)$(4)10M 赤能源 + 1 块母岩 → 母岩升一档$(0)（瑕疵 → 普通 → 完好 → 完美）$(br2)自带 $(4)2 亿$(0)能量缓冲，能量只进不出——用能量管道把电灌进来，放入原料即可自动开工。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)记住这条：赤石锭的唯一量产途径$(0)就是这台聚合器。它同时卡着赤石装备、机器组件的产能上限，是整个工业链的咽喉。$(br2)母岩升级也走这里：把瑕疵母岩一路升到完美档，催化农场产量直接翻几倍。$(br2)电不够？多挂发生机、加「$(l:akaishi:energy_pipe)能量管道$(/l)」并联成网，再囤进储存单元。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ingot",
+        "akaishi:catalyst",
+        "akaishi:energy_pipe"
+      ],
+      "text": "锭能做什么、母岩农场怎么搭，分别读「$(l:akaishi:ingot)赤石锭$(/l)」和「$(l:akaishi:catalyst)赤石催化器$(/l)」。"
     }
   ]
 }

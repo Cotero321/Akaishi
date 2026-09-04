@@ -14,6 +14,8 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class AkaishiLifeFusionSet {
 
+    /** 全套件数（满 4 件激活全套效果） */
+    public static final int SET_PIECES = 4;
     /** 单件护甲提供的全基因适配加成 */
     public static final int GENE_COMPAT_PER_PIECE = 2;
     /** 全套激活时器官属性强度倍率（+20%） */
@@ -22,6 +24,8 @@ public final class AkaishiLifeFusionSet {
     public static final double REJECTION_SLOW_FACTOR = 0.75;
     /** 每抵消 1 点伤害消耗的赤能源 */
     public static final long ENERGY_PER_DAMAGE = 100;
+    /** 便携赤能源单元修复生命融合护甲的速率倍率（相对普通赤石装备，恢复显著更快） */
+    public static final int LIFE_FUSION_REPAIR_MULTIPLIER = 4;
     /** BOSS / 龙肢体强化：额外最大生命值 */
     public static final double BOSS_DRAGON_HEALTH_BONUS = 10.0;
 
@@ -46,7 +50,7 @@ public final class AkaishiLifeFusionSet {
 
     /** 是否穿齐 4 件（全套激活） */
     public static boolean isFullSet(Player player) {
-        return countWorn(player) >= 4;
+        return countWorn(player) >= SET_PIECES;
     }
 
     /** 全套穿戴带来的全基因适配加成（每件 +2，可叠加） */

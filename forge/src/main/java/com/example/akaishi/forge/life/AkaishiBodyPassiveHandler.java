@@ -45,6 +45,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +91,8 @@ public final class AkaishiBodyPassiveHandler {
     private static final int COMPAT_SEVERE = 60;
     /** 天敌反噬间隔（tick） */
     private static final int CONFLICT_PUNISH_INTERVAL = 100;
+    /** 排斥增长间隔下限（tick = 15s/点）：限制低适配/强基因的加速惩罚，避免顶级器官过快报废 */
+    private static final int GROWTH_INTERVAL_MIN_TICKS = 300;
     /** 天敌反噬每次对玩家自身造成的伤害（爆炸伤害源，吃护甲减伤） */
     private static final float CONFLICT_PUNISH_DAMAGE = 5.0F;
     /** 长臂被动：每臂近战攻击距离加成（格） */
@@ -168,7 +171,6 @@ public final class AkaishiBodyPassiveHandler {
         if (digest.equals(last)) {
             return;
         }
-        ATTRIBUTE_DIGEST.put(player, digest);
         // 移除旧修饰
         for (AppliedAttr prev : APPLIED.getOrDefault(player, List.of())) {
             AttributeInstance inst = player.getAttribute(prev.attribute());
@@ -195,8 +197,10 @@ public final class AkaishiBodyPassiveHandler {
             // 突破激活且来源匹配：正数基础值乘 (1+pct/100)，负数基础值词条期间跳过
             boolean btActive = state.isBreakthroughActive(AkaishiOrganItem.getEntityId(organ.stack()));
             double breakthroughFactor = btActive ? 1.0 + state.getBreakthroughPct() / 100.0 : 1.0;
-            List<OrganTemplate.AttributeBonus> bonuses = OrganEffectResolver.bonusesOf(organ.stack(), organ.slot(), organ.effect());
-            for (OrganTemplate.AttributeBonus b : bonuses) {
+            // 按属性先聚合再挂载：模板词条与突变词条可能给同一槽位提供同一属性，
+            // 逐个 addTransientModifier 会因 uuid（槽位:属性）相同抛 "Modifier is already applied" → 求和后只挂一个
+            Map<Attribute, Double> perAttr = new HashMap<>();
+            for (OrganTemplate.AttributeBonus b : OrganEffectResolver.bonusesOf(organ.stack(), organ.slot(), organ.effect())) {
                 double base = b.base();
                 if (btActive && base < 0) {
                     continue; // 负基础值词条：突破激活期内暂时失效
@@ -207,13 +211,23 @@ public final class AkaishiBodyPassiveHandler {
                     healthPct += value / BASE_HEALTH;
                     continue;
                 }
-                AttributeInstance inst = player.getAttribute(b.attribute());
-                if (inst == null || value == 0.0) {
+                perAttr.merge(b.attribute(), value, Double::sum);
+            }
+            for (Map.Entry<Attribute, Double> e : perAttr.entrySet()) {
+                if (e.getValue() == 0.0) {
                     continue;
                 }
-                inst.addTransientModifier(new AttributeModifier(uuidOf(organ.slot().name(), b.attribute()),
-                        "Akaishi organ", value, ADD));
-                next.add(new AppliedAttr(organ.slot().name(), b.attribute()));
+                AttributeInstance inst = player.getAttribute(e.getKey());
+                if (inst == null) {
+                    continue;
+                }
+                UUID uuid = uuidOf(organ.slot().name(), e.getKey());
+                // 防御：异常残留或外部占用同 UUID 时先清后挂，杜绝 "Modifier is already applied"
+                if (inst.getModifier(uuid) != null) {
+                    inst.removeModifier(uuid);
+                }
+                inst.addTransientModifier(new AttributeModifier(uuid, "Akaishi organ", e.getValue(), ADD));
+                next.add(new AppliedAttr(organ.slot().name(), e.getKey()));
             }
         }
         // 生命融合套装·BOSS/龙肢体：移植 BOSS 或龙族来源器官时额外 +10 最大生命
@@ -225,12 +239,17 @@ public final class AkaishiBodyPassiveHandler {
         if (Math.abs(healthDelta) > 0.001) {
             AttributeInstance health = player.getAttribute(Attributes.MAX_HEALTH);
             if (health != null) {
-                health.addTransientModifier(new AttributeModifier(uuidOf(HEALTH_KEY, Attributes.MAX_HEALTH),
-                        "Akaishi organ health", healthDelta, ADD));
+                UUID healthUuid = uuidOf(HEALTH_KEY, Attributes.MAX_HEALTH);
+                if (health.getModifier(healthUuid) != null) {
+                    health.removeModifier(healthUuid);
+                }
+                health.addTransientModifier(new AttributeModifier(healthUuid, "Akaishi organ health", healthDelta, ADD));
                 next.add(new AppliedAttr(HEALTH_KEY, Attributes.MAX_HEALTH));
             }
         }
         APPLIED.put(player, next);
+        // 全部挂载成功后统一提交摘要：中途异常时摘要不更新 → 下一 tick 自动重试自愈（契合单异常不崩溃规范）
+        ATTRIBUTE_DIGEST.put(player, digest);
     }
 
     /** 键 + 属性 → 稳定 UUID（移植/摘除后精确移除同一修饰符） */
@@ -459,7 +478,8 @@ public final class AkaishiBodyPassiveHandler {
             if (AkaishiLifeFusionSet.isFullSet(player)) {
                 factor *= AkaishiLifeFusionSet.REJECTION_SLOW_FACTOR;
             }
-            int interval = (int) Math.max(1, tier.getGrowthIntervalSeconds() * 20.0 / factor);
+            // 增长间隔 ≥300t：即使极端低适配也不低于 15s/点，保留梯度同时封住爆炸增速
+            int interval = (int) Math.max(GROWTH_INTERVAL_MIN_TICKS, tier.getGrowthIntervalSeconds() * 20.0 / factor);
             if (player.tickCount % interval == 0) {
                 state.addRejection(slot, 1);
             }
@@ -495,7 +515,11 @@ public final class AkaishiBodyPassiveHandler {
         }
         int total = 0;
         for (BodySlot slot : BodySlot.values()) {
-            total += state.getRejection(slot);
+            int rej = state.getRejection(slot);
+            // 完全失效（=100）的器官已无收益，不再计入超载负担
+            if (rej < PlayerBodyState.MAX_REJECTION) {
+                total += rej;
+            }
         }
         if (total >= OVERLOAD_HEAVY) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1, false, false));

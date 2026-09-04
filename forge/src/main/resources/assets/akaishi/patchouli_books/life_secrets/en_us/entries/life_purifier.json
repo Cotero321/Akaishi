@@ -7,7 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_purifier",
-      "text": "A life-energy solidifier that freezes \"flowing life\" into \"solid life\".$(br)Each run costs 10M energy + 1000 life energy to produce 1 Life Energy Solid.$(br2)Its output slot supports hoppers, AE2, and item pipes — full automation, hoard all the solids you like."
+      "text": "$(bold)What it does:$(0) freezes \"flowing\" Life Energy into portable $(4)Life Essence Solids$(0).$(br2)$(bold)Recipe:$(0) $(4)10M Akaishi Energy + 1000 Life Energy$(0) → 1 Solid, about 10 ticks per run (draws up to 1M akaishi/tick).$(br2)$(bold)Interfaces:$(0) akaishi buffer of 20M (expandable with energy upgrades), Life Energy buffer of 5,000 (enough for 5 runs); the output slot accepts hoppers and item pipes for full automation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Solids = Universal Currency",
+      "text": "Solids are the life line's $(4)universal currency$(0) — $(bold)stockpile before you build$(0):$(li)Life Structuring Table: $(4)5$(0) per organ$(li)Surgery Chamber implant: $(4)3$(0) per operation (extraction: 1)$(li)Cultivator purification / tier upgrade: $(4)1-16$(0) by tier$(li)Potion Table: $(4)3$(0) permanent / $(4)5$(0) breakthrough$(li)Embryo recipe: $(4)8$(0) around 1 egg → 1 Life Embryo$(br2)$(bold)Tip:$(0) run your Matrix output into the Purifier first — bank the energy, then start researching."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_energy",
+        "akaishi:life_path",
+        "akaishi:life_samples"
+      ],
+      "text": "Where the feedstock comes from and goes: \"$(l:akaishi:life_energy)Life Energy$(/l)\" and \"$(l:akaishi:life_conversion)Life Conversion$(/l)\"; once you've banked enough, open the sample line."
     }
   ]
 }

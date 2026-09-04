@@ -1,0 +1,22 @@
+{
+  "name": "Cell Serializer",
+  "icon": "akaishi:akaishi_energy_cell_serializer",
+  "category": "akaishi:energy",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_serializer",
+      "text": "One cell not enough? The $(4)Energy Cell Serializer$(0) welds scattered cells into one mega-battery.$(br2)$(bold)Forming it:$(0)place the serializer in the centre and $(4)26 energy cells$(0) (any tier) around it to fill a 3×3×3 shell; connect a pipe to any shell cell to charge or drain the whole block.$(br2)$(bold)Total storage = 10 billion base + 26 × each cell's capacity$(0). With all Super cells that is 26 × 20 billion + 10 billion ≈ $(bold)521 billion$(0) AE.$(br2)(The creative-only \"Infinite Cell\" is a debug item — don't count on it in survival.)"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_cell",
+        "akaishi:generator",
+        "akaishi:energy_pipe"
+      ],
+      "text": "The Serializer stacks \"$(l:akaishi:energy_cell)Energy Cells$(/l)\"; pair it with a \"$(l:akaishi:generator)Generator$(/l)\" or \"$(l:akaishi:gen_matrix)Generator Matrix$(/l)\" and wire it in with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\"."
+    }
+  ]
+}

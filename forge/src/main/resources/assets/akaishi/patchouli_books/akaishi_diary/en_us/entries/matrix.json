@@ -2,17 +2,25 @@
   "name": "Matrix Structures",
   "icon": "akaishi:akaishi_gen_matrix_controller_basic",
   "category": "akaishi:tech",
-  "sortnum": 4,
+  "sortnum": 17,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_gen_matrix_controller_basic",
-      "text": "The Generator Matrix: matrix casings enclose a sealed space (low tier 3×3×3 / high tier 5×5×5), with the controller and ports on the walls.$(li)Low tier: 45× burn speed, 1.5× single-unit output$(li)High tier: 200× burn speed, 3× single-unit output$(br2)Piece generators together into an array and your output climbs in leaps and bounds."
+      "type": "patchouli:text",
+      "text": "Akaishi's \"sealed-cavity matrices\" in one line: $(4)wall off scattered machines into a hollow box and merge them into one big machine$(0).$(br2)$(bold)Universal rules:$(0)$(li)Casing is a $(bold)hollow sealed box with an odd edge length$(0) (3 or 5)$(li)Casings make the walls; ports and the controller sit on them, and the $(4)cavity must be empty$(0)$(li)Once formed it works as one unit — break any casing block and it instantly fails$(br2)Only two matrices have ever been built under these rules: one generates power, the other refines essence. Open their entries below for the exact layouts and stats."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_purifier_matrix_controller",
-      "text": "The Purifier Matrix: a 3×3×3 sealed space, 30× purifying speed, 150 energy per tick.$(br2)$(2,4)Life Conversion Matrix$(0): a 3×3×3 sealed space that converts energy into life energy at 45×. Want to cross over into life tech? Flip open the \"Book of Life\"."
+      "type": "patchouli:text",
+      "text": "$(bold)Generator Matrix (power):$(0) move the Energy Generator into a sealed cavity and burn fuel at a fixed multiplier. Two tiers — Basic 3×3×3 and Advanced 5×5×5; formed-structure stats and fuel/energy port hookups live in the $(l:akaishi:gen_matrix)Akaishi Generator Matrix$(/l) entry.$(br2)$(bold)Purifier Matrix (refining):$(0) a 3×3×3 cavity turned into a central refining line that crushes raw blocks and crystal blocks into essence in bulk at $(4)30x speed$(0). It runs on grid power and carries no fuel slot — see the $(l:akaishi:purifier_matrix)Purifier Matrix$(/l) entry.$(br2)Both are instances of the rules above: read this overview first, then dive into the entries and your layout will stay straight."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gen_matrix",
+        "akaishi:purifier_matrix",
+        "akaishi:generator",
+        "akaishi:purifier"
+      ],
+      "text": "Single-block machines are where matrices start: the $(l:akaishi:generator)Energy Generator$(/l) and the $(l:akaishi:purifier)Akaishi Purifier$(/l) each have their own entry, and the two matrices grow out of them."
     }
   ]
 }

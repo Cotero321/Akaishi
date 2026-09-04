@@ -62,7 +62,8 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
     /** 服务端刷新数据槽：取背包第一张身份卡，反查其授权终端的在线状态（无全图扫描） */
     private void refreshData(Level level) {
         ItemStack card = findCard(player);
-        UUID cardUuid = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.uuidOf(card);
+        // 服务端逻辑：为背包新卡生成唯一卡号，保证能反查授权终端
+        UUID cardUuid = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.ensureUuid(card);
         data.set(DATA_CARD_HASH, cardUuid == null ? 0 : (int) (cardUuid.getMostSignificantBits() >>> 32));
 
         UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid);

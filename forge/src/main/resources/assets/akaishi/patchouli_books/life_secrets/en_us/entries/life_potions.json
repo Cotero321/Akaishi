@@ -2,22 +2,37 @@
   "name": "Potions",
   "icon": "akaishi:akaishi_potion",
   "category": "akaishi:life_organs",
-  "sortnum": 3,
+  "sortnum": 6,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_potion_table",
-      "text": "The Potion Table: sample ≥25 purity + solids + life energy → akaishi potion; the potion inherits the sample's creature source and purity.$(br2)$(2,4)Permanent Potion$(0): absorbs that creature's genotype (no side effects) — all organs of that source gain +2~+10 compatibility by purity; each genotype is absorbed once per lifetime, up to 4 at once, and can be re-absorbed after unloading in the Gene Manager.$(br)$(2,4)Breakthrough Potion$(0): requires that source's genotype already absorbed AND a non-native organ of that source transplanted; activates for 30 min — base stats +10%~40%, extra compatibility +2~+8 (tiered by purity), negative-base-value traits temporarily disabled. At most 1 active at a time, can end early, re-activatable after expiry."
+      "text": "The Potion Table brews $(4)Akaishi Potions$(0) from samples of purity 25+, and each potion inherits the sample's purity and creature source.$(br2)$(bold)Two recipes:$(0)$(li)$(4)Permanent Potion$(0): 3 solidified essence + 20,000 life energy, 60 ticks (3 seconds)$(li)$(4)Breakthrough Potion$(0): 5 solidified essence + 30,000 life energy, 80 ticks (4 seconds)$(br2)Learn what each potion does (next page) before deciding what to brew; for storing the finished potions, see \"$(l:akaishi:life_vaults)Vaults$(/l)\"."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_potion",
-      "text": "Purity tiers: 0-20 → permanent +2 / breakthrough +2 comp·+10%; 21-40 → +4 / +4·20%; 41-60 → +6 / +6·30%; 61-80 → +8 / +8·40%; 81-100 → permanent +10.$(br2)Drinking requires meeting the prerequisites (gene slots / absorbed genes / transplanted same-source organ); the potion is not consumed if unmet.$(br2)$(2,4)Effective compatibility$(0) = organ's own compatibility + that source's gene bonus (capped 100), plus extra compatibility during breakthrough that can temporarily exceed 100, falling back when it expires."
+      "text": "$(bold)Permanent Potion = absorb a genotype:$(0) writes that creature's genes into your body, giving $(4)every organ of that source +N effective compatibility$(0) — tiered by purity in steps of 20: +2 / +4 / +6 / +8 / +10.$(br2)$(li)Each source can be absorbed only once in a lifetime$(li)At most 4 genotypes at once; unload one and you may absorb it again$(br2)$(bold)Breakthrough Potion = temporary awakening:$(0) requires that source already absorbed AND one of its non-native organs transplanted.$(li)Active for 30 minutes, one at a time$(li)+2 / +4 / +6 / +8 extra compatibility and +10% / +20% / +30% / +40% enhancement (by purity tier)$(br2)Check and unload absorbed genotypes at the Gene Manager on the next page."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_rejection_serum",
+      "text": "The Rejection Neutralizer is your $(4)first-aid$(0) for transplant rejection.$(br2)$(bold)Effects:$(0)$(li)Each bottle cuts rejection by −12 in every organ slot$(li)You can drink it repeatedly, but only the first 5 bottles count per transplant period$(li)30-second cooldown between drinks$(br2)$(c)Slots lock-sealed by a natural-enemy conflict are excluded$(0) — remove one conflicting side first.$(br2)Plain and simple: when rejection nears the danger line, drink one to \"wash\" it back to safety — don't wait for the backlash."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_gene_manager",
-      "text": "The Gene Manager lists absorbed genotypes and the currently active breakthrough (with live remaining time and boosted-organ count).$(br2)Unload a gene: removes that source's bonus and frees a slot (re-absorb anytime by drinking the permanent potion); if it's powering a breakthrough, that breakthrough ends too.$(br)End button: ends the current breakthrough early without losing the gene, then you can reactivate right away. Want to \"change skins\"? Come unload here first."
+      "text": "The Gene Manager is your gene filing cabinet.$(br2)$(li)View absorbed genotypes and their current state$(li)Unload a source's gene: the bonus is removed and a slot frees up — you can then $(4)re-absorb$(0) it by drinking another Permanent Potion$(br2)Want a different gene setup? Unload here first, then start over."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_organs",
+        "akaishi:life_body",
+        "akaishi:life_vaults"
+      ],
+      "text": "Suggested order: high-purity samples come from \"Samples & Genes\"; these potions serve the organs built in \"Organ Construction\"; check rejection with \"Body & Decay\"; keep the finished potions in the vault system."
     }
   ]
 }

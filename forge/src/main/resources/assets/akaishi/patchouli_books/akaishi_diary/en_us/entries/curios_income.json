@@ -1,0 +1,26 @@
+{
+  "name": "Fortune Trinkets",
+  "icon": "akaishi:akaishi_hunting_ring",
+  "category": "akaishi:advanced",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_hunting_ring",
+      "text": "$(4)Akaishi Hunting Ring$(0) (ring slot, 100k buffer): $(4)15%$(0) chance per kill to drop 1 Akaishi Crystal straight into your inventory — $(bold)no energy used$(0)."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gathering_bracelet",
+      "text": "$(4)Akaishi Gathering Bracelet$(0) (hands slot, 100k buffer): $(4)5%$(0) chance per block mined to drop 1 Akaishi Crystal — also free.$(br2)One farms mobs, the other farms mining. Wear them and you carry a crystal dispenser everywhere."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "Shared mechanics and the slot map live in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; the crystals they drop feed the refining line of $(l:akaishi:crystal)Crystals & Essence$(/l)."
+    }
+  ]
+}

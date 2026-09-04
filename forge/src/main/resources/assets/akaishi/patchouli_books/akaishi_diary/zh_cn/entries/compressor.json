@@ -7,7 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_compressor",
-      "text": "赤石压缩机，粉末的「回炉重造」机：$(li)各种粉末 → 对应块$(li)赤石精华 → 浓缩赤石精华$(br2)单格进单格出，通电就干。散装货进去，整块出来。"
+      "text": "赤石压缩机：把粉末与赤石晶$(4)压实成大块$(0)，散装进、整块出。单进单出、通电即干，一次压制耗时 100 tick、每 tick 耗 15 点赤能源，内置储能上限 10 万。$(br2)$(bold)主要配方：$(0)$(li)煤/铁/铜/金/青金石/钻石/绿宝石/石英粉 → 9 压 1 对应矿物块$(li)$(4)9 下界合金粉 → 1 下界合金锭$(0)（注意是锭不是块）$(li)$(4)4 黑曜石粉 → 1 黑曜石$(0)$(li)9 赤石粉 → 1 赤石精华$(li)9 赤石晶 → 1 赤石水晶块$(br2)赤石水晶块只能在这压；工作台里 9 赤石晶做的是粗制赤石块，两者别混。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:pulverizer",
+        "akaishi:dusts",
+        "akaishi:crystal"
+      ],
+      "text": "先把矿石交给「$(l:akaishi:pulverizer)赤石打粉机$(/l)」打成粉再回来压；全部粉末清单见「$(l:akaishi:dusts)粉末$(/l)」，晶体的精炼升级读「$(l:akaishi:crystal)赤石晶与精华$(/l)」。"
     }
   ]
 }

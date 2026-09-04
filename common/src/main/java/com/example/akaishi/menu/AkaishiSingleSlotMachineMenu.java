@@ -35,8 +35,8 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
         this.upgrades = upgrades;
 
         // 升级槽（速度/能量各一格，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 40));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 40));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 40));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 40));
         // 输入槽：排除升级组件（保证 shift 点击时升级组件只进升级槽）
         addSlot(new Slot(inventory, 0, 26, 40) {
             @Override

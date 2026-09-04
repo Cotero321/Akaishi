@@ -1,0 +1,30 @@
+{
+  "name": "赤红升级台",
+  "icon": "akaishi:akaishi_upgrade_station",
+  "category": "akaishi:advanced",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_upgrade_station",
+      "text": "赤红升级台给赤石装备附加$(4)特殊能力$(0)：投入 1 枚「$(l:akaishi:upgrade_template)赤红升级模板$(/l)」+ $(4)2000 万$(0)赤能源，并占用装备 $(4)1 个升级槽位$(0)，所选能力 +1 级。$(br2)一台装备能附多少能力，取决于它还剩几个升级槽——先想清楚路线再点。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)通用能力（上限 3 级）：$(0)$(li)吸血$(li)击退抗性$(li)移动速度$(li)火焰抗性$(li)爆炸保护$(li)摔落保护$(br2)这些能力不分部位，任意赤石装备都能上；同一能力重复附魔逐级提升。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)部位专属（1 级封顶）：$(0)$(li)头盔：急迫 + 水下呼吸$(li)胸甲：抗性 + 受击回血$(li)护腿：跳跃提升 + 游泳速度$(li)靴子：缓降 + 移动速度$(br2)$(bold)工具与剑：$(0)$(li)镐/锹/斧：范围挖掘（1 级）$(li)剑：精华掉落（上限 3 级）$(br2)专属能力只能上在对应部位，别把能力点浪费在错位的装备上。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:upgrade_template",
+        "akaishi:equipment",
+        "akaishi:equipment_forger"
+      ],
+      "text": "先经「$(l:akaishi:equipment_forger)赤石装备打造器$(/l)」重铸出装备，再用模板来升级台附能力；模板的获取与辨析见「$(l:akaishi:upgrade_template)赤红升级模板$(/l)」。"
+    }
+  ]
+}

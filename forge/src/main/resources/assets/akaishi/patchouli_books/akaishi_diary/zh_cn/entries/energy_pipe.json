@@ -2,17 +2,30 @@
   "name": "赤能源管道",
   "icon": "akaishi:akaishi_energy_pipe_ultimate",
   "category": "akaishi:energy",
-  "sortnum": 4,
+  "sortnum": 6,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_pipe",
-      "text": "赤能源管道，电网的血管，共 4 级：基础、中级、高级、超级，传输速率一级比一级猛。$(br)想造大机器？先把管道铺明白，否则电堵在路上比堵车还气人。"
+      "text": "赤能源管道 = 电网的$(4)血管$(0)：把发生机、储存单元与机器连成一张会自动调度的网。$(br2)$(bold)要点$(0)：$(li)相邻管道与方块会$(4)自动连接$(0)，互相连通即成一张网络$(li)$(bold)单张网络最多 1024 段$(0)管道，足够铺开大型基地$(li)连上设备就供电，多台设备按需自动分配$(br2)想精细控制流向？每段管道都能设「正常 / 推 / 拉」模式，还能单独断开某一侧——工具在下一页。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_debug_tool",
-      "text": "赤能源配置器，管道的「遥控器」：$(li)右键管道：切换推/拉模式$(li)Shift 右键：断开/恢复单侧连接$(br2)接错方向？别慌，掏出它，一键救场。"
+      "text": "$(4)赤能源配置器$(0)就是管道的「施工钳」：$(li)$(bold)右键$(0)管道：在「正常 → 推 → 拉」间循环切换。$(bold)正常$(0)双向自由流通；$(bold)推$(0)只向相连设备送电；$(bold)拉$(0)只从相连设备抽电$(li)$(bold)潜行 + 右键$(0)点击某一面：$(4)断开 / 恢复$(0)那一侧的连接，让电绕开不想接的方块$(br2)接错方向？掏出配置器点两下就改，无需拆管。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)四档管道每 tick 传输速率$(0)：$(li)赤能源管道：5 万$(li)中级（advanced）：50 万$(li)高级（elite）：500 万$(li)超级（ultimate）：5000 万$(br2)相邻档位相差 10 倍。$(4)基础款就带得动单台发生器矩阵$(0)，大规模电网再换高档次——$(bold)别让管道成了瓶颈$(0)。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:generator",
+        "akaishi:energy_cell",
+        "akaishi:energy_basics"
+      ],
+      "text": "把「$(l:akaishi:generator)发生机$(/l)」产出的电经管道送进「$(l:akaishi:energy_cell)储存单元$(/l)」，再分给各台机器，一套完整电网就位。忘了基础？回看「$(l:akaishi:energy_basics)赤能源基础$(/l)」。"
     }
   ]
 }

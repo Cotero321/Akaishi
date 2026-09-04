@@ -2,8 +2,12 @@
   "name": "Fusion Reactor",
   "icon": "akaishi:akaishi_fusion_controller",
   "category": "akaishi:tech",
-  "sortnum": 2,
+  "sortnum": 13,
   "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The Fusion Reactor is $(4)endgame power$(0): one unit dwarfs a whole reactor array, and it is also the pickiest machine you will ever build.$(br2)It burns \"$(l:akaishi:plasma)plasma fuel rods$(/l)\" — read the downstream fuel chain before you start.$(br2)$(bold)Two outputs:$(0)$(li)$(4)Massive akaishi energy$(0): split evenly among its energy output ports$(li)$(4)Life Ash$(0): the more you burn, the faster it banks up — a ticket to late-game life tech$(br2)Assemble the 7×7×7 onion structure on the next page first; only then will it fire."
+    },
     {
       "type": "patchouli:multiblock",
       "name": "Fusion Reactor (7x7x7)",
@@ -23,42 +27,39 @@
           "0": "akaishi:akaishi_fusion_core"
         },
         "symmetrical": false
-      },
-      "text": "An onion-like layered structure: outer 7×7×7 shell → middle 5×5×5 insulation → inner 3×3×3 frame → central fusion core. The controller must sit on a wall, not in the core slot, or it won't register."
+      }
     },
     {
       "type": "patchouli:text",
-      "text": "$(2,4)Build tips$(0)$(li)Shell walls can be swapped for: Fusion Controller / Energy Output / Item Input / Item Output$(li)Frame-layer empty slots hold: Fuel Frames / Cooling Frames / Efficiency Frames$(li)Caps: fuel 4, cooling 10, efficiency 12$(li)Exactly 1 core, dead center$(br2)Once formed, the controller re-checks every 20 ticks — a missing block or a wrong block breaks it. The fusion reactor is precision work, don't fumble."
+      "text": "Four onion layers anchored on the wall: outer 7×7×7 shell → 5×5×5 insulation → 3×3×3 frame → exactly 1 Fusion Core at the center.$(br2)$(bold)The controller IS a wall block:$(0) swap it in for $(4)any one shell on any outer wall$(0) — sides, top or bottom all work, corners and edges count too. The build is sized from that wall: 6 blocks deep inward, ±3 blocks along the other two axes.$(c)Fill the bottom 3 levels too$(0): no floating or buried structure.$(br2)$(bold)Layer rules:$(0)$(li)Outer shell: Fusion Shell everywhere; the controller / Energy Output / Item Input / Item Output ports may replace shell spots$(li)Insulation: all 98 spots $(4)must be Fusion Insulation$(0) — one gap voids the structure$(li)Frame cavity: the 26 spots may stay empty; insert Fuel ≤4 / Cooler ≤10 / Efficiency ≤12 frames$(li)Center: exactly 1 Fusion Core$(br2)Build it right and the controller shows $(4)formed$(0) within about a second; breaking any wrong block collapses it instantly."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fusion_controller",
-      "text": "The Fusion Controller is the brain: feed in a plasma fuel rod and it starts burning.$(br)$(2,4)Temperature mechanics$(0)$(li)Base target temperature 50M$(li)The more heat production exceeds cooling, the higher the temperature$(li)100M~130M yields ×1.0 — optimal$(li)Below 100M yield climbs linearly 0.5~1.0$(li)130M~160M yield decays to 0.5$(li)≥160M overheats and shuts down, recovers automatically at 80M (no explosion, don't panic)"
+      "type": "patchouli:text",
+      "text": "$(bold)Output:$(0) each fuel slot drains energy at \"rod base yield × 1.15^efficiency frames\"; 12 efficiency frames reach about $(4)5.35×$(0). Produced energy splits evenly across all energy output ports (20 billion buffer each, output only).$(br2)$(bold)Temperature model:$(0) target = 50M + Σ heat value × efficiency multiplier − cooling; cooling = (Σ heat-sink efficiency% × (1 + 0.1 × cooler-frame count) + rod cooling) × 2M, where Σ only counts sinks already placed into unlocked slots on the controller's Heat page (10 max).$(br2)Heat sinks are stored in the controller: open it and drop them in/out via the Heat page; cooler frames only decide how many slots unlock and amplify cooling.$(br2)Each tick the actual temperature drifts 2% toward the target, clamped at ±2M per step — no sudden spikes."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fusion_fuel_aggregator",
-      "text": "The Fusion Fuel Aggregator: 2000 energy + 1 activated component → 1000mb of plasma.$(br)Three plasmas (mixed/nether/end) must be stored in their own dedicated tanks, then piped into the Plasma Filler via plasma pipes."
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_plasma_filler",
-      "text": "The Plasma Filler: 1 fusion reaction rod + 1000mb plasma → 1 matching plasma fuel rod (100 ticks).$(br)It prioritizes the plasma tank with the most stock and processes the same kind in a row — even machines have their own \"greed\"."
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_mixed_plasma_rod",
-      "text": "Three plasma fuel rods, 6 trillion energy each:$(li)$(bold)Mixed Plasma Rod$(0): 4M/t base rate, 27M heat — the balanced pick, stack yield with efficiency frames$(li)$(bold)Nether Plasma Rod$(0): 4M/t base rate, 40M heat — high yield high heat, needs serious cooling to hold temperature$(li)$(bold)End Plasma Rod$(0): 2.6M/t base rate, 15M heat — low yield low heat, 4 rods with no cooling hit the sweet zone"
+      "type": "patchouli:text",
+      "text": "$(bold)Sweet spot: 100M~130M, yield ×1.0$(0). Below 100M the yield slides with temperature; above 130M it decays linearly — yield bottoms out at $(e)×0.5 on the 160M theoretical peak$(0), but you never get there:$(br2)crossing $(c)159M trips the overheat shutdown$(0): burning stops, it $(bold)never explodes$(0), and it stays shut down for a forced 5-minute cooldown before it may resume.$(br2)Want full output? Pin the temperature between 100M and 130M — the yield multiplier decides how much power you squeeze from every rod."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:fusion_heat_sink_tier5",
-      "text": "Fusion heat sinks come in 6 grades (tiers 1-5 + life-grade), cooling 5% / 7% / 9% / 12% / 15% / 20%.$(br)Install into cooling frames; every 5 seconds they lose 1 durability (8000 total) and shatter at zero.$(br)Cooling formula: cooling% × (1 + 0.1 × cooling-frame count) × 2M + fuel-rod cooling bonus. Can't hold temperature? Stuff in more heat-sink tiers."
+      "text": "Fusion heat sinks come in five tiers:$(li)tier1: 5%$(li)tier2: 7%$(li)tier3: 9%$(li)tier4: 12%$(li)tier5: 15%$(br2)The $(bold)Life Heat Sink$(0) (fusion_heat_sink_life) hits $(4)20%$(0) — the top grade, crafted from Life Ash.$(br2)$(bold)How to use:$(0) right-click the controller and place sinks straight into the grid on its $(2)Heat$(0) page; each Cooler Frame inside the structure unlocks one slot (10 max) and scales total cooling by (1 + 0.1 × frames).$(br2)Each sink has 8,000 durability and loses 1 every 100 ticks while running or cooling down; at zero it $(4)shatters$(0). Restock before you leave it running for days."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_ash",
-      "text": "While burning it also banks Life Ash: 1 ash per 100 billion energy consumed.$(br)Ash is auto-extracted through the fusion item output and is a key material for life heat sinks and high-tier life tech.$(br2)Produced energy is split evenly across all energy outputs (200 billion buffer each, output only)."
+      "text": "Burning also banks $(bold)Life Ash$(0): 1 ash per 100 billion akaishi energy consumed.$(br2)Ash is $(4)pushed out automatically$(0) through the Fusion Item Output Port — hook up an item pipe and it never clogs the core.$(br2)It is not only for heat sinks: the Life Heat Sink and the $(4)Mother Altar$(0) life tech both crave it — that is covered in \"Secrets of Life\". Burn enough akaishi power first."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma",
+        "akaishi:fuel_system",
+        "akaishi:reactor",
+        "akaishi:generator"
+      ],
+      "text": "Suggested order: start with the Energy Generator → practice heat control on the Reactor → master Fuel & Cooling → stock rods via the Plasma Chain → then take on the Fusion Reactor."
     }
   ]
 }

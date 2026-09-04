@@ -6,23 +6,42 @@
   "pages": [
     {
       "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_exhausted_crystal",
+      "text": "$(bold)Waste, three questions:$(0)$(li)Where from: reactors bleed exhausted fuel out of the $(4)waste output port$(0) on the reactor wall - 7 kinds, mixable$(li)Why dangerous: breaking its pipes/barrels/machines leaks a decay zone (see $(l:akaishi:life_body)Body & Decay$(/l))$(li)What to do: this neutralize -> separate -> reforge line squeezes every drop dry$(br2)$(bold)One-line flow:$(0) exhausted fuel -> $(4)Life Activator$(0) (life energy neutralizes it) -> activated fuel -> $(4)Life Centrifuge$(0) (split into crystals): the main activated crystal climbs the fusion-fuel line, the byproduct $(4)Exhausted Crystal$(0) drives the Item Reconstructor."
+    },
+    {
+      "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_activator",
-      "text": "The Life Activator burns life energy to neutralize exhausted fuel (100 life energy per mb), 1:1 into activated exhausted liquid.$(br)Waste pipes feed the input tank; normal liquid pipes pull from the output tank — waste in, safe liquid out."
+      "text": "$(bold)Life Activator:$(0) burns life energy to neutralize exhausted fuel $(4)1:1$(0) into the matching Activated Exhausted fuel - a safe intermediate that normal liquid pipes can carry and store.$(br2)$(bold)Parameters:$(0)$(li)Life buffer $(4)200,000$(0); 100 life energy per 1mb$(li)Input tank 8,000mb (fed by waste pipes, all 7 kinds mix)$(li)Output tank 16,000mb (activated liquid, drawn by normal pipes)$(li)Up to 4mb converted per tick$(br2)Idles without liquid, energy or room. $(4)Warning:$(0) breaking it with exhausted fuel still in the input tank leaks a decay zone (tier 1-3 by volume)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_centrifuge",
-      "text": "The Life Centrifuge splits activated fuel into a main product and a byproduct.$(br)The Activated Fractionator then refines the activated components — these get polymerized into plasma on the road to fusion. Waste isn't the end, it's the start."
+      "text": "$(bold)Life Centrifuge:$(0) splits activated fuel into two kinds of crystal.$(br2)$(bold)Parameters:$(0)$(li)Redstone buffer $(4)100,000$(0); 50 redstone per 1mb; up to 8mb per tick$(li)Input tank 64,000mb, filled by normal liquid pipes$(li)Every $(4)1000mb$(0) settles one batch: 1 activated crystal of the matching kind (main) + 1 $(4)Exhausted Crystal$(0) (universal byproduct); output is a 2-slot bin you must take from$(li)Takes speed/energy upgrades$(br2)The activated crystals feed the fusion-fuel line; Exhausted Crystals go to the Item Reconstructor. Waste is not the end - it is the start of two production lines."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_item_reconstructor",
-      "text": "The Item Reconstructor rebuilds items from exhausted crystals, turning waste back into usable resources.$(br)Trash in, treasure out — truly \"turning trash into treasure\"."
+      "text": "$(bold)Item Reconstructor:$(0) pays Exhausted Crystals to $(4)transmute$(0) low-value items into high-value goods.$(br2)$(bold)Rules:$(0) load the material plus crystals; each tick it eats 1 crystal and 50 redstone for 1 progress point. At full cost it eats 1 material and spits out 1 product; $(4)swapping the material resets progress$(0); speed upgrades push several steps per tick.$(br2)$(bold)Too many rates to fit here - the full table is on the next page$(0), from Skeleton Skull all the way to Nether Star."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Reconstructor Rates",
+      "text": "$(bold)Costs (Exhausted Crystals):$(0)$(li)Skeleton Skull -> Wither Skeleton Skull 32; Wither Skeleton Skull -> Nether Star 32$(li)Rotten Flesh -> Rabbit's Foot 32; Snowball -> Ghast Tear 32; End Crystal -> Dragon's Breath 32$(li)Golden Apple -> Enchanted Golden Apple 16; Quartz -> Prismarine Shard 16; Leather -> Phantom Membrane 16; Prismarine Shard -> Scute 16$(li)Amethyst Shard -> Echo Shard 8; Deepslate -> Reinforced Deepslate 8$(br2)Each craft eats 1 material and yields 1 product; the cheaper the crystal cost, the better the deal - top-tier goods are built out of crystals. Trash in, treasure out: $(bold)literally turning trash into treasure$(0)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_exhausted_pipe",
-      "text": "Exhausted waste pipes come in two flavors:$(li)Sealed Exhausted Pipe: single buffer, steady as a rock$(li)Multi-Fluid Waste Pipe: multi-buffer, bulk and then some$(br)They haul waste and nothing else — the dedicated waste courier feeding your Activator's input."
+      "text": "$(bold)Waste transport trio$(0) (the waste network is $(4)physically isolated$(0) from normal liquid pipes and only touches waste):$(li)Sealed Exhausted Pipe: single 8,000mb buffer, one fuel kind at a time$(li)Multi-Fluid Waste Pipe: multi buffer of 8,000mb, all 7 exhausted fuels can mix in transit$(li)Exhausted Fuel Barrel: a $(4)1,000,000mb$(0) bulk tank with a GUI gauge; waste pipes fill and drain it$(br2)Reactor waste port -> pipes/barrel -> Activator input tank: a fully automatic neutralization queue.$(4)High risk:$(0) breaking any of the three leaks a decay zone (tier 1-3 by contents) - cleanup lives in $(l:akaishi:life_body)Body & Decay$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_conversion",
+        "akaishi:life_energy",
+        "akaishi:life_body"
+      ],
+      "text": "The Activator burns life energy: set up the Conversion Matrix and storage line first. Decay zones from broken waste gear are handled with a Purifier Tower - see Body & Decay."
     }
   ]
 }

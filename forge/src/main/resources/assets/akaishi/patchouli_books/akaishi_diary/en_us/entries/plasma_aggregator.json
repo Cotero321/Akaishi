@@ -1,0 +1,26 @@
+{
+  "name": "Fusion Fuel Aggregator",
+  "icon": "akaishi:akaishi_fusion_fuel_aggregator",
+  "category": "akaishi:tech",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_fuel_aggregator",
+      "text": "Fusion Fuel Aggregator: $(4)1 activated component → 1,000 mb of plasma$(0), costing 2,000 energy and 100 ticks.$(br2)Output plasma is sorted by its component:$(li)$(bold)Mixed Plasma$(0): World Base / Advanced Mixture / Ultimate Mixture components$(li)$(bold)Nether Plasma$(0): Nether Compound / Pure components$(li)$(bold)End Plasma$(0): End Mixture / Dragon components$(br2)Store the three kinds in separate tanks — don't let the flavors mix."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Watch the plumbing:$(0) plasma travels only through Plasma Pipes / Plasma Fuel Tanks — ordinary fluid pipes refuse it. Lay the dedicated line between this machine and the $(l:akaishi:plasma_filler)Plasma Filler$(/l) first.$(br2)Filled rods go straight into the $(l:akaishi:fusion)Fusion Reactor$(/l); the temper of each rod is compared in $(l:akaishi:plasma_rods)Plasma Fuel Rods$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma",
+        "akaishi:plasma_fractionator",
+        "akaishi:plasma_filler"
+      ],
+      "text": "Feedstock comes from the $(l:akaishi:plasma_fractionator)Activated Fractionator$(/l), output goes to the $(l:akaishi:plasma_filler)Plasma Filler$(/l); chain overview in $(l:akaishi:plasma)Plasma Chain$(/l)."
+    }
+  ]
+}

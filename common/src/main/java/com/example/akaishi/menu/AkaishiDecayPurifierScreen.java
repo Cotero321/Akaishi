@@ -77,10 +77,10 @@ public class AkaishiDecayPurifierScreen extends AbstractContainerScreen<AkaishiD
         }
         gui.drawString(this.font, status, 8, 24, color, false);
 
-        // 范围内区域数
+        // 范围内区域数（状态行下方，避开右侧升级槽 y=30..46 与能量数值 y=70）
         gui.drawString(this.font, Component.translatable("gui.akaishi.decay_purifier.zones",
                         menu.getZoneCount()),
-                8, 74, TEXT, false);
+                8, 33, TEXT, false);
 
         // 能量数值（居中，右对齐防出框）
         Component energyText = Component.translatable("gui.akaishi.energy",

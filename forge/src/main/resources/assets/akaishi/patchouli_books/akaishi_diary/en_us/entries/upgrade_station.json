@@ -1,0 +1,30 @@
+{
+  "name": "Upgrade Station",
+  "icon": "akaishi:akaishi_upgrade_station",
+  "category": "akaishi:advanced",
+  "sortnum": 8,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_upgrade_station",
+      "text": "The Upgrade Station bolts $(4)special abilities$(0) onto Akaishi gear: put in 1 $(l:akaishi:upgrade_template)Upgrade Template$(/l) + $(4)20M$(0) Akaishi Energy, spend $(4)1 upgrade slot$(0) on the gear, and the chosen ability gains +1 level.$(br2)How many abilities a piece can carry depends on how many upgrade slots it has left — plan the route before you click."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)General abilities (up to level 3):$(0)$(li)Lifesteal$(li)Knockback Resistance$(li)Movement Speed$(li)Fire Resistance$(li)Blast Protection$(li)Fall Protection$(br2)These work on any slot, any piece of Akaishi gear; repeating the same ability levels it up further."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Per-slot abilities (1 level cap):$(0)$(li)Helmet: Haste + Water Breathing$(li)Chestplate: Resistance + Hit Regen$(li)Leggings: Jump Boost + Swim Speed$(li)Boots: Slow Falling + Speed$(br2)$(bold)Tools & sword:$(0)$(li)Pickaxe/Shovel/Axe: Area Break (1 level)$(li)Sword: Essence Drop (up to level 3)$(br2)Slot-locked abilities only work on the right piece — don't waste ability points on mismatched gear."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:upgrade_template",
+        "akaishi:equipment",
+        "akaishi:equipment_forger"
+      ],
+      "text": "Recast your gear at the $(l:akaishi:equipment_forger)Equipment Forger$(/l) first, then spend Templates here; where templates come from and what they aren't: $(l:akaishi:upgrade_template)Upgrade Template$(/l)."
+    }
+  ]
+}

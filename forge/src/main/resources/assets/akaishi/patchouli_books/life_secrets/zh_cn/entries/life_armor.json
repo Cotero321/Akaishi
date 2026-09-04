@@ -1,0 +1,31 @@
+{
+  "name": "生命融合护甲",
+  "icon": "akaishi:akaishi_life_fusion_chestplate",
+  "category": "akaishi:life_advanced",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_fusion_chestplate",
+      "text": "整条生命线最贵的一身装备：$(4)生命融合护甲$(0)。$(br2)$(bold)怎么获得：$(0)在「$(l:akaishi:life_fusion_anvil)生命的融合砧$(/l)」上，把 1 件赤石护甲 + 1 个「$(4)生命的融合锭$(0)」合在一起锻造。$(li)融合锭只能从「$(l:akaishi:mother_altar)黑山羊之母祭坛$(/l)」的供奉中搏出来——这正是它金贵的根源$(li)成品$(4)完整保留原装备的升级与全部 NBT$(0)，附魔一并带走$(br2)一句话：$(4)先把你最好的那件赤石护甲养到毕业，再来锻。$(0)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)面板速览$(0)（赤石护甲的 2 倍）：$(li)护甲值：靴子 8 / 护腿 14 / 胸甲 20 / 头盔 8$(li)韧性 8 · 击退抗性 0.2$(li)附魔能力 25$(li)耐久 = 原版对应护甲基数 × 92$(li)修复材料 = 生命的融合锭$(br2)四件套的物品 id：$(li)akaishi_life_fusion_helmet$(li)akaishi_life_fusion_chestplate$(li)akaishi_life_fusion_leggings$(li)akaishi_life_fusion_boots"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)套装效果：$(0)$(li)$(4)每穿 1 件$(0)：全部已移植器官的「$(4)有效适配 +2$(0)」——排斥涨得更慢、部位减益阈值抬高$(li)$(4)穿齐 4 件$(0)激活全套：$(br2)$(li)器官强度 ×1.2$(li)排斥增长速度 ×0.75$(li)受伤时按伤害点数消耗背包内「便携赤能源单元」抵伤（每点 100）$(li)体内有 BOSS/龙族来源的生效器官时，额外 +10 最大生命$(li)获得$(4)免能量消耗的飞行$(0)——脱下任何一件即取消$(br2)穿戴与躯体改造的联动细节，见「$(l:akaishi:life_body)躯体检查与衰变$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:mother_altar",
+        "akaishi:life_fusion_anvil",
+        "akaishi:life_body",
+        "akaishi:trait_safe"
+      ],
+      "text": "前置阅读：母神祭坛（怎么拿融合锭）→ 生命的融合砧（怎么锻）→ 躯体检查与衰变（配合躯体改造）；把词条玩明白后再锻，收益最大。"
+    }
+  ]
+}

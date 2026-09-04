@@ -1,0 +1,33 @@
+{
+  "name": "赤石发生器矩阵",
+  "icon": "akaishi:akaishi_gen_matrix_controller_basic",
+  "category": "akaishi:energy",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "赤石发生器矩阵＝把单块发生机搬进$(4)封闭腔体$(0)，按固定倍率集中烧燃料的规模化发电。$(br2)$(bold)成型结构：$(0)$(li)用「发生器矩阵外壳」围出$(4)封闭箱体$(0)——箱子是$(bold)奇数边长$(0)的空心盒$(li)墙面装上「矩阵控制器」$(li)墙面再装「能量输出口」与「燃料输入口」$(li)$(4)内腔必须全空$(0)——不需要任何内部组件$(br2)箱子没围严不干活，拆掉任意一块墙立即失效。$(br2)共两档：3×3×3（低级）与 5×5×5（高级），装哪块控制器决定哪一档。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_basic",
+      "text": "规模化发电第一步：$(4)低级发生器矩阵$(0)，外壳为 3×3×3 封闭箱体。$(br2)$(bold)成型后参数$(0)：$(li)成型倍率 $(bold)×45$(0)$(li)产率 $(bold)3375 赤能源/tick$(0)$(li)储能上限 $(bold)500 万$(0)$(li)燃料系数 ×9/8：同样燃料能多烧出约 1.13 倍电$(br2)别忘在墙面装「能量输出口」——它自带 $(bold)1 亿$(0) 缓冲，把电送进电网。$(br2)摆位要点见「$(l:akaishi:matrix)矩阵结构$(/l)」条目。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gen_matrix_controller_advanced",
+      "text": "大功率本垒打：$(4)高级发生器矩阵$(0)，外壳为 5×5×5 封闭箱体。$(br2)$(bold)成型后参数$(0)：$(li)成型倍率 $(bold)×200$(0)$(li)产率 $(bold)15000 赤能源/tick$(0)$(li)储能上限 $(bold)5000 万$(0)$(li)燃料系数 ×9/4：同样燃料能多烧出约 2.25 倍电$(br2)两档通用：燃料输入口 $(4)27 格自动补料$(0)，可直接接物品管道；升级组件还能继续提速。$(br2)还是不够？大后期交给「$(l:akaishi:reactor)反应堆$(/l)」与「$(l:akaishi:fusion)聚变堆$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_basics",
+        "akaishi:energy_cell",
+        "akaishi:energy_pipe",
+        "akaishi:generator",
+        "akaishi:matrix"
+      ],
+      "text": "阅读顺序建议：燃料知识看「$(l:akaishi:energy_basics)赤能源基础$(/l)」，电网靠「$(l:akaishi:energy_pipe)管道$(/l)」与「$(l:akaishi:energy_cell)储存单元$(/l)」；想省心就用单块「$(l:akaishi:generator)发生机$(/l)」。多方块通用摆位规则见「$(l:akaishi:matrix)矩阵结构$(/l)」。"
+    }
+  ]
+}

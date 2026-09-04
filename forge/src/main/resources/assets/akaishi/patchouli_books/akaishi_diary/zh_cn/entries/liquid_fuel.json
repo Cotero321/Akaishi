@@ -2,27 +2,24 @@
   "name": "液体燃料链",
   "icon": "akaishi:akaishi_energy_liquefier",
   "category": "akaishi:tech",
-  "sortnum": 6,
+  "sortnum": 2,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_liquefier",
-      "text": "能量液化装置：把硬邦邦的赤能源强行压成「下界能量液体」。$(br)别问能量为什么能装罐，问就是赤石科技震撼人心——每 tick 吞赤能源、吐液体，纯度堪比实验室量杯。"
+      "type": "patchouli:text",
+      "text": "液体燃料产线一句话：$(4)液化 → 加工 → 混合 → 装罐 → 燃烧$(0)。$(br2)$(li)「$(l:akaishi:fuel_liquefier)能量液化装置$(/l)」：固态原料压成液体能量$(li)「$(l:akaishi:fuel_processor)能量加工器$(/l)」：液体能量兑成可烧燃料$(li)「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」：低级燃料兑成高级燃料$(li)「$(l:akaishi:fuel_canner)燃料装罐机$(/l)」：液体灌进燃料罐$(br2)成品罐交给「$(l:akaishi:reactor)反应堆$(/l)」烧；最顶级的燃料还会继续走向「$(l:akaishi:plasma)等离子体链$(/l)」。每台机器的配方与参数点上方链接逐台看。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_processor",
-      "text": "能量加工器：固态物 + 下界能量液体，搅拌成可燃烧的燃料。$(br)这大概就是赤石界的「液体面包」——左手倒固态，右手灌液体，出来就是能塞进反应堆的硬通货。"
+      "type": "patchouli:text",
+      "text": "$(bold)产线后勤：$(0)$(li)液体储罐三档：基础 16000mb / 高级 64000mb / 超级 256000mb——输出先落罐再抽给下游，机器不等料$(li)液体管道：$(4)4000mb/tick$(0) 搬任何液体，通用无歧视$(br2)$(bold)例外：$(0)衰竭燃料有腐蚀性，必须走专用「封闭性衰竭管道」，普通管道不接这种货。$(br2)衰竭燃料的回收路线在《生命的奥秘》里——先记住$(4)别乱倒$(0)。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fluid_tank_basic",
-      "text": "液体储罐共三级：$(li)基础：装点家用$(li)高级：装点工坊用$(li)超级：装到怀疑人生$(br)专存下界能量 / 燃料液体，管道一接，液体自己找家。"
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_fluid_pipe",
-      "text": "液体管道：把液体搬来搬去，比快递还靠谱，从不丢件。$(br)配合储罐、液化器、加工器，就能搭一条全自动「液体燃料流水线」。"
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:fuel_system",
+        "akaishi:reactor",
+        "akaishi:plasma"
+      ],
+      "text": "上游看「$(l:akaishi:fuel_system)燃料与散热$(/l)」，下游看「$(l:akaishi:reactor)反应堆$(/l)」；本链最顶级的产物会汇入「$(l:akaishi:plasma)等离子体链$(/l)」继续浓缩。"
     }
   ]
 }

@@ -171,8 +171,10 @@ public final class ModConfig {
     public static volatile long fusionCoolingPerPercent = 2_000_000L;
     /** 基础温度（无燃料热值时） */
     public static volatile int fusionBaseTemp = 50_000_000;
-    /** 温度上限：达到后过热宕机（停止燃烧，不爆炸） */
+    /** 温度硬上限（clamp 与产率线性下滑的终点，M）；实际超温停机见 fusionTempTrip */
     public static volatile int fusionTempMax = 160_000_000;
+    /** 过热停机阈值：温度 ≥ 该值立即停烧（M）。略低于硬上限，避免堆子贴着极限长时间运行 */
+    public static volatile int fusionTempTrip = 159_000_000;
     /** 最优产率温度区间下限 */
     public static volatile int fusionTempOptMin = 100_000_000;
     /** 最优产率温度区间上限 */
@@ -195,8 +197,6 @@ public final class ModConfig {
     public static volatile double wirelessLossPerBlock = 0.001;
     /** 损耗上限（防极端场景无意义传输） */
     public static volatile double wirelessMaxLoss = 0.5;
-    /** 输入口/输出口每 tick 基础传输上限（按身份卡等级倍率提升） */
-    public static volatile long wirelessPortTransferRate = 4096L;
     /** 跨维度传输固定损耗（需终端结构含跨维组件解锁） */
     public static volatile double wirelessCrossDimLoss = 0.25;
     /** 每个损耗抑制组件削减的损耗比例（0.05 = 削减 5%，可叠加，最高削减 90%） */

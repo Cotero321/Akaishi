@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 /**
  * 无线赤能源端口界面（输入口/输出口共用，两类页面：运行情况/传输情况）。
  * 页面由顶部按钮本地互斥切换（互不重叠）；解绑身份卡走服务端按钮。
- * 数据来自 {@link AkaishiWirelessPortMenu} 的 ContainerData（缓冲储能 long + 绑定卡/终端/认证/速率）。
+ * 数据来自 {@link AkaishiWirelessPortMenu} 的 ContainerData（缓冲储能 long + 绑定卡/终端/认证/方向）。
  * 198 高布局：标题 y=6 与切页按钮 y=16 错开，内容区 y=36 起舒展排布。
  */
 public class AkaishiWirelessPortScreen extends AbstractContainerScreen<AkaishiWirelessPortMenu> {
@@ -106,7 +106,7 @@ public class AkaishiWirelessPortScreen extends AbstractContainerScreen<AkaishiWi
         }
     }
 
-    /** 页2：传输情况（缓冲储能条 + 速率 + 方向提示） */
+    /** 页2：传输情况（缓冲储能条 + 不限速提示 + 方向提示） */
     private void renderTransferPage(GuiGraphics gui) {
         // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
         int x = 0;
@@ -122,9 +122,9 @@ public class AkaishiWirelessPortScreen extends AbstractContainerScreen<AkaishiWi
         Component energyText = Component.literal(EnergyFormat.format(energy) + " / " + EnergyFormat.format(max));
         int textWidth = this.font.width(energyText);
         gui.drawString(this.font, energyText, x + 88 - textWidth / 2, y + BAR_Y + 10, TEXT, false);
-        // 传输速率（按卡自动解锁）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.port.rate",
-                EnergyFormat.format(menu.getRate()) + "/tick"), x + 8, y + 56, TEXT, false);
+        // 无线传输不限速（卡为纯凭证，无速率上限）
+        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.port.rate_unlimited"),
+                x + 8, y + 56, TEXT, false);
         // 方向提示（输入口=纯接收，输出口=纯发电）
         gui.drawString(this.font, Component.translatable(menu.isOutput()
                         ? "gui.akaishi.wireless.port.output_hint" : "gui.akaishi.wireless.port.input_hint"),

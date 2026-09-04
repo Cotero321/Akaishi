@@ -8,6 +8,7 @@ import com.example.akaishi.block.AkaishiLifeMatrixCasingBlock;
 import com.example.akaishi.block.AkaishiLifeMatrixControllerBlock;
 import com.example.akaishi.block.AkaishiLifeMatrixEnergyInputPortBlock;
 import com.example.akaishi.block.AkaishiLifeMatrixEnergyOutputPortBlock;
+import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
@@ -117,12 +118,13 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
         return false;
     }
 
-    /** 墙块判定：矩阵外壳 / 两种能量端口 / 控制器自身（控制器在墙面上） */
+    /** 墙块判定：矩阵外壳 / 两种能量端口 / 控制器自身 / 结构玻璃（控制器在墙面上） */
     private boolean isWall(Block b) {
         return b instanceof AkaishiLifeMatrixCasingBlock
                 || b instanceof AkaishiLifeMatrixEnergyInputPortBlock
                 || b instanceof AkaishiLifeMatrixEnergyOutputPortBlock
-                || b instanceof AkaishiLifeMatrixControllerBlock;
+                || b instanceof AkaishiLifeMatrixControllerBlock
+                || b == ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get();
     }
 
     /** 结构检测节流计数（成型后每 10 tick 校验一次） */

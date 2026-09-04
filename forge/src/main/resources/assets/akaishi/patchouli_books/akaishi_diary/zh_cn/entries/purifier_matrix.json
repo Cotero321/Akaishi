@@ -1,0 +1,27 @@
+{
+  "name": "赤石提纯矩阵",
+  "icon": "akaishi:akaishi_purifier_matrix_controller",
+  "category": "akaishi:intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_purifier_matrix_controller",
+      "text": "提纯矩阵是$(4)独立的批量精炼多方块$(0)——$(bold)不是$(0)把提纯器围进箱子里，而是用「提纯矩阵外壳」另起一座 3×3×3 封闭空腔。$(br2)$(bold)墙面清单：$(0)$(li)外壳：四周与顶底用提纯矩阵外壳填满$(li)任一面贴「矩阵控制器」$(li)再贴「能量输入口」$(li)贴「物品输入口」与「物品输出口」$(li)$(4)内腔必须全空$(0)$(br2)成型后由控制器集中精炼：粗制赤石块 → $(bold)1 精华$(0)、赤石水晶块 → $(bold)4 精华$(0)，全程 $(4)30 倍速$(0)。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)和提纯器怎么分工：$(0)$(li)单块提纯器自带燃料槽，$(bold)不拉电网也能慢慢烧$(0)$(li)提纯矩阵$(4)没有燃料槽$(0)，全靠能量输入口喂电——先建好电网再来搭$(li)原料自动从物品输入口进、精华从物品输出口出，接上物品管道即可全自动$(br2)$(bold)何时升级：$(0)当单台提纯器把原料堵在箱子前排队时，就是盖矩阵的信号。矩阵成型后每轮提纯消耗 500 赤能源，吞吐量远非单台可比。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:purifier",
+        "akaishi:matrix",
+        "akaishi:energy_pipe",
+        "akaishi:item_pipe"
+      ],
+      "text": "单块机起步看「$(l:akaishi:purifier)赤石提纯器$(/l)」；封闭腔体的通用摆位规则见「$(l:akaishi:matrix)矩阵结构$(/l)」；喂电与物流分别靠「$(l:akaishi:energy_pipe)赤能源管道$(/l)」与「$(l:akaishi:item_pipe)物品管道$(/l)」。"
+    }
+  ]
+}

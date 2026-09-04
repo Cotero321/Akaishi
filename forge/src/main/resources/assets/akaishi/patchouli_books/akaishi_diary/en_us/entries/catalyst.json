@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_catalyst_basic",
-      "text": "The Catalyst, the \"seeder\" of crystal automation: burns energy to grow akaishi clusters on geodes in range.$(li)Basic: 3×3×3, 20% success, 5 energy/t$(li)Intermediate: 5×5×5, 30% success, 25 energy/t$(li)Advanced: 9×9×9, 40% success, 125 energy/t$(li)Ultimate: 16×16×16, 50% success, 625 energy/t$(br2)Bigger is stronger, but the power bill grows too — pace yourself."
+      "text": "The Catalyst is step one of a crystal farm: it $(4)burns Akaishi Energy to make Geodes grow$(0) clusters on their own.$(br2)$(bold)Four tiers$(0) (range side / success chance / energy per tick):$(li)$(4)Basic$(0): 3x3x3, 20%, 5 E/t$(li)Medium: 5x5x5, 30%, 25 E/t$(li)Advanced: 9x9x9, 40%, 125 E/t$(li)Ultimate: 16x16x16, 50%, 625 E/t$(br2)Higher tiers are stronger but thirstier. Pipe power into it before you let it run."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_geode_pristine",
-      "text": "Geodes come in 4 grades: flawed / normal / intact / pristine, and they're the bed where clusters grow.$(br)Catalyst plants, Collector reaps, and you get to lie back and count crystals."
+      "text": "Clusters only grow next to $(bold)Akaishi Crystal Geodes$(0). Geodes come in four grades: $(4)Flawed -> Normal -> Pristine -> Perfect$(0); the higher the grade, the faster they grow on their own.$(br2)$(bold)What the Catalyst does:$(0) every tick, each Geode in range gets one growth attempt — the Akaishi Crystal Clusters that sprout drop 1-2 Akaishi Essence when broken.$(br2)$(bold)Upgrading a Geode?$(0) Take it to the \"$(l:akaishi:aggregator)Energy Aggregator$(/l)\": 10M energy per grade."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:aggregator",
+        "akaishi:collector",
+        "akaishi:crystal",
+        "akaishi:pulverizer"
+      ],
+      "text": "Where Geodes and crystals come from: \"$(l:akaishi:crystal)Crystals & Essence$(/l)\". Want an idle crystal farm? Read the \"$(l:akaishi:collector)Auto Collector$(/l)\" next."
     }
   ]
 }

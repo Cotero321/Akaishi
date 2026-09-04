@@ -1,0 +1,31 @@
+{
+  "name": "Life Fusion Armor",
+  "icon": "akaishi:akaishi_life_fusion_chestplate",
+  "category": "akaishi:life_advanced",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_fusion_chestplate",
+      "text": "The most expensive suit on the whole life path: the $(4)Life Fusion Armor$(0).$(br2)$(bold)How to get it:$(0) at the \"$(l:akaishi:life_fusion_anvil)Life Fusion Anvil$(/l)\", fuse 1 piece of Akaishi Armor with 1 \"$(4)Life Fusion Ingot$(0)\".$(li)Fusion Ingots only come from offerings at the \"$(l:akaishi:mother_altar)Altar of the Black Mother$(/l)\" — which is exactly why they cost a fortune$(li)The result $(4)keeps every upgrade and all NBT from the original gear$(0), enchantments included$(br2)In one line: $(4)raise your best Akaishi Armor to endgame first, then fuse it.$(0)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Stats at a glance$(0) (2x Akaishi Armor):$(li)Armor: boots 8 / leggings 14 / chestplate 20 / helmet 8$(li)Toughness 8 · Knockback resistance 0.2$(li)Enchantability 25$(li)Durability = vanilla base for that slot × 92$(li)Repair material = Life Fusion Ingot$(br2)Item IDs of the four pieces:$(li)akaishi_life_fusion_helmet$(li)akaishi_life_fusion_chestplate$(li)akaishi_life_fusion_leggings$(li)akaishi_life_fusion_boots"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Set effects:$(0)$(li)$(4)Each piece worn$(0): every implanted organ gains \"$(4)effective compatibility +2$(0)\" — rejection grows slower and slot debuff thresholds rise$(li)$(4)All 4 pieces$(0) unlock the full set:$(br2)$(li)Organ strength ×1.2$(li)Rejection growth ×0.75$(li)On hit, damage is offset by draining portable Akaishi Energy cells in your inventory (100 per point)$(li)+10 max health while an active BOSS/Dragon-source organ is implanted$(li)Gain $(4)flight with no energy cost$(0) — take off any piece and it is revoked$(br2)How it plays with your body mods is covered in \"$(l:akaishi:life_body)Body & Decay$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:mother_altar",
+        "akaishi:life_fusion_anvil",
+        "akaishi:life_body",
+        "akaishi:trait_safe"
+      ],
+      "text": "Read first: the Mother Altar (where ingots come from) → the Life Fusion Anvil (how to forge) → Body & Decay (to pair with your implants); master your traits before forging for maximum value."
+    }
+  ]
+}

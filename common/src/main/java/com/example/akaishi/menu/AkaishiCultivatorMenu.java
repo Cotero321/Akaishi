@@ -53,9 +53,12 @@ public class AkaishiCultivatorMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；右侧空位）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 与浮层第一行末尾两格坐标重叠，须随浮层开关失活让位）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30,
+                () -> linkState != null && linkState.open));
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30,
+                () -> linkState != null && linkState.open));
 
         // 输入槽：生命样本（纯度 <100，满纯度无需再提纯）或器官（品质 <IV）
         addSlot(new OverlayHidingSlot(container, AkaishiCultivatorBlockEntity.INPUT_SLOT, 56, 30,
@@ -154,8 +157,9 @@ public class AkaishiCultivatorMenu extends AbstractContainerMenu {
                         MACHINE_SLOT_END + 36, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else {
+            } else if (linkState == null || !linkState.open) {
                 // 玩家背包：升级组件进升级槽，样本/器官/固态物按 mayPlace 自动进对应槽
+                // 浮层打开时机器槽失活隐藏，moveItemStackTo 不校验 isActive → 禁止 Shift 塞入不可见槽
                 if (!this.moveItemStackTo(current, 0, MACHINE_SLOT_END, false)) {
                     return ItemStack.EMPTY;
                 }

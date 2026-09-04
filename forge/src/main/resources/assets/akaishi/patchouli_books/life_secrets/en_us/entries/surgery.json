@@ -1,0 +1,27 @@
+{
+  "name": "Surgery Chamber",
+  "icon": "akaishi:akaishi_surgery",
+  "category": "akaishi:life_organs",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_surgery",
+      "text": "Implant organs into your body, or take them out.$(br2)$(bold)Transplant:$(0)$(li)3 solidified essence + 20,000 life energy, 80 ticks (4 seconds)$(li)the target slot must be empty$(li)writes the starting rejection: native organs start at 0, higher grades start higher$(br2)$(bold)Extract:$(0)1 solidified essence + 5,000 life energy, you take damage to that body part and rejection resets to zero.$(br2)$(bold)Note:$(0) surgery only runs while the $(4)GUI is open$(0) - closing it or dying mid-procedure interrupts the work."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Implanting & Rejection",
+      "text": "Rejection is an organ's $(4)compatibility score$(0) with your body: the slot type (organ/limb) sets the rules for rejection and side effects, while the grade sets its starting value and growth - higher grades are far less forgiving.$(br2)$(bold)Managing rejection:$(0) see the $(l:akaishi:life_potions)Life Potions$(/l) entry for the rejection serum; if an organ can't be tamed, come back and extract it.$(br2)Pair the Surgery Chamber with the $(l:akaishi:life_vaults)Vaults$(/l)' Organ Vault within 3 blocks for linked item access."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_organs",
+        "akaishi:life_potions",
+        "akaishi:life_vaults"
+      ],
+      "text": "Where do organs come from? Organ Construction. How do you keep rejection down? Life Potions."
+    }
+  ]
+}

@@ -2,22 +2,26 @@
   "name": "赤石装备",
   "icon": "akaishi:akaishi_sword",
   "category": "akaishi:advanced",
-  "sortnum": 4,
+  "sortnum": 5,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sword",
-      "text": "全套赤石装备：头盔/胸甲/护腿/靴子/剑/镐/铲/斧。$(br)由赤石锭锻造，基础扎实。注意：这套家伙已经$(2,4)取消工作台合成$(0)，别再对着一桌材料干瞪眼——它们的正门是下面的打造器。"
+      "text": "赤石装备是下界合金的$(4)强化版$(0)，面板约 ×1.25：$(li)护甲值 $(4){4,7,10,4}$(0)（靴/腿/胸/头），韧性 4$(li)击退抗性 0.1，附魔能力 15$(li)剑攻击 11 点，镐/锹/斧同理强于下界合金$(br2)$(bold)它们不再能工作台合成$(0)——正门在下面的赤石装备打造器。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_equipment_forger",
-      "text": "赤石装备打造器：消耗赤能源与升级点（锻造赠 4 点，每点 10M 赤能源）给装备分配基础属性——攻速/伤害/效率/生命/护甲/韧性。$(br)想当六边形战士？从这一台开始点天赋。"
+      "type": "patchouli:text",
+      "text": "$(bold)打造：$(0)所有赤石装备都从「$(l:akaishi:equipment_forger)赤石装备打造器$(/l)」重铸而来——喂下界合金装备与赤石锭，按部位扣费。$(br2)$(bold)强化：$(0)重铸完还能上「$(l:akaishi:upgrade_station)赤红升级台$(/l)」附加特殊能力，门票是「$(l:akaishi:upgrade_template)赤红升级模板$(/l)」。$(br2)想挂机攒锭，先去读「$(l:akaishi:ingot)赤石锭$(/l)」。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_upgrade_station",
-      "text": "赤红升级台：消耗 1 个升级槽位、1 枚赤红升级模板与 20M 赤能源，把所选特殊能力（吸血/击退/急迫/防火/防爆/摔落等）提升 1 级。$(br)通用能力最高 3 级，部位专属能力仅 1 级，别贪多嚼不烂。"
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:equipment_forger",
+        "akaishi:upgrade_station",
+        "akaishi:upgrade_template",
+        "akaishi:ingot"
+      ],
+      "text": "打造器、升级台、模板是一套流程：打造 → 附能力 → 再附能力；赤石锭则是重铸的燃料。"
     }
   ]
 }

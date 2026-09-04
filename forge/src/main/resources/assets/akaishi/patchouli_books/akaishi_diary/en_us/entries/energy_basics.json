@@ -1,12 +1,26 @@
 {
-  "name": "Energy Basics",
+  "name": "Akaishi Energy Basics",
   "icon": "akaishi:akaishi_energy_cell_basic",
   "category": "akaishi:energy",
   "sortnum": 1,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Welcome to akaishi tech — the home of \"Akaishi Energy\", the red cousin of electricity.$(br2)In short, you have to feed it before you can do anything useful. Remember this food chain:$(li)$(2,4)Generate$(0): Energy Generator, Assembly, Super Architecture, Reactor, Fusion Reactor (each step costs more hair)$(li)$(2,4)Store$(0): Energy Cells, Serializer (the piggy bank itself)$(li)$(2,4)Transport$(0): Energy Pipes (the grid — don't wire it backwards)$(li)$(2,4)Carry$(0): Portable Cells (a power bank with legs)$(br2)One line to live by: power first, ores second, and only then your fortune."
+      "text": "Akaishi Energy is this mod's \"electricity\": almost every machine runs on it.$(br2)$(bold)One line to remember:$(0) if you want automation, feed the grid first.$(br2)A power grid is made of four jobs:$(li)$(4)Generate$(0): the \"$(l:akaishi:generator)Energy Generator$(/l)\" burns fuel into power; later come the Reactor and Fusion Reactor for mass output$(li)$(4)Store$(0): \"$(l:akaishi:energy_cell)Energy Cells$(/l)\"$(li)$(4)Transport$(0): \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" carry power to every machine$(li)$(4)Carry$(0): \"$(l:akaishi:portable_cell)Portable Cells$(/l)\" power you on the go$(br2)Build the generator first, then cells, then pipe your machines into one grid — the order matters, you can't skip a step."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Five fuel tiers$(0) (heating value, low to high):$(li)Akaishi Crystal$(li)Raw Akaishi Block$(li)Akaishi Essence$(li)Condensed Akaishi Essence$(li)Condensed Akaishi Essence Block$(br2)Each step up is worth roughly 10x the heating value, refined through the chain described in \"$(l:akaishi:crystal)Akaishi Crystals & Essence$(/l)\".$(br2)$(bold)Reading big numbers:$(0) machine UIs abbreviate large values: K=thousand, M=million, B=billion. The better you refine your fuel, the longer and stronger each burn lasts — one extra refining step saves ten refills."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:generator",
+        "akaishi:energy_cell",
+        "akaishi:energy_pipe",
+        "akaishi:purifier"
+      ],
+      "text": "After this page, read in order: Energy Generator → Energy Cells → Energy Pipes to complete your first power grid."
     }
   ]
 }

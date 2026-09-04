@@ -49,9 +49,12 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；3×3 区右侧中部空位）
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 86, 30));
-        addSlot(new Slot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 104, 30));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 坐标落在存储浮层面板带内（x80..98 / y24..42），浮层打开时必须失活让位 → OverlayHidingSlot）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 86, 30,
+                () -> linkState != null && linkState.open));
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 104, 30,
+                () -> linkState != null && linkState.open));
 
         // 器官输入槽：仅接受器官物品（槽位匹配在服务端手术开始时校验）
         addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.ORGAN_SLOT, 120, 28,
@@ -151,8 +154,9 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
                         MACHINE_SLOT_END + 36, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else {
+            } else if (linkState == null || !linkState.open) {
                 // 玩家背包：升级组件进升级槽，器官/固态物按 mayPlace 自动进对应槽
+                // 浮层打开时机器槽失活隐藏，moveItemStackTo 不校验 isActive → 禁止 Shift 塞入不可见槽
                 if (!this.moveItemStackTo(current, 0, MACHINE_SLOT_END, false)) {
                     return ItemStack.EMPTY;
                 }

@@ -2,7 +2,6 @@ package com.example.akaishi.wireless;
 
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.item.IdentityCardTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -90,10 +89,5 @@ public final class WirelessTransferUtil {
             return false;
         }
         return target.getBlockEntity(tr.pos()) instanceof AkaishiWirelessTerminalBlockEntity t && t.isCrossDim();
-    }
-
-    /** 口每 tick 传输上限 = 基础速率 × 卡等级倍率（按卡自动解锁，当前仅基础级 1×） */
-    public static long transferRate(IdentityCardTier tier) {
-        return ModConfig.wirelessPortTransferRate * tier.rateMultiplier();
     }
 }

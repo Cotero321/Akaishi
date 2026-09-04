@@ -1,5 +1,6 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiCompressorMenu;
@@ -32,7 +33,10 @@ public class AkaishiCompressorBlockEntity extends AkaishiSingleSlotMachineBlockE
             Map.entry(ModItems.quartzDust.get(), new MachineRecipe(ModItems.quartzDust.get(), 9, Items.QUARTZ_BLOCK, 1)),
             Map.entry(ModItems.netheriteDust.get(), new MachineRecipe(ModItems.netheriteDust.get(), 9, Items.NETHERITE_INGOT, 1)),
             Map.entry(ModItems.obsidianDust.get(), new MachineRecipe(ModItems.obsidianDust.get(), 4, Items.OBSIDIAN, 1)),
-            Map.entry(ModItems.akaishiDust.get(), new MachineRecipe(ModItems.akaishiDust.get(), 9, ModItems.akaishiEssence.get(), 1))
+            Map.entry(ModItems.akaishiDust.get(), new MachineRecipe(ModItems.akaishiDust.get(), 9, ModItems.akaishiEssence.get(), 1)),
+            // 赤石水晶块：9 赤石晶 → 压缩机压 1 块（与工作台「9 晶压粗制赤石块」区分开，避免配方冲突）
+            Map.entry(ModItems.akaishiCrystal.get(),
+                    new MachineRecipe(ModItems.akaishiCrystal.get(), 9, ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem(), 1))
     );
 
     public AkaishiCompressorBlockEntity(BlockPos pos, BlockState state) {

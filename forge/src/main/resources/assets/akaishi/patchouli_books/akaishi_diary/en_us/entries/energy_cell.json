@@ -2,22 +2,28 @@
   "name": "Energy Storage",
   "icon": "akaishi:akaishi_energy_cell_super",
   "category": "akaishi:energy",
-  "sortnum": 3,
+  "sortnum": 4,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_cell_basic",
-      "text": "Energy cells, your power piggy bank, come in three tiers: basic, advanced, super — capacity goes sky-high as you climb.$(br)Your base can lack walls, but the grid can't lack these."
+      "text": "Energy Cells are your grid's $(4)reservoir$(0): they decouple generation from consumption, so a stuttering generator never starves your machines.$(br2)$(bold)Basic Cell:$(0)$(li)Capacity: $(bold)500 million$(0) AE$(li)Up to $(4)1 million AE/tick$(0) in or out (shared charge/discharge limit)$(br2)Tier comparison on the next page. Pro tip: drop a Portable Cell into its charge slot and the cell tops it up for you."
     },
     {
       "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_cell_serializer",
-      "text": "The Energy Cell Serializer: arrange 26 cells into a 3×3×3 and let them \"fuse\" into one behemoth.$(br)Total capacity explodes, so say goodbye to the nightmare of \"power low\" warnings."
+      "item": "akaishi:akaishi_energy_cell_super",
+      "text": "$(bold)Three tiers of storage$(0) (capacity / per-tick transfer):$(li)$(4)Basic$(0): 500 million / 1 million$(li)Advanced: 2 billion / 5 million$(li)$(4)Super$(0): 20 billion / 50 million$(br2)Advanced and Super are crafted by upgrading the tier below them, and tiers mix freely in one grid.$(br2)That transfer limit decides your burst throughput — when your generators and pipes are fast, don't let a small cell become the bottleneck.$(br2)One cell not enough? See the \"$(l:akaishi:cell_serializer)Cell Serializer$(/l)\" for a mega-battery."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:portable_akaishi_cell_super",
-      "text": "The portable cell is a power bank for your backpack.$(br)Carry it to auto-repair akaishi gear, right-click to check the juice — it's your lifeline when you head out to roam."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:generator",
+        "akaishi:gen_matrix",
+        "akaishi:energy_pipe",
+        "akaishi:portable_cell",
+        "akaishi:cell_serializer"
+      ],
+      "text": "Storing is only half the job: get started with \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\", then pair the \"$(l:akaishi:generator)Energy Generator$(/l)\" or \"$(l:akaishi:gen_matrix)Generator Matrix$(/l)\" with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" into a full loop — scale up with the \"$(l:akaishi:cell_serializer)Cell Serializer$(/l)\" and carry \"$(l:akaishi:portable_cell)Portable Cells$(/l)\" when you head out."
     }
   ]
 }

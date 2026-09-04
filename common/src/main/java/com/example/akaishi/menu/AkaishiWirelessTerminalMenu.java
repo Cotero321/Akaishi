@@ -12,6 +12,8 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.UUID;
+
 /**
  * 无线赤能源终端菜单（终端方块主界面，四个互斥页面：运行情况/能量储存/安全卡认证/能量传输）。
  * 无机器存储槽，仅 1 个「安全卡认证」页的授权槽（只接受身份卡）；
@@ -108,11 +110,16 @@ public class AkaishiWirelessTerminalMenu extends AbstractContainerMenu {
         ItemStack card = cardInv.getItem(0);
         if (card.getItem() instanceof AkaishiWirelessIdentityCardItem) {
             if (id == BTN_AUTHORIZE) {
-                be.authorizeCard(AkaishiWirelessIdentityCardItem.uuidOf(card));
+                // 授权需真实卡号：服务端逻辑为新卡生成唯一 UUID 并写回
+                be.authorizeCard(AkaishiWirelessIdentityCardItem.ensureUuid(card));
                 return true;
             }
             if (id == BTN_REVOKE) {
-                be.revokeCard(AkaishiWirelessIdentityCardItem.uuidOf(card));
+                // 撤销只读卡号：无 UUID 说明从未授权，不凭空生成
+                UUID cardUuid = AkaishiWirelessIdentityCardItem.uuidOf(card);
+                if (cardUuid != null) {
+                    be.revokeCard(cardUuid);
+                }
                 return true;
             }
         }

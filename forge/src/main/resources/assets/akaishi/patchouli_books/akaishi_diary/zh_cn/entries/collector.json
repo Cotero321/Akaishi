@@ -7,7 +7,19 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_collector_basic",
-      "text": "自动收集器，赤石晶自动化的「收割机」：自动收获范围内成熟水晶簇，精华入 27 槽容器。$(li)基础：3×3×3，30 tick/方块，2 能/t$(li)中级：5×5×5，15 tick/方块，4 能/t$(li)高级：9×9×9，7 tick/方块，8 能/t$(li)超级：16×16×16，2 tick/方块，16 能/t$(br2)支持漏斗与物品管道抽取，配合催化器=全自动印钞机。"
+      "text": "自动收集器是水晶农场的「收割机」：自动收获范围内成熟的水晶簇，产物（1-2 赤石精华）直接存进内部 $(4)27 格箱子$(0)。$(br2)$(bold)四档规格$(0)（范围边长 / 单方块耗时 / 每 tick 能耗）：$(li)$(4)基础$(0)：3×3×3，30 tick/个，2 能/tick$(li)中级：5×5×5，15 tick/个，4 能/tick$(li)高级：9×9×9，7 tick/个，8 能/tick$(li)超级：16×16×16，2 tick/个，16 能/tick$(br2)放心挂机：容器满了它宁可停工也不拆簇。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)黄金搭档：催化器 + 收集器 = 全自动水晶农场。$(0)$(li)催化器每 tick 催熟范围内的母岩长簇$(li)收集器随后扫掉成熟簇，精华进箱$(br2)两台机器范围对齐摆好就能挂机。$(br2)箱子里的精华支持$(4)漏斗与物品管道$(0)抽取，运去压缩机等下游加工即可。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:catalyst",
+        "akaishi:pulverizer"
+      ],
+      "text": "产出端靠「$(l:akaishi:catalyst)赤石催化器$(/l)」供簇；精华的用途从「$(l:akaishi:pulverizer)粉碎机$(/l)」开始读。"
     }
   ]
 }

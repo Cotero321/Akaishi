@@ -2,12 +2,25 @@
   "name": "Energy Aggregator",
   "icon": "akaishi:akaishi_energy_aggregator",
   "category": "akaishi:advanced",
-  "sortnum": 5,
+  "sortnum": 4,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_aggregator",
-      "text": "The Energy Aggregator, the alchemy furnace that condenses a mountain of energy into an Akaishi Ingot.$(br)Feed it a Netherite Ingot and pour in 10M energy, and out comes an Akaishi Ingot — the milestone where ore civilization crosses into industrial civilization, all in one smelt."
+      "text": "The Energy Aggregator condenses a mountain of Akaishi Energy into something real:$(br2)$(bold)Two uses:$(0)$(li)$(4)10M energy + 1 Netherite Ingot -> 1 Akaishi Ingot$(0)$(li)$(4)10M energy + 1 Geode -> Geode one grade higher$(0) (Flawed -> Normal -> Pristine -> Perfect)$(br2)It carries a $(4)200M$(0) energy buffer and only takes power in — pipe energy over, drop in the material, and it works on its own."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Remember this: the Aggregator is the only way to mass-produce Akaishi Ingots.$(0) It gates everything downstream — Akaishi gear, machine components, the whole industrial chain.$(br2)Geode upgrades run through it too: push a Flawed Geode all the way to Perfect and your crystal farm yields several times over.$(br2)Low on power? Add generators, mesh them into one grid with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" and bank it in Energy Cells."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ingot",
+        "akaishi:catalyst",
+        "akaishi:energy_pipe"
+      ],
+      "text": "What the ingots build and how the Geode farm works: see \"$(l:akaishi:ingot)Akaishi Ingot$(/l)\" and \"$(l:akaishi:catalyst)Catalyst$(/l)\"."
     }
   ]
 }

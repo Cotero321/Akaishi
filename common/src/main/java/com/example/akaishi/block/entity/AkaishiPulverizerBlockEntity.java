@@ -48,6 +48,16 @@ public class AkaishiPulverizerBlockEntity extends AkaishiSingleSlotMachineBlockE
         map.put(Items.NETHER_QUARTZ_ORE, new MachineRecipe(Items.NETHER_QUARTZ_ORE, 1, ModItems.quartzDust.get(), 2));
         map.put(Items.ANCIENT_DEBRIS, new MachineRecipe(Items.ANCIENT_DEBRIS, 1, ModItems.netheriteDust.get(), 1));
         map.put(Items.OBSIDIAN, new MachineRecipe(Items.OBSIDIAN, 1, ModItems.obsidianDust.get(), 1));
+        // 原料（矿物锭/宝石）→ 单粉：1 原料打成 1 粉（产量低于原矿打粉，属便利性补充途径）
+        map.put(Items.COAL, new MachineRecipe(Items.COAL, 1, ModItems.coalDust.get(), 1));
+        map.put(Items.IRON_INGOT, new MachineRecipe(Items.IRON_INGOT, 1, ModItems.ironDust.get(), 1));
+        map.put(Items.COPPER_INGOT, new MachineRecipe(Items.COPPER_INGOT, 1, ModItems.copperDust.get(), 1));
+        map.put(Items.GOLD_INGOT, new MachineRecipe(Items.GOLD_INGOT, 1, ModItems.goldDust.get(), 1));
+        map.put(Items.LAPIS_LAZULI, new MachineRecipe(Items.LAPIS_LAZULI, 1, ModItems.lapisDust.get(), 1));
+        map.put(Items.DIAMOND, new MachineRecipe(Items.DIAMOND, 1, ModItems.diamondDust.get(), 1));
+        map.put(Items.EMERALD, new MachineRecipe(Items.EMERALD, 1, ModItems.emeraldDust.get(), 1));
+        map.put(Items.QUARTZ, new MachineRecipe(Items.QUARTZ, 1, ModItems.quartzDust.get(), 1));
+        map.put(Items.NETHERITE_INGOT, new MachineRecipe(Items.NETHERITE_INGOT, 1, ModItems.netheriteDust.get(), 1));
         // 16 个赤石矿石 → 赤石粉（浓度/环境无关，统一 2 粉）
         for (AkaishiOreDef def : ModBlocks.ALL_ORES) {
             Item ore = ModBlocks.get(def).asItem();

@@ -1,6 +1,6 @@
 {
   "name": "Akaishi Energy",
-  "description": "Akaishi Energy powers everything. Build generation and storage first.",
+  "description": "The power source of every machine. This chapter teaches generation, storage, transport and portable cells — $(bold)build your grid before moving to Machines$(0).",
   "icon": "akaishi:akaishi_energy_cell_basic",
   "sortnum": 2
 }

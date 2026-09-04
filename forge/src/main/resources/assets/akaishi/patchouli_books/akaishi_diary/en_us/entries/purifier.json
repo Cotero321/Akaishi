@@ -7,12 +7,20 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_purifier",
-      "text": "The Akaishi Purifier, the \"juicer\" that squeezes rough akaishi blocks into akaishi essence.$(br)It's the very first consumer of energy — feed it a block, power it up, and essence rolls into the output slot. Your first power-hungry machine starts right here."
+      "text": "The Akaishi Purifier is still very much in service as a $(4)self-fueling single-block refiner$(0): drop Akaishi Crystals or Raw Akaishi Blocks into the fuel slot, and it burns them into energy that converts a Raw Akaishi Block in the input slot into $(bold)1 essence$(0) — or an Akaishi Crystal Block into $(bold)4 essence$(0).$(br2)$(bold)Three tips:$(0)$(li)It has its own fuel slot — $(bold)it runs without a grid$(0)$(li)Speed upgrades accelerate it, and an energy pipe can lend a hand$(li)Never feed essence as fuel — it only burns crystals and raw blocks"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_advanced_purifier",
-      "text": "The Advanced Purifier block is a wall block of the Purifier Matrix.$(br)Enclose a 3×3×3 space with matrix casings, add a controller and ports, and purifying speed jumps 30×. The full matrix recipe is in the \"Advanced Tech\" chapter."
+      "type": "patchouli:text",
+      "text": "When output can't keep up, stop circling the Purifier: the $(4)Purifier Matrix$(0) is a $(bold)standalone bulk-refining multiblock$(0) — frame a 3×3×3 cavity with Purifier Matrix Casing, then add the controller, an energy input port and item input/output ports. Once formed, the controller refines in bulk at $(4)30x speed$(0): Raw Akaishi Block → 1 essence, Akaishi Crystal Block → 4 essence.$(br2)$(bold)One key difference:$(0) the matrix has no fuel slot — $(e)it lives on grid power$(0). Full wall checklist and build guide: \"$(l:akaishi:purifier_matrix)Purifier Matrix$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:ore",
+        "akaishi:crystal",
+        "akaishi:purifier_matrix"
+      ],
+      "text": "Reading order: ore brings crystals → craft them into raw blocks → squeeze essence out of them with the Purifier → feed the essence into the concentration chain. Going big? Open the Purifier Matrix entry and start building."
     }
   ]
 }

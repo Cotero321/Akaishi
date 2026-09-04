@@ -2,27 +2,26 @@
   "name": "等离子体链",
   "icon": "akaishi:akaishi_activated_fractionator",
   "category": "akaishi:tech",
-  "sortnum": 7,
+  "sortnum": 8,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_activated_fractionator",
-      "text": "活化分馏器：把活化结晶劈成两半——$(li)活化成分：喂给聚变燃料聚合器，走向等离子体$(li)衰竭结晶：废料，但别扔，物品重构仪爱它$(br)一次加工，两种命运，堪称赤石界的「选择困难症终结者」。"
+      "type": "patchouli:text",
+      "text": "等离子体链 = $(4)燃料的终极形态$(0)：把普通燃料一步步浓缩成等离子体燃料棒，专供聚变堆。$(br2)$(bold)上游：$(0)本链原料「活化结晶」产自衰竭燃料的活化器 → 离心机路线——那是《生命的奥秘》的内容。$(br2)$(bold)本链三步，逐台入口：$(0)$(li)「$(l:akaishi:plasma_fractionator)活化分馏器$(/l)」：活化结晶切成活化成分$(li)「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」：活化成分聚成等离子体$(li)「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」：等离子体灌进反应棒$(br2)成品直接喂「$(l:akaishi:fusion)聚变堆$(/l)」。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_plasma_pipe",
-      "text": "等离子体管道：第三传输家族，只认等离子体这一种货。$(br)别的液体想蹭管道？门都没有。高冷、专一、绝不串味。"
+      "type": "patchouli:text",
+      "text": "$(bold)物流专线：$(0)等离子体只能走$(4)等离子体管道 / 等离子体燃料储罐$(0)，普通液体管道一概不认——从聚合器到填装器先铺好这条专线，一滴不洒。$(br2)三种燃料棒总能量都是 $(4)6 万亿$(0)，只是脾气各异：怎么挑、怎么烧，见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」专条。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_plasma_tank",
-      "text": "等离子体燃料储罐：等离子体的专属豪宅，只存等离子体。$(br)配合管道与聚合器，等离子体从生产到填装全程无缝衔接，一滴都不浪费。"
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_exhausted_barrel",
-      "text": "衰竭保存桶：专储衰竭燃料的「有害垃圾回收站」。$(br)反应堆炸不炸，一半看散热，一半看你有没有及时把废料塞进这里。"
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma_fractionator",
+        "akaishi:plasma_aggregator",
+        "akaishi:plasma_filler",
+        "akaishi:plasma_rods",
+        "akaishi:fusion"
+      ],
+      "text": "产线三台机器与成品棒的专条都在上方；最终烧掉它们的是「$(l:akaishi:fusion)聚变堆$(/l)」。"
     }
   ]
 }

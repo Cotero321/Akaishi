@@ -1,6 +1,6 @@
 {
   "name": "High Tech",
-  "description": "Reactor, fusion and wireless energy - the crown of Akaishi tech.",
+  "description": "The crown of Akaishi tech: fuel & cooling → reactor → plasma → fusion → wireless energy.$(br)Cooling sinks from the Advanced chapter are your ticket in.",
   "icon": "akaishi:akaishi_reactor_controller",
   "sortnum": 6
 }

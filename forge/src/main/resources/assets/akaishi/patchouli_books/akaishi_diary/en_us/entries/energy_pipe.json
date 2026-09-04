@@ -2,17 +2,30 @@
   "name": "Energy Pipes",
   "icon": "akaishi:akaishi_energy_pipe_ultimate",
   "category": "akaishi:energy",
-  "sortnum": 4,
+  "sortnum": 6,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_pipe",
-      "text": "Energy pipes, the veins of your grid, come in 4 tiers: basic, intermediate, advanced, ultimate — transfer rates climb tier by tier.$(br)Building something big? Route your pipes right first, or the power will jam up worse than rush-hour traffic."
+      "text": "Energy Pipes are the $(4)veins$(0) of your grid: they tie generators, cells and machines into one network that balances power on its own.$(br2)$(bold)Key facts:$(0)$(li)Neighbouring pipes and blocks $(4)connect automatically$(0) — anything linked shares one grid$(li)A single network holds up to $(bold)1024 pipe segments$(0), plenty for a large base$(li)Hook up a machine and power flows; several machines share it on demand$(br2)Want fine control over the flow? Every segment has a Normal / Push / Pull mode and can have one side severed — the tool is on the next page."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_debug_tool",
-      "text": "The Configurator is your pipe remote control:$(li)Right-click a pipe: toggle push/pull mode$(li)Sneak + right-click: break/restore one side of the connection$(br2)Wired it backwards? Don't panic, whip this out and save the day."
+      "text": "The $(4)Configurator$(0) is your wrench for pipes:$(li)$(bold)Right-click$(0) a pipe: cycle Normal → Push → Pull. $(bold)Normal$(0) flows both ways; $(bold)Push$(0) only feeds connected devices; $(bold)Pull$(0) only drains them$(li)$(bold)Sneak + right-click$(0) one face: $(4)sever / restore$(0) that side so power skips whatever you don't want to touch$(br2)Wired it backwards? Two clicks fix it — no need to break the pipe."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Four tiers of transfer rate per tick$(0):$(li)Akaishi Energy Pipe: 50 thousand$(li)Advanced: 500 thousand$(li)Elite: 5 million$(li)Ultimate: 50 million$(br2)Each step is 10× the last. $(4)A Basic pipe already drives a single Generator Matrix$(0); switch to the higher tiers for a sprawling grid — $(bold)never let the pipe be the bottleneck$(0)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:generator",
+        "akaishi:energy_cell",
+        "akaishi:energy_basics"
+      ],
+      "text": "Run the \"$(l:akaishi:generator)Energy Generator$(/l)\" output through pipes into \"$(l:akaishi:energy_cell)Energy Cells$(/l)\" and out to every machine — that's a complete grid. Missed the fundamentals? Check \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\"."
     }
   ]
 }

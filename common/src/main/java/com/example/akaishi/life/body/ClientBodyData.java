@@ -80,11 +80,17 @@ public final class ClientBodyData {
         return REJECTION.getOrDefault(slot, 0);
     }
 
-    /** 总排斥值（9 槽位求和） */
+    /**
+     * 总排斥值（9 槽位求和）。与服务器超载判定一致：已完全失效（=100）的死器官不计入，
+     * 避免体检台显示与身上的超载 debuff 对不上。
+     */
     public static int getTotalRejection() {
         int total = 0;
         for (BodySlot slot : BodySlot.values()) {
-            total += getRejection(slot);
+            int rej = getRejection(slot);
+            if (rej < PlayerBodyState.MAX_REJECTION) {
+                total += rej;
+            }
         }
         return total;
     }

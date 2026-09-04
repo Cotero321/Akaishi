@@ -1,0 +1,25 @@
+{
+  "name": "Fuel Canner",
+  "icon": "akaishi:akaishi_fuel_canner",
+  "category": "akaishi:tech",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fuel_canner",
+      "text": "The Canner pours liquid into fuel cells: $(4)10,000 mb per cell$(0), filling at 1,000 mb/tick and $(bold)free of charge$(0).$(br2)Fully automatic: empty cell in → filled → full cell out. Hook up fluid and item pipes and it runs unattended."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)What to can:$(0) the Nether Compound / Pure fuel from the $(l:akaishi:fuel_processor)Energy Processor$(/l) and the Advanced / Ultimate Mixture from the $(l:akaishi:fuel_mixer)Fuel Mixer$(/l).$(br2)Carry the filled cells straight to the $(l:akaishi:reactor)Reactor$(/l); chasing the top tier? Blend it in the Mixer first."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:reactor"
+      ],
+      "text": "Overview in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l); the $(l:akaishi:reactor)Reactor$(/l) is where the cells get burned."
+    }
+  ]
+}

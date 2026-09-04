@@ -7,11 +7,20 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_ore_medium",
-      "text": "Akaishi crystals spawn as ore clusters in the Overworld (stone/deepslate), the Nether, and the End — its shadow reaches the very edge of the universe.$(br)Clusters come in 4 concentrations: flawless, low, medium, perfect. The richer the concentration, the fatter the drop per swing."
+      "text": "Ore clusters are where Akaishi Crystals come from — and the very start of your tech line: mine a cluster $(bold)with a pickaxe and crystals drop straight out$(0), no smelting, no machinery.$(br2)$(bold)Where to find them:$(0) the Overworld (stone and deepslate layers), the Nether and the End all host them.$(br2)$(4)Newbie advice:$(0) mine every cluster you see — $(e)you need a pickaxe$(0) for anything to drop. Bank a full stack of crystals first; refining and power generation both depend on them."
     },
     {
       "type": "patchouli:text",
-      "text": "$(2,4)Concentration = yield$(0): concentration decides how many crystals drop per break. Don't frown at the count — slap Fortune on your pickaxe to boost it further.$(br2)$(2,4)Want to count money while lying down?$(0)Remember two names: Catalyst + Collector. Together they make crystal farming fully automatic. The full play is in the \"Advanced Industry\" chapter."
+      "text": "There are $(bold)16 kinds$(0) of cluster: 4 environments (Overworld / Deepslate / Nether / End) × 4 density grades.$(br2)$(bold)The four grades:$(0)$(li)Low-Density — most common, 1 crystal per block$(li)Medium-Density — 2 crystals$(li)Perfect — 3 crystals$(li)Flawless — rarest, 4 crystals$(br2)$(bold)Drops are fixed:$(0) Fortune does nothing here, so skip the enchant; Silk Touch lets you carry the whole cluster home.$(br2)$(4)Richer means rarer$(0) — to turn what you mine into essence and ingots, read \"$(l:akaishi:crystal)Crystal & Essence$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:crystal",
+        "akaishi:catalyst",
+        "akaishi:purifier"
+      ],
+      "text": "Ore runs out, crystals don't: Akaishi Crystal Geodes (akaishi_geode_*) sprout clusters on their own, and a Catalyst plus a Collector turn that into mass production — see the Advanced chapter. For now, feed what you mine into the Purifier and cash it in as essence."
     }
   ]
 }

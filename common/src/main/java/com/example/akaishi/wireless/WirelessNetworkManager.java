@@ -3,6 +3,7 @@ package com.example.akaishi.wireless;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -193,7 +194,12 @@ public final class WirelessNetworkManager {
         if (target == null) {
             return false;
         }
-        BlockEntity be = target.getBlockEntity(BlockPos.of(key.pos()));
+        BlockPos pos = BlockPos.of(key.pos());
+        // 仅检查已加载区块，避免 getBlockEntity 触发未加载区块的同步加载/生成（跨维度周期性抖动）
+        if (!((ServerLevel) target).isLoaded(pos)) {
+            return false;
+        }
+        BlockEntity be = target.getBlockEntity(pos);
         return be != null && valid.test(be);
     }
 

@@ -1,0 +1,22 @@
+{
+  "name": "赤能源储存串联器",
+  "icon": "akaishi:akaishi_energy_cell_serializer",
+  "category": "akaishi:energy",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_energy_cell_serializer",
+      "text": "一台不够装？$(4)赤能源储存串联器$(0)把零散单元拼成巨型电池。$(br2)$(bold)成型$(0)：中心放 1 个串联器，周围 $(4)26 个能量单元$(0)（任意等级）摆满 3×3×3 外壳位；任取一个外壳单元接管道，即可整体充放电。$(br2)$(bold)总储能 = 基础 10 亿 + 26 × 单个单元容量$(0)。全上超级单元即 26×200 亿 + 10 亿 ≈ $(bold)5210 亿$(0)。$(br2)（创造模式那个「无限单元」是调试道具，生存别指望它。）"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_cell",
+        "akaishi:generator",
+        "akaishi:energy_pipe"
+      ],
+      "text": "串联器堆的是「$(l:akaishi:energy_cell)储存单元$(/l)」；配「$(l:akaishi:generator)发生机$(/l)」/「$(l:akaishi:gen_matrix)发生器矩阵$(/l)」供电，再用「$(l:akaishi:energy_pipe)管道$(/l)」接入电网。"
+    }
+  ]
+}

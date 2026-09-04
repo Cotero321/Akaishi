@@ -2,22 +2,26 @@
   "name": "Equipment",
   "icon": "akaishi:akaishi_sword",
   "category": "akaishi:advanced",
-  "sortnum": 4,
+  "sortnum": 5,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sword",
-      "text": "The full akaishi gear set: helmet / chestplate / leggings / boots / sword / pickaxe / shovel / axe.$(br)Forged from Akaishi Ingots with solid base stats. Heads up: this set has already $(2,4)lost its crafting-table recipes$(0) — stop staring at a table full of materials, their front door is the Forger below."
+      "text": "Akaishi gear is a $(4)beefed-up Netherite set$(0), roughly x1.25 on the stats sheet:$(li)armor $(4){4,7,10,4}$(0) (boots/legs/chest/head), toughness 4$(li)knockback resistance 0.1, enchantability 15$(li)the sword hits for 11; pickaxe/shovel/axe outclass Netherite the same way$(br2)$(bold)None of it is crafted at a table anymore$(0) — the front door is the Equipment Forger below."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_equipment_forger",
-      "text": "The Equipment Forger: spend energy and upgrade points (forging grants 4 points, 10M energy each) to assign base stats to gear — attack speed / damage / efficiency / health / armor / toughness.$(br)Want to be a hexagon warrior? Start assigning your talents here."
+      "type": "patchouli:text",
+      "text": "$(bold)Craft it:$(0) every piece of Akaishi gear comes from the $(l:akaishi:equipment_forger)Equipment Forger$(/l) — feed it Netherite gear and Akaishi Ingots, each piece has its own cost.$(br2)$(bold)Enhance it:$(0) after recasting, the $(l:akaishi:upgrade_station)Upgrade Station$(/l) bolts special abilities on, and the ticket is the $(l:akaishi:upgrade_template)Upgrade Template$(/l).$(br2)To farm ingots on autopilot, read $(l:akaishi:ingot)Akaishi Ingot$(/l) first."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_upgrade_station",
-      "text": "The Upgrade Station: spend 1 upgrade slot, 1 Upgrade Template, and 20M energy to raise a chosen special ability (lifesteal, knockback, haste, fire protection, blast protection, fall protection, etc.) by 1 level.$(br)General abilities cap at level 3; body-part-specific abilities only go to level 1 — don't bite off more than you can chew."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:equipment_forger",
+        "akaishi:upgrade_station",
+        "akaishi:upgrade_template",
+        "akaishi:ingot"
+      ],
+      "text": "The Forger, the Station and the Template are one pipeline: recast, then bolt on abilities, then bolt on more; Akaishi Ingots are the recasting fuel."
     }
   ]
 }

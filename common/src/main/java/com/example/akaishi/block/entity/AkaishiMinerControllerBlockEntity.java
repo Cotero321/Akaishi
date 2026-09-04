@@ -20,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -125,8 +124,25 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
             setFormed(valid, scan);
             formed = valid;
             changed = true;
+        } else if (checked && valid) {
+            // 已成型且本次扫描有效：刷新缓存（BE 重载后 upgradeFrames/ports 为空，
+            // 不刷新会导致升级统计归零、产物不推送转口）
+            upgradeFrames = scan.upgradeFrames();
+            ports = scan.ports();
+            refreshUpgrades();
+            for (BlockPos pp : ports) {
+                if (level.getBlockEntity(pp) instanceof AkaishiMinerPortBlockEntity port) {
+                    port.setControllerPos(worldPosition);
+                }
+            }
         }
         data.set(DATA_FORMED, formed ? 1 : 0);
+        if (!formed) {
+            // 结构解散：升级统计清零，避免 GUI 残留上一次成型数据
+            data.set(DATA_SPEED, 0);
+            data.set(DATA_FORTUNE, 0);
+            data.set(DATA_STORAGE, 0);
+        }
 
         if (formed) {
             if (++upgradeTick % 20 == 0) {
@@ -135,24 +151,26 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
             data.set(DATA_SPEED, speedCount);
             data.set(DATA_FORTUNE, fortuneCount);
             data.set(DATA_STORAGE, storageCount);
-            // 消耗能量推进挖矿进度（速度升级加速、也提能耗；能量不足则停机）
-            long cost = (long) (ModConfig.minerCostPerTickBase * (1.0 + COST_STEP * speedCount));
-            if (energy.getEnergyStored() >= cost) {
-                energy.extractEnergy(cost, false);
-                speedAccum += t.rateMultiplier * (1.0 + SPEED_STEP * speedCount);
-                int delta = (int) speedAccum;
-                if (delta > 0) {
-                    speedAccum -= delta;
-                    progress += delta;
-                }
-                if (progress >= ModConfig.minerTicksBase) {
-                    progress = 0;
-                    speedAccum = 0;
-                    produceOre(t);
-                }
-                changed = true;
-            }
+            // 先把暂存槽产物推向转口，为下批产出腾空间（爆仓保护依赖此步每 tick 执行）
             pushToPorts();
+            // 爆仓保护：进度攒满但暂存/转口均无空位时停机不耗能，待清出空间后再结算产出
+            if (progress >= ModConfig.minerTicksBase) {
+                // 只有真正结算成功（产物落槽、进度归零）才标脏存档；爆仓未结算无状态变化不标脏
+                changed |= settleOre(t);
+            } else {
+                // 消耗能量推进挖矿进度（速度升级加速、也提能耗；能量不足则停机）
+                long cost = (long) (ModConfig.minerCostPerTickBase * (1.0 + COST_STEP * speedCount));
+                if (energy.getEnergyStored() >= cost) {
+                    energy.extractEnergy(cost, false);
+                    speedAccum += t.rateMultiplier * (1.0 + SPEED_STEP * speedCount);
+                    int delta = (int) speedAccum;
+                    if (delta > 0) {
+                        speedAccum -= delta;
+                        progress += delta;
+                    }
+                    changed = true;
+                }
+            }
         }
         if (changed) {
             setChanged();
@@ -207,30 +225,34 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
         }
     }
 
-    /** 按概率表随机产出一个矿物（数量 = 1 + 时运升级数） */
-    private void produceOre(AkaishiMinerTier t) {
+    /**
+     * 结算一次采矿产出：按概率表随机产出（数量 = 1 + 时运升级数）并放入暂存槽。
+     * 优先合并到同种矿物格，其次空槽；全部放不下（爆仓）返回 false，进度保留等待清仓后再结算。
+     */
+    private boolean settleOre(AkaishiMinerTier t) {
         Item ore = rollMineral(level.random, t);
         int qty = Math.min(1 + FORTUNE_STEP * fortuneCount, ore.getMaxStackSize());
-        ItemStack stack = new ItemStack(ore, qty);
-        // 优先合并到同种矿物格，其次空槽；暂存全满则掉落世界
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             ItemStack s = inventory.getItem(i);
             if (s.is(ore) && s.getCount() + qty <= s.getMaxStackSize()) {
                 s.grow(qty);
-                return;
+                progress = 0;
+                speedAccum = 0;
+                return true;
             }
         }
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             if (inventory.getItem(i).isEmpty()) {
-                inventory.setItem(i, stack);
-                return;
+                inventory.setItem(i, new ItemStack(ore, qty));
+                progress = 0;
+                speedAccum = 0;
+                return true;
             }
         }
-        Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5,
-                worldPosition.getZ() + 0.5, stack);
+        return false;
     }
 
-    /** 把暂存槽产物推送给转口（整格移动，转口缓冲满则留待下 tick） */
+    /** 把暂存槽产物推送给转口（部分合并：同种槽塞满为止，剩余留待下 tick） */
     private void pushToPorts() {
         if (ports.isEmpty()) {
             return;
@@ -241,12 +263,15 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
                 continue;
             }
             for (BlockPos pp : ports) {
-                BlockEntity be = level.getBlockEntity(pp);
-                if (be instanceof AkaishiMinerPortBlockEntity port && port.receiveOutput(stack)) {
-                    inventory.setItem(i, ItemStack.EMPTY);
+                if (stack.isEmpty()) {
                     break;
                 }
+                BlockEntity be = level.getBlockEntity(pp);
+                if (be instanceof AkaishiMinerPortBlockEntity port) {
+                    stack = port.receivePartial(stack);
+                }
             }
+            inventory.setItem(i, stack);
         }
     }
 

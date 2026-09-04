@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 无线赤能源端口菜单（输入口/输出口共用，两类页面：运行情况/传输情况）。
- * 无机器槽位；缓冲储能 + 绑定卡 + 认证状态 + 速率经数据槽同步。
+ * 无机器槽位；缓冲储能 + 绑定卡 + 认证状态经数据槽同步。
  * 页面切换由 Screen 本地状态互斥切换（互不重叠）；解绑走 clickMenuButton（服务端经 {@link IWirelessPortHost} 生效）。
  */
 public class AkaishiWirelessPortMenu extends AbstractContainerMenu {
@@ -84,11 +84,6 @@ public class AkaishiWirelessPortMenu extends AbstractContainerMenu {
 
     public boolean isAuthenticated() {
         return data.get(AkaishiWirelessInputPortBlockEntity.DATA_AUTHENTICATED) != 0;
-    }
-
-    public long getRate() {
-        return ((long) data.get(AkaishiWirelessInputPortBlockEntity.DATA_RATE_HIGH) << 32)
-                | (data.get(AkaishiWirelessInputPortBlockEntity.DATA_RATE_LOW) & 0xFFFFFFFFL);
     }
 
     /** 是否为输出口（经方向数据槽同步，客户端/服务端一致） */

@@ -1,6 +1,6 @@
 {
   "name": "赤能源",
-  "description": "赤能源是赤石科技的动力源泉，先建设能量生产与储存体系。",
+  "description": "一切机器的动力源。本章教你发电、储电、输电与随身携带赤能源——$(bold)搭好供电体系再进入「赤石机器」$(0)。",
   "icon": "akaishi:akaishi_energy_cell_basic",
   "sortnum": 2
 }

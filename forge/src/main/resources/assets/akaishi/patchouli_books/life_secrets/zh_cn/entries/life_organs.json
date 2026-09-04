@@ -5,19 +5,30 @@
   "sortnum": 2,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_life_struct",
-      "text": "生命结构台：1 序列 + 5 固态物 + 80,000 生命能量造器官，耗时 6 秒，无失败风险。$(br)完整度 = 序列纯度 − 随机损耗（0-20）：100→III 品、50-99→II 品、<50→I 品。造器官这步，稳得让人放心。"
+      "type": "patchouli:text",
+      "text": "$(bold)器官图鉴$(0)——九件，槽位各一：$(li)$(4)眼部器官$(0)（eye）→ 眼槽$(li)$(4)心脏器官$(0)（heart）→ 心脏槽$(li)$(4)肺部器官$(0)（lungs）→ 肺槽$(li)$(4)内体器官$(0)（viscera）→ 内体槽$(li)$(4)肾脏器官$(0)（kidneys）→ 肾脏槽$(li)$(4)左臂/右臂器官$(0)（left_arm / right_arm）→ 肢体槽$(li)$(4)左腿/右腿器官$(0)（left_leg / right_leg）→ 肢体槽$(br2)前五件占「器官」槽，后四件占「肢体」槽——$(bold)槽位类型$(0)决定排斥与负面效果的规则。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_surgery",
-      "text": "手术仓：把器官移植进躯体（9 槽位各一）或摘除。$(br)移植：3 固态物 + 20,000 能量；摘除：1 固态物 + 5,000 能量。$(br2)排斥 = 品质 × 生物分组系数 × 完整度修正，随时间增长；天敌组合会锁满排斥并爆炸反噬！动刀前，先想想这器官跟你「合不合」。"
+      "type": "patchouli:text",
+      "title": "属性与品质",
+      "text": "$(bold)默认模板增益$(0)（基础值，未乘品质）：$(li)眼部：攻击 +0.5$(li)心脏：最大生命 +2$(li)肺部：护甲韧性 +0.5$(li)内体：幸运 +0.5$(li)肾脏：攻击 +0.5$(li)每只手臂：攻击 +0.75、击退抗性 +0.05$(li)每条腿：移速 +0.015$(br2)$(bold)品质 I-IV 倍率：1.25 / 1.5 / 1.75 / 2.0$(0)——品质越高增益越大，$(4)初始排斥与排斥增速也越高$(0)：高品器官更强，也更「挑身体」。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_cultivator",
-      "text": "部件培养舱：样本提纯（纯度 +10/次，四档成功率）与器官升级（品质 I→IV，85/75/65% 成功率）。$(br)想养出好器官？这舱就是你的「器官健身房」。"
+      "type": "patchouli:text",
+      "title": "一段流程，三台机器",
+      "text": "$(li)1. $(l:akaishi:life_struct)生命结构台$(/l)：基因序列铸器官（必成，完整度取决于纯度）$(li)2. $(l:akaishi:surgery)手术仓$(/l)：装进身体或摘除（要交固态物与生命能量）$(li)3. $(l:akaishi:cultivator)部件培养舱$(/l)：样本提纯、器官升品$(br2)器官供「$(l:akaishi:mother_altar)黑山羊之母祭坛$(/l)」献祭、做护甲材料；排斥管理走「$(l:akaishi:life_potions)生命药剂$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_struct",
+        "akaishi:surgery",
+        "akaishi:cultivator",
+        "akaishi:life_potions",
+        "akaishi:life_vaults"
+      ],
+      "text": "阅读顺序：样本出序列 → 结构台铸器官 → 手术仓移植 → 培养舱提纯升品。好器官存「仓库体系」，排斥交给「生命药剂」。"
     }
   ]
 }

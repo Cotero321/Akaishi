@@ -21,6 +21,7 @@ public class AkaishiLifeEmbryoItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.akaishi.life_embryo.desc"));
+        // 键名需与注册 id 前缀一致（item.akaishi.akaishi_life_embryo.desc），否则会回退显示原始键
+        tooltip.add(Component.translatable("item.akaishi.akaishi_life_embryo.desc"));
     }
 }

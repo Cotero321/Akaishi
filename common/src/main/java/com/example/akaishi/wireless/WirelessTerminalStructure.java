@@ -10,6 +10,7 @@ import com.example.akaishi.block.AkaishiWirelessOutputLossBlock;
 import com.example.akaishi.block.AkaishiWirelessSecurityBlock;
 import com.example.akaishi.block.AkaishiWirelessShellBlock;
 import com.example.akaishi.block.AkaishiWirelessTerminalBlock;
+import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -186,11 +187,12 @@ public final class WirelessTerminalStructure {
                 shells, core, crossDimCount, chunkLoaderCount, chunkRangeCount, inputLossCount, outputLossCount);
     }
 
-    /** 是否为合法墙面块（构成封闭壳体的方块） */
+    /** 是否为合法墙面块（构成封闭壳体的方块）：终端/安全/控制器/外壳/结构玻璃 */
     public static boolean isWallBlock(Block b) {
         return b instanceof AkaishiWirelessTerminalBlock
                 || b instanceof AkaishiWirelessSecurityBlock
                 || b instanceof AkaishiWirelessControllerBlock
-                || b instanceof AkaishiWirelessShellBlock;
+                || b instanceof AkaishiWirelessShellBlock
+                || b == ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get();
     }
 }

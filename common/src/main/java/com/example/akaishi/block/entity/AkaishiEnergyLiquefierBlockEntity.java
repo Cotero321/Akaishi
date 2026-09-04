@@ -163,8 +163,8 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
             progressEnergy = 0;
             lastItemKey = key;
         }
-        // 需要固态物的配方必须提供生命能量固态物，否则停机等待
-        if (recipe.needsSolid && inventory.getItem(SOLID_SLOT).isEmpty()) {
+        // 需要固态物的配方必须持有生命能量固态物（按类型校验而非仅非空，防止管道/误放物品被吞），否则停机等待
+        if (recipe.needsSolid && !inventory.getItem(SOLID_SLOT).is(ModItems.akaishiLifeEssenceSolid.get())) {
             progressEnergy = 0;
             data.set(DATA_PROGRESS, 0);
             return;

@@ -1,0 +1,42 @@
+{
+  "name": "The Path of Life Research",
+  "icon": "akaishi:akaishi_life_book",
+  "category": "akaishi:life_intro",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This book covers what lies above Akaishi Energy — $(4)Life Energy$(0) — and the body research and modification it unlocks.$(br2)$(bold)Main line in one phrase:$(0) Akaishi Energy → Life Energy → Samples → Genes → Organs → Transplant & Mutate.$(br2)$(bold)Before you start:$(0) Life Energy is converted from Akaishi Energy, so first build a $(4)stable power grid$(0) (generation, storage, pipes) as covered in the Energy chapter of the Akaishi Research Diary.$(br2)Blue text is clickable, and entry numbers within a chapter are the suggested reading order. Each stage below follows the same pattern: $(bold)what to build, why, and what to read next$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stage 1 - Generate: Refining Life Energy",
+      "text": "$(bold)What to build first:$(0) assemble the $(l:akaishi:life_conversion)Life Conversion Matrix$(/l) to turn oceans of Akaishi Energy into Life Energy, then craft a $(l:akaishi:life_energy)Life Energy Cell$(/l) and Life Energy Pipes to stockpile and deliver it.$(br2)$(bold)Why:$(0) the Matrix is the life line's $(4)only Life Energy source$(0) — every machine downstream drinks it, so if generation is shaky, everything stalls.$(br2)$(bold)Next:$(0) liquid energy is awkward to trade. Move to Stage 2 and solidify it into currency."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stage 2 - Solidify: Turning Energy into Currency",
+      "text": "$(bold)What to build first:$(0) the $(l:akaishi:life_purifier)Life Energy Purifier$(/l), which condenses flowing Life Energy into $(4)Life Essence Solids$(0).$(br2)$(bold)Why:$(0) the Solid is the life line's $(4)universal currency$(0) — organ crafting, transplants, cultivation and brewing all charge it. It can be carried, hoarded and piped far more easily than raw energy.$(br2)$(bold)Next:$(0) with currency in hand, go harvest the \"raw material\" — Stage 3 begins with sampling."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stage 3 - Samples → Genes → Organs",
+      "text": "$(bold)What to build first:$(0) follow $(l:akaishi:life_samples)Samples & Genes$(/l) to collect samples and crack out gene sequences, then $(l:akaishi:life_organs)Organ Construction$(/l) for forging and transplanting organs; $(l:akaishi:life_potions)Potions$(/l) absorb genotypes and grant temporary bursts.$(br2)$(bold)Why:$(0) organs are where the combat power lives — and watch your rejection value, hostile combos bite back.$(br2)$(bold)Next:$(0) outgrown basic organs? Stage 4 breaks the ceiling with mutation traits."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stages 4 & 5 - Mutation & Advanced Life",
+      "text": "$(bold)What to build first:$(0) roll random traits onto organs in the Life Breeder — see $(l:akaishi:trait_safe)Safe Mutations$(/l) and $(l:akaishi:trait_dual)Aberrant Double-Edged$(/l) codexes, and the $(l:akaishi:trait_reforger)Trait Reforger$(/l) for rerolling.$(br2)$(bold)Advanced:$(0) body scanning and decay cleanup live in $(l:akaishi:life_body)Body & Decay$(/l), exhausted-fuel recycling in $(l:akaishi:life_waste)Waste Neutralization$(/l); the endgame is the fusion ingots of the $(l:akaishi:mother_altar)Altar of the Black Mother$(/l), forged into endgame armor on the $(l:akaishi:life_fusion_anvil)Life Fusion Anvil$(/l).$(br2)$(bold)Why:$(0) both stages devour resources — don't touch them on a weak foundation."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_energy",
+        "akaishi:life_conversion",
+        "akaishi:life_purifier",
+        "akaishi:life_samples"
+      ],
+      "text": "End of the tour: get Life Energy flowing, bank it as solids, then start from samples and read through the organ line."
+    }
+  ]
+}

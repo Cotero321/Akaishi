@@ -1,0 +1,26 @@
+{
+  "name": "Sustain Trinkets",
+  "icon": "akaishi:akaishi_satiation_charm",
+  "category": "akaishi:advanced",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_satiation_charm",
+      "text": "$(4)Akaishi Satiation Charm$(0) (charm slot, 500k buffer): when saturation drops below 5 it restores +0.1 every tick. The food supply, in trinket form."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_antidote_bracelet",
+      "text": "$(4)Akaishi Antidote Bracelet$(0) (bracelet slot, 200k buffer): instantly cures poison, $(4)500 energy per use$(0).$(br2)$(bold)Akaishi Wither Charm$(0) (belt slot, 200k buffer): instantly cures wither, $(4)1000 energy per use$(0).$(br2)Between them they chew through the nastiest debuffs the moment they land."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "Shared mechanics and the slot map live in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; the battery that keeps them going is the $(l:akaishi:portable_cell)Portable Cell$(/l)."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "赤石生财饰品",
+  "icon": "akaishi:akaishi_hunting_ring",
+  "category": "akaishi:advanced",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_hunting_ring",
+      "text": "$(4)赤石狩猎指环$(0)（ring 槽，容量 10 万）：击杀生物有 $(4)15%$(0) 概率直接掉 1 颗赤石晶，$(bold)不耗能$(0)。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_gathering_bracelet",
+      "text": "$(4)赤石采集手环$(0)（hands 槽，容量 10 万）：挖掘方块有 $(4)5%$(0) 概率掉 1 颗赤石晶，同样不耗能。$(br2)一个刷怪、一个挖矿——出门戴上，等于随身带了一台赤石晶自助机。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:curios",
+        "akaishi:portable_cell"
+      ],
+      "text": "饰品共通机制与槽位见「$(l:akaishi:curios)赤石饰品$(/l)」总览；掉出来的晶是提纯与浓缩链的起点，见「$(l:akaishi:crystal)赤石晶与精华$(/l)」。"
+    }
+  ]
+}

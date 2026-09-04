@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_pulverizer",
-      "text": "赤石打粉机，把硬邦邦的矿物「碎成渣」：$(li)原版矿物 → 对应矿物粉$(li)赤石 → 赤石粉$(li)$(2,4)黑曜石 → 黑曜石粉$(0)$(br2)粉末是散热片和高阶合成的关键，机器界的「磨牙工具」。"
+      "text": "赤石打粉机：把矿石$(4)碎成粉末$(0)，矿物处理线的第一步。一次打粉 100 tick、每 tick 耗 15 点能量，内置储能上限 10 万；深层矿与原矿产出相同。$(li)煤、铁、金、钻石、绿宝石、石英矿 → 对应粉×2$(li)铜矿 → 铜粉×3$(li)青金石矿 → 青金石粉×4$(li)红石矿 → 原版红石粉×4$(li)远古残骸 → 下界合金粉$(li)黑曜石 → 黑曜石粉$(li)赤石矿 → 赤石粉×2"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:obsidian_dust",
-      "text": "黑曜石粉是打粉机的招牌产物之一。$(br)全套粉末清单，去「粉末」条目看个痛快。"
+      "text": "粉末是机器线的$(4)万能中转物$(0)：往压缩机压回块，往变化器变基底。$(br2)$(bold)记住两点：$(0)$(li)黑曜石粉与下界合金粉$(e)没有原版熔炼出路$(0)——想还原黑曜石、下界合金锭，只能打粉后走压缩机$(li)青金石、铜、红石出料最肥（单次 3-4 份），这类矿优先喂打粉机$(br2)接上物品管道自动喂矿、抽粉，就是一条无人值守的矿处理线。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:compressor",
+        "akaishi:dusts",
+        "akaishi:transformer",
+        "akaishi:ore"
+      ],
+      "text": "打成粉后：压块看「$(l:akaishi:compressor)赤石压缩机$(/l)」、变基底看「$(l:akaishi:transformer)赤石变化器$(/l)」、粉末清单看「$(l:akaishi:dusts)粉末$(/l)」；矿源怎么找见「$(l:akaishi:ore)赤石矿簇$(/l)」。"
     }
   ]
 }

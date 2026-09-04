@@ -7,12 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transformer",
-      "text": "The Transformer, a machine that calls a deer a horse:$(li)$(2,4)Lapis Dust → Cooling Base$(0)$(li)Minerals (ingots/blocks) → matching Ore Bases$(br2)It disguises ordinary minerals as advanced materials — the catalyst and fusion heat sinks both need it to pave the way."
+      "text": "The Akaishi Transformer $(4)converts raw ores — or Lapis Dust — into standardized bases$(0): one mineral, one ID. One input in, one base out. Each change takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(li)Lapis Dust → Cooling Base$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)Akaishi ore → Akaishi Ore Base"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:cooling_base",
-      "text": "The Cooling Base is the starting point of the cooling system: mix it with dusts tier by tier, from iron dust all the way to netherite ingots.$(br)No matter how hot it gets, every heat sink starts here."
+      "text": "Bases are never used directly — they are the $(4)keys that unlock advanced recipes$(0), vouching for a mineral's origin:$(li)Cooling Base + Copper Ingot → Poor Heat Sink — the whole heat-sink line starts here (see $(l:akaishi:fuel_system)Fuel & Cooling$(/l))$(li)Iron / Gold / Diamond / Ancient Debris Bases → the four Catalyst tiers$(li)Copper / Redstone / Lapis Bases → the Auto Collector upgrade line$(li)Other bases feed the fuel canner, wireless core and more — check JEI$(br2)For the full roll call of bases, read the Ore Bases entry."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:pulverizer",
+        "akaishi:ore_bases",
+        "akaishi:dusts"
+      ],
+      "text": "See $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:dusts)Dusts$(/l) for where the feedstock comes from, and $(l:akaishi:ore_bases)Ore Bases$(/l) for the full family and every recipe that needs them."
     }
   ]
 }

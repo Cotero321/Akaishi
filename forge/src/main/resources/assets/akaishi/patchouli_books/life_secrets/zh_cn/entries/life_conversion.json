@@ -7,17 +7,26 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_controller",
-      "text": "生命转换矩阵，当前唯一能「炼出」生命能量的家伙：控制器、矩阵外壳与能量端口围成 3×3×3 封闭结构后自动成型。$(br)摆对位置，它就是你的生命能量印钞机。"
+      "text": "现役主生产线：把海量赤能源炼成生命能量的$(4)唯一来源$(0)。$(br2)$(bold)怎么搭：$(0)$(li)用「生命转换矩阵外壳」围出 $(4)3×3×3$(0) 的中空封闭箱$(li)墙面装「赤能源输入口」与「生命输出口」$(li)控制器$(4)贴墙$(0)安装，结构成型即自动开工；拆任意一块外壳立即停摆$(br2)$(bold)参数：$(0)每 tick 至多 $(4)45 次$(0)转换，单次烧 $(4)1000 万赤能源$(0) 换 $(4)10 点生命能量$(0)——满速约 450 生命/tick，需约 4.5 亿赤/tick 持续供能，$(bold)先喂饱电网再开机$(0)。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_energy_input",
-      "text": "赤能源经能量输入口注入矩阵中心，成型后每 tick 最多 45 次转换（每次耗 10M 赤能源、产 10 生命能量）。$(br)电喂得越饱，命炼得越快。"
+      "text": "$(bold)赤能源输入口$(0)：自带 $(4)1 亿$(0)缓冲，能量管道灌入后逐 tick 喂给控制器，专治单次 10M 消耗的供能落差。$(br2)$(bold)生命输出口$(0)：每 tick 从控制器拉走至多 $(4)450$(0)（满产时）存入自己的 5000 缓冲，供生命能量管道抽取。$(br2)接管道记住一句话：$(bold)输入走赤、输出走命$(0)，别接反。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_life_matrix_energy_output",
-      "text": "生命能量经能量输出口输出（仅管道抽取），配合生命能量管道就能驱动样本采集、器官研究等后续设备。$(br)输出口就是生命科技的「第一滴水」。"
+      "type": "patchouli:text",
+      "title": "旧机器说明",
+      "text": "$(bold)当心过时图纸$(0)：老教程里的「$(4)生命聚合转换器$(0)」与「$(4)生命转换架构$(0)」$(bold)已被矩阵取代$(0)——如今只是带能量缓存的$(4)合成材料$(0)，不再单独运转、结构永远不成型。$(br2)留作建材没问题，想靠它们炼命？$(bold)搭矩阵去$(0)。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_energy",
+        "akaishi:life_path",
+        "akaishi:life_purifier"
+      ],
+      "text": "能量存与传看「$(l:akaishi:life_energy)生命能量$(/l)」；炼出的能量下一步固化成货币，见「$(l:akaishi:life_purifier)生命能量提纯器$(/l)」。"
     }
   ]
 }

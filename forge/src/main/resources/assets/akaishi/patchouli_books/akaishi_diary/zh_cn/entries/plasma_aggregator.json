@@ -1,0 +1,26 @@
+{
+  "name": "聚变燃料聚合器",
+  "icon": "akaishi:akaishi_fusion_fuel_aggregator",
+  "category": "akaishi:tech",
+  "sortnum": 10,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fusion_fuel_aggregator",
+      "text": "聚变燃料聚合器：$(4)1 个活化成分 → 1000mb 等离子体$(0)，耗电 2000、耗时 100 tick。$(br2)产出的等离子体按成分归类：$(li)$(bold)混合等离子体$(0)：世界基础 / 高级混合 / 终极混合 成分$(li)$(bold)下界等离子体$(0)：下界复合 / 至纯 成分$(li)$(bold)末地等离子体$(0)：末地混合 / 巨龙 成分$(br2)三类分罐储存，别串味。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)物流注意：$(0)等离子体只能走等离子体管道 / 等离子体燃料储罐，普通液体管道一概不认——从这台到「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」之间先铺好专线。$(br2)灌好棒直接进「$(l:akaishi:fusion)聚变堆$(/l)」，三种棒的脾气对比见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma",
+        "akaishi:plasma_fractionator",
+        "akaishi:plasma_filler"
+      ],
+      "text": "原料来自「$(l:akaishi:plasma_fractionator)活化分馏器$(/l)」，成品交给「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」；产线总览见「$(l:akaishi:plasma)等离子体链$(/l)」。"
+    }
+  ]
+}

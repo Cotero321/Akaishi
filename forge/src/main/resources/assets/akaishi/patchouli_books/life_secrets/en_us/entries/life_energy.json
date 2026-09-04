@@ -7,12 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_essence_solid",
-      "text": "Life energy is polymerized from akaishi energy by the Life Conversion Matrix (10M energy → 10 life energy per conversion, 45 conversions per tick).$(br)Life Energy Solid is the cornerstone material of life research — to play with life, first you must \"forge\" it."
+      "text": "Life Energy is a high-tier form of energy, $(4)independent of Akaishi Energy$(0): it has its own pipes and tanks and can never be mixed with akaishi power — the $(l:akaishi:life_conversion)Life Conversion Matrix$(/l) is its only refinery.$(br2)A player's own Life Energy caps at a base of $(4)1000$(0) and $(bold)never regenerates on its own$(0) — don't treat it as a self-filling fuel gauge.$(br2)$(bold)Core use:$(0) solidify it into $(4)Life Essence Solids$(0), the currency of the whole life line — see the $(l:akaishi:life_purifier)Life Energy Purifier$(/l)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_energy_cell",
-      "text": "The Life Energy Cell and Life Energy Pipes handle storage and transport of life energy.$(br)Sample collection, organ construction... every life-research device runs on it. With energy in place, you can work wonders."
+      "text": "$(bold)Storage:$(0) a single Life Energy Cell holds $(4)1,000,000$(0) Life Energy with a two-way buffer — charge and drain it freely. It's the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows.$(br2)Run the Matrix output into a pipe, then into a cell: a $(bold)stockpile-first line$(0) beats live-to-live production."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_conversion",
+        "akaishi:life_path",
+        "akaishi:life_purifier"
+      ],
+      "text": "Missed the roadmap? Read \"$(l:akaishi:life_path)The Path of Life Research$(/l)\". How it is made and spent: see the Matrix and the Purifier."
     }
   ]
 }

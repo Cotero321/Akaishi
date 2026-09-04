@@ -1,0 +1,23 @@
+{
+  "name": "Life Structuring Table",
+  "icon": "akaishi:akaishi_life_struct",
+  "category": "akaishi:life_organs",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_struct",
+      "text": "This machine forges an organ out of $(4)gene sequence + solidified essence + life energy$(0) - it $(bold)always succeeds$(0).$(br2)$(bold)Cost:$(0) 1 sequence, 5 solidified essence and 80,000 life energy, over 120 ticks (6 seconds).$(br2)$(bold)Integrity = sequence purity - random loss (0-20):$(0)$(li)100 -> grade III$(li)50-99 -> grade II$(li)<50 -> grade I$(br2)The source's default grade only acts as a fallback: Warm-blooded I, Undead/Explosive/Aberrant II, Ender III, Boss/Dragon IV.$(br2)Want high grades reliably? Push the sequence purity to 100 first. See the $(l:akaishi:life_organs)Organ Construction$(/l) catalog for what each organ does."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_organs",
+        "akaishi:cultivator",
+        "akaishi:life_vaults"
+      ],
+      "text": "Feed it: samples with purity 25+ are cracked into sequences by the Gene Analyzer first; store the organs in the Vault, upgrade them in the Cultivator."
+    }
+  ]
+}

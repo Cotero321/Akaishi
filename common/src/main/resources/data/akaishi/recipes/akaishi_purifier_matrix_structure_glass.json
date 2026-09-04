@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GSG",
+    "S S",
+    "GSG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "S": { "item": "akaishi:akaishi_purifier_matrix_casing" }
+  },
+  "result": { "item": "akaishi:akaishi_purifier_matrix_structure_glass", "count": 4 }
+}

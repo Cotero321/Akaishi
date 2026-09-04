@@ -1,0 +1,26 @@
+{
+  "name": "燃料混合器",
+  "icon": "akaishi:akaishi_fuel_mixer",
+  "category": "akaishi:tech",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_fuel_mixer",
+      "text": "混合器把低级燃料兑成高级燃料，两档配方（每批耗电 200万，吃速度升级）：$(li)$(bold)高级混合燃料$(0)：1000mb 末地混合燃料 + 1000mb 下界复合燃料 → $(4)1500mb$(0)，白赚 50%$(li)$(bold)终极混合燃料$(0)：50mb 末地巨龙燃料 + 50mb 至纯燃料 → 50mb$(br2)终极混合是全链最高档，热值最猛，留给需要顶配燃料的玩法。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)原料从哪来：$(0)$(li)末地混合燃料 ←「$(l:akaishi:fuel_liquefier)能量液化装置$(/l)」的末地混合物配方$(li)下界复合燃料、至纯燃料 ←「$(l:akaishi:fuel_processor)能量加工器$(/l)」$(li)末地巨龙燃料 ← 液化装置的巨龙混合物配方$(br2)兑好的高级/终极混合燃料灌进「$(l:akaishi:fuel_canner)燃料装罐机$(/l)」，就能交给「$(l:akaishi:reactor)反应堆$(/l)」烧。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:liquid_fuel",
+        "akaishi:fuel_canner",
+        "akaishi:reactor"
+      ],
+      "text": "产线总览见「$(l:akaishi:liquid_fuel)液体燃料链$(/l)」；装罐与燃烧入口在上方。"
+    }
+  ]
+}

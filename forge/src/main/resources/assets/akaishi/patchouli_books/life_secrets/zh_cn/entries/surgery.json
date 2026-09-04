@@ -1,0 +1,27 @@
+{
+  "name": "手术仓",
+  "icon": "akaishi:akaishi_surgery",
+  "category": "akaishi:life_organs",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_surgery",
+      "text": "把器官装进身体，或摘下来。$(br2)$(bold)移植：$(0)$(li)耗 3 固态物 ＋ 2 万生命能量，80 tick（4 秒）$(li)目标槽必须为空$(li)写入初始排斥：原生器官为 0，品质越高起点越高$(br2)$(bold)摘除：$(0)耗 1 固态物 ＋ 5000 生命能量，承受对应部位伤害，排斥清零。$(br2)$(bold)注意：$(0)手术只在$(4)界面开启时$(0)进行——关闭界面或中途死亡都会中断。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "移植与排斥",
+      "text": "排斥是器官与身体的$(4)兼容度指标$(0)：槽位类型（器官/肢体）决定排斥与负面效果的规则，器官品质决定其起点与增速——品质越高排斥越凶。$(br2)$(bold)控制排斥：$(0)管理手段见「$(l:akaishi:life_potions)生命药剂$(/l)」里的排异中和剂；实在养不住就回手术仓摘除。$(br2)搭配「$(l:akaishi:life_vaults)仓库体系$(/l)」的器官储藏库放在 3 格内，可联动存取器官。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_organs",
+        "akaishi:life_potions",
+        "akaishi:life_vaults"
+      ],
+      "text": "器官哪来的？「器官构造」；排斥怎么压？「生命药剂」。"
+    }
+  ]
+}

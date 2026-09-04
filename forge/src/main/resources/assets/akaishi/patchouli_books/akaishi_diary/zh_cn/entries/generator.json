@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_generator",
-      "text": "赤能源发生机，烧燃料产电的「第一口锅」。$(br)自带 10 个升级槽，塞进$(2,4)能源产生升级组件$(0)可提升产能（每个 ×1.75，最多 10 个）。燃料管够，电费管饱。"
+      "text": "赤能源发生机是$(4)入门级单块发电$(0)：喂入赤石燃料，按基准 $(bold)75 赤能源/tick$(0) 持续产电。$(br2)$(bold)扩产$(0)：自带 10 个升级槽，每放一个「能源产生升级组件」产率 ×1.75（附带 1% 产量损失），$(4)满配 10 个约 ×242$(0)。$(br2)$(bold)燃料五档热值$(0)：$(li)赤石晶 2000$(li)粗制赤石块 20000$(li)赤石精华 80000$(li)浓缩赤石精华 800000$(li)浓缩赤石精华块 7200000$(br2)燃料从哪来、如何精炼，见「$(l:akaishi:energy_basics)赤能源基础$(/l)」。嫌一台不够猛？升级方向是「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_gen_matrix_controller_basic",
-      "text": "$(2,4)想规模化发电？$(0)老的「小型组合」与「超级架构」已经退休，现在由$(2,4)发生器矩阵$(0)接手：矩阵外壳围成封闭空间，控制器与端口挂墙，产能翻着跟头涨。$(br)结构摆法去「矩阵结构」条目看。"
+      "type": "patchouli:text",
+      "text": "$(bold)退役结构说明：$(0)旧版「$(4)小型组合$(0)」（3×3×3）与「$(4)超级发生器$(0)」（5×5×5）等散装形态$(bold)已经退役$(0)，如今统一由「赤石发生器矩阵」接手，老结构的方块只能当$(e)材料$(0)用。$(br2)$(bold)发生机 vs 矩阵：$(0)单块机便宜、随放随用、自带燃料槽；$(4)矩阵要吃电网$(0)，但倍率从 ×45 起步——预算和产线规模决定你选哪条路。$(br2)矩阵的成型清单与两档参数见「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」条目。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_basics",
+        "akaishi:energy_cell",
+        "akaishi:energy_pipe",
+        "akaishi:gen_matrix",
+        "akaishi:reactor"
+      ],
+      "text": "阅读顺序建议：先读「$(l:akaishi:energy_basics)赤能源基础$(/l)」搞懂燃料，再配「$(l:akaishi:energy_pipe)管道$(/l)」与「$(l:akaishi:energy_cell)储存单元$(/l)」铺好电网；要上规模就搭「$(l:akaishi:gen_matrix)发生器矩阵$(/l)」；矩阵都不够时，就该上「$(l:akaishi:reactor)反应堆$(/l)」了。"
     }
   ]
 }

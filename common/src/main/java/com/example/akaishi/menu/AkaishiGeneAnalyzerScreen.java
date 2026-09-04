@@ -71,9 +71,9 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
         }
-        // 升级槽标签（输入/输出槽之间小字提示）
+        // 升级槽标签（置于槽位下方，与其他机器一致；原画在输入/输出槽中间易误读）
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
+                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
         // 生命能量条（绿）
         GuiWidgets.track(gui, x + LIFE_BAR_X, y + LIFE_BAR_Y, BAR_W, BAR_H);
         long life = menu.getLifeEnergy();

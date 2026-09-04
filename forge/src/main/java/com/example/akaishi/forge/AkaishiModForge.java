@@ -15,11 +15,13 @@ import com.example.akaishi.forge.fluid.ForgeFluidHandler;
 import com.example.akaishi.forge.fluid.ModFluidsImpl;
 import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
+import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
 import com.example.akaishi.forge.life.AkaishiLifeInteraction;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
 import com.example.akaishi.gametest.AkaishiLifeSystemTests;
+import com.example.akaishi.item.AkaishiLifeFusionSet;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
@@ -154,6 +156,9 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiBodyPassiveHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(AkaishiBodyCombatHandler.INSTANCE);
 
+        // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
+        MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
+
         // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（伤害上限/免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
 
@@ -168,9 +173,17 @@ public final class AkaishiModForge {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
     }
 
-    /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定 cutout */
+    /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */
     private void onClientSetup(FMLClientSetupEvent event) {
         RenderTypeRegistry.register(RenderType.cutout(), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get());
+        // 结构玻璃为半透明材质，注册 translucent 才能正确混合显示内部结构
+        RenderTypeRegistry.register(RenderType.translucent(),
+                ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get(),
+                ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get(),
+                ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get(),
+                ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get(),
+                ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get(),
+                ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get());
         // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
     }
@@ -296,7 +309,8 @@ public final class AkaishiModForge {
 
     /**
      * 玩家 tick：背包中任意位置的便捷赤能源储存单元都会自动为玩家身上（护甲 + 主副手）
-     * 的赤石装备补充耐久，每 1 点耐久消耗 ENERGY_PER_DURABILITY 赤能源，速率受单元等级限制。
+     * 的赤石装备补充耐久，每 1 点耐久消耗 ENERGY_PER_DURABILITY 赤能源，速率受单元等级限制；
+     * 生命融合护甲同样吸收赤能源修复，速率为普通赤石装备的 LIFE_FUSION_REPAIR_MULTIPLIER 倍。
      */
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -326,6 +340,7 @@ public final class AkaishiModForge {
         // 修复目标：护甲 4 件 + 主副手（便携单元放不进护甲槽，无需跳过）
         EquipmentSlot[] gearSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET,
                 EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND};
+        EquipmentSlot[] armorSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
         // 外层遍历单元：每个单元每 tick 有独立修复额度，多个单元可叠加供能
         for (ItemStack cellStack : cells) {
             AkaishiPortableEnergyCell portable = (AkaishiPortableEnergyCell) cellStack.getItem();
@@ -333,12 +348,13 @@ public final class AkaishiModForge {
                 continue; // 该单元能量不足，换下一个
             }
             int repairLimit = portable.tier.repairPerTick;
+            // 1) 普通赤石装备（护甲/剑/工具）原速率修复；生命融合护甲交给下方专用快速循环
             for (EquipmentSlot slot : gearSlots) {
                 if (repairLimit <= 0) {
                     break; // 本单元本 tick 额度用完
                 }
                 ItemStack gear = player.getItemBySlot(slot);
-                if (gear.isEmpty() || !gear.isDamaged()) {
+                if (gear.isEmpty() || !gear.isDamaged() || AkaishiLifeFusionSet.isLifeFusionArmor(gear)) {
                     continue;
                 }
                 // 兼容创造模式直接取用的无标签装备，并过滤非赤石装备
@@ -354,6 +370,25 @@ public final class AkaishiModForge {
                 portable.extractEnergy(cellStack, toRepair * AkaishiPortableEnergyCell.ENERGY_PER_DURABILITY, false);
                 gear.setDamageValue(gear.getDamageValue() - toRepair);
                 repairLimit -= toRepair;
+            }
+            // 2) 生命融合护甲：同样消耗赤能源，但修复速率 ×4，恢复显著快于普通赤石装备
+            int lifeBudget = portable.tier.repairPerTick * AkaishiLifeFusionSet.LIFE_FUSION_REPAIR_MULTIPLIER;
+            for (EquipmentSlot slot : armorSlots) {
+                if (lifeBudget <= 0) {
+                    break; // 本单元本 tick 的生命护甲修复额度用完
+                }
+                ItemStack gear = player.getItemBySlot(slot);
+                if (gear.isEmpty() || !gear.isDamaged() || !AkaishiLifeFusionSet.isLifeFusionArmor(gear)) {
+                    continue;
+                }
+                int toRepair = (int) Math.min(lifeBudget, Math.min(gear.getDamageValue(),
+                        portable.getEnergyStored(cellStack) / AkaishiPortableEnergyCell.ENERGY_PER_DURABILITY));
+                if (toRepair <= 0) {
+                    continue;
+                }
+                portable.extractEnergy(cellStack, toRepair * AkaishiPortableEnergyCell.ENERGY_PER_DURABILITY, false);
+                gear.setDamageValue(gear.getDamageValue() - toRepair);
+                lifeBudget -= toRepair;
             }
         }
     }

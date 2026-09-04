@@ -1,0 +1,27 @@
+{
+  "name": "赤石装备打造器",
+  "icon": "akaishi:akaishi_equipment_forger",
+  "category": "akaishi:advanced",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_equipment_forger",
+      "text": "赤石装备打造器把$(4)下界合金装备重铸成赤石装备$(0)——装备不再能工作台合成，这里是唯一的正门。$(br2)$(bold)锭费：$(0)$(li)头盔 5、胸甲 8、护腿 7、靴子 4$(li)剑 2、镐 3、锹 1、斧 3$(br2)一台机器通吃全套，丢进对应下界合金件就能点单。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)能耗：$(0)$(4)5000 万$(0)赤能源 + 已选升级点 ×$(4)1000 万$(0)。$(br2)产出装备自带 $(4)4 点升级点$(0)可分配：$(li)攻击速度 +0.15/点$(li)攻击伤害 +1/点$(li)最大生命 +2/点$(li)护甲 +1/点$(li)韧性 +1/点$(li)镐/锹/斧还可点：效率 +20/点$(br2)一次重铸最多投入 4 点；确认前可撤销重配，点错了能改。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:equipment",
+        "akaishi:ingot",
+        "akaishi:aggregator",
+        "akaishi:portable_cell"
+      ],
+      "text": "重铸燃料「$(l:akaishi:ingot)赤石锭$(/l)」由「$(l:akaishi:aggregator)赤石能量聚合器$(/l)」凝成；这台机器单次能耗不小，先备好「$(l:akaishi:portable_cell)便捷赤能源单元$(/l)」级别的储能。成品性能见「$(l:akaishi:equipment)赤石装备$(/l)」。"
+    }
+  ]
+}

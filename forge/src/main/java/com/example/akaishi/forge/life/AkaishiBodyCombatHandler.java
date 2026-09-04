@@ -23,6 +23,7 @@ import net.minecraft.world.entity.projectile.DragonFireball;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * 器官战斗效果处理器（Forge 服务端）：
  * - 攻击方（移植玩家）：命中附加效果（减速/中毒/凋零）、伤害增幅（跳跃/水下/弹射物）、满级特殊弹射物
- * - 受害方（移植玩家）：火焰弱点 / 摔落免疫 / 荆棘反弹 / 瞬移闪避
+ * - 受害方（移植玩家）：火焰弱点 / 摔落免疫 / 荆棘反弹 / 瞬移闪避 / 能量盾（仅超出防护的实际伤害耗能抵消）
  * 满级特殊弹射物（凋零骷髅头/龙息）仅在对应器官品质 IV 时触发，且不破坏方块、伤害较低。
  */
 public final class AkaishiBodyCombatHandler {
@@ -118,8 +119,6 @@ public final class AkaishiBodyCombatHandler {
     private static void applyVictimEffects(LivingHurtEvent event, Player victim, Entity attacker) {
         float amount = event.getAmount();
         IPlayerBodyState state = PlayerBodyHelper.of(victim);
-        // 生命融合套装能量护盾：优先消耗背包便携赤能源完全/部分抵消伤害（100 能量抵消 1 伤害）
-        amount = applyEnergyShield(event, victim, amount);
         // 火焰免疫（烈焰之心/末影龙之心）：直接吞掉火焰/岩浆类伤害；着火状态的清除由被动 tick 负责
         if (OrganEffectResolver.hasPassive(state, OrganPassive.FIRE_IMMUNE)
                 && event.getSource().is(DamageTypeTags.IS_FIRE)) {
@@ -168,10 +167,21 @@ public final class AkaishiBodyCombatHandler {
     }
 
     /**
-     * 生命融合套装能量护盾：从背包便携赤能源单元抽取能量抵消伤害（100 能量抵消 1 伤害）。
+     * 生命融合套装能量护盾：只在护甲/附魔/吸收心结算后仍会造成实际扣血的伤害
+     * 上消耗能量抵消（100 能量抵消 1 伤害）——防护挡得住的伤害不耗能。
      * 能量足够则完全抵消并取消事件；不足则按比例抵扣后返回剩余伤害。
      */
-    private static float applyEnergyShield(LivingHurtEvent event, Player victim, float amount) {
+    @SubscribeEvent
+    public void onLivingDamage(LivingDamageEvent event) {
+        if (event.getEntity().level().isClientSide) {
+            return;
+        }
+        if (event.getEntity() instanceof Player victim) {
+            event.setAmount(applyEnergyShield(event, victim, event.getAmount()));
+        }
+    }
+
+    private static float applyEnergyShield(LivingDamageEvent event, Player victim, float amount) {
         if (amount <= 0.0F || !AkaishiLifeFusionSet.isFullSet(victim)) {
             return amount;
         }

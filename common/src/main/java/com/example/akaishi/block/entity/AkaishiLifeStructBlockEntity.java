@@ -78,8 +78,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
     private int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
     private float speedAccum;
-    /** 目标槽位（BodySlot.values() 索引） */
-    private int targetSlot;
+    /** 目标器官模型槽位（BodySlot.values() 索引）；-1 = 未选择，须玩家在界面显式点选后才开始构造 */
+    private int targetSlot = -1;
 
     public AkaishiLifeStructBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_STRUCT.get(), pos, state);
@@ -131,18 +131,19 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         }
     }
 
-    /** 序列更换时，若目标槽位不可用则自动回落到第一个可用槽位 */
+    /** 序列更换或目标失效时重置为“未选择”：构造必须由玩家显式点选器官模型后才开始 */
     private void refreshTarget() {
         ItemStack input = inventory.getItem(INPUT_SLOT);
-        if (!(input.getItem() instanceof AkaishiGeneSequenceItem)) {
-            return;
-        }
-        List<BodySlot> available = OrganEffectRegistry.availableSlots(AkaishiGeneSequenceItem.getEntityId(input));
-        if (available.isEmpty()) {
-            return;
-        }
-        if (!available.contains(BodySlot.values()[clampTarget()])) {
-            targetSlot = available.get(0).ordinal();
+        if (input.getItem() instanceof AkaishiGeneSequenceItem) {
+            // 已有选择仅当仍在当前序列可用列表内才保留，否则回到未选择状态
+            int cur = Math.max(0, Math.min(BodySlot.values().length - 1, targetSlot));
+            if (targetSlot < 0 || !OrganEffectRegistry.availableSlots(
+                    AkaishiGeneSequenceItem.getEntityId(input)).contains(BodySlot.values()[cur])) {
+                targetSlot = -1;
+            }
+        } else {
+            // 无序列 → 清除目标，等放入新序列后由玩家重选
+            targetSlot = -1;
         }
     }
 
@@ -159,7 +160,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         if (OrganEffectRegistry.availableSlots(AkaishiGeneSequenceItem.getEntityId(input)).isEmpty()) {
             return false;
         }
-        if (!availableContains(BodySlot.values()[clampTarget()])) {
+        // 未点选器官模型前不产出（玩家必须先在界面选定目标器官）
+        if (targetSlot < 0 || !availableContains(BodySlot.values()[targetSlot])) {
             return false;
         }
         if (!hasSolid(SOLID_COST) || life.getEnergyStored() < LIFE_COST) {
@@ -203,18 +205,22 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         return solid.is(ModItems.akaishiLifeEssenceSolid.get()) && solid.getCount() >= count;
     }
 
-    /** 界面选择目标槽位（C2S 入口，服务端校验范围与可用性，拒绝非法/远程篡改） */
+    /** 界面选择目标器官模型（C2S 入口，服务端校验可用性；拒绝不可用/越界/无序列请求） */
     public void setTargetSlot(int index) {
-        int clamped = Math.max(0, Math.min(BodySlot.values().length - 1, index));
-        ItemStack input = inventory.getItem(INPUT_SLOT);
-        if (input.getItem() instanceof AkaishiGeneSequenceItem) {
-            // 目标必须是当前序列已注册的可用槽位（GUI 只会发送可用项，此处拦截异常包）
-            BodySlot target = BodySlot.values()[clamped];
-            if (!OrganEffectRegistry.availableSlots(AkaishiGeneSequenceItem.getEntityId(input)).contains(target)) {
-                return;
-            }
+        if (index < 0 || index >= BodySlot.values().length) {
+            return;
         }
-        targetSlot = clamped;
+        BodySlot target = BodySlot.values()[index];
+        ItemStack input = inventory.getItem(INPUT_SLOT);
+        // 目标必须是当前序列已注册的可用槽位（GUI 只发送可用项，此处拦截异常包）
+        if (!(input.getItem() instanceof AkaishiGeneSequenceItem)
+                || !OrganEffectRegistry.availableSlots(AkaishiGeneSequenceItem.getEntityId(input)).contains(target)) {
+            return;
+        }
+        targetSlot = index;
+        // 中途更换目标立即清空当前进度：进度属于具体器官模型，防止“切目标白嫖加工”
+        progress = 0;
+        speedAccum = 0;
         data.set(DATA_TARGET, targetSlot);
         setChanged();
     }

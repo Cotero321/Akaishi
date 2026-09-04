@@ -9,9 +9,9 @@
       "name": "Akaishi Miner (9x9x3)",
       "multiblock": {
         "pattern": [
-          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "],
+          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "],
           ["    F    ", "         ", "         ", "         ", "F   0   F", "         ", "         ", "         ", "    F    "],
-          ["    F    ", " FUU FUU ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUU FUU ", "    F    "]
+          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "]
         ],
         "mapping": {
           "F": "akaishi:akaishi_miner_frame",
@@ -21,11 +21,21 @@
         },
         "symmetrical": false
       },
-      "text": "The controller sits at the center of the middle layer. The bottom and top layers each have one port (2 total). U slots can be swapped for upgrade-module blocks."
+      "text": "The Akaishi Miner is a fixed $(bold)9x9x3$(0) multiblock: the bottom and top layers are cross-shaped frameworks with a Port at each center, while the middle layer holds only four framework pillars plus the controller.$(br2)F = Miner Framework, U = Miner Framework (Upgrade) — or an upgrade module — P = Miner Port, red block = controller. Keep the four corners hollow."
     },
     {
       "type": "patchouli:text",
-      "text": "$(2,4)Build tips$(0)$(li)9×9 cross-section × 3 layers tall$(li)Place the controller at the middle-layer center first, then fill in the rest$(li)Upgrade-frame slots U: put empty upgrade frames or install upgrade modules directly$(li)Put 1 port P at the center of both the top and bottom layers$(br2)Once formed, the controller broadcasts to the ports and produced minerals auto-flow into the port buffers. Get the positions right and the miner \"spits ore\" on its own."
+      "text": "$(bold)Build order:$(0)$(li)Middle layer first: put four Framework pillars at the edge midpoints and the controller dead center (placing it early is fine — it detects the structure on its own)$(li)Bottom layer: one Port P at the very center, Framework F as the cross beams, Upgrade Frames U filling the ribs$(li)Top layer: mirror the bottom layer (Port at center too) — done$(br2)$(bold)Formed or not:$(0)the controller keeps checking automatically — $(c)break or misplace any block and the whole miner collapses$(0): upgrade counts reset, ports disconnect, digging freezes.$(br2)It reads like two floating cross-shaped decks with hollow corners — build it on open ground so you have room to add \"$(l:akaishi:miner_upgrades)upgrade modules$(/l)\" and route pipes later."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:miner_tiers",
+        "akaishi:miner_upgrades",
+        "akaishi:energy_pipe",
+        "akaishi:energy_cell"
+      ],
+      "text": "With the frame up, read on in order: pick a controller to set the \"tier\", then add \"upgrade modules\", then pipe power from the ports back into your grid."
     }
   ]
 }

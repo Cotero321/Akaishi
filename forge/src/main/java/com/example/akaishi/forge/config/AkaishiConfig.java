@@ -99,6 +99,7 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.LongValue FUSION_COOLING_PER_PERCENT;
     public static final ForgeConfigSpec.IntValue FUSION_BASE_TEMP;
     public static final ForgeConfigSpec.IntValue FUSION_TEMP_MAX;
+    public static final ForgeConfigSpec.IntValue FUSION_TEMP_TRIP;
     public static final ForgeConfigSpec.IntValue FUSION_TEMP_OPT_MIN;
     public static final ForgeConfigSpec.IntValue FUSION_TEMP_OPT_MAX;
     public static final ForgeConfigSpec.IntValue FUSION_TEMP_RESUME;
@@ -111,7 +112,6 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.DoubleValue WIRELESS_BASE_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_LOSS_PER_BLOCK;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_MAX_LOSS;
-    public static final ForgeConfigSpec.LongValue WIRELESS_PORT_TRANSFER_RATE;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_CROSS_DIM_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_LOSS_REDUCTION_PER_MODULE;
     public static final ForgeConfigSpec.LongValue WIRELESS_CHUNK_TAX_PER_CHUNK;
@@ -284,8 +284,10 @@ public final class AkaishiConfig {
                 .defineInRange("coolingPerPercent", 2_000_000L, 1L, Long.MAX_VALUE);
         FUSION_BASE_TEMP = b.comment("Base temperature with no fuel heat (M)")
                 .defineInRange("baseTemp", 50_000_000, 0, Integer.MAX_VALUE);
-        FUSION_TEMP_MAX = b.comment("Overheat shutdown threshold: burning stops (no explosion)")
+        FUSION_TEMP_MAX = b.comment("Physical temperature cap / yield falloff anchor (M); overheat shutdown happens at tempTrip")
                 .defineInRange("tempMax", 160_000_000, 1, Integer.MAX_VALUE);
+        FUSION_TEMP_TRIP = b.comment("Overheat shutdown threshold: burning stops once temperature reaches this value (M, below tempMax)")
+                .defineInRange("tempTrip", 159_000_000, 1, Integer.MAX_VALUE);
         FUSION_TEMP_OPT_MIN = b.comment("Optimal yield temperature range lower bound (M)")
                 .defineInRange("tempOptMin", 100_000_000, 0, Integer.MAX_VALUE);
         FUSION_TEMP_OPT_MAX = b.comment("Optimal yield temperature range upper bound (M)")
@@ -309,8 +311,6 @@ public final class AkaishiConfig {
                 .defineInRange("lossPerBlock", 0.001, 0.0, 0.1);
         WIRELESS_MAX_LOSS = b.comment("Loss ratio cap")
                 .defineInRange("maxLoss", 0.5, 0.0, 0.99);
-        WIRELESS_PORT_TRANSFER_RATE = b.comment("Base transfer per port per tick (no upgrades)")
-                .defineInRange("portTransferRate", 4096L, 1L, Long.MAX_VALUE);
         WIRELESS_CROSS_DIM_LOSS = b.comment("Fixed loss ratio for cross-dimension transfer (requires dim bridge)")
                 .defineInRange("crossDimLoss", 0.25, 0.0, 0.99);
         WIRELESS_LOSS_REDUCTION_PER_MODULE = b.comment("Loss reduction per input/output loss suppressor module (0.05 = -5%, stackable, capped at 90%)")

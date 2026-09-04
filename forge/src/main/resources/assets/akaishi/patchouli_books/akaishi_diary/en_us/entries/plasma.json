@@ -2,27 +2,26 @@
   "name": "Plasma Chain",
   "icon": "akaishi:akaishi_activated_fractionator",
   "category": "akaishi:tech",
-  "sortnum": 7,
+  "sortnum": 8,
   "pages": [
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_activated_fractionator",
-      "text": "Activated Fractionator: splits activated crystal in two —$(li)Activated component: feeds the Fusion Fuel Aggregator, heading toward plasma$(li)Exhausted crystal: waste, but don't toss it; the Item Reconstructor loves it$(br)One process, two destinies — the akaishi 'indecision ender'."
+      "type": "patchouli:text",
+      "text": "The Plasma Chain is the $(4)ultimate form of fuel$(0): ordinary fuel is condensed step by step into plasma fuel rods, made only for the Fusion Reactor.$(br2)$(bold)Upstream:$(0) its \"activated crystals\" come from the exhausted-fuel activator → centrifuge route — that belongs to \"Secrets of Life\".$(br2)$(bold)Three steps on this chain, one entry each:$(0)$(li)$(l:akaishi:plasma_fractionator)Activated Fractionator$(/l): splits activated crystals into components$(li)$(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l): condenses components into plasma$(li)$(l:akaishi:plasma_filler)Plasma Filler$(/l): pours plasma into fusion rods$(br2)The finished rods feed straight into \"$(l:akaishi:fusion)Fusion Reactor$(/l)\"."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_plasma_pipe",
-      "text": "Plasma Pipe: the third transport family, and it only accepts plasma.$(br)Other liquids want a ride? Not a chance. Aloof, faithful, never mixes flavors."
+      "type": "patchouli:text",
+      "text": "$(bold)A dedicated line:$(0) plasma travels only through the $(4)Plasma Pipe / Plasma Fuel Tank$(0) — ordinary fluid pipes won't touch it. Lay it from aggregator to filler first and not a drop spills.$(br2)All three rods carry $(4)6 trillion$(0) energy each; they differ only in temper — how to pick and burn them: $(l:akaishi:plasma_rods)Plasma Fuel Rods$(/l)."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_plasma_tank",
-      "text": "Plasma Fuel Tank: the exclusive mansion for plasma, storing nothing but plasma.$(br)With pipes and the aggregator, plasma flows from production to filling without spilling a single drop."
-    },
-    {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_exhausted_barrel",
-      "text": "Exhausted Fuel Barrel: the dedicated 'hazardous waste bin' for spent fuel.$(br)Whether your reactor stays in one piece is half cooling, half remembering to dump the waste in here."
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma_fractionator",
+        "akaishi:plasma_aggregator",
+        "akaishi:plasma_filler",
+        "akaishi:plasma_rods",
+        "akaishi:fusion"
+      ],
+      "text": "The three machines and the finished rods each have their own entry above; the $(l:akaishi:fusion)Fusion Reactor$(/l) is where they get burned."
     }
   ]
 }

@@ -7,12 +7,22 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_generator",
-      "text": "The Energy Generator, the \"first pot\" that burns fuel into power.$(br)It has 10 upgrade slots; stuff in $(2,4)Energy Production Upgrade Components$(0) to boost output (each ×1.75, up to 10). Fuel in, power out, forever."
+      "text": "The Energy Generator is your $(4)entry-level standalone generator$(0): feed it Akaishi fuel and it burns steadily at a base rate of $(bold)75 AE/tick$(0) (AE = Akaishi Energy).$(br2)$(bold)Boosting it:$(0)it has 10 upgrade slots. Each Energy Production Upgrade Component is ×1.75 output (with a 1% output tax), so $(4)a full rack lands around ×242$(0).$(br2)$(bold)Five fuel tiers$(0) (heating value):$(li)Akaishi Crystal: 2000$(li)Raw Akaishi Block: 20000$(li)Akaishi Essence: 80000$(li)Condensed Akaishi Essence: 800000$(li)Condensed Akaishi Essence Block: 7200000$(br2)Where those fuels come from and how to refine them: \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\". One unit too weak? The upgrade path is the \"$(l:akaishi:gen_matrix)Akaishi Generator Matrix$(/l)\"."
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_gen_matrix_controller_basic",
-      "text": "$(2,4)Want power at scale?$(0) The old \"Small Assembly\" and \"Super Architecture\" have retired, replaced by the $(2,4)Generator Matrix$(0): enclose a sealed space with matrix casings and mount the controller and ports on the walls, and output climbs in leaps and bounds.$(br)See the \"Matrix Structures\" entry for the layout."
+      "type": "patchouli:text",
+      "text": "$(bold)Retired builds:$(0) the $(4)Small Assembly$(0) (3×3×3) and the $(4)Super Generator$(0) (5×5×5) block-built forms have $(bold)retired$(0). The Akaishi Generator Matrix now does that job, and the old blocks are just $(e)spare parts$(0).$(br2)$(bold)Standalone vs matrix:$(0) the generator is cheap, drop-in and carries its own fuel slot; $(4)the matrix needs grid power$(0), but starts at a ×45 multiplier — your budget and line size decide which route to take.$(br2)Forming requirements and both tiers' stats live in the \"$(l:akaishi:gen_matrix)Akaishi Generator Matrix$(/l)\" entry."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_basics",
+        "akaishi:energy_cell",
+        "akaishi:energy_pipe",
+        "akaishi:gen_matrix",
+        "akaishi:reactor"
+      ],
+      "text": "Suggested reading: start with \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\" to master fuel, then wire everything up with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" and \"$(l:akaishi:energy_cell)Energy Cells$(/l)\"; to scale up, build the \"$(l:akaishi:gen_matrix)Generator Matrix$(/l)\" — and when even that falls short, it's time for the \"$(l:akaishi:reactor)Reactor$(/l)\"."
     }
   ]
 }

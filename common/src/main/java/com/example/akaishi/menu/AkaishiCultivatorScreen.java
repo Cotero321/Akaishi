@@ -22,8 +22,8 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
 
     private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
     private static final int PROGRESS_X = 56, PROGRESS_Y = 74, PROGRESS_W = 56, PROGRESS_H = 8;
-    /** 机器槽位数量（输入槽 + 材料槽，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = 2;
+    /** 机器槽位数量（升级槽 2 + 输入/材料槽 2，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = 4;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，能量条下方右侧空位；标签置于槽位下方避开能量条） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
@@ -84,9 +84,7 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
         if (progressWidth > 0) {
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, color);
         }
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位下方标签，避开上方能量条）
-        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
+        // 升级槽标签（槽位下方，避开上方能量条）
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
                 x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
     }

@@ -39,20 +39,21 @@ import net.minecraft.world.level.block.state.BlockState;
  * 以基因序列为培养基、衰竭结晶为催化剂对器官施加随机基因突变（双刃剑）：
  * - 输入器官必须非原生、已定型且未达词条承载上限（与序列同基因来源组才可培养）
  * - 成功率由序列纯度决定：纯度 25 → 35%、纯度 100 → 70% 线性插值（封顶 70%）
- * - 培养成功：消耗材料，返回器官副本并附加 1 条随机突变词条；失败：材料与器官均损毁
+ * - 培养成功：消耗材料与原器官，返回器官副本并附加 1 条随机突变词条；
+ *   失败：仅消耗材料（结晶/序列/能量），输入器官保留，可补料重试
  * 槽位：0=器官输入，1=基因序列，2=衰竭结晶，3=产物输出。
  */
 public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 单次培养消耗的生命能量 */
-    public static final long LIFE_COST = 120_000L;
-    /** 单次培养消耗的衰竭结晶数量 */
-    public static final int CRYSTAL_COST = 4;
+    /** 单次培养消耗的生命能量（消耗减半：原 120K） */
+    public static final long LIFE_COST = 60_000L;
+    /** 单次培养消耗的衰竭结晶数量（消耗减半：原 4） */
+    public static final int CRYSTAL_COST = 2;
     /** 生命能量缓冲容量（够 2 次培养） */
-    public static final long LIFE_CAPACITY = 240_000L;
-    /** 单次培养耗时（tick） */
-    public static final int PROGRESS_TICKS = 1200;
+    public static final long LIFE_CAPACITY = 120_000L;
+    /** 单次培养耗时（tick，50 秒） */
+    public static final int PROGRESS_TICKS = 1000;
     /** 成功率下限（纯度 25）与上限（纯度 100，封顶 70%） */
     public static final float MIN_SUCCESS_RATE = 0.35F;
     public static final float MAX_SUCCESS_RATE = 0.70F;
@@ -164,7 +165,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         return inventory.getItem(OUTPUT_SLOT).isEmpty();
     }
 
-    /** 培养结算：成败均消耗结晶 + 序列 + 器官；成功产出器官副本并附加随机词条 */
+    /** 培养结算：成败均消耗结晶 + 序列 + 能量；成功消耗原器官产出突变副本，失败器官保留可重试 */
     private void settle() {
         ItemStack organ = inventory.getItem(ORGAN_SLOT);
         ItemStack sequence = inventory.getItem(SEQUENCE_SLOT);
@@ -174,7 +175,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         inventory.getItem(CRYSTAL_SLOT).shrink(CRYSTAL_COST);
         sequence.shrink(1);
 
-        // 失败：器官损毁（无产物）；成功：器官副本 + 随机突变词条（稀有度由纯度解锁）
+        // 成功：消耗原器官并产出副本 + 随机突变词条（稀有度由纯度解锁）；失败：仅材料损失，器官留在输入槽
         if (level.random.nextFloat() < successRate(purity)) {
             ItemStack result = organ.copy();
             // 排除器官已携带词条，避免同词条重复占用承载上限
@@ -184,8 +185,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
                 AkaishiOrganItem.addMutation(result, trait);
             }
             inventory.setItem(OUTPUT_SLOT, result);
+            organ.shrink(1);
         }
-        organ.shrink(1);
     }
 
     public Container inventory() {

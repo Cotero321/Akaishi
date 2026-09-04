@@ -1,0 +1,22 @@
+{
+  "name": "Plasma Fuel Rods",
+  "icon": "akaishi:akaishi_mixed_plasma_rod",
+  "category": "akaishi:tech",
+  "sortnum": 12,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mixed_plasma_rod",
+      "text": "All three rods carry $(4)6 trillion$(0) energy each; only their temper differs:$(li)$(bold)Mixed Rod$(0): 4M/t yield, 27M heat value — balanced, ideal for stacking efficiency frames$(li)$(bold)Nether Rod$(0): 4M/t yield, 40M heat — high output and heat, bring serious cooling$(li)$(bold)End Rod$(0): 2.6M/t yield, 15M heat — mild; four of them with no cooling land right in the fusion sweet spot$(br2)How to burn them: see \"$(l:akaishi:fusion)Fusion Reactor$(/l)\"."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma_filler",
+        "akaishi:plasma",
+        "akaishi:fusion"
+      ],
+      "text": "Rods are made by the $(l:akaishi:plasma_filler)Plasma Filler$(/l); to burn them, follow the $(l:akaishi:fusion)Fusion Reactor$(/l) layout."
+    }
+  ]
+}

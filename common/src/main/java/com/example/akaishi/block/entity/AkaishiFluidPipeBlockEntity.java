@@ -401,6 +401,9 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
 
     /** 邻居方块是否存在可对接的液体罐（模组设备或外部液体能力），按罐级家族过滤 */
     private boolean hasFluidTank(BlockEntity be, Direction side) {
+        if (be == null) {
+            return false; // 邻居未加载/已拆除：视作无罐，避免 NPE 拖垮 tick
+        }
         if (be instanceof IFluidPipeDevice device) {
             List<FluidTank> tanks = device.getFluidTanks();
             if (tanks == null) {

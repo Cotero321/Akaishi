@@ -2,12 +2,26 @@
   "name": "赤红升级模板",
   "icon": "akaishi:akaishi_upgrade_template",
   "category": "akaishi:advanced",
-  "sortnum": 6,
+  "sortnum": 7,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_upgrade_template",
-      "text": "赤红升级模板，装备强化的「门票」。$(br)赤红升级台每升 1 级特殊能力，就要吃掉 1 个升级槽位 + 1 枚模板 + 20M 赤能源。$(br2)装备的基础属性（攻速/伤害/效率/生命/护甲/韧性）则由赤石装备打造器在锻造时分配升级点。想变强？先把门票囤起来。"
+      "text": "赤红升级模板是升级台的「门票」：在「$(l:akaishi:upgrade_station)赤红升级台$(/l)」每给装备升 1 级特殊能力，就要吃掉 1 枚模板（外加 $(4)2000 万$(0)能量和装备的 1 个升级槽位）。$(br2)囤模板 = 囤战力——打高阶装备前，先把它备足。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)先别把它和下面这族升级件搞混$(0)（它们各有分工）：$(li)$(4)赤红机器组件 / 赤红高级机械组件$(0)：通用机器合成材料，大量机器配方的上游$(li)$(4)能源产生升级$(0)：插进发生机/矩阵的升级槽（上限 10 个），每级产能 ×1.75 但产出 −1%，总倍率 = 1.75^n × (1 − 0.01n)$(li)$(4)机器速度 / 机器能量升级$(0)：塞进通用机器两格升级槽，速度每级 +12.5%、能量容量每级 +50%，$(4)8 级封顶$(0)$(br2)模板管装备强化，它们管机器强化，别买错票。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:upgrade_station",
+        "akaishi:equipment",
+        "akaishi:pulverizer",
+        "akaishi:transformer"
+      ],
+      "text": "模板的用法回看「$(l:akaishi:equipment)赤石装备$(/l)」；机器升级组件能插在哪些机器上，从「$(l:akaishi:pulverizer)粉碎机$(/l)」「$(l:akaishi:transformer)变压器$(/l)」看起。"
     }
   ]
 }

@@ -7,17 +7,30 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_trait_reforger",
-      "text": "重铸原理：把器官上选定的第 N 条突变词条，重铸为该档位词条池里的随机新词条（不会与器官已携带的词条重复）。$(br2)每次消耗：衰竭结晶 ×（2 × 档位） + 生命能量 120,000。$(br2)确定性成功：材料与能量齐了就必然成功，器官绝不损坏——洗到不满意，尽管反复洗。"
+      "text": "词条重铸仪：把器官上$(4)指定的词条原位替换$(0)为同档位池里的新词条。$(br2)$(bold)三条铁律：$(0)$(li)确定性必成——材料与能量齐了必定成功，不赌运气$(li)不损坏器官$(li)排除器官已带的词条，不会 roll 出重复项$(br2)要求：器官$(bold)非原生、已定型$(0)、且至少携带 1 条词条。$(br2)长错词条？这是唯一的「原位洗点」手段。"
     },
     {
-      "type": "patchouli:crafting",
-      "recipe": "akaishi:akaishi_trait_reforger",
-      "text": "合成：八枚赤石锭环绕一枚衰竭结晶。"
+      "type": "patchouli:text",
+      "text": "$(bold)每次消耗：$(0)$(li)衰竭结晶：稀有度 ×2 个——1 / 2 / 3 级词条分别要 2 / 4 / 6 个$(li)生命能量 12 万$(li)耗时 600 tick（30 秒）$(br2)$(bold)注意：$(0)新词条仍在$(bold)同一档位池$(0)抽取——想从 2 级池里洗出 3 级词条，不可能。$(br2)器官词条多就先选最碍事的那条：一次重铸只换一条。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_exhausted_crystal",
-      "text": "操作流程：放入带突变词条的器官 → 点上方序号选要重铸的词条 → 衰竭结晶与生命能量就绪后自动开始（约 30 秒）。$(br2)重铸中可随时切目标（进度会重置）；完成后从输出口取回新器官。天然原生器官无法重铸。洗词条，就是这么简单粗暴。"
+      "text": "衰竭结晶：词条重铸的$(4)硬通货$(0)。$(br2)$(bold)来源：$(0)活化分馏器、生命离心机分离时的通用副产——整条净化产线详见「$(l:akaishi:life_waste)衰竭燃料无害化$(/l)」。$(br2)一次重铸要 2-6 个，用量不小：$(bold)攒结晶就是囤底气$(0)，废料管线早接早省心。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "akaishi:akaishi_trait_reforger",
+      "text": "合成配方：八枚赤石锭围一枚衰竭结晶。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:trait_safe",
+        "akaishi:life_waste",
+        "akaishi:life_purifier"
+      ],
+      "text": "阅读顺序：重铸前先翻「常规变异」「畸变双刃」图鉴；衰竭结晶的产线见「衰竭燃料无害化」；固态物与生命能量由「生命提纯器」体系供给。"
     }
   ]
 }

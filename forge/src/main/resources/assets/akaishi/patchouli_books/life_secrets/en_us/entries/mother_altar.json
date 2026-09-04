@@ -7,7 +7,45 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_mother_altar",
-      "text": "Altar of the Black Mother: a full-on Lovecraftian offering stand.$(br)It has no GUI — it reads the offerings you slot in via NBT, then levitates them above the altar for 'Her' to enjoy.$(br)Offer the right tribute and you might earn an unexpected boon; offer the wrong one... good luck."
+      "text": "$(bold)Purpose:$(0) the end-game ritual of the Life line - build the shrine and offer creations of life to obtain the only source of the $(4)Life Fusion Ingot$(0). Take the ingot to the $(l:akaishi:life_fusion_anvil)Life Fusion Anvil$(/l).$(br2)$(bold)Interaction (no GUI):$(0)$(li)Right-click while holding a creation of life: place 1 offering, it floats above the altar$(li)Right-click empty-handed: take the offering back$(br2)$(bold)Accepted tributes:$(0) life organs (natives included), life samples, gene sequences, life embryos, life ash and condensed life essence - anything born of Life."
+    },
+    {
+      "type": "patchouli:multiblock",
+      "name": "Altar of the Black Mother (17x17x2)",
+      "multiblock": {
+        "pattern": [
+          ["                 ", "        S        ", "                 ", "        T        ", "                 ", "     T  T  T     ", "      T   T      ", "       S S       ", " S T T  0  T T S ", "       S S       ", "      T   T      ", "     T  T  T     ", "                 ", "        T        ", "                 ", "        S        ", "                 "],
+          ["        C        ", "       CCC       ", "      CACAC      ", "     CAACAAC     ", "    CAAACAAAC    ", "   CAAAACAAAAC   ", "  CAAAAACAAAAAC  ", " CAAAAACCCAAAAAC ", "CCCCCCCCCCCCCCCCC", " CAAAAACCCAAAAAC ", "  CAAAAACAAAAAC  ", "   CAAAACAAAAC   ", "    CAAACAAAC    ", "     CAACAAC     ", "      CACAC      ", "       CCC       ", "        C        "]
+        ],
+        "mapping": {
+          "C": "minecraft:crying_obsidian",
+          "A": "akaishi:akaishi_altar_stone",
+          "S": "minecraft:soul_campfire",
+          "T": "akaishi:akaishi_mother_altar",
+          "0": "akaishi:akaishi_mother_altar"
+        },
+        "symmetrical": true
+      },
+      "text": "$(bold)Top layer (ground y=0):$(0) 0/T=Altar of the Black Mother (red 0 = the center anchor), S=Soul Campfire. $(bold)Bottom layer (y-1):$(0) C=Crying Obsidian (diamond ring + center cross), A=Mother Altar Stone (quadrants), everything else air.$(br2)The shrine is 90-degree rotationally symmetric, so $(4)any orientation works$(0). Level a clean 17x17 area, lay the bottom layer, then place the top - one block off and the ritual never settles."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Coordinates & Offerings",
+      "text": "$(bold)Ground-layer positions (center at the origin; checked every 20 ticks = 1s):$(0)$(li)Center (0,0): a Heart organ, $(4)compatibility 50 or higher$(0)$(li)Inner ring 8 at (±3,0)(0,±3)(±2,±2): one organ for each of the 8 non-heart slots, $(4)no repeated slots$(0), no hearts, all at compatibility 50+$(li)4 diagonal altars at (±3,±3): 1 Life Ash each$(li)4 cross altars at (±5,0)(0,±5): 1 Life Embryo each$(br2)Only altars on the exact spots count for the Mother; if an organ fails the check, the other offerings stay on their altars."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Crafting & Cost",
+      "text": "$(bold)Mother Altar Stone:$(0) COC/OEO/COC (C=Crying Obsidian, O=Obsidian, E=Life Essence Solid) -> 8. $(bold)Altar of the Black Mother:$(0) 8 Altar Stone around 1 Life Essence Solid -> 1.$(br2)$(bold)Full shrine cost:$(0) Crying Obsidian 173 (65 base + 108 crafting), Obsidian 108, Life Essence Solid 44 (27 stones + 17 altars), Soul Campfires 8.$(br2)$(bold)Resolution:$(0) once all 17 offerings are in place they are consumed on the spot and 1 Life Fusion Ingot pops out above the center; players within 32 blocks see the completion message (3s of nausea + 1s of darkness). Each run burns a compatible heart, 8 compatible organs, 4 embryos and 4 ash - $(4)offerings never come back$(0)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_organs",
+        "akaishi:life_purifier",
+        "akaishi:life_fusion_anvil"
+      ],
+      "text": "Prereq: grow organ compatibility to 50 first (see Organ Research); stock Life Essence Solid at the Life Purifier. Once the ingot drops, take it straight to the Life Fusion Anvil."
     }
   ]
 }

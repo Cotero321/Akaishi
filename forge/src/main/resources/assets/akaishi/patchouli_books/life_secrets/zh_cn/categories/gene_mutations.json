@@ -1,6 +1,6 @@
 {
   "name": "基因变异",
-  "description": "突变词条图鉴：认识培养中可能出现的基因变异——并小心双刃畸变。",
+  "description": "器官突变词条图鉴与重铸玩法：词条在培育时随机附加，可交给「词条重铸仪」洗练。$(br)先读「器官研究」建立器官产线。",
   "icon": "akaishi:akaishi_life_breeder",
   "sortnum": 5
 }

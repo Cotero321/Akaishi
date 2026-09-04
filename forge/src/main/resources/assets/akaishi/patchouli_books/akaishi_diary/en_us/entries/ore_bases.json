@@ -6,7 +6,19 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Transformer products — one base per mineral, the \"mineral ID card\":$(li)Coal / Iron / Copper Ore Bases$(li)Gold / Redstone / Lapis Ore Bases$(li)Diamond / Emerald Ore Bases$(li)Nether Quartz / Ancient Debris / Akaishi Ore Bases$(br2)These bases are the core materials for Catalyst tiers — without them, your crystal line stays stuck in the stone age."
+      "text": "Ore Bases are the Akaishi Transformer's $(4)signature output$(0): they squeeze any lump of ore into a single standardized base, so machines can recognize materials at a glance.$(br2)$(bold)The whole family:$(0)$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)Akaishi ore → Akaishi Ore Base$(li)Lapis Dust → Cooling Base (it serves the cooling line, not the ores)$(br2)One machine makes them all: the Transformer, one in, one out."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Where they are used (verified from recipes):$(0)$(li)Iron → Gold → Diamond → Ancient Debris Bases: the four Catalyst tiers$(li)Copper → Redstone → Lapis Bases: the Auto Collector upgrade line$(li)Coal Ore Base → Fuel Canner$(li)Nether Quartz Ore Base → Wireless Core and Fusion Insulation$(li)Emerald Ore Base → Life Centrifuge; Akaishi Ore Base → Chi Energy Assembly$(li)Cooling Base → the start of the heat-sink line (see Fuel & Cooling)$(br2)Whichever base shows up in a recipe tells you which tier you have reached."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:transformer",
+        "akaishi:dusts"
+      ],
+      "text": "These bases are made by the $(l:akaishi:transformer)Transformer$(/l), whose feedstock like Lapis Dust is covered in $(l:akaishi:dusts)Dusts$(/l)."
     }
   ]
 }

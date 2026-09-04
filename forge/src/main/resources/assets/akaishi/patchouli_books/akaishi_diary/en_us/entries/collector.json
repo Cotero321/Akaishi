@@ -7,7 +7,19 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_collector_basic",
-      "text": "The Collector, the \"harvester\" of crystal automation: auto-harvests mature clusters in range, stashing essence into a 27-slot container.$(li)Basic: 3×3×3, 30 ticks/block, 2 energy/t$(li)Intermediate: 5×5×5, 15 ticks/block, 4 energy/t$(li)Advanced: 9×9×9, 7 ticks/block, 8 energy/t$(li)Ultimate: 16×16×16, 2 ticks/block, 16 energy/t$(br2)Supports hoppers and item pipes. Pair it with a Catalyst and you've got a fully automatic money printer."
+      "text": "The Auto Collector is the \"harvester\" of a crystal farm: it reaps mature clusters in range and tucks the drops (1-2 Akaishi Essence) into its own $(4)27-slot chest$(0).$(br2)$(bold)Four tiers$(0) (range side / time per cluster / energy per tick):$(li)$(4)Basic$(0): 3x3x3, 30 ticks, 2 E/t$(li)Medium: 5x5x5, 15 ticks, 4 E/t$(li)Advanced: 9x9x9, 7 ticks, 8 E/t$(li)Ultimate: 16x16x16, 2 ticks, 16 E/t$(br2)Idle with peace of mind: when its chest is full it stops working instead of breaking your clusters."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Dream team: Catalyst + Collector = a fully automatic crystal farm.$(0)$(li)the Catalyst makes Geodes in range sprout clusters every tick$(li)the Collector then sweeps up the mature ones and stores the Essence$(br2)Place both with matching ranges and it runs on its own.$(br2)Hoppers and item pipes can pull the Essence out and feed it down the line — into a Compressor or whatever you need."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:catalyst",
+        "akaishi:pulverizer"
+      ],
+      "text": "The \"$(l:akaishi:catalyst)Catalyst$(/l)\" supplies the clusters; follow \"$(l:akaishi:pulverizer)Pulverizer$(/l)\" to see where the Essence goes."
     }
   ]
 }

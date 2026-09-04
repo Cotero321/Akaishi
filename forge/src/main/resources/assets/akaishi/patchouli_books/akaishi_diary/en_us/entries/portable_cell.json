@@ -2,12 +2,26 @@
   "name": "Portable Cells",
   "icon": "akaishi:portable_akaishi_cell_super",
   "category": "akaishi:energy",
-  "sortnum": 5,
+  "sortnum": 7,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:portable_akaishi_cell_basic",
-      "text": "A pocket power pack in 3 tiers: basic / advanced / super.$(br)Carry it around to auto-repair your akaishi gear's durability, right-click to check the charge — a true walking power bank for builds and adventures alike."
+      "text": "A Portable Akaishi Cell is a $(4)pocket power bank$(0).$(br2)$(bold)Three tiers$(0) (capacity / per-tick charge & output):$(li)Basic: 50 million / 500 thousand$(li)Advanced: 200 million / 1 million$(li)Super: 1 billion / 4 million$(br2)$(bold)How to use it:$(0)just carry it in your inventory. When Akaishi curios run dry, they $(4)automatically draw power from the Portable Cells in your backpack$(0) — and it also patches up your equipped Akaishi gear. Details on the next page."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Auto-repair:$(0)a Portable Cell anywhere in your inventory continuously repairs the Akaishi gear on your body and in your hands:$(li)Basic: 10 durability per tick$(li)Advanced: 20 durability per tick$(li)Super: 40 durability per tick$(br2)Each point of durability costs $(bold)100 AE$(0). Several cells in the bag $(4)stack their power$(0) — when one runs dry, the next takes over automatically.$(br2)$(bold)Recharging:$(0)drop the Portable Cell into the charge slot of a \"$(l:akaishi:energy_cell)Storage Cell$(/l)\" GUI."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:energy_cell",
+        "akaishi:energy_basics",
+        "akaishi:equipment",
+        "akaishi:curios"
+      ],
+      "text": "It travels, while the block-sized cells stay home — the capacity ladder is in \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\" and \"$(l:akaishi:energy_cell)Energy Storage$(/l)\". It shines brightest with \"$(l:akaishi:equipment)Equipment$(/l)\" and \"$(l:akaishi:curios)Akaishi Trinkets$(/l)\"."
     }
   ]
 }

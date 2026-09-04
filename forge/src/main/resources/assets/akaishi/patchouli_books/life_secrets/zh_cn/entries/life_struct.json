@@ -1,0 +1,23 @@
+{
+  "name": "生命结构台",
+  "icon": "akaishi:akaishi_life_struct",
+  "category": "akaishi:life_organs",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_struct",
+      "text": "把$(4)基因序列＋固态物＋生命能量$(0)铸成器官的机器，$(bold)必定成功$(0)。$(br2)$(bold)消耗：$(0)1 条序列 ＋ 5 固态物 ＋ 8 万生命能量，耗时 120 tick（6 秒）。$(br2)$(bold)完整度＝序列纯度 − 随机损耗（0-20）：$(0)$(li)100 → III 品$(li)50-99 → II 品$(li)<50 → I 品$(br2)来源的默认品质仅作回退：温血 I、亡灵/爆炸/异变 II、末影 III、首领/龙 IV。$(br2)想稳定拿高品？先把序列纯度提到 100 再铸。铸出的器官种类见「$(l:akaishi:life_organs)器官构造$(/l)」图鉴。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_organs",
+        "akaishi:cultivator",
+        "akaishi:life_vaults"
+      ],
+      "text": "原料：纯度 ≥25 的样本先在分析台解成序列；铸出的器官可存器官库、升品找培养舱。"
+    }
+  ]
+}

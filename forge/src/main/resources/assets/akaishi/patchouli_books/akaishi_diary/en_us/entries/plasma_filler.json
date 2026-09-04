@@ -1,0 +1,26 @@
+{
+  "name": "Plasma Filler",
+  "icon": "akaishi:akaishi_plasma_filler",
+  "category": "akaishi:tech",
+  "sortnum": 11,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_plasma_filler",
+      "text": "Plasma Filler: $(4)Fusion Rod + 1,000 mb of matching plasma → 1 plasma fuel rod$(0), taking 100 ticks.$(br2)This is the last stop for fusion fuel: once the rod is in hand, stuff it straight into the $(l:akaishi:fusion)Fusion Reactor$(/l)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Match the rod:$(0) each Fusion Rod demands the $(bold)matching plasma$(0) — mixed components make Mixed rods, Nether components make Nether rods, End components make End rods.$(br2)Rod stats: $(l:akaishi:plasma_rods)Plasma Fuel Rods$(/l); how the Fusion Reactor is laid out: $(l:akaishi:fusion)Fusion Reactor$(/l)."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:plasma",
+        "akaishi:plasma_aggregator",
+        "akaishi:plasma_rods"
+      ],
+      "text": "Plasma arrives from the $(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l); chain overview in $(l:akaishi:plasma)Plasma Chain$(/l)."
+    }
+  ]
+}

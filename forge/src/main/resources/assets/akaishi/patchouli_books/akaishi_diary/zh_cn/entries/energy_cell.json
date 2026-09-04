@@ -2,22 +2,28 @@
   "name": "赤能源储存",
   "icon": "akaishi:akaishi_energy_cell_super",
   "category": "akaishi:energy",
-  "sortnum": 3,
+  "sortnum": 4,
   "pages": [
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_cell_basic",
-      "text": "赤能源储存单元，你的电力小金库，分三档：基础、高级、超级，容量一路狂飙。$(br)家可以没有墙，但电网不能没有它。"
+      "text": "赤能源储存单元 = 电网的$(4)蓄水池$(0)：把发电与用电解耦，产率再颠簸也不拖垮机器。$(br2)$(bold)基本单元$(0)：$(li)容量 $(bold)5 亿$(0) 赤能源$(li)每 tick 最多$(4)收发 100 万$(0)（充放共用上限）$(br2)三档对比见下页。小窍门：把「便捷单元」放进它的界面充能槽，还能顺手给随身电池回电。"
     },
     {
       "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_energy_cell_serializer",
-      "text": "赤能源储存串联器：把 26 台储存单元摆成 3×3×3，让它们「合体」成一台巨无霸。$(br)总容量暴增，从此告别「电量告急」的噩梦。"
+      "item": "akaishi:akaishi_energy_cell_super",
+      "text": "$(bold)三档储存单元$(0)（容量 / 每 tick 收发上限）：$(li)$(4)基本$(0)：5 亿 / 100 万$(li)高级：20 亿 / 500 万$(li)$(4)超级$(0)：200 亿 / 5000 万$(br2)高级、超级都由低一级单元$(4)合成升级$(0)，同张电网里可以混搭。$(br2)收发上限决定瞬时吞吐——发电端和管道都很猛时，别让低档单元卡住电。$(br2)一台不够装？$(bold)巨型电池$(0)请看「$(l:akaishi:cell_serializer)储存串联器$(/l)」。"
     },
     {
-      "type": "patchouli:spotlight",
-      "item": "akaishi:portable_akaishi_cell_super",
-      "text": "便捷赤能源储存单元：塞进背包的充电宝。$(br)揣在身上自动给赤石装备回耐久，右键一开就能查电量——出门浪，全靠它兜底。"
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:generator",
+        "akaishi:gen_matrix",
+        "akaishi:energy_pipe",
+        "akaishi:portable_cell",
+        "akaishi:cell_serializer"
+      ],
+      "text": "存得下还要送得出：先用「$(l:akaishi:energy_basics)赤能源基础$(/l)」入门，配上「$(l:akaishi:generator)发生机$(/l)」/「$(l:akaishi:gen_matrix)发生器矩阵$(/l)」与「$(l:akaishi:energy_pipe)管道$(/l)」形成完整回路；容量不够上「$(l:akaishi:cell_serializer)储存串联器$(/l)」；出门在外就靠「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
     }
   ]
 }
