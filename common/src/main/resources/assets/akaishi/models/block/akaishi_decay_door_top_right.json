@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_right",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_decay_door_bottom",
+    "top": "akaishi:block/akaishi_decay_door_top"
+  }
+}

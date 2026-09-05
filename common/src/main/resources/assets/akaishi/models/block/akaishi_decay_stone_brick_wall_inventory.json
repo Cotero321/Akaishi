@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "akaishi:block/akaishi_decay_stone_bricks"
+  }
+}

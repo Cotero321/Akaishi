@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "akaishi:block/akaishi_transgene_factory"
+    }
+  }
+}

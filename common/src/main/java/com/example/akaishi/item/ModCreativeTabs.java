@@ -1,6 +1,7 @@
 package com.example.akaishi.item;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.ModBlocks;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -535,6 +536,10 @@ public final class ModCreativeTabs {
                                     if (ModBlocks.CHISHI_GENE_ANALYZER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_GENE_ANALYZER.get()));
                                     }
+                                    // 转基因工厂（生命科技：凋零骷髅基因 + 生物质 → 凋零藤）
+                                    if (ModBlocks.CHISHI_TRANSGENE_FACTORY != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_TRANSGENE_FACTORY.get()));
+                                    }
                                     // 部件培养舱（生命科技：提纯 + 器官升级）
                                     if (ModBlocks.CHISHI_CULTIVATOR != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_CULTIVATOR.get()));
@@ -585,6 +590,39 @@ public final class ModCreativeTabs {
                                     // 母神祭坛石（祭坛结构件/装饰建材）
                                     if (ModBlocks.CHISHI_ALTAR_STONE != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ALTAR_STONE.get()));
+                                    }
+                                    // 衰竭区域污染产物（衰竭土壤/衰竭木：装饰建材与体系原料）
+                                    if (ModBlocks.CHISHI_DECAY_SOIL != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_DECAY_SOIL.get()));
+                                    }
+                                    if (ModBlocks.CHISHI_DECAY_LOG != null) {
+                                        output.accept(new ItemStack(ModBlocks.CHISHI_DECAY_LOG.get()));
+                                    }
+                                    // 衰竭全家桶：衰竭岩石组 / 衰竭木完整组 / 衰竭地表组
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STONE.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_COBBLESTONE.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STONE_BRICKS.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STONE_BRICK_STAIRS.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STONE_BRICK_SLAB.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STONE_BRICK_WALL.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_PLANKS.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_STAIRS.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_SLAB.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_FENCE.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_FENCE_GATE.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_DOOR.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_TRAPDOOR.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_BUTTON.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_PRESSURE_PLATE.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_SAND.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_GRAVEL.get()));
+                                    output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_GRASS_BLOCK.get()));
+                                    // 凋零藤种子（转基因工厂产物）+ 成熟收获物：凋零凝聚体
+                                    if (ModItems.akaishiWitherSeed != null) {
+                                        output.accept(new ItemStack(ModItems.akaishiWitherSeed.get()));
+                                    }
+                                    if (ModItems.akaishiWitherCondensate != null) {
+                                        output.accept(new ItemStack(ModItems.akaishiWitherCondensate.get()));
                                     }
                                     // 生命科技：样本采集器 + 生命样本 + 基因序列片段
                                     if (ModItems.sampleCollector != null) {

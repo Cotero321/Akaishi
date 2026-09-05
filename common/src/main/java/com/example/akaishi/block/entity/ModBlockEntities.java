@@ -133,6 +133,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiLifeBreederBlockEntity>> CHISHI_LIFE_BREEDER;
     /** 词条重铸仪方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiTraitReforgerBlockEntity>> CHISHI_TRAIT_REFORGER;
+    /** 转基因工厂方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiTransgeneFactoryBlockEntity>> CHISHI_TRANSGENE_FACTORY;
     /** 手术仓方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiSurgeryBlockEntity>> CHISHI_SURGERY;
     /** 药剂台方块实体类型 */
@@ -378,6 +380,9 @@ public final class ModBlockEntities {
         // 词条重铸仪（器官 + 衰竭结晶 → 原位替换指定突变词条）
         CHISHI_TRAIT_REFORGER = be("akaishi_trait_reforger", AkaishiTraitReforgerBlockEntity::new,
                 ModBlocks.CHISHI_TRAIT_REFORGER);
+        // 转基因工厂（凋零骷髅基因 + 生物质 → 凋零藤）
+        CHISHI_TRANSGENE_FACTORY = be("akaishi_transgene_factory", AkaishiTransgeneFactoryBlockEntity::new,
+                ModBlocks.CHISHI_TRANSGENE_FACTORY);
         // 手术仓（器官移植/摘除）
         CHISHI_SURGERY = be("akaishi_surgery", AkaishiSurgeryBlockEntity::new, ModBlocks.CHISHI_SURGERY);
         // 药剂台（永久/突破药剂制作）

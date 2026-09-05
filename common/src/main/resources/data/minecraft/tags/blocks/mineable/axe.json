@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "akaishi:akaishi_decay_log",
+    "akaishi:akaishi_decay_planks",
+    "akaishi:akaishi_decay_stairs",
+    "akaishi:akaishi_decay_slab",
+    "akaishi:akaishi_decay_fence",
+    "akaishi:akaishi_decay_fence_gate",
+    "akaishi:akaishi_decay_door",
+    "akaishi:akaishi_decay_trapdoor",
+    "akaishi:akaishi_decay_button",
+    "akaishi:akaishi_decay_pressure_plate"
+  ]
+}

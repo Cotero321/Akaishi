@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "akaishi:block/akaishi_decay_slab"
+    },
+    "type=double": {
+      "model": "akaishi:block/akaishi_decay_planks"
+    },
+    "type=top": {
+      "model": "akaishi:block/akaishi_decay_slab_top"
+    }
+  }
+}

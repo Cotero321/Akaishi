@@ -219,6 +219,12 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_BREEDER;
     /** 词条重铸仪：衰竭结晶 + 生命能量 → 原位替换指定第 N 条突变词条（确定性必成） */
     public static RegistrySupplier<Block> CHISHI_TRAIT_REFORGER;
+    /** 转基因工厂：凋零骷髅基因（纯度≥50）+ 缠怨藤 + 凋零玫瑰 + 固态物 → 凋零藤种子 */
+    public static RegistrySupplier<Block> CHISHI_TRANSGENE_FACTORY;
+    /** 凋零藤根：整株第 1 格（种子种下/挖掘产出种子），随机刻长出茎 */
+    public static RegistrySupplier<Block> CHISHI_WITHER_ROOT;
+    /** 凋零藤茎：整株第 2/3 格（无物品、只能由根长出），成熟顶端可收凝聚体 */
+    public static RegistrySupplier<Block> CHISHI_WITHER_STEM;
     /** 手术仓：移植/摘除玩家躯体器官（消耗固态 + 生命能量，带进度） */
     public static RegistrySupplier<Block> CHISHI_SURGERY;
     /** 药剂台：样本（纯度 ≥25）+ 固态 + 生命能量 → 永久/突破药剂 */
@@ -231,6 +237,10 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_SAMPLE_VAULT;
     /** 衰变净化塔：消耗赤能源净化范围内衰竭区域（加速区域消散） */
     public static RegistrySupplier<Block> CHISHI_DECAY_PURIFIER;
+    /** 衰竭土壤：衰竭区域内泥土腐化后的终态（区域污染产物/原料） */
+    public static RegistrySupplier<Block> CHISHI_DECAY_SOIL;
+    /** 衰竭木：衰竭区域内原木污染后的终态柱状方块（区域污染产物/原料） */
+    public static RegistrySupplier<Block> CHISHI_DECAY_LOG;
     /** 母神祭坛：生命线终局多方块祭坛核心（黑山羊之母，NBT 献祭识别 + 悬浮供奉） */
     public static RegistrySupplier<Block> CHISHI_MOTHER_ALTAR;
     /** 母神祭坛石：祭坛结构件（5×5 底座 + 四角柱，铺设成型后母神驻留） */
@@ -696,6 +706,17 @@ public final class ModBlocks {
         CHISHI_POTION_CABINET = registerReactorBlock(blockRegistrar, "akaishi_potion_cabinet", AkaishiPotionCabinetBlock::new);
         CHISHI_SAMPLE_VAULT = registerReactorBlock(blockRegistrar, "akaishi_sample_vault", AkaishiSampleVaultBlock::new);
         CHISHI_DECAY_PURIFIER = registerReactorBlock(blockRegistrar, "akaishi_decay_purifier", AkaishiDecayPurifierBlock::new);
+        // 转基因工厂（生命科技）：基因蓝图 + 生物质 → 转基因作物
+        CHISHI_TRANSGENE_FACTORY = registerReactorBlock(blockRegistrar, "akaishi_transgene_factory", AkaishiTransgeneFactoryBlock::new);
+        // 凋零藤根/茎：纯植物方块（无物品），种子种植生成根、根随机刻长茎
+        CHISHI_WITHER_ROOT = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_root"), AkaishiWitherRootBlock::new);
+        CHISHI_WITHER_STEM = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_stem"), AkaishiWitherStemBlock::new);
+
+        // 衰竭区域污染产物：衰竭土壤（泥土终态）+ 衰竭木（原木终态），均可被玩家采集作装饰/原料
+        CHISHI_DECAY_SOIL = registerReactorBlock(blockRegistrar, "akaishi_decay_soil", AkaishiDecaySoilBlock::new);
+        CHISHI_DECAY_LOG = registerReactorBlock(blockRegistrar, "akaishi_decay_log", AkaishiDecayLogBlock::new);
 
         // ===== 母神祭坛（生命线终局多方块：黑山羊之母）=====
         CHISHI_MOTHER_ALTAR = registerReactorBlock(blockRegistrar, "akaishi_mother_altar", AkaishiMotherAltarBlock::new);

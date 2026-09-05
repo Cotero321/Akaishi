@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=y": { "model": "akaishi:block/akaishi_decay_log" },
+    "axis=z": { "model": "akaishi:block/akaishi_decay_log_horizontal", "y": 90 },
+    "axis=x": { "model": "akaishi:block/akaishi_decay_log_horizontal", "y": 270 }
+  }
+}

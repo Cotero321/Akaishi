@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "akaishi:block/akaishi_decay_stone_brick_slab"
+    },
+    "type=double": {
+      "model": "akaishi:block/akaishi_decay_stone_bricks"
+    },
+    "type=top": {
+      "model": "akaishi:block/akaishi_decay_stone_brick_slab_top"
+    }
+  }
+}

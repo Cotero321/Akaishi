@@ -22,6 +22,7 @@ import com.example.akaishi.block.entity.AkaishiCultivatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeStructBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeBreederBlockEntity;
 import com.example.akaishi.block.entity.AkaishiTraitReforgerBlockEntity;
+import com.example.akaishi.block.entity.AkaishiTransgeneFactoryBlockEntity;
 import com.example.akaishi.block.entity.AkaishiSurgeryBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPotionTableBlockEntity;
 import com.example.akaishi.block.entity.AkaishiOrganVaultBlockEntity;
@@ -133,6 +134,8 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiLifeBreederMenu>> CHISHI_LIFE_BREEDER;
     /** 词条重铸仪菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiTraitReforgerMenu>> CHISHI_TRAIT_REFORGER;
+    /** 转基因工厂菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiTransgeneFactoryMenu>> CHISHI_TRANSGENE_FACTORY;
     /** 手术仓菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiSurgeryMenu>> CHISHI_SURGERY;
     /** 药剂台菜单类型 */
@@ -676,6 +679,22 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_trait_reforger"), () -> traitReforgerType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(traitReforgerType, AkaishiTraitReforgerScreen::new));
+
+        // 转基因工厂：凋零骷髅基因（纯度≥50）+ 缠怨藤 + 凋零玫瑰 + 固态物 → 凋零藤
+        MenuType<AkaishiTransgeneFactoryMenu> transgeneFactoryType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiTransgeneFactoryBlockEntity factory) {
+                return new AkaishiTransgeneFactoryMenu(syncId, inv, factory.inventory(), factory.data());
+            }
+            return new AkaishiTransgeneFactoryMenu(syncId, inv);
+        });
+        CHISHI_TRANSGENE_FACTORY = (RegistrySupplier<MenuType<AkaishiTransgeneFactoryMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_transgene_factory"), () -> transgeneFactoryType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(transgeneFactoryType, AkaishiTransgeneFactoryScreen::new));
 
         // 手术仓：器官移植/摘除（消耗固态 + 生命能量，带进度）
         MenuType<AkaishiSurgeryMenu> surgeryType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

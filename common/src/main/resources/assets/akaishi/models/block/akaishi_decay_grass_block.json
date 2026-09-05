@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "akaishi:block/akaishi_decay_grass_block_top",
+    "bottom": "akaishi:block/akaishi_decay_soil",
+    "side": "akaishi:block/akaishi_decay_grass_block_side"
+  }
+}

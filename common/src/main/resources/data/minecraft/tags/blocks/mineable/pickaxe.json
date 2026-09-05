@@ -33,6 +33,12 @@
     "akaishi:akaishi_reactor_fuel_rod",
     "akaishi:akaishi_reactor_cooler",
     "akaishi:akaishi_reactor_core",
-    "akaishi:akaishi_exhausted_barrel"
+    "akaishi:akaishi_exhausted_barrel",
+    "akaishi:akaishi_decay_stone",
+    "akaishi:akaishi_decay_cobblestone",
+    "akaishi:akaishi_decay_stone_bricks",
+    "akaishi:akaishi_decay_stone_brick_stairs",
+    "akaishi:akaishi_decay_stone_brick_slab",
+    "akaishi:akaishi_decay_stone_brick_wall"
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "akaishi:akaishi_decay_soil",
+    "akaishi:akaishi_decay_sand",
+    "akaishi:akaishi_decay_gravel",
+    "akaishi:akaishi_decay_grass_block"
+  ]
+}

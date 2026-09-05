@@ -1,9 +1,11 @@
 package com.example.akaishi;
 
 import com.example.akaishi.api.energy.EnergyTypeRegistry;
+import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.decay.DecayZoneManager;
+import com.example.akaishi.decay.DecayZoneSync;
 import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModCreativeTabs;
@@ -33,6 +35,7 @@ public final class AkaishiMod {
         EnergyTypeRegistry.register(AkaishiEnergyType.INSTANCE);
         ModItems.register();
         ModBlocks.register();
+        AkaishiDecayBlocks.register();
         ModBlockEntities.register();
         ModCreativeTabs.register();
         ModMenus.register();
@@ -40,10 +43,13 @@ public final class AkaishiMod {
         ModEffects.register();
         // 衰竭区域：服务端每 tick 结算减益/环境转化/生物转化
         TickEvent.SERVER_LEVEL_POST.register(DecayZoneManager::serverTick);
+        // 衰竭区域污染强度同步：服务端周期推送玩家所在区域强度（伪群系氛围）
+        TickEvent.SERVER_LEVEL_POST.register(DecayZoneSync::serverTick);
         // 躯体状态同步包：仅客户端注册接收器（服务端通过 sendToPlayer 主动推送）
         // 用 Platform 判断环境，避免 EnvExecutor 重载签名对 fabric EnvType 的解析依赖
         if (Platform.getEnvironment() == Env.CLIENT) {
             PlayerBodySync.registerClient();
+            DecayZoneSync.registerClient();
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();

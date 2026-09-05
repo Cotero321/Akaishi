@@ -212,6 +212,10 @@ public final class ModItems {
     public static RegistrySupplier<Item> akaishiSpeedUpgrade;
     /** 生命能量固态物 */
     public static RegistrySupplier<Item> akaishiLifeEssenceSolid;
+    /** 凋零藤种子（转基因工厂产物）：右键种植生成凋零藤根，根挖掘返还本种子 */
+    public static RegistrySupplier<Item> akaishiWitherSeed;
+    /** 凋零凝聚体（成熟凋零藤收获）：凋零系高级原料/介质 */
+    public static RegistrySupplier<Item> akaishiWitherCondensate;
     /** 末地混合物 */
     public static RegistrySupplier<Item> endMixture;
     /** 巨龙混合物 */
@@ -419,6 +423,14 @@ public final class ModItems {
         // 生命能量固态物（生命能量提纯器产出，生命能源体系基础材料）
         akaishiLifeEssenceSolid = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_ESSENCE_SOLID_ID),
+                        () -> new Item(new Item.Properties()));
+        // 凋零藤种子（转基因工厂产物）
+        akaishiWitherSeed = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_seed"),
+                        () -> new AkaishiWitherSeedItem(new Item.Properties()));
+        // 凋零凝聚体（成熟凋零藤右键剪取/挖掘收获）
+        akaishiWitherCondensate = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_condensate"),
                         () -> new Item(new Item.Properties()));
         // 末地混合物（工作台合成，液化装置 → 末地混合燃料）
         endMixture = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)

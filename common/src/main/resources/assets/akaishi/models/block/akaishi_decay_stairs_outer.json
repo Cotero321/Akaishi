@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_decay_planks",
+    "side": "akaishi:block/akaishi_decay_planks",
+    "top": "akaishi:block/akaishi_decay_planks"
+  }
+}

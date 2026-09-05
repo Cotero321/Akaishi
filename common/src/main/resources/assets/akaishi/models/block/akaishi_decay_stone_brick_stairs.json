@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_decay_stone_bricks",
+    "side": "akaishi:block/akaishi_decay_stone_bricks",
+    "top": "akaishi:block/akaishi_decay_stone_bricks"
+  }
+}
