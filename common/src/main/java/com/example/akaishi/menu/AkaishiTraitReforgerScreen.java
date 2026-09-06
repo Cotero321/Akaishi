@@ -133,7 +133,7 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
         } else {
             MutantTrait trait = currentTrait();
             if (trait != null && !MutantTrait.hasCandidates(trait.getRarity(),
-                    AkaishiOrganItem.getMutations(organStack()))) {
+                    AkaishiOrganItem.getMutations(organStack()), AkaishiOrganItem.slotOf(organStack()))) {
                 msg = Component.translatable("gui.akaishi.trait_reforger.no_candidate");
                 color = COLOR_WARN;
             } else if (menu.getProgress() > 0) {

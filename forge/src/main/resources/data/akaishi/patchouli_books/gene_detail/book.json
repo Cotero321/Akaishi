@@ -1,0 +1,15 @@
+{
+  "name": "akaishi.patchouli.gene_detail.name",
+  "landing_text": "akaishi.patchouli.gene_detail.landing_text",
+  "use_resource_pack": true,
+  "i18n": true,
+  "model": "akaishi:akaishi_gene_book",
+  "crafting_recipe": "akaishi:akaishi_gene_book",
+  "dont_generate_book": true,
+  "custom_book_item": "akaishi:akaishi_gene_book",
+  "creative_tab": "akaishi:akaishi",
+  "book_texture": "patchouli:textures/gui/book_purple.png",
+  "filler_texture": "patchouli:textures/gui/page_filler.png",
+  "show_progress": true,
+  "version": 1
+}

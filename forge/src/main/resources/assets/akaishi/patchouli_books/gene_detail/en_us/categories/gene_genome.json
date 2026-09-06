@@ -1,0 +1,6 @@
+{
+  "name": "Genome Registry",
+  "description": "Data cards for the seven genomes: base purity, collection rate, compatibility range and rejection factor — plus the ecosystem synergy thresholds for pure builds.$(br)Read $(4)Seven Genomes$(0) first, then $(4)Ecosystem Synergy$(0).",
+  "icon": "akaishi:akaishi_sample_collector",
+  "sortnum": 0
+}

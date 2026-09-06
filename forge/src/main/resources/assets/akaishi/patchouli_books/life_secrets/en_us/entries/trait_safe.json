@@ -15,7 +15,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)【Tier 1 · Safe traits】$(0)$(br2)$(li)Dense Tissue (dense_tissue): +1 armor$(li)Muscle Fiber (muscle_fiber): +1 attack damage$(li)Hyperactive Marrow (marrow_hyper): +3 max health$(li)Reflex Neurons (reflex_neuron): +0.4 attack speed$(li)Elastic Tendon (elastic_tendon): +0.015 move speed$(br2)All tier 1 traits are clean, purely positive little boosts — stable, no side effects, a great baseline."
+      "text": "$(bold)【Tier 1 · Safe traits】$(0)$(br2)$(li)Dense Tissue (dense_tissue): +1 armor$(li)Muscle Fiber (muscle_fiber): +1 attack damage$(li)Hyperactive Marrow (marrow_hyper): +3 max health$(li)Reflex Neurons (reflex_neuron): +0.4 attack speed$(li)Elastic Tendon (elastic_tendon): +1.5% move speed$(br2)All tier 1 traits are clean, purely positive little boosts — stable, no side effects, a great baseline."
     },
     {
       "type": "patchouli:text",

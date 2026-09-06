@@ -218,8 +218,8 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
                         inventory.getItem(SOLID_SLOT).shrink(solid);
                         if (level.random.nextInt(100) < upgradeRate(tier)) {
                             AkaishiOrganItem.setTier(input, tier.next());
-                            // 培养升级同时提升适配度 +5（封顶 100），降低后续排异压力
-                            AkaishiOrganItem.addCompat(input, 5);
+                            // 培养升级同时提升适配度 +8（封顶 100），显著对冲升品带来的排斥成本
+                            AkaishiOrganItem.addCompat(input, 8);
                         }
                     }
                     changed = true;

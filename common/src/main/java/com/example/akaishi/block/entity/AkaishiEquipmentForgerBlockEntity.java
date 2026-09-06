@@ -5,6 +5,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
@@ -39,7 +40,7 @@ import java.util.function.Supplier;
  * 产出装备携带已选基础升级并初始拥有 4 个升级槽位（高级升级由赤红升级台提供）。
  * 重铸配方：下界合金装备 → 对应赤石装备 + 消耗锭数（头盔 5 / 胸甲 8 / 护腿 7 / 靴子 4 / 剑 2）。
  */
-public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
+public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int INPUT_GEAR_SLOT = 0;
     public static final int INPUT_INGOT_SLOT = 1;
@@ -277,6 +278,18 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         buf.writeBlockPos(worldPosition);
+    }
+
+    // ===== IItemPipeDevice：装备/赤石锭槽可入、锻造结果槽仅出 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{INPUT_GEAR_SLOT, INPUT_INGOT_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{OUTPUT_SLOT};
     }
 
     // ---- Container（AE2 存储总线 / Mekanism 物流管道可直接访问槽位） ----

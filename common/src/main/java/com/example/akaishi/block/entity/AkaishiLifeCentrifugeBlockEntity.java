@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
@@ -21,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -41,10 +43,10 @@ import java.util.List;
  * 生命离心机方块实体（仅服务端驱动逻辑）。
  * 将活化衰竭液体分离为两类结晶：1 个对应活化结晶（主产物）+ 1 个衰竭结晶（通用副产物）。
  * 每 100mb 活化燃料产出各 1 个；每 tick 至多分离 8mb，每 1mb 消耗 50 赤能源。
- * 输入罐仅接纳活化燃料（普通液体管道注入），物品管道不可接入，输出物由玩家从 GUI 取出。
+ * 输入罐仅接纳活化燃料（普通液体管道注入），输出结晶由第三方物流/玩家从产物槽取出。
  */
 public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     /** 每批产出所需的活化燃料量（mb） */
     public static final long BATCH_MB = 1000L;
@@ -172,6 +174,70 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
 
     public SimpleContainer outputContainer() {
         return output;
+    }
+
+    // ===== IItemPipeDevice / Container：产物槽（0 活化结晶 / 1 衰竭结晶）仅出，第三方物流可抽取 =====
+
+    @Override
+    public boolean canPipeInput() {
+        return IFluidPipeDevice.super.canPipeInput() || IItemPipeDevice.super.canPipeInput();
+    }
+
+    @Override
+    public boolean canPipeOutput() {
+        return IFluidPipeDevice.super.canPipeOutput() || IItemPipeDevice.super.canPipeOutput();
+    }
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[0]; // 无物品输入（原料为液体）
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{0, 1};
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 2;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return output.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return index >= 0 && index < 2 ? output.getItem(index) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        return index >= 0 && index < 2 ? output.removeItem(index, count) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return index >= 0 && index < 2 ? output.removeItemNoUpdate(index) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        if (index >= 0 && index < 2) {
+            output.setItem(index, stack);
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        output.clearContent();
     }
 
     // ===== ExtendedMenuProvider =====

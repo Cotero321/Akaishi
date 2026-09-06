@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_cultivator",
-      "text": "One machine, two modes - it picks the mode automatically from what you feed it.$(br2)$(bold)1. Purify samples$(0) (purity <100): tiered by current purity - floor 0 / 25 / 50 / 75 means success 90 / 80 / 70 / 60%, costing 10k / 20k / 40k / 80k life energy + 1 / 2 / 4 / 8 essence over 300 / 600 / 1200 / 2400 ticks.$(br2)Success adds +10 purity (cap 100); failure loses the materials but keeps the sample.$(br2)$(bold)2. Upgrade organ grade:$(0)$(li)I->II (85%, 20k life + 1 essence, 600 ticks)$(li)II->III (75%, 80k + 4, 1200)$(li)III->IV (65%, 300k + 16, 2400)$(br2)Success raises the grade by 1 and compatibility by +5; failure keeps the organ."
+      "text": "One machine, two modes - it picks the mode automatically from what you feed it.$(br2)$(bold)1. Purify samples$(0) (purity <100): tiered by current purity - floor 0 / 25 / 50 / 75 means success 90 / 80 / 70 / 60%, costing 10k / 20k / 40k / 80k life energy + 1 / 2 / 4 / 8 essence over 300 / 600 / 1200 / 2400 ticks.$(br2)Success adds +10 purity (cap 100); failure loses the materials but keeps the sample.$(br2)$(bold)2. Upgrade organ grade:$(0)$(li)I->II (85%, 20k life + 1 essence, 600 ticks)$(li)II->III (75%, 80k + 4, 1200)$(li)III->IV (65%, 300k + 16, 2400)$(br2)Success raises the grade by 1 and compatibility by +8; failure keeps the organ."
     },
     {
       "type": "patchouli:relations",

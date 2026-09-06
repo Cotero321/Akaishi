@@ -1,0 +1,6 @@
+{
+  "name": "Trait Catalog",
+  "description": "Mutation trait catalog split by $(4)pure-positive / dual-edge$(0) (45 benign / 12 dual), each listed with stats and passives sorted by rarity and design intent (Strike / Ward / Glide); about half are $(4)slot-bound$(0), only appearing on organs of the matching body slot.$(br)Traits are not bound to any genome — every breed rolls from the same pool.",
+  "icon": "akaishi:akaishi_life_breeder",
+  "sortnum": 2
+}

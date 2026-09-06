@@ -43,10 +43,11 @@ public final class AkaishiMod {
     public static void init() {
         EnergyTypeRegistry.register(AkaishiEnergyType.INSTANCE);
         ModItems.register();
+        // 衰竭域须先于方块门面注册：ModBlocks 门面会转发其字段引用
+        AkaishiDecayBlocks.register();
         ModBlocks.register();
         AkaishiCrystalBlocks.register();
         AkaishiEnergyBlocks.register();
-        AkaishiDecayBlocks.register();
         AkaishiWirelessBlocks.register();
         AkaishiFusionBlocks.register();
         AkaishiMinerBlocks.register();

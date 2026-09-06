@@ -18,10 +18,12 @@ import java.util.List;
 
 /**
  * 药剂物品（单物品 + 模板 NBT，新增药剂无需新物品）：
- * - 永久药剂：将该生物基因型吸收进身体 → 该来源所有器官"有效适配度"+N（纯度五档 2/4/6/8/10），
+ * - 永久药剂：将该生物基因型吸收进身体 → 该来源所有器官"有效适配度"+N（纯度五档 3/6/9/12/15），
  *   每种基因型只能吸收一次，最多同时 4 种；无副作用，可由基因管理器卸载（卸载后可再次吸收）
- * - 突破药剂：对已吸收的基因型发动临时激活（30 分钟，同一时间最多 1 种，到期/卸载后可再次激活）：
- *   该来源器官基础数值 +10%~40%（纯度四档）+ 额外适配 +2~+8，负基础值属性词条激活期内暂时失效
+ * - 突破药剂（均衡/狂涌/深沉三种模式，同一时间最多 1 种，到期/卸载后可再次激活）：
+ *   对已吸收的基因型发动临时激活——额外适配 +2~+8（纯度四档），该来源器官基础数值按模式乘倍
+ *   强化（均衡 ×5 →10~40% / 30 分钟；狂涌 ×10 →20~80% / 15 分钟；深沉 ×3 →6~24% / 60 分钟），
+ *   负基础值属性词条激活期内暂时失效
  * 数值随样本纯度分档（由药剂台制作时继承样本纯度与生物来源）。
  */
 public class AkaishiPotionItem extends Item {
@@ -30,9 +32,6 @@ public class AkaishiPotionItem extends Item {
     public static final String TAG_PURITY = "purity";
     /** 生物来源（药剂台制作时从样本继承，生物药剂差异化依据） */
     public static final String TAG_ENTITY = "entity_id";
-
-    /** 突破药剂激活时长：30 分钟（tick） */
-    public static final long BREAKTHROUGH_DURATION_TICKS = 30L * 60L * 20L;
 
     public AkaishiPotionItem(Properties properties) {
         super(properties);
@@ -79,7 +78,7 @@ public class AkaishiPotionItem extends Item {
             return InteractionResultHolder.fail(stack);
         }
         boolean applied = template.breakthrough()
-                ? applyBreakthrough(player, state, getPurity(stack), getEntityId(stack))
+                ? applyBreakthrough(player, state, template, getPurity(stack), getEntityId(stack))
                 : applyPermanent(player, state, getPurity(stack), getEntityId(stack));
         if (!applied) {
             return InteractionResultHolder.fail(stack); // 无可作用器官：不消耗
@@ -113,10 +112,14 @@ public class AkaishiPotionItem extends Item {
         return true;
     }
 
-    /** 突破药剂：须先经永久药剂吸收该来源基因型。激活后 30 分钟内该来源器官获得——
-     *  额外适配（纯度四档 2/4/6/8，叠加于身体基因加成）+ 基础数值百分比强化（10/20/30/40%），
-     *  负基础值属性词条激活期内暂时失效。同一时间最多 1 种激活；到期/卸载后可再次激活同一来源 */
-    private boolean applyBreakthrough(Player player, IPlayerBodyState state, int purity, String entityId) {
+    /**
+     * 突破药剂：须先经永久药剂吸收该来源基因型。激活后按模板模式（均衡/狂涌/深沉）获得——
+     *  额外适配（纯度四档 2/4/6/8，叠加于身体基因加成）+ 基础数值百分比强化
+     *  （pct = 额外适配 × 模式倍率，如均衡 10/20/30/40%），时长由模式决定（30/15/60 分钟），
+     *  负基础值属性词条激活期内暂时失效。同一时间最多 1 种激活；到期/卸载后可再次激活同一来源
+     */
+    private boolean applyBreakthrough(Player player, IPlayerBodyState state, PotionTemplate template,
+                                      int purity, String entityId) {
         if (entityId.isEmpty()) {
             noSource(player);
             return false;
@@ -126,13 +129,13 @@ public class AkaishiPotionItem extends Item {
             player.displayClientMessage(Component.translatable("message.akaishi.potion.need_gene"), true);
             return false;
         }
-        // 前置：须至少移植一枚该来源的非原生器官，激活才有效果（避免 30 分钟空转）
+        // 前置：须至少移植一枚该来源的非原生器官，激活才有效果（避免激活期空转）
         if (!hasSameSourceOrgan(state, entityId)) {
             player.displayClientMessage(Component.translatable("message.akaishi.potion.need_organ"), true);
             return false;
         }
         if (state.isBreakthroughActive(entityId)) {
-            // 同源突破仍激活中：等待本次结束（30 分钟到/卸载）后再喝即可再次激活
+            // 同源突破仍激活中：等待本次结束（到期/卸载）后再喝即可再次激活
             player.displayClientMessage(Component.translatable("message.akaishi.potion.bt_running"), true);
             return false;
         }
@@ -140,16 +143,18 @@ public class AkaishiPotionItem extends Item {
             player.displayClientMessage(Component.translatable("message.akaishi.potion.bt_active"), true);
             return false;
         }
+        BreakthroughMode mode = template.mode();
         int extra = extraCompatByPurity(purity); // 2/4/6/8
-        long until = player.level().getGameTime() + BREAKTHROUGH_DURATION_TICKS;
-        if (!state.startBreakthrough(entityId, extra, extra * 5, until)) {
+        int pct = mode.pctFor(extra);
+        long until = player.level().getGameTime() + mode.durationTicks();
+        if (!state.startBreakthrough(entityId, extra, pct, until)) {
             return false; // 兜底（前置已校验，正常不可达）：不消耗
         }
         Component sourceName = EntityType.byString(entityId)
                 .map(type -> (Component) type.getDescription())
                 .orElse(Component.literal(entityId));
         player.displayClientMessage(Component.translatable("message.akaishi.potion.breakthrough_ok",
-                sourceName, extra, extra * 5), true);
+                sourceName, mode.durationMinutes(), extra, pct), true);
         return true;
     }
 
@@ -204,10 +209,12 @@ public class AkaishiPotionItem extends Item {
         }
         tooltip.add(Component.translatable("gui.akaishi.potion.purity", getPurity(stack)));
         if (template.breakthrough()) {
-            // 突破药剂：需先吸收该来源基因；激活期内强化基础数值，负基础值词条暂时失效
+            // 突破药剂：需先吸收该来源基因；激活期内按模式强化基础数值（均衡/狂涌/深沉时长不同）
             tooltip.add(Component.translatable("gui.akaishi.potion.hint_breakthrough"));
             int extra = extraCompatByPurity(getPurity(stack));
-            tooltip.add(Component.translatable("gui.akaishi.potion.bt_bonus", extra, extra * 5));
+            BreakthroughMode mode = template.mode();
+            tooltip.add(Component.translatable("gui.akaishi.potion.bt_bonus",
+                    mode.durationMinutes(), extra, mode.pctFor(extra)));
         } else {
             // 永久药剂：直接显示本次适配度加成 + 吸收规则
             tooltip.add(Component.translatable("gui.akaishi.potion.compat_bonus",

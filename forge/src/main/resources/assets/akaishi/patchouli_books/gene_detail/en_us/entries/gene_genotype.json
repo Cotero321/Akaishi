@@ -1,0 +1,31 @@
+{
+  "name": "Genotype Potions Guide",
+  "icon": "akaishi:akaishi_potion",
+  "category": "akaishi:gene_genotype",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_potion_table",
+      "text": "Potion Table: brew samples with purity ≥25 into potions; the product $(4)inherits the sample's purity and creature source$(0).$(br2)$(bold)Why genotypes matter$(0): samples come from a concrete creature (zombie, pig, Ender Dragon...); the potion brews that creature's $(4)genotype$(0).$(br2)Check your body at the Gene Manager first: $(4)each genotype can be absorbed once, up to 4 total$(0) — plan before you brew, don't waste high-purity samples."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Permanent Potion (absorption)",
+      "text": "$(bold)Recipe:$(0) 3 Solid Matter + 20,000 life energy, 60 ticks.$(br2)$(bold)Effect:$(0) writes the genotype into your body; $(4)effective compatibility of ALL organs of that source +N$(0).$(br2)$(bold)Purity tiers:$(0)$(li)Purity 1-20 → +3$(li)21-40 → +6$(li)41-60 → +9$(li)61-80 → +12$(li)81-100 → +15$(br2)$(bold)Rules:$(0) one absorption per source per lifetime; cap 4 sources; uninstall at the Gene Manager to re-absorb. Compatibility scales organ output directly — absorbing high-purity genes is the foundation of a build."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Breakthrough Potion (awakening)",
+      "text": "$(bold)Shared prerequisites:$(0)$(li)That source's genotype already absorbed via permanent potion$(li)At least 1 $(4)non-native$(0) organ of that source transplanted (native doesn't count)$(br2)$(bold)Effect:$(0) organs of that source get a temporary boost for the mode's duration —$(li)Extra compatibility +2 to +8 (four purity tiers)$(li)Base stats amplified by the mode's percentage$(li)$(4)Negative-base traits are suspended while active$(0)$(br2)$(bold)Only 1 breakthrough active at a time$(0); re-activate after expiry/uninstall. Breakthrough stacks with ecosystem synergy."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_breakthrough",
+        "akaishi:gene_synergy"
+      ],
+      "text": "Recipes and the three modes (Balance / Surge / Endure) are on the next page. For reading a whole-build boost, see Ecosystem Synergy. Rejection and gene-slot management live under Sequences & Organs."
+    }
+  ]
+}

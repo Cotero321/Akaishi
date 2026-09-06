@@ -79,19 +79,8 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + p, y + PROGRESS_Y + PROGRESS_H, COLOR_PROGRESS);
         }
 
-        // 模板按钮（含名称 + 消耗），选中高亮
-        List<PotionTemplate> templates = PotionRegistry.all();
-        for (int i = 0; i < templates.size(); i++) {
-            PotionTemplate t = templates.get(i);
-            int by = y + BTN_Y(i);
-            boolean selected = menu.getSelectedIndex() == i;
-            gui.fill(x + BTN_X, by, x + BTN_X + BTN_W, by + BTN_H, selected ? 0xFF5B8731 : 0xFF8B8B8B);
-            gui.drawString(this.font, Component.translatable(t.nameKey()), x + BTN_X + 4, by + 3,
-                    selected ? 0xFF2E7D32 : 0xFF3F3F3F, false);
-            gui.drawString(this.font, Component.translatable("gui.akaishi.potion_table.cost",
-                            t.solidCost(), t.lifeCost() / 1000),
-                    x + BTN_X + 4, by + 12, 0xFF6F6F6F, false);
-        }
+        // 模板按钮（行0=永久药剂；行1=突破家族，随模式轮换显示当前支），选中高亮
+        renderTemplateButtons(gui, x, y);
 
         // 槽位背景框（样本/固态/输出 + 升级 + 背包 + 联动槽仅激活时）
         for (var slot : this.menu.slots) {
@@ -133,8 +122,41 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
                 menu.linkState.canPageNext() ? 0xFF2E7D32 : 0xFF8B8B8B, false);
     }
 
-    private static int BTN_Y(int index) {
-        return 30 + index * BTN_STEP;
+    private static int BTN_Y(int row) {
+        return 30 + row * BTN_STEP;
+    }
+
+    /** 行0=永久药剂（all() 下标 0）；行1=突破家族（all() 下标 1..n，随模式轮换） */
+    private void renderTemplateButtons(GuiGraphics gui, int x, int y) {
+        List<PotionTemplate> all = PotionRegistry.all();
+        int selected = menu.getSelectedIndex();
+        // 行0：永久药剂
+        PotionTemplate permanent = all.get(0);
+        drawTemplateButton(gui, x, y, 0, permanent, selected == 0);
+        // 行1：突破家族——展示当前选中支（未选中/选中永久时回落到均衡支）
+        drawTemplateButton(gui, x, y, 1, all.get(currentBreakthroughIndex()), selected > 0);
+    }
+
+    private void drawTemplateButton(GuiGraphics gui, int x, int y, int row, PotionTemplate t, boolean selected) {
+        int by = y + BTN_Y(row);
+        gui.fill(x + BTN_X, by, x + BTN_X + BTN_W, by + BTN_H, selected ? 0xFF5B8731 : 0xFF8B8B8B);
+        gui.drawString(this.font, Component.translatable(t.nameKey()), x + BTN_X + 4, by + 3,
+                selected ? 0xFF2E7D32 : 0xFF3F3F3F, false);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.potion_table.cost",
+                        t.solidCost(), t.lifeCost() / 1000),
+                x + BTN_X + 4, by + 12, 0xFF6F6F6F, false);
+    }
+
+    /** 当前应展示的突破支在 all() 中的下标（选中任意突破支则为其本身，否则为家族首支=均衡） */
+    private int currentBreakthroughIndex() {
+        int selected = menu.getSelectedIndex();
+        return selected > 0 && selected < PotionRegistry.all().size() ? selected : 1;
+    }
+
+    private boolean hitTemplateRow(double mouseX, double mouseY, int row) {
+        int by = this.topPos + BTN_Y(row);
+        return mouseX >= this.leftPos + BTN_X && mouseX < this.leftPos + BTN_X + BTN_W
+                && mouseY >= by && mouseY < by + BTN_H;
     }
 
     private void drawSlotBox(GuiGraphics gui, int x, int y) {
@@ -180,17 +202,15 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
         }
         // 模板按钮悬停：显示功效描述（存储浮层打开时其位置被覆盖，跳过）
         if (menu.linkState == null || !menu.linkState.open) {
-            List<PotionTemplate> templates = PotionRegistry.all();
-            for (int i = 0; i < templates.size(); i++) {
-                int by = this.topPos + BTN_Y(i);
-                if (mouseX >= this.leftPos + BTN_X && mouseX < this.leftPos + BTN_X + BTN_W
-                        && mouseY >= by && mouseY < by + BTN_H) {
-                    PotionTemplate t = templates.get(i);
-                    Component desc = t.breakthrough()
-                            ? Component.translatable("gui.akaishi.potion_table.breakthrough_desc")
-                            : Component.translatable("gui.akaishi.potion_table.permanent_desc");
-                    gui.renderTooltip(this.font, desc, mouseX, mouseY);
-                }
+            if (hitTemplateRow(mouseX, mouseY, 0)) {
+                gui.renderComponentTooltip(this.font,
+                        List.of(Component.translatable("gui.akaishi.potion_table.permanent_desc")),
+                        mouseX, mouseY);
+            } else if (hitTemplateRow(mouseX, mouseY, 1)) {
+                gui.renderComponentTooltip(this.font, List.of(
+                                Component.translatable("gui.akaishi.potion_table.breakthrough_desc"),
+                                Component.translatable("gui.akaishi.potion_table.bt_mode_hint")),
+                        mouseX, mouseY);
             }
         }
         // 存储按钮悬停提示
@@ -227,14 +247,18 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
             }
         }
         if (button == 0 && menu.getBlockPos() != null) {
-            List<PotionTemplate> templates = PotionRegistry.all();
-            for (int i = 0; i < templates.size(); i++) {
-                int by = this.topPos + BTN_Y(i);
-                if (mouseX >= this.leftPos + BTN_X && mouseX < this.leftPos + BTN_X + BTN_W
-                        && mouseY >= by && mouseY < by + BTN_H) {
-                    AkaishiPotionSync.sendSelect(menu.getBlockPos(), i);
-                    return true;
-                }
+            // 行0：选中永久药剂
+            if (hitTemplateRow(mouseX, mouseY, 0)) {
+                AkaishiPotionSync.sendSelect(menu.getBlockPos(), 0);
+                return true;
+            }
+            // 行1：突破家族——已选中某突破支时在家族内轮换下一支，否则选中家族首支（均衡）
+            if (hitTemplateRow(mouseX, mouseY, 1)) {
+                List<PotionTemplate> family = PotionRegistry.breakthroughs();
+                int selected = menu.getSelectedIndex();
+                int next = selected > 0 ? selected % family.size() + 1 : currentBreakthroughIndex();
+                AkaishiPotionSync.sendSelect(menu.getBlockPos(), next);
+                return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);

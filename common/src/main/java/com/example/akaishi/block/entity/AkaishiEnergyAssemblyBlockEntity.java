@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiEnergyAssemblyBlock;
 import com.example.akaishi.block.AkaishiEnergyGeneratorBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
@@ -27,7 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 小型赤能源组合结构方块实体：已停用为纯材料（发生器矩阵取代），不再形成多方块结构、不再提供界面。
  * 保留能量/燃料存储（NBT 持久化），作为合成材料时无实际功能。
  */
-public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEnergyProvider, Container, IDataCarrier {
+public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -163,6 +164,18 @@ public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEn
 
     public Container inventory() {
         return inventory;
+    }
+
+    // ===== IItemPipeDevice：燃料槽可入、升级装配槽不向物流开放 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{FUEL_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[0]; // 燃料消耗型，无物品产物
     }
 
     // ===== Container：使 AE2 存储总线 / Mekanism 物流管道能直接读写机器槽位（零硬依赖） =====

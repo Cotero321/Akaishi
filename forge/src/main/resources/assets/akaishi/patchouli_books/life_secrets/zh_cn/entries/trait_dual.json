@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(bold)畸变词条＝强力正向 ＋ 代价的「双刃剑」$(0)。$(br2)$(bold)【2 级 · 畸变】$(0)$(li)狂战基因（berserk_gene）：攻击 +2、护甲 −1.5$(li)玻璃骨（glass_bone）：攻击速度 +0.8、最大生命 −2$(br2)$(bold)【3 级 · 畸变】$(0)$(li)捕食者本能（predator_instinct）：攻击 +3、移速 +0.02、最大生命 −4$(li)爆燃血肉（pyroblast_flesh）：攻击 +3、$(c)怕火$(0)——火焰伤害大幅加深$(br2)稀有度越高越极端：$(4)收益越夸张，代价越致命$(0)。"
+      "text": "$(bold)畸变词条＝强力正向 ＋ 代价的「双刃剑」$(0)。$(br2)$(bold)【2 级 · 畸变】$(0)$(li)狂战基因（berserk_gene）：攻击 +2、护甲 −1.5$(li)玻璃骨（glass_bone）：攻击速度 +0.8、最大生命 −2$(br2)$(bold)【3 级 · 畸变】$(0)$(li)捕食者本能（predator_instinct）：攻击 +3、移速 +2%、最大生命 −4$(li)爆燃血肉（pyroblast_flesh）：攻击 +3、$(c)怕火$(0)——火焰伤害大幅加深$(br2)稀有度越高越极端：$(4)收益越夸张，代价越致命$(0)。"
     },
     {
       "type": "patchouli:text",

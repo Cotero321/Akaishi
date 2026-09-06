@@ -21,6 +21,10 @@
     },
     {
       "type": "patchouli:text",
+      "text": "$(bold)Mining Modes:$(0) open the controller UI and flip the $(bold)Normal / Silk$(0) buttons on the right.$(br2)$(4)Normal mode$(0): yields refined minerals (coal / raw iron / raw copper...), fortune applies in full — maxed out that is 9 items per cycle.$(br2)$(e)Silk (precise) mode$(0): digs up the $(4)raw ore blocks themselves$(0) (iron ore / diamond ore...), which you must smelt or fortune-crush yourself; fortune upgrades only count at $(4)1/3$(0) here (one extra per 3 blocks, rounded down; configurable).$(br2)Switch to Silk when you want to stockpile ore blocks (feed a custom line, smelt raw ore), stay on Normal when you just want the finished minerals."
+    },
+    {
+      "type": "patchouli:text",
       "text": "$(bold)Caps unlock with the controller tier:$(0)$(br2)$(bold)Speed$(0): Basic 8 → Advanced 16 → Super 24 → Ultimate 32 blocks — maxed-out mining rate ×2 / ×3 / ×4 / ×5.$(br2)$(bold)Storage & Fortune$(0): both sit at a quarter of the Speed cap — Basic 2 / Advanced 4 / Super 6 / Ultimate 8.$(br2)The frame is big (48 U slots in total), yet a lower-tier controller only honours the lower cap — to max out you must upgrade the controller. Storage and Fortune sharing one cap forces a real choice between going fast, holding more power, or hauling more ore."
     },
     {

@@ -15,7 +15,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)【1 级 · 常规词条】$(0)$(br2)$(li)致密组织（dense_tissue）：护甲 +1$(li)强韧肌纤维（muscle_fiber）：攻击 +1$(li)活性骨髓（marrow_hyper）：最大生命 +3$(li)反射神经元（reflex_neuron）：攻击速度 +0.4$(li)弹力肌腱（elastic_tendon）：移速 +0.015$(br2)1 级全是干净正向的小增益——稳定、无副作用，打底首选。"
+      "text": "$(bold)【1 级 · 常规词条】$(0)$(br2)$(li)致密组织（dense_tissue）：护甲 +1$(li)强韧肌纤维（muscle_fiber）：攻击 +1$(li)活性骨髓（marrow_hyper）：最大生命 +3$(li)反射神经元（reflex_neuron）：攻击速度 +0.4$(li)弹力肌腱（elastic_tendon）：移速 +1.5%$(br2)1 级全是干净正向的小增益——稳定、无副作用，打底首选。"
     },
     {
       "type": "patchouli:text",

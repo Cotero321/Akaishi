@@ -1,0 +1,6 @@
+{
+  "name": "Sequences & Organs",
+  "description": "The full gene pipeline from blood to transplant: sampling & purification → sequence extraction → organ construction, plus data cards for quality, compatibility, rejection and body slots.",
+  "icon": "akaishi:akaishi_gene_sequence",
+  "sortnum": 3
+}

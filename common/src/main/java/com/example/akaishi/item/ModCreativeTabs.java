@@ -866,9 +866,11 @@ public final class ModCreativeTabs {
                                     if (AkaishiMinerBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK != null) {
                                         output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK.get()));
                                     }
-                                    // 手册：赤石研究日记（akaishi_diary）+ 生命的奥秘（akaishi_life_book），作为 Patchouli 自定义书物品
+                                    // 手册：赤石研究日记（akaishi_diary）+ 生命的奥秘（akaishi_life_book）
+                                    // + 基因详解（akaishi_gene_book），作为 Patchouli 自定义书物品
                                     accept(output, ModItems.akaishiDiary);
                                     accept(output, ModItems.lifeBook);
+                                    accept(output, ModItems.geneBook);
                                 })
                                 .build());
     }

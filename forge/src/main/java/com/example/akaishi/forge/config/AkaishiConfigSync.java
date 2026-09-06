@@ -79,6 +79,8 @@ public final class AkaishiConfigSync {
         ModConfig.transformerCostPerTick = AkaishiConfig.TRANSFORMER_COST_PER_TICK.get();
         ModConfig.minerTicksBase = AkaishiConfig.MINER_TICKS_BASE.get();
         ModConfig.minerCostPerTickBase = AkaishiConfig.MINER_COST_PER_TICK_BASE.get();
+        ModConfig.minerPreciseFortuneDivisor = AkaishiConfig.MINER_PRECISE_FORTUNE_DIVISOR.get();
+        ModConfig.minerExtraOreWeight = AkaishiConfig.MINER_EXTRA_ORE_WEIGHT.get();
 
         ModConfig.decayZoneDurationTicks = AkaishiConfig.DECAY_ZONE_DURATION_TICKS.get();
         ModConfig.decayZoneEnvSamplesPerTick = AkaishiConfig.DECAY_ZONE_SAMPLES_PER_TICK.get();

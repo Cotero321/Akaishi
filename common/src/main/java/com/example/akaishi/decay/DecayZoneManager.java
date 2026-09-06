@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 衰竭区域管理器：跨重启持久化所有活跃衰竭区域（30 小时）并驱动每 tick 结算。
@@ -44,7 +45,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 2. 环境转化（仅 amp≥1 的泄漏/爆炸区；amp=0 泄漏区不腐化地形只影响生物）：
  *    随机采样球内方块，原块按材质族替换为衰竭全家桶（草皮类→衰竭草块、
  *    泥土/沙/砾石/石料→各自衰竭变体、原木→衰竭木、木板→衰竭木板），植物/树叶 → 摧毁
- * 3. 生物转化（周期）：骷髅→凋零骷髅、马→僵尸马/骷髅马、村民→僵尸村民
+ * 3. 生物转化（周期）：骷髅→凋零骷髅、马→僵尸马/骷髅马、村民→僵尸村民；转化整批置于
+ *    批处理标志内，Forge 死寂拦截据此放行"本区域转化产物"，其余入区实体一律拦截，
+ *    杜绝原版夜间自然刷出的带职业僵尸村民在区内刷新堆积。
  * 区域半径按等级呈 3 的次方区块梯度（3/9/27/81 区块），由 {@link #radiusBlocksFor} 计算。
  */
 public final class DecayZoneManager extends SavedData {
@@ -55,6 +58,13 @@ public final class DecayZoneManager extends SavedData {
     private static final int CONVERT_INTERVAL = 40;
     /** 区域剩余时间落盘间隔（tick）：衰减/净化递减需周期保存，防重启后剩余时间回滚 */
     private static final int SAVE_INTERVAL = 600;
+    /** 转化批处理进行中（服务端主线程串行，Atomic 防多线程误读）：死寂拦截据此放行正在转化的入区产物 */
+    private static final AtomicBoolean CONVERTING = new AtomicBoolean();
+
+    /** 当前是否处于区域转化批处理中（供 Forge 死寂拦截放行区域转化产物） */
+    public static boolean isConvertingBatch() {
+        return CONVERTING.get();
+    }
 
     /**
      * 区域半径分级：区块数 = 3^(等级)，等级 0（泄漏）最小为 3 区块，
@@ -197,6 +207,30 @@ public final class DecayZoneManager extends SavedData {
         return best;
     }
 
+    /**
+     * 刷怪拦截判定（供 Forge 死寂拦截调用）：
+     * 以水平距离 ≤ 半径 + 边缘缓冲 为准，忽略高度差——
+     * 防止区域中心与地表存在高差时（山顶中心/地底中心），同水平范围内的地表生物被 3D 球判定挤出球外而在"边缘"漏刷；
+     * 边缘缓冲避免禁区紧邻处刷怪突入造成视觉断层。
+     */
+    public static boolean isSpawnBlocked(ServerLevel level, BlockPos pos) {
+        final int MARGIN = 8; // 边缘软化缓冲（格）
+        DecayZoneManager mgr = get(level);
+        String dim = level.dimension().location().toString();
+        for (DecayZone zone : mgr.zones) {
+            if (!zone.dimension().equals(dim)) {
+                continue;
+            }
+            long dx = pos.getX() - zone.center().getX();
+            long dz = pos.getZ() - zone.center().getZ();
+            long reach = zone.radius() + MARGIN;
+            if (dx * dx + dz * dz <= reach * reach) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** 服务端每 tick 调用（由 Architectury TickEvent.SERVER_LEVEL_POST 驱动，每个维度各调一次） */
     public static void serverTick(ServerLevel level) {
         DecayZoneManager mgr = get(level);
@@ -245,7 +279,7 @@ public final class DecayZoneManager extends SavedData {
                 sampleDecayBlock(level, zone);
             }
         }
-        // 3) 生物转化（周期性判定）
+        // 3) 生物转化（周期性判定，整批置于批处理标志内供死寂拦截识别）
         if (now % CONVERT_INTERVAL == 0) {
             convertEntities(level, box);
         }
@@ -303,28 +337,36 @@ public final class DecayZoneManager extends SavedData {
         }
     }
 
-    /** 生物转化：骷髅→凋零骷髅（小概率）、马→僵尸马/骷髅马、村民→僵尸村民（必定） */
+    /**
+     * 生物转化：骷髅→凋零骷髅（小概率）、马→僵尸马/骷髅马、村民→僵尸村民（必定）。
+     * 整批置于转化标志内执行：转化产物经 convertTo 重新入区会触发实体加入事件，
+     * 死寂拦截依据该标志放行这批"本区域转化产物"；非批处理期间的同类入区实体一律被拦截。
+     */
     private static void convertEntities(ServerLevel level, AABB box) {
-        for (LivingEntity e : new ArrayList<>(level.getEntitiesOfClass(Mob.class, box))) {
-            if (e instanceof WitherSkeleton) {
-                continue; // 已转化完成
-            }
-            if (e instanceof Skeleton sk) {
-                if (level.random.nextFloat() < 0.02f) {
-                    sk.convertTo(EntityType.WITHER_SKELETON, true);
+        CONVERTING.set(true);
+        try {
+            for (LivingEntity e : new ArrayList<>(level.getEntitiesOfClass(Mob.class, box))) {
+                if (e instanceof WitherSkeleton) {
+                    continue; // 已转化完成
                 }
-            } else if (e instanceof Horse horse) {
-                if (level.random.nextFloat() < 0.05f) {
-                    boolean zombie = level.random.nextBoolean();
-                    if (zombie) {
-                        horse.convertTo(EntityType.ZOMBIE_HORSE, true);
-                    } else {
-                        horse.convertTo(EntityType.SKELETON_HORSE, true);
+                if (e instanceof Skeleton sk) {
+                    if (level.random.nextFloat() < 0.02f) {
+                        sk.convertTo(EntityType.WITHER_SKELETON, true);
                     }
+                } else if (e instanceof Horse horse) {
+                    if (level.random.nextFloat() < 0.05f) {
+                        if (level.random.nextBoolean()) {
+                            horse.convertTo(EntityType.ZOMBIE_HORSE, true);
+                        } else {
+                            horse.convertTo(EntityType.SKELETON_HORSE, true);
+                        }
+                    }
+                } else if (e instanceof Villager villager) {
+                    villager.convertTo(EntityType.ZOMBIE_VILLAGER, true);
                 }
-            } else if (e instanceof Villager villager) {
-                villager.convertTo(EntityType.ZOMBIE_VILLAGER, true);
             }
+        } finally {
+            CONVERTING.set(false);
         }
     }
 

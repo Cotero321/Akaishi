@@ -148,15 +148,36 @@ public final class OrganEffectResolver {
 
     /** 指定被动技能的持有数量（多器官可叠加，含突变词条被动） */
     public static int countPassive(IPlayerBodyState state, OrganPassive passive) {
+        return strengthsOf(state, passive).count();
+    }
+
+    /** 被动持有强度：数量维度（跨器官叠加）+ 品质维度（携带该被动的最强来源器官品质序号，I=0 ~ IV=3）。
+     *  品质阶梯真值源：数值型被动由生效层按 maxTierOrd 逐档增强（每档 +25%，与属性品质倍率同节奏），
+     *  I 级行为与旧版完全一致，向后兼容不削弱。 */
+    public record PassiveStrengths(int count, int maxTierOrd) {
+        /** 品质阶梯系数：I=1.0 / II=1.25 / III=1.5 / IV=1.75（对数值型被动整体放大） */
+        public float tierFactor() {
+            return 1.0F + 0.25F * maxTierOrd;
+        }
+    }
+
+    /** 聚合统计指定被动：来源数（count）+ 最高来源品质序号（maxTierOrd） */
+    public static PassiveStrengths strengthsOf(IPlayerBodyState state, OrganPassive passive) {
         int count = 0;
+        int maxOrd = -1;
         for (ActiveOrgan organ : collect(state)) {
+            boolean hit = false;
             for (OrganPassive p : passivesOf(organ.stack(), organ.effect())) {
                 if (p == passive) {
                     count++;
+                    hit = true;
                 }
             }
+            if (hit) {
+                maxOrd = Math.max(maxOrd, organ.tier().ordinal());
+            }
         }
-        return count;
+        return new PassiveStrengths(count, maxOrd);
     }
 
     /** 器官属性集：特色覆盖优先，否则回退槽位模板（槽位无模板时返回空列表，避免 NPE） */

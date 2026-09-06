@@ -1,6 +1,7 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeFusionAnvilMenu;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 消耗 1 枚融合锭，完整复制原装备 NBT（保留升级数据），不消耗能量。
  * 仅支持赤石护甲 4 件（头盔/胸甲/护腿/靴子）。
  */
-public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements ExtendedMenuProvider, Container, IDataCarrier {
+public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements ExtendedMenuProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int INPUT_GEAR_SLOT = 0;
     public static final int INPUT_INGOT_SLOT = 1;
@@ -115,6 +116,18 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         buf.writeBlockPos(worldPosition);
+    }
+
+    // ===== IItemPipeDevice：护甲/融合锭槽可入、融合结果槽仅出 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{INPUT_GEAR_SLOT, INPUT_INGOT_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{OUTPUT_SLOT};
     }
 
     // ---- Container（漏斗 / 物流管道可直接访问槽位） ----

@@ -9,16 +9,28 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * 玩家躯体状态网络同步（S2C）：
- * 服务端打开躯体检查仪时，将玩家 9 槽位器官 + 排斥值打包推送到客户端缓存。
+ * 服务端打开躯体检查仪时，将玩家 9 槽位器官 + 排斥值打包推送到客户端缓存；
+ * 末尾附带"躯体总览"属性加成列表（身体系统当前实际生效的净加成，由平台注入计算器产出）。
  * 仅使用 Architectury Networking，common 无平台差异。
  */
 public final class PlayerBodySync {
 
     public static final ResourceLocation CHANNEL = new ResourceLocation(AkaishiMod.MOD_ID, "player_body_state");
 
+    /** 平台注入的躯体总览计算器（forge 读取玩家实际属性修饰聚合 + 被动叠加计数）；未注入时不发送总览字段 */
+    private static Function<ServerPlayer, BodyOverviewResult> overviewProvider;
+
     private PlayerBodySync() {
+    }
+
+    /** 平台在初始化时注册总览计算器 */
+    public static void registerOverviewProvider(Function<ServerPlayer, BodyOverviewResult> provider) {
+        overviewProvider = provider;
     }
 
     /** 客户端注册接收器（AkaishiMod.init 的 Env.CLIENT 分支调用） */
@@ -62,6 +74,20 @@ public final class PlayerBodySync {
             buf.writeInt(state.getBreakthroughExtra());
             buf.writeInt(state.getBreakthroughPct());
             buf.writeLong(state.getBreakthroughUntil());
+        }
+        // 躯体总览：身体系统当前实际生效的属性净加成 + 被动叠加计数
+        BodyOverviewResult result = overviewProvider == null ? null : overviewProvider.apply(player);
+        List<BodyOverviewEntry> overview = result == null ? List.of() : result.attributes();
+        buf.writeVarInt(overview.size());
+        for (BodyOverviewEntry entry : overview) {
+            buf.writeUtf(entry.attributeKey());
+            buf.writeDouble(entry.value());
+        }
+        List<BodyPassiveEntry> passives = result == null ? List.of() : result.passives();
+        buf.writeVarInt(passives.size());
+        for (BodyPassiveEntry entry : passives) {
+            buf.writeUtf(entry.passiveId());
+            buf.writeVarInt(entry.count());
         }
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }

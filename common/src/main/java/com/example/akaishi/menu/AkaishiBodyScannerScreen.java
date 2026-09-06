@@ -1,5 +1,7 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.life.body.BodyOverviewEntry;
+import com.example.akaishi.life.body.BodyPassiveEntry;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
@@ -7,10 +9,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,10 +53,22 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
     private static final int BREAKTHROUGH_Y = 178;
     private static final int SYNERGY_Y = 187;
 
+    /** 顶部页签（互斥双页：槽位扫描 / 躯体总览），右对齐于面板内容区右上角 */
+    private static final int TAB_Y = 4;
+
+    /** 躯体总览页排版：纯文字行距（收窄以容纳更多属性种类），内容区上限 12 行 */
+    private static final int OVERVIEW_LINE_H = 13;
+    private static final int OVERVIEW_MAX_ROWS = 12;
+
     /** 背景色 */
     private static final int BG_COLOR = 0xFFC6C6C6;
     private static final int PANEL_COLOR = 0xFFB0B0B0;
     private static final int LINE_COLOR = 0xFF373737;
+
+    /** 当前页面：false=槽位扫描页（默认），true=躯体总览页（互斥切换，杜绝两页内容重叠） */
+    private boolean overviewMode = false;
+    /** 躯体总览页滚动偏移（行单位，超出可视行数时滚轮调节） */
+    private int overviewScroll = 0;
 
     public AkaishiBodyScannerScreen(AkaishiBodyScannerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -65,6 +82,10 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         gui.fill(this.leftPos, this.topPos, this.leftPos + PANEL_W, this.topPos + PANEL_H, BG_COLOR);
         // 面板内容区
         gui.fill(this.leftPos + 6, this.topPos + 18, this.leftPos + PANEL_W - 6, this.topPos + 192, PANEL_COLOR);
+        // 躯体总览页不复用槽位排斥条背景（互斥页各自内容，避免残留扫描页元素）
+        if (overviewMode) {
+            return;
+        }
 
         // 9 行槽位：排斥条
         for (int i = 0; i < BodySlot.values().length; i++) {
@@ -91,6 +112,13 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
+
+        // 顶部页签（互斥双页）
+        drawTabs(gui);
+        if (overviewMode) {
+            renderOverview(gui);
+            return;
+        }
 
         // 9 行槽位：部位名 + 器官图标/名称 + 排斥数值
         BodySlot[] slots = BodySlot.values();
@@ -186,6 +214,156 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             gui.renderComponentTooltip(this.font, tip, mouseX, mouseY);
             return;
         }
+    }
+
+    /** 顶部页签：槽位扫描 / 躯体总览（右对齐，激活项提亮） */
+    private void drawTabs(GuiGraphics gui) {
+        String scan = Component.translatable("gui.akaishi.body_scanner.tab_scan").getString();
+        String overview = Component.translatable("gui.akaishi.body_scanner.tab_overview").getString();
+        int right = this.leftPos + PANEL_W - 6;
+        int overRight = right;
+        int overLeft = overRight - this.font.width(overview);
+        int scanRight = overLeft - 10;
+        int scanLeft = scanRight - this.font.width(scan);
+        int y = this.topPos + TAB_Y;
+        int scanColor = overviewMode ? 0xFF8B8B8B : 0xFFE0E0E0;
+        int overColor = overviewMode ? 0xFFE0E0E0 : 0xFF8B8B8B;
+        gui.drawString(this.font, scan, scanLeft, y, scanColor, false);
+        gui.drawString(this.font, overview, overLeft, y, overColor, false);
+    }
+
+    /** 躯体总览页：身体系统当前实际生效的属性净加成 + 被动叠加（服务端计算随包下发）。
+     *  属性在前、被动在后统一成行模型；超出可视行数（OVERVIEW_MAX_ROWS）由滚轮滚动，右侧绘制滚动条。
+     *  被动叠加 ≥2 来源时右侧显示罗马数字等级（与强度升级一一对应） */
+    private void renderOverview(GuiGraphics gui) {
+        List<BodyOverviewEntry> attributes = ClientBodyData.getOverview();
+        List<BodyPassiveEntry> passives = ClientBodyData.getPassives();
+        List<OverviewRow> rows = new ArrayList<>();
+        for (BodyOverviewEntry entry : attributes) {
+            // 移动速度为小秒速（0.03），与器官 tooltip 同口径按百分比呈现（+3%）
+            boolean percent = Attributes.MOVEMENT_SPEED.getDescriptionId().equals(entry.attributeKey());
+            rows.add(new OverviewRow(Component.translatable(entry.attributeKey()),
+                    formatOverview(entry.value(), percent),
+                    entry.value() < 0 ? 0xFFD64545 : 0xFF2E7D32));
+        }
+        for (BodyPassiveEntry passive : passives) {
+            int roman = passive.count() >= 2 ? Math.min(passive.count(), 10) : 0;
+            rows.add(new OverviewRow(Component.translatable("life.akaishi.organ_passive." + passive.passiveId()),
+                    roman > 0 ? toRoman(roman) : "", roman > 0 ? 0xFFC8A03C : 0xFF9E9E9E));
+        }
+        int x = this.leftPos + ROW_X;
+        int y = this.topPos + ROW_START_Y;
+        if (rows.isEmpty()) {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_empty"),
+                    x, y, 0x707070, false);
+            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_hint"),
+                    x, y + 13, 0x8B8B8B, false);
+            return;
+        }
+        int total = rows.size();
+        int maxOffset = Math.max(0, total - OVERVIEW_MAX_ROWS);
+        if (overviewScroll > maxOffset) {
+            overviewScroll = maxOffset; // 防御：数据收缩后滚动位置越界即钳制
+        }
+        int shown = 0;
+        for (int i = overviewScroll; i < total && shown < OVERVIEW_MAX_ROWS; i++, shown++) {
+            OverviewRow row = rows.get(i);
+            String name = this.font.plainSubstrByWidth(row.name().getString(), 96);
+            gui.drawString(this.font, name, x, y, 0xE0E0E0, false);
+            if (!row.right().isEmpty()) {
+                gui.drawString(this.font, row.right(),
+                        this.leftPos + REJECT_NUM_X - this.font.width(row.right()), y, row.color(), false);
+            }
+            y += OVERVIEW_LINE_H;
+        }
+        if (maxOffset == 0 && shown < OVERVIEW_MAX_ROWS) {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_hint"),
+                    x, y, 0x8B8B8B, false);
+        } else if (maxOffset > 0) {
+            // 可滚动：右侧轨道 + 滑块（vanilla 灰阶，与界面配色一致）
+            int trackTop = this.topPos + ROW_START_Y;
+            int trackH = OVERVIEW_LINE_H * OVERVIEW_MAX_ROWS;
+            int barX = this.leftPos + PANEL_W - 6; // 贴内容区右缘，与数值列（REJECT_NUM_X）留出间隙
+            gui.fill(barX, trackTop, barX + 2, trackTop + trackH, 0xFF3F3F3F);
+            int thumbH = Math.max(14, trackH * OVERVIEW_MAX_ROWS / total);
+            int thumbY = trackTop + (trackH - thumbH) * overviewScroll / maxOffset;
+            gui.fill(barX, thumbY, barX + 2, thumbY + thumbH, 0xFF8B8B8B);
+        }
+    }
+
+    /** 总览页单行（属性行：右侧数值着色；被动行：右侧罗马级金色） */
+    private record OverviewRow(Component name, String right, int color) {
+    }
+
+    /** 被动叠加计数 → 罗马数字（I~X，超出回退十进制） */
+    private static String toRoman(int n) {
+        String[] roman = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
+        return n < roman.length ? roman[n] : String.valueOf(n);
+    }
+
+    /** 总览属性值格式化：整数带符号、无小数点；小数保留至多 4 位去尾零（小基数加成不显示成 0.0）；移动速度换算百分比 */
+    private static String formatOverview(double value, boolean percent) {
+        double disp = percent ? value * 100.0 : value;
+        String sign = disp > 0 ? "+" : "";
+        if (!percent && disp == Math.floor(disp) && !Double.isInfinite(disp)) {
+            return sign + (long) disp;
+        }
+        return sign + BigDecimal.valueOf(disp).setScale(4, RoundingMode.HALF_UP)
+                .stripTrailingZeros().toPlainString() + (percent ? "%" : "");
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int tab = hitTab(mouseX, mouseY);
+            if (tab == 1) {
+                overviewMode = false;
+                overviewScroll = 0;
+                return true;
+            }
+            if (tab == 2) {
+                overviewMode = true;
+                overviewScroll = 0;
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    /** 躯体总览页滚轮翻页：上滚回看、下滚下翻，越界自动钳制 */
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (overviewMode) {
+            int maxOffset = Math.max(0, ClientBodyData.getOverview().size()
+                    + ClientBodyData.getPassives().size() - OVERVIEW_MAX_ROWS);
+            if (maxOffset > 0 && delta != 0) {
+                int target = overviewScroll - (delta > 0 ? 1 : -1);
+                overviewScroll = Math.max(0, Math.min(maxOffset, target));
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    /** 命中页签：1=槽位扫描，2=躯体总览，0=未命中（坐标算法与 drawTabs 一致） */
+    private int hitTab(double mouseX, double mouseY) {
+        if (mouseY < this.topPos + TAB_Y - 1 || mouseY >= this.topPos + TAB_Y + 10) {
+            return 0;
+        }
+        String scan = Component.translatable("gui.akaishi.body_scanner.tab_scan").getString();
+        String overview = Component.translatable("gui.akaishi.body_scanner.tab_overview").getString();
+        int right = this.leftPos + PANEL_W - 6;
+        int scanRight = right - this.font.width(overview) - 10;
+        int scanLeft = scanRight - this.font.width(scan);
+        int overRight = right;
+        int overLeft = overRight - this.font.width(overview);
+        if (mouseX >= scanLeft - 2 && mouseX <= scanRight + 2) {
+            return 1;
+        }
+        if (mouseX >= overLeft - 2 && mouseX <= overRight + 2) {
+            return 2;
+        }
+        return 0;
     }
 
     /** 槽位行悬停内容：器官自带属性行 + 排斥值；空槽显示原装说明 */

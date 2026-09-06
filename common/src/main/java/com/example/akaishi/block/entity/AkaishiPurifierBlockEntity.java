@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiPurifierBlock;
 import com.example.akaishi.block.ModBlocks;
@@ -39,7 +40,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 逻辑：燃烧赤石晶/粗制块产生赤石能量 → 消耗能量提纯输入为赤石精华。
  * 配方：粗制赤石块 → 1 精华；赤石水晶块 → 4 精华。
  */
-public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier, IUpgradeableMachine {
+public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     public static final int FUEL_SLOT = 0;
     public static final int INPUT_SLOT = 1;

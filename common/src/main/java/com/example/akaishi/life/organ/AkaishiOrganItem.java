@@ -4,18 +4,29 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.linkage.OrganLinkage;
 import com.example.akaishi.life.sample.SampleGroup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -109,6 +120,11 @@ public class AkaishiOrganItem extends Item {
             case LEFT_LEG -> ModItems.akaishiOrganLeftLeg.get();
             case RIGHT_LEG -> ModItems.akaishiOrganRightLeg.get();
         };
+    }
+
+    /** 器官栈 → 槽位（非器官物品返回 null；词条部位专属判定用） */
+    public static BodySlot slotOf(ItemStack stack) {
+        return stack.getItem() instanceof AkaishiOrganItem organ ? organ.slot : null;
     }
 
     // ===== 读取 =====
@@ -289,6 +305,16 @@ public class AkaishiOrganItem extends Item {
                 Component.translatable("life.akaishi.organ_tier." + tier.name().toLowerCase())));
         tooltip.add(Component.translatable("gui.akaishi.organ.source",
                 Component.translatable(source.getNameKey())));
+        // 具体生物（如 minecraft:cow → 牛）；未注册类型回退原始 id
+        String entityId = getEntityId(stack);
+        if (entityId != null) {
+            ResourceLocation entityLoc = ResourceLocation.tryParse(entityId);
+            EntityType<?> type = entityLoc != null
+                    ? BuiltInRegistries.ENTITY_TYPE.getOptional(entityLoc).orElse(null) : null;
+            tooltip.add(Component.translatable("gui.akaishi.organ.entity",
+                    type != null ? Component.translatable(type.getDescriptionId())
+                            : Component.literal(entityId)));
+        }
         // 适配度（按等级着色：≥80 绿 / 60-79 黄 / <60 红）
         int compat = getCompat(stack);
         String compatKey = compat >= 80 ? "gui.akaishi.organ.compat_high"
@@ -301,28 +327,51 @@ public class AkaishiOrganItem extends Item {
             tooltip.add(Component.translatable("gui.akaishi.organ.purity", purity));
         }
         double compatFactor = compat / 100.0;
+        // 实际生效数值 = 基础值 × 品质倍率 × 适配度（forge 层同公式；突破倍率仅移植后加成）
+        double scale = tier.getMultiplier() * compatFactor;
         // 生物特色效果（未注册时回退槽位模板属性，槽位无模板返回空列表）
         OrganEffect effect = OrganEffectRegistry.get(getEntityId(stack), slot);
-        List<OrganTemplate.AttributeBonus> bonuses = OrganEffectResolver.bonusesOf(stack, slot, effect);
-        // 属性加成（基础值 × 品质倍率 × 适配度；实际生效还受身体基因加成，见 forge 处理）
-        for (OrganTemplate.AttributeBonus bonus : bonuses) {
-            double value = bonus.base() * tier.getMultiplier() * compatFactor;
-            boolean negative = value < 0;
-            tooltip.add(Component.translatable(negative ? "gui.akaishi.organ.attribute_neg" : "gui.akaishi.organ.attribute",
-                    formatValue(value), Component.translatable(bonus.attribute().getDescriptionId())));
+        List<MutantTrait> mutations = getMutations(stack);
+        // —— 属性栏：器官本体 + 全部词条，按属性归并求和（同属性只留一行净值，消除加减重复）——
+        OrganTemplate slotTemplate = OrganRegistry.get(slot);
+        Map<Attribute, Double> merged = new LinkedHashMap<>();
+        if (effect != null && effect.attributes() != null) {
+            mergeBonuses(merged, effect.attributes(), scale);
+        } else if (slotTemplate != null) {
+            mergeBonuses(merged, slotTemplate.bonuses(), scale);
         }
-        // 被动技能（常驻/被动触发）：生物特色被动 + 突变词条被动合并去重
-        for (OrganPassive passive : OrganEffectResolver.passivesOf(stack, effect)) {
-            tooltip.add(Component.translatable("gui.akaishi.organ.passive",
+        for (MutantTrait mutation : mutations) {
+            mergeBonuses(merged, mutation.attributes(), scale);
+        }
+        for (Map.Entry<Attribute, Double> entry : merged.entrySet()) {
+            double value = entry.getValue();
+            // 移动速度基础值为小秒速（+0.03），tooltip 按百分比展示更直观（+3%）
+            boolean percent = Attributes.MOVEMENT_SPEED.equals(entry.getKey());
+            String text = percent ? formatPercent(value * 100.0) : formatValue(value);
+            tooltip.add(Component.translatable(value < 0 ? "gui.akaishi.organ.attribute_neg" : "gui.akaishi.organ.attribute",
+                    text, Component.translatable(entry.getKey().getDescriptionId())));
+        }
+        // —— 被动栏：器官本体 + 全部词条的被动，按被动去重（同被动只列一次，来源计数合并）——
+        Set<OrganPassive> passives = new LinkedHashSet<>();
+        if (effect != null && effect.passives() != null) {
+            passives.addAll(effect.passives());
+        }
+        for (MutantTrait mutation : mutations) {
+            passives.addAll(mutation.passives());
+        }
+        for (OrganPassive passive : passives) {
+            // 负面（代价型）被动红字警示，与畸变词条同色系；正面被动沿用蓝色前缀
+            tooltip.add(Component.translatable(passive.isNegative()
+                            ? "gui.akaishi.organ.passive_neg"
+                            : "gui.akaishi.organ.passive",
                     Component.translatable("life.akaishi.organ_passive." + passive.getId())));
         }
-        // 独特机制
+        // 独特机制（生物特色专属，不并入属性/被动）
         if (effect != null && effect.special() != null) {
             tooltip.add(Component.translatable("gui.akaishi.organ.special",
                     Component.translatable("life.akaishi.organ_special." + effect.special().getId())));
         }
-        // 基因突变词条（生命培育器施加，不可还原；畸变以警示色显示）
-        List<MutantTrait> mutations = getMutations(stack);
+        // —— 基因突变词条区：只列词条名（畸变以警示色显示）；效果已并入上方属性/被动栏 ——
         if (!mutations.isEmpty()) {
             tooltip.add(Component.translatable("gui.akaishi.organ.mutations",
                     mutations.size(), maxMutations(tier)));
@@ -339,11 +388,25 @@ public class AkaishiOrganItem extends Item {
         tooltip.add(Component.translatable("gui.akaishi.organ.hint"));
     }
 
+    /** 属性归并：一组属性条目（本体/词条）按同属性求和并入 merged（已乘品质×适配缩放） */
+    private static void mergeBonuses(Map<Attribute, Double> merged,
+                                     List<OrganTemplate.AttributeBonus> bonuses, double scale) {
+        for (OrganTemplate.AttributeBonus bonus : bonuses) {
+            merged.merge(bonus.attribute(), bonus.base() * scale, Double::sum);
+        }
+    }
+
     /** 属性值格式化：整数显示整数，否则保留一位小数 */
     private static String formatValue(double value) {
         if (value == Math.floor(value) && !Double.isInfinite(value)) {
             return String.valueOf((long) value);
         }
         return String.format("%.1f", value);
+    }
+
+    /** 百分比数值格式化：保留至多一位小数并带符号（正值由模板补 +，负值自带 -；2.0 → "2%"，-1.5 → "-1.5%"） */
+    private static String formatPercent(double percent) {
+        BigDecimal bd = BigDecimal.valueOf(Math.abs(percent)).setScale(1, RoundingMode.HALF_UP).stripTrailingZeros();
+        return (percent < 0 ? "-" : "") + bd.toPlainString() + "%";
     }
 }

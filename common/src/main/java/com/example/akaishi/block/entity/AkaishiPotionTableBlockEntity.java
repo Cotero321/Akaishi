@@ -120,7 +120,11 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
         setChanged();
     }
 
-    /** 制作条件：选中模板 + 样本纯度 ≥25 + 固态/能量足够 + 输出槽可叠加 */
+    /**
+     * 制作条件：选中模板 + 样本纯度 ≥25 + 固态/能量足够 + 输出可收纳。
+     * 输出须与本次产出同栈（同模板同纯度同来源，NBT 一致方可堆叠）且未满，
+     * 否则停机——杜绝"不可叠加却持续消耗材料"的空转/覆盖。
+     */
     private boolean canProcess(PotionTemplate template) {
         if (template == null) {
             return false;
@@ -137,7 +141,17 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
             return false;
         }
         ItemStack output = inventory.getItem(OUTPUT_SLOT);
-        return output.isEmpty() || (output.is(ModItems.akaishiPotion.get()) && output.getCount() < output.getMaxStackSize());
+        if (output.isEmpty()) {
+            return true;
+        }
+        if (!output.is(ModItems.akaishiPotion.get())
+                || output.getCount() >= output.getMaxStackSize()) {
+            return false;
+        }
+        return ItemStack.isSameItemSameTags(output,
+                AkaishiPotionItem.create(new ItemStack(output.getItem()),
+                        template.id(), AkaishiLifeSampleItem.getPurity(sample),
+                        AkaishiLifeSampleItem.getEntityId(sample)));
     }
 
     private void complete(PotionTemplate template) {
@@ -145,14 +159,23 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
         int purity = AkaishiLifeSampleItem.getPurity(sample);
         // 生物来源随样本写入药剂 NBT（生物药剂差异化依据）
         String entityId = AkaishiLifeSampleItem.getEntityId(sample);
+        // 每次产出构建独立新瓶：空槽放入，可堆叠（同 NBT 且未满）时 +1；
+        // 异源/已满时中止本单制作，绝不覆盖既有产出或空耗材料（canProcess 已先行拦截，此处兜底）
+        ItemStack result = AkaishiPotionItem.create(
+                new ItemStack(ModItems.akaishiPotion.get()), template.id(), purity, entityId);
         ItemStack output = inventory.getItem(OUTPUT_SLOT);
         if (output.isEmpty()) {
-            output = AkaishiPotionItem.create(
-                    new ItemStack(ModItems.akaishiPotion.get()), template.id(), purity, entityId);
+            inventory.setItem(OUTPUT_SLOT, result);
+        } else if (ItemStack.isSameItemSameTags(output, result)
+                && output.getCount() < output.getMaxStackSize()) {
+            output.grow(1);
         } else {
-            AkaishiPotionItem.create(output, template.id(), purity, entityId);
+            // 兜底：中止本单制作并归零进度，避免进度卡满反复进入 complete
+            progress = 0;
+            speedAccum = 0;
+            setChanged();
+            return;
         }
-        inventory.setItem(OUTPUT_SLOT, output);
         // 扣消耗：1 样本 + 模板固态物 + 模板生命能量
         sample.shrink(1);
         inventory.getItem(SOLID_SLOT).shrink(template.solidCost());

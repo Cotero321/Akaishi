@@ -1,0 +1,35 @@
+{
+  "name": "Three Breakthrough Modes",
+  "icon": "akaishi:akaishi_potion",
+  "category": "akaishi:gene_genotype",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)One awakening system, three recipe directions$(0) — select Breakthrough at the Potion Table, then $(4)click again to cycle modes$(0) (Balance → Surge → Endure); the button shows the current mode.$(br2)$(bold)Shared tiers:$(0) extra compatibility scales with purity in four steps = 2 / 4 / 6 / 8.$(br2)$(bold)They differ in three things only:$(0) base-stat amplification %, duration and crafting cost.$(br2)One-line pick:$(li)$(4)Balance$(0) = all-rounder$(li)$(4)Surge$(0) = short-window all-in$(li)$(4)Endure$(0) = steady marathon"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Balance (standard)",
+      "text": "$(bold)Role:$(0) direct heir of the original breakthrough potion — complete, no weak spots, smoothest pacing.$(br2)$(bold)Numbers:$(0) +5% base stats per point of extra compat$(li)Purity tiers → boost: +10% / +20% / +30% / +40%$(li)Duration: 30 minutes$(br2)$(bold)Recipe:$(0) 5 Solid Matter + 30,000 life energy, 80 ticks.$(br2)$(bold)Best for:$(0) overworld trips, mining and pre-boss all-round buffs — no extremes, but stable across a full dungeon run."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Surge (burst)",
+      "text": "$(bold)Role:$(0) a high-risk recipe that crushes the reward curve into a short window.$(br2)$(bold)Numbers:$(0) +10% base stats per point of extra compat$(li)Purity tiers → boost: +20% / +40% / +60% / +80%$(li)Duration: 15 minutes (halved)$(br2)$(bold)Recipe:$(0) 7 Solid Matter + 50,000 life energy, 100 ticks.$(br2)$(bold)Best for:$(0) focused fights — drink one before the Wither, dragon fight or PvP to push source organs past their usual ceiling; the cost is steep and the window short."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Endure (long haul)",
+      "text": "$(bold)Role:$(0) a low-amplitude, long-lasting steady-state recipe.$(br2)$(bold)Numbers:$(0) +3% base stats per point of extra compat$(li)Purity tiers → boost: +6% / +12% / +18% / +24%$(li)Duration: 60 minutes (doubled)$(br2)$(bold)Recipe:$(0) 4 Solid Matter + 25,000 life energy, 120 ticks.$(br2)$(bold)Best for:$(0) long AFK zones (mob farms, ranches, auto lines) — trades intensity for uptime, the lowest cost-per-minute of the three."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_genotype",
+        "akaishi:gene_synergy"
+      ],
+      "text": "Shared mechanics (prerequisites / one-source cap / negative-trait suspension) are in Genotype Potions Guide; which ecosystem it pays off on — see Ecosystem Synergy."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "akaishi:akaishi_life_book" },
+    { "item": "akaishi:akaishi_life_essence_solid" }
+  ],
+  "result": { "item": "akaishi:akaishi_gene_book", "count": 1 }
+}

@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
@@ -37,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
  * 换料/取空输入槽会清零进度，防止跨配方错配白嫖半程进度。
  */
 public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     // ===== 数据槽 =====
     public static final int DATA_SLOTS = 3;
@@ -52,7 +53,13 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
     /** 输入槽（0=活化结晶，7 种任一） */
     private final SimpleContainer input;
     /** 输出槽（0=活化成分，1=衰竭结晶） */
-    private final SimpleContainer output = new SimpleContainer(2);
+    private final SimpleContainer output = new SimpleContainer(2) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            AkaishiActivatedFractionatorBlockEntity.this.setChanged();
+        }
+    };
     /** 当前加工进度（tick，满 {@link ModConfig#fractionatorProcessTicks} 结算一次） */
     private int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
@@ -185,6 +192,72 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
 
     public SimpleContainer outputContainer() {
         return output;
+    }
+
+    // ===== IItemPipeDevice：对外虚拟槽 0=输入、1/2=两个输出（组合容器视图，方向与 GUI 一致） =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{0};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{1, 2};
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 3;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return input.isEmpty() && output.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        if (index == 0) {
+            return input.getItem(0);
+        }
+        return index >= 1 && index <= 2 ? output.getItem(index - 1) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        if (index == 0) {
+            return input.removeItem(0, count);
+        }
+        return index >= 1 && index <= 2 ? output.removeItem(index - 1, count) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        if (index == 0) {
+            return input.removeItemNoUpdate(0);
+        }
+        return index >= 1 && index <= 2 ? output.removeItemNoUpdate(index - 1) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        if (index == 0) {
+            input.setItem(0, stack);
+        } else if (index >= 1 && index <= 2) {
+            output.setItem(index - 1, stack);
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        input.clearContent();
+        output.clearContent();
     }
 
     // ===== ExtendedMenuProvider =====

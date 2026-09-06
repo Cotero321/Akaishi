@@ -2,7 +2,10 @@ package com.example.akaishi.life.organ;
 
 /**
  * 器官被动技能类型（全部常驻/被动触发，无需玩家操作）。
- * 参数均为固定设计值，未来如需差异化可在 OrganEffect 中扩展。
+ * 强度两维：
+ * - 数量维度：跨器官来源数叠加（由生效层 count 聚合，≥2 升级）；
+ * - 品质维度：携带该被动的最高来源器官品质抬升数值上限（由生效层按 QualityTier 档位逐级增强）。
+ * negative = 负面（代价型）被动：tooltip 红字警示，用于诅咒/高风险器官多元化。
  */
 public enum OrganPassive {
 
@@ -43,7 +46,7 @@ public enum OrganPassive {
     /** 攻击命中附加凋零（II，3 秒） */
     WITHER_ON_HIT("wither_on_hit"),
     /** 火焰伤害 +50%（负面） */
-    FIRE_WEAKNESS("fire_weakness"),
+    FIRE_WEAKNESS("fire_weakness", true),
     /** 水下攻击伤害 +50% */
     WATER_ATTACK_BOOST("water_attack_boost"),
     /** 弹射物伤害 +25% */
@@ -59,15 +62,42 @@ public enum OrganPassive {
     /** 命中附加挖掘疲劳（10 秒 I 级，克制采矿——远古守卫者激光眼） */
     FATIGUE_ON_HIT("fatigue_on_hit"),
     /** 寒髓代谢：免疫冰冻并清除缓慢（雪傀儡肾脏） */
-    ANTIFREEZE("antifreeze");
+    ANTIFREEZE("antifreeze"),
+    /** 冲撞兽击：命中把目标向后顶开（疣猪兽兽性冲撞，与武器击退叠加） */
+    KNOCKBACK_ON_HIT("knockback_on_hit"),
+    /** 灼热点燃：命中使目标着火 3 秒（岩浆怪熔核） */
+    IGNITE_ON_HIT("ignite_on_hit"),
+    /** 爆破体质：受到的爆炸伤害减免（苦力怕硫磺代谢——自家爆炸反噬免疫） */
+    BLAST_RESIST("blast_resist"),
+    /** 女巫酿造：每 12 秒随机调一杯药水给自己灌下（运动/防护/恢复随机池，20 秒持续） */
+    WITCH_BREW("witch_brew"),
+
+    // ===== 负面被动（诅咒系——高回报器官的代价，tooltip 红字警示）=====
+    /** 阳光灼晒：白天处于天空直射下会燃烧（亡灵速腿/幻翼肺的代价，抗火药水/火焰免疫可豁免） */
+    SUNLIGHT_BURN("sunlight_burn", true),
+    /** 脆骨体质：受到的近战/弹射伤害加深（凋灵骷髅臂——玻璃大炮） */
+    VULNERABLE("vulnerable", true),
+    /** 高代谢：饥饿消耗加速（狂怒副肾等强攻速器官的代价） */
+    RAPID_EXHAUSTION("rapid_exhaustion", true);
 
     private final String id;
+    /** 是否为负面（代价型）被动：tooltip 以红字警示 */
+    private final boolean negative;
 
     OrganPassive(String id) {
+        this(id, false);
+    }
+
+    OrganPassive(String id, boolean negative) {
         this.id = id;
+        this.negative = negative;
     }
 
     public String getId() {
         return id;
+    }
+
+    public boolean isNegative() {
+        return negative;
     }
 }

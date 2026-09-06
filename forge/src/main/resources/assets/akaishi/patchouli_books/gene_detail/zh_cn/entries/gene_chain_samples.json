@@ -1,0 +1,36 @@
+{
+  "name": "血样与序列",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:gene_chain",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_sample",
+      "text": "$(bold)从生物到器官的三段链路：$(0)$(br)$(li)样本采集器 → $(4)生命样本$(0)$(li)生命分析台 → $(4)基因序列$(0)$(li)生命结构台 → $(4)器官$(0)$(br2)贯穿全链的是$(4)纯度$(0)：样本纯度 → 序列纯度 → 器官完整度 → 排斥修正。想要高纯器官，就从采集高纯样本那一步开始努力——后面每道工序都会保留（并损耗一部分）纯度。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "第一步：采样",
+      "text": "$(bold)$(item:akaishi:akaishi_sample_collector)$(0)$(li)每次抽取耗 5 千生命能量$(li)同一生物个体最多成功采集 3 份$(li)生物越虚弱成功率越高：半血 +10%、四分之一血再 +10%，封顶 95%$(br2)$(bold)纯度分布偏斜低值：$(0)$(li)60% 概率落在 0-49$(li)25% 概率落在 50-74$(li)15% 概率落在 75-100$(br2)血厚、基因强（末影/首领/龙）的生物更容易采出高纯样本；低纯样本也别扔——它们是药剂台的原料。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "第二步：解构为序列",
+      "text": "$(bold)生命分析台$(0)（akaishi:akaishi_gene_analyzer）$(br)$(li)原料：纯度 ≥25 的生命样本$(li)耗 5000 生命能量，耗时 5 秒$(li)成功率随纯度浮动：25 纯约 70%，100 纯约 95%$(li)失败会损失样本——好样本谨慎下台$(br2)产物为$(4)基因序列片段$(0)，完整保留样本的来源分组、具体生物与纯度。低于 25 纯的样本分析台不收，只能走药剂台路线。"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "第三步：构造器官",
+      "text": "$(bold)$(item:akaishi:akaishi_life_struct)$(0)$(li)原料：基因序列 1 ＋ 固态物 5 ＋ 8 万生命能量$(li)耗时 6 秒$(li)$(4)器官完整度 = 序列纯度 − 随机损耗（0-20）$(0)$(br2)$(bold)完整度影响排斥修正：$(0)完整度越高移植排斥越低（最高减半），所以 90+ 纯的序列值得为它多刷几管样本。$(br2)$(bold)器官品质由来源分组起步：$(0)温血 I → 亡灵/爆炸/异变 II → 末影 III → 首领/龙 IV，属性倍率随品质 1.25 → 2.0；适配度则随纯度牵引向分组区间上限靠拢。"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_groups",
+        "akaishi:gene_chain_body"
+      ],
+      "text": "每个生物归入哪个基因组、区间数值见「七大基因组」；器官造好之后怎么移植、排斥怎么涨，见下页「上身与维护」。"
+    }
+  ]
+}

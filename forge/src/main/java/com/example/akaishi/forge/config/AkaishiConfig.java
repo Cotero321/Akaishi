@@ -83,6 +83,8 @@ public final class AkaishiConfig {
     // ==================== 赤石矿机 ====================
     public static final ForgeConfigSpec.IntValue MINER_TICKS_BASE;
     public static final ForgeConfigSpec.LongValue MINER_COST_PER_TICK_BASE;
+    public static final ForgeConfigSpec.IntValue MINER_PRECISE_FORTUNE_DIVISOR;
+    public static final ForgeConfigSpec.IntValue MINER_EXTRA_ORE_WEIGHT;
 
     // ==================== 衰竭区域 ====================
     public static final ForgeConfigSpec.LongValue DECAY_ZONE_DURATION_TICKS;
@@ -257,6 +259,12 @@ public final class AkaishiConfig {
                 .defineInRange("ticksBase", 200, 1, Integer.MAX_VALUE);
         MINER_COST_PER_TICK_BASE = b.comment("Base akaishi energy consumed per tick while mining")
                 .defineInRange("costPerTickBase", 2000L, 1L, Long.MAX_VALUE);
+        MINER_PRECISE_FORTUNE_DIVISOR = b.comment("Precise mode fortune divisor: fortune upgrades take effect at 1/N "
+                        + "(effective fortune = fortuneCount / N, rounded down). 3 = fortune works at 1/3 in precise mode")
+                .defineInRange("preciseFortuneDivisor", 3, 1, 8);
+        MINER_EXTRA_ORE_WEIGHT = b.comment("Loot weight for extra minerals registered via the #akaishi:miner/minerals "
+                        + "item tag (0 = disable tag extension, mine only the default ten ores)")
+                .defineInRange("extraOreWeight", 1, 0, 1000);
         b.pop();
 
         b.push("decay_zone");

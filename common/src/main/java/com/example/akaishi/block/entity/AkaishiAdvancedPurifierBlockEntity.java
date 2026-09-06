@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiAdvancedPurifierBlock;
 import com.example.akaishi.block.AkaishiPurifierBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
@@ -24,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 成型后（formed=true）休眠，能量与容器访问代理到中心提纯器——
  * 中心被 26 格外壳完全包裹，管道经外壳才能给中心供能，AE2/物流管道经外壳读写中心槽位。
  */
-public class AkaishiAdvancedPurifierBlockEntity extends BlockEntity implements IEnergyProvider, Container, IDataCarrier {
+public class AkaishiAdvancedPurifierBlockEntity extends BlockEntity implements IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     /** 自身能量存储：单放时无意义（无 UI/无消耗），成型后代理中心存储 */
     private final AkaishiEnergyStorage energy;
@@ -132,6 +133,18 @@ public class AkaishiAdvancedPurifierBlockEntity extends BlockEntity implements I
     private Container currentContainer() {
         AkaishiPurifierBlockEntity center = cachedCenter();
         return center != null ? center.inventory() : inventory;
+    }
+
+    // ===== IItemPipeDevice：外壳成型后容器代理中心提纯器（0 燃料/1 原料入、2 产物出）；未成型无物流方向 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return cachedCenter() != null ? new int[]{0, 1} : new int[0];
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return cachedCenter() != null ? new int[]{2} : new int[0];
     }
 
     // ===== Container：使 AE2 存储总线 / Mekanism 物流管道能直接读写中心机器槽位（零硬依赖） =====

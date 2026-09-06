@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -35,7 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 配方（转基因判定）：凋零骷髅基因 → 凋零藤。判定条件抽成配方记录，便于后续扩充其它转基因。
  */
 public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, Container, IDataCarrier, IEnergyProvider {
+        ExtendedMenuProvider, Container, IItemPipeDevice, IDataCarrier, IEnergyProvider {
 
     /** 配方记录：基因来源生物 + 最低纯度（产物固化在产出步骤，扩展时按基因新增产出分支） */
     private record GeneRecipe(String geneEntity, int minPurity) {
@@ -227,6 +228,18 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     @Override
     public void clearContent() {
         inventory.clearContent();
+    }
+
+    // ===== IItemPipeDevice：0~3 为输入（基因/藤/玫瑰/固态精华），4=产物可被第三方物流抽取 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{SLOT_GENE, SLOT_VINE, SLOT_ROSE, SLOT_SOLID};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{SLOT_OUT};
     }
 
     @Override

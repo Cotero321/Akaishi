@@ -143,6 +143,10 @@ public final class ModConfig {
     public static volatile int minerTicksBase = 200;
     /** 挖矿每 tick 基础能耗（速度升级按比例提升） */
     public static volatile long minerCostPerTickBase = 2000L;
+    /** 精准模式时运折算除数：生效时运升级数 = 时运升级数 ÷ 该值向下取整（3 = 时运 1/3 生效） */
+    public static volatile int minerPreciseFortuneDivisor = 3;
+    /** 物品标签 #akaishi:miner/minerals 扩展矿物的抽奖权重（0 = 关闭标签扩展，只挖默认十种） */
+    public static volatile int minerExtraOreWeight = 1;
 
     // ==================== 衰竭区域 ====================
     /** 衰竭区域持续时长（tick，默认 30 小时） */

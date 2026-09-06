@@ -29,9 +29,9 @@ public class AkaishiRejectionSerumItem extends Item {
     /** 每瓶每个可洗器官的排斥下降量（下限 0） */
     public static final int WASH_REDUCE = 12;
     /** 每个器官每次移植可被中和剂清洗的次数（移植时在 PlayerBodyState 清零） */
-    public static final int WASH_LIMIT = 5;
-    /** 饮用冷却（tick = 30 秒） */
-    public static final int COOLDOWN_TICKS = 600;
+    public static final int WASH_LIMIT = 6;
+    /** 饮用冷却（tick = 15 秒） */
+    public static final int COOLDOWN_TICKS = 300;
 
     public AkaishiRejectionSerumItem(Properties properties) {
         super(properties);

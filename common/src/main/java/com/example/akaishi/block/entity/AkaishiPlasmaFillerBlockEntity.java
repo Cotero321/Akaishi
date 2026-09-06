@@ -2,6 +2,7 @@ package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
@@ -15,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +42,7 @@ import java.util.List;
  * 加工罐选择：优先量最多的可用罐（单一/混合注入均自然支持）。
  */
 public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     // ===== 数据槽 =====
     public static final int DATA_SLOTS = 7;
@@ -208,6 +210,82 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
 
     public SimpleContainer outputContainer() {
         return output;
+    }
+
+    // ===== IItemPipeDevice / Container：组合视图（0=反应棒入，1~3=燃料棒产物仅出），供第三方物流 =====
+
+    @Override
+    public boolean canPipeInput() {
+        return IFluidPipeDevice.super.canPipeInput() || IItemPipeDevice.super.canPipeInput();
+    }
+
+    @Override
+    public boolean canPipeOutput() {
+        return IFluidPipeDevice.super.canPipeOutput() || IItemPipeDevice.super.canPipeOutput();
+    }
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{0}; // 反应棒槽可插
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{1, 2, 3}; // 3 格产物只读，仅可抽取
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 4;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return rods.isEmpty() && output.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        if (index == 0) {
+            return rods.getItem(0);
+        }
+        return index >= 1 && index <= 3 ? output.getItem(index - 1) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        if (index == 0) {
+            return rods.removeItem(0, count);
+        }
+        return index >= 1 && index <= 3 ? output.removeItem(index - 1, count) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        if (index == 0) {
+            return rods.removeItemNoUpdate(0);
+        }
+        return index >= 1 && index <= 3 ? output.removeItemNoUpdate(index - 1) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        if (index == 0) {
+            rods.setItem(0, stack);
+        } else if (index >= 1 && index <= 3) {
+            output.setItem(index - 1, stack);
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        rods.clearContent();
+        output.clearContent();
     }
 
     // ===== ExtendedMenuProvider =====

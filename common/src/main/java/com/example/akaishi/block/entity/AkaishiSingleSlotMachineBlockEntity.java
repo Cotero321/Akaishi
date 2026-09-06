@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
@@ -37,7 +38,7 @@ import java.util.Map;
  * 子类仅需提供配方表、能量容量/耗时/能耗与菜单构造。
  */
 public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     /** 加工配方：输入物品 → 输出物品（inputCount 消耗量、outputCount 产量） */
     public record MachineRecipe(Item input, int inputCount, Item output, int outputCount) {
@@ -161,6 +162,58 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
 
     public Container inventory() {
         return inventory;
+    }
+
+    // ===== IItemPipeDevice：第三方物流向输入槽供料、从输出槽取料（方向与 GUI 一致） =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{SLOT_INPUT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{SLOT_OUTPUT};
+    }
+
+    @Override
+    public int getContainerSize() {
+        return inventory.getContainerSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return inventory.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return inventory.getItem(index);
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        return inventory.removeItem(index, count);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return inventory.removeItemNoUpdate(index);
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        inventory.setItem(index, stack);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     public ContainerData data() {

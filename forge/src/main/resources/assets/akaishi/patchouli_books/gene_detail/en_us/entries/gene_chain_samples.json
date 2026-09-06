@@ -1,0 +1,36 @@
+{
+  "name": "Samples & Sequences",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:gene_chain",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_sample",
+      "text": "$(bold)Three steps from creature to organ:$(0)$(br)$(li)Sample Collector → $(4)Life Sample$(0)$(li)Gene Analyzer → $(4)Gene Sequence$(0)$(li)Life Struct → $(4)Organ$(0)$(br2)$(4)Purity$(0) flows through the whole chain: sample purity → sequence purity → organ completeness → rejection modifier. Want high-purity organs? Start by hunting high-purity samples — every later step keeps (and drains a bit of) purity."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Step 1: Sampling",
+      "text": "$(bold)$(item:akaishi:akaishi_sample_collector)$(0)$(li)5,000 life energy per draw$(li)At most 3 successful draws per creature individual$(li)Weaker creatures are easier: +10% at half health, +10% more at quarter health, capped 95%$(br2)$(bold)Purity skews low:$(0)$(li)60% chance of 0-49$(li)25% chance of 50-74$(li)15% chance of 75-100$(br2)Tanky, strong-gene creatures (Ender / Boss / Dragon) give the best odds of high purity. Don't throw away low-purity samples — they are potion-table fuel."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Step 2: Extraction",
+      "text": "$(bold)$(item:akaishi:akaishi_gene_analyzer)$(0)$(li)Input: life samples with purity ≥25$(li)5,000 life energy, 5 seconds$(li)Success rate scales with purity: ≈70% at 25, ≈95% at 100$(li)Failure destroys the sample — treat good samples carefully$(br2)Output is a $(4)gene sequence fragment$(0) that keeps the source group, the exact creature and the purity. Samples below 25 purity are rejected here and only have the potion route."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Step 3: Organ construction",
+      "text": "$(bold)$(item:akaishi:akaishi_life_struct)$(0)$(li)Input: 1 gene sequence + 5 Solid Matter + 80,000 life energy$(li)6 seconds$(li)$(4)Organ completeness = sequence purity − random loss (0-20)$(0)$(br2)$(bold)Completeness drives rejection:$(0) the higher the completeness, the lower the transplant rejection (up to half off) — a 90+ purity sequence is worth extra sample runs.$(br2)$(bold)Quality starts from the source group:$(0) Warm-blooded I → Undead/Explosive/Aberrant II → Ender III → Boss/Dragon IV, attribute multiplier 1.25 → 2.0; compatibility is pulled toward the group's top range by purity."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_groups",
+        "akaishi:gene_chain_body"
+      ],
+      "text": "Which genome each creature belongs to and its ranges are in The Seven Genomes. Once organs are built, how to transplant and manage rejection is on the next page — Installation & Care."
+    }
+  ]
+}

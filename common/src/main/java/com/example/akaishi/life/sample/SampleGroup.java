@@ -117,17 +117,22 @@ public enum SampleGroup {
         if (entity instanceof Creeper) {
             return EXPLOSIVE;
         }
-        // 异变体：非自然强敌（节肢/软泥/元素/构装/精灵），无法归入常规生态组
-        if (type == EntityType.SPIDER || type == EntityType.CAVE_SPIDER || type == EntityType.SLIME || type == EntityType.BLAZE
+        // 异变体：非自然强敌（节肢/软泥/元素/构装/精灵/下界族/灾厄施法者），无法归入常规生态组
+        if (type == EntityType.SPIDER || type == EntityType.CAVE_SPIDER || type == EntityType.SLIME
+                || type == EntityType.MAGMA_CUBE || type == EntityType.BLAZE
                 || type == EntityType.GUARDIAN || type == EntityType.ELDER_GUARDIAN || type == EntityType.IRON_GOLEM
                 || type == EntityType.SNOW_GOLEM || type == EntityType.ALLAY
-                || type == EntityType.GHAST || type == EntityType.VINDICATOR) {
+                || type == EntityType.GHAST || type == EntityType.VINDICATOR
+                // 下界系（1.16+ 火狱生态）：猪灵/蛮兵（人形贪婪）、疣猪兽（冲撞兽）、女巫（灾厄炼药者）
+                || type == EntityType.PIGLIN || type == EntityType.PIGLIN_BRUTE
+                || type == EntityType.HOGLIN || type == EntityType.WITCH) {
             return ABERRATION;
         }
         if (entity instanceof EnderMan || entity instanceof Endermite || entity instanceof Shulker) {
             return ENDER;
         }
-        if (entity.getMobType() == MobType.UNDEAD) {
+        // 亡灵：mobType 判定之外，幻翼（夜航幽魂）与僵尸疣猪兽（疣猪兽感染体）同为不死生态
+        if (type == EntityType.PHANTOM || type == EntityType.ZOGLIN || entity.getMobType() == MobType.UNDEAD) {
             return UNDEAD;
         }
         if (entity instanceof Animal || entity instanceof AmbientCreature || entity instanceof WaterAnimal) {

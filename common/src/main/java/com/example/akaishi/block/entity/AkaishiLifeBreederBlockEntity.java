@@ -180,7 +180,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             ItemStack result = organ.copy();
             // 排除器官已携带词条，避免同词条重复占用承载上限
             MutantTrait trait = MutantTrait.roll(level.random, MutantTrait.maxRarity(purity),
-                    AkaishiOrganItem.getMutations(result));
+                    AkaishiOrganItem.getMutations(result), AkaishiOrganItem.slotOf(result));
             if (trait != null) {
                 AkaishiOrganItem.addMutation(result, trait);
             }

@@ -1,0 +1,36 @@
+{
+  "name": "Installation & Care",
+  "icon": "akaishi:akaishi_surgery",
+  "category": "akaishi:gene_chain",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Nine body slots:$(0)$(li)5 organs: Eye / Heart / Lungs / Viscera / Kidneys$(li)4 limbs: left arm / right arm / left leg / right leg$(br2)Each organ item is fixed to one slot. $(4)Native organs$(0) are the parts you start with — compatibility locked at 100, no effects and no rejection; once replaced, restoring them requires making a new native part (or just accepting the alien one).$(br2)$(bold)Empty-slot cost:$(0) an empty slot cuts max health by its life weight (Heart 20%, each other 10%) — think twice before stripping a full build."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Transplant & removal (Surgery Chamber)",
+      "text": "$(bold)Transplant:$(0)$(li)3 Solid Matter + 20,000 life energy, 4 seconds$(li)target slot must be empty$(li)writes initial rejection: higher quality, stronger genes and lower completeness raise the starting point$(br2)$(bold)Removal:$(0)$(li)1 Solid Matter + 5,000 life energy$(li)take the slot's damage (Heart/Lungs 8, Eye/Viscera/Kidneys 6, limbs 4 — ignores armor), rejection resets to 0$(br2)$(bold)Note:$(0) surgery only runs while the GUI is open — closing it or dying mid-surgery interrupts the process."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Rejection: the body fights back",
+      "text": "$(bold)Rejection = base (tier) × group factor × (1 − completeness modifier)$(0)$(li)completeness 100 applies the biggest modifier (halves rejection)$(li)group factor: Warm-blooded 0.8 lowest, Dragon 1.6 highest — strong genes are naturally hard to keep$(br2)$(bold)Rejection base by quality:$(0) Tier I 12 / II 24 / III 36 / IV 48 — then × group factor × completeness modifier gives the starting point.$(br2)$(bold)Rejection grows over time:$(0) it climbs point by point on the quality interval (Tier I every 45s / II 30s / III 20s / IV 20s), but the real interval is scaled by $(4)effective compatibility$(0) — worse fit climbs faster, doubling below 60.$(br2)$(bold)Costs come in three bands:$(0)$(li)single slot ≥60: random Weakness; ≥80: random Poison$(li)full-body overload (organs already dead at 100 excluded): total ≥320 → Slowness I; ≥450 → Slowness II + Weakness$(li)at 100 rejection the organ fully fails (stats/passives/specials stop). A $(4)predator conflict$(0) (e.g. cat × creeper) locks both sides at 100, fails them and triggers periodic backlash — serum cannot wash it.$(br2)Managing it: neutralization serum (−12 per slot per bottle, max 6 washes per transplant), high-completeness organs, or removal and re-implant."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Compatibility: the fit",
+      "text": "$(bold)Compatibility (0-100) decides three things:$(0)$(li)effectiveness ratio: actual = base × quality × compat / 100; numeric passives (regen / thorns / glow / pickup / dodge) additionally scale with the strongest source organ's tier (+25% per tier, Tier I = base)$(li)rejection growth and slot side-effects at low fit: $(4)effective compat ≥70 is clean, 45–69 mild, <45 severe$(0) — the negative applies per slot (Eyes→Darkness / Heart·Lungs→Weakness / Viscera→Hunger / Kidneys→Poison / Arms→Mining Fatigue / Legs→Slowness); effective compat = organ fit + genotype potion + same-source bonus + Fusion armor$(li)direct interaction with potion buffs$(br2)$(bold)Raising compatibility:$(0)$(li)build organs from high-purity sequences — purity pulls compat toward the group's upper range$(li)$(4)permanent potion$(0): after absorbing the genotype, all organs of that source gain +3 to +15 compat (five purity tiers)$(li)$(4)breakthrough potion$(0): temporary extra compat plus amplified base stats (see Genotypes · Potions)$(br2)Compatibility is the core growth axis of a build — a 40-fit and a 90-fit organ are two different strengths."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_chain_samples",
+        "akaishi:gene_synergy",
+        "akaishi:gene_genotype"
+      ],
+      "text": "How organs are made: Samples & Sequences. To stack one genome into an Ecosystem Synergy set, read the Genome Registry category; the potions that raise compat and numbers live under Genotypes · Potions."
+    }
+  ]
+}

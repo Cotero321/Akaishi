@@ -10,7 +10,7 @@ package com.example.akaishi.life.potion;
  * @param solidCost     制作消耗固态物数量
  * @param lifeCost      制作消耗生命能量
  * @param ticks         制作耗时（tick）
- * @param breakthrough  是否突破药剂（临时激活基因强化，同一时间最多 1 种，到期后可再次激活）
+ * @param mode          突破模式：NONE=永久药剂（吸收基因型）；其余=对应方向的突破药剂
  */
 public record PotionTemplate(
         String id,
@@ -18,5 +18,10 @@ public record PotionTemplate(
         int solidCost,
         long lifeCost,
         int ticks,
-        boolean breakthrough) {
+        BreakthroughMode mode) {
+
+    /** 是否突破药剂（临时激活基因强化，同一时间最多 1 种，到期后可再次激活） */
+    public boolean breakthrough() {
+        return mode.isBreakthrough();
+    }
 }

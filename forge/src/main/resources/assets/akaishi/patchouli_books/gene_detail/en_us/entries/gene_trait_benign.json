@@ -1,0 +1,46 @@
+{
+  "name": "Benign Trait Catalog",
+  "icon": "akaishi:akaishi_life_breeder",
+  "category": "akaishi:gene_traits",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_breeder",
+      "text": "$(bold)Where traits come from$(0): the Life Breeder grafts traits onto \"fixed, non-native\" organs — 1 same-source gene sequence + 2 exhausted crystals + 60,000 life energy, 1000 ticks (50s).$(br2)$(bold)Unlock tiers follow sequence purity:$(0)$(li)purity <60: tier 1 only$(li)60-84: tiers 1-2$(li)85+: tiers 1-3 unlocked$(br2)Each roll is benign : dual ≈ $(4)7:3$(0); this entry lists all $(4)45 benign traits$(0) — about half carry a $(4)[slot-only]$(0) tag: their effect is bound to an organ slot (eye/lungs/legs/arms/guts/kidneys/heart) and only appears on that slot's organs; the rest fit any slot.$(br)Each entry is tagged by direction: $(4)Strike$(0) = offensive pressure, $(4)Ward$(0) = defense/survival, $(4)Glide$(0) = mobility, senses & convenience. Traits are spread over one page per tier for readability."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 1 · Benign (10)",
+      "text": "$(bold)Strike$(0)$(li)Muscle Fiber: +1 attack$(li)Reflex Neurons: +0.4 attack speed$(br2)$(bold)Ward$(0)$(li)Dense Tissue: +1 armor$(li)Hyperactive Marrow: +3 max health$(li)Vascular Mesh: +1 armor toughness$(li)Dense Bone: +0.1 knockback resist$(li)Ossified Ligament: +0.5 armor, +0.05 knockback resist$(li)Keratin Layer: +0.5 armor, +0.5 armor toughness$(br2)$(bold)Glide$(0)$(li)Elastic Tendon: +1.5% move speed$(li)Coordination Neurons: +1 luck$(br2)Tier 1 is clean small gains — no downsides, clear stacking, the go-to foundation."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 2 · Benign (1/2)",
+      "text": "$(bold)Strike$(0)$(li)Venom Gland: poison II on hit (3s) [guts]$(li)Power Cord: +1 attack, +0.2 attack speed [arms]$(li)Scorch Gland: ignites target on hit (3s)$(li)Eagle Membrane: +25% projectile damage [eyes]$(li)Hormone Recycler: +0.2 attack speed [kidneys]$(br2)$(bold)Ward (I)$(0)$(li)Carapace Growth: +2 armor, +0.2 knockback resist$(li)Lymph Filter: purges own poison every 5s [kidneys]$(li)Arctic Cells: freeze immune, clears slowness$(li)Cushion Sole: immune to fall damage [legs]"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 2 · Benign (2/2)",
+      "text": "$(bold)Ward (II)$(0)$(li)Omnivore Gut: eating restores health [guts]$(li)Alchemist Gut: periodically drinks a random buff potion [guts]$(li)Myocardium: +2 max health [heart]$(br2)$(bold)Glide$(0)$(li)Night-Vision Retina: constant night vision [eyes]$(li)Gill Slits: water breathing [lungs]$(li)Bioluminescent Cells: self glow$(li)Sticky Glands: slow II on hit (5s)$(li)Glider Membrane: slow-fall glide [lungs]$(li)Abyssal Webbing: greatly faster swimming [lungs]$(li)Symbiote Flora: +1 luck [guts]$(br2)Tier 2 starts adding real $(4)passives$(0) — ignite, ranged, aquatic and sustain spread here; items tagged $(4)[slot]$(0) only appear on that slot's organs — don't fish for a leg trait on an eye."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 3 · Benign (1/2)",
+      "text": "$(bold)Strike$(0)$(li)Wither Tooth: wither II on hit (3s)$(li)Catapult Muscle: +60% jump-attack damage$(li)Charge Muscle: shoves the target back on hit$(li)Depth Pressure: +50% underwater attack damage$(li)Elongated Joints: +0.75 block attack reach$(li)Lassitude Gland: mining-fatigue on hit (counters griefers)$(br2)$(bold)Ward (I)$(0)$(li)Crystal Carapace: +1.5 armor, reflects 30% melee$(li)Stem Cell Regeneration: constant slow regen$(li)Refractory Cells: fire/lava immune"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 3 · Benign (2/2)",
+      "text": "$(bold)Ward (II)$(0)$(li)Pressure Skin: −30% explosion damage taken$(li)Synovial Lining: immune to slowness & cobweb stick$(br2)$(bold)Glide$(0)$(li)Shadow Vein: blink dodge when hit$(li)Jump Tendons: +1% move + jump boost$(li)Alert Retina: +0.5 armor, highlights hostiles$(li)Streamline Cartilage: +2% move$(li)Magnet Down: auto-picks up nearby drops$(br2)Tier 3 is the benign ceiling — attack reach, underwater damage, slow immunity and knockback-on-hit live here; anything stronger usually demands a dual-edge price — see the Dual-Edge catalog."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_trait_dual",
+        "akaishi:gene_chain_samples"
+      ],
+      "text": "Benign and dual traits roll from the same pool; compare on the Dual-Edge page. Unlock depends on sequence purity — see Samples & Sequences for where purity comes from. For rerolling tools read The Secrets of Life."
+    }
+  ]
+}

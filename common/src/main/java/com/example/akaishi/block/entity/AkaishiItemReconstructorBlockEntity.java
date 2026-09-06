@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
@@ -39,7 +40,7 @@ import java.util.Map;
  * 更换原料自动重置进度，防止错配。
  */
 public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     /** 重构配方：原料 → (产物, 结晶代价) */
     public record ReconstructRecipe(Item output, int crystalCost) {
@@ -76,7 +77,13 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     /** 物品槽：0=原料，1=衰竭结晶（代价），2=产物 */
-    private final SimpleContainer inventory = new SimpleContainer(3);
+    private final SimpleContainer inventory = new SimpleContainer(3) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            AkaishiItemReconstructorBlockEntity.this.setChanged();
+        }
+    };
     /** 当前配方对应的原料（null=空/未初始化；更换原料时重置进度） */
     private Item currentInput;
     private int progress;
@@ -156,6 +163,58 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
 
     public SimpleContainer inventory() {
         return inventory;
+    }
+
+    // ===== IItemPipeDevice：第三方物流向原料槽/结晶槽供料，从产物槽取料（仅输出侧开放抽取） =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{0, 1}; // 0=原料，1=衰竭结晶代价
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{2}; // 2=产物
+    }
+
+    @Override
+    public int getContainerSize() {
+        return inventory.getContainerSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return inventory.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return inventory.getItem(index);
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        return inventory.removeItem(index, count);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return inventory.removeItemNoUpdate(index);
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        inventory.setItem(index, stack);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     // ===== ExtendedMenuProvider =====

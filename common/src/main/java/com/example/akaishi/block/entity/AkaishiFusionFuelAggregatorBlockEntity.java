@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
@@ -20,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +49,7 @@ import java.util.List;
  * 输出罐为等离子体专用罐（仅等离子体管道可对接抽取）；换料清零进度防跨类错配。
  */
 public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     // ===== 数据槽 =====
     public static final int DATA_SLOTS = 9;
@@ -203,6 +205,70 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
 
     public SimpleContainer inputContainer() {
         return input;
+    }
+
+    // ===== IItemPipeDevice / Container：输入槽（0）供第三方物流投入活化成分，仅入不可抽 =====
+
+    @Override
+    public boolean canPipeInput() {
+        return IFluidPipeDevice.super.canPipeInput() || IItemPipeDevice.super.canPipeInput();
+    }
+
+    @Override
+    public boolean canPipeOutput() {
+        return IFluidPipeDevice.super.canPipeOutput() || IItemPipeDevice.super.canPipeOutput();
+    }
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{0};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[0]; // 产物为等离子体液体（走 FLUID_HANDLER），无物品输出
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return input.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return index == 0 ? input.getItem(0) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        return index == 0 ? input.removeItem(0, count) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return index == 0 ? input.removeItemNoUpdate(0) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        if (index == 0) {
+            input.setItem(0, stack);
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        input.clearContent();
     }
 
     public List<FluidTank> plasmaTanks() {

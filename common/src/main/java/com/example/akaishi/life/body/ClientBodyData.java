@@ -4,9 +4,11 @@ import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +26,10 @@ public final class ClientBodyData {
     private static int btExtra;
     private static int btPct;
     private static long btUntil = -1L;
+    /** 躯体总览：身体系统当前实际生效的属性净加成（服务端计算随包下发） */
+    private static final List<BodyOverviewEntry> OVERVIEW = new ArrayList<>();
+    /** 躯体总览·被动叠加计数（被动 id → 来源数，≥2 表示强度升级） */
+    private static final List<BodyPassiveEntry> PASSIVES = new ArrayList<>();
 
     private ClientBodyData() {
     }
@@ -64,6 +70,17 @@ public final class ClientBodyData {
             btExtra = 0;
             btPct = 0;
             btUntil = -1L;
+        }
+        // 躯体总览（顺序与发送端一致：突破数据之后）
+        OVERVIEW.clear();
+        int overviewCount = buf.readVarInt();
+        for (int i = 0; i < overviewCount; i++) {
+            OVERVIEW.add(new BodyOverviewEntry(buf.readUtf(), buf.readDouble()));
+        }
+        PASSIVES.clear();
+        int passiveCount = buf.readVarInt();
+        for (int i = 0; i < passiveCount; i++) {
+            PASSIVES.add(new BodyPassiveEntry(buf.readUtf(), buf.readVarInt()));
         }
     }
 
@@ -172,5 +189,15 @@ public final class ClientBodyData {
             return 0L;
         }
         return Math.max(0L, btUntil - clientGameTime);
+    }
+
+    /** 躯体总览：身体系统当前实际生效的属性净加成（不可变视图） */
+    public static List<BodyOverviewEntry> getOverview() {
+        return Collections.unmodifiableList(OVERVIEW);
+    }
+
+    /** 躯体总览·被动叠加计数（不可变视图） */
+    public static List<BodyPassiveEntry> getPassives() {
+        return Collections.unmodifiableList(PASSIVES);
     }
 }

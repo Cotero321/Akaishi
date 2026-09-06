@@ -1,0 +1,6 @@
+{
+  "name": "基因组图鉴",
+  "description": "七大基因组的注册数据卡：基础纯度、采集成功率、适配区间与排斥系数，以及纯种构筑的生态共鸣阈值。$(br)先读「七大基因组」再对照「生态共鸣」。",
+  "icon": "akaishi:akaishi_sample_collector",
+  "sortnum": 0
+}

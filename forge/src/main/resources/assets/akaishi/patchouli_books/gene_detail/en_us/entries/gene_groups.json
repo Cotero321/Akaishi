@@ -1,0 +1,36 @@
+{
+  "name": "The Seven Genomes",
+  "icon": "akaishi:akaishi_sample_collector",
+  "category": "akaishi:gene_genome",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_sample_collector",
+      "text": "Every organ's genes trace back to one of the $(4)seven genomes$(0). Right-click a creature with the $(4)Sample Collector$(0) to file it into a genome (priority: Dragon > Boss > Explosive > Aberrant > Ender > Undead > Warm-blooded).$(br2)$(bold)Two laws:$(0)$(li)The stronger the genome, the $(4)higher its base purity and potential$(0) (Dragon 90 > Warm-blooded 45).$(li)The stronger the genome, the $(4)harder it is to bear$(0) — narrower compatibility and heavier rejection."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Data Card ① Warm-blooded / Undead",
+      "text": "$(bold)$(4)Warm-blooded genome$(0)$(li)Base purity: 45$(li)Collect rate: 85%$(li)Organ compat: 75 - 95$(li)Rejection factor: 0.8 (best fit)$(br2)$(bold)$(4)Undead genome$(0)$(li)Base purity: 55$(li)Collect rate: 70%$(li)Organ compat: 60 - 85$(li)Rejection factor: 1.0$(br2)Warm-blooded is the gentlest start: highest collect rate, widest compat, lowest rejection — ideal for your first full build."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Data Card ② Explosive / Aberrant",
+      "text": "$(bold)$(4)Explosive genome$(0) (Creeper)$(li)Base purity: 60$(li)Collect rate: 55%$(li)Organ compat: 45 - 70$(li)Rejection factor: 1.1$(br2)$(bold)$(4)Aberrant genome$(0) (spiders/slimes/blazes and other unnatural foes)$(li)Base purity: 65$(li)Collect rate: 45%$(li)Organ compat: 45 - 70$(li)Rejection factor: 1.15$(br2)Aberrants include many functional mobs (spiders, blazes, guardians) — a common source for trait and passive builds."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Data Card ③ Ender / Boss / Dragon",
+      "text": "$(bold)$(4)Ender genome$(0)$(li)Base purity: 70$(li)Collect rate: 40%$(li)Organ compat: 35 - 60$(li)Rejection factor: 1.3$(br2)$(bold)$(4)Boss genome$(0) (Wither / Warden)$(li)Base purity: 85$(li)Collect rate: 20%$(li)Organ compat: 30 - 55$(li)Rejection factor: 1.5$(br2)$(bold)$(4)Dragon genome$(0) (Ender Dragon)$(li)Base purity: 90$(li)Collect rate: 25%$(li)Organ compat: 25 - 50$(li)Rejection factor: 1.6 (hardest fit)"
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_synergy",
+        "akaishi:gene_chain_samples"
+      ],
+      "text": "How to read: chase peak numbers with Dragon/Boss, or chase stability with Warm-blooded/Undead; transplanting several organs of one group can trigger Ecosystem Synergy — see next page."
+    }
+  ]
+}

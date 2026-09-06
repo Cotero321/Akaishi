@@ -1,0 +1,6 @@
+{
+  "name": "序列与器官",
+  "description": "从血样到移植的完整基因链路：采样提纯 → 解构序列 → 器官构造，以及品质、适配、排斥与部位规则的数据卡。",
+  "icon": "akaishi:akaishi_gene_sequence",
+  "sortnum": 3
+}

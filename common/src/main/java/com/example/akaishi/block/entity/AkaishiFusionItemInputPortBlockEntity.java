@@ -2,6 +2,7 @@ package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
 import com.example.akaishi.menu.AkaishiFusionItemPortMenu;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -21,8 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 聚变物品输入口方块实体：燃料棒缓冲槽（27 格），对接物品管道/手动投放。
- * 结构成型后自动将缓冲槽内的燃料棒分配到控制器空燃料槽。
+ * 聚变物品输入口方块实体：燃料棒/散热片缓冲槽（27 格），对接物品管道/手动投放。
+ * 结构成型后自动将缓冲槽内的燃料棒分配到控制器空燃料槽、散热片分配到控制器散热片槽。
  * NBT 持久化缓冲槽与控制器坐标。右键打开 27 格缓冲界面。
  */
 public class AkaishiFusionItemInputPortBlockEntity extends BlockEntity implements IItemPipeDevice, ExtendedMenuProvider, IDataCarrier {
@@ -51,6 +52,7 @@ public class AkaishiFusionItemInputPortBlockEntity extends BlockEntity implement
         AkaishiFusionControllerBlockEntity controller = getController();
         if (controller != null && controller.isFormed()) {
             pushRods(controller);
+            pushHeatSinks(controller);
         }
     }
 
@@ -78,6 +80,23 @@ public class AkaishiFusionItemInputPortBlockEntity extends BlockEntity implement
             for (int i = 0; i < controller.getFuelSlotCount(); i++) {
                 if (controller.fuelSlots().getItem(i).isEmpty()) {
                     controller.fuelSlots().setItem(i, rod.copy());
+                    buffer.setItem(slot, ItemStack.EMPTY);
+                    break;
+                }
+            }
+        }
+    }
+
+    /** 将缓冲槽中的散热片分配到控制器的空散热片槽（仅已解锁槽） */
+    private void pushHeatSinks(AkaishiFusionControllerBlockEntity controller) {
+        for (int slot = 0; slot < BUFFER_SLOTS; slot++) {
+            ItemStack sink = buffer.getItem(slot);
+            if (!(sink.getItem() instanceof AkaishiFusionHeatSinkItem)) {
+                continue;
+            }
+            for (int i = 0; i < controller.getCoolerSlotCount(); i++) {
+                if (controller.coolerSlots().getItem(i).isEmpty()) {
+                    controller.coolerSlots().setItem(i, sink.copy());
                     buffer.setItem(slot, ItemStack.EMPTY);
                     break;
                 }
@@ -171,13 +190,15 @@ public class AkaishiFusionItemInputPortBlockEntity extends BlockEntity implement
 
     @Override
     public boolean canPlaceItem(int index, ItemStack stack) {
-        return stack.isEmpty() || stack.getItem() instanceof AkaishiPlasmaRodItem;
+        return stack.isEmpty() || stack.getItem() instanceof AkaishiPlasmaRodItem
+                || stack.getItem() instanceof AkaishiFusionHeatSinkItem;
     }
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        // 管道灌入不经过类型校验：输入口只允许燃料棒，防止杂物占用缓冲槽
-        if (stack.isEmpty() || stack.getItem() instanceof AkaishiPlasmaRodItem) {
+        // 管道灌入不经过类型校验：输入口只允许燃料棒/散热片，防止杂物占用缓冲槽
+        if (stack.isEmpty() || stack.getItem() instanceof AkaishiPlasmaRodItem
+                || stack.getItem() instanceof AkaishiFusionHeatSinkItem) {
             buffer.setItem(index, stack);
         }
     }

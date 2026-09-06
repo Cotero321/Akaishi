@@ -58,7 +58,7 @@ import java.util.WeakHashMap;
  *   其余属性 = 基础值 × 品质倍率 × 适配度，摘要缓存避免每 tick 重挂
  * - 被动技能：常驻药水 / 免疫 / 再生 / 敌意高亮 / 自动拾取
  * - 排斥增长：速率 × 100/适配度（低适配度排异更快，<60 重度再翻倍）
- * - 部位 debuff：适配度 <80 出现该部位负面效果（≥80 无 / 60-79 轻度 / <60 重度）
+ * - 部位 debuff：适配度 <70 出现该部位负面效果（≥70 无 / 45-69 轻度 / <45 重度）
  * - 天敌冲突：排斥锁满 + 器官失效 + 周期性爆炸反噬，移除一侧自动解除
  * - 独特机制：牛胃（吃小麦 / 禁肉）、末影怕水（接触水源瞬移掉血）
  * 所有效果数据来自 common 的 OrganEffectResolver，本类仅做平台事件桥接。
@@ -85,10 +85,12 @@ public final class AkaishiBodyPassiveHandler {
     private static final int REJECTION_WARNING = 60;
     /** 排斥中毒阈值 */
     private static final int REJECTION_POISON = 80;
-    /** 适配度 ≥80 无部位 debuff */
-    private static final int COMPAT_CLEAN = 80;
-    /** 适配度 <60 部位 debuff 重度（且排斥速率 ×2） */
+    /** 排斥增速翻倍线：有效适配度 <60 排斥速率 ×2（部位 debuff 的重度线独立为 45） */
     private static final int COMPAT_SEVERE = 60;
+    /** 部位 debuff 豁免线：有效适配度 ≥70 无部位负面（下调自 80——顶级基因全力 build 后不再永久带伤） */
+    private static final int SLOT_DEBUFF_CLEAN = 70;
+    /** 部位 debuff 重度线：有效适配度 <45 部位负面升为 II 级（下调自 60） */
+    private static final int SLOT_DEBUFF_SEVERE = 45;
     /** 天敌反噬间隔（tick） */
     private static final int CONFLICT_PUNISH_INTERVAL = 100;
     /** 排斥增长间隔下限（tick = 15s/点）：限制低适配/强基因的加速惩罚，避免顶级器官过快报废 */
@@ -137,6 +139,25 @@ public final class AkaishiBodyPassiveHandler {
         applyOverload(player, state);
         applySlotDebuffs(player, state);
         tickSpecial(player, state);
+    }
+
+    /** 重生克隆后立即重建（供 PlayerBodyCapability.onPlayerClone 调用）：
+     *  属性修饰/长臂/套装效果/常驻被动不依赖重生实体首个 tick 即生效，
+     *  消除"点重生后数值空窗"（区块加载前实体 tick 不运行，等 tick 会延迟生效）。 */
+    public static void resyncAfterClone(Player player) {
+        if (player.level().isClientSide) {
+            return;
+        }
+        IPlayerBodyState state = PlayerBodyHelper.of(player);
+        if (state == null) {
+            return;
+        }
+        ATTRIBUTE_DIGEST.remove(player);
+        APPLIED.remove(player);
+        REACH_CACHE.remove(player);
+        rebuildAttributes(player, state);
+        applyLifeFusionSet(player);
+        applyPassives(player, state);
     }
 
     /** 进食增强（鸡砂囊·食物恢复）：食物饥饿与饱和 +25% */
@@ -293,10 +314,12 @@ public final class AkaishiBodyPassiveHandler {
     private static void applyPassives(Player player, IPlayerBodyState state) {
         // 长臂被动走 Forge 专属属性（ENTITY_REACH），无条件同步以防摘除后残留
         syncReach(player, state);
-        for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
-            // 突变词条被动与生物被动统一生效（passivesOf 合并去重）
-            for (OrganPassive passive : OrganEffectResolver.passivesOf(organ.stack(), organ.effect())) {
-                applyPassive(player, state, passive);
+        // 被动按来源数聚合后统一生效：跨器官同被动叠加 → 强度升级（数量 × 效果等级/范围）；
+        // 携带来源的最高品质同时抬升数值型被动（品质阶梯：I 级行为与旧版一致）
+        for (OrganPassive passive : OrganPassive.values()) {
+            OrganEffectResolver.PassiveStrengths s = OrganEffectResolver.strengthsOf(state, passive);
+            if (s.count() > 0) {
+                applyPassive(player, state, passive, s.count(), s.maxTierOrd());
             }
         }
     }
@@ -360,9 +383,13 @@ public final class AkaishiBodyPassiveHandler {
         REACH_CACHE.put(player, amount);
     }
 
-    private static void applyPassive(Player player, IPlayerBodyState state, OrganPassive passive) {
+    /**
+     * 常驻被动生效：count = 跨器官来源数（≥2 时强度升级），tierOrd = 最强来源品质序号（0~3，品质阶梯）。
+     * 覆盖型/免疫型被动无强度维度，重复来源只保证生效一次（不产生额外叠加）。
+     */
+    private static void applyPassive(Player player, IPlayerBodyState state, OrganPassive passive, int count, int tierOrd) {
         switch (passive) {
-            case JUMP_BOOST -> applyPotion(player, MobEffects.JUMP, 1);
+            case JUMP_BOOST -> applyPotion(player, MobEffects.JUMP, Math.min(count, 3));
             case NIGHT_VISION -> applyPotion(player, MobEffects.NIGHT_VISION, 0);
             case WATER_BREATHING -> applyPotion(player, MobEffects.WATER_BREATHING, 0);
             case SWIM_BOOST -> applyPotion(player, MobEffects.DOLPHINS_GRACE, 0);
@@ -370,18 +397,19 @@ public final class AkaishiBodyPassiveHandler {
             case FALL_IMMUNE -> player.fallDistance = 0.0F;
             case SLOW_IMMUNE -> removeEffect(player, MobEffects.MOVEMENT_SLOWDOWN);
             case REGEN -> {
+                // 再生随最强来源品质逐档增强：每来源 +1 点/2 秒起步，每高一级 +0.5（IV 龙/凋灵心 ≈ 2.5 点/2 秒）
                 if (player.tickCount % 40 == 0) {
-                    player.heal(1.0F);
+                    player.heal(count + 0.5F * tierOrd);
                 }
             }
             case ENEMY_GLOW -> {
                 if (player.tickCount % 20 == 0) {
-                    glowNearbyHostiles(player);
+                    glowNearbyHostiles(player, 24 + 8 * (count - 1) + 4 * tierOrd); // 侦测范围随来源与品质扩大
                 }
             }
             case AUTO_PICKUP -> {
                 if (player.tickCount % 10 == 0) {
-                    pickupNearbyItems(player);
+                    pickupNearbyItems(player, 5 + 2 * (count - 1) + 2 * tierOrd); // 拾取半径随来源与品质扩大
                 }
             }
             case GLIDE -> applyPotion(player, MobEffects.SLOW_FALLING, 0);
@@ -404,16 +432,45 @@ public final class AkaishiBodyPassiveHandler {
                     player.clearFire();
                 }
             }
+            case WITCH_BREW -> {
+                // 女巫酿造（女巫炼药内脏）：每 12 秒随机调一杯女巫药水灌下（持续 20 秒）——
+                // 随机池兼顾运动/防护/恢复，掺一杯缓降当"乱炖彩蛋"；摘除器官后自然停止续杯
+                if (player.tickCount % 240 == 0) {
+                    MobEffect[] brew = {MobEffects.MOVEMENT_SPEED, MobEffects.JUMP,
+                            MobEffects.FIRE_RESISTANCE, MobEffects.WATER_BREATHING,
+                            MobEffects.REGENERATION, MobEffects.SLOW_FALLING};
+                    MobEffect pick = brew[player.getRandom().nextInt(brew.length)];
+                    player.addEffect(new MobEffectInstance(pick, 400, 0, false, false));
+                }
+            }
+            case SUNLIGHT_BURN -> {
+                // 阳光灼晒（负面·亡灵速腿/幻翼肺的代价）：白天天空直射下自燃。
+                // 抗火药水或火焰免疫器官可豁免——移植火免器官等于解开亡灵的日光枷锁
+                Level level = player.level();
+                if (player.tickCount % 100 == 0 && level.isDay()
+                        && level.dimensionType().hasSkyLight()
+                        && level.canSeeSky(player.blockPosition())
+                        && !player.hasEffect(MobEffects.FIRE_RESISTANCE)
+                        && !OrganEffectResolver.hasPassive(state, OrganPassive.FIRE_IMMUNE)) {
+                    player.setSecondsOnFire(3);
+                }
+            }
+            case RAPID_EXHAUSTION -> {
+                // 高代谢（负面·狂怒副肾的代价）：常驻额外消耗饥饿（每来源每 5 秒 +0.1，≈每 3 分钟 1 饥饿）
+                if (player.tickCount % 100 == 0) {
+                    player.getFoodData().addExhaustion(0.1F * count);
+                }
+            }
             default -> {
                 // 战斗类被动（SLOW_ON_HIT/POISON_ON_HIT 等）由战斗处理器承接
             }
         }
     }
 
-    /** 缺失时补充指定药水效果（2 秒刷新，脱器官自然消退） */
+    /** 缺失时补充指定药水效果（5 秒持续；被动每 tick 巡检，效果近似常驻，摘除器官后自然消退） */
     private static void applyPotion(Player player, MobEffect effect, int amplifier) {
         if (!player.hasEffect(effect)) {
-            player.addEffect(new MobEffectInstance(effect, 40, amplifier, false, false));
+            player.addEffect(new MobEffectInstance(effect, 100, amplifier, false, false));
         }
     }
 
@@ -423,9 +480,9 @@ public final class AkaishiBodyPassiveHandler {
         }
     }
 
-    /** 敌意侦测：高亮 24 格内以玩家为目标的怪物（每 20 tick 刷新标签） */
-    private static void glowNearbyHostiles(Player player) {
-        AABB box = player.getBoundingBox().inflate(24.0);
+    /** 敌意侦测：高亮 range 格内以玩家为目标的怪物（每 20 tick 刷新标签；范围随被动来源扩大） */
+    private static void glowNearbyHostiles(Player player, int range) {
+        AABB box = player.getBoundingBox().inflate(range);
         for (Monster mob : player.level().getEntitiesOfClass(Monster.class, box, Monster::isAlive)) {
             if (mob.getTarget() == player) {
                 mob.setGlowingTag(true);
@@ -433,9 +490,9 @@ public final class AkaishiBodyPassiveHandler {
         }
     }
 
-    /** 悦灵之心：自动拾取 5 格内掉落物（跳过刚掉落冷却，背包满则停止） */
-    private static void pickupNearbyItems(Player player) {
-        AABB box = player.getBoundingBox().inflate(5.0);
+    /** 悦灵之心：自动拾取 range 格内掉落物（跳过刚掉落冷却，背包满则停止；半径随被动来源扩大） */
+    private static void pickupNearbyItems(Player player, int range) {
+        AABB box = player.getBoundingBox().inflate(range);
         for (ItemEntity item : player.level().getEntitiesOfClass(ItemEntity.class, box, ItemEntity::isAlive)) {
             if (item.hasPickUpDelay()) {
                 continue;
@@ -548,14 +605,14 @@ public final class AkaishiBodyPassiveHandler {
                 continue;
             }
             int compat = BodyGeneHelper.effectiveCompat(state, organ, gearCompat);
-            if (compat >= COMPAT_CLEAN) {
+            if (compat >= SLOT_DEBUFF_CLEAN) {
                 continue; // 完全适应
             }
             MobEffect effect = slot.getDebuff();
             if (effect == null) {
                 continue;
             }
-            int amplifier = compat < COMPAT_SEVERE ? 1 : 0;
+            int amplifier = compat < SLOT_DEBUFF_SEVERE ? 1 : 0;
             player.addEffect(new MobEffectInstance(effect, 160, amplifier, false, false));
         }
     }

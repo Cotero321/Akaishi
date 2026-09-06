@@ -11,7 +11,7 @@
     {
       "type": "patchouli:text",
       "title": "Bonuses & Grades",
-      "text": "$(bold)Default template bonuses$(0) (base values, before grade):$(li)Eyes: +0.5 attack$(li)Heart: +2 max health$(li)Lungs: +0.5 armor toughness$(li)Viscera: +0.5 luck$(li)Kidneys: +0.5 attack$(li)Each arm: +0.75 attack and +0.05 knockback resistance$(li)Each leg: +0.015 move speed$(br2)$(bold)Grade I-IV multipliers: 1.25 / 1.5 / 1.75 / 2.0$(0) - higher grades give bigger bonuses but also $(4)higher starting rejection and faster rejection growth$(0): stronger organs are pickier about their host."
+      "text": "$(bold)Default template bonuses$(0) (base values, before grade):$(li)Eyes: +0.5 attack$(li)Heart: +2 max health$(li)Lungs: +0.5 armor toughness$(li)Viscera: +0.5 luck$(li)Kidneys: +0.5 attack$(li)Each arm: +0.75 attack and +0.05 knockback resistance$(li)Each leg: +1.5% move speed$(br2)$(bold)Grade I-IV multipliers: 1.25 / 1.5 / 1.75 / 2.0$(0) - higher grades give bigger bonuses but also $(4)higher starting rejection and faster rejection growth$(0): stronger organs are pickier about their host."
     },
     {
       "type": "patchouli:text",

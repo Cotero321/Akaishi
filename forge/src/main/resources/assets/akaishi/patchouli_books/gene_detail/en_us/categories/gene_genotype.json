@@ -1,0 +1,6 @@
+{
+  "name": "Genotypes · Potions",
+  "description": "Two ways to write a creature's genes into your body: the $(4)permanent potion$(0) (genotype absorption) and the $(4)breakthrough potion$(0) (temporary awakening) — breakthrough splits into three directions: Balance / Surge / Endure, alongside the gene manager and rejection serum.$(br)Start with $(4)Genotype Potions Guide$(0), then check recipe data in $(4)Three Breakthrough Modes$(0).",
+  "icon": "akaishi:akaishi_potion",
+  "sortnum": 1
+}

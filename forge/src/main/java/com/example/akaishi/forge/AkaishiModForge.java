@@ -1,6 +1,8 @@
 package com.example.akaishi.forge;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
@@ -22,6 +24,7 @@ import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.fluid.ForgeFluidBridge;
 import com.example.akaishi.forge.fluid.ForgeFluidHandler;
 import com.example.akaishi.forge.fluid.ModFluidsImpl;
+import com.example.akaishi.forge.io.MachineCapabilityProvider;
 import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
 import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
@@ -121,9 +124,16 @@ public final class AkaishiModForge {
         ModFluidsImpl.register(FMLJavaModLoadingContext.get().getModEventBus());
         // 注入外部液体访问桥（MEK 等第三方液体能力对接）
         ForgeFluidBridge.init();
-        // 液体管道 FLUID_HANDLER 能力：MEK 等外部管道可直接向管道缓冲注入/抽取（家族过滤由缓冲罐 fill 覆写继承）
+        // 第三方物流能力（能量除外）：任何实现 IItemPipeDevice / IFluidPipeDevice 的机器方块自动
+        // 暴露 Forge ITEM_HANDLER / FLUID_HANDLER，原版漏斗、MEK 管道、AE2/RS 等可直接对接；
+        // 方向（仅输出/仅输入）与废料/等离子家族过滤由 forge.io 适配器逐槽/逐罐遵守。
+        // 液体管道自身缓冲另暴露 FLUID_HANDLER（家族过滤由缓冲罐 fill 覆写继承）。
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, (AttachCapabilitiesEvent<BlockEntity> event) -> {
-            if (event.getObject() instanceof AkaishiFluidPipeBlockEntity pipe) {
+            BlockEntity be = event.getObject();
+            if (be instanceof IItemPipeDevice || be instanceof IFluidPipeDevice) {
+                event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "external_logistics"),
+                        new MachineCapabilityProvider(be));
+            } else if (be instanceof AkaishiFluidPipeBlockEntity pipe) {
                 event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "fluid_pipe_buffer"),
                         new ICapabilitySerializable<CompoundTag>() {
                             @Override
@@ -553,6 +563,8 @@ public final class AkaishiModForge {
     @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
         if (System.getProperty("akaishi.gametest") != null) {
+            // 先做器官登记入库核对（同步、无 tick 依赖），再启动燃料端到端测试
+            AkaishiOrganRegistryChecker.run(event.getServer());
             AkaishiGameTestAutoRunner.start(event.getServer());
         }
         if (System.getProperty("akaishi.gametest.reactor") != null) {

@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiFusionItemInputPortBlockEntity;
+import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
 import com.example.akaishi.item.ModItems;
 import net.minecraft.world.Container;
@@ -12,13 +13,13 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 聚变物品口菜单：输入口（燃料棒缓冲）/ 输出口（生命灰烬缓冲）共用，27 格 9×3 缓冲槽 + 玩家背包。
- * 缓冲类型决定槽位可放置的物品：输入口仅燃料棒、输出口仅生命灰烬，与方块实体管道校验一致。
- * 缓冲槽中的物品由方块实体自动流转（输入口 → 控制器燃料槽；控制器灰烬 → 输出口），无需玩家干预。
+ * 聚变物品口菜单：输入口（燃料棒/散热片缓冲）/ 输出口（生命灰烬缓冲）共用，27 格 9×3 缓冲槽 + 玩家背包。
+ * 缓冲类型决定槽位可放置的物品：输入口仅燃料棒/散热片、输出口仅生命灰烬，与方块实体管道校验一致。
+ * 缓冲槽中的物品由方块实体自动流转（输入口 → 控制器燃料/散热槽；控制器灰烬 → 输出口），无需玩家干预。
  */
 public class AkaishiFusionItemPortMenu extends AbstractContainerMenu {
 
-    /** 缓冲类型：输入口收燃料棒，输出口收生命灰烬 */
+    /** 缓冲类型：输入口收燃料棒/散热片，输出口收生命灰烬 */
     public enum BufferKind { INPUT_RODS, OUTPUT_ASH }
 
     private final Container buffer;
@@ -62,13 +63,13 @@ public class AkaishiFusionItemPortMenu extends AbstractContainerMenu {
         }
     }
 
-    /** 槽位过滤：输入口仅燃料棒，输出口仅生命灰烬 */
+    /** 槽位过滤：输入口仅燃料棒/散热片，输出口仅生命灰烬 */
     private boolean canPlace(ItemStack stack) {
         if (stack.isEmpty()) {
             return true;
         }
         return kind == BufferKind.INPUT_RODS
-                ? stack.getItem() instanceof AkaishiPlasmaRodItem
+                ? stack.getItem() instanceof AkaishiPlasmaRodItem || stack.getItem() instanceof AkaishiFusionHeatSinkItem
                 : stack.is(ModItems.lifeAsh.get());
     }
 

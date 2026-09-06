@@ -1,0 +1,58 @@
+{
+  "name": "Organ Source Atlas",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:gene_genome",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_organ_heart",
+      "text": "$(bold)Organ Source Atlas$(0): one page per $(4)body slot$(0) — every organ that slot can take, listed by its source creature.$(br2)$(bold)How to read:$(0)$(li)an organ item = slot base plate + creature gene (Cow + Heart plate = cow heart)$(li)entry format: $(4)creature (genome · quality)$(0) + effect$(li)one creature often feeds several slots and reappears on each matching page (Fox → Viscera and Legs)$(li)group fit ranges and rejection factors: the Seven Genomes data cards$(br2)$(bold)Colors:$(0) red text = negative cost / curse axis, most counterable by a specific organ (e.g. Refractory Cells cancel sunburn).$(br2)Transplant, rejection and slot debuffs: Installation & Care. Synergy set building: Ecosystem Synergy."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Eye organs",
+      "text": "$(bold)$(4)Night vision$(0)$(li)Cat (Warm · I): permanent Night Vision$(li)Spider (Aberration · II): permanent Night Vision$(br2)$(bold)$(4)Combat$(0)$(li)Cave spider (Aberration · II): poison on hit$(li)Elder guardian (Aberration · II): Mining Fatigue on hit (10s)$(li)Ghast (Aberration · II): +25% projectile damage$(li)Blaze (Aberration · II): reveal and highlight hostile mobs$(br2)$(bold)$(4)Utility$(0)$(li)Piglin (Aberration · II): +0.75 luck (golden gaze)$(li)Zombie villager (Undead · II): +0.5 luck$(li)Stray (Undead · II): slow on hit$(li)Endermite (Ender · III): chance to blink-dodge when hit$(br2)Eye picks: cat eye is the easiest permanent night vision (warm-blooded); take ghast/elder guardian for damage; blink-dodge is endermite's own."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Heart organs",
+      "text": "$(bold)$(4)Survival$(0)$(li)Cow (Warm · I): +3 max health$(li)Pig (Warm · I): +3 max health$(li)Turtle (Warm · I): +1 health + +50% underwater attack$(li)Allay (Aberration · II): auto-pickup drops within 5 blocks$(br2)$(bold)$(4)Combat$(0)$(li)Zombie (Undead · II): +1 attack + slow regen §cDrawback: +50% fire damage taken§r$(li)Hoglin (Aberration · II): +1 attack + +2% move speed + knockback on hit$(li)Iron golem (Aberration · II): +4 health + +2 armor + +0.1 knockback resist §cDrawback: −3% move speed, −1.0 attack speed§r$(li)Zoglin (Undead · II): +6 max health §cDrawback: −1.2% move speed, −0.2 knockback resist§r$(br2)$(bold)$(4)Resist / gimmick$(0)$(li)Blaze (Aberration · II): fire/lava immunity$(li)Enderman (Ender · III): blink-dodge when hit §cDrawback: fears water — teleports and takes damage on contact§r$(br2)$(bold)$(4)Top tier (aims at the full-quality special)$(0)$(li)Wither (Boss · IV): +4 health + +2 armor; wither on hit + slow regen; full quality launches wither skulls$(li)Warden (Boss · IV): +4 health + +1 armor; highlight hostiles; full quality piercing sonic boom (ignores armor)$(li)Ender Dragon (Dragon · IV): +6 health + +3 armor + +2 toughness; regen + fire immunity; full quality dragonfire breath"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Lung organs",
+      "text": "$(bold)$(4)Underwater$(0)$(li)Cod (Warm · I): water breathing$(li)Frog (Warm · I): water breathing + jump boost$(li)Axolotl (Warm · I): water breathing + slow regen$(li)Dolphin (Warm · I): swim speed boost$(br2)$(bold)$(4)Mobility$(0)$(li)Parrot (Warm · I): slow-fall gliding$(li)Phantom (Undead · II): slow-fall gliding §cDrawback: burns under direct daylight (Refractory Cells cancel it)§r$(li)Slime (Aberration · II): jump boost + fall immunity$(br2)$(bold)$(4)Combat$(0)$(li)Magma cube (Aberration · II): ignite on hit (3s)$(br2)Lung picks: cod/axolotl for underwater, slime is the most versatile mobility (jump + fall immunity); phantom gliding needs Refractory Cells to be safe."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Viscera organs",
+      "text": "$(bold)$(4)Warm-blooded base (I)$(0)$(li)Cow: eat wheat to restore hunger, but no meat$(li)Fox: +0.75 luck + +60% jump attack damage$(li)Bat: reveal and highlight hostile mobs$(li)Chicken: +25% food healing$(li)Sheep: immune to Slowness$(li)Glow squid: emit light around self$(li)Bee: poison on hit$(li)Turtle: +1 armor$(li)Pufferfish: reflect 30% of melee damage$(li)Squid: 25% chance to ink-stealth 4s when hit$(li)Sniffer: +0.8 luck$(br2)$(bold)$(4)Undead / Explosive (II)$(0)$(li)Skeleton: +1 armor + +25% projectile damage$(li)Creeper: §cBlast Sac — no effect at all§r, exists only for the Cat × Creeper predator chain$(br2)$(bold)$(4)Aberration / Ender$(0)$(li)Spider (Aberration · II): slow on hit$(li)Guardian (Aberration · II): reflect 30% of melee damage$(li)Ghast (Aberration · II): +2.0 attack (highest in the library) §cDrawback: +50% fire damage taken§r$(li)Witch (Aberration · II): random positive potion every 12s$(li)Shulker (Ender · III): +0.15 knockback resist + +0.5 armor$(br2)Viscera is the most varied slot: three luck pieces for exploration (fox/sniffer/bat), two thorns sources (pufferfish/guardian), burst damage from ghast (carry the fire weakness)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Kidney organs",
+      "text": "$(bold)$(4)Cleanse$(0)$(li)Zombified piglin (Undead · II): cleanse own Poison every 5s$(li)Snow golem (Aberration · II): immune to freezing, cleanse Slowness$(li)Camel (Warm · I): immune to Slowness and webs$(br2)$(bold)$(4)Combat$(0)$(li)Guardian (Aberration · II): +50% underwater attack$(li)Hoglin (Aberration · II): +0.35 attack speed (no cost)$(li)Zoglin (Undead · II): +0.3 attack speed §cDrawback: −1 max health§r$(li)Vindicator (Aberration · II): +0.4 attack speed §cDrawback: hunger drains faster§r$(br2)$(bold)$(4)Defense$(0)$(li)Creeper (Explosive · II): −30% explosion damage taken$(br2)Kidney picks: camel for easy cleansing (warm-blooded); hoglin attack speed is free, vindicator hits hardest but burns hunger; harvesting creeper kidneys means leaving cat-line genes behind."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Arm organs (left/right equal)",
+      "text": "$(bold)$(4)Warm-blooded (I)$(0)$(li)Cat: +0.5 attack speed (agile)$(li)Wolf: +1.0 attack + +0.15 attack speed$(li)Polar bear: +1.5 attack + +0.05 knockback resist §cDrawback: −1% move speed§r$(li)Panda: +1.0 attack + +0.1 knockback resist §cDrawback: −2% move speed§r$(li)Squid: +0.75 block reach (pure range)$(br2)$(bold)$(4)Undead (II)$(0)$(li)Skeleton: +0.5 attack (light)$(li)Drowned: +0.75 attack + +50% underwater attack$(li)Wither skeleton: +1 attack + wither on hit §cDrawback: extra physical damage taken§r$(li)Husk: +1 attack + +0.5 armor$(li)Zombified piglin: +0.75 attack$(br2)$(bold)$(4)Aberration / Ender$(0)$(li)Iron golem (Aberration · II): +1 attack + +0.05 knockback resist + +0.75 reach$(li)Vindicator (Aberration · II): +1.5 attack (highest pure attack) §cDrawback: −1 max health per arm§r$(li)Piglin brute (Aberration · II): +1.25 attack + +0.05 knockback resist$(li)Enderman (Ender · III): +0.75 block reach$(br2)Arm picks: vindicator/polar bear for pure damage, enderman or squid arms for reach (two long-arm sources); undead bone arms each carry a small cost."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Leg organs (left/right equal)",
+      "text": "$(bold)$(4)Speed (Warm I)$(0)$(li)Horse: +3% move speed (fastest)$(li)Ocelot: +2.5% move speed + jump boost$(li)Fox: +2% move speed$(li)Goat: +2% move speed + jump boost$(li)Rabbit: +2% move speed + jump boost + fall immunity$(br2)$(bold)$(4)Stability (Warm I)$(0)$(li)Donkey: +1% move speed + +0.08 knockback resist (most stubborn)$(li)Camel: +2.5% move speed + +0.05 knockback resist$(li)Llama: +1.5% move speed + +0.05 knockback resist$(li)Pig: +1.5% move speed + +0.06 knockback resist$(br2)$(bold)$(4)Special / Undead$(0)$(li)Chicken (Warm · I): fall damage immunity$(li)Cow (Warm · I): +1.0 attack §cDrawback: −2% move speed§r$(li)Skeleton horse (Undead · II): +3% move speed$(li)Zombie horse (Undead · II): +2% move speed + +0.1 knockback resist$(li)Stray (Undead · II): slow on hit$(br2)Leg picks: horse/ocelot to run (skeleton horse matches speed but carries undead rejection); donkey/llama to stand firm; rabbit legs are the best jump + fall-proof combo."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_groups",
+        "akaishi:gene_synergy",
+        "akaishi:gene_chain_samples",
+        "akaishi:gene_chain_body"
+      ],
+      "text": "Group data cards and harvest rates: Seven Genomes. Stack 3/6 organs of one genome for Ecosystem Synergy. Sample-to-organ pipeline: Samples & Sequences. Transplant, rejection and slot debuffs: Installation & Care."
+    }
+  ]
+}

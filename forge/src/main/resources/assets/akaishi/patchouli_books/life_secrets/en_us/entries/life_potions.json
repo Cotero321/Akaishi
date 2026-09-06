@@ -12,12 +12,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_potion",
-      "text": "$(bold)Permanent Potion = absorb a genotype:$(0) writes that creature's genes into your body, giving $(4)every organ of that source +N effective compatibility$(0) — tiered by purity in steps of 20: +2 / +4 / +6 / +8 / +10.$(br2)$(li)Each source can be absorbed only once in a lifetime$(li)At most 4 genotypes at once; unload one and you may absorb it again$(br2)$(bold)Breakthrough Potion = temporary awakening:$(0) requires that source already absorbed AND one of its non-native organs transplanted.$(li)Active for 30 minutes, one at a time$(li)+2 / +4 / +6 / +8 extra compatibility and +10% / +20% / +30% / +40% enhancement (by purity tier)$(br2)Check and unload absorbed genotypes at the Gene Manager on the next page."
+      "text": "$(bold)Permanent Potion = absorb a genotype:$(0) writes that creature's genes into your body, giving $(4)every organ of that source +N effective compatibility$(0) — tiered by purity in steps of 20: +3 / +6 / +9 / +12 / +15.$(br2)$(li)Each source can be absorbed only once in a lifetime$(li)At most 4 genotypes at once; unload one and you may absorb it again$(br2)$(bold)Breakthrough Potion = temporary awakening:$(0) requires that source already absorbed AND one of its non-native organs transplanted.$(li)Active for 30 minutes, one at a time$(li)+2 / +4 / +6 / +8 extra compatibility and +10% / +20% / +30% / +40% enhancement (by purity tier)$(br2)Check and unload absorbed genotypes at the Gene Manager on the next page."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_rejection_serum",
-      "text": "The Rejection Neutralizer is your $(4)first-aid$(0) for transplant rejection.$(br2)$(bold)Effects:$(0)$(li)Each bottle cuts rejection by −12 in every organ slot$(li)You can drink it repeatedly, but only the first 5 bottles count per transplant period$(li)30-second cooldown between drinks$(br2)$(c)Slots lock-sealed by a natural-enemy conflict are excluded$(0) — remove one conflicting side first.$(br2)Plain and simple: when rejection nears the danger line, drink one to \"wash\" it back to safety — don't wait for the backlash."
+      "text": "The Rejection Neutralizer is your $(4)first-aid$(0) for transplant rejection.$(br2)$(bold)Effects:$(0)$(li)Each bottle cuts rejection by −12 in every organ slot$(li)You can drink it repeatedly, but only the first 6 bottles count per transplant period$(li)15-second cooldown between drinks$(br2)$(c)Slots lock-sealed by a natural-enemy conflict are excluded$(0) — remove one conflicting side first.$(br2)Plain and simple: when rejection nears the danger line, drink one to \"wash\" it back to safety — don't wait for the backlash."
     },
     {
       "type": "patchouli:spotlight",

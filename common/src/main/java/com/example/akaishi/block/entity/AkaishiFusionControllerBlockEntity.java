@@ -480,6 +480,11 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         return structure == null ? 0 : structure.fuelFrames;
     }
 
+    /** 当前成型结构解锁的散热片槽数（结构内散热框架计数决定，≤ MAX_COOLER_SLOTS） */
+    public int getCoolerSlotCount() {
+        return structure == null ? 0 : Math.min(structure.coolerFrames.size(), MAX_COOLER_SLOTS);
+    }
+
     public FusionStructure.Result getStructure() {
         return structure;
     }

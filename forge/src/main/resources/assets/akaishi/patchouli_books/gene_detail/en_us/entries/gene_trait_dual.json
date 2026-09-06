@@ -1,0 +1,40 @@
+{
+  "name": "Dual-Edge Trait Catalog",
+  "icon": "akaishi:akaishi_life_breeder",
+  "category": "akaishi:gene_traits",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Dual-edge$(0): the stronger the upside, the more likely a numbered downside — pushing one stat up while shaving off survival or mobility.$(br2)$(bold)Roll rules:$(0) each roll is benign : dual ≈ $(4)7 : 3$(0), and the tier-1 pool has no dual traits — risk only starts at tier 2.$(br2)$(bold)Carrying capacity:$(0) trait slots = quality tier + 1 (I=1 / II=2 / III=3 / IV=4); higher-tier organs carry more mutations, dual included.$(br2)Unlock tiers still follow sequence purity: <60 sees tier 1 only, 60-84 tiers 1-2, 85+ all three. This entry lists all $(4)12 dual traits$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 2 · Dual (4)",
+      "text": "$(bold)Strike$(0)$(li)Berserker Gene: +2 attack, −1.5 armor as price$(li)Glass Bones: +0.8 attack speed, −2 max health$(li)Feral Surge: +2 attack & +0.6 attack speed, −2 max health$(br2)$(bold)Strike · Glide$(0)$(li)Hypertrophy: +1.5 attack, −1.5% move speed$(br2)Tier-2 dual traits share one idea: trade a bit of body or mobility for a big damage spike — ideal as damage amplifier pieces."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 3 · Dual (1/2)",
+      "text": "$(bold)Strike$(0)$(li)Predator Instinct: +3 attack & +2% move, −4 max health$(li)Pyroblast Flesh: +3 attack, permanent fire weakness$(li)Adrenal Overdrive: +1.2 attack speed, −6 max health$(li)Nocturne Bone: +0.5 attack speed & +2% move, ignites under direct sunlight (Refractory Cells cancels it)"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier 3 · Dual (2/2)",
+      "text": "$(bold)Strike (cont.)$(0)$(li)Glutton Muscle: +2 attack & +0.4 attack speed, hunger drains faster$(li)Fracture Strike: +2.5 attack & +0.3 attack speed, takes extra physical damage$(br2)$(bold)Ward$(0)$(li)Juggernaut Core: +4 armor & +2 armor toughness, −2% move$(br2)$(bold)Mass$(0)$(li)Gigantism: +8 max health, −2% move & −0.4 attack speed$(br2)Tier-3 dual traits are the biggest gamble: on top of health/armor prices, three new cost axes — sun-burn, hyper-metabolism and fragile bones — make downsides anything but uniform."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "How to play dual",
+      "text": "$(bold)Right ways:$(0)$(li)$(4)In-place reroll$(0) at the trait reforger — unhappy with a roll, wash it and try again for crystals and life energy$(li)$(4)While a breakthrough potion is active, negative-base traits are suspended$(0) — you keep the upside and dodge the downside; dual organs shine hardest in that window$(li)Gigantism-style \"health-for-speed\" trades pair well with regen passives to swallow the price$(br2)$(bold)Pitfalls:$(0) stacking Berserker Gene and Predator Instinct on one squishy organ drains armor and health at once — dual traits amplify each other's prices too."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_trait_benign",
+        "akaishi:gene_chain_samples"
+      ],
+      "text": "For the benign counterparts see Benign Trait Catalog; dual and benign roll from the same pool, unlocked by sequence purity — see Samples & Sequences. Reroll details are in The Secrets of Life."
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
@@ -33,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 吸血 / 击退抗性 / 移动速度 / 火焰抗性 / 爆炸伤害保护 / 摔落伤害保护。
  * 升级选项由 GUI 按钮选择（clickMenuButton），执行由按钮触发。
  */
-public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
+public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int INPUT_GEAR_SLOT = 0;
     public static final int INPUT_TEMPLATE_SLOT = 1;

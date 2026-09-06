@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiGenEnergyOutputPortBlock;
 import com.example.akaishi.block.AkaishiGenFuelInputPortBlock;
 import com.example.akaishi.block.AkaishiGenMatrixCasingBlock;
@@ -40,7 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 成型后以对应倍率集中产能，能量经能量输出口对外输出，燃料经燃料输入口注入。
  * 数据槽：0=能量，1=燃烧能量，2=燃料总能量，3=结构状态，4=升级组件数。
  */
-public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
+public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;

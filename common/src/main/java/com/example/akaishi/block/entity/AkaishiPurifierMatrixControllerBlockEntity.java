@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiPurifierEnergyInputPortBlock;
@@ -45,7 +46,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 数据槽：0=能量，1=进度百分比，2=结构状态。
  */
 public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
-        implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier, IUpgradeableMachine {
+        implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
@@ -217,6 +218,18 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
 
     public ContainerData data() {
         return data;
+    }
+
+    // ===== IItemPipeDevice：粗制块/水晶块槽可入、精华产物槽仅出 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{INPUT_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[]{OUTPUT_SLOT};
     }
 
     // ===== Container =====

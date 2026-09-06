@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiEnergyAssemblyBlock;
 import com.example.akaishi.block.AkaishiSuperGeneratorCoreBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
@@ -34,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 作为 3x3 多方块结构外壳时（formed=true）休眠，不再独立燃烧。
  * 数据槽：0=能量，1=燃烧时间，2=燃烧总时间。
  */
-public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IDataCarrier {
+public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -143,6 +144,18 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
             }
         }
         return inventory;
+    }
+
+    // ===== IItemPipeDevice：燃料槽可入、升级装配槽不向物流开放（防第三方抽走升级件/塞入杂物） =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{FUEL_SLOT};
+    }
+
+    @Override
+    public int[] getPipeOutputSlots() {
+        return new int[0]; // 仅燃料消耗，无物品产物
     }
 
     // ===== Container：使 AE2 存储总线 / Mekanism 物流管道能直接读写机器槽位（零硬依赖） =====

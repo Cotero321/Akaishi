@@ -25,12 +25,13 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import java.util.function.Supplier;
 
 /**
- * 衰竭全家桶注册表：衰竭区域内对应原版方块被污染后的终态变体。
+ * 衰竭域方块注册（衰竭全家桶）：衰竭区域内对应原版方块被污染后的终态变体。
  * <p>
- * 按材质族划分三组：衰竭岩石组（石/圆石/石砖及其楼梯台阶墙）、衰竭木完整组
+ * 按材质族划分四组：衰竭岩石组（石/圆石/石砖及其楼梯台阶墙）、衰竭木完整组
  * （木板/楼梯/台阶/栅栏/栅栏门/门/活板门/按钮/压力板）、衰竭地表组
- * （沙/砾石/草方块）。属性一律沿袭各自原版方块，保证挖掘音效/硬度/工具一致，
- * 仅在视觉上呈现灰紫腐化（模型/纹理与 ModBlocks 中已有的衰竭土壤/衰竭木互补）。
+ * （沙/砾石/草方块）、衰竭区域治理与终态方块（衰变净化塔/衰竭土壤/衰竭木）。
+ * 属性一律沿袭各自原版方块，保证挖掘音效/硬度/工具一致，
+ * 仅在视觉上呈现灰紫腐化。
  * <p>
  * 所有静态字段显式初始化为 null，由 {@link #register()} 在 {@link AkaishiMod#init()}
  * 阶段填充；任何消费方都须在 register() 之后访问，否则会触发 NPE。
@@ -60,6 +61,14 @@ public final class AkaishiDecayBlocks {
     public static RegistrySupplier<Block> CHISHI_DECAY_SAND = null;
     public static RegistrySupplier<Block> CHISHI_DECAY_GRAVEL = null;
     public static RegistrySupplier<Block> CHISHI_DECAY_GRASS_BLOCK = null;
+
+    // ===== 衰竭区域治理与终态方块 =====
+    /** 衰变净化塔：清除衰竭地表并将其转化为衰竭土壤的治理机器 */
+    public static RegistrySupplier<Block> CHISHI_DECAY_PURIFIER = null;
+    /** 衰竭土壤：衰竭区域地表经净化后的终态（不可蔓延） */
+    public static RegistrySupplier<Block> CHISHI_DECAY_SOIL = null;
+    /** 衰竭木：衰竭区域树木被污染后的终态 */
+    public static RegistrySupplier<Block> CHISHI_DECAY_LOG = null;
 
     private AkaishiDecayBlocks() {
     }
@@ -112,6 +121,11 @@ public final class AkaishiDecayBlocks {
                 () -> new Block(Block.Properties.copy(Blocks.GRAVEL)));
         CHISHI_DECAY_GRASS_BLOCK = register(blocks, "akaishi_decay_grass_block",
                 () -> new Block(Block.Properties.copy(Blocks.GRASS_BLOCK)));
+
+        // ---- 衰竭区域治理与终态方块：净化塔（机器）与污染产物块（均带 BlockItem）----
+        CHISHI_DECAY_PURIFIER = register(blocks, "akaishi_decay_purifier", AkaishiDecayPurifierBlock::new);
+        CHISHI_DECAY_SOIL = register(blocks, "akaishi_decay_soil", AkaishiDecaySoilBlock::new);
+        CHISHI_DECAY_LOG = register(blocks, "akaishi_decay_log", AkaishiDecayLogBlock::new);
     }
 
     /** 注册方块 + 同名 BlockItem */

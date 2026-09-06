@@ -1,0 +1,30 @@
+{
+  "name": "Ecosystem Synergy",
+  "icon": "akaishi:akaishi_organ_heart",
+  "category": "akaishi:gene_genome",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)What is synergy?$(0) Count the $(4)non-native organs$(0) by creature source: when one genome fills enough slots, a hidden \"ecosystem set\" bonus activates — the reward for a pure build.$(br2)$(bold)Rules:$(0)$(li)Native organs never count$(li)Group each source, keep the $(4)largest group$(0)$(li)$(4)3+ organs$(0) = minor synergy; $(4)6+ organs$(0) = major synergy (majority of the nine slots)$(br2)To trigger a set, let that genome dominate your body — mixed builds trigger nothing."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Set effects at a glance",
+      "text": "$(bold)$(4)Warm-blooded set$(0) (regeneration)$(li)Minor: Regeneration I (constant)$(li)Major: Regeneration II (constant)$(br2)$(bold)$(4)Undead set$(0) (night fighter)$(li)Minor: +10% melee damage at night$(li)Major: +15% melee damage at night$(br2)$(bold)$(4)Aberrant set$(0) (frenzy)$(li)Minor: 25% chance on hit taken for Speed I (2s)$(li)Major: 30% chance on hit taken for Speed II (3s)"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Ender and the empty rows",
+      "text": "$(bold)$(4)Ender set$(0) (escape artist)$(li)Minor: 15% chance to blink away when hit$(li)Major: 25% chance to blink away when hit$(br2)$(bold)$(4)Explosive / Boss / Dragon$(0)$(li)No synergy implemented yet — the payoff of these high-purity groups lives in organ quality and traits, not set bonuses$(br2)Tip: Aberrant and Ender effects resolve $(4)when you take a hit$(0) — higher armor (smaller hits) actually triggers them more often; Warm-blooded and Undead are always-on / night passives that ignore proc chance."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:gene_groups",
+        "akaishi:gene_chain_body"
+      ],
+      "text": "Synergy counts transplanted non-native organs; sources and transplant rules are in Seven Genomes and Installation & Care. For a temporary boost across a full build, check the Three Breakthrough Modes under Genotypes · Potions."
+    }
+  ]
+}

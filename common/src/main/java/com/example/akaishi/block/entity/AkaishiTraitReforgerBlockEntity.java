@@ -192,7 +192,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
         ItemStack result = organ.copy();
         // roll 已由 canProcess 的候选校验保证非空（排除全部已携带词条，新词条必不同于旧词条）
         MutantTrait fresh = MutantTrait.roll(level.random, old.getRarity(),
-                AkaishiOrganItem.getMutations(result));
+                AkaishiOrganItem.getMutations(result), AkaishiOrganItem.slotOf(organ));
         if (fresh != null) {
             AkaishiOrganItem.replaceMutation(result, targetIndex, fresh);
         }

@@ -75,31 +75,49 @@ public final class AkaishiBodyCombatHandler {
         }
     }
 
-    /** 攻击方：命中附加 + 伤害增幅 + 满级特殊弹射物 */
+    /** 攻击方：命中附加 + 伤害增幅 + 满级特殊弹射物（命中 debuff 等级 / 增幅倍率随被动来源数叠加） */
     private static void applyAttackerEffects(LivingHurtEvent event, Player attacker, IPlayerBodyState state) {
         LivingEntity target = event.getEntity();
         float amount = event.getAmount();
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.SLOW_ON_HIT)) {
-            applyToTarget(target, MobEffects.MOVEMENT_SLOWDOWN, 1, 100);
+        int slow = OrganEffectResolver.countPassive(state, OrganPassive.SLOW_ON_HIT);
+        if (slow > 0) {
+            applyToTarget(target, MobEffects.MOVEMENT_SLOWDOWN, Math.min(slow, 4), 100); // 5 秒
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.POISON_ON_HIT)) {
-            applyToTarget(target, MobEffects.POISON, 1, 60);
+        int poison = OrganEffectResolver.countPassive(state, OrganPassive.POISON_ON_HIT);
+        if (poison > 0) {
+            applyToTarget(target, MobEffects.POISON, Math.min(poison, 4), 100); // 5 秒
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.WITHER_ON_HIT)) {
-            applyToTarget(target, MobEffects.WITHER, 1, 60);
+        int wither = OrganEffectResolver.countPassive(state, OrganPassive.WITHER_ON_HIT);
+        if (wither > 0) {
+            applyToTarget(target, MobEffects.WITHER, Math.min(wither, 4), 100); // 5 秒
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.FATIGUE_ON_HIT)) {
-            applyToTarget(target, MobEffects.DIG_SLOWDOWN, 1, 200);
+        int fatigue = OrganEffectResolver.countPassive(state, OrganPassive.FATIGUE_ON_HIT);
+        if (fatigue > 0) {
+            applyToTarget(target, MobEffects.DIG_SLOWDOWN, Math.min(fatigue, 4), 100); // 5 秒
         }
-        // 伤害增幅
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.JUMP_ATTACK_BOOST) && !attacker.onGround()) {
-            amount *= 1.6F; // 跳跃攻击 +60%
+        // 冲撞兽击：命中把目标沿击退方向顶开（疣猪兽之心；推力随来源数叠加并受来源品质放大，与武器击退叠加）
+        OrganEffectResolver.PassiveStrengths charge = OrganEffectResolver.strengthsOf(state, OrganPassive.KNOCKBACK_ON_HIT);
+        if (charge.count() > 0) {
+            target.knockback(0.3F * charge.count() * charge.tierFactor(),
+                    target.getX() - attacker.getX(), target.getZ() - attacker.getZ());
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.WATER_ATTACK_BOOST) && attacker.isInWater()) {
-            amount *= 1.5F; // 水下攻击 +50%
+        // 灼热点燃：命中使目标着火（岩浆怪熔肺；火免目标由原版免疫拦截，点燃时长随来源 +1 秒）
+        int ignite = OrganEffectResolver.countPassive(state, OrganPassive.IGNITE_ON_HIT);
+        if (ignite > 0) {
+            target.setSecondsOnFire(Math.min(2 + ignite, 4));
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.PROJECTILE_BOOST) && event.getSource().isIndirect()) {
-            amount *= 1.25F; // 弹射物伤害 +25%
+        // 伤害增幅（每多一个来源叠加一份基础增幅，最高来源品质再放大整条倍率——品质阶梯）
+        OrganEffectResolver.PassiveStrengths jumpAtk = OrganEffectResolver.strengthsOf(state, OrganPassive.JUMP_ATTACK_BOOST);
+        if (jumpAtk.count() > 0 && !attacker.onGround()) {
+            amount *= (1.0F + 0.6F * jumpAtk.count()) * jumpAtk.tierFactor(); // 跳跃攻击 +60%/来源
+        }
+        OrganEffectResolver.PassiveStrengths waterAtk = OrganEffectResolver.strengthsOf(state, OrganPassive.WATER_ATTACK_BOOST);
+        if (waterAtk.count() > 0 && attacker.isInWater()) {
+            amount *= (1.0F + 0.5F * waterAtk.count()) * waterAtk.tierFactor(); // 水下攻击 +50%/来源
+        }
+        OrganEffectResolver.PassiveStrengths proj = OrganEffectResolver.strengthsOf(state, OrganPassive.PROJECTILE_BOOST);
+        if (proj.count() > 0 && event.getSource().isIndirect()) {
+            amount *= (1.0F + 0.25F * proj.count()) * proj.tierFactor(); // 弹射物伤害 +25%/来源
         }
         // 生态套装·纯亡灵：夜间近战增伤（小共鸣 +10% / 大共鸣 +15%）
         OrganEffectResolver.Synergy synergy = OrganEffectResolver.synergyOf(state, attacker.level());
@@ -129,23 +147,38 @@ public final class AkaishiBodyCombatHandler {
                 && event.getSource().is(DamageTypeTags.IS_FIRE)) {
             amount *= 1.5F; // 怕火：火焰伤害 +50%
         }
+        // 脆骨体质（凋灵骷髅臂的代价）：近战/弹射/摔落等物理受击加深（火焰/爆炸来源除外，玻璃大炮）
+        OrganEffectResolver.PassiveStrengths vuln = OrganEffectResolver.strengthsOf(state, OrganPassive.VULNERABLE);
+        if (vuln.count() > 0 && !event.getSource().is(DamageTypeTags.IS_FIRE)
+                && !event.getSource().is(DamageTypeTags.IS_EXPLOSION)) {
+            amount *= 1.0F + 0.15F * Math.min(vuln.count(), 2);
+        }
         if (OrganEffectResolver.hasPassive(state, OrganPassive.FALL_IMMUNE)
                 && event.getSource().is(DamageTypeTags.IS_FALL)) {
             amount = 0.0F; // 摔落免疫
         }
-        event.setAmount(amount);
-        // 荆棘反弹：近战伤害 30% 返还攻击者
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.THORNS) && attacker instanceof LivingEntity la) {
-            la.hurt(victim.damageSources().thorns(victim), event.getAmount() * 0.3F);
+        // 爆破体质：爆炸伤害减免 30%/来源（苦力怕硫磺肾；封顶 60%，与护甲/能量盾独立结算）
+        int blast = OrganEffectResolver.countPassive(state, OrganPassive.BLAST_RESIST);
+        if (blast > 0 && event.getSource().is(DamageTypeTags.IS_EXPLOSION)) {
+            amount *= 1.0F - 0.3F * Math.min(blast, 2);
         }
-        // 瞬移闪避：受击 20% 概率瞬移（不减免伤害，只躲后续）
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.TELEPORT_DODGE)
-                && victim.getRandom().nextFloat() < 0.2F) {
+        event.setAmount(amount);
+        // 荆棘反弹：近战伤害 30%/来源 返还攻击者（封顶 60%，防高层反弹伤害互相弹射失控；受来源品质放大）
+        OrganEffectResolver.PassiveStrengths thorns = OrganEffectResolver.strengthsOf(state, OrganPassive.THORNS);
+        if (thorns.count() > 0 && attacker instanceof LivingEntity la) {
+            la.hurt(victim.damageSources().thorns(victim),
+                    event.getAmount() * 0.3F * Math.min(thorns.count(), 2) * thorns.tierFactor());
+        }
+        // 瞬移闪避：受击概率瞬移（不减免伤害，只躲后续；概率随来源与品质提高，封顶 40%）
+        OrganEffectResolver.PassiveStrengths dodge = OrganEffectResolver.strengthsOf(state, OrganPassive.TELEPORT_DODGE);
+        if (dodge.count() > 0 && victim.getRandom().nextFloat()
+                < Math.min(0.2F + 0.05F * (dodge.count() - 1) + 0.05F * dodge.maxTierOrd(), 0.4F)) {
             teleportRandomly(victim);
         }
-        // 墨雾脱身：受击 25% 概率喷墨隐身 4 秒（鱿鱼墨囊）
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.INK_CLOUD)
-                && victim.getRandom().nextFloat() < 0.25F) {
+        // 墨雾脱身：受击概率喷墨隐身 4 秒（鱿鱼墨囊；概率随来源与品质提高，封顶 50%）
+        OrganEffectResolver.PassiveStrengths ink = OrganEffectResolver.strengthsOf(state, OrganPassive.INK_CLOUD);
+        if (ink.count() > 0 && victim.getRandom().nextFloat()
+                < Math.min(0.25F + 0.05F * (ink.count() - 1) + 0.05F * ink.maxTierOrd(), 0.5F)) {
             victim.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 80, 0, false, false));
             victim.level().addParticle(ParticleTypes.SQUID_INK,
                     victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(),
