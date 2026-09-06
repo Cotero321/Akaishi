@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiPurifierBlock;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
@@ -250,12 +251,12 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     /** 有效输入：粗制赤石块 或 赤石水晶块 */
     private boolean isValidInput(ItemStack stack) {
         return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
-                || stack.is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+                || stack.is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
     }
 
     /** 单次提纯产出的精华数：赤石水晶块 4 个，粗制赤石块 1 个 */
     private int outputPerInput() {
-        return inventory.getItem(INPUT_SLOT).is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
+        return inventory.getItem(INPUT_SLOT).is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
     }
 
     /** 燃料能量值，非燃料返回 0（public 供 Menu 燃料槽放入校验） */

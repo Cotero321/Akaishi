@@ -51,8 +51,6 @@ public final class DecayZoneManager extends SavedData {
 
     /** 存档键名 */
     public static final String DATA_NAME = "akaishi_decay_zones";
-    /** 每 tick 环境采样次数（分批转化防止卡顿） */
-    private static final int ENV_SAMPLES_PER_TICK = 256;
     /** 生物转化判定周期（tick） */
     private static final int CONVERT_INTERVAL = 40;
     /** 区域剩余时间落盘间隔（tick）：衰减/净化递减需周期保存，防重启后剩余时间回滚 */
@@ -240,10 +238,10 @@ public final class DecayZoneManager extends SavedData {
                 e.hurt(level.damageSources().magic(), dmg);
             }
         }
-        // 2) 环境转化（每 tick 一批，30 小时内必然覆盖全区域）
+        // 2) 环境转化（每 tick 一批采样点，量级由配置控制：256=慢速精细，8192=默认×32）
         //    仅 amp≥1 的泄漏类区域才腐化地形；amp=0（反应堆内能外泄）只影响生物，避免大面积改地
         if (amp > 0) {
-            for (int i = 0; i < ENV_SAMPLES_PER_TICK; i++) {
+            for (int i = 0; i < ModConfig.decayZoneEnvSamplesPerTick; i++) {
                 sampleDecayBlock(level, zone);
             }
         }

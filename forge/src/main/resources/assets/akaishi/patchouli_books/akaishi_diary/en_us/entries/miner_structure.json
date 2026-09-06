@@ -6,26 +6,55 @@
   "pages": [
     {
       "type": "patchouli:multiblock",
-      "name": "Akaishi Miner (9x9x3)",
+      "name": "Akaishi Miner (9x9x5 Hollow)",
       "multiblock": {
         "pattern": [
-          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "],
-          ["    F    ", "         ", "         ", "         ", "F   0   F", "         ", "         ", "         ", "    F    "],
-          ["    F    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "FFUUPUUFF", " U  U  U ", " U  U  U ", " FUUFUUF ", "    F    "]
+          ["    X    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "XFUUPUUFE", " U  U  U ", " U  U  U ", " FUUFUUF ", "    S    "],
+          ["    X    ", "         ", "         ", "         ", "X   F   X", "         ", "         ", "         ", "    X    "],
+          ["    X    ", "         ", "         ", "         ", "X   C   X", "         ", "         ", "         ", "    X    "],
+          ["    X    ", "         ", "         ", "         ", "X   F   X", "         ", "         ", "         ", "    X    "],
+          ["    X    ", " FUUFUUF ", " U  U  U ", " U  U  U ", "XFUU0UUFX", " U  U  U ", " U  U  U ", " FUUFUUF ", "    X    "]
         ],
         "mapping": {
           "F": "akaishi:akaishi_miner_frame",
+          "X": "akaishi:akaishi_miner_frame",
           "U": "akaishi:akaishi_miner_upgrade_frame",
+          "S": "akaishi:akaishi_miner_frame_external",
+          "E": "akaishi:akaishi_miner_energy_input",
           "P": "akaishi:akaishi_miner_port",
-          "0": "akaishi:akaishi_miner_controller_basic"
+          "C": "akaishi:akaishi_miner_controller_basic",
+          "0": "akaishi:akaishi_miner_drill_bit"
         },
         "symmetrical": false
-      },
-      "text": "The Akaishi Miner is a fixed $(bold)9x9x3$(0) multiblock: the bottom and top layers are cross-shaped frameworks with a Port at each center, while the middle layer holds only four framework pillars plus the controller.$(br2)F = Miner Framework, U = Miner Framework (Upgrade) — or an upgrade module — P = Miner Port, red block = controller. Keep the four corners hollow."
+      }
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Build order:$(0)$(li)Middle layer first: put four Framework pillars at the edge midpoints and the controller dead center (placing it early is fine — it detects the structure on its own)$(li)Bottom layer: one Port P at the very center, Framework F as the cross beams, Upgrade Frames U filling the ribs$(li)Top layer: mirror the bottom layer (Port at center too) — done$(br2)$(bold)Formed or not:$(0)the controller keeps checking automatically — $(c)break or misplace any block and the whole miner collapses$(0): upgrade counts reset, ports disconnect, digging freezes.$(br2)It reads like two floating cross-shaped decks with hollow corners — build it on open ground so you have room to add \"$(l:akaishi:miner_upgrades)upgrade modules$(/l)\" and route pipes later."
+      "text": "The Akaishi Miner is a fixed $(bold)9x9x5 hollow$(0) multiblock: only the $(bold)bottom and top decks$(0) are full cross-shaped plates (24 upgrade spots U each — 48 in total), while the middle three layers stay open, connected solely by four pillars and the center column.$(br2)The preview centers on the $(bold)Drill Bit (0)$(0) at the bottom; above it: Framework → Controller (C) → Framework → Port (P).$(br2)Pillar example: the north and west pillars and pillar bodies use regular Framework (X/F), the $(4)south pillar (S) tops off with one Miner Framework (External)$(0), and the east pillar (E) carries a single Energy Input near the top — Framework (External), Energy Input and Item Output are interchangeable \"external blocks\", $(4)at most one per pillar$(0) (north & west show zero); fill remaining pillar slots with regular Framework. Just an illustration — any mix of the four pillar blocks forms the structure."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Build order:$(0)$(li)Pillars: from the planned center, count 4 blocks out in each cardinal direction and raise a 5-block pillar. Every level may be Miner Framework, Framework (External), Energy Input or Item Output — the last three are interchangeable \"external blocks\" sharing one spot per pillar: $(4)at most one in total per pillar$(0) (at any height); fill the rest of the pillar with Miner Framework$(li)Center column: stack Drill Bit → Framework → Controller → Framework → Port at the very center (the 0 in the picture is the Drill Bit — your origin marker)$(li)Two decks: fill the bottom and top cross plates with Framework + Upgrade Frames (24 spots each); keep the middle three layers hollow$(br2)$(bold)Formed or not:$(0)the controller keeps checking — $(c)remove or misplace any required block (e.g. two external blocks on one pillar) and the miner collapses$(0).$(br2)$(green)Air is loose:$(0)every spot outside the required blocks (the hollow zone, corners, gaps between cross arms) may be filled freely without breaking the machine. Once formed, the Drill Bit beams straight down so you can spot a working miner from afar."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_drill_bit",
+      "text": "$(bold)Drill Bit$(0): sits at the very bottom of the center column, on the same axis as the controller. It is the preview anchor point and the \"drill\" that fires a $(4)beacon beam$(0) straight down while the structure is formed. A required block — break it and the miner collapses; to stop digging without gutting the build, break it or the controller."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_energy_input",
+      "text": "$(bold)Miner Energy Input$(0): a \"charging port\" for the pillar blocks. It carries its own $(4)10M$(0) energy buffer for your pipes, and once formed it forwards power to the controller $(4)without a rate cap$(0). Its UI shows the local charge and formed state — before forming it only stores, never sends. It accepts power only, so don't try draining the buffer."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_item_output",
+      "text": "$(bold)Miner Item Output$(0): an \"outlet station\" for the pillar blocks. It has a $(4)27-slot$(0) product buffer that the controller pushes mined ores into; the buffer is $(4)read-only$(0) — hoppers and item pipes can only pull. Together with the Energy Input and Framework (External) it counts as an \"external block\": $(4)each pillar accepts at most one of the three in total$(0), so spread them across different pillars."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miner_frame_external",
+      "text": "$(bold)Miner Framework (External)$(0): a purely structural block that looks a bit different from the regular Framework and is only $(4)valid on pillar spots$(0) — cross beams and the center column reject it. It has no interfaces but counts as an \"external block\" together with Energy Inputs / Item Outputs: $(4)at most one per pillar — pick one of the three$(0) (the south pillar top shows it). To fill the remaining pillar slots, use regular Framework."
     },
     {
       "type": "patchouli:relations",
@@ -35,7 +64,7 @@
         "akaishi:energy_pipe",
         "akaishi:energy_cell"
       ],
-      "text": "With the frame up, read on in order: pick a controller to set the \"tier\", then add \"upgrade modules\", then pipe power from the ports back into your grid."
+      "text": "With the frame up, read on in order: pick a controller to set the \"tier\", then add \"upgrade modules\", then pipe power from the Port / Energy Inputs back into your grid."
     }
   ]
 }

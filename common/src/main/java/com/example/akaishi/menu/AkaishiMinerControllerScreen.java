@@ -77,22 +77,24 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT, false);
-        // 产物暂存 / 升级统计 / 成型状态
+        // 产物暂存（左上，位于 3×2 槽上方）
         gui.drawString(this.font, Component.translatable("gui.akaishi.miner.output"),
                 36, 32, 0xFF707070, false);
+        // 升级统计（右侧空闲区竖向三行，行距 14px，避免三种语言文案互相压字）
         gui.drawString(this.font, Component.translatable("gui.akaishi.miner.speed", menu.getSpeedCount()),
-                26, 80, 0xFF707070, false);
+                88, 40, 0xFF707070, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.miner.fortune", menu.getFortuneCount()),
-                62, 80, 0xFF707070, false);
+                88, 54, 0xFF707070, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.miner.storage", menu.getStorageCount()),
-                98, 80, 0xFF707070, false);
+                88, 68, 0xFF707070, false);
+        // 成型状态（进度条下方，与玩家背包标题留足行距）
         if (menu.isFormed()) {
-            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.formed"), 26, 108, GREEN, false);
+            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.formed"), 26, 102, GREEN, false);
         } else {
-            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.not_formed"), 26, 108, RED, false);
+            gui.drawString(this.font, Component.translatable("gui.akaishi.miner.not_formed"), 26, 102, RED, false);
         }
         // 玩家背包标题
-        gui.drawString(this.font, Component.translatable("container.inventory"), 8, 116, TEXT, false);
+        gui.drawString(this.font, Component.translatable("container.inventory"), 8, 114, TEXT, false);
     }
 
     @Override

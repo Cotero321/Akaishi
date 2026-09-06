@@ -1,6 +1,6 @@
 package com.example.akaishi.multiblock;
 
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
@@ -124,7 +124,7 @@ public final class AkaishiMotherAltarStructure {
                         }
                     }
                     case ALTAR_STONE -> {
-                        if (!state.is(ModBlocks.CHISHI_ALTAR_STONE.get())) {
+                        if (!state.is(AkaishiMotherAltarBlocks.CHISHI_ALTAR_STONE.get())) {
                             return null;
                         }
                     }
@@ -155,7 +155,7 @@ public final class AkaishiMotherAltarStructure {
                         }
                     }
                     case ALTAR -> {
-                        if (!state.is(ModBlocks.CHISHI_MOTHER_ALTAR.get())) {
+                        if (!state.is(AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR.get())) {
                             return null;
                         }
                     }

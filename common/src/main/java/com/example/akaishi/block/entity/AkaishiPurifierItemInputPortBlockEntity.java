@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiPurifierMatrixControllerBlock;
 import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
@@ -78,7 +79,7 @@ public class AkaishiPurifierItemInputPortBlockEntity extends BlockEntity impleme
     /** 有效输入：粗制赤石块 或 赤石水晶块 */
     private static boolean isValidInput(ItemStack stack) {
         return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
-                || stack.is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+                || stack.is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
     }
 
     public void setControllerPos(BlockPos pos) {

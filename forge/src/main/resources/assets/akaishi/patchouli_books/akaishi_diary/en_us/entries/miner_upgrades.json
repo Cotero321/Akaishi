@@ -7,17 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_speed_upgrade_block",
-      "text": "$(bold)Speed Upgrade Module:$(0) makes the miner faster — and hungrier.$(br2)$(li)Each block: mining progress $(4)+12.5%$(0), energy cost $(e)+10%$(0) per tick$(li)Cap: $(4)10 blocks$(0)$(br2)Maxed out, that's rate ×2.25 at double the power draw (the base 10 energy/tick climbs to 20). Make sure the grid can feed it before you floor it."
+      "text": "$(bold)Speed Upgrade Module:$(0) makes the miner faster — and hungrier.$(br2)$(li)Each block: mining progress $(4)+12.5%$(0), energy cost $(e)+10%$(0) per tick$(li)Cap unlocks with the controller tier: Basic 8 / Advanced 16 / Super 24 / Ultimate 32 (see next page)$(br2)Maxed on an Ultimate miner that is rate ×5 at ×4.2 the power draw (the base 2,000 energy/tick climbs to 8,400). The higher the tier, the hungrier it gets — make sure the grid can feed it before you floor it."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_fortune_upgrade_block",
-      "text": "$(bold)Fortune Upgrade Module:$(0) cures the \"one ore per haul\" stinginess.$(br2)$(li)Each block: $(4)+1$(0) item per haul$(li)Cap: $(4)4 blocks$(0)$(br2)Maxed out, every cycle yields a fixed $(4)5 items$(0) (the type is still rolled from the weight table). It adds no power cost — a great deal when stockpiling bulk ores like coal, iron and copper."
+      "text": "$(bold)Fortune Upgrade Module:$(0) cures the \"one ore per haul\" stinginess.$(br2)$(li)Each block: $(4)+1$(0) item per haul$(li)Cap shares the Storage tier cap — a quarter of the Speed cap: Basic 2 / Advanced 4 / Super 6 / Ultimate 8 (see next page)$(br2)Maxed on an Ultimate miner, every cycle yields a fixed $(4)9 items$(0) (the type is still rolled from the weight table). It adds no power cost — a great deal when stockpiling bulk ores like coal, iron and copper."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_storage_upgrade_block",
-      "text": "$(bold)Storage Upgrade Module:$(0) stretches the controller's fuel tank.$(br2)$(li)Each block: energy capacity $(4)+50%$(0) (multiplied onto the tier's base capacity)$(li)Cap: $(4)10 blocks$(0)$(br2)Maxed out, that's capacity ×6: Basic 1M → 6M, Ultimate 50M → 300M.$(br2)$(bold)Fitting them:$(0) modules are plain blocks — $(4)just place one into any U slot$(0) (upgrade-frame position), replacing an empty frame. The controller re-counts every 20 ticks, so adds and removals apply instantly. Modules don't care about tier — the same set and the same caps work on all four, and anything beyond the cap simply doesn't stack."
+      "text": "$(bold)Storage Upgrade Module:$(0) stretches the controller's fuel tank.$(br2)$(li)Each block: energy capacity $(4)+50%$(0) (multiplied onto the tier's base capacity)$(li)Cap shares the Fortune tier cap — a quarter of the Speed cap: Basic 2 / Advanced 4 / Super 6 / Ultimate 8 (see next page)$(br2)Maxed per tier that is capacity ×2 / ×3 / ×4 / ×5: Basic 1M → 2M, Ultimate 50M → 250M.$(br2)$(bold)Fitting them:$(0) modules are plain blocks — $(4)just place one into any U slot$(0) (upgrade-frame position), replacing an empty frame. The controller re-counts every 20 ticks, so adds and removals apply instantly. Modules don't care about tier — the same blocks work on all four controllers; anything beyond your current tier's cap simply doesn't stack."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Caps unlock with the controller tier:$(0)$(br2)$(bold)Speed$(0): Basic 8 → Advanced 16 → Super 24 → Ultimate 32 blocks — maxed-out mining rate ×2 / ×3 / ×4 / ×5.$(br2)$(bold)Storage & Fortune$(0): both sit at a quarter of the Speed cap — Basic 2 / Advanced 4 / Super 6 / Ultimate 8.$(br2)The frame is big (48 U slots in total), yet a lower-tier controller only honours the lower cap — to max out you must upgrade the controller. Storage and Fortune sharing one cap forces a real choice between going fast, holding more power, or hauling more ore."
     },
     {
       "type": "patchouli:relations",

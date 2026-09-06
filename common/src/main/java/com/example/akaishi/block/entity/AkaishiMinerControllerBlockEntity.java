@@ -1,8 +1,10 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.api.IMinerPortDevice;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IMinerOutputSink;
 import com.example.akaishi.block.AkaishiMinerControllerBlock;
 import com.example.akaishi.block.AkaishiMinerTier;
 import com.example.akaishi.block.AkaishiMinerUpgradeBlock;
@@ -37,9 +39,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 /**
- * 赤石矿机控制器（核心方块，4 级共用）：固定 9×9×3 结构的主方块。
- * 结构成型后消耗赤能源持续挖矿：进度满时按概率表随机产出原版矿物，
- * 产物先入暂存槽再推送给转口；升级模块（速度/时运/储能方块）安装在升级框架位置上，控制器扫描生效。
+ * 赤石矿机控制器（核心方块，4 级共用）：固定 9×9×5 结构的主方块（控制器位于中间层中心）。
+ * 结构成型后消耗赤能源持续挖矿：进度满时按概率表随机产出原矿物，
+ * 产物先入暂存槽再推送给结构端口（顶层中心转口 / 立柱物品输出口等 IMinerOutputSink）；
+ * 能量由端口（转口/能量输入口）各自限量转发注入；升级模块（速度/时运/储能方块）
+ * 安装在升级框架位置上，控制器扫描生效。
  * 数据槽：0=能量 1=容量 2=进度 3=总耗时 4=成型 5=速度升级 6=时运升级 7=储能升级。
  */
 public class AkaishiMinerControllerBlockEntity extends BlockEntity
@@ -50,10 +54,6 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
     public static final int DATA_COUNT = 8;
     public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_PROGRESS = 2, DATA_REQUIRED = 3,
             DATA_FORMED = 4, DATA_SPEED = 5, DATA_FORTUNE = 6, DATA_STORAGE = 7;
-    /** 每类升级模块生效上限（超出部分不再叠加）：速度 10 / 时运 4 / 储能 10 */
-    public static final int SPEED_MAX = 10;
-    public static final int FORTUNE_MAX = 4;
-    public static final int STORAGE_MAX = 10;
     /** 速度升级：每级 +12.5% 挖矿速率 */
     public static final double SPEED_STEP = 0.125;
     /** 速度升级：每级 +10% 能耗 */
@@ -131,7 +131,7 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
             ports = scan.ports();
             refreshUpgrades();
             for (BlockPos pp : ports) {
-                if (level.getBlockEntity(pp) instanceof AkaishiMinerPortBlockEntity port) {
+                if (level.getBlockEntity(pp) instanceof IMinerPortDevice port) {
                     port.setControllerPos(worldPosition);
                 }
             }
@@ -177,7 +177,10 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
         }
     }
 
-    /** 汇总结构内已安装的升级模块方块（每类上限：速度 10 / 时运 4 / 储能 10） */
+    /**
+     * 汇总结构内已安装的升级模块方块。生效上限按矿机等级解锁：
+     * 效率 = 该等级 maxSpeedUpgrades（8/16/24/32）；储能与时运 = 效率上限的四分之一（2/4/6/8）。
+     */
     private void refreshUpgrades() {
         int s = 0, f = 0, st = 0;
         for (BlockPos p : upgradeFrames) {
@@ -190,9 +193,11 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
                 }
             }
         }
-        speedCount = Math.min(s, SPEED_MAX);
-        fortuneCount = Math.min(f, FORTUNE_MAX);
-        storageCount = Math.min(st, STORAGE_MAX);
+        int speedCap = tier().maxSpeedUpgrades;
+        int supportCap = speedCap / 4; // 储能与时运共用该上限
+        speedCount = Math.min(s, speedCap);
+        fortuneCount = Math.min(f, supportCap);
+        storageCount = Math.min(st, supportCap);
     }
 
     /** 切换结构状态：同步自身 FORMED 标记，建立/解除转口关联，刷新升级缓存 */
@@ -219,7 +224,7 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
         }
         for (BlockPos p : BlockPos.betweenClosed(min, max)) {
             BlockEntity be = level.getBlockEntity(p);
-            if (be instanceof AkaishiMinerPortBlockEntity port) {
+            if (be instanceof IMinerPortDevice port) {
                 port.setControllerPos(formed ? worldPosition : null);
             }
         }
@@ -267,8 +272,8 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
                     break;
                 }
                 BlockEntity be = level.getBlockEntity(pp);
-                if (be instanceof AkaishiMinerPortBlockEntity port) {
-                    stack = port.receivePartial(stack);
+                if (be instanceof IMinerOutputSink sink) {
+                    stack = sink.receivePartial(stack);
                 }
             }
             inventory.setItem(i, stack);

@@ -178,11 +178,6 @@ public class AkaishiWirelessTerminalMenu extends AbstractContainerMenu {
         return data.get(AkaishiWirelessTerminalBlockEntity.DATA_CHUNK_LOADED);
     }
 
-    /** 区块加载能量税是否因能量不足而停用（网络区块加载已关闭） */
-    public boolean isChunkTaxDisabled() {
-        return data.get(AkaishiWirelessTerminalBlockEntity.DATA_TAX_DISABLED) == 1;
-    }
-
     /** 内腔输入损耗抑制组件数量 */
     public int inputLossModules() {
         return data.get(AkaishiWirelessTerminalBlockEntity.DATA_INPUT_LOSS);

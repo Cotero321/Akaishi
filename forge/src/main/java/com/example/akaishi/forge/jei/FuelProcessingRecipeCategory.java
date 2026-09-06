@@ -1,7 +1,7 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.entity.AkaishiEnergyProcessorBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
@@ -45,7 +45,7 @@ public class FuelProcessingRecipeCategory implements IRecipeCategory<FuelProcess
 
     public FuelProcessingRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 60);
-        this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_ENERGY_PROCESSOR.get()));
+        this.icon = helper.createDrawableItemStack(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PROCESSOR.get()));
     }
 
     @Override

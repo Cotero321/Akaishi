@@ -1,8 +1,17 @@
 package com.example.akaishi.item;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.AkaishiOreDef;
+import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiLifeBlocks;
+import com.example.akaishi.block.AkaishiMinerBlocks;
+import com.example.akaishi.block.AkaishiMotherAltarBlocks;
+import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
+import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -54,26 +63,26 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ADVANCED_PURIFIER.get()));
                                     }
                                     // 赤能源储存单元 + 管道
-                                    if (ModBlocks.CHISHI_ENERGY_CELL_BASIC != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_CELL_BASIC.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_BASIC != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_BASIC.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_CELL_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_CELL_ADVANCED.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_CELL_SUPER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_CELL_SUPER.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_SUPER != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_SUPER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_PIPE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PIPE.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_PIPE_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PIPE_ADVANCED.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_PIPE_ELITE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PIPE_ELITE.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ELITE != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ELITE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_PIPE_ULTIMATE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PIPE_ULTIMATE.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ULTIMATE != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ULTIMATE.get()));
                                     }
                                     // 赤能源调试工具（切换管道方向模式）
                                     if (ModItems.akaishiDebugTool != null) {
@@ -111,33 +120,33 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ESSENCE_BLOCK.get()));
                                     }
                                     // 赤能源发生机 + 小型赤能源组合结构
-                                    if (ModBlocks.CHISHI_ENERGY_GENERATOR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_GENERATOR.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_GENERATOR != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_GENERATOR.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_ASSEMBLY != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_ASSEMBLY.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_ASSEMBLY != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_ASSEMBLY.get()));
                                     }
                                     // 赤能源储存串联器（多方块主方块）
-                                    if (ModBlocks.CHISHI_ENERGY_CELL_SERIALIZER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_CELL_SERIALIZER.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_SERIALIZER != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_SERIALIZER.get()));
                                     }
                                     // 超级发生器架构核心（5×5×5 多方块主方块）
-                                    if (ModBlocks.CHISHI_SUPER_GENERATOR_CORE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_SUPER_GENERATOR_CORE.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_SUPER_GENERATOR_CORE != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_SUPER_GENERATOR_CORE.get()));
                                     }
                                     // 生命能量管道 + 生命聚合转换器 + 生命转换架构
-                                    if (ModBlocks.CHISHI_LIFE_ENERGY_PIPE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_ENERGY_PIPE.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE.get()));
                                     }
                                     // 生命能量储存器（纯生命能量存储）
-                                    if (ModBlocks.CHISHI_LIFE_ENERGY_CELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_ENERGY_CELL.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL.get()));
                                     }
                                     // 赤石锭 + 赤红升级模板
                                     if (ModItems.akaishiIngot != null) {
@@ -147,8 +156,8 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.akaishiUpgradeTemplate.get()));
                                     }
                                     // 赤石能量聚合器 + 赤石装备打造器 + 赤红升级台
-                                    if (ModBlocks.CHISHI_ENERGY_AGGREGATOR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_AGGREGATOR.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_AGGREGATOR != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_AGGREGATOR.get()));
                                     }
                                     if (ModBlocks.CHISHI_EQUIPMENT_FORGER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_EQUIPMENT_FORGER.get()));
@@ -192,49 +201,49 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.portableCellSuper.get()));
                                     }
                                     // 赤石水晶体系：4 级母岩 + 水晶簇 + 水晶块
-                                    if (ModBlocks.CHISHI_GEODE_FLAWED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEODE_FLAWED.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEODE_NORMAL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEODE_NORMAL.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEODE_PRISTINE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEODE_PRISTINE.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEODE_PERFECT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEODE_PERFECT.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CRYSTAL_CLUSTER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CRYSTAL_CLUSTER.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CRYSTAL_BLOCK != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CRYSTAL_BLOCK.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get()));
                                     }
                                     // 赤石催化器（4 级）：催生母岩生长
-                                    if (ModBlocks.CHISHI_CATALYST_BASIC != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_BASIC.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CATALYST_BASIC != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CATALYST_BASIC.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CATALYST_MEDIUM != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_MEDIUM.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CATALYST_MEDIUM != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CATALYST_MEDIUM.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CATALYST_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_ADVANCED.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CATALYST_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CATALYST_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CATALYST_ULTIMATE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CATALYST_ULTIMATE.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_CATALYST_ULTIMATE != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_CATALYST_ULTIMATE.get()));
                                     }
                                     // 自动收集器（4 级）：自动收获水晶簇
-                                    if (ModBlocks.CHISHI_COLLECTOR_BASIC != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_BASIC.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_COLLECTOR_BASIC != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_COLLECTOR_BASIC.get()));
                                     }
-                                    if (ModBlocks.CHISHI_COLLECTOR_MEDIUM != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_MEDIUM.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_COLLECTOR_MEDIUM != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_COLLECTOR_MEDIUM.get()));
                                     }
-                                    if (ModBlocks.CHISHI_COLLECTOR_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_ADVANCED.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_COLLECTOR_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_COLLECTOR_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_COLLECTOR_ULTIMATE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_COLLECTOR_ULTIMATE.get()));
+                                    if (AkaishiCrystalBlocks.CHISHI_COLLECTOR_ULTIMATE != null) {
+                                        output.accept(new ItemStack(AkaishiCrystalBlocks.CHISHI_COLLECTOR_ULTIMATE.get()));
                                     }
                                     // 物品管道（4 级）：物流网络中继，传输物品到相连容器/机器
                                     if (ModBlocks.CHISHI_ITEM_PIPE != null) {
@@ -250,8 +259,8 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE.get()));
                                     }
                                     // 生命能量提纯器 + 生命能量固态物
-                                    if (ModBlocks.CHISHI_LIFE_PURIFIER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_PURIFIER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER.get()));
                                     }
                                     if (ModItems.akaishiLifeEssenceSolid != null) {
                                         output.accept(new ItemStack(ModItems.akaishiLifeEssenceSolid.get()));
@@ -273,11 +282,11 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_ACTIVATED_FRACTIONATOR.get()));
                                     }
                                     // 创造模式能量源（测试用，无限输出）
-                                    if (ModBlocks.CHISHI_CREATIVE_ENERGY_CELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_ENERGY_CELL.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_CREATIVE_ENERGY_CELL != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_CREATIVE_ENERGY_CELL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_CREATIVE_LIFE_CELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CREATIVE_LIFE_CELL.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_CREATIVE_LIFE_CELL != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_CREATIVE_LIFE_CELL.get()));
                                     }
                                     // 液体管道 + 液体储罐（3 级）+ 废料专用管道
                                     if (ModBlocks.CHISHI_FLUID_PIPE != null) {
@@ -299,11 +308,11 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_FLUID_TANK_SUPER.get()));
                                     }
                                     // 能量液化装置 + 能量加工器（燃料加工核心）
-                                    if (ModBlocks.CHISHI_ENERGY_LIQUEFIER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_LIQUEFIER.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_LIQUEFIER != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_LIQUEFIER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_ENERGY_PROCESSOR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ENERGY_PROCESSOR.get()));
+                                    if (AkaishiEnergyBlocks.CHISHI_ENERGY_PROCESSOR != null) {
+                                        output.accept(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_PROCESSOR.get()));
                                     }
                                     // 燃料装罐机 + 燃料混合器 + 燃料罐
                                     if (ModBlocks.CHISHI_FUEL_CANNER != null) {
@@ -326,39 +335,39 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.sculkLifeform.get()));
                                     }
                                     // 反应堆体系：外壳/控制器/投放口/输出口/废品口/燃料棒/散热组件/核心
-                                    if (ModBlocks.CHISHI_REACTOR_SHELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_SHELL.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_SHELL != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_SHELL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_CONTROLLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_CONTROLLER.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_FUEL_PORT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_FUEL_PORT.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_PORT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_WASTE_PORT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_WASTE_PORT.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_WASTE_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_WASTE_PORT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_FUEL_ROD != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_FUEL_ROD.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_COOLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_COOLER.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_COOLER != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_COOLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_REACTOR_CORE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_REACTOR_CORE.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_REACTOR_CORE != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_CORE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_EXHAUSTED_BARREL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_EXHAUSTED_BARREL.get()));
+                                    if (AkaishiReactorBlocks.CHISHI_EXHAUSTED_BARREL != null) {
+                                        output.accept(new ItemStack(AkaishiReactorBlocks.CHISHI_EXHAUSTED_BARREL.get()));
                                     }
                                     // 聚变燃料体系：聚合器（赤能源产等离子体）+ 填装器（反应棒灌等离子体）+ 等离子体管道
-                                    if (ModBlocks.CHISHI_FUSION_FUEL_AGGREGATOR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_FUEL_AGGREGATOR.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_FUEL_AGGREGATOR != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_FUEL_AGGREGATOR.get()));
                                     }
                                     if (ModBlocks.CHISHI_PLASMA_FILLER != null) {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_PLASMA_FILLER.get()));
@@ -430,58 +439,58 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.activatedUltimateMixtureComponent.get()));
                                     }
                                     // 发生器矩阵体系（类反应堆式：外壳/控制器/能量输出口/燃料输入口）
-                                    if (ModBlocks.CHISHI_GEN_MATRIX_CASING != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CASING.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CASING.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CONTROLLER_BASIC.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_CONTROLLER_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEN_ENERGY_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_ENERGY_OUTPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_ENERGY_OUTPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_GEN_FUEL_INPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GEN_FUEL_INPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_GEN_FUEL_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_GEN_FUEL_INPUT.get()));
                                     }
                                     // 提纯矩阵体系（外壳/控制器/能量输入口/物品输入口/物品输出口）
-                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_CASING != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CASING.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_CASING.get()));
                                     }
-                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_CONTROLLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_PURIFIER_ENERGY_INPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ENERGY_INPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_ENERGY_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_ENERGY_INPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_PURIFIER_ITEM_INPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ITEM_INPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_ITEM_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_ITEM_INPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_PURIFIER_ITEM_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_PURIFIER_ITEM_OUTPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_PURIFIER_ITEM_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_PURIFIER_ITEM_OUTPUT.get()));
                                     }
                                     // 生命转换矩阵体系（外壳/控制器/能源输入口/能源输出口）
-                                    if (ModBlocks.CHISHI_LIFE_MATRIX_CASING != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CASING.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_CASING != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_CASING.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_CONTROLLER.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_CONTROLLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT.get()));
+                                    if (AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT.get()));
                                     }
                                     // 散热片（5 品质）
                                     if (ModItems.heatSinkPoor != null) {
@@ -525,44 +534,44 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.witherCharm.get()));
                                     }
                                     // 躯体检查仪（生命科技：体检面板）
-                                    if (ModBlocks.CHISHI_BODY_SCANNER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_BODY_SCANNER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_BODY_SCANNER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_BODY_SCANNER.get()));
                                     }
                                     // 基因管理器（生命科技：已吸收基因强化管理/卸载）
-                                    if (ModBlocks.CHISHI_GENE_MANAGER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GENE_MANAGER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_GENE_MANAGER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_GENE_MANAGER.get()));
                                     }
                                     // 生命分析台（生命科技：样本解构）
-                                    if (ModBlocks.CHISHI_GENE_ANALYZER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_GENE_ANALYZER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_GENE_ANALYZER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_GENE_ANALYZER.get()));
                                     }
                                     // 转基因工厂（生命科技：凋零骷髅基因 + 生物质 → 凋零藤）
-                                    if (ModBlocks.CHISHI_TRANSGENE_FACTORY != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_TRANSGENE_FACTORY.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_TRANSGENE_FACTORY != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_TRANSGENE_FACTORY.get()));
                                     }
                                     // 部件培养舱（生命科技：提纯 + 器官升级）
-                                    if (ModBlocks.CHISHI_CULTIVATOR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_CULTIVATOR.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_CULTIVATOR != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_CULTIVATOR.get()));
                                     }
                                     // 生命结构台（生命科技：基因序列 → 器官）
-                                    if (ModBlocks.CHISHI_LIFE_STRUCT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_STRUCT.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_STRUCT != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_STRUCT.get()));
                                     }
                                     // 生命培育器（生命科技：器官施加突变词条）
-                                    if (ModBlocks.CHISHI_LIFE_BREEDER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_LIFE_BREEDER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_BREEDER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_BREEDER.get()));
                                     }
                                     // 词条重铸仪（生命科技：原位重铸指定突变词条）
-                                    if (ModBlocks.CHISHI_TRAIT_REFORGER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_TRAIT_REFORGER.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_TRAIT_REFORGER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_TRAIT_REFORGER.get()));
                                     }
                                     // 手术仓（生命科技：器官移植/摘除）
-                                    if (ModBlocks.CHISHI_SURGERY != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_SURGERY.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_SURGERY != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_SURGERY.get()));
                                     }
                                     // 药剂台（生命科技：永久/突破药剂）
-                                    if (ModBlocks.CHISHI_POTION_TABLE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_POTION_TABLE.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_POTION_TABLE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_POTION_TABLE.get()));
                                     }
                                     // 药剂（生命科技：永久/突破模板）
                                     if (ModItems.akaishiPotion != null) {
@@ -572,24 +581,24 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.rejectionSerum.get()));
                                     }
                                     // 器官储藏库（生命科技：按槽位分页的器官仓库）
-                                    if (ModBlocks.CHISHI_ORGAN_VAULT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ORGAN_VAULT.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_ORGAN_VAULT != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_ORGAN_VAULT.get()));
                                     }
                                     // 样本库（生命科技：大容量样本仓库，自动合并）
-                                    if (ModBlocks.CHISHI_SAMPLE_VAULT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_SAMPLE_VAULT.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT.get()));
                                     }
                                     // 药剂库（生命科技：大容量药剂仓库，自动合并）
-                                    if (ModBlocks.CHISHI_POTION_CABINET != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_POTION_CABINET.get()));
+                                    if (AkaishiLifeBlocks.CHISHI_POTION_CABINET != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_POTION_CABINET.get()));
                                     }
                                     // 黑山羊之母祭坛（生命线终局：献上生命造物，识别 NBT 的祭坛）
-                                    if (ModBlocks.CHISHI_MOTHER_ALTAR != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MOTHER_ALTAR.get()));
+                                    if (AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR != null) {
+                                        output.accept(new ItemStack(AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR.get()));
                                     }
                                     // 母神祭坛石（祭坛结构件/装饰建材）
-                                    if (ModBlocks.CHISHI_ALTAR_STONE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_ALTAR_STONE.get()));
+                                    if (AkaishiMotherAltarBlocks.CHISHI_ALTAR_STONE != null) {
+                                        output.accept(new ItemStack(AkaishiMotherAltarBlocks.CHISHI_ALTAR_STONE.get()));
                                     }
                                     // 衰竭区域污染产物（衰竭土壤/衰竭木：装饰建材与体系原料）
                                     if (ModBlocks.CHISHI_DECAY_SOIL != null) {
@@ -668,45 +677,45 @@ public final class ModCreativeTabs {
                                     output.accept(new ItemStack(ModItems.akaishiOrganLeftLeg.get()));
                                     output.accept(new ItemStack(ModItems.akaishiOrganRightLeg.get()));
                                     // 无线赤能源体系：外壳/终端核心/控制器/输入口/输出口
-                                    if (ModBlocks.CHISHI_WIRELESS_SHELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_SHELL.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_SHELL != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_SHELL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_TERMINAL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_TERMINAL.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_TERMINAL != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_TERMINAL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_SECURITY != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_SECURITY.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_SECURITY != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_SECURITY.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_CORE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CORE.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_CORE != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_CORE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_CONTROLLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CONTROLLER.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_CONTROLLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_INPUT_PORT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_INPUT_PORT.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_PORT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get()));
                                     }
                                     // 无线赤能源体系：内腔功能组件（跨维/区块加载/区块扩展/入损/出损抑制）
-                                    if (ModBlocks.CHISHI_WIRELESS_DIM_BRIDGE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_DIM_BRIDGE.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_DIM_BRIDGE != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_DIM_BRIDGE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CHUNK_LOADER.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_LOADER != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_LOADER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_CHUNK_RANGE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_CHUNK_RANGE.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_RANGE != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_RANGE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_INPUT_LOSS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_INPUT_LOSS.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_LOSS != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_LOSS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_WIRELESS_OUTPUT_LOSS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_WIRELESS_OUTPUT_LOSS.get()));
+                                    if (AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_LOSS != null) {
+                                        output.accept(new ItemStack(AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_LOSS.get()));
                                     }
                                     // 无线赤能源体系：便捷组件/便捷终端/身份卡
                                     if (ModItems.akaishiWirelessComponent != null) {
@@ -719,38 +728,38 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModItems.akaishiWirelessIdentityCard.get()));
                                     }
                                     // 聚变堆体系：外壳/隔热层/控制器/核心/框架（散热/燃料/效率）/接口（能量/物品输入/物品输出）
-                                    if (ModBlocks.CHISHI_FUSION_SHELL != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_SHELL.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_SHELL != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_SHELL.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_INSULATION != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_INSULATION.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_INSULATION != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_INSULATION.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_CONTROLLER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_CONTROLLER.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_CONTROLLER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_CORE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_CORE.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_CORE != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_CORE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_COOLER_FRAME != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_COOLER_FRAME.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_COOLER_FRAME != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_COOLER_FRAME.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_FUEL_FRAME != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_FUEL_FRAME.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_FUEL_FRAME != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_FUEL_FRAME.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_EFFICIENCY_FRAME != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_EFFICIENCY_FRAME.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_EFFICIENCY_FRAME != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_EFFICIENCY_FRAME.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_ENERGY_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_ENERGY_OUTPUT.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_ENERGY_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_ENERGY_OUTPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_ITEM_INPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_ITEM_INPUT.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_ITEM_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_ITEM_INPUT.get()));
                                     }
-                                    if (ModBlocks.CHISHI_FUSION_ITEM_OUTPUT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_FUSION_ITEM_OUTPUT.get()));
+                                    if (AkaishiFusionBlocks.CHISHI_FUSION_ITEM_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiFusionBlocks.CHISHI_FUSION_ITEM_OUTPUT.get()));
                                     }
                                     // 聚变堆体系：生命灰烬 + 6 档聚变散热片（5%/7%/9%/12%/15%/生命 20%）
                                     if (ModItems.lifeAsh != null) {
@@ -813,36 +822,49 @@ public final class ModCreativeTabs {
                                         output.accept(new ItemStack(ModBlocks.CHISHI_TRANSFORMER.get()));
                                     }
                                     // 赤石矿机体系：4 级控制器 + 架构/升级框架 + 转口
-                                    if (ModBlocks.CHISHI_MINER_CONTROLLER_BASIC != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_CONTROLLER_BASIC.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_BASIC != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_BASIC.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_CONTROLLER_ADVANCED != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_CONTROLLER_ADVANCED.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_ADVANCED.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_CONTROLLER_SUPER != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_CONTROLLER_SUPER.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_SUPER != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_SUPER.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_CONTROLLER_ULTIMATE != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_CONTROLLER_ULTIMATE.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_ULTIMATE != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_CONTROLLER_ULTIMATE.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_FRAME != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_FRAME.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_FRAME != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_FRAME.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_UPGRADE_FRAME != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_UPGRADE_FRAME.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_UPGRADE_FRAME != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_UPGRADE_FRAME.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_PORT != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_PORT.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_PORT.get()));
+                                    }
+                                    // 9×9×5 结构新增件：钻机钻头 / 架构【外接】 / 能量输入口 / 物品输出口
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_DRILL_BIT != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_DRILL_BIT.get()));
+                                    }
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_FRAME_EXTERNAL != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_FRAME_EXTERNAL.get()));
+                                    }
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_ENERGY_INPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_ENERGY_INPUT.get()));
+                                    }
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_ITEM_OUTPUT != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_ITEM_OUTPUT.get()));
                                     }
                                     // 矿机升级模块方块（速度/时运/储能，安装于升级框架位置）
-                                    if (ModBlocks.CHISHI_MINER_SPEED_UPGRADE_BLOCK != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_SPEED_UPGRADE_BLOCK.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_SPEED_UPGRADE_BLOCK != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_SPEED_UPGRADE_BLOCK.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_FORTUNE_UPGRADE_BLOCK != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_FORTUNE_UPGRADE_BLOCK.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_FORTUNE_UPGRADE_BLOCK != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_FORTUNE_UPGRADE_BLOCK.get()));
                                     }
-                                    if (ModBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK != null) {
-                                        output.accept(new ItemStack(ModBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK.get()));
+                                    if (AkaishiMinerBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK != null) {
+                                        output.accept(new ItemStack(AkaishiMinerBlocks.CHISHI_MINER_STORAGE_UPGRADE_BLOCK.get()));
                                     }
                                     // 手册：赤石研究日记（akaishi_diary）+ 生命的奥秘（akaishi_life_book），作为 Patchouli 自定义书物品
                                     accept(output, ModItems.akaishiDiary);

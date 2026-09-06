@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiPurifierMatrixControllerBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
@@ -49,7 +50,7 @@ public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
-                        || stack.is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+                        || stack.is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
             }
         });
         // 输出槽：只出不进

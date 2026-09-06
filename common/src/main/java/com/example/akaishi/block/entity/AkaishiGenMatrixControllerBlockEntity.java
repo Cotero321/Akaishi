@@ -8,7 +8,7 @@ import com.example.akaishi.block.AkaishiGenFuelInputPortBlock;
 import com.example.akaishi.block.AkaishiGenMatrixCasingBlock;
 import com.example.akaishi.block.AkaishiGenMatrixControllerBlock;
 import com.example.akaishi.block.AkaishiGenMatrixTier;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
@@ -157,7 +157,7 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
                 || b instanceof AkaishiGenEnergyOutputPortBlock
                 || b instanceof AkaishiGenFuelInputPortBlock
                 || b instanceof AkaishiGenMatrixControllerBlock
-                || b == ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get();
+                || b == AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get();
     }
 
     /** 结构检测节流计数（成型后每 10 tick 校验一次） */

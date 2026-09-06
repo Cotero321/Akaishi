@@ -10,6 +10,7 @@ import com.example.akaishi.block.AkaishiFusionInsulationBlock;
 import com.example.akaishi.block.AkaishiFusionItemInputPortBlock;
 import com.example.akaishi.block.AkaishiFusionItemOutputPortBlock;
 import com.example.akaishi.block.AkaishiFusionShellBlock;
+import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -209,6 +210,6 @@ public final class FusionStructure {
                 || b instanceof AkaishiFusionEnergyOutputBlock
                 || b instanceof AkaishiFusionItemInputPortBlock
                 || b instanceof AkaishiFusionItemOutputPortBlock
-                || b == ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get();
+                || b == AkaishiFusionBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get();
     }
 }

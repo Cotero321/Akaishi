@@ -1,6 +1,7 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
@@ -84,7 +85,7 @@ public class PurificationRecipeCategory implements IRecipeCategory<PurificationR
         /** 生成全部展示配方：不同燃料对应不同配方 */
         public static List<PurificationRecipe> getAll() {
             ItemStack raw = new ItemStack(ModBlocks.RAW_CHISHI_BLOCK.get());
-            ItemStack crystalBlock = new ItemStack(ModBlocks.CHISHI_CRYSTAL_BLOCK.get());
+            ItemStack crystalBlock = new ItemStack(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get());
             ItemStack essence = new ItemStack(ModItems.akaishiEssence.get());
             ItemStack essence4 = new ItemStack(ModItems.akaishiEssence.get(), 4);
             List<PurificationRecipe> recipes = new ArrayList<>();

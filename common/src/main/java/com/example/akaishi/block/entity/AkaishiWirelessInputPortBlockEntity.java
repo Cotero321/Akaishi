@@ -88,9 +88,13 @@ public class AkaishiWirelessInputPortBlockEntity extends BlockEntity implements 
                     long sendNet = (long) (toSend * (1.0 - loss));
                     if (sendNet > 0) {
                         long sent = terminal.receiveWireless(sendNet); // 实收（储能可能满）
-                        // 实扣 = 全额推走 - 储能拒收：损耗部分从缓冲蒸发，储能拒收部分退回缓冲
-                        long taken = toSend - (sendNet - sent);
-                        buffer.extractEnergy(taken, false);
+                        if (sent > 0) {
+                            // 实扣 = 全额推走 - 储能拒收：损耗部分从缓冲蒸发，储能拒收部分退回缓冲
+                            long taken = toSend - (sendNet - sent);
+                            buffer.extractEnergy(taken, false);
+                        }
+                        // sent == 0：终端储能已满，缓冲分文不动（损耗也暂不扣除），
+                        // 等储能有空位再送；否则会在满位反复推拒造成数字跳动与损耗空烧
                     }
                 }
             } else {

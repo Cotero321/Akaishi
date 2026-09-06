@@ -3,6 +3,8 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
+import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiPurifierEnergyInputPortBlock;
 import com.example.akaishi.block.AkaishiPurifierItemInputPortBlock;
 import com.example.akaishi.block.AkaishiPurifierItemOutputPortBlock;
@@ -148,7 +150,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
                 || b instanceof AkaishiPurifierItemOutputPortBlock
                 || b instanceof AkaishiPurifierEnergyInputPortBlock
                 || b instanceof AkaishiPurifierMatrixControllerBlock
-                || b == ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get();
+                || b == AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get();
     }
 
     /** 结构检测节流计数（成型后每 10 tick 校验一次） */
@@ -192,12 +194,12 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
     /** 有效输入：粗制赤石块 或 赤石水晶块 */
     private boolean isValidInput(ItemStack stack) {
         return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
-                || stack.is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+                || stack.is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
     }
 
     /** 单次提纯产出的精华数：赤石水晶块 4 个，粗制赤石块 1 个 */
     private int outputPerInput() {
-        return inventory.getItem(INPUT_SLOT).is(ModBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
+        return inventory.getItem(INPUT_SLOT).is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
     }
 
     /** 结构是否成型（端口用） */

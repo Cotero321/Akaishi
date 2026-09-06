@@ -142,11 +142,13 @@ public final class ModConfig {
     /** 挖矿一次基础耗时（tick，等级倍率在此基础上加速） */
     public static volatile int minerTicksBase = 200;
     /** 挖矿每 tick 基础能耗（速度升级按比例提升） */
-    public static volatile long minerCostPerTickBase = 10L;
+    public static volatile long minerCostPerTickBase = 2000L;
 
     // ==================== 衰竭区域 ====================
     /** 衰竭区域持续时长（tick，默认 30 小时） */
     public static volatile long decayZoneDurationTicks = 30L * 60 * 60 * 20;
+    /** 每区域每 tick 腐化方块采样次数（256=旧速；8192=旧速 32 倍；上限 65536=256 倍） */
+    public static volatile int decayZoneEnvSamplesPerTick = 8192;
 
     // ==================== 衰变净化塔 ====================
     /** 净化塔赤能源缓冲容量 */
@@ -157,10 +159,6 @@ public final class ModConfig {
     public static volatile long decayPurifierCostPerTick = 2_000L;
     /** 每 tick 削减的衰竭区域剩余时间（tick，10 = 区域 10 倍速消散） */
     public static volatile long decayPurifierTicksPerTick = 10L;
-
-    // ==================== 无线赤能源 ====================
-    /** 无线区块加载能量税：每区块每 tick 消耗的赤石能量（区块加载构架生效时按加载区块数持续扣费） */
-    public static volatile long wirelessChunkTaxPerChunk = 1_000L;
 
     // ==================== 聚变堆 ====================
     /** 效率框架增长系数：每个效率框架使产率/产热 ×该值（默认 1.15，12 个 → 约 5.35 倍） */

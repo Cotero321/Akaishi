@@ -40,6 +40,8 @@ import com.example.akaishi.block.entity.AkaishiPulverizerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiTransformerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMinerControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMinerPortBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMinerEnergyInputBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMinerItemOutputBlockEntity;
 import com.example.akaishi.block.entity.AkaishiActivatedFractionatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionFuelAggregatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionItemInputPortBlockEntity;
@@ -170,6 +172,10 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiMinerControllerMenu>> CHISHI_MINER_CONTROLLER;
     /** 矿机转口菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiMinerPortMenu>> CHISHI_MINER_PORT;
+    /** 矿机能量输入口菜单（能量缓冲展示） */
+    public static RegistrySupplier<MenuType<AkaishiMinerEnergyInputMenu>> CHISHI_MINER_ENERGY_INPUT;
+    /** 矿机物品输出口菜单（产物缓冲展示） */
+    public static RegistrySupplier<MenuType<AkaishiMinerItemOutputMenu>> CHISHI_MINER_ITEM_OUTPUT;
     /** 活化分馏器（活化结晶深度拆分） */
     public static RegistrySupplier<MenuType<AkaishiActivatedFractionatorMenu>> CHISHI_ACTIVATED_FRACTIONATOR;
     /** 聚变燃料聚合器（活化成分 → 等离子体） */
@@ -996,6 +1002,40 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_miner_port"), () -> minerPortType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(minerPortType, AkaishiMinerPortScreen::new));
+
+        // 矿机能量输入口：纯能量缓冲展示（无机器槽）+ 3 数据槽（能量/容量/成型）
+        MenuType<AkaishiMinerEnergyInputMenu> energyInputType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiMinerEnergyInputBlockEntity port) {
+                return new AkaishiMinerEnergyInputMenu(syncId, inv, port.data());
+            }
+            return AkaishiMinerEnergyInputMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_MINER_ENERGY_INPUT = (RegistrySupplier<MenuType<AkaishiMinerEnergyInputMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_miner_energy_input"), () -> energyInputType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(energyInputType, AkaishiMinerEnergyInputScreen::new));
+
+        // 矿机物品输出口：产物缓冲 27 槽（只读）+ 3 数据槽（能量/容量/成型）
+        MenuType<AkaishiMinerItemOutputMenu> itemOutputType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiMinerItemOutputBlockEntity port) {
+                return new AkaishiMinerItemOutputMenu(syncId, inv, port);
+            }
+            return new AkaishiMinerItemOutputMenu(syncId, inv,
+                    new SimpleContainer(AkaishiMinerItemOutputBlockEntity.BUFFER_SLOTS),
+                    new SimpleContainerData(3));
+        });
+        CHISHI_MINER_ITEM_OUTPUT = (RegistrySupplier<MenuType<AkaishiMinerItemOutputMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_miner_item_output"), () -> itemOutputType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(itemOutputType, AkaishiMinerItemOutputScreen::new));
 
         // 活化分馏器：3 机器槽（输入活化结晶 + 2 只读输出槽）+ 3 数据槽（能量/进度）
         MenuType<AkaishiActivatedFractionatorMenu> fractionatorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

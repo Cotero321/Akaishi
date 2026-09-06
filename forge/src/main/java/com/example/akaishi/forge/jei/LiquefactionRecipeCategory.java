@@ -1,7 +1,7 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.entity.AkaishiEnergyLiquefierBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
@@ -46,7 +46,7 @@ public class LiquefactionRecipeCategory implements IRecipeCategory<LiquefactionR
 
     public LiquefactionRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 84);
-        this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_ENERGY_LIQUEFIER.get()));
+        this.icon = helper.createDrawableItemStack(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_LIQUEFIER.get()));
     }
 
     @Override

@@ -111,13 +111,11 @@ public class AkaishiWirelessTerminalScreen extends AbstractContainerScreen<Akais
                 menu.isChunkLoad() ? "OK" : "NO",
                 menu.isChunkRange() ? "3x3" : "1x1"),
                 x + 8, y + 84, TEXT_DIM, false);
-        // 区块加载能量税状态：正常绿字显示弱加载区块数，能量不足停用则红字警告
+        // 区块加载状态：绿字显示当前弱加载区块数（区块加载免能量税）
         if (menu.isChunkLoad()) {
-            boolean disabled = menu.isChunkTaxDisabled();
-            Component taxLine = disabled
-                    ? Component.translatable("gui.akaishi.wireless.terminal.chunk_tax_disabled")
-                    : Component.translatable("gui.akaishi.wireless.terminal.chunk_tax", menu.getChunkLoaded());
-            gui.drawString(this.font, taxLine, x + 8, y + 96, disabled ? TEXT_RED : TEXT_GREEN, false);
+            gui.drawString(this.font,
+                    Component.translatable("gui.akaishi.wireless.terminal.chunk_tax", menu.getChunkLoaded()),
+                    x + 8, y + 96, TEXT_GREEN, false);
         }
     }
 

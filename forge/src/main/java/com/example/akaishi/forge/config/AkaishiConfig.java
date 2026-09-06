@@ -86,6 +86,7 @@ public final class AkaishiConfig {
 
     // ==================== 衰竭区域 ====================
     public static final ForgeConfigSpec.LongValue DECAY_ZONE_DURATION_TICKS;
+    public static final ForgeConfigSpec.IntValue DECAY_ZONE_SAMPLES_PER_TICK;
 
     // ==================== 衰变净化塔 ====================
     public static final ForgeConfigSpec.LongValue DECAY_PURIFIER_ENERGY_CAPACITY;
@@ -114,7 +115,6 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.DoubleValue WIRELESS_MAX_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_CROSS_DIM_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_LOSS_REDUCTION_PER_MODULE;
-    public static final ForgeConfigSpec.LongValue WIRELESS_CHUNK_TAX_PER_CHUNK;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -256,12 +256,15 @@ public final class AkaishiConfig {
         MINER_TICKS_BASE = b.comment("Base ticks for one mining cycle (tier multiplier speeds it up)")
                 .defineInRange("ticksBase", 200, 1, Integer.MAX_VALUE);
         MINER_COST_PER_TICK_BASE = b.comment("Base akaishi energy consumed per tick while mining")
-                .defineInRange("costPerTickBase", 10L, 1L, Long.MAX_VALUE);
+                .defineInRange("costPerTickBase", 2000L, 1L, Long.MAX_VALUE);
         b.pop();
 
         b.push("decay_zone");
         DECAY_ZONE_DURATION_TICKS = b.comment("Decay zone duration (ticks, default 30 hours)")
                 .defineInRange("durationTicks", 30L * 60 * 60 * 20, 1L, Long.MAX_VALUE);
+        DECAY_ZONE_SAMPLES_PER_TICK = b.comment("Block conversion samples per zone per tick (256 = old speed; 8192 = 32x, default). "
+                        + "Capped at 65536 (256x old speed) to keep chunk sampling cost sane.")
+                .defineInRange("samplesPerTick", 8192, 256, 65536);
         b.pop();
 
         b.push("decay_purifier");
@@ -315,8 +318,6 @@ public final class AkaishiConfig {
                 .defineInRange("crossDimLoss", 0.25, 0.0, 0.99);
         WIRELESS_LOSS_REDUCTION_PER_MODULE = b.comment("Loss reduction per input/output loss suppressor module (0.05 = -5%, stackable, capped at 90%)")
                 .defineInRange("lossReductionPerModule", 0.05, 0.0, 0.9);
-        WIRELESS_CHUNK_TAX_PER_CHUNK = b.comment("Chunk loading energy tax per loaded chunk per tick (chunk loader module active)")
-                .defineInRange("chunkTaxPerChunk", 1_000L, 0L, Long.MAX_VALUE);
         b.pop();
 
         SPEC = b.build();

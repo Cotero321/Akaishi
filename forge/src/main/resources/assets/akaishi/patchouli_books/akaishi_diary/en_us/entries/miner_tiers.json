@@ -19,7 +19,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_port",
-      "text": "The Miner Port is your power inlet and product outlet in one. Each miner has two, sitting at the $(bold)dead center of the bottom and top layers$(0), on the same axis as the controller.$(br2)$(bold)Feeding power:$(0) each port carries a $(4)10M$(0) energy buffer for your pipes; once formed it forwards up to $(4)2000 energy/tick$(0) to the controller.$(br2)$(bold)Collecting loot:$(0) the controller pushes ores into the port's $(4)27-slot$(0) buffer, and hoppers or item pipes can pull from any slot. Both ports are identical — wire them however you like."
+      "text": "The Miner Port is your power inlet and product outlet in one. In the new 9x9x5 layout each miner has a single one, sitting at the $(bold)dead center of the top layer$(0) on the same axis as the controller — the $(bold)bottom center now belongs to the Drill Bit$(0).$(br2)$(bold)Feeding power:$(0) the port carries a $(4)10M$(0) energy buffer for your pipes; once formed it forwards power to the controller $(4)without a rate cap$(0).$(br2)$(bold)Collecting loot:$(0) the controller pushes ores into the port's $(4)27-slot$(0) buffer, and hoppers or item pipes can pull from any slot.$(br2)One port not enough? The pillars accept extra \"Miner Energy Input\" and \"Miner Item Output\" blocks with the same interfaces — split your power and loot routing onto separate pillars. See the \"Miner Structure\" entry."
     },
     {
       "type": "patchouli:relations",

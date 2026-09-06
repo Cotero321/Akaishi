@@ -1,8 +1,10 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.api.IMinerPortDevice;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.item.IMinerOutputSink;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiMinerControllerBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
@@ -32,14 +34,13 @@ import org.jetbrains.annotations.NotNull;
  * 结构成型后每 tick 把缓冲能量转发给控制器，并接收控制器推送的挖矿产物。
  */
 public class AkaishiMinerPortBlockEntity extends BlockEntity
-        implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier {
+        implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier,
+        IMinerPortDevice, IMinerOutputSink {
 
     /** 产物缓冲槽数 */
     public static final int BUFFER_SLOTS = 27;
     /** 能量缓冲容量 */
     public static final long BUFFER_CAPACITY = 10_000_000L;
-    /** 每 tick 向控制器转发的能量上限（20 tick/s） */
-    public static final long ENERGY_TRANSFER_RATE = 2_000L;
 
     public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_FORMED = 2;
 
@@ -78,9 +79,9 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         if (!formed) {
             return;
         }
-        // 能量缓冲 → 控制器（限量，避免瞬时清空缓冲）
+        // 能量缓冲 → 控制器（每 tick 满速转发，仅受控制器剩余容量限制）
         long free = controller.getEnergyCapacity() - controller.getEnergyStored();
-        long pushed = energy.extractEnergy(Math.min(ENERGY_TRANSFER_RATE, free), false);
+        long pushed = energy.extractEnergy(free, false);
         if (pushed > 0) {
             controller.addEnergy(pushed);
             controller.setChanged();
@@ -89,6 +90,7 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
     }
 
     /** 接收控制器推送的产物（支持部分合并：尽量并入同种槽/空槽，返回未放入的剩余部分） */
+    @Override
     public ItemStack receivePartial(ItemStack incoming) {
         if (incoming.isEmpty()) {
             return ItemStack.EMPTY;
@@ -128,6 +130,7 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         return data;
     }
 
+    @Override
     public void setControllerPos(BlockPos pos) {
         if (!java.util.Objects.equals(pos, controllerPos)) {
             this.controllerPos = pos == null ? null : pos.immutable();

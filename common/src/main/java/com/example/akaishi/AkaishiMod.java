@@ -1,7 +1,16 @@
 package com.example.akaishi;
 
 import com.example.akaishi.api.energy.EnergyTypeRegistry;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
+import com.example.akaishi.block.AkaishiWirelessBlocks;
+import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiLifeBlocks;
+import com.example.akaishi.block.AkaishiMinerBlocks;
+import com.example.akaishi.block.AkaishiMotherAltarBlocks;
+import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.decay.DecayZoneManager;
@@ -35,7 +44,16 @@ public final class AkaishiMod {
         EnergyTypeRegistry.register(AkaishiEnergyType.INSTANCE);
         ModItems.register();
         ModBlocks.register();
+        AkaishiCrystalBlocks.register();
+        AkaishiEnergyBlocks.register();
         AkaishiDecayBlocks.register();
+        AkaishiWirelessBlocks.register();
+        AkaishiFusionBlocks.register();
+        AkaishiMinerBlocks.register();
+        AkaishiMotherAltarBlocks.register();
+        AkaishiReactorBlocks.register();
+        AkaishiLifeBlocks.register();
+        AkaishiMatrixBlocks.register();
         ModBlockEntities.register();
         ModCreativeTabs.register();
         ModMenus.register();

@@ -75,7 +75,7 @@ public class AkaishiGeodeBlock extends Block {
             return;
         }
         Direction dir = airDirs.get(random.nextInt(airDirs.size()));
-        level.setBlock(geodePos.relative(dir), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState()
+        level.setBlock(geodePos.relative(dir), AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER.get().defaultBlockState()
                 .setValue(AkaishiCrystalClusterBlock.FACING, dir), 3);
     }
 }

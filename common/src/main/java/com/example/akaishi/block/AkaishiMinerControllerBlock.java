@@ -26,8 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 赤石矿机控制器（核心方块，4 级共用，等级由方块实例决定）。
- * 需按固定 9×9×3 布局搭建结构：底层/顶层为十字框架布局，中间层中心为本方块。
- * 结构成型（formed）后消耗赤能源持续挖矿，产物经转口输出，升级件放在升级框架中。
+ * 需按固定 9×9×5 布局搭建结构：五层共用十字框架布局，控制器位于中间层中心，
+ * 底部中心柱为钻机钻头、顶部中心柱为矿机转口，四根边立柱可由设备/架构件混搭。
+ * 结构成型（formed）后消耗赤能源持续挖矿，产物经转口/物品输出口输出，升级件放在升级框架中。
  */
 public class AkaishiMinerControllerBlock extends AkaishiMachineBlock {
 

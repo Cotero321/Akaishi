@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "akaishi:block/akaishi_miner_frame_external_bottom",
+    "top": "akaishi:block/akaishi_miner_frame_external_top",
+    "side": "akaishi:block/akaishi_miner_frame_external_side"
+  }
+}

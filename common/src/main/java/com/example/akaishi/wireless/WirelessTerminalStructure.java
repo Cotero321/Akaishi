@@ -10,6 +10,7 @@ import com.example.akaishi.block.AkaishiWirelessOutputLossBlock;
 import com.example.akaishi.block.AkaishiWirelessSecurityBlock;
 import com.example.akaishi.block.AkaishiWirelessShellBlock;
 import com.example.akaishi.block.AkaishiWirelessTerminalBlock;
+import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -193,6 +194,6 @@ public final class WirelessTerminalStructure {
                 || b instanceof AkaishiWirelessSecurityBlock
                 || b instanceof AkaishiWirelessControllerBlock
                 || b instanceof AkaishiWirelessShellBlock
-                || b == ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get();
+                || b == AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get();
     }
 }

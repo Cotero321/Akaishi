@@ -67,9 +67,9 @@ public class AkaishiFusionEnergyOutputBlockEntity extends BlockEntity implements
         }
     }
 
-    /** 控制器灌入产出能量 */
-    public void receiveEnergy(long amount) {
-        energy.addEnergy(amount, false);
+    /** 控制器灌入产出能量，返回实收（储能满/空间不足时返回实际装入量） */
+    public long receiveEnergy(long amount) {
+        return energy.addEnergy(amount, false);
     }
 
     public AkaishiEnergyStorage energy() {

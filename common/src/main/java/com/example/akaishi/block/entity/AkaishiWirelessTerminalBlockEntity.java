@@ -70,14 +70,14 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
     public static final int DATA_TERMINAL_ID = 14;
     /** 当前弱加载区块数（区块加载构架生效时 >0） */
     public static final int DATA_CHUNK_LOADED = 15;
-    /** 区块加载能量税停用标志（1=因能量不足关闭网络区块加载） */
+    /** 区块加载能量税停用标志（1=因能量不足关闭网络区块加载）——已废弃：税已移除，槽位保留以免索引错位 */
     public static final int DATA_TAX_DISABLED = 16;
     public static final int DATA_SLOTS = 17;
 
     /** 绑定储能单元的搜索半径：结构外围 1 格（单元单方块直接贴身布置即可，范围小不误扫无关方块） */
     private static final int BIND_RANGE = 1;
-    /** 区块加载结算间隔（tick）：每 20 tick 结算一次能量税并刷新弱加载 ticket */
-    private static final int CHUNK_TAX_INTERVAL = 20;
+    /** 区块加载刷新间隔（tick）：每 20 tick 按网络变化 diff 刷新弱加载 ticket（免能量税） */
+    private static final int CHUNK_REFRESH_INTERVAL = 20;
 
     /** 结构扫描缓存失效标记 */
     private boolean structureDirty = true;
@@ -98,8 +98,6 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
     private long lastMax;
     /** 当前弱加载的「维度 + 区块」集合（区块加载构架生效时维护，diff 更新防泄漏） */
     private final Set<DimChunk> loadedChunks = new HashSet<>();
-    /** 区块加载能量税停用标志（能量不足关闭网络区块加载，供 GUI 显示） */
-    private boolean taxDisabled;
     /** 绑定储能成员缓存：每 20 tick 刷新，避免每次能量操作都全量扫描周围方块 */
     private List<com.example.akaishi.api.energy.IEnergyStorage> cachedMembers = List.of();
 
@@ -146,21 +144,14 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
                         be -> be instanceof AkaishiWirelessInputPortBlockEntity p && p.authenticated(terminalId),
                         be -> be instanceof AkaishiWirelessOutputPortBlockEntity p && p.authenticated(terminalId));
             }
-            // 区块加载：每 20 tick 结算能量税并刷新网络区块弱加载（终端 + 已认证口）
-            // 能量税不足时关闭网络区块加载，能量恢复后下个结算周期自动重开
+            // 区块加载（免费）：每 20 tick 按终端/口的在线变化 diff 刷新弱加载 ticket，防止 ticket 泄漏；
+            // 不再收取能量税，避免税成为持续负载导致满储能时聚变堆仍周期性点火
             if (--chunkLoadCooldown <= 0) {
-                chunkLoadCooldown = CHUNK_TAX_INTERVAL;
+                chunkLoadCooldown = CHUNK_REFRESH_INTERVAL;
                 if (structure.chunkLoaderCount > 0) {
-                    if (payChunkLoadTax()) {
-                        updateChunkLoad();
-                        taxDisabled = false;
-                    } else {
-                        releaseChunkLoad();
-                        taxDisabled = true;
-                    }
+                    updateChunkLoad();
                 } else {
                     releaseChunkLoad();
-                    taxDisabled = false;
                 }
             }
             // 绑定储能成员缓存：每 20 tick 重扫贴身储能单元（结构变化不频繁，避免每 tick 全量扫描）
@@ -193,7 +184,7 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
         data.set(DATA_CHUNK_LOAD, structure != null && structure.chunkLoaderCount > 0 ? 1 : 0);
         data.set(DATA_CHUNK_RANGE, structure != null && structure.chunkRangeCount > 0 ? 1 : 0);
         data.set(DATA_CHUNK_LOADED, loadedChunks.size());
-        data.set(DATA_TAX_DISABLED, taxDisabled ? 1 : 0);
+        data.set(DATA_TAX_DISABLED, 0); // 废弃占位：区块加载税已移除，槽位保留以免后续索引错位
         data.set(DATA_INPUT_LOSS, structure == null ? 0 : structure.inputLossCount);
         data.set(DATA_OUTPUT_LOSS, structure == null ? 0 : structure.outputLossCount);
         // 终端短 ID（UUID 前 4 字节）：GUI 8 位 hex 与身份卡/终端显示格式一致
@@ -248,27 +239,6 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
             }
         }
         return want;
-    }
-
-    /**
-     * 区块加载能量税：按「应加载区块数 × 每区块费率 × 结算间隔」从绑定储能扣除赤石能量。
-     * 先 simulate 确认足额再实扣，能量不足时一毫不扣并返回 false（由调用方关闭网络区块加载）。
-     */
-    private boolean payChunkLoadTax() {
-        long tax = ModConfig.wirelessChunkTaxPerChunk;
-        if (tax <= 0) {
-            return true; // 税率为 0：区块加载免费
-        }
-        int want = computeWantChunks().size();
-        if (want <= 0) {
-            return true;
-        }
-        long fee = tax * want * CHUNK_TAX_INTERVAL;
-        if (boundStorage.extractEnergy(fee, true) < fee) {
-            return false;
-        }
-        boundStorage.extractEnergy(fee, false);
-        return true;
     }
 
     /** 将目标区块加入弱加载集合；range=true 时扩为以目标为中心的 3×3 区块 */

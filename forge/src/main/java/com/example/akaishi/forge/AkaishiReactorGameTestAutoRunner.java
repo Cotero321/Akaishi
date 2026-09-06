@@ -1,6 +1,6 @@
 package com.example.akaishi.forge;
 
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorCoolerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorEnergyOutputBlockEntity;
@@ -146,15 +146,15 @@ public final class AkaishiReactorGameTestAutoRunner {
                 continue;
             }
             if (p.equals(CONTROLLER)) {
-                setBlock(p, ModBlocks.CHISHI_REACTOR_CONTROLLER.get());
+                setBlock(p, AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get());
             } else if (p.equals(ENERGY_OUT)) {
-                setBlock(p, ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get());
+                setBlock(p, AkaishiReactorBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get());
             } else if (p.equals(WASTE_OUT)) {
-                setBlock(p, ModBlocks.CHISHI_REACTOR_WASTE_PORT.get());
+                setBlock(p, AkaishiReactorBlocks.CHISHI_REACTOR_WASTE_PORT.get());
             } else if (p.equals(FUEL_PORT)) {
-                setBlock(p, ModBlocks.CHISHI_REACTOR_FUEL_PORT.get());
+                setBlock(p, AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_PORT.get());
             } else {
-                setBlock(p, ModBlocks.CHISHI_REACTOR_SHELL.get());
+                setBlock(p, AkaishiReactorBlocks.CHISHI_REACTOR_SHELL.get());
             }
         }
     }
@@ -168,12 +168,12 @@ public final class AkaishiReactorGameTestAutoRunner {
     /** 阶段 A：2 燃料棒 + 4 散热组件（插劣质散热片）+ 1 核心 */
     private static void buildPhaseA() {
         buildShell();
-        setBlock(CORE, ModBlocks.CHISHI_REACTOR_CORE.get());
+        setBlock(CORE, AkaishiReactorBlocks.CHISHI_REACTOR_CORE.get());
         for (BlockPos rod : RODS_A) {
-            setBlock(rod, ModBlocks.CHISHI_REACTOR_FUEL_ROD.get());
+            setBlock(rod, AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD.get());
         }
         for (BlockPos cooler : COOLERS_A) {
-            setBlock(cooler, ModBlocks.CHISHI_REACTOR_COOLER.get());
+            setBlock(cooler, AkaishiReactorBlocks.CHISHI_REACTOR_COOLER.get());
             // getBlockEntity 需用绝对坐标（at = base.offset），否则查到世界原点附近空位置
             if (level.getBlockEntity(at(cooler)) instanceof AkaishiReactorCoolerBlockEntity c) {
                 c.insertHeatSink(new ItemStack(ModItems.heatSinkPoor.get()));
@@ -194,14 +194,14 @@ public final class AkaishiReactorGameTestAutoRunner {
         for (BlockPos p : BlockPos.betweenClosed(new BlockPos(1, 1, 1), new BlockPos(3, 3, 3))) {
             setBlock(p, Blocks.AIR);
         }
-        setBlock(CORE, ModBlocks.CHISHI_REACTOR_CORE.get());
+        setBlock(CORE, AkaishiReactorBlocks.CHISHI_REACTOR_CORE.get());
         // 10 棒：y=1 层 9 个 + (1,2,1)
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
-                setBlock(new BlockPos(x, 1, z), ModBlocks.CHISHI_REACTOR_FUEL_ROD.get());
+                setBlock(new BlockPos(x, 1, z), AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD.get());
             }
         }
-        setBlock(new BlockPos(1, 2, 1), ModBlocks.CHISHI_REACTOR_FUEL_ROD.get());
+        setBlock(new BlockPos(1, 2, 1), AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD.get());
         // 直接注入控制器燃料槽（10 棒终极混合 → 无散热必爆）
         AkaishiReactorControllerBlockEntity controller = asController();
         if (controller != null) {

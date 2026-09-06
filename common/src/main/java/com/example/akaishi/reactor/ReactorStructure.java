@@ -8,7 +8,7 @@ import com.example.akaishi.block.AkaishiReactorFuelPortBlock;
 import com.example.akaishi.block.AkaishiReactorFuelRodBlock;
 import com.example.akaishi.block.AkaishiReactorShellBlock;
 import com.example.akaishi.block.AkaishiReactorWastePortBlock;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.entity.AkaishiReactorCoolerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -209,6 +209,6 @@ public final class ReactorStructure {
                 || b instanceof AkaishiReactorFuelPortBlock
                 || b instanceof AkaishiReactorEnergyOutputBlock
                 || b instanceof AkaishiReactorWastePortBlock
-                || b == ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get();
+                || b == AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get();
     }
 }

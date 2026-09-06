@@ -1,7 +1,12 @@
 package com.example.akaishi.forge;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
+import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
+import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiFluidPipeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
@@ -9,6 +14,7 @@ import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
+import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
 import com.example.akaishi.forge.config.AkaishiConfig;
@@ -181,7 +187,7 @@ public final class AkaishiModForge {
 
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */
     private void onClientSetup(FMLClientSetupEvent event) {
-        RenderTypeRegistry.register(RenderType.cutout(), ModBlocks.CHISHI_CRYSTAL_CLUSTER.get());
+        RenderTypeRegistry.register(RenderType.cutout(), AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER.get());
         // 凋零藤根/茎为带透明像素的十字植物，须注册 cutout 否则透明区呈黑色
         RenderTypeRegistry.register(RenderType.cutout(),
                 ModBlocks.CHISHI_WITHER_ROOT.get(),
@@ -192,14 +198,16 @@ public final class AkaishiModForge {
                 AkaishiDecayBlocks.CHISHI_DECAY_TRAPDOOR.get());
         // 结构玻璃为半透明材质，注册 translucent 才能正确混合显示内部结构
         RenderTypeRegistry.register(RenderType.translucent(),
-                ModBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get(),
-                ModBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get(),
-                ModBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get(),
-                ModBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get(),
-                ModBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get(),
-                ModBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get());
+                AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get(),
+                AkaishiFusionBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get(),
+                AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get(),
+                AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get(),
+                AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get(),
+                AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get());
         // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
+        // 钻机钻头：结构成型时从钻头底面打出向下的信标光束（客户端渲染器）
+        BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINER_DRILL_BIT.get(), DrillBitBeaconRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
     }

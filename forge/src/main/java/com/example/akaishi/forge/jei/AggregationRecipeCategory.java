@@ -1,7 +1,8 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
@@ -42,7 +43,7 @@ public class AggregationRecipeCategory implements IRecipeCategory<AggregationRec
 
     public AggregationRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 60);
-        this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_ENERGY_AGGREGATOR.get()));
+        this.icon = helper.createDrawableItemStack(new ItemStack(AkaishiEnergyBlocks.CHISHI_ENERGY_AGGREGATOR.get()));
     }
 
     @Override
@@ -87,9 +88,9 @@ public class AggregationRecipeCategory implements IRecipeCategory<AggregationRec
         public static List<AggregationRecipe> getAll() {
             List<AggregationRecipe> list = new ArrayList<>();
             list.add(new AggregationRecipe(new ItemStack(Items.NETHERITE_INGOT), new ItemStack(ModItems.akaishiIngot.get())));
-            list.add(new AggregationRecipe(new ItemStack(ModBlocks.CHISHI_GEODE_FLAWED.get()), new ItemStack(ModBlocks.CHISHI_GEODE_NORMAL.get())));
-            list.add(new AggregationRecipe(new ItemStack(ModBlocks.CHISHI_GEODE_NORMAL.get()), new ItemStack(ModBlocks.CHISHI_GEODE_PRISTINE.get())));
-            list.add(new AggregationRecipe(new ItemStack(ModBlocks.CHISHI_GEODE_PRISTINE.get()), new ItemStack(ModBlocks.CHISHI_GEODE_PERFECT.get())));
+            list.add(new AggregationRecipe(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get()), new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get())));
+            list.add(new AggregationRecipe(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get()), new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get())));
+            list.add(new AggregationRecipe(new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get()), new ItemStack(AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get())));
             return list;
         }
     }

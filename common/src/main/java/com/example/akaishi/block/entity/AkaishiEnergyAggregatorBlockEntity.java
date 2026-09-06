@@ -4,7 +4,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -58,9 +58,9 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
     /** 全部配方：赤石锭聚合 + 母岩三级升级 */
     private static final List<Recipe> RECIPES = List.of(
             new Recipe(() -> Items.NETHERITE_INGOT, () -> ModItems.akaishiIngot.get(), ENERGY_PER_INGOT),
-            new Recipe(() -> ModBlocks.CHISHI_GEODE_FLAWED.get().asItem(), () -> ModBlocks.CHISHI_GEODE_NORMAL.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
-            new Recipe(() -> ModBlocks.CHISHI_GEODE_NORMAL.get().asItem(), () -> ModBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
-            new Recipe(() -> ModBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), () -> ModBlocks.CHISHI_GEODE_PERFECT.get().asItem(), ENERGY_PER_GEODE_UPGRADE)
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get().asItem(), ENERGY_PER_GEODE_UPGRADE)
     );
 
     private final AkaishiEnergyStorage energy;

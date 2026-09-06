@@ -81,6 +81,7 @@ public final class AkaishiConfigSync {
         ModConfig.minerCostPerTickBase = AkaishiConfig.MINER_COST_PER_TICK_BASE.get();
 
         ModConfig.decayZoneDurationTicks = AkaishiConfig.DECAY_ZONE_DURATION_TICKS.get();
+        ModConfig.decayZoneEnvSamplesPerTick = AkaishiConfig.DECAY_ZONE_SAMPLES_PER_TICK.get();
         // 衰变净化塔
         ModConfig.decayPurifierEnergyCapacity = AkaishiConfig.DECAY_PURIFIER_ENERGY_CAPACITY.get();
         ModConfig.decayPurifierRange = AkaishiConfig.DECAY_PURIFIER_RANGE.get();
@@ -106,6 +107,5 @@ public final class AkaishiConfigSync {
         ModConfig.wirelessMaxLoss = AkaishiConfig.WIRELESS_MAX_LOSS.get();
         ModConfig.wirelessCrossDimLoss = AkaishiConfig.WIRELESS_CROSS_DIM_LOSS.get();
         ModConfig.wirelessLossReductionPerModule = AkaishiConfig.WIRELESS_LOSS_REDUCTION_PER_MODULE.get();
-        ModConfig.wirelessChunkTaxPerChunk = AkaishiConfig.WIRELESS_CHUNK_TAX_PER_CHUNK.get();
     }
 }

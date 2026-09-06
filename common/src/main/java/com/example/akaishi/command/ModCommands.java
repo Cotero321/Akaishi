@@ -1,6 +1,6 @@
 package com.example.akaishi.command;
 
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -24,10 +24,10 @@ public final class ModCommands {
 
     /** 赤石水晶母岩方块（4 个等级） */
     private static final List<Block> GEODES = List.of(
-            ModBlocks.CHISHI_GEODE_FLAWED.get(),
-            ModBlocks.CHISHI_GEODE_NORMAL.get(),
-            ModBlocks.CHISHI_GEODE_PRISTINE.get(),
-            ModBlocks.CHISHI_GEODE_PERFECT.get());
+            AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get(),
+            AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get(),
+            AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get(),
+            AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get());
 
     /** 扫描步长：跳过部分方块换取速度（晶洞体积远超步长，不会漏掉） */
     private static final int SCAN_STEP = 4;

@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.block.AkaishiFusionControllerBlock;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.fusion.FusionStructure;
 import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
@@ -236,17 +237,45 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         double speed = Math.pow(ModConfig.fusionEfficiencyGrowth, effFrames);
         speedPercent = (int) Math.round(speed * 100);
 
-        int active = 0;
-        long consumed = 0;
-        long heatValue = 0;
+        // 第一遍（只读试算）：统计本 tick 计划消耗的燃料能量与产热，不修改任何槽位
+        long planned = 0;
+        double heatValue = 0;
         int coolingBonus = 0;
+        int active = 0;
         for (int i = 0; i < MAX_FUEL_SLOTS && i < fuelFrames; i++) {
             ItemStack rod = fuelSlots.getItem(i);
             if (!(rod.getItem() instanceof AkaishiPlasmaRodItem p)) {
                 continue;
             }
             active++;
-            // 消耗 = 单棒基础产率 × 效率系数（100% 转化；宕机时不燃烧不消耗）
+            long per = (long) (p.getRodType().baseYield * speed);
+            planned += Math.min(per, AkaishiPlasmaRodItem.getEnergy(rod));
+            heatValue += p.getRodType().heatValue;
+            coolingBonus += p.getRodType().coolingBonus;
+        }
+        heatValue *= speed;
+        activeSlots = active;
+
+        // 满位门控：输出储能剩余空间装不下“整 tick 计划消耗”则不点火。
+        // 产出 = 消耗 × 温度系数(≤1) ≤ 消耗，因此空间足以装下消耗就一定能装下产出，
+        // 杜绝“烧 1 tick→灌满→停→腾出一点空间又点火”的振荡空耗（每次翻转都会真烧燃料）。
+        if (planned <= 0) {
+            yieldPerTick = 0;
+            return;
+        }
+        if (outputSpace() < planned) {
+            activeSlots = 0;
+            yieldPerTick = 0;
+            return;
+        }
+
+        // 第二遍（实际执行）：试算通过才真正扣除燃料，与第一遍计算完全一致
+        long consumed = 0;
+        for (int i = 0; i < MAX_FUEL_SLOTS && i < fuelFrames; i++) {
+            ItemStack rod = fuelSlots.getItem(i);
+            if (!(rod.getItem() instanceof AkaishiPlasmaRodItem p)) {
+                continue;
+            }
             long per = (long) (p.getRodType().baseYield * speed);
             long energy = AkaishiPlasmaRodItem.getEnergy(rod);
             long actual = Math.min(per, energy);
@@ -257,13 +286,9 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
             } else {
                 AkaishiPlasmaRodItem.setEnergy(rod, energy - actual);
             }
-            heatValue += p.getRodType().heatValue;
-            coolingBonus += p.getRodType().coolingBonus;
         }
 
-        activeSlots = active;
         yieldPerTick = (long) (consumed * temperatureCoefficient());
-        heatValue *= speed; // 产热随效率系数同步放大
         // 温度目标：基础 + 产热 − 散热（散热 = 控制器散热片总效率 × 框架乘数 × 每%抵消 + 末地棒散热加成）
         int frameCount = structure.coolerFrames.size();
         double cooling = (activeCoolingPercent() * (1 + ModConfig.fusionCoolerFrameBonus * frameCount)
@@ -334,15 +359,33 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         }
     }
 
-    /** 将产出的赤能源平分到全部能量输出口（输出口缓冲满则溢出丢弃） */
+    /** 全部能量输出口的剩余可装空间合计（供满位门控：空间不足整 tick 产出则停烧） */
+    private long outputSpace() {
+        if (structure == null) {
+            return 0;
+        }
+        long space = 0;
+        for (BlockPos p : structure.energyPorts) {
+            if (level.getBlockEntity(p) instanceof AkaishiFusionEnergyOutputBlockEntity e) {
+                AkaishiEnergyStorage s = e.energy();
+                space += Math.max(0, s.getMaxEnergy() - s.getEnergyStored());
+            }
+        }
+        return space;
+    }
+
     private void distributeEnergy(long amount) {
         if (structure == null || amount <= 0 || structure.energyPorts.isEmpty()) {
             return;
         }
-        long per = amount / structure.energyPorts.size();
+        // 顺序填充分配：每个口尽力接收剩余能量，实收返回；避免均分时部分满口丢弃产出
+        long remaining = amount;
         for (BlockPos p : structure.energyPorts) {
+            if (remaining <= 0) {
+                break;
+            }
             if (level.getBlockEntity(p) instanceof AkaishiFusionEnergyOutputBlockEntity e) {
-                e.receiveEnergy(per);
+                remaining -= e.receiveEnergy(remaining);
             }
         }
     }

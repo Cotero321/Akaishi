@@ -22,7 +22,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 矿机转口：赤石矿机产物输出 + 赤能源输入口（布局编号 4，上下层中心各 1 个）。
+ * 矿机转口：赤石矿机产物输出 + 赤能源输入口（中心柱顶端的设备位，控制器上方两格）。
  * 产物缓冲 27 格供物品管道/漏斗抽取；能量管道从转口充能后每 tick 转发给控制器。
  */
 public class AkaishiMinerPortBlock extends AkaishiMachineBlock {

@@ -1,6 +1,12 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.AkaishiCrystalBlocks;
+import com.example.akaishi.block.AkaishiEnergyBlocks;
+import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiLifeBlocks;
+import com.example.akaishi.block.AkaishiReactorBlocks;
+import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -67,14 +73,14 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(PlantCultivatorRecipeCategory.TYPE, PlantCultivatorRecipeCategory.getAll());
 
         // 催化器与收集器不是合成机器，用物品信息说明其功能与等级数值
-        addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_BASIC.get(), "jei.akaishi.catalyst_basic");
-        addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_MEDIUM.get(), "jei.akaishi.catalyst_medium");
-        addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_ADVANCED.get(), "jei.akaishi.catalyst_advanced");
-        addIngredientInfo(registration, ModBlocks.CHISHI_CATALYST_ULTIMATE.get(), "jei.akaishi.catalyst_ultimate");
-        addIngredientInfo(registration, ModBlocks.CHISHI_COLLECTOR_BASIC.get(), "jei.akaishi.collector_basic");
-        addIngredientInfo(registration, ModBlocks.CHISHI_COLLECTOR_MEDIUM.get(), "jei.akaishi.collector_medium");
-        addIngredientInfo(registration, ModBlocks.CHISHI_COLLECTOR_ADVANCED.get(), "jei.akaishi.collector_advanced");
-        addIngredientInfo(registration, ModBlocks.CHISHI_COLLECTOR_ULTIMATE.get(), "jei.akaishi.collector_ultimate");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_CATALYST_BASIC.get(), "jei.akaishi.catalyst_basic");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_CATALYST_MEDIUM.get(), "jei.akaishi.catalyst_medium");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_CATALYST_ADVANCED.get(), "jei.akaishi.catalyst_advanced");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_CATALYST_ULTIMATE.get(), "jei.akaishi.catalyst_ultimate");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_COLLECTOR_BASIC.get(), "jei.akaishi.collector_basic");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_COLLECTOR_MEDIUM.get(), "jei.akaishi.collector_medium");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_COLLECTOR_ADVANCED.get(), "jei.akaishi.collector_advanced");
+        addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_COLLECTOR_ULTIMATE.get(), "jei.akaishi.collector_ultimate");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.akaishiSpeedUpgrade.get(), "jei.akaishi.speed_upgrade");
         // 物品管道（4 级）：物流网络中继，等级越高每 tick 传输物品越多
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE.get(), "jei.akaishi.item_pipe_basic");
@@ -82,7 +88,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_ELITE.get(), "jei.akaishi.item_pipe_elite");
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE.get(), "jei.akaishi.item_pipe_ultimate");
         // 生命能量提纯器与固态物：双能量输入的固化设备，用物品信息说明数值
-        addIngredientInfo(registration, ModBlocks.CHISHI_LIFE_PURIFIER.get(), "jei.akaishi.life_purifier");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER.get(), "jei.akaishi.life_purifier");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.akaishiLifeEssenceSolid.get(), "jei.akaishi.life_essence_solid");
 
         // ===== 生命系统：样本 → 基因 → 器官 → 移植 全链路（物品信息说明机制） =====
@@ -94,26 +100,26 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         // 器官（9 槽位同一机制，以心脏为代表说明）
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.akaishiOrganHeart.get(), "jei.akaishi.organ");
         // 生命机器
-        addIngredientInfo(registration, ModBlocks.CHISHI_GENE_ANALYZER.get(), "jei.akaishi.gene_analyzer");
-        addIngredientInfo(registration, ModBlocks.CHISHI_CULTIVATOR.get(), "jei.akaishi.cultivator");
-        addIngredientInfo(registration, ModBlocks.CHISHI_LIFE_STRUCT.get(), "jei.akaishi.life_struct");
-        addIngredientInfo(registration, ModBlocks.CHISHI_SURGERY.get(), "jei.akaishi.surgery");
-        addIngredientInfo(registration, ModBlocks.CHISHI_POTION_TABLE.get(), "jei.akaishi.potion_table");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_GENE_ANALYZER.get(), "jei.akaishi.gene_analyzer");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_CULTIVATOR.get(), "jei.akaishi.cultivator");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_STRUCT.get(), "jei.akaishi.life_struct");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_SURGERY.get(), "jei.akaishi.surgery");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_POTION_TABLE.get(), "jei.akaishi.potion_table");
         // 存储库
-        addIngredientInfo(registration, ModBlocks.CHISHI_SAMPLE_VAULT.get(), "jei.akaishi.sample_vault");
-        addIngredientInfo(registration, ModBlocks.CHISHI_ORGAN_VAULT.get(), "jei.akaishi.organ_vault");
-        addIngredientInfo(registration, ModBlocks.CHISHI_POTION_CABINET.get(), "jei.akaishi.potion_cabinet");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT.get(), "jei.akaishi.sample_vault");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT.get(), "jei.akaishi.organ_vault");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_POTION_CABINET.get(), "jei.akaishi.potion_cabinet");
 
         // ===== 反应堆体系：多方块发电（方块） =====
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_CONTROLLER.get(), "jei.akaishi.reactor_controller");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_SHELL.get(), "jei.akaishi.reactor_shell");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_FUEL_ROD.get(), "jei.akaishi.reactor_fuel_rod");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_COOLER.get(), "jei.akaishi.reactor_cooler");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_CORE.get(), "jei.akaishi.reactor_core");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_FUEL_PORT.get(), "jei.akaishi.reactor_fuel_port");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get(), "jei.akaishi.reactor_energy_output");
-        addIngredientInfo(registration, ModBlocks.CHISHI_REACTOR_WASTE_PORT.get(), "jei.akaishi.reactor_waste_port");
-        addIngredientInfo(registration, ModBlocks.CHISHI_EXHAUSTED_BARREL.get(), "jei.akaishi.exhausted_barrel");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get(), "jei.akaishi.reactor_controller");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_SHELL.get(), "jei.akaishi.reactor_shell");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_ROD.get(), "jei.akaishi.reactor_fuel_rod");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_COOLER.get(), "jei.akaishi.reactor_cooler");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_CORE.get(), "jei.akaishi.reactor_core");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_FUEL_PORT.get(), "jei.akaishi.reactor_fuel_port");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_ENERGY_OUTPUT.get(), "jei.akaishi.reactor_energy_output");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_WASTE_PORT.get(), "jei.akaishi.reactor_waste_port");
+        addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_EXHAUSTED_BARREL.get(), "jei.akaishi.exhausted_barrel");
         // 散热片（5 品质共用同一说明）
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.heatSinkPoor.get(), "jei.akaishi.heat_sink");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.heatSinkNormal.get(), "jei.akaishi.heat_sink");
@@ -126,13 +132,13 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.sculkLifeform.get(), "jei.akaishi.sculk_lifeform");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.fuelCell.get(), "jei.akaishi.fuel_cell");
         // 燃料加工机
-        addIngredientInfo(registration, ModBlocks.CHISHI_ENERGY_LIQUEFIER.get(), "jei.akaishi.energy_liquefier");
-        addIngredientInfo(registration, ModBlocks.CHISHI_ENERGY_PROCESSOR.get(), "jei.akaishi.energy_processor");
+        addIngredientInfo(registration, AkaishiEnergyBlocks.CHISHI_ENERGY_LIQUEFIER.get(), "jei.akaishi.energy_liquefier");
+        addIngredientInfo(registration, AkaishiEnergyBlocks.CHISHI_ENERGY_PROCESSOR.get(), "jei.akaishi.energy_processor");
         addIngredientInfo(registration, ModBlocks.CHISHI_FUEL_CANNER.get(), "jei.akaishi.fuel_canner");
         addIngredientInfo(registration, ModBlocks.CHISHI_FUEL_MIXER.get(), "jei.akaishi.fuel_mixer");
 
         // ===== 聚变燃料体系：赤能源聚合等离子体 → 填装器灌入反应棒 → 燃料棒 =====
-        addIngredientInfo(registration, ModBlocks.CHISHI_FUSION_FUEL_AGGREGATOR.get(), "jei.akaishi.fusion_fuel_aggregator");
+        addIngredientInfo(registration, AkaishiFusionBlocks.CHISHI_FUSION_FUEL_AGGREGATOR.get(), "jei.akaishi.fusion_fuel_aggregator");
         addIngredientInfo(registration, ModBlocks.CHISHI_PLASMA_FILLER.get(), "jei.akaishi.plasma_filler");
         addIngredientInfo(registration, ModBlocks.CHISHI_PLASMA_PIPE.get(), "jei.akaishi.plasma_pipe");
         addIngredientInfo(registration, ModBlocks.CHISHI_PLASMA_TANK.get(), "jei.akaishi.plasma_tank");
@@ -143,11 +149,11 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.endPlasmaRod.get(), "jei.akaishi.plasma_rod");
 
         // ===== 无线赤能源体系：身份卡认证 + 多方块终端 + 无线口（参考 MEK 量子传输/Flux） =====
-        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_TERMINAL.get(), "jei.akaishi.wireless");
-        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_SECURITY.get(), "jei.akaishi.wireless");
-        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_CORE.get(), "jei.akaishi.wireless");
-        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_INPUT_PORT.get(), "jei.akaishi.wireless");
-        addIngredientInfo(registration, ModBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get(), "jei.akaishi.wireless");
+        addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_TERMINAL.get(), "jei.akaishi.wireless");
+        addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_SECURITY.get(), "jei.akaishi.wireless");
+        addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_CORE.get(), "jei.akaishi.wireless");
+        addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_PORT.get(), "jei.akaishi.wireless");
+        addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get(), "jei.akaishi.wireless");
 
         // ===== 活化产物系列获取说明：活化结晶（7）/ 活化成分（7）/ 衰竭结晶 / 生命灰烬 =====
         // 活化结晶：7 种同机制（生命离心机分离活化衰竭液体，共用说明）
