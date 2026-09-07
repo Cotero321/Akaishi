@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -52,17 +53,6 @@ import java.util.UUID;
 public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 移植手术消耗：3 固态 + 20K 生命能量 */
-    public static final int IMPLANT_SOLID_COST = 3;
-    public static final long IMPLANT_LIFE_COST = 20_000L;
-    /** 摘除手术消耗：1 固态 + 5K 生命能量 */
-    public static final int EXTRACT_SOLID_COST = 1;
-    public static final long EXTRACT_LIFE_COST = 5_000L;
-    /** 生命能量缓冲容量（够 5 次移植） */
-    public static final long LIFE_CAPACITY = 100_000L;
-    /** 单次手术耗时（tick） */
-    public static final int PROGRESS_TICKS = 80;
-
     public static final int ORGAN_SLOT = 0;
     public static final int SOLID_SLOT = 1;
     public static final int SLOT_COUNT = 2;
@@ -94,7 +84,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
 
     public AkaishiSurgeryBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_SURGERY.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.surgeryLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -112,7 +102,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.surgeryLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(DATA_ENERGY, (int) life.getEnergyStored());
         data.set(DATA_CAPACITY, (int) life.getMaxEnergy());
         data.set(DATA_SOLID, inventory.getItem(SOLID_SLOT).getCount());
@@ -131,7 +121,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
                     speedAccum -= delta;
                     progress += delta;
                 }
-                if (progress >= PROGRESS_TICKS) {
+                if (progress >= ModConfig.surgeryProcessTicks) {
                     completeOperation();
                 }
             }
@@ -139,7 +129,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
             progress = 0;
             speedAccum = 0;
         }
-        data.set(DATA_PROGRESS, progress * 100 / PROGRESS_TICKS);
+        data.set(DATA_PROGRESS, progress * 100 / ModConfig.surgeryProcessTicks);
         data.set(DATA_OPERATION, operationType);
         data.set(DATA_TARGET, targetSlot);
         setChanged();
@@ -177,14 +167,14 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
                 player.sendSystemMessage(Component.translatable("message.akaishi.surgery.conflict_warn"));
                 return;
             }
-            if (!hasResources(IMPLANT_SOLID_COST, IMPLANT_LIFE_COST)) {
+            if (!hasResources(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost)) {
                 return;
             }
         } else if (type == OP_EXTRACT) {
             if (!state.isOccupied(target)) {
                 return;
             }
-            if (!hasResources(EXTRACT_SOLID_COST, EXTRACT_LIFE_COST)) {
+            if (!hasResources(ModConfig.surgeryExtractSolidCost, ModConfig.surgeryExtractLifeCost)) {
                 return;
             }
         } else {
@@ -209,14 +199,14 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         if (operationType == OP_IMPLANT) {
             ItemStack organ = inventory.getItem(ORGAN_SLOT);
             if (organ.getItem() instanceof AkaishiOrganItem item && item.slot == target
-                    && !state.isOccupied(target) && hasResources(IMPLANT_SOLID_COST, IMPLANT_LIFE_COST)) {
-                consume(IMPLANT_SOLID_COST, IMPLANT_LIFE_COST);
+                    && !state.isOccupied(target) && hasResources(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost)) {
+                consume(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost);
                 state.implantOrgan(target, organ);
                 inventory.setItem(ORGAN_SLOT, ItemStack.EMPTY);
             }
         } else if (operationType == OP_EXTRACT) {
-            if (state.isOccupied(target) && hasResources(EXTRACT_SOLID_COST, EXTRACT_LIFE_COST)) {
-                consume(EXTRACT_SOLID_COST, EXTRACT_LIFE_COST);
+            if (state.isOccupied(target) && hasResources(ModConfig.surgeryExtractSolidCost, ModConfig.surgeryExtractLifeCost)) {
+                consume(ModConfig.surgeryExtractSolidCost, ModConfig.surgeryExtractLifeCost);
                 ItemStack removed = state.extractOrgan(player, target);
                 if (!removed.isEmpty() && !player.getInventory().add(removed)) {
                     dropItem(removed);
@@ -241,13 +231,13 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
     // ===== 资源 =====
 
     private int requiredSolid() {
-        return operationType == OP_IMPLANT ? IMPLANT_SOLID_COST
-                : operationType == OP_EXTRACT ? EXTRACT_SOLID_COST : 0;
+        return operationType == OP_IMPLANT ? ModConfig.surgeryImplantSolidCost
+                : operationType == OP_EXTRACT ? ModConfig.surgeryExtractSolidCost : 0;
     }
 
     private long requiredLife() {
-        return operationType == OP_IMPLANT ? IMPLANT_LIFE_COST
-                : operationType == OP_EXTRACT ? EXTRACT_LIFE_COST : 0;
+        return operationType == OP_IMPLANT ? ModConfig.surgeryImplantLifeCost
+                : operationType == OP_EXTRACT ? ModConfig.surgeryExtractLifeCost : 0;
     }
 
     private boolean hasResources(int solid, long lifeCost) {

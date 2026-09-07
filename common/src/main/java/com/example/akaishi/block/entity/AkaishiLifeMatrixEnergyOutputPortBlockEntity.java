@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.block.AkaishiLifeMatrixControllerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import net.minecraft.core.BlockPos;
@@ -20,15 +21,12 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifeMatrixEnergyOutputPortBlockEntity extends BlockEntity implements IEnergyProvider, IDataCarrier {
 
-    /** 缓冲容量：与控制器生命能量容量一致 */
-    public static final long BUFFER_CAPACITY = 5000L;
-
     private final AkaishiEnergyStorage energy;
     private BlockPos controllerPos;
 
     public AkaishiLifeMatrixEnergyOutputPortBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeMatrixOutputPortBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiLifeMatrixEnergyOutputPortBlockEntity be) {
@@ -46,9 +44,8 @@ public class AkaishiLifeMatrixEnergyOutputPortBlockEntity extends BlockEntity im
         if (controller == null || !controller.getBlockState().getValue(AkaishiLifeMatrixControllerBlock.FORMED)) {
             return;
         }
-        // 从控制器拉取生命能量到缓冲，每 tick 按控制器当前速率（45 次 × 10 = 450）拉取
-        long rate = AkaishiLifeMatrixControllerBlockEntity.CONVERSIONS_PER_TICK
-                * AkaishiLifeMatrixControllerBlockEntity.CONVERSION_OUTPUT;
+        // 从控制器拉取生命能量到缓冲，每 tick 按控制器当前速率（每 tick 转化次数 × 单次产出）拉取
+        long rate = (long) ModConfig.lifeMatrixConversionsPerTick * ModConfig.lifeAggregationConversionOutput;
         long take = Math.min(rate, controller.lifeStorage().getEnergyStored());
         long free = energy.getMaxEnergy() - energy.getEnergyStored();
         long pulled = controller.lifeStorage().extractEnergy(Math.min(take, free), false);

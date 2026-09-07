@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -50,8 +51,6 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
 
     /** 样本解构门槛：纯度 ≥25 才可用于药剂制作（与分析台一致） */
     public static final int MIN_PURITY = 25;
-    /** 生命能量缓冲容量（够 5 次永久药剂） */
-    public static final long LIFE_CAPACITY = 100_000L;
 
     public static final int SAMPLE_SLOT = 0;
     public static final int SOLID_SLOT = 1;
@@ -77,7 +76,7 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
 
     public AkaishiPotionTableBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_POTION_TABLE.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.potionTableLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -95,7 +94,7 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.potionTableLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(DATA_ENERGY, (int) life.getEnergyStored());
         data.set(DATA_CAPACITY, (int) life.getMaxEnergy());
         data.set(DATA_TEMPLATE, templateIndex());

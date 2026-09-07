@@ -69,15 +69,16 @@ public class AkaishiDecayPurifierBlockEntity extends BlockEntity
         long stored = energy.getEnergyStored();
         long max = energy.getMaxEnergy();
 
-        // 待机：无区域可净化或能量不足
-        if (zoneCount <= 0 || stored < ModConfig.decayPurifierCostPerTick) {
+        // 待机：无区域可净化或能量不足（运行能耗 = 基础 × 配置 [machine] costMultiplier，判定与扣费口径一致）
+        long perTick = (long) (ModConfig.decayPurifierCostPerTick * ModConfig.machineCostMultiplier);
+        if (zoneCount <= 0 || stored < perTick) {
             working = false;
             speedAccum = 0;
             syncData(zoneCount);
             return;
         }
         working = true;
-        energy.extractEnergy(ModConfig.decayPurifierCostPerTick, false);
+        energy.extractEnergy(perTick, false);
         // 净化速度 = 基础 × 速度倍率；余量累加防截断，避免 1~7 级速度升级全部无效
         speedAccum += ModConfig.decayPurifierTicksPerTick * getSpeedMultiplier();
         long ticks = (long) speedAccum;

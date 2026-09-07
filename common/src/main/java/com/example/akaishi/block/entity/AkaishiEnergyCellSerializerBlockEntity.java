@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.block.AkaishiEnergyCellBlock;
 import com.example.akaishi.block.AkaishiEnergyCellSerializerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyCellArrayStorage;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
@@ -34,16 +35,14 @@ import java.util.List;
  */
 public class AkaishiEnergyCellSerializerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
-    /** 串联器自身基础容量（成型后总容量 = 该值 + 26 个外壳单元容量之和） */
-    public static final long BASE_CAPACITY = 1_000_000_000L;
-
     private final AkaishiEnergyStorage energy;
     private final AkaishiEnergyCellArrayStorage arrayStorage;
     private final SimpleContainerData data;
 
     public AkaishiEnergyCellSerializerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_CELL_SERIALIZER.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BASE_CAPACITY);
+        // 串联器自身基础容量（成型后总容量 = 该值 + 26 个外壳单元容量之和）
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyCellSerializerBaseCapacity);
         this.arrayStorage = new AkaishiEnergyCellArrayStorage(AkaishiEnergyType.INSTANCE, this::collectMembers);
         this.data = new SimpleContainerData(5);
     }

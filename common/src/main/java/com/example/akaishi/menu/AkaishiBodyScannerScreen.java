@@ -4,6 +4,7 @@ import com.example.akaishi.life.body.BodyOverviewEntry;
 import com.example.akaishi.life.body.BodyPassiveEntry;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
+import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -93,9 +94,10 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             int barY = this.topPos + ROW_START_Y + i * ROW_HEIGHT;
             int x = this.leftPos + REJECT_BAR_X;
             int rej = ClientBodyData.getRejection(slot);
-            // 底色 + 填充
+            // 底色 + 填充（比例随配置上限 maxRejection，默认 100 时不变）
             gui.fill(x, barY, x + REJECT_BAR_W, barY + REJECT_BAR_H, LINE_COLOR);
-            int width = (int) (REJECT_BAR_W * Math.min(100, rej) / 100.0);
+            int cap = PlayerBodyState.maxRejection();
+            int width = (int) (REJECT_BAR_W * Math.min(cap, rej) / (double) cap);
             if (width > 0) {
                 gui.fill(x, barY, x + width, barY + REJECT_BAR_H, rejectionColor(rej));
             }
@@ -149,13 +151,14 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         int occupied = ClientBodyData.getOccupiedCount();
         String statusKey;
         int statusColor;
-        if (total >= 100) {
+        int cap = PlayerBodyState.maxRejection();
+        if (total >= cap) {
             statusKey = "gui.akaishi.body_scanner.critical";
             statusColor = 0xFFD64545;
-        } else if (total >= 60) {
+        } else if (total >= cap * 0.6) {
             statusKey = "gui.akaishi.body_scanner.warning";
             statusColor = 0xFF8B6F1E;
-        } else if (total >= 30) {
+        } else if (total >= cap * 0.3) {
             statusKey = "gui.akaishi.body_scanner.caution";
             statusColor = 0xFFE0A63A;
         } else {
@@ -451,11 +454,12 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
                 PANEL_W - ROW_X - 14);
     }
 
-    /** 排斥值 → 颜色（绿/黄/橙/红） */
+    /** 排斥值 → 颜色（绿/黄/橙/红），中低档按配置上限等比缩放（默认 100 时为 60/30） */
     private int rejectionColor(int rej) {
-        if (rej >= 100) return 0xFFD64545;
-        if (rej >= 60) return 0xFFE08A3A;
-        if (rej >= 30) return 0xFF8B6F1E;
+        int cap = PlayerBodyState.maxRejection();
+        if (rej >= cap) return 0xFFD64545;
+        if (rej >= cap * 0.6) return 0xFFE08A3A;
+        if (rej >= cap * 0.3) return 0xFF8B6F1E;
         return 0xFF2E7D32;
     }
 }

@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiFusionEnergyOutputMenu;
@@ -26,8 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiFusionEnergyOutputBlockEntity extends BlockEntity implements IEnergyProvider, ExtendedMenuProvider, IDataCarrier {
 
-    /** 缓冲容量：满配产出（约 6400 万/tick）下约 5 分钟 */
-    public static final long BUFFER_CAPACITY = 20_000_000_000L;
     public static final int DATA_SLOTS = 4;
 
     private final AkaishiEnergyStorage energy;
@@ -36,7 +35,7 @@ public class AkaishiFusionEnergyOutputBlockEntity extends BlockEntity implements
 
     public AkaishiFusionEnergyOutputBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUSION_ENERGY_OUTPUT.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.fusionEnergyOutputBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiFusionEnergyOutputBlockEntity be) {

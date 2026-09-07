@@ -5,6 +5,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.block.AkaishiPurifierMatrixControllerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import net.minecraft.core.BlockPos;
@@ -19,15 +20,12 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiPurifierEnergyInputPortBlockEntity extends BlockEntity implements IEnergyProvider, IDataCarrier {
 
-    /** 缓冲容量：1M，覆盖管道单次大额注入与控制器 10k 存储的落差 */
-    public static final long BUFFER_CAPACITY = 1_000_000L;
-
     private final AkaishiEnergyStorage energy;
     private BlockPos controllerPos;
 
     public AkaishiPurifierEnergyInputPortBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_PURIFIER_ENERGY_INPUT.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.purifierEnergyInputPortBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiPurifierEnergyInputPortBlockEntity be) {

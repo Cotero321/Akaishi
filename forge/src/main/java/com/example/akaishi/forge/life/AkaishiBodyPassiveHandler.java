@@ -1,5 +1,6 @@
 package com.example.akaishi.forge.life;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodyGeneHelper;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
@@ -81,22 +82,7 @@ public final class AkaishiBodyPassiveHandler {
     /** 天敌冲突锁定记录：用于冲突解除时重置排斥 */
     private static final Map<Player, Set<BodySlot>> CONFLICT_LOCKED = new WeakHashMap<>();
 
-    /** 排斥负面效果触发阈值 */
-    private static final int REJECTION_WARNING = 60;
-    /** 排斥中毒阈值 */
-    private static final int REJECTION_POISON = 80;
-    /** 排斥增速翻倍线：有效适配度 <60 排斥速率 ×2（部位 debuff 的重度线独立为 45） */
-    private static final int COMPAT_SEVERE = 60;
-    /** 部位 debuff 豁免线：有效适配度 ≥70 无部位负面（下调自 80——顶级基因全力 build 后不再永久带伤） */
-    private static final int SLOT_DEBUFF_CLEAN = 70;
-    /** 部位 debuff 重度线：有效适配度 <45 部位负面升为 II 级（下调自 60） */
-    private static final int SLOT_DEBUFF_SEVERE = 45;
-    /** 天敌反噬间隔（tick） */
-    private static final int CONFLICT_PUNISH_INTERVAL = 100;
-    /** 排斥增长间隔下限（tick = 15s/点）：限制低适配/强基因的加速惩罚，避免顶级器官过快报废 */
-    private static final int GROWTH_INTERVAL_MIN_TICKS = 300;
-    /** 天敌反噬每次对玩家自身造成的伤害（爆炸伤害源，吃护甲减伤） */
-    private static final float CONFLICT_PUNISH_DAMAGE = 5.0F;
+    /** 排斥/超载阈值与天敌反噬参数均读取配置 [rejection]（热更新即时生效），此处不再声明常量 */
     /** 长臂被动：每臂近战攻击距离加成（格） */
     private static final double REACH_PER_ARM = 0.75;
     /** 攻击距离修饰符固定 UUID（akaishi:long_reach） */
@@ -444,10 +430,10 @@ public final class AkaishiBodyPassiveHandler {
                 }
             }
             case SUNLIGHT_BURN -> {
-                // 阳光灼晒（负面·亡灵速腿/幻翼肺的代价）：白天天空直射下自燃。
+                // 阳光灼晒（负面·亡灵速腿/幻翼肺的代价）：白天天空直射下自燃，可经配置 [toggles] sunlightBurn 整体关闭。
                 // 抗火药水或火焰免疫器官可豁免——移植火免器官等于解开亡灵的日光枷锁
                 Level level = player.level();
-                if (player.tickCount % 100 == 0 && level.isDay()
+                if (ModConfig.sunlightBurnEnabled && player.tickCount % 100 == 0 && level.isDay()
                         && level.dimensionType().hasSkyLight()
                         && level.canSeeSky(player.blockPosition())
                         && !player.hasEffect(MobEffects.FIRE_RESISTANCE)
@@ -522,7 +508,7 @@ public final class AkaishiBodyPassiveHandler {
             // 有效适配度含身体基因加成与装备全基因适配（吸收基因药剂/穿戴生命融合装备可减缓排斥）
             int compat = BodyGeneHelper.effectiveCompat(state, organ, gearCompat);
             double factor = 100.0 / Math.max(1, compat);
-            if (compat < COMPAT_SEVERE) {
+            if (compat < ModConfig.compatSevereThreshold) {
                 factor *= 2.0;
             }
             // 同源套装：同一来源 ≥2 枚已移植器官 → 排斥增速 -20%（身体"认可"这套基因）
@@ -536,7 +522,7 @@ public final class AkaishiBodyPassiveHandler {
                 factor *= AkaishiLifeFusionSet.REJECTION_SLOW_FACTOR;
             }
             // 增长间隔 ≥300t：即使极端低适配也不低于 15s/点，保留梯度同时封住爆炸增速
-            int interval = (int) Math.max(GROWTH_INTERVAL_MIN_TICKS, tier.getGrowthIntervalSeconds() * 20.0 / factor);
+            int interval = (int) Math.max(ModConfig.growthIntervalMinTicks, tier.getGrowthIntervalSeconds() * 20.0 / factor);
             if (player.tickCount % interval == 0) {
                 state.addRejection(slot, 1);
             }
@@ -547,10 +533,10 @@ public final class AkaishiBodyPassiveHandler {
         }
         for (BodySlot slot : BodySlot.values()) {
             int rejection = state.getRejection(slot);
-            if (rejection < REJECTION_WARNING) {
+            if (rejection < ModConfig.rejectionWarning) {
                 continue;
             }
-            if (rejection >= REJECTION_POISON && player.getRandom().nextFloat() < 0.3F) {
+            if (rejection >= ModConfig.rejectionPoison && player.getRandom().nextFloat() < 0.3F) {
                 player.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0, false, false));
             } else if (player.getRandom().nextFloat() < 0.4F) {
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, false, false));
@@ -560,28 +546,24 @@ public final class AkaishiBodyPassiveHandler {
 
     // ===== 躯体超载（排斥预算） =====
 
-    /** 全身总排斥 ≥ 此值：躯体超载 I（移动缓慢） */
-    private static final int OVERLOAD_LIGHT = 320;
-    /** 全身总排斥 ≥ 此值：躯体超载 II（移动缓慢 II + 虚弱） */
-    private static final int OVERLOAD_HEAVY = 450;
-
-    /** 躯体超载：排斥预算（全身总排斥）过高 → 施加持续负面（缓慢/虚弱），每 5 秒刷新一次 */
+    /** 躯体超载：排斥预算（全身总排斥）过高 → 施加持续负面（缓慢/虚弱），每 5 秒刷新一次。
+     *  超载线（320/450）读取配置 [rejection]，整体开关见 [toggles] overload */
     private static void applyOverload(Player player, IPlayerBodyState state) {
-        if (player.tickCount % 100 != 0) {
+        if (!ModConfig.overloadEnabled || player.tickCount % 100 != 0) {
             return;
         }
         int total = 0;
         for (BodySlot slot : BodySlot.values()) {
             int rej = state.getRejection(slot);
-            // 完全失效（=100）的器官已无收益，不再计入超载负担
-            if (rej < PlayerBodyState.MAX_REJECTION) {
+            // 完全失效（=上限）的器官已无收益，不再计入超载负担
+            if (rej < PlayerBodyState.maxRejection()) {
                 total += rej;
             }
         }
-        if (total >= OVERLOAD_HEAVY) {
+        if (total >= ModConfig.overloadHeavy) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 0, false, false));
-        } else if (total >= OVERLOAD_LIGHT) {
+        } else if (total >= ModConfig.overloadLight) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 0, false, false));
         }
     }
@@ -605,14 +587,14 @@ public final class AkaishiBodyPassiveHandler {
                 continue;
             }
             int compat = BodyGeneHelper.effectiveCompat(state, organ, gearCompat);
-            if (compat >= SLOT_DEBUFF_CLEAN) {
+            if (compat >= ModConfig.slotDebuffCleanThreshold) {
                 continue; // 完全适应
             }
             MobEffect effect = slot.getDebuff();
             if (effect == null) {
                 continue;
             }
-            int amplifier = compat < SLOT_DEBUFF_SEVERE ? 1 : 0;
+            int amplifier = compat < ModConfig.slotDebuffSevereThreshold ? 1 : 0;
             player.addEffect(new MobEffectInstance(effect, 160, amplifier, false, false));
         }
     }
@@ -643,11 +625,11 @@ public final class AkaishiBodyPassiveHandler {
         CONFLICT_LOCKED.put(player, conflicts);
         // 排斥锁满：器官随即失效，且不可被药剂降低
         for (BodySlot slot : conflicts) {
-            state.setRejection(slot, PlayerBodyState.MAX_REJECTION);
+            state.setRejection(slot, PlayerBodyState.maxRejection());
         }
         // 周期性天敌反噬：仅对玩家自身结算爆炸伤害 + 爆炸视觉，避免误伤同队/宠物
-        if (player.tickCount % CONFLICT_PUNISH_INTERVAL == 0) {
-            player.hurt(player.damageSources().explosion(null), CONFLICT_PUNISH_DAMAGE);
+        if (player.tickCount % ModConfig.conflictPunishIntervalTicks == 0) {
+            player.hurt(player.damageSources().explosion(null), (float) ModConfig.conflictPunishDamage);
             if (player.level() instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                         player.getX(), player.getY() + 0.5, player.getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);

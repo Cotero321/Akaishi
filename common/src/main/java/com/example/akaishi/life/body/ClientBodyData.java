@@ -105,7 +105,7 @@ public final class ClientBodyData {
         int total = 0;
         for (BodySlot slot : BodySlot.values()) {
             int rej = getRejection(slot);
-            if (rej < PlayerBodyState.MAX_REJECTION) {
+            if (rej < PlayerBodyState.maxRejection()) {
                 total += rej;
             }
         }

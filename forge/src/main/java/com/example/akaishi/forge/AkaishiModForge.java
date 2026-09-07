@@ -15,7 +15,9 @@ import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
+import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
+import com.example.akaishi.forge.client.AkaishiConfigScreenFactory;
 import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
@@ -45,6 +47,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -119,6 +122,12 @@ public final class AkaishiModForge {
         // 注册数值配置（common.toml）：加载/重载时同步到 common ModConfig
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AkaishiConfig.SPEC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(AkaishiConfigSync::onModConfig);
+        // 玩家登录时推送服务端权威配置值（客户端界面标尺/成功率与服务器一致）
+        MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                ConfigSyncS2C.sendToPlayer(serverPlayer);
+            }
+        });
 
         // 注册 4 种液体（下界至纯/复合能量 + 至纯/复合燃料）到 Forge 注册表
         ModFluidsImpl.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -220,6 +229,8 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINER_DRILL_BIT.get(), DrillBitBeaconRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
+        // Mods 列表"配置"按钮 → Cloth Config 游戏内配置界面
+        AkaishiConfigScreenFactory.register();
     }
 
     /**

@@ -182,10 +182,10 @@ public class AkaishiPotionItem extends Item {
         player.displayClientMessage(Component.translatable("message.akaishi.potion.no_source"), true);
     }
 
-    /** 永久药剂加成（纯度五档）：纯度每 20 分一档 → 加成 2/4/6/8/10（纯度 81+ 到顶 +10） */
+    /** 永久药剂加成（纯度五档）：纯度每 20 分一档 → 加成 3/6/9/12/15（纯度 81+ 到顶 +15） */
     public static int compatBonusByPurity(int purity) {
         int clamped = Math.max(1, Math.min(100, purity));
-        return ((clamped + 19) / 20) * 2;
+        return ((clamped + 19) / 20) * 3;
     }
 
     // ===== 显示 =====

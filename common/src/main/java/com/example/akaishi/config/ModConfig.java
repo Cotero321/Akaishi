@@ -203,4 +203,288 @@ public final class ModConfig {
     public static volatile double wirelessCrossDimLoss = 0.25;
     /** 每个损耗抑制组件削减的损耗比例（0.05 = 削减 5%，可叠加，最高削减 90%） */
     public static volatile double wirelessLossReductionPerModule = 0.05;
+
+    // ==================== 器官·品质曲线（override：0 = 不覆盖，用 QualityTier 内置默认） ====================
+    /** 品质 I~IV 属性加成倍率 override（索引 = 品质序号） */
+    public static volatile double[] organTierMultiplier = {0.0, 0.0, 0.0, 0.0};
+    /** 品质 I~IV 移植基础排斥 override */
+    public static volatile int[] organTierBaseRejection = {0, 0, 0, 0};
+    /** 品质 I~IV 排斥增长间隔（秒）override */
+    public static volatile int[] organTierGrowthInterval = {0, 0, 0, 0};
+
+    // ==================== 基因来源组（override：0 = 不覆盖，用 SampleGroup 内置排斥系数） ====================
+    /** 七组排斥系数 override（索引 = SampleGroup 序号：温血/亡灵/爆炸/异变/末影/Boss/龙） */
+    public static volatile double[] groupRejectionFactor = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    // ==================== 纯度联动（override：0 = 不覆盖，用 OrganLinkage 内置常量） ====================
+    /** 完整度对排斥的最大削减比例 */
+    public static volatile double purityRejectionCap = 0.0;
+    /** 纯度对适配度偏置的最大权重 */
+    public static volatile double purityCompatWeight = 0.0;
+
+    // ==================== 排斥·标尺与阈值 ====================
+    /** 排斥值上限 override（0 = 用 PlayerBodyState.MAX_REJECTION=100；达上限器官失效） */
+    public static volatile int maxRejection = 0;
+    /** 排斥负面效果触发阈值（≥ 该值开始掷中毒/虚弱） */
+    public static volatile int rejectionWarning = 60;
+    /** 排斥中毒阈值 */
+    public static volatile int rejectionPoison = 80;
+    /** 排斥增速翻倍线：有效适配度 < 该值排斥速率 ×2 */
+    public static volatile int compatSevereThreshold = 60;
+    /** 部位 debuff 豁免线：有效适配度 ≥ 该值无部位负面 */
+    public static volatile int slotDebuffCleanThreshold = 70;
+    /** 部位 debuff 重度线：有效适配度 < 该值部位负面升 II 级 */
+    public static volatile int slotDebuffSevereThreshold = 45;
+    /** 排斥增长间隔下限（tick，15s/点） */
+    public static volatile int growthIntervalMinTicks = 300;
+    /** 天敌反噬周期（tick） */
+    public static volatile int conflictPunishIntervalTicks = 100;
+    /** 天敌反噬每次自伤伤害（爆炸伤害源） */
+    public static volatile double conflictPunishDamage = 5.0;
+    /** 躯体超载 I 线：全身总排斥 ≥ 该值 → 缓慢 I */
+    public static volatile int overloadLight = 320;
+    /** 躯体超载 II 线：全身总排斥 ≥ 该值 → 缓慢 II + 虚弱 */
+    public static volatile int overloadHeavy = 450;
+
+    // ==================== 排异中和剂（血清） ====================
+    /** 每瓶每个可洗器官的排斥下降量 */
+    public static volatile int serumWashReduce = 12;
+    /** 每个器官每次移植可被清洗的次数上限 */
+    public static volatile int serumWashLimit = 6;
+    /** 饮用冷却（tick） */
+    public static volatile int serumCooldownTicks = 300;
+
+    // ==================== 突变词条 ====================
+    /** 良性 : 畸变(双刃) 的良性占比（roll 时先滚良性池） */
+    public static volatile double traitBenignRatio = 0.7;
+    /** 词条稀有度 3 档纯度门槛（纯度 ≥ 该值可出稀有度 3 词条） */
+    public static volatile int traitRarityHighThreshold = 85;
+    /** 词条稀有度 2 档纯度门槛 */
+    public static volatile int traitRarityMidThreshold = 60;
+
+    // ==================== 培养机·品质升级（override：0 = 用内置 UPGRADE_TIERS） ====================
+    /** I→II / II→III / III→IV 成功率（百分比） */
+    public static volatile int[] cultivatorUpgradeSuccess = {0, 0, 0};
+    /** 三段升级生命能量消耗 */
+    public static volatile int[] cultivatorUpgradeEnergy = {0, 0, 0};
+    /** 三段升级固态物消耗 */
+    public static volatile int[] cultivatorUpgradeSolid = {0, 0, 0};
+    /** 三段升级耗时（tick） */
+    public static volatile int[] cultivatorUpgradeTicks = {0, 0, 0};
+    /** 升级成功额外适配加成 override（0 = 用内置 +8） */
+    public static volatile int cultivatorUpgradeCompatBonus = 0;
+
+    // ==================== 机器全局倍率 ====================
+    /** 全部可升级加工机器的工作速度倍率（含速度升级，1.0 = 不变） */
+    public static volatile double machineWorkSpeed = 1.0;
+    /** 持续耗能机器的运行能耗倍率（1.0 = 不变） */
+    public static volatile double machineCostMultiplier = 1.0;
+
+    // ==================== 机制开关 ====================
+    /** 衰竭区域生成（管道/桶/反应堆泄漏等触发） */
+    public static volatile boolean decayZoneEnabled = true;
+    /** 日光自燃负面被动（亡灵速腿/幻翼肺的代价） */
+    public static volatile boolean sunlightBurnEnabled = true;
+    /** 躯体超载 debuff（全身总排斥预算惩罚） */
+    public static volatile boolean overloadEnabled = true;
+
+    // ==================== 生命研究机器 ====================
+    /** 基因分析仪：解构一次消耗的生命能量 */
+    public static volatile long geneAnalyzerLifeCost = 5_000L;
+    /** 基因分析仪：生命能量缓冲容量 */
+    public static volatile long geneAnalyzerLifeCapacity = 10_000L;
+    /** 基因分析仪：解构耗时（tick） */
+    public static volatile int geneAnalyzerProcessTicks = 100;
+    /** 基因分析仪：最低成功率（纯度 25） */
+    public static volatile double geneAnalyzerMinSuccessRate = 0.70;
+    /** 基因分析仪：最高成功率（纯度 100） */
+    public static volatile double geneAnalyzerMaxSuccessRate = 0.95;
+    /** 生命结构台：构造一次消耗的生命能量 */
+    public static volatile long lifeStructLifeCost = 80_000L;
+    /** 生命结构台：构造一次消耗的固态生命精华 */
+    public static volatile int lifeStructSolidCost = 5;
+    /** 生命结构台：生命能量缓冲容量 */
+    public static volatile long lifeStructLifeCapacity = 160_000L;
+    /** 生命结构台：构造耗时（tick） */
+    public static volatile int lifeStructProcessTicks = 120;
+    /** 生命培育器：培育一次消耗的生命能量 */
+    public static volatile long lifeBreederLifeCost = 60_000L;
+    /** 生命培育器：培育一次消耗的赤水晶 */
+    public static volatile int lifeBreederCrystalCost = 2;
+    /** 生命培育器：生命能量缓冲容量 */
+    public static volatile long lifeBreederLifeCapacity = 120_000L;
+    /** 生命培育器：培育耗时（tick） */
+    public static volatile int lifeBreederProcessTicks = 1000;
+    /** 生命培育器：最低成功率 */
+    public static volatile double lifeBreederMinSuccessRate = 0.35;
+    /** 生命培育器：最高成功率 */
+    public static volatile double lifeBreederMaxSuccessRate = 0.70;
+    /** 词条重铸仪：重铸一次消耗的生命能量 */
+    public static volatile long traitReforgerLifeCost = 120_000L;
+    /** 词条重铸仪：生命能量缓冲容量 */
+    public static volatile long traitReforgerLifeCapacity = 240_000L;
+    /** 词条重铸仪：重铸耗时（tick） */
+    public static volatile int traitReforgerProcessTicks = 600;
+    /** 词条重铸仪：每级稀有度消耗的赤水晶 */
+    public static volatile int traitReforgerCrystalPerRarity = 2;
+    /** 转基因工厂：加工一次消耗的生命能量 */
+    public static volatile long transgeneFactoryLifeCost = 5_000L;
+    /** 转基因工厂：生命能量缓冲容量 */
+    public static volatile long transgeneFactoryLifeCapacity = 10_000L;
+    /** 转基因工厂：加工耗时（tick） */
+    public static volatile int transgeneFactoryProcessTicks = 100;
+    /** 手术仓：移植消耗的固态生命精华 */
+    public static volatile int surgeryImplantSolidCost = 3;
+    /** 手术仓：移植消耗的生命能量 */
+    public static volatile long surgeryImplantLifeCost = 20_000L;
+    /** 手术仓：摘除消耗的固态生命精华 */
+    public static volatile int surgeryExtractSolidCost = 1;
+    /** 手术仓：摘除消耗的生命能量 */
+    public static volatile long surgeryExtractLifeCost = 5_000L;
+    /** 手术仓：生命能量缓冲容量 */
+    public static volatile long surgeryLifeCapacity = 100_000L;
+    /** 手术仓：单次手术耗时（tick） */
+    public static volatile int surgeryProcessTicks = 80;
+    /** 器官储藏库：生命能量缓冲容量 */
+    public static volatile long organVaultLifeCapacity = 100_000L;
+    /** 器官储藏库：每 tick 保育消耗（有器官时） */
+    public static volatile long organVaultKeepCostPerTick = 1L;
+    /** 药剂台：生命能量缓冲容量 */
+    public static volatile long potionTableLifeCapacity = 100_000L;
+
+    // ==================== 能量机器 ====================
+    /** 能量加工机：每 tick 抽取赤能源上限 */
+    public static volatile long energyProcessorChishiRate = 1_000_000L;
+    /** 能量加工机：赤能源池容量 */
+    public static volatile long energyProcessorChishiCapacity = 20_000_000L;
+    /** 能量加工机：各液体罐容量（mb） */
+    public static volatile long energyProcessorTankCapacity = 16_000L;
+    /** 能量加工机：每次加工消耗的赤能源 */
+    public static volatile long energyProcessorChishiCost = 5_000_000L;
+    /** 能量液化器：每 tick 抽取赤能源上限 */
+    public static volatile long energyLiquefierChishiRate = 1_000_000L;
+    /** 能量液化器：赤能源池容量 */
+    public static volatile long energyLiquefierChishiCapacity = 100_000_000L;
+    /** 能量液化器：液体罐容量（mb） */
+    public static volatile long energyLiquefierTankCapacity = 16_000L;
+    /** 燃料混合器：每 tick 抽取赤能源上限 */
+    public static volatile long fuelMixerChishiRate = 1_000_000L;
+    /** 燃料混合器：赤能源池容量 */
+    public static volatile long fuelMixerChishiCapacity = 100_000_000L;
+    /** 燃料混合器：每次混合消耗的赤能源 */
+    public static volatile long fuelMixerChishiCost = 2_000_000L;
+    /** 燃料混合器：液体罐容量（mb） */
+    public static volatile long fuelMixerTankCapacity = 16_000L;
+    /** 燃料灌装机：液体罐容量（mb） */
+    public static volatile long fuelCannerTankCapacity = 16_000L;
+    /** 燃料灌装机：每 tick 灌装量（mb） */
+    public static volatile long fuelCannerFillRate = 1_000L;
+    /** 能量聚合器：每颗赤石粉聚合消耗的赤能源 */
+    public static volatile long energyAggregatorEnergyPerIngot = 10_000_000L;
+    /** 能量聚合器：晶洞升级一次消耗的赤能源 */
+    public static volatile long energyAggregatorEnergyPerGeodeUpgrade = 10_000_000L;
+    /** 能量聚合器：赤能源存储容量 */
+    public static volatile long energyAggregatorEnergyCapacity = 200_000_000L;
+    /** 能量发电机：每 tick 发电量 */
+    public static volatile int energyGeneratorGenerateRate = 75;
+    /** 能量组装机：每 tick 发电量 */
+    public static volatile int energyAssemblyGenerateRate = 3375;
+    /** 超级发电机核心：每 tick 发电量 */
+    public static volatile int superGeneratorCoreGenerateRate = 15_000;
+    /** 能量池：基础容量 */
+    public static volatile long energyCellSerializerBaseCapacity = 1_000_000_000L;
+    /** 升级工作台：每次升级消耗的赤能源 */
+    public static volatile long upgradeStationEnergyPerUpgrade = 20_000_000L;
+    /** 升级工作台：赤能源存储容量 */
+    public static volatile long upgradeStationEnergyCapacity = 40_000_000L;
+    /** 装备锻造台：每次锻造消耗的赤能源 */
+    public static volatile long equipmentForgerEnergyPerForge = 50_000_000L;
+    /** 装备锻造台：赤能源存储容量 */
+    public static volatile long equipmentForgerEnergyCapacity = 100_000_000L;
+
+    // ==================== 净化与矩阵 ====================
+    /** 净化塔：每 tick 消耗的赤能源 */
+    public static volatile int purifierEnergyPerTick = 5;
+    /** 净化塔：燃料燃烧速率（每点产能 tick 数） */
+    public static volatile int purifierBurnRate = 10;
+    /** 净化塔：单次提纯消耗（生命能量） */
+    public static volatile long purifierTotalCost = 500L;
+    /** 净化塔：成型后每 tick 提纯量 */
+    public static volatile long purifierRateFormed = 150L;
+    /** 净化矩阵：单次提纯消耗（生命能量） */
+    public static volatile long purifierMatrixTotalCost = 500L;
+    /** 净化矩阵：成型后每 tick 提纯量 */
+    public static volatile long purifierMatrixRateFormed = 150L;
+    /** 生命净化机：每 tick 抽取赤能源上限 */
+    public static volatile long lifePurifierChishiRate = 1_000_000L;
+    /** 生命净化机：单次固化消耗的赤能源 */
+    public static volatile long lifePurifierTotalCost = 10_000_000L;
+    /** 生命净化机：单次固化消耗的生命能量 */
+    public static volatile long lifePurifierLifeCost = 1_000L;
+    /** 生命净化机：赤能源池容量 */
+    public static volatile long lifePurifierChishiCapacity = 20_000_000L;
+    /** 生命净化机：生命能量缓冲容量 */
+    public static volatile long lifePurifierLifeCapacity = 5_000L;
+    /** 生命矩阵：每 tick 转化次数 */
+    public static volatile int lifeMatrixConversionsPerTick = 45;
+    /** 生命矩阵：单次转化消耗的赤能源 */
+    public static volatile long lifeMatrixConversionCost = 10_000_000L;
+    /** 生命矩阵：赤能源池容量 */
+    public static volatile long lifeMatrixChishiCapacity = 500_000_000L;
+    /** 生命矩阵：生命能量缓冲容量 */
+    public static volatile long lifeMatrixLifeCapacity = 5_000L;
+    /** 生命转化架构【外接】：每 tick 转化次数 */
+    public static volatile int lifeConversionConversionsPerTick = 45;
+    /** 生命转化架构【外接】：赤能源池容量 */
+    public static volatile long lifeConversionChishiCapacity = 500_000_000L;
+    /** 生命转化架构【外接】：生命能量缓冲容量 */
+    public static volatile long lifeConversionLifeCapacity = 5_000L;
+    /** 生命聚合转化器：单次转化消耗的赤能源 */
+    public static volatile long lifeAggregationConversionCost = 10_000_000L;
+    /** 生命聚合转化器：单次转化产出的生命能量 */
+    public static volatile long lifeAggregationConversionOutput = 10L;
+    /** 生命聚合转化器：赤能源池容量 */
+    public static volatile long lifeAggregationChishiCapacity = 100_000_000L;
+    /** 生命聚合转化器：生命能量缓冲容量 */
+    public static volatile long lifeAggregationLifeCapacity = 100L;
+
+    // ==================== 端口与电池缓冲 ====================
+    /** 生命矩阵能量输入口缓冲容量 */
+    public static volatile long lifeMatrixInputPortBufferCapacity = 100_000_000L;
+    /** 生命矩阵能量输出口缓冲容量 */
+    public static volatile long lifeMatrixOutputPortBufferCapacity = 5_000L;
+    /** 净化矩阵能量输入口缓冲容量 */
+    public static volatile long purifierEnergyInputPortBufferCapacity = 1_000_000L;
+    /** 矿机物品输出口缓冲（物品格数语义不变，仅能量/液体缓冲类） */
+    public static volatile long minerPortBufferCapacity = 10_000_000L;
+    /** 矿机能量输入口缓冲容量 */
+    public static volatile long minerEnergyInputBufferCapacity = 10_000_000L;
+    /** 无线能量输入口缓冲容量 */
+    public static volatile long wirelessInputPortBufferCapacity = 100_000_000L;
+    /** 无线能量输出口缓冲容量 */
+    public static volatile long wirelessOutputPortBufferCapacity = 100_000_000L;
+    /** 生命矩阵结构【外接】能量输出口缓冲容量 */
+    public static volatile long genEnergyOutputPortBufferCapacity = 100_000_000L;
+    /** 聚变能量输出口缓冲容量 */
+    public static volatile long fusionEnergyOutputBufferCapacity = 20_000_000_000L;
+    /** 反应堆能量输出口缓冲容量 */
+    public static volatile long reactorEnergyOutputBufferCapacity = 5_000_000_000L;
+    /** 生命能量电池：容量 */
+    public static volatile long lifeEnergyCellLifeCapacity = 1_000_000L;
+    /** 等离子储罐：容量（mb） */
+    public static volatile long plasmaTankCapacity = 16_000L;
+
+    // ==================== 培养机提纯与分馏机 ====================
+    /** 培养机：生命能量缓冲容量 */
+    public static volatile long cultivatorLifeCapacity = 500_000L;
+    /** 培养机：提纯成功率（%）按纯度区间 [0, 25, 50, 75]；0 = 用内置默认 */
+    public static volatile int[] cultivatorPurifySuccess = {0, 0, 0, 0};
+    /** 培养机：提纯生命能量消耗按纯度区间 [0, 25, 50, 75]；0 = 用内置默认 */
+    public static volatile long[] cultivatorPurifyEnergy = {0, 0, 0, 0};
+    /** 培养机：提纯固态生命精华消耗按纯度区间 [0, 25, 50, 75]；0 = 用内置默认 */
+    public static volatile int[] cultivatorPurifySolid = {0, 0, 0, 0};
+    /** 培养机：提纯耗时 (tick) 按纯度区间 [0, 25, 50, 75]；0 = 用内置默认 */
+    public static volatile int[] cultivatorPurifyTicks = {0, 0, 0, 0};
+    /** 培养机：单次提纯增加的纯度 */
+    public static volatile int cultivatorPurifyGain = 10;
 }

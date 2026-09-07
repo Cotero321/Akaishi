@@ -1,5 +1,6 @@
 package com.example.akaishi.life.body;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -25,6 +26,10 @@ public class PlayerBodyState implements IPlayerBodyState {
 
     /** 排斥值上限（达到上限器官失效） */
     public static final int MAX_REJECTION = 100;
+    /** 排斥值上限：配置 [rejection] maxRejection 覆盖内置 100（0 = 用内置） */
+    public static int maxRejection() {
+        return ModConfig.maxRejection > 0 ? ModConfig.maxRejection : MAX_REJECTION;
+    }
     /** 最多可吸收的基因型数量（不同生物来源各一次） */
     public static final int GENE_CAPACITY = 4;
 
@@ -120,7 +125,7 @@ public class PlayerBodyState implements IPlayerBodyState {
 
     @Override
     public void setRejection(BodySlot slot, int value) {
-        rejection.put(slot, Math.max(0, Math.min(MAX_REJECTION, value)));
+        rejection.put(slot, Math.max(0, Math.min(maxRejection(), value)));
     }
 
     @Override

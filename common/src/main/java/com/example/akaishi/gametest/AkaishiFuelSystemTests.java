@@ -3,6 +3,7 @@ package com.example.akaishi.gametest;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiFuelCannerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFuelMixerBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
@@ -54,7 +55,7 @@ public final class AkaishiFuelSystemTests {
             List<FluidTank> tanks = mixer.getFluidTanks(); // [in1, in2, out]
             tanks.get(0).setStack(FluidStack.create(dragon, 100));
             tanks.get(1).setStack(FluidStack.create(pure, 100));
-            ((AkaishiEnergyStorage) mixer.getEnergyStorage()).setEnergy(AkaishiFuelMixerBlockEntity.CHISHI_COST);
+            ((AkaishiEnergyStorage) mixer.getEnergyStorage()).setEnergy(ModConfig.fuelMixerChishiCost);
 
             // 灌装 5 tick + 结算 2 tick，等 20 tick 冗余后统一验证
             helper.runAfterDelay(20, () -> {

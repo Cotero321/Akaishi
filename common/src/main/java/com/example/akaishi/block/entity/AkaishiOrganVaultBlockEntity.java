@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.api.storage.IStorageVault;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.life.body.BodySlot;
@@ -54,11 +55,6 @@ public class AkaishiOrganVaultBlockEntity extends BlockEntity implements
     /** 总槽位数（81 + 9 = 90） */
     public static final int SLOT_COUNT = TEMP_START + TEMP_SIZE;
 
-    /** 生命能量缓冲容量 */
-    public static final long LIFE_CAPACITY = 100_000L;
-    /** 每 tick 活性维持消耗 */
-    public static final long KEEP_COST_PER_TICK = 1L;
-
     /** Menu 同步数据：0/1=生命能量/容量 2=活性状态（1 活性 0 休眠） */
     public static final int DATA_SLOTS = 3;
     public static final int DATA_ENERGY = 0;
@@ -71,7 +67,7 @@ public class AkaishiOrganVaultBlockEntity extends BlockEntity implements
 
     public AkaishiOrganVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ORGAN_VAULT.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.organVaultLifeCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
             public void setChanged() {
@@ -90,7 +86,7 @@ public class AkaishiOrganVaultBlockEntity extends BlockEntity implements
         // 活性维持：每 tick 消耗 1 生命能量
         long stored = life.getEnergyStored();
         if (stored > 0) {
-            life.extractEnergy(KEEP_COST_PER_TICK, false);
+            life.extractEnergy(ModConfig.organVaultKeepCostPerTick, false);
         }
         data.set(DATA_ENERGY, (int) stored);
         data.set(DATA_CAPACITY, (int) life.getMaxEnergy());

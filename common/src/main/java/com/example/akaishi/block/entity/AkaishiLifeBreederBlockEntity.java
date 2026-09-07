@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -46,17 +47,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 单次培养消耗的生命能量（消耗减半：原 120K） */
-    public static final long LIFE_COST = 60_000L;
-    /** 单次培养消耗的衰竭结晶数量（消耗减半：原 4） */
-    public static final int CRYSTAL_COST = 2;
-    /** 生命能量缓冲容量（够 2 次培养） */
-    public static final long LIFE_CAPACITY = 120_000L;
-    /** 单次培养耗时（tick，50 秒） */
-    public static final int PROGRESS_TICKS = 1000;
-    /** 成功率下限（纯度 25）与上限（纯度 100，封顶 70%） */
-    public static final float MIN_SUCCESS_RATE = 0.35F;
-    public static final float MAX_SUCCESS_RATE = 0.70F;
     /** 序列纯度的有效插值下限（与基因分析台解构门槛一致） */
     public static final int MIN_PURITY = 25;
 
@@ -74,7 +64,9 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
     /** 成功率 = 纯度 25→35%、纯度 100→70% 线性插值；纯度越纯越接近 70% 封顶 */
     public static float successRate(int purity) {
         float t = (float) (Math.max(MIN_PURITY, Math.min(100, purity)) - MIN_PURITY) / (100 - MIN_PURITY);
-        return MIN_SUCCESS_RATE + t * (MAX_SUCCESS_RATE - MIN_SUCCESS_RATE);
+        float min = (float) ModConfig.lifeBreederMinSuccessRate;
+        float max = (float) ModConfig.lifeBreederMaxSuccessRate;
+        return min + t * (max - min);
     }
 
     private final SimpleContainer inventory;
@@ -88,7 +80,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
 
     public AkaishiLifeBreederBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_BREEDER.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeBreederLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -106,7 +98,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容生命能量缓冲（倍率变化时自动夹取）
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.lifeBreederLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(0, (int) life.getEnergyStored());
         data.set(1, (int) life.getMaxEnergy());
         // 同步当前序列纯度（供客户端实时计算成功率，序列为空时置 0）
@@ -123,7 +115,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
                 speedAccum -= delta;
                 progress += delta;
             }
-            if (progress >= PROGRESS_TICKS) {
+            if (progress >= ModConfig.lifeBreederProcessTicks) {
                 progress = 0;
                 settle();
             }
@@ -133,7 +125,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             speedAccum = 0;
         }
         // 进度数据槽在状态变更后写入：停机/完成当帧即同步新值，避免残留旧进度
-        data.set(2, progress * 100 / PROGRESS_TICKS);
+        data.set(2, progress * 100 / ModConfig.lifeBreederProcessTicks);
         if (changed) {
             setChanged();
         }
@@ -155,10 +147,10 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             return false;
         }
         if (!inventory.getItem(CRYSTAL_SLOT).is(ModItems.exhaustedCrystal.get())
-                || inventory.getItem(CRYSTAL_SLOT).getCount() < CRYSTAL_COST) {
+                || inventory.getItem(CRYSTAL_SLOT).getCount() < ModConfig.lifeBreederCrystalCost) {
             return false;
         }
-        if (life.getEnergyStored() < LIFE_COST) {
+        if (life.getEnergyStored() < ModConfig.lifeBreederLifeCost) {
             return false;
         }
         // 产物槽必须为空：突变器官 NBT 与既有物品不同，无法合并堆叠
@@ -171,8 +163,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         ItemStack sequence = inventory.getItem(SEQUENCE_SLOT);
         int purity = AkaishiGeneSequenceItem.getPurity(sequence);
 
-        life.extractEnergy(LIFE_COST, false);
-        inventory.getItem(CRYSTAL_SLOT).shrink(CRYSTAL_COST);
+        life.extractEnergy(ModConfig.lifeBreederLifeCost, false);
+        inventory.getItem(CRYSTAL_SLOT).shrink(ModConfig.lifeBreederCrystalCost);
         sequence.shrink(1);
 
         // 成功：消耗原器官并产出副本 + 随机突变词条（稀有度由纯度解锁）；失败：仅材料损失，器官留在输入槽

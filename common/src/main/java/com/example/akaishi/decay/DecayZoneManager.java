@@ -120,6 +120,10 @@ public final class DecayZoneManager extends SavedData {
      * @param explosion 是否爆炸触发（仅决定语义，效果等级由 amplifier 表达）
      */
     public static void createZone(ServerLevel level, BlockPos center, int amplifier, boolean explosion) {
+        // 全局开关 [toggles] decayZone：关闭后任何泄漏源不再生成衰竭区域
+        if (!ModConfig.decayZoneEnabled) {
+            return;
+        }
         DecayZoneManager mgr = get(level);
         mgr.zones.add(new DecayZone(center, radiusBlocksFor(amplifier) * 16, amplifier,
                 level.dimension().location().toString(), ModConfig.decayZoneDurationTicks));

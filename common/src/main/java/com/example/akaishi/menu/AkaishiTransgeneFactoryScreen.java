@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiTransgeneFactoryBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -86,7 +87,7 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
         if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isWitherSkeletonGene(gene)) {
             return Component.translatable("gui.akaishi.transgene_factory.gene_bad");
         }
-        if (this.menu.getLifeEnergy() < AkaishiTransgeneFactoryBlockEntity.LIFE_COST) {
+        if (this.menu.getLifeEnergy() < ModConfig.transgeneFactoryLifeCost) {
             return Component.translatable("gui.akaishi.transgene_factory.energy");
         }
         return Component.translatable("gui.akaishi.transgene_factory.idle");
@@ -100,7 +101,7 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
         if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isWitherSkeletonGene(gene)) {
             return TEXT_RED;
         }
-        if (this.menu.getLifeEnergy() < AkaishiTransgeneFactoryBlockEntity.LIFE_COST) {
+        if (this.menu.getLifeEnergy() < ModConfig.transgeneFactoryLifeCost) {
             return TEXT_RED;
         }
         return TEXT_DIM;

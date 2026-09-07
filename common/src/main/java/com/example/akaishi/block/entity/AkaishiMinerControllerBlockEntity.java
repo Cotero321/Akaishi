@@ -208,11 +208,13 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
                 // 只有真正结算成功（产物落槽、进度归零）才标脏存档；爆仓未结算无状态变化不标脏
                 changed |= settleOre(t);
             } else {
-                // 消耗能量推进挖矿进度（速度升级加速、也提能耗；能量不足则停机）
-                long cost = (long) (ModConfig.minerCostPerTickBase * (1.0 + COST_STEP * speedCount));
+                // 消耗能量推进挖矿进度（速度升级加速、也提能耗；能量不足则停机）。
+                // 配置 [machine]：workSpeed 全局加速，costMultiplier 放大运行耗能
+                long cost = (long) (ModConfig.minerCostPerTickBase * (1.0 + COST_STEP * speedCount)
+                        * ModConfig.machineCostMultiplier);
                 if (energy.getEnergyStored() >= cost) {
                     energy.extractEnergy(cost, false);
-                    speedAccum += t.rateMultiplier * (1.0 + SPEED_STEP * speedCount);
+                    speedAccum += t.rateMultiplier * (1.0 + SPEED_STEP * speedCount) * ModConfig.machineWorkSpeed;
                     int delta = (int) speedAccum;
                     if (delta > 0) {
                         speedAccum -= delta;

@@ -7,6 +7,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
@@ -52,13 +53,6 @@ import java.util.List;
  */
 public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
-
-    /** 每 tick 赤能源输入率 */
-    public static final long CHISHI_RATE = 1_000_000L;
-    /** 赤能源缓冲容量（够 2 次下界之星液化积累） */
-    public static final long CHISHI_CAPACITY = 100_000_000L;
-    /** 单个产物液体罐容量（mb） */
-    public static final long TANK_CAPACITY = 16_000L;
 
     public static final int INPUT_SLOT = 0;
     /** 生命能量固态物槽（末地/幽匿/巨龙燃料液化消耗） */
@@ -120,9 +114,9 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
 
     public AkaishiEnergyLiquefierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_LIQUEFIER.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyLiquefierChishiCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
-        this.outputTank = new FluidTank(TANK_CAPACITY) {
+        this.outputTank = new FluidTank(ModConfig.energyLiquefierTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
@@ -144,7 +138,7 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
-        akaishi.setMaxEnergy((long) (CHISHI_CAPACITY * getEnergyCapacityMultiplier()));
+        akaishi.setMaxEnergy((long) (ModConfig.energyLiquefierChishiCapacity * getEnergyCapacityMultiplier()));
         data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
         data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
         data.set(DATA_FLUID_AMOUNT, (int) outputTank.getAmount());
@@ -169,16 +163,19 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
             data.set(DATA_PROGRESS, 0);
             return;
         }
+        // 配置 [machine] costMultiplier：单件赤能源需求与每 tick 抽取额同步放大 → 只增耗能、吞吐不变
+        long costTotal = (long) (recipe.cost * ModConfig.machineCostMultiplier);
         // 目标罐：通用输出罐（产物与罐中异常液体不一致时 fill 会拒绝，安全）
         boolean changed = false;
         if (canAdd(outputTank, recipe.amount)) {
             // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）
-            long extract = Math.min((long) (CHISHI_RATE * getSpeedMultiplier()), akaishi.getEnergyStored());
+            long extract = Math.min((long) (ModConfig.energyLiquefierChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+                    akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
                 progressEnergy += extract;
-                if (progressEnergy >= recipe.cost) {
-                    progressEnergy -= recipe.cost;
+                if (progressEnergy >= costTotal) {
+                    progressEnergy -= costTotal;
                     outputTank.fill(FluidStack.create(recipe.output, recipe.amount), false);
                     inventory.getItem(INPUT_SLOT).shrink(1);
                     if (inventory.getItem(INPUT_SLOT).isEmpty()) {
@@ -197,7 +194,7 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
         } else {
             progressEnergy = 0;
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / recipe.cost));
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
         if (changed) {
             setChanged();
         }

@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
@@ -54,13 +55,6 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
     public static final int DATA_OUT_CAPACITY = 7;
     public static final int DATA_PROGRESS = 8;
 
-    /** 每 tick 赤能源输入率 / 容量 / 单批混合成本 */
-    public static final long CHISHI_RATE = 1_000_000L;
-    public static final long CHISHI_CAPACITY = 100_000_000L;
-    public static final long CHISHI_COST = 2_000_000L;
-    /** 单个液体罐容量（mb） */
-    public static final long TANK_CAPACITY = 16_000L;
-
     /** 混合配方：两种输入液体 1:1:1 → 一种输出液体 */
     public record Recipe(Fluid in1, long in1Amount, Fluid in2, long in2Amount, Fluid out, long outAmount) {
     }
@@ -90,28 +84,28 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
     private final FluidTank in2Tank;
     /** 输出罐（当前配方产物，通用） */
     private final FluidTank outTank;
-    /** 已投入的赤能源（能量池模式，满 CHISHI_COST 完成一次） */
+    /** 已投入的赤能源（能量池模式，满单批混合成本完成一次） */
     private long progressEnergy;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
 
     public AkaishiFuelMixerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUEL_MIXER.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.fuelMixerChishiCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
-        this.in1Tank = new FluidTank(TANK_CAPACITY) {
+        this.in1Tank = new FluidTank(ModConfig.fuelMixerTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
             }
         };
-        this.in2Tank = new FluidTank(TANK_CAPACITY) {
+        this.in2Tank = new FluidTank(ModConfig.fuelMixerTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
             }
         };
-        this.outTank = new FluidTank(TANK_CAPACITY) {
+        this.outTank = new FluidTank(ModConfig.fuelMixerTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
@@ -126,7 +120,7 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
-        akaishi.setMaxEnergy((long) (CHISHI_CAPACITY * getEnergyCapacityMultiplier()));
+        akaishi.setMaxEnergy((long) (ModConfig.fuelMixerChishiCapacity * getEnergyCapacityMultiplier()));
         data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
         data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
         data.set(DATA_IN1_AMOUNT, (int) in1Tank.getAmount());
@@ -144,20 +138,23 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
             data.set(DATA_PROGRESS, 0);
             return;
         }
-        // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）
-        long extract = Math.min((long) (CHISHI_RATE * getSpeedMultiplier()), akaishi.getEnergyStored());
+        // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
+        // 配置 [machine] costMultiplier：单件赤能源需求与每 tick 抽取额同步放大 → 只增耗能、吞吐不变
+        long costTotal = (long) (ModConfig.fuelMixerChishiCost * ModConfig.machineCostMultiplier);
+        long extract = Math.min((long) (ModConfig.fuelMixerChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+                akaishi.getEnergyStored());
         if (extract > 0) {
             akaishi.extractEnergy(extract, false);
             progressEnergy += extract;
-            if (progressEnergy >= CHISHI_COST) {
-                progressEnergy -= CHISHI_COST;
+            if (progressEnergy >= costTotal) {
+                progressEnergy -= costTotal;
                 in1Tank.drain(recipe.in1Amount, false);
                 in2Tank.drain(recipe.in2Amount, false);
                 outTank.fill(FluidStack.create(recipe.out, recipe.outAmount), false);
             }
             setChanged();
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / CHISHI_COST));
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
     }
 
     /** 输出罐可容纳指定液体（空或同液体且余量足够） */

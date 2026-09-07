@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiTraitReforgerBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.MutantTrait;
 import net.minecraft.client.gui.GuiGraphics;
@@ -140,7 +141,7 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
                 msg = Component.translatable("gui.akaishi.trait_reforger.working");
             } else {
                 msg = Component.translatable("gui.akaishi.trait_reforger.cost",
-                        menu.getCrystalCost(), AkaishiTraitReforgerBlockEntity.LIFE_COST / 1000);
+                        menu.getCrystalCost(), ModConfig.traitReforgerLifeCost / 1000);
             }
         }
         gui.drawString(this.font, msg, x + 8, y + STATUS_Y, color, false);

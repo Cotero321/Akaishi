@@ -1,5 +1,6 @@
 package com.example.akaishi.upgrade;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.item.MachineUpgradeType;
 import net.minecraft.core.NonNullList;
@@ -57,9 +58,9 @@ public class MachineUpgradeSlots extends SimpleContainer {
         return getItem(SLOT_ENERGY).getCount();
     }
 
-    /** 速度倍率：1 + 0.125 × 数量，8 个封顶 2.0 */
+    /** 速度倍率：1 + 0.125 × 数量，8 个封顶 2.0；再乘配置 [machine] workSpeed 全局速度倍率（默认 1.0 = 不变） */
     public float getSpeedMultiplier() {
-        return 1F + 0.125F * getSpeedCount();
+        return (1F + 0.125F * getSpeedCount()) * (float) ModConfig.machineWorkSpeed;
     }
 
     /** 容量倍率：1 + 0.5 × 数量，8 个封顶 5.0 */

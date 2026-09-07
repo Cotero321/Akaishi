@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.entity.AkaishiLifeBreederBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
@@ -97,13 +98,13 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
         }
         ItemStack crystal = menu.slots.get(IDX_CRYSTAL).getItem();
         if (!crystal.is(ModItems.exhaustedCrystal.get())
-                || crystal.getCount() < AkaishiLifeBreederBlockEntity.CRYSTAL_COST) {
+                || crystal.getCount() < ModConfig.lifeBreederCrystalCost) {
             return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_crystal",
-                    AkaishiLifeBreederBlockEntity.CRYSTAL_COST), 0xFF707070);
+                    ModConfig.lifeBreederCrystalCost), 0xFF707070);
         }
-        if (menu.getLifeEnergy() < AkaishiLifeBreederBlockEntity.LIFE_COST) {
+        if (menu.getLifeEnergy() < ModConfig.lifeBreederLifeCost) {
             return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_energy",
-                    formatEnergy(AkaishiLifeBreederBlockEntity.LIFE_COST)), 0xFF707070);
+                    formatEnergy(ModConfig.lifeBreederLifeCost)), 0xFF707070);
         }
         if (!menu.slots.get(IDX_OUTPUT).getItem().isEmpty()) {
             return new BreederStatus(Component.translatable("gui.akaishi.life_breeder.need_output"), 0xFF707070);
@@ -253,8 +254,8 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
             if (menu.getPurity() >= AkaishiLifeBreederBlockEntity.MIN_PURITY) {
                 tip.add(Component.translatable("gui.akaishi.life_breeder.rate", menu.getSuccessRate()));
                 tip.add(Component.translatable("gui.akaishi.life_breeder.cost",
-                        AkaishiLifeBreederBlockEntity.CRYSTAL_COST,
-                        formatEnergy(AkaishiLifeBreederBlockEntity.LIFE_COST)));
+                        ModConfig.lifeBreederCrystalCost,
+                        formatEnergy(ModConfig.lifeBreederLifeCost)));
             } else {
                 tip.add(Component.translatable("gui.akaishi.life_breeder.no_sequence"));
             }

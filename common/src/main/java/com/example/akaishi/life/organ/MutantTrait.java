@@ -1,5 +1,6 @@
 package com.example.akaishi.life.organ;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodySlot;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -214,12 +215,14 @@ public enum MutantTrait {
         return null;
     }
 
-    /** 纯度 → 词条稀有度解锁档（1/2/3） */
+    /** 纯度 → 词条稀有度解锁档（1/2/3）。阈值读取配置 [trait]，两阈值取大者出 3 档、小者出 2 档（防填反） */
     public static int maxRarity(int purity) {
-        if (purity >= 85) {
+        int high = Math.max(ModConfig.traitRarityHighThreshold, ModConfig.traitRarityMidThreshold);
+        int mid = Math.min(ModConfig.traitRarityHighThreshold, ModConfig.traitRarityMidThreshold);
+        if (purity >= high) {
             return 3;
         }
-        return purity >= 60 ? 2 : 1;
+        return purity >= mid ? 2 : 1;
     }
 
     /**
@@ -263,8 +266,8 @@ public enum MutantTrait {
             }
             (trait.dual ? duals : benign).add(trait);
         }
-        // 双刃剑：多数常规、少数畸变；空池互退
-        List<MutantTrait> pool = random.nextFloat() < 0.7F ? benign : duals;
+        // 双刃剑：多数常规、少数畸变（比例可配置 [trait] benignRatio）；空池互退
+        List<MutantTrait> pool = random.nextFloat() < ModConfig.traitBenignRatio ? benign : duals;
         if (pool.isEmpty()) {
             pool = pool == benign ? duals : benign;
         }

@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
@@ -17,22 +18,13 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity implements IEnergyProvider {
 
-    /** 单次聚合消耗的赤能源量（保留常量供旧数据解读） */
-    public static final long CONVERSION_COST = 10_000_000L;
-    /** 单次聚合产出的生命能量量 */
-    public static final long CONVERSION_OUTPUT = 10L;
-    /** 自身赤能源缓冲容量 */
-    public static final long CHISHI_CAPACITY = 100_000_000L;
-    /** 自身生命能量缓冲容量 */
-    public static final long LIFE_CAPACITY = 100L;
-
     private final AkaishiEnergyStorage akaishi;
     private final AkaishiEnergyStorage life;
 
     public AkaishiLifeAggregationConverterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_AGGREGATION_CONVERTER.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.lifeAggregationChishiCapacity);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeAggregationLifeCapacity);
     }
 
     @Override

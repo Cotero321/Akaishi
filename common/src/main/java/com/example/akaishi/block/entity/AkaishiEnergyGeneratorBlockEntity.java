@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiEnergyAssemblyBlock;
 import com.example.akaishi.block.AkaishiSuperGeneratorCoreBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
@@ -48,8 +49,6 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     /** 最大能量存储（10M，容纳满配升级约 145 tick 产出） */
     public static final int MAX_ENERGY = 10_000_000;
-    /** 单方块燃烧产能速率（产能减半后 150→75） */
-    public static final int GENERATE_RATE = 75;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -106,7 +105,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
             if (burnTime > 0) {
                 burnTime--;
                 // 升级组件：每个 ×1.75 倍产出速度、减少 1% 产出（净倍率 1.75^n × (1-0.01n)）
-                energy.addEnergy((long) (GENERATE_RATE * getBoostMultiplier(upgrades)), false);
+                energy.addEnergy((long) (ModConfig.energyGeneratorGenerateRate * getBoostMultiplier(upgrades)), false);
                 changed = true;
             }
         }

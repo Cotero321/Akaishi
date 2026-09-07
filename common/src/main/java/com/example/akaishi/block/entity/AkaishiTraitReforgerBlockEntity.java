@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -46,15 +47,6 @@ import java.util.List;
 public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 单次重铸消耗的生命能量 */
-    public static final long LIFE_COST = 120_000L;
-    /** 生命能量缓冲容量（够 2 次重铸） */
-    public static final long LIFE_CAPACITY = 240_000L;
-    /** 单次重铸耗时（tick） */
-    public static final int PROGRESS_TICKS = 600;
-    /** 衰竭结晶消耗基数：crystalCost(rarity) = 2 × rarity（1/2/3 档 → 2/4/6 个） */
-    public static final int CRYSTAL_PER_RARITY = 2;
-
     public static final int ORGAN_SLOT = 0;
     public static final int CRYSTAL_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
@@ -65,9 +57,9 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
     public static final int DATA_COUNT = 3;
     public static final int DATA_TARGET = 4;
 
-    /** 衰竭结晶消耗 = 稀有度 × 2（1/2/3 档 → 2/4/6） */
+    /** 衰竭结晶消耗 = 稀有度 × 基数（1/2/3 档 → 2/4/6） */
     public static int crystalCost(int rarity) {
-        return Math.max(1, rarity) * CRYSTAL_PER_RARITY;
+        return Math.max(1, rarity) * ModConfig.traitReforgerCrystalPerRarity;
     }
 
     private final SimpleContainer inventory;
@@ -83,7 +75,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
 
     public AkaishiTraitReforgerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_TRAIT_REFORGER.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.traitReforgerLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -101,7 +93,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容生命能量缓冲（倍率变化时自动夹取）
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.traitReforgerLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(0, (int) life.getEnergyStored());
         data.set(1, (int) life.getMaxEnergy());
 
@@ -124,7 +116,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
                 speedAccum -= delta;
                 progress += delta;
             }
-            if (progress >= PROGRESS_TICKS) {
+            if (progress >= ModConfig.traitReforgerProcessTicks) {
                 progress = 0;
                 settle();
             }
@@ -134,7 +126,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
             speedAccum = 0;
         }
         // 进度数据槽在状态变更后写入：停机/完成当帧即同步新值，避免残留旧进度
-        data.set(DATA_PROGRESS, progress * 100 / PROGRESS_TICKS);
+        data.set(DATA_PROGRESS, progress * 100 / ModConfig.traitReforgerProcessTicks);
         if (changed) {
             setChanged();
         }
@@ -171,7 +163,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
                 || inventory.getItem(CRYSTAL_SLOT).getCount() < cost) {
             return false;
         }
-        if (life.getEnergyStored() < LIFE_COST) {
+        if (life.getEnergyStored() < ModConfig.traitReforgerLifeCost) {
             return false;
         }
         // 产物槽必须为空：重铸后器官 NBT 与既有物品不同，无法合并堆叠
@@ -186,7 +178,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
             return;
         }
         int cost = crystalCost(old.getRarity());
-        life.extractEnergy(LIFE_COST, false);
+        life.extractEnergy(ModConfig.traitReforgerLifeCost, false);
         inventory.getItem(CRYSTAL_SLOT).shrink(cost);
 
         ItemStack result = organ.copy();

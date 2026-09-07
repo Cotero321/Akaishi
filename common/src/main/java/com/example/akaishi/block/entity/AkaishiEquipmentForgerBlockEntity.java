@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
@@ -47,18 +48,13 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
 
-    /** 重铸基础消耗的赤能源量 */
-    public static final long ENERGY_PER_FORGE = 50_000_000L;
-    /** 赤能源缓冲容量（满能可承担 4 点满配重铸：50M + 4×10M = 90M） */
-    public static final long ENERGY_CAPACITY = 100_000_000L;
-
     /** 当前锻造总能耗 = 基础 + 已选升级点数 × 单点（动态计算） */
     public long getCurrentCost() {
         long points = 0;
         for (int c : baseCounts) {
             points += c;
         }
-        return ENERGY_PER_FORGE + points * AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE;
+        return ModConfig.equipmentForgerEnergyPerForge + points * AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE;
     }
 
     /** data 布局：0=能量 1=最大 2=充能进度 3=剩余升级点 4-9=6 种属性已选次数 */
@@ -90,7 +86,7 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
 
     public AkaishiEquipmentForgerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_EQUIPMENT_FORGER.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ENERGY_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.equipmentForgerEnergyCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT);
         this.data = new SimpleContainerData(DATA_SIZE);
     }

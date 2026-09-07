@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -46,15 +47,14 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
     // ===== 提纯参数（按纯度区间 0/25/50/75 分档：越高越难，代价递增）=====
-    /** 分档数据：{最低纯度, 成功率x100, 生命能量, 固态物, 耗时tick} */
+    /** 内置默认分档：{最低纯度, 成功率x100, 生命能量, 固态物, 耗时tick}；
+     *  配置 [cultivator] 数组第 i 项 > 0 才覆盖对应档位，否则回退本表 */
     private static final int[][] PURIFY_TIERS = {
             {0, 90, 10_000, 1, 300},
             {25, 80, 20_000, 2, 600},
             {50, 70, 40_000, 4, 1200},
             {75, 60, 80_000, 8, 2400}
     };
-    /** 单次提纯增加纯度 */
-    public static final int PURIFY_GAIN = 10;
 
     // ===== 升级参数（按品质等级 I→II / II→III / III→IV：成功率下降，代价递增）=====
     /** 分档数据：{成功率x100, 生命能量, 固态物, 耗时tick} */
@@ -63,9 +63,6 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
             {75, 80_000, 4, 1200},
             {65, 300_000, 16, 2400}
     };
-
-    /** 生命能量缓冲容量（够 III→IV 一次消耗） */
-    public static final long LIFE_CAPACITY = 500_000L;
 
     public static final int INPUT_SLOT = 0;
     public static final int SOLID_SLOT = 1;
@@ -85,44 +82,57 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
         return purity < 25 ? 0 : purity < 50 ? 1 : purity < 75 ? 2 : 3;
     }
 
-    /** 提纯成功率（百分比） */
+    /** 提纯成功率（百分比；配置 [cultivator] 第 i 项 > 0 覆盖，数组缺项回退内置默认） */
     public static int purifyRate(int purity) {
-        return PURIFY_TIERS[purifyTierIndex(purity)][1];
+        int i = purifyTierIndex(purity);
+        int[] arr = ModConfig.cultivatorPurifySuccess;
+        return i < arr.length && arr[i] > 0 ? arr[i] : PURIFY_TIERS[i][1];
     }
 
-    /** 提纯能量消耗 */
+    /** 提纯能量消耗（覆盖规则同上） */
     public static long purifyCost(int purity) {
-        return PURIFY_TIERS[purifyTierIndex(purity)][2];
+        int i = purifyTierIndex(purity);
+        long[] arr = ModConfig.cultivatorPurifyEnergy;
+        return i < arr.length && arr[i] > 0 ? arr[i] : PURIFY_TIERS[i][2];
     }
 
-    /** 提纯固态物消耗 */
+    /** 提纯固态物消耗（覆盖规则同上） */
     public static int purifySolid(int purity) {
-        return PURIFY_TIERS[purifyTierIndex(purity)][3];
+        int i = purifyTierIndex(purity);
+        int[] arr = ModConfig.cultivatorPurifySolid;
+        return i < arr.length && arr[i] > 0 ? arr[i] : PURIFY_TIERS[i][3];
     }
 
-    /** 提纯耗时（tick） */
+    /** 提纯耗时（tick，覆盖规则同上） */
     public static int purifyTicks(int purity) {
-        return PURIFY_TIERS[purifyTierIndex(purity)][4];
+        int i = purifyTierIndex(purity);
+        int[] arr = ModConfig.cultivatorPurifyTicks;
+        return i < arr.length && arr[i] > 0 ? arr[i] : PURIFY_TIERS[i][4];
     }
 
-    /** 器官升级成功率（百分比，按当前品质） */
+    /** 器官升级成功率（百分比，按当前品质；配置 [cultivator_upgrade] 0 = 用内置默认） */
     public static int upgradeRate(QualityTier tier) {
-        return UPGRADE_TIERS[tier.ordinal()][0];
+        return upgradeOverride(ModConfig.cultivatorUpgradeSuccess, tier.ordinal(), UPGRADE_TIERS[tier.ordinal()][0]);
     }
 
-    /** 器官升级能量消耗 */
+    /** 器官升级能量消耗（同上配置可覆盖） */
     public static long upgradeCost(QualityTier tier) {
-        return UPGRADE_TIERS[tier.ordinal()][1];
+        return upgradeOverride(ModConfig.cultivatorUpgradeEnergy, tier.ordinal(), UPGRADE_TIERS[tier.ordinal()][1]);
     }
 
-    /** 器官升级固态物消耗 */
+    /** 器官升级固态物消耗（同上配置可覆盖） */
     public static int upgradeSolid(QualityTier tier) {
-        return UPGRADE_TIERS[tier.ordinal()][2];
+        return upgradeOverride(ModConfig.cultivatorUpgradeSolid, tier.ordinal(), UPGRADE_TIERS[tier.ordinal()][2]);
     }
 
-    /** 器官升级耗时（tick） */
+    /** 器官升级耗时（tick，同上配置可覆盖） */
     public static int upgradeTicks(QualityTier tier) {
-        return UPGRADE_TIERS[tier.ordinal()][3];
+        return upgradeOverride(ModConfig.cultivatorUpgradeTicks, tier.ordinal(), UPGRADE_TIERS[tier.ordinal()][3]);
+    }
+
+    /** 升级参数配置 override（0 = 未配置 → 用内置 UPGRADE_TIERS；防配置缺条目越界） */
+    private static int upgradeOverride(int[] arr, int idx, int def) {
+        return idx < arr.length && arr[idx] > 0 ? arr[idx] : def;
     }
 
     private final SimpleContainer inventory;
@@ -137,7 +147,7 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
 
     public AkaishiCultivatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_CULTIVATOR.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.cultivatorLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -155,7 +165,7 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.cultivatorLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(0, (int) life.getEnergyStored());
         data.set(1, (int) life.getMaxEnergy());
 
@@ -186,7 +196,7 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
                     life.extractEnergy(cost, false);
                     inventory.getItem(SOLID_SLOT).shrink(solid);
                     if (level.random.nextInt(100) < purifyRate(purity)) {
-                        AkaishiLifeSampleItem.setPurity(input, Math.min(100, purity + PURIFY_GAIN));
+                        AkaishiLifeSampleItem.setPurity(input, Math.min(100, purity + ModConfig.cultivatorPurifyGain));
                     }
                 }
                 changed = true;
@@ -218,8 +228,11 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
                         inventory.getItem(SOLID_SLOT).shrink(solid);
                         if (level.random.nextInt(100) < upgradeRate(tier)) {
                             AkaishiOrganItem.setTier(input, tier.next());
-                            // 培养升级同时提升适配度 +8（封顶 100），显著对冲升品带来的排斥成本
-                            AkaishiOrganItem.addCompat(input, 8);
+                            // 培养升级同时提升适配度（内置 +8，配置 [cultivator_upgrade] compatBonus 可改），
+                            // 显著对冲升品带来的排斥成本
+                            AkaishiOrganItem.addCompat(input,
+                                    ModConfig.cultivatorUpgradeCompatBonus > 0
+                                            ? ModConfig.cultivatorUpgradeCompatBonus : 8);
                         }
                     }
                     changed = true;

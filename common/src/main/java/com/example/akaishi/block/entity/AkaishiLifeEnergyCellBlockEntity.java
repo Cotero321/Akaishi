@@ -5,6 +5,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeConverterMenu;
@@ -28,16 +29,13 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
-    /** 存储容量 */
-    public static final long LIFE_CAPACITY = 1_000_000L;
-
     private final AkaishiEnergyStorage energy;
     /** 数据缓存：0/1=赤槽（恒 0，供菜单占位），2=生命能量，3=生命容量，4=结构状态（恒 0） */
     private final SimpleContainerData data;
 
     public AkaishiLifeEnergyCellBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_ENERGY_CELL.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeEnergyCellLifeCapacity);
         this.data = new SimpleContainerData(5);
     }
 

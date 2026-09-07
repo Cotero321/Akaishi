@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -45,13 +46,6 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     /** 凋零藤配方：凋零骷髅基因纯度≥50 + 缠怨藤 + 凋零玫瑰 + 固态物 → 凋零藤 */
     private static final GeneRecipe WITHER_VINE_RECIPE = new GeneRecipe("minecraft:wither_skeleton", 50);
 
-    /** 合成耗时（tick，5 秒） */
-    public static final int PROGRESS_TICKS = 100;
-    /** 每次合成消耗的生命能量（5k） */
-    public static final long LIFE_COST = 5_000;
-    /** 内部生命能量上限（可连续加工 2 次） */
-    public static final long LIFE_CAPACITY = 10_000;
-
     public static final int SLOT_GENE = 0;
     public static final int SLOT_VINE = 1;
     public static final int SLOT_ROSE = 2;
@@ -81,7 +75,7 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
             }
         };
         this.data = new SimpleContainerData(DATA_SLOTS);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.transgeneFactoryLifeCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiTransgeneFactoryBlockEntity be) {
@@ -90,15 +84,15 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         data.set(DATA_ENERGY, (int) Math.min(Integer.MAX_VALUE, life.getEnergyStored()));
-        data.set(DATA_MAX, (int) Math.min(Integer.MAX_VALUE, LIFE_CAPACITY));
-        data.set(DATA_PROGRESS, progress * 100 / PROGRESS_TICKS);
+        data.set(DATA_MAX, (int) Math.min(Integer.MAX_VALUE, ModConfig.transgeneFactoryLifeCapacity));
+        data.set(DATA_PROGRESS, progress * 100 / ModConfig.transgeneFactoryProcessTicks);
         data.set(DATA_WORKING, canProcess() ? 1 : 0);
         if (canProcess()) {
             progress++;
-            if (progress >= PROGRESS_TICKS) {
+            if (progress >= ModConfig.transgeneFactoryProcessTicks) {
                 progress = 0;
-                // 扣除一次合成所需生命能量（5k），并消耗材料
-                life.extractEnergy(LIFE_COST, false);
+                // 扣除一次合成所需生命能量，并消耗材料
+                life.extractEnergy(ModConfig.transgeneFactoryLifeCost, false);
                 inventory.removeItem(SLOT_GENE, 1);
                 inventory.removeItem(SLOT_VINE, 1);
                 inventory.removeItem(SLOT_ROSE, 1);
@@ -130,7 +124,7 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
                 || !inventory.getItem(SLOT_SOLID).is(ModItems.akaishiLifeEssenceSolid.get())) {
             return false;
         }
-        if (life.getEnergyStored() < LIFE_COST) {
+        if (life.getEnergyStored() < ModConfig.transgeneFactoryLifeCost) {
             return false;
         }
         ItemStack out = inventory.getItem(SLOT_OUT);
@@ -288,7 +282,7 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     }
 
     public long getLifeMax() {
-        return LIFE_CAPACITY;
+        return ModConfig.transgeneFactoryLifeCapacity;
     }
 
     @Override

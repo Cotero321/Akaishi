@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEquipmentForgerBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import net.minecraft.world.Container;
@@ -105,7 +106,7 @@ public class AkaishiEquipmentForgerMenu extends AbstractContainerMenu {
         if (!getSlot(AkaishiEquipmentForgerBlockEntity.OUTPUT_SLOT).getItem().isEmpty()) {
             return false;
         }
-        long cost = AkaishiEquipmentForgerBlockEntity.ENERGY_PER_FORGE
+        long cost = ModConfig.equipmentForgerEnergyPerForge
                 + totalPoints() * AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE;
         return data.get(0) >= cost;
     }

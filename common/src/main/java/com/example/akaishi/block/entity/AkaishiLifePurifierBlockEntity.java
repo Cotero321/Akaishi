@@ -4,6 +4,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
@@ -39,17 +40,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifePurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IUpgradeableMachine {
 
-    /** 每 tick 赤能源输入率（需求速率） */
-    public static final long CHISHI_RATE = 1_000_000L;
-    /** 完成一次固化所需赤能源总量 */
-    public static final long TOTAL_COST = 10_000_000L;
-    /** 完成一次固化消耗的生命能量 */
-    public static final long LIFE_COST = 1000L;
-    /** 赤能源缓冲容量（够 2 次固化积累） */
-    public static final long CHISHI_CAPACITY = 20_000_000L;
-    /** 生命能量缓冲容量（够 5 次固化） */
-    public static final long LIFE_CAPACITY = 5000L;
-
     public static final int OUTPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;
     /** Menu 同步数据槽：0/1=赤能量/赤容量 2/3=生命能量/生命容量 4=固化进度百分比 */
@@ -62,13 +52,13 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
     private final AkaishiEnergyStorage life;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
-    /** 已投入的赤能源（能量池模式，满 {@link #TOTAL_COST} 完成一次） */
+    /** 已投入的赤能源（能量池模式，满 ModConfig.lifePurifierTotalCost 完成一次） */
     private long progressEnergy;
 
     public AkaishiLifePurifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_PURIFIER.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.lifePurifierChishiCapacity);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifePurifierLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -86,25 +76,28 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
 
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升赤能源缓冲上限（生命能量为原料槽保持固定）
-        akaishi.setMaxEnergy((long) (CHISHI_CAPACITY * getEnergyCapacityMultiplier()));
+        akaishi.setMaxEnergy((long) (ModConfig.lifePurifierChishiCapacity * getEnergyCapacityMultiplier()));
+        // 单件赤能源需求（配置 [machine] costMultiplier 全局放大；进度/抽取额同步乘，吞吐不变、仅增耗能）
+        long costTotal = (long) (ModConfig.lifePurifierTotalCost * ModConfig.machineCostMultiplier);
         // 同步数据到 GUI（Menu 的 broadcastChanges 据此下发客户端）
         data.set(0, (int) akaishi.getEnergyStored());
         data.set(1, (int) akaishi.getMaxEnergy());
         data.set(2, (int) life.getEnergyStored());
         data.set(3, (int) life.getMaxEnergy());
-        data.set(4, (int) (progressEnergy * 100 / TOTAL_COST));
+        data.set(4, (int) (progressEnergy * 100 / costTotal));
 
         boolean changed = false;
         // 原料（生命能量）与输出满足条件时投入赤能源推进进度；赤能源不足时进度暂停不清零
         if (canProcess()) {
             // 速度升级：每 tick 赤能源抽取率按倍率提升（总耗不变，提速消耗更快）
-            long extract = Math.min((long) (CHISHI_RATE * getSpeedMultiplier()), akaishi.getEnergyStored());
+            long extract = Math.min((long) (ModConfig.lifePurifierChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+                    akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
                 progressEnergy += extract;
-                if (progressEnergy >= TOTAL_COST) {
-                    progressEnergy -= TOTAL_COST;
-                    life.extractEnergy(LIFE_COST, false);
+                if (progressEnergy >= costTotal) {
+                    progressEnergy -= costTotal;
+                    life.extractEnergy(ModConfig.lifePurifierLifeCost, false);
                     ItemStack out = inventory.getItem(OUTPUT_SLOT);
                     if (out.isEmpty()) {
                         inventory.setItem(OUTPUT_SLOT, new ItemStack(ModItems.akaishiLifeEssenceSolid.get()));
@@ -125,7 +118,7 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
 
     /** 固化条件：生命能量充足 + 输出可容纳（赤能源检查在 tick 内做，不足时暂停） */
     private boolean canProcess() {
-        if (life.getEnergyStored() < LIFE_COST) {
+        if (life.getEnergyStored() < ModConfig.lifePurifierLifeCost) {
             return false;
         }
         ItemStack out = inventory.getItem(OUTPUT_SLOT);

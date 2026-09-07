@@ -1,8 +1,10 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiSurgeryBlockEntity;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
+import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -81,8 +83,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         if (!(organ.getItem() instanceof AkaishiOrganItem item) || item.slot != target) {
             return false;
         }
-        return menu.getSolidCount() >= AkaishiSurgeryBlockEntity.IMPLANT_SOLID_COST
-                && menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST;
+        return menu.getSolidCount() >= ModConfig.surgeryImplantSolidCost
+                && menu.getLifeEnergy() >= ModConfig.surgeryImplantLifeCost;
     }
 
     /** 摘除按钮可用：目标槽位已占用 + 资源足够 + 无手术进行中 */
@@ -93,8 +95,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         if (!ClientBodyData.isOccupied(selectedSlot())) {
             return false;
         }
-        return menu.getSolidCount() >= AkaishiSurgeryBlockEntity.EXTRACT_SOLID_COST
-                && menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST;
+        return menu.getSolidCount() >= ModConfig.surgeryExtractSolidCost
+                && menu.getLifeEnergy() >= ModConfig.surgeryExtractLifeCost;
     }
 
     // ===== 渲染 =====
@@ -180,10 +182,10 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         drawButton(gui, x + EXTRACT_X, y + BTN_Y, "gui.akaishi.surgery.extract", canExtract());
         // 按钮下方常驻显示所需生命能量（绿=能量足够/红=不足，悬停另有完整明细）；手术中隐藏让位进度条
         if (!isOperating()) {
-            drawCost(gui, x + IMPLANT_X, y + COST_Y, AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST,
-                    menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST);
-            drawCost(gui, x + EXTRACT_X, y + COST_Y, AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST,
-                    menu.getLifeEnergy() >= AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST);
+            drawCost(gui, x + IMPLANT_X, y + COST_Y, ModConfig.surgeryImplantLifeCost,
+                    menu.getLifeEnergy() >= ModConfig.surgeryImplantLifeCost);
+            drawCost(gui, x + EXTRACT_X, y + COST_Y, ModConfig.surgeryExtractLifeCost,
+                    menu.getLifeEnergy() >= ModConfig.surgeryExtractLifeCost);
         }
 
         // 背包槽位框（菜单槽位坐标；联动槽仅浮层打开时激活）
@@ -346,15 +348,15 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         if (mouseX >= this.leftPos + IMPLANT_X && mouseX < this.leftPos + IMPLANT_X + BTN_W
                 && mouseY >= this.topPos + BTN_Y && mouseY < this.topPos + BTN_Y + BTN_H) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.surgery.implant_tip",
-                    AkaishiSurgeryBlockEntity.IMPLANT_SOLID_COST,
-                    formatEnergy(AkaishiSurgeryBlockEntity.IMPLANT_LIFE_COST)),
+                    ModConfig.surgeryImplantSolidCost,
+                    formatEnergy(ModConfig.surgeryImplantLifeCost)),
                     mouseX, mouseY);
         }
         if (mouseX >= this.leftPos + EXTRACT_X && mouseX < this.leftPos + EXTRACT_X + BTN_W
                 && mouseY >= this.topPos + BTN_Y && mouseY < this.topPos + BTN_Y + BTN_H) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.surgery.extract_tip",
-                    AkaishiSurgeryBlockEntity.EXTRACT_SOLID_COST,
-                    formatEnergy(AkaishiSurgeryBlockEntity.EXTRACT_LIFE_COST)),
+                    ModConfig.surgeryExtractSolidCost,
+                    formatEnergy(ModConfig.surgeryExtractLifeCost)),
                     mouseX, mouseY);
         }
     }
@@ -418,11 +420,12 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    /** 排斥值 → 颜色 */
+    /** 排斥值 → 颜色（红档 = 排斥上限；中低档按配置上限等比缩放，默认 100 时为 60/30） */
     private int rejectionColor(int rej) {
-        if (rej >= 100) return 0xFFD64545;
-        if (rej >= 60) return 0xFFE08A3A;
-        if (rej >= 30) return 0xFF8B6F1E;
+        int cap = PlayerBodyState.maxRejection();
+        if (rej >= cap) return 0xFFD64545;
+        if (rej >= cap * 0.6) return 0xFFE08A3A;
+        if (rej >= cap * 0.3) return 0xFF8B6F1E;
         return 0xFF2E7D32;
     }
 }

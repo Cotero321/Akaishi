@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.block.AkaishiLifeMatrixControllerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import net.minecraft.core.BlockPos;
@@ -20,15 +21,12 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifeMatrixEnergyInputPortBlockEntity extends BlockEntity implements IEnergyProvider, IDataCarrier {
 
-    /** 缓冲容量：100M，覆盖单次 10M 的转换消耗落差 */
-    public static final long BUFFER_CAPACITY = 100_000_000L;
-
     private final AkaishiEnergyStorage energy;
     private BlockPos controllerPos;
 
     public AkaishiLifeMatrixEnergyInputPortBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_MATRIX_ENERGY_INPUT.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.lifeMatrixInputPortBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiLifeMatrixEnergyInputPortBlockEntity be) {

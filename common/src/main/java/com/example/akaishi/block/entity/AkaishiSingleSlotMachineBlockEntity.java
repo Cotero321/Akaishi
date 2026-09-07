@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
@@ -121,13 +122,15 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         data.set(DATA_PROGRESS, progress);
 
         // 无配方 / 输入不足 / 输出不可容纳 / 能量不足 → 待机
+        // （运行能耗 = energyPerTick × 配置 [machine] costMultiplier，判定与扣费口径一致）
+        long perTick = (long) (energyPerTick() * ModConfig.machineCostMultiplier);
         int have = consumesInput() ? inputStack.getCount() : 1;
         if (recipe == null || inputStack.isEmpty() || have < recipe.inputCount()
-                || !canFitOutput(recipe.output()) || energy.getEnergyStored() < energyPerTick()) {
+                || !canFitOutput(recipe.output()) || energy.getEnergyStored() < perTick) {
             return;
         }
         // 推进：每 tick 扣能量，进度按速度倍率累加（小数余量防截断）
-        energy.extractEnergy(energyPerTick(), false);
+        energy.extractEnergy(perTick, false);
         speedAccum += getSpeedMultiplier();
         int delta = (int) speedAccum;
         if (delta > 0) {

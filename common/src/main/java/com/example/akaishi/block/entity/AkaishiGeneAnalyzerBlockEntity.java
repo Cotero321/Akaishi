@@ -1,6 +1,7 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.config.ModConfig;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
@@ -44,15 +45,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 单次解构消耗的生命能量 */
-    public static final long LIFE_COST = 5000L;
-    /** 生命能量缓冲容量（够 2 次解构） */
-    public static final long LIFE_CAPACITY = 10_000L;
-    /** 解构耗时（tick） */
-    public static final int PROGRESS_TICKS = 100;
-    /** 解构成功率下限（纯度 25）与上限（纯度 100），随纯度线性插值 */
-    public static final float MIN_SUCCESS_RATE = 0.70F;
-    public static final float MAX_SUCCESS_RATE = 0.95F;
     /** 可解构的最低样本纯度 */
     public static final int MIN_PURITY = 25;
 
@@ -67,7 +59,9 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
     public static float successRate(int purity) {
         float t = (float) (purity - MIN_PURITY) / (100 - MIN_PURITY);
         t = Math.max(0, Math.min(1, t));
-        return MIN_SUCCESS_RATE + t * (MAX_SUCCESS_RATE - MIN_SUCCESS_RATE);
+        float min = (float) ModConfig.geneAnalyzerMinSuccessRate;
+        float max = (float) ModConfig.geneAnalyzerMaxSuccessRate;
+        return min + t * (max - min);
     }
 
     private final SimpleContainer inventory;
@@ -82,7 +76,7 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
 
     public AkaishiGeneAnalyzerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_GENE_ANALYZER.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.geneAnalyzerLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -100,10 +94,10 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容生命能量缓冲（倍率变化时自动夹取）
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.geneAnalyzerLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(0, (int) life.getEnergyStored());
         data.set(1, (int) life.getMaxEnergy());
-        data.set(2, progress * 100 / PROGRESS_TICKS);
+        data.set(2, progress * 100 / ModConfig.geneAnalyzerProcessTicks);
 
         boolean changed = false;
         if (canProcess()) {
@@ -114,9 +108,9 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
                 speedAccum -= delta;
                 progress += delta;
             }
-            if (progress >= PROGRESS_TICKS) {
+            if (progress >= ModConfig.geneAnalyzerProcessTicks) {
                 progress = 0;
-                life.extractEnergy(LIFE_COST, false);
+                life.extractEnergy(ModConfig.geneAnalyzerLifeCost, false);
                 // 无论成败样本都消耗；先取 NBT 再扣减
                 ItemStack sample = inventory.getItem(INPUT_SLOT);
                 ItemStack sequence = AkaishiGeneSequenceItem.createFromSample(sample);
@@ -148,7 +142,7 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
                 || AkaishiLifeSampleItem.getPurity(input) < MIN_PURITY) {
             return false;
         }
-        if (life.getEnergyStored() < LIFE_COST) {
+        if (life.getEnergyStored() < ModConfig.geneAnalyzerLifeCost) {
             return false;
         }
         ItemStack out = inventory.getItem(OUTPUT_SLOT);

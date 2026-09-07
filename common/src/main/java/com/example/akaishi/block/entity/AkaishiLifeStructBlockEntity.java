@@ -1,6 +1,7 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.config.ModConfig;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
@@ -50,14 +51,6 @@ import java.util.List;
 public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 单次构造消耗的生命能量 */
-    public static final long LIFE_COST = 80_000L;
-    /** 单次构造消耗的固态物数量 */
-    public static final int SOLID_COST = 5;
-    /** 生命能量缓冲容量（够 2 次构造） */
-    public static final long LIFE_CAPACITY = 160_000L;
-    /** 构造耗时（tick） */
-    public static final int PROGRESS_TICKS = 120;
     /** 完整度随机损耗上限（0-20） */
     public static final int PURITY_LOSS_MAX = 20;
 
@@ -83,7 +76,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
 
     public AkaishiLifeStructBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_STRUCT.get(), pos, state);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeStructLifeCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.inventory = new SimpleContainer(SLOT_COUNT) {
             @Override
@@ -101,7 +94,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
-        life.setMaxEnergy((long) (LIFE_CAPACITY * getEnergyCapacityMultiplier()));
+        life.setMaxEnergy((long) (ModConfig.lifeStructLifeCapacity * getEnergyCapacityMultiplier()));
         data.set(0, (int) life.getEnergyStored());
         data.set(1, (int) life.getMaxEnergy());
 
@@ -115,7 +108,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
                 speedAccum -= delta;
                 progress += delta;
             }
-            if (progress >= PROGRESS_TICKS) {
+            if (progress >= ModConfig.lifeStructProcessTicks) {
                 progress = 0;
                 complete();
             }
@@ -124,7 +117,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
             progress = 0;
             speedAccum = 0;
         }
-        data.set(2, progress * 100 / PROGRESS_TICKS);
+        data.set(2, progress * 100 / ModConfig.lifeStructProcessTicks);
         data.set(3, targetSlot);
         if (changed) {
             setChanged();
@@ -164,7 +157,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         if (targetSlot < 0 || !availableContains(BodySlot.values()[targetSlot])) {
             return false;
         }
-        if (!hasSolid(SOLID_COST) || life.getEnergyStored() < LIFE_COST) {
+        if (!hasSolid(ModConfig.lifeStructSolidCost) || life.getEnergyStored() < ModConfig.lifeStructLifeCost) {
             return false;
         }
         // 产物槽必须为空：每次产出的器官纯度/适配度 NBT 均随机生成，与旧产物无法正确合并，
@@ -186,8 +179,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         BodySlot target = BodySlot.values()[clampTarget()];
         int seqPurity = AkaishiGeneSequenceItem.getPurity(input);
 
-        life.extractEnergy(LIFE_COST, false);
-        inventory.getItem(SOLID_SLOT).shrink(SOLID_COST);
+        life.extractEnergy(ModConfig.lifeStructLifeCost, false);
+        inventory.getItem(SOLID_SLOT).shrink(ModConfig.lifeStructSolidCost);
         input.shrink(1);
 
         // 完整度 = 序列纯度 − 随机损耗 0-20（越低完整度越差，品质档位越低）

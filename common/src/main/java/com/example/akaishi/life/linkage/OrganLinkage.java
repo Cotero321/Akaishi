@@ -1,5 +1,6 @@
 package com.example.akaishi.life.linkage;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.SampleGroup;
@@ -55,7 +56,8 @@ public final class OrganLinkage {
             return 0;
         }
         double factor = rejectionFactorOf(organ);
-        double purityMod = 1.0 - (AkaishiOrganItem.getPurity(organ) / 100.0) * PURITY_REJECTION_CAP;
+        double cap = ModConfig.purityRejectionCap > 0 ? ModConfig.purityRejectionCap : PURITY_REJECTION_CAP;
+        double purityMod = 1.0 - (AkaishiOrganItem.getPurity(organ) / 100.0) * cap;
         return (int) Math.max(0, Math.round(tier.getBaseRejection() * factor * purityMod));
     }
 
@@ -69,7 +71,8 @@ public final class OrganLinkage {
             return AkaishiOrganItem.NATIVE_COMPAT;
         }
         int range = Math.max(1, source.getCompatMax() - source.getCompatMin());
-        double purityBias = PURITY_COMPAT_WEIGHT * Math.max(0, Math.min(100, purity)) / 100.0;
+        double weight = ModConfig.purityCompatWeight > 0 ? ModConfig.purityCompatWeight : PURITY_COMPAT_WEIGHT;
+        double purityBias = weight * Math.max(0, Math.min(100, purity)) / 100.0;
         double roll = (1.0 - purityBias) * random.nextDouble() * random.nextDouble() + purityBias;
         return Math.min(AkaishiOrganItem.MAX_COMPAT, source.getCompatMin() + (int) (range * roll));
     }

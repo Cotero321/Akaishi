@@ -3,6 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiWirelessPortMenu;
@@ -34,9 +35,6 @@ import java.util.UUID;
  */
 public class AkaishiWirelessOutputPortBlockEntity extends BlockEntity implements IEnergyProvider, ExtendedMenuProvider, IDataCarrier, IWirelessPortHost {
 
-    /** 缓冲容量 */
-    public static final long BUFFER_CAPACITY = 100_000_000L;
-
     // ===== 数据槽 =====
     public static final int DATA_STORED_LOW = 0;
     public static final int DATA_STORED_HIGH = 1;
@@ -60,7 +58,7 @@ public class AkaishiWirelessOutputPortBlockEntity extends BlockEntity implements
 
     public AkaishiWirelessOutputPortBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_WIRELESS_OUTPUT_PORT.get(), pos, state);
-        this.buffer = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.buffer = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.wirelessOutputPortBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiWirelessOutputPortBlockEntity be) {

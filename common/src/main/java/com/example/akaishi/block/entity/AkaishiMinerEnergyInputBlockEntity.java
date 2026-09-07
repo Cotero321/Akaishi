@@ -5,6 +5,7 @@ import com.example.akaishi.api.IMinerPortDevice;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.block.AkaishiMinerControllerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerEnergyInputMenu;
@@ -30,12 +31,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AkaishiMinerEnergyInputBlockEntity extends BlockEntity
         implements ExtendedMenuProvider, IMinerPortDevice, IEnergyProvider, IDataCarrier {
 
-    /** 能量缓冲容量（与矿机转口一致） */
-    public static final long BUFFER_CAPACITY = 10_000_000L;
-
     public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_FORMED = 2;
 
-    private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+    private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.minerEnergyInputBufferCapacity);
     private final SimpleContainerData data = new SimpleContainerData(3);
     private BlockPos controllerPos;
 

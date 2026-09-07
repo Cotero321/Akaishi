@@ -1,5 +1,6 @@
 package com.example.akaishi.life.potion;
 
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
@@ -20,18 +21,11 @@ import java.util.Set;
 
 /**
  * 排异中和剂：消耗品，饮用后减轻全身已移植非原生器官的排斥（排斥可逆的唯一通道）。
- * 规则：每器官每次移植限洗 WASH_LIMIT 次（摘除重植重置额度）；每瓶降所有可洗槽
- * 排斥 WASH_REDUCE（下限 0）；两次饮用间隔 COOLDOWN_TICKS（物品冷却，防连喝秒清）。
+ * 规则：每器官每次移植限洗（配置 [serum] washLimit 次，摘除重植重置额度）；每瓶降所有可洗槽
+ * 排斥（配置 [serum] washReduce，下限 0）；两次饮用间隔（配置 [serum] cooldownTicks）。
  * 全程仅服务端结算，前提不满足（无排异/额度用尽/冷却中）一律不消耗。
  */
 public class AkaishiRejectionSerumItem extends Item {
-
-    /** 每瓶每个可洗器官的排斥下降量（下限 0） */
-    public static final int WASH_REDUCE = 12;
-    /** 每个器官每次移植可被中和剂清洗的次数（移植时在 PlayerBodyState 清零） */
-    public static final int WASH_LIMIT = 6;
-    /** 饮用冷却（tick = 15 秒） */
-    public static final int COOLDOWN_TICKS = 300;
 
     public AkaishiRejectionSerumItem(Properties properties) {
         super(properties);
@@ -71,12 +65,12 @@ public class AkaishiRejectionSerumItem extends Item {
                 continue;
             }
             int used = AkaishiOrganItem.getWashUsed(organ);
-            if (used >= WASH_LIMIT) {
+            if (used >= ModConfig.serumWashLimit) {
                 // 该器官本次移植的清洗额度已用完（摘除重植才恢复）
                 quotaExhausted = true;
                 continue;
             }
-            state.addRejection(slot, -WASH_REDUCE);
+            state.addRejection(slot, -ModConfig.serumWashReduce);
             AkaishiOrganItem.setWashUsed(organ, used + 1);
             washed++;
         }
@@ -87,7 +81,7 @@ public class AkaishiRejectionSerumItem extends Item {
             player.displayClientMessage(Component.translatable(key), true);
             return InteractionResultHolder.fail(stack);
         }
-        player.getCooldowns().addCooldown(this, COOLDOWN_TICKS);
+        player.getCooldowns().addCooldown(this, ModConfig.serumCooldownTicks);
         stack.shrink(1);
         player.displayClientMessage(Component.translatable("message.akaishi.serum.wash", washed), true);
         return InteractionResultHolder.consume(stack);

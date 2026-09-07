@@ -19,6 +19,7 @@ import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModCreativeTabs;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.life.body.PlayerBodySync;
 import com.example.akaishi.menu.AkaishiLifeStructSync;
 import com.example.akaishi.menu.AkaishiSurgerySync;
@@ -69,6 +70,8 @@ public final class AkaishiMod {
         if (Platform.getEnvironment() == Env.CLIENT) {
             PlayerBodySync.registerClient();
             DecayZoneSync.registerClient();
+            // 服务端权威配置值同步（登录/热重载时由 forge 层推送）
+            ConfigSyncS2C.registerClient();
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();

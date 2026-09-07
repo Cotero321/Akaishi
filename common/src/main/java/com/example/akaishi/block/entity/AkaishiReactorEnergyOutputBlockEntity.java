@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiReactorEnergyOutputMenu;
@@ -28,8 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiReactorEnergyOutputBlockEntity extends BlockEntity implements IEnergyProvider, ExtendedMenuProvider, IDataCarrier {
 
-    /** 缓冲容量：可容纳长时间满负荷产出（满产 100M/tick 下约 50 秒） */
-    public static final long BUFFER_CAPACITY = 5_000_000_000L;
     /** 数据槽：0/1=能量低/高位，2/3=容量低/高位（long 拆分同步） */
     public static final int DATA_SLOTS = 4;
 
@@ -39,7 +38,7 @@ public class AkaishiReactorEnergyOutputBlockEntity extends BlockEntity implement
 
     public AkaishiReactorEnergyOutputBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_REACTOR_ENERGY_OUTPUT.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.reactorEnergyOutputBufferCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiReactorEnergyOutputBlockEntity be) {

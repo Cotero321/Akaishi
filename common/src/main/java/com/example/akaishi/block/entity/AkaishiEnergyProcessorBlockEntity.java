@@ -7,6 +7,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
@@ -48,14 +49,6 @@ import java.util.List;
 public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** 每 tick 赤能源输入率 */
-    public static final long CHISHI_RATE = 1_000_000L;
-    /** 赤能源缓冲容量（够 4 次加工积累） */
-    public static final long CHISHI_CAPACITY = 20_000_000L;
-    /** 单个液体罐容量（mb） */
-    public static final long TANK_CAPACITY = 16_000L;
-    /** 每次加工消耗赤能源 */
-    public static final long CHISHI_COST = 5_000_000L;
     /** 复合加工：1 固态物 + 1000mb 复合能量 → 1000mb 复合燃料 */
     public static final long COMPOUND_AMOUNT = 1000L;
     /** 至纯加工：1 固态物 + 100mb 至纯能量 → 75mb 至纯燃料（轻度浓缩，减轻固态物负担） */
@@ -110,7 +103,7 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
 
     public AkaishiEnergyProcessorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_PROCESSOR.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyProcessorChishiCapacity);
         this.upgradeSlots.setOnChange(this::setChanged);
         this.pureInTank = tank();
         this.compoundInTank = tank();
@@ -127,7 +120,7 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
     }
 
     private FluidTank tank() {
-        return new FluidTank(TANK_CAPACITY) {
+        return new FluidTank(ModConfig.energyProcessorTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
@@ -141,7 +134,7 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
-        akaishi.setMaxEnergy((long) (CHISHI_CAPACITY * getEnergyCapacityMultiplier()));
+        akaishi.setMaxEnergy((long) (ModConfig.energyProcessorChishiCapacity * getEnergyCapacityMultiplier()));
         data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
         data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
         data.set(DATA_PURE_IN_AMOUNT, (int) pureInTank.getAmount());
@@ -183,13 +176,16 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         FluidTank outputTank = recipe.outputFluid == ModFluids.get(ModFluids.PURE_FUEL_ID) ? pureOutTank : compoundOutTank;
         boolean changed = false;
         if (canProcess(inputTank, outputTank, recipe)) {
-            // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）
-            long extract = Math.min((long) (CHISHI_RATE * getSpeedMultiplier()), akaishi.getEnergyStored());
+            // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
+            // 配置 [machine] costMultiplier：单件赤能源需求与每 tick 抽取额同步放大 → 只增耗能、吞吐不变
+            long costTotal = (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier);
+            long extract = Math.min((long) (ModConfig.energyProcessorChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+                    akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
                 progressEnergy += extract;
-                if (progressEnergy >= CHISHI_COST) {
-                    progressEnergy -= CHISHI_COST;
+                if (progressEnergy >= costTotal) {
+                    progressEnergy -= costTotal;
                     // 原子完成：消耗固态物 + 输入液体，产出燃料液体
                     inputTank.drain(recipe.inputAmount, false);
                     outputTank.fill(FluidStack.create(recipe.outputFluid, recipe.outputAmount), false);
@@ -203,7 +199,7 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         } else {
             progressEnergy = 0;
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / CHISHI_COST));
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier)));
         if (changed) {
             setChanged();
         }

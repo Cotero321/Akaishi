@@ -7,6 +7,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.item.IMinerOutputSink;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiMinerControllerBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerPortMenu;
@@ -39,8 +40,6 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
 
     /** 产物缓冲槽数 */
     public static final int BUFFER_SLOTS = 27;
-    /** 能量缓冲容量 */
-    public static final long BUFFER_CAPACITY = 10_000_000L;
 
     public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_FORMED = 2;
 
@@ -51,7 +50,7 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
             AkaishiMinerPortBlockEntity.this.setChanged();
         }
     };
-    private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, BUFFER_CAPACITY);
+    private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.minerPortBufferCapacity);
     private final SimpleContainerData data = new SimpleContainerData(3);
     private BlockPos controllerPos;
 

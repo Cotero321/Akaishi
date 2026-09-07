@@ -112,7 +112,9 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         if (main == null || !canFit(0, main) || !canFit(1, ModItems.exhaustedCrystal.get())) {
             return; // 输出槽不可容纳完整一批，暂停分离
         }
-        long afford = energy.getEnergyStored() / ModConfig.lifeCentrifugeCostPerMb;
+        // 单位成本 = costPerMb × 配置 [machine] costMultiplier（afford 按此口径限流，防超扣）
+        long unitCost = (long) (ModConfig.lifeCentrifugeCostPerMb * ModConfig.machineCostMultiplier);
+        long afford = energy.getEnergyStored() / unitCost;
         // 速度升级：每 tick 分离量按倍率提升（消耗率随之上升，能量不足时由 afford 限流）
         long rate = (long) (Math.min(Math.min(ModConfig.lifeCentrifugeConvertRate, inTank.getAmount(fluid)), afford)
                 * getSpeedMultiplier());
@@ -120,7 +122,7 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
             return;
         }
         inTank.drain(fluid, rate, false);
-        energy.extractEnergy(rate * ModConfig.lifeCentrifugeCostPerMb, false);
+        energy.extractEnergy(rate * unitCost, false);
         progress += rate;
         // 每满一批结算一次（速率低于阈值，单 tick 至多结算 1 批）
         while (progress >= BATCH_MB) {

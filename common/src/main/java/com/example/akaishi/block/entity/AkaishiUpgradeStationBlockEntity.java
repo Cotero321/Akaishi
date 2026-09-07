@@ -6,6 +6,7 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
@@ -41,11 +42,6 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
 
-    /** 单次升级消耗的赤能源量 */
-    public static final long ENERGY_PER_UPGRADE = 20_000_000L;
-    /** 赤能源缓冲容量 */
-    public static final long ENERGY_CAPACITY = 40_000_000L;
-
     private final AkaishiEnergyStorage energy;
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -55,7 +51,7 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
 
     public AkaishiUpgradeStationBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_UPGRADE_STATION.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ENERGY_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.upgradeStationEnergyCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT);
         this.data = new SimpleContainerData(5);
     }
@@ -98,7 +94,7 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
         ItemStack template = inventory.getItem(INPUT_TEMPLATE_SLOT);
         ItemStack output = inventory.getItem(OUTPUT_SLOT);
         AkaishiUpgradeHelper.ensureGear(gear);
-        if (energy.getEnergyStored() < ENERGY_PER_UPGRADE
+        if (energy.getEnergyStored() < ModConfig.upgradeStationEnergyPerUpgrade
                 || !AkaishiUpgradeHelper.isAkaishiGear(gear)
                 || !template.is(ModItems.akaishiUpgradeTemplate.get())
                 || !output.isEmpty()) {
@@ -115,7 +111,7 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
         if (!AkaishiUpgradeHelper.applyAbility(gear, abilities[selectedType])) {
             return;
         }
-        energy.extractEnergy(ENERGY_PER_UPGRADE, false);
+        energy.extractEnergy(ModConfig.upgradeStationEnergyPerUpgrade, false);
         inventory.removeItem(INPUT_TEMPLATE_SLOT, 1);
         inventory.setItem(OUTPUT_SLOT, gear.copy());
         inventory.removeItem(INPUT_GEAR_SLOT, 1);

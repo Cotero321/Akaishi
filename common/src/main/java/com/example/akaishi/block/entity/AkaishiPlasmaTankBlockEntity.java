@@ -2,6 +2,7 @@ package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiFluidTankMenu;
@@ -34,15 +35,12 @@ public class AkaishiPlasmaTankBlockEntity extends BlockEntity implements Extende
     public static final int DATA_AMOUNT = 0;
     public static final int DATA_CAPACITY = 1;
 
-    /** 容量：16000mb（与基础液体储罐同级） */
-    private static final long CAPACITY = 16_000L;
-
     private final FluidTank tank;
     private final SimpleContainerData data;
 
     public AkaishiPlasmaTankBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_PLASMA_TANK.get(), pos, state);
-        this.tank = new FluidTank(CAPACITY) {
+        this.tank = new FluidTank(ModConfig.plasmaTankCapacity) {
             @Override
             public long fill(FluidStack resource, boolean simulate) {
                 if (resource == null || !ModFluids.isPlasma(resource.getFluid())) {

@@ -5,6 +5,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -41,15 +42,8 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
     public static final int OUTPUT_SLOT = 1;
     public static final int SLOT_COUNT = 2;
 
-    /** 聚合赤石锭单次消耗的赤能源量 */
-    public static final long ENERGY_PER_INGOT = 10_000_000L;
-    /** 母岩升一级消耗的赤能源量 */
-    public static final long ENERGY_PER_GEODE_UPGRADE = 10_000_000L;
-    /** 赤能源缓冲容量 */
-    public static final long ENERGY_CAPACITY = 200_000_000L;
-
-    /** 聚合配方：输入物品 → 输出物品 + 能量消耗 */
-    private record Recipe(java.util.function.Supplier<Item> input, java.util.function.Supplier<Item> output, long energy) {
+    /** 聚合配方：输入物品 → 输出物品 + 能量消耗（能耗经 LongSupplier 延迟求值，配置热重载即时生效） */
+    private record Recipe(java.util.function.Supplier<Item> input, java.util.function.Supplier<Item> output, java.util.function.LongSupplier energy) {
         boolean matches(ItemStack stack) {
             return !stack.isEmpty() && stack.is(input.get());
         }
@@ -57,10 +51,10 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
 
     /** 全部配方：赤石锭聚合 + 母岩三级升级 */
     private static final List<Recipe> RECIPES = List.of(
-            new Recipe(() -> Items.NETHERITE_INGOT, () -> ModItems.akaishiIngot.get(), ENERGY_PER_INGOT),
-            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
-            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), ENERGY_PER_GEODE_UPGRADE),
-            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get().asItem(), ENERGY_PER_GEODE_UPGRADE)
+            new Recipe(() -> Items.NETHERITE_INGOT, () -> ModItems.akaishiIngot.get(), () -> ModConfig.energyAggregatorEnergyPerIngot),
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), () -> ModConfig.energyAggregatorEnergyPerGeodeUpgrade),
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), () -> ModConfig.energyAggregatorEnergyPerGeodeUpgrade),
+            new Recipe(() -> AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get().asItem(), () -> AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get().asItem(), () -> ModConfig.energyAggregatorEnergyPerGeodeUpgrade)
     );
 
     private final AkaishiEnergyStorage energy;
@@ -70,7 +64,7 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
 
     public AkaishiEnergyAggregatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_AGGREGATOR.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ENERGY_CAPACITY);
+        this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyAggregatorEnergyCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT);
         this.data = new SimpleContainerData(4);
     }
@@ -96,7 +90,7 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
             process(recipe);
         }
         long stored = energy.getEnergyStored();
-        long currentCost = recipe != null ? recipe.energy() : ENERGY_PER_INGOT;
+        long currentCost = recipe != null ? recipe.energy().getAsLong() : ModConfig.energyAggregatorEnergyPerIngot;
         data.set(0, (int) stored);
         data.set(1, (int) energy.getMaxEnergy());
         // 进度 = 当次聚合的充能进度（能量 / 当前配方消耗，long 计算防溢出）
@@ -106,7 +100,7 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
 
     /** 条件：能量足够 + 输入匹配配方 + 输出可容纳产物 */
     private boolean canProcess(Recipe recipe) {
-        if (energy.getEnergyStored() < recipe.energy()) {
+        if (energy.getEnergyStored() < recipe.energy().getAsLong()) {
             return false;
         }
         ItemStack output = inventory.getItem(OUTPUT_SLOT);
@@ -116,7 +110,7 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
 
     /** 执行聚合：消耗能量 + 1 输入 → 产出 1 配方产物 */
     private void process(Recipe recipe) {
-        energy.extractEnergy(recipe.energy(), false);
+        energy.extractEnergy(recipe.energy().getAsLong(), false);
         inventory.removeItem(INPUT_SLOT, 1);
         ItemStack result = new ItemStack(recipe.output().get());
         ItemStack output = inventory.getItem(OUTPUT_SLOT);

@@ -1,7 +1,13 @@
 package com.example.akaishi.forge.config;
 
+import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.config.ModConfig;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
+
+import java.util.List;
 
 /**
  * Forge 配置 → common 值同步。在配置加载/重载时把 ForgeConfigSpec 的当前值
@@ -19,7 +25,8 @@ public final class AkaishiConfigSync {
         }
     }
 
-    private static void sync() {
+    /** spec 当前值 → ModConfig（配置加载/重载与游戏内界面保存时调用，末尾附带 S2C 广播） */
+    public static void sync() {
         // 反应堆
         ModConfig.reactorEnergyPerSlot = AkaishiConfig.REACTOR_ENERGY_PER_SLOT.get();
         ModConfig.reactorBaseTemp = AkaishiConfig.REACTOR_BASE_TEMP.get();
@@ -109,5 +116,188 @@ public final class AkaishiConfigSync {
         ModConfig.wirelessMaxLoss = AkaishiConfig.WIRELESS_MAX_LOSS.get();
         ModConfig.wirelessCrossDimLoss = AkaishiConfig.WIRELESS_CROSS_DIM_LOSS.get();
         ModConfig.wirelessLossReductionPerModule = AkaishiConfig.WIRELESS_LOSS_REDUCTION_PER_MODULE.get();
+
+        // 器官·品质曲线（列表 → 数组整体发布，volatile 引用保证读取端原子可见）
+        ModConfig.organTierMultiplier = toDoubleArray(AkaishiConfig.ORGAN_TIER_MULTIPLIER.get());
+        ModConfig.organTierBaseRejection = toIntArray(AkaishiConfig.ORGAN_TIER_BASE_REJECTION.get());
+        ModConfig.organTierGrowthInterval = toIntArray(AkaishiConfig.ORGAN_TIER_GROWTH_INTERVAL.get());
+        // 基因来源组排斥系数
+        ModConfig.groupRejectionFactor = toDoubleArray(AkaishiConfig.GROUP_REJECTION_FACTOR.get());
+        // 纯度联动
+        ModConfig.purityRejectionCap = AkaishiConfig.PURITY_REJECTION_CAP.get();
+        ModConfig.purityCompatWeight = AkaishiConfig.PURITY_COMPAT_WEIGHT.get();
+        // 排斥标尺与阈值
+        ModConfig.maxRejection = AkaishiConfig.MAX_REJECTION.get();
+        ModConfig.rejectionWarning = AkaishiConfig.REJECTION_WARNING.get();
+        ModConfig.rejectionPoison = AkaishiConfig.REJECTION_POISON.get();
+        ModConfig.compatSevereThreshold = AkaishiConfig.COMPAT_SEVERE_THRESHOLD.get();
+        ModConfig.slotDebuffCleanThreshold = AkaishiConfig.SLOT_DEBUFF_CLEAN_THRESHOLD.get();
+        ModConfig.slotDebuffSevereThreshold = AkaishiConfig.SLOT_DEBUFF_SEVERE_THRESHOLD.get();
+        ModConfig.growthIntervalMinTicks = AkaishiConfig.GROWTH_INTERVAL_MIN_TICKS.get();
+        ModConfig.conflictPunishIntervalTicks = AkaishiConfig.CONFLICT_PUNISH_INTERVAL_TICKS.get();
+        ModConfig.conflictPunishDamage = AkaishiConfig.CONFLICT_PUNISH_DAMAGE.get();
+        ModConfig.overloadLight = AkaishiConfig.OVERLOAD_LIGHT.get();
+        ModConfig.overloadHeavy = AkaishiConfig.OVERLOAD_HEAVY.get();
+        // 血清
+        ModConfig.serumWashReduce = AkaishiConfig.SERUM_WASH_REDUCE.get();
+        ModConfig.serumWashLimit = AkaishiConfig.SERUM_WASH_LIMIT.get();
+        ModConfig.serumCooldownTicks = AkaishiConfig.SERUM_COOLDOWN_TICKS.get();
+        // 突变词条
+        ModConfig.traitBenignRatio = AkaishiConfig.TRAIT_BENIGN_RATIO.get();
+        ModConfig.traitRarityHighThreshold = AkaishiConfig.TRAIT_RARITY_HIGH_THRESHOLD.get();
+        ModConfig.traitRarityMidThreshold = AkaishiConfig.TRAIT_RARITY_MID_THRESHOLD.get();
+        // 培养机品质升级
+        ModConfig.cultivatorUpgradeSuccess = toIntArray(AkaishiConfig.CULTIVATOR_UPGRADE_SUCCESS.get());
+        ModConfig.cultivatorUpgradeEnergy = toIntArray(AkaishiConfig.CULTIVATOR_UPGRADE_ENERGY.get());
+        ModConfig.cultivatorUpgradeSolid = toIntArray(AkaishiConfig.CULTIVATOR_UPGRADE_SOLID.get());
+        ModConfig.cultivatorUpgradeTicks = toIntArray(AkaishiConfig.CULTIVATOR_UPGRADE_TICKS.get());
+        ModConfig.cultivatorUpgradeCompatBonus = AkaishiConfig.CULTIVATOR_UPGRADE_COMPAT_BONUS.get();
+        // 机器全局倍率
+        ModConfig.machineWorkSpeed = AkaishiConfig.MACHINE_WORK_SPEED.get();
+        ModConfig.machineCostMultiplier = AkaishiConfig.MACHINE_COST_MULTIPLIER.get();
+        // 机制开关
+        ModConfig.decayZoneEnabled = AkaishiConfig.DECAY_ZONE_ENABLED.get();
+        ModConfig.sunlightBurnEnabled = AkaishiConfig.SUNLIGHT_BURN_ENABLED.get();
+        ModConfig.overloadEnabled = AkaishiConfig.OVERLOAD_ENABLED.get();
+
+        // 生命研究机器
+        ModConfig.geneAnalyzerLifeCost = AkaishiConfig.GENE_ANALYZER_LIFE_COST.get();
+        ModConfig.geneAnalyzerLifeCapacity = AkaishiConfig.GENE_ANALYZER_LIFE_CAPACITY.get();
+        ModConfig.geneAnalyzerProcessTicks = AkaishiConfig.GENE_ANALYZER_PROCESS_TICKS.get();
+        ModConfig.geneAnalyzerMinSuccessRate = AkaishiConfig.GENE_ANALYZER_MIN_SUCCESS.get();
+        ModConfig.geneAnalyzerMaxSuccessRate = AkaishiConfig.GENE_ANALYZER_MAX_SUCCESS.get();
+        ModConfig.lifeStructLifeCost = AkaishiConfig.LIFE_STRUCT_LIFE_COST.get();
+        ModConfig.lifeStructSolidCost = AkaishiConfig.LIFE_STRUCT_SOLID_COST.get();
+        ModConfig.lifeStructLifeCapacity = AkaishiConfig.LIFE_STRUCT_LIFE_CAPACITY.get();
+        ModConfig.lifeStructProcessTicks = AkaishiConfig.LIFE_STRUCT_PROCESS_TICKS.get();
+        ModConfig.lifeBreederLifeCost = AkaishiConfig.LIFE_BREEDER_LIFE_COST.get();
+        ModConfig.lifeBreederCrystalCost = AkaishiConfig.LIFE_BREEDER_CRYSTAL_COST.get();
+        ModConfig.lifeBreederLifeCapacity = AkaishiConfig.LIFE_BREEDER_LIFE_CAPACITY.get();
+        ModConfig.lifeBreederProcessTicks = AkaishiConfig.LIFE_BREEDER_PROCESS_TICKS.get();
+        ModConfig.lifeBreederMinSuccessRate = AkaishiConfig.LIFE_BREEDER_MIN_SUCCESS.get();
+        ModConfig.lifeBreederMaxSuccessRate = AkaishiConfig.LIFE_BREEDER_MAX_SUCCESS.get();
+        ModConfig.traitReforgerLifeCost = AkaishiConfig.TRAIT_REFORGER_LIFE_COST.get();
+        ModConfig.traitReforgerLifeCapacity = AkaishiConfig.TRAIT_REFORGER_LIFE_CAPACITY.get();
+        ModConfig.traitReforgerProcessTicks = AkaishiConfig.TRAIT_REFORGER_PROCESS_TICKS.get();
+        ModConfig.traitReforgerCrystalPerRarity = AkaishiConfig.TRAIT_REFORGER_CRYSTAL_PER_RARITY.get();
+        ModConfig.transgeneFactoryLifeCost = AkaishiConfig.TRANSGENE_FACTORY_LIFE_COST.get();
+        ModConfig.transgeneFactoryLifeCapacity = AkaishiConfig.TRANSGENE_FACTORY_LIFE_CAPACITY.get();
+        ModConfig.transgeneFactoryProcessTicks = AkaishiConfig.TRANSGENE_FACTORY_PROCESS_TICKS.get();
+        ModConfig.surgeryImplantSolidCost = AkaishiConfig.SURGERY_IMPLANT_SOLID_COST.get();
+        ModConfig.surgeryImplantLifeCost = AkaishiConfig.SURGERY_IMPLANT_LIFE_COST.get();
+        ModConfig.surgeryExtractSolidCost = AkaishiConfig.SURGERY_EXTRACT_SOLID_COST.get();
+        ModConfig.surgeryExtractLifeCost = AkaishiConfig.SURGERY_EXTRACT_LIFE_COST.get();
+        ModConfig.surgeryLifeCapacity = AkaishiConfig.SURGERY_LIFE_CAPACITY.get();
+        ModConfig.surgeryProcessTicks = AkaishiConfig.SURGERY_PROCESS_TICKS.get();
+        ModConfig.organVaultLifeCapacity = AkaishiConfig.ORGAN_VAULT_LIFE_CAPACITY.get();
+        ModConfig.organVaultKeepCostPerTick = AkaishiConfig.ORGAN_VAULT_KEEP_COST.get();
+        ModConfig.potionTableLifeCapacity = AkaishiConfig.POTION_TABLE_LIFE_CAPACITY.get();
+        // 能量机器
+        ModConfig.energyProcessorChishiRate = AkaishiConfig.ENERGY_PROCESSOR_CHISHI_RATE.get();
+        ModConfig.energyProcessorChishiCapacity = AkaishiConfig.ENERGY_PROCESSOR_CHISHI_CAPACITY.get();
+        ModConfig.energyProcessorTankCapacity = AkaishiConfig.ENERGY_PROCESSOR_TANK_CAPACITY.get();
+        ModConfig.energyProcessorChishiCost = AkaishiConfig.ENERGY_PROCESSOR_CHISHI_COST.get();
+        ModConfig.energyLiquefierChishiRate = AkaishiConfig.ENERGY_LIQUEFIER_CHISHI_RATE.get();
+        ModConfig.energyLiquefierChishiCapacity = AkaishiConfig.ENERGY_LIQUEFIER_CHISHI_CAPACITY.get();
+        ModConfig.energyLiquefierTankCapacity = AkaishiConfig.ENERGY_LIQUEFIER_TANK_CAPACITY.get();
+        ModConfig.fuelMixerChishiRate = AkaishiConfig.FUEL_MIXER_CHISHI_RATE.get();
+        ModConfig.fuelMixerChishiCapacity = AkaishiConfig.FUEL_MIXER_CHISHI_CAPACITY.get();
+        ModConfig.fuelMixerChishiCost = AkaishiConfig.FUEL_MIXER_CHISHI_COST.get();
+        ModConfig.fuelMixerTankCapacity = AkaishiConfig.FUEL_MIXER_TANK_CAPACITY.get();
+        ModConfig.fuelCannerTankCapacity = AkaishiConfig.FUEL_CANNER_TANK_CAPACITY.get();
+        ModConfig.fuelCannerFillRate = AkaishiConfig.FUEL_CANNER_FILL_RATE.get();
+        ModConfig.energyAggregatorEnergyPerIngot = AkaishiConfig.ENERGY_AGGREGATOR_PER_INGOT.get();
+        ModConfig.energyAggregatorEnergyPerGeodeUpgrade = AkaishiConfig.ENERGY_AGGREGATOR_PER_GEODE.get();
+        ModConfig.energyAggregatorEnergyCapacity = AkaishiConfig.ENERGY_AGGREGATOR_CAPACITY.get();
+        ModConfig.energyGeneratorGenerateRate = AkaishiConfig.ENERGY_GENERATOR_RATE.get();
+        ModConfig.energyAssemblyGenerateRate = AkaishiConfig.ENERGY_ASSEMBLY_RATE.get();
+        ModConfig.superGeneratorCoreGenerateRate = AkaishiConfig.SUPER_GENERATOR_CORE_RATE.get();
+        ModConfig.energyCellSerializerBaseCapacity = AkaishiConfig.ENERGY_CELL_BASE_CAPACITY.get();
+        ModConfig.upgradeStationEnergyPerUpgrade = AkaishiConfig.UPGRADE_STATION_PER_UPGRADE.get();
+        ModConfig.upgradeStationEnergyCapacity = AkaishiConfig.UPGRADE_STATION_CAPACITY.get();
+        ModConfig.equipmentForgerEnergyPerForge = AkaishiConfig.EQUIPMENT_FORGER_PER_FORGE.get();
+        ModConfig.equipmentForgerEnergyCapacity = AkaishiConfig.EQUIPMENT_FORGER_CAPACITY.get();
+        // 净化与矩阵
+        ModConfig.purifierEnergyPerTick = AkaishiConfig.PURIFIER_ENERGY_PER_TICK.get();
+        ModConfig.purifierBurnRate = AkaishiConfig.PURIFIER_BURN_RATE.get();
+        ModConfig.purifierTotalCost = AkaishiConfig.PURIFIER_TOTAL_COST.get();
+        ModConfig.purifierRateFormed = AkaishiConfig.PURIFIER_RATE_FORMED.get();
+        ModConfig.purifierMatrixTotalCost = AkaishiConfig.PURIFIER_MATRIX_TOTAL_COST.get();
+        ModConfig.purifierMatrixRateFormed = AkaishiConfig.PURIFIER_MATRIX_RATE_FORMED.get();
+        ModConfig.lifePurifierChishiRate = AkaishiConfig.LIFE_PURIFIER_CHISHI_RATE.get();
+        ModConfig.lifePurifierTotalCost = AkaishiConfig.LIFE_PURIFIER_TOTAL_COST.get();
+        ModConfig.lifePurifierLifeCost = AkaishiConfig.LIFE_PURIFIER_LIFE_COST.get();
+        ModConfig.lifePurifierChishiCapacity = AkaishiConfig.LIFE_PURIFIER_CHISHI_CAPACITY.get();
+        ModConfig.lifePurifierLifeCapacity = AkaishiConfig.LIFE_PURIFIER_LIFE_CAPACITY.get();
+        ModConfig.lifeMatrixConversionsPerTick = AkaishiConfig.LIFE_MATRIX_CONVERSIONS_PER_TICK.get();
+        ModConfig.lifeMatrixConversionCost = AkaishiConfig.LIFE_MATRIX_CONVERSION_COST.get();
+        ModConfig.lifeMatrixChishiCapacity = AkaishiConfig.LIFE_MATRIX_CHISHI_CAPACITY.get();
+        ModConfig.lifeMatrixLifeCapacity = AkaishiConfig.LIFE_MATRIX_LIFE_CAPACITY.get();
+        ModConfig.lifeConversionConversionsPerTick = AkaishiConfig.LIFE_CONVERSION_PER_TICK.get();
+        ModConfig.lifeConversionChishiCapacity = AkaishiConfig.LIFE_CONVERSION_CHISHI_CAPACITY.get();
+        ModConfig.lifeConversionLifeCapacity = AkaishiConfig.LIFE_CONVERSION_LIFE_CAPACITY.get();
+        ModConfig.lifeAggregationConversionCost = AkaishiConfig.LIFE_AGGREGATION_COST.get();
+        ModConfig.lifeAggregationConversionOutput = AkaishiConfig.LIFE_AGGREGATION_OUTPUT.get();
+        ModConfig.lifeAggregationChishiCapacity = AkaishiConfig.LIFE_AGGREGATION_CHISHI_CAPACITY.get();
+        ModConfig.lifeAggregationLifeCapacity = AkaishiConfig.LIFE_AGGREGATION_LIFE_CAPACITY.get();
+        // 端口与电池缓冲
+        ModConfig.lifeMatrixInputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_INPUT_PORT_BUFFER.get();
+        ModConfig.lifeMatrixOutputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_OUTPUT_PORT_BUFFER.get();
+        ModConfig.purifierEnergyInputPortBufferCapacity = AkaishiConfig.PURIFIER_INPUT_PORT_BUFFER.get();
+        ModConfig.minerPortBufferCapacity = AkaishiConfig.MINER_PORT_BUFFER.get();
+        ModConfig.minerEnergyInputBufferCapacity = AkaishiConfig.MINER_ENERGY_INPUT_BUFFER.get();
+        ModConfig.wirelessInputPortBufferCapacity = AkaishiConfig.WIRELESS_INPUT_PORT_BUFFER.get();
+        ModConfig.wirelessOutputPortBufferCapacity = AkaishiConfig.WIRELESS_OUTPUT_PORT_BUFFER.get();
+        ModConfig.genEnergyOutputPortBufferCapacity = AkaishiConfig.GEN_ENERGY_OUTPUT_BUFFER.get();
+        ModConfig.fusionEnergyOutputBufferCapacity = AkaishiConfig.FUSION_ENERGY_OUTPUT_BUFFER.get();
+        ModConfig.reactorEnergyOutputBufferCapacity = AkaishiConfig.REACTOR_ENERGY_OUTPUT_BUFFER.get();
+        ModConfig.lifeEnergyCellLifeCapacity = AkaishiConfig.LIFE_ENERGY_CELL_CAPACITY.get();
+        ModConfig.plasmaTankCapacity = AkaishiConfig.PLASMA_TANK_CAPACITY.get();
+
+        // 培养机提纯与分馏机
+        ModConfig.cultivatorLifeCapacity = AkaishiConfig.CULTIVATOR_LIFE_CAPACITY.get();
+        ModConfig.cultivatorPurifySuccess = toIntArray(AkaishiConfig.CULTIVATOR_PURIFY_SUCCESS.get());
+        ModConfig.cultivatorPurifyEnergy = toLongArray(AkaishiConfig.CULTIVATOR_PURIFY_ENERGY.get());
+        ModConfig.cultivatorPurifySolid = toIntArray(AkaishiConfig.CULTIVATOR_PURIFY_SOLID.get());
+        ModConfig.cultivatorPurifyTicks = toIntArray(AkaishiConfig.CULTIVATOR_PURIFY_TICKS.get());
+        ModConfig.cultivatorPurifyGain = AkaishiConfig.CULTIVATOR_PURIFY_GAIN.get();
+        ModConfig.fractionatorEnergyCapacity = AkaishiConfig.FRACTIONATOR_ENERGY_CAPACITY.get();
+        ModConfig.fractionatorCostPerCraft = AkaishiConfig.FRACTIONATOR_COST_PER_CRAFT.get();
+        ModConfig.fractionatorProcessTicks = AkaishiConfig.FRACTIONATOR_PROCESS_TICKS.get();
+
+        // 配置热重载后把服务端权威值推送给所有在线玩家（登录推送见 AkaishiModForge）
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                ConfigSyncS2C.sendToPlayer(player);
+            }
+        }
+    }
+
+    /** 配置 Double 列表 → double[]（空/越界条目由读取方按"0 = 内置默认"回退） */
+    private static double[] toDoubleArray(List<?> list) {
+        double[] arr = new double[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = ((Number) list.get(i)).doubleValue();
+        }
+        return arr;
+    }
+
+    /** 配置 Integer 列表 → int[] */
+    private static int[] toIntArray(List<?> list) {
+        int[] arr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = ((Number) list.get(i)).intValue();
+        }
+        return arr;
+    }
+
+    /** 配置 Long 列表 → long[] */
+    private static long[] toLongArray(List<?> list) {
+        long[] arr = new long[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = ((Number) list.get(i)).longValue();
+        }
+        return arr;
     }
 }

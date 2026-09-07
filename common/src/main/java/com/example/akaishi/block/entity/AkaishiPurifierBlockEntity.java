@@ -7,6 +7,7 @@ import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiPurifierBlock;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -55,18 +56,10 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     public static final int MAX_ENERGY = 10000;
     /** 提纯进度百分比满值（GUI 进度条分母） */
     public static final int MAX_PROGRESS = 100;
-    /** 单方块每 tick 提纯消耗能量（需求减半后 10→5，燃烧产能 10/tick 可净积累 5/tick） */
-    public static final int ENERGY_PER_TICK = 5;
-    /** 每 tick 燃烧产能（产能减半后 20→10，与提纯消耗持平，可配合管道外部供能缓冲） */
-    private static final int BURN_RATE = 10;
     /** 燃料能量：赤石晶 */
     public static final int FUEL_CRYSTAL = 200;
     /** 燃料能量：粗制赤石块 */
     public static final int FUEL_RAW_BLOCK = 2000;
-    /** 单方块完成一次提纯所需总能量 = 100 tick × 5（提纯矩阵与单台一致，速度与耗能同步 30 倍） */
-    public static final long TOTAL_COST = 500L;
-    /** 提纯矩阵成型后每 tick 消耗 = 普通（5）× 30（耗能率 30 倍，配合 30 倍速度） */
-    public static final long RATE_FORMED = 150L;
 
     private final SimpleContainer inventory;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
@@ -136,7 +129,7 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
             }
             if (burnTime > 0) {
                 burnTime--;
-                energy.addEnergy(BURN_RATE, false);
+                energy.addEnergy(ModConfig.purifierBurnRate, false);
                 changed = true;
             }
         }
@@ -176,14 +169,16 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
         }
     }
 
-    /** 当前模式完成一次提纯所需总能量（矩阵成型与单台一致，均为 500） */
+    /** 当前模式完成一次提纯所需总能量（矩阵成型与单台一致，均为 500）；
+     *  乘配置 [machine] costMultiplier 全局放大单件能耗（判定/扣减/进度显示共用，口径一致） */
     private long needed() {
-        return TOTAL_COST;
+        return (long) (ModConfig.purifierTotalCost * ModConfig.machineCostMultiplier);
     }
 
-    /** 当前模式每 tick 提纯消耗能量（矩阵成型 150，未成型 5） */
+    /** 当前模式每 tick 提纯消耗能量（矩阵成型 150，未成型 5）；
+     *  与 needed() 同乘 costMultiplier → 保持吞吐不变、仅放大单件耗能 */
     private long rate() {
-        return matrixFormed ? RATE_FORMED : ENERGY_PER_TICK;
+        return (long) ((matrixFormed ? ModConfig.purifierRateFormed : ModConfig.purifierEnergyPerTick) * ModConfig.machineCostMultiplier);
     }
 
     /** 当前成型缓存值（供外壳查询，不触发扫描） */

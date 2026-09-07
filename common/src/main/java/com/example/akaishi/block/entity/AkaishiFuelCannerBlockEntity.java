@@ -4,6 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.item.AkaishiFuelCellItem;
 import com.example.akaishi.item.ModItems;
@@ -47,18 +48,13 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
     public static final int DATA_FLUID_AMOUNT = 0;
     public static final int DATA_FLUID_CAPACITY = 1;
 
-    /** 输入液体罐容量（mb） */
-    public static final long TANK_CAPACITY = 16_000L;
-    /** 每 tick 最大灌装量（mb） */
-    public static final long FILL_RATE = 1_000L;
-
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private final FluidTank liquidTank;
 
     public AkaishiFuelCannerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUEL_CANNER.get(), pos, state);
-        this.liquidTank = new FluidTank(TANK_CAPACITY) {
+        this.liquidTank = new FluidTank(ModConfig.fuelCannerTankCapacity) {
             @Override
             protected void onChanged() {
                 setChanged();
@@ -106,7 +102,7 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
         if (remaining <= 0) {
             return;
         }
-        long toFill = Math.min(FILL_RATE, Math.min(liquidTank.getAmount(), remaining));
+        long toFill = Math.min(ModConfig.fuelCannerFillRate, Math.min(liquidTank.getAmount(), remaining));
         if (toFill <= 0) {
             return;
         }

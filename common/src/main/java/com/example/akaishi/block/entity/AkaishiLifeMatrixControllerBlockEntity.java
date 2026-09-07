@@ -9,6 +9,7 @@ import com.example.akaishi.block.AkaishiLifeMatrixControllerBlock;
 import com.example.akaishi.block.AkaishiLifeMatrixEnergyInputPortBlock;
 import com.example.akaishi.block.AkaishiLifeMatrixEnergyOutputPortBlock;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
@@ -37,16 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
-    /** 成型后每 tick 转换次数（= 45 倍单台速率） */
-    public static final int CONVERSIONS_PER_TICK = 45;
-    /** 单次转换消耗的赤能源量 */
-    public static final long CONVERSION_COST = 10_000_000L;
-    /** 单次转换产出的生命能量量 */
-    public static final long CONVERSION_OUTPUT = 10L;
-    /** 中心赤能源缓冲容量（支持一轮 45 次转换后仍有余量） */
-    public static final long CHISHI_CAPACITY = 500_000_000L;
-    /** 中心生命能量存储容量 */
-    public static final long LIFE_CAPACITY = 5000L;
     public static final int DATA_SLOTS = 5;
 
     private final AkaishiEnergyStorage akaishi;
@@ -57,8 +48,8 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
 
     public AkaishiLifeMatrixControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_MATRIX_CONTROLLER.get(), pos, state);
-        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, CHISHI_CAPACITY);
-        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, LIFE_CAPACITY);
+        this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.lifeMatrixChishiCapacity);
+        this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeMatrixLifeCapacity);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiLifeMatrixControllerBlockEntity be) {
@@ -86,9 +77,9 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
             formed = valid;
             changed = true;
         }
-        // 成型后以 45 倍速率集中转换
+        // 成型后按配置速率集中转换
         if (formed) {
-            for (int i = 0; i < CONVERSIONS_PER_TICK; i++) {
+            for (int i = 0; i < ModConfig.lifeMatrixConversionsPerTick; i++) {
                 if (!convert()) {
                     break;
                 }
@@ -109,10 +100,10 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
 
     /** 单次转换：赤能源充足且生命能量未满时执行 */
     private boolean convert() {
-        if (akaishi.getEnergyStored() >= CONVERSION_COST
-                && life.getEnergyStored() + CONVERSION_OUTPUT <= life.getMaxEnergy()) {
-            akaishi.extractEnergy(CONVERSION_COST, false);
-            life.addEnergy(CONVERSION_OUTPUT, false);
+        if (akaishi.getEnergyStored() >= ModConfig.lifeMatrixConversionCost
+                && life.getEnergyStored() + ModConfig.lifeAggregationConversionOutput <= life.getMaxEnergy()) {
+            akaishi.extractEnergy(ModConfig.lifeMatrixConversionCost, false);
+            life.addEnergy(ModConfig.lifeAggregationConversionOutput, false);
             return true;
         }
         return false;

@@ -7,6 +7,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiEnergyAssemblyBlock;
 import com.example.akaishi.block.AkaishiEnergyGeneratorBlock;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
@@ -41,12 +42,10 @@ public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEn
 
     /** 最大能量存储 = 单台发生机 10 万 × 50 倍 */
     public static final int MAX_ENERGY = 100000 * 50;
-    /** 结构激活燃烧速度 = 单台 75 × 45 倍（处理速度最快档） */
-    public static final int GENERATE_RATE = 150 * 45 / 2;
     /**
      * 燃料总能量 = 燃料能量值 × 9 / 8（= ×1.125 = 单台总产能 × 1.5）。
      * 单台总产能 = 燃料能量/100 × 75 = 燃料能量 × 0.75，×1.5 后 = 燃料能量 × 1.125。
-     * 采用按能量消耗而非整数 tick：每 tick 产出并消耗 min(剩余, 3375)，确保每份燃料总产能精确为单台 1.5 倍。
+     * 采用按能量消耗而非整数 tick：每 tick 产出并消耗 min(剩余, 单 tick 产能速率)，确保每份燃料总产能精确为单台 1.5 倍。
      */
     private static final int TOTAL_ENERGY_NUMERATOR = 9;
     private static final int TOTAL_ENERGY_DENOMINATOR = 8;
@@ -123,8 +122,8 @@ public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEn
                 }
             }
             if (burnEnergy > 0) {
-                // 每 tick 产出并消耗 min(剩余, 3375)，按能量精确消耗，低档燃料不再被取整吞掉
-                int consume = Math.min(GENERATE_RATE, burnEnergy);
+                // 每 tick 产出并消耗 min(剩余, 配置产能速率)，按能量精确消耗，低档燃料不再被取整吞掉
+                int consume = Math.min(ModConfig.energyAssemblyGenerateRate, burnEnergy);
                 burnEnergy -= consume;
                 // 升级组件：每个 ×1.75 倍产出速度、减少 1% 产出（净倍率 1.75^n × (1-0.01n)）
                 energy.addEnergy((long) (consume * getBoostMultiplier(upgrades)), false);

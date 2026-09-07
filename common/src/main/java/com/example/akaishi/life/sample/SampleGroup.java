@@ -1,5 +1,6 @@
 package com.example.akaishi.life.sample;
 
+import com.example.akaishi.config.ModConfig;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
@@ -85,9 +86,12 @@ public enum SampleGroup {
         return basePurity;
     }
 
-    /** 排斥系数（基因强度 → 身体负担倍数，值越低越契合） */
+    /** 排斥系数（基因强度 → 身体负担倍数，值越低越契合）——
+     *  可由配置 akaishi-common.toml [sample_groups] 列表覆盖（按枚举序数，0 = 内置默认） */
     public double getRejectionFactor() {
-        return rejectionFactor;
+        int i = ordinal();
+        return i < ModConfig.groupRejectionFactor.length && ModConfig.groupRejectionFactor[i] > 0
+                ? ModConfig.groupRejectionFactor[i] : rejectionFactor;
     }
 
     public String getNameKey() {

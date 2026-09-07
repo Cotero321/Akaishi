@@ -12,6 +12,7 @@ import com.example.akaishi.block.AkaishiPurifierItemOutputPortBlock;
 import com.example.akaishi.block.AkaishiPurifierMatrixCasingBlock;
 import com.example.akaishi.block.AkaishiPurifierMatrixControllerBlock;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -55,17 +56,13 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
 
     /** 最大能量存储（与旧提纯器一致） */
     public static final int MAX_ENERGY = 10000;
-    /** 单次提纯所需总能量 */
-    public static final long TOTAL_COST = 500L;
-    /** 成型后每 tick 提纯消耗能量（30 倍速度，总耗不变） */
-    public static final long RATE_FORMED = 150L;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     private final AkaishiEnergyStorage energy;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
-    /** 已投入提纯能量（能量池模式，满 TOTAL_COST 完成一次） */
+    /** 已投入提纯能量（能量池模式，满单次提纯总耗完成一次） */
     private long progressEnergy;
     /** 最近一次成型的箱体范围（解除端口关联时使用） */
     private BlockPos boxMin, boxMax;
@@ -114,14 +111,17 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
         }
         data.set(2, formed ? 1 : 0);
 
+        // 单件提纯赤能源需求（配置 [machine] costMultiplier 全局放大；每 tick 抽取额同步放大 → 吞吐不变、仅增耗能）
+        long costTotal = (long) (ModConfig.purifierMatrixTotalCost * ModConfig.machineCostMultiplier);
         // 成型后集中提纯：消耗能量推进进度，不足时暂停不清零（速度升级：消耗率 ×(1+12.5%/级)）
         if (formed && canProcess()) {
-            long extract = Math.min((long) (RATE_FORMED * getSpeedMultiplier()), energy.getEnergyStored());
+            long extract = Math.min((long) (ModConfig.purifierMatrixRateFormed * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+                    energy.getEnergyStored());
             if (extract > 0) {
                 energy.extractEnergy(extract, false);
                 progressEnergy += extract;
-                if (progressEnergy >= TOTAL_COST) {
-                    progressEnergy -= TOTAL_COST;
+                if (progressEnergy >= costTotal) {
+                    progressEnergy -= costTotal;
                     inventory.removeItem(INPUT_SLOT, 1);
                     ItemStack out = inventory.getItem(OUTPUT_SLOT);
                     int amount = outputPerInput();
@@ -137,7 +137,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
             // 无有效输入或输出已满：重置进度
             progressEnergy = 0;
         }
-        data.set(1, (int) (progressEnergy * 100 / TOTAL_COST));
+        data.set(1, (int) (progressEnergy * 100 / costTotal));
 
         if (changed) {
             setChanged();
