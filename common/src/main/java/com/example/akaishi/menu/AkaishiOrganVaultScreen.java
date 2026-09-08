@@ -2,10 +2,12 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiOrganVaultBlockEntity;
 import com.example.akaishi.life.body.BodySlot;
+import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * 器官储藏库界面：左侧 3×3 页按钮（点击切换选中页，纯本地状态），
@@ -64,11 +66,9 @@ public class AkaishiOrganVaultScreen extends AbstractContainerScreen<AkaishiOrga
             gui.fill(bx, by + 17, bx + 18, by + 18, COLOR_LINE);
             gui.fill(bx, by, bx + 1, by + 18, COLOR_LINE);
             gui.fill(bx + 17, by, bx + 18, by + 18, COLOR_LINE);
-            // 页码数字（居中；完整部位名经悬停提示展示）
+            // 页按钮：显示对应躯体槽位的器官材质（点击整页存取；完整部位名经悬停提示展示）
             BodySlot slot = BodySlot.values()[i];
-            String label = String.valueOf(i + 1);
-            gui.drawString(this.font, label, bx + 6, by + 5,
-                    selected ? COLOR_ACTIVE : 0xFF3F3F3F, false);
+            gui.renderItem(new ItemStack(AkaishiOrganItem.of(slot)), bx + 1, by + 1);
         }
 
         // 槽位背景框
@@ -117,6 +117,25 @@ public class AkaishiOrganVaultScreen extends AbstractContainerScreen<AkaishiOrga
                 BodySlot slot = BodySlot.values()[i];
                 gui.renderTooltip(this.font,
                         Component.translatable(slot.getNameKey()), mouseX, mouseY);
+            }
+        }
+
+        // 页槽悬停：空槽显示该页存放用途提示（规则9）
+        for (int i = 0; i < AkaishiOrganVaultBlockEntity.PER_PAGE; i++) {
+            int sx = this.leftPos + PAGE_X + (i % 3) * 18;
+            int sy = this.topPos + PAGE_Y + (i / 3) * 18;
+            if (mouseX >= sx && mouseX < sx + 18 && mouseY >= sy && mouseY < sy + 18
+                    && this.menu.slots.get(i).getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.organ_vault.page_tip"), mouseX, mouseY);
+            }
+        }
+        // 暂存槽悬停：空槽显示存放用途提示（规则9）
+        for (int i = 0; i < AkaishiOrganVaultBlockEntity.TEMP_SIZE; i++) {
+            int sx = this.leftPos + TEMP_X + (i % 3) * 18;
+            int sy = this.topPos + TEMP_Y + (i / 3) * 18;
+            if (mouseX >= sx && mouseX < sx + 18 && mouseY >= sy && mouseY < sy + 18
+                    && this.menu.slots.get(AkaishiOrganVaultBlockEntity.PER_PAGE + i).getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.organ_vault.temp_tip"), mouseX, mouseY);
             }
         }
     }

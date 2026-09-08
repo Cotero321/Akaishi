@@ -1,13 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " A ",
+    " E ",
     "ASA",
-    " A "
+    " E "
   ],
   "key": {
     "A": { "item": "akaishi:akaishi_advanced_component" },
-    "S": { "item": "akaishi:akaishi_energy_cell_super" }
+    "S": { "item": "akaishi:portable_akaishi_cell_advanced" },
+    "E": { "item": "akaishi:akaishi_energy_cell_super" }
   },
   "result": { "item": "akaishi:portable_akaishi_cell_super", "count": 1 }
 }

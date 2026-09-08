@@ -22,18 +22,22 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
     private static final int PANEL_W = 176;
     private static final int PANEL_H = 166;
     /** 能量条 */
-    private static final int ENERGY_X = 16, ENERGY_Y = 16, ENERGY_W = 96, ENERGY_H = 8;
+    private static final int ENERGY_X = 16, ENERGY_Y = 24, ENERGY_W = 96, ENERGY_H = 8;
     /** 词条序号按钮（行内 1..4，点击选择目标词条） */
     private static final int BTN_X0 = 8, BTN_Y = 50, BTN_STEP = 42, BTN_W = 38, BTN_H = 14;
     /** 状态提示行（进度条上方） */
     private static final int STATUS_Y = 67;
     /** 重铸进度条 */
     private static final int PROGRESS_X = 56, PROGRESS_Y = 76, PROGRESS_W = 96, PROGRESS_H = 8;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，右上能量条下方空位；标签置于槽位上方） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3；标签置于槽位左侧） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 存储开关按钮（移置左上方，避免与右上角升级槽重叠；仅在相邻存储库时显示） */
+    private static final int STORE_X = 8, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
     /** 器官输入槽的 Menu 槽位索引（机器槽第 3 个，词条读取用） */
     private static final int ORGAN_SLOT_INDEX = 2;
+    private static final int CRYSTAL_SLOT_INDEX = ORGAN_SLOT_INDEX + 1;
+    private static final int OUTPUT_SLOT_INDEX = ORGAN_SLOT_INDEX + 2;
 
     private static final int COLOR_BG = 0xFFC6C6C6;
     private static final int COLOR_LINE = 0xFF373737;
@@ -73,14 +77,10 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
 
         gui.fill(x + 6, y + 14, x + PANEL_W - 6, y + PANEL_H - 7, 0xFFB0B0B0);
 
-        // 能量条（绿）
-        long energy = menu.getLifeEnergy();
-        long cap = Math.max(1, menu.getLifeMax());
-        int w = (int) (ENERGY_W * Math.max(0, Math.min(energy, cap)) / cap);
-        gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + ENERGY_W, y + ENERGY_Y + ENERGY_H, COLOR_LINE);
-        if (w > 0) {
-            gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + w, y + ENERGY_Y + ENERGY_H, COLOR_ENERGY);
-        }
+        // 能量条（绿，轨道常驻占位，无论能量是否为 0 均显示；规则 4）
+        GuiWidgets.track(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H);
+        GuiWidgets.bar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H,
+                menu.getLifeEnergy(), menu.getLifeMax(), COLOR_ENERGY);
 
         // 重铸进度条（黄）
         int p = (int) (PROGRESS_W * menu.getProgress() / 100.0F);
@@ -103,9 +103,9 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
         // 状态提示行：无器官 / 无候选 / 正常提示
         drawStatusLine(gui, x, y);
 
-        // 升级槽标签（槽位框已由下方循环自绘）
+        // 升级槽标签（槽位框已由下方循环自绘；置于槽位左侧，避免压到顶部能量条）
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, COLOR_TEXT_SUB, false);
+                x + SPEED_SLOT_X - 34, y + SPEED_SLOT_Y + 4, COLOR_TEXT_SUB, false);
 
         // 槽位背景框（机器 + 升级 + 背包 + 联动槽仅激活时）
         for (var slot : this.menu.slots) {
@@ -144,7 +144,8 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
                         menu.getCrystalCost(), ModConfig.traitReforgerLifeCost / 1000);
             }
         }
-        gui.drawString(this.font, msg, x + 8, y + STATUS_Y, color, false);
+        String text = this.font.plainSubstrByWidth(msg.getString(), PANEL_W - 24);
+        gui.drawString(this.font, text, x + 8, y + STATUS_Y, color, false);
     }
 
     /** 器官输入槽中的物品（客户端槽位同步副本，词条名/稀有度展示用） */
@@ -165,10 +166,11 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
 
     private void drawStorageButton(GuiGraphics gui, int x, int y) {
         boolean open = menu.linkState.open;
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 16, open ? 0xFF5B8731 : 0xFFB0B0B0);
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 7, COLOR_LINE);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + STORE_H,
+                open ? 0xFF5B8731 : 0xFFB0B0B0);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + 1, COLOR_LINE);
         gui.drawString(this.font, Component.translatable("gui.akaishi.storage_link.open"),
-                x + PANEL_W - 38, y + 7, open ? 0xFF2E7D32 : COLOR_TEXT, false);
+                x + STORE_X + 2, y + STORE_Y + 1, open ? 0xFF2E7D32 : COLOR_TEXT, false);
     }
 
     private void drawStorageOverlay(GuiGraphics gui, int x, int y) {
@@ -249,10 +251,24 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
         }
+        // 器官输入/衰竭结晶/输出空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(30, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(ORGAN_SLOT_INDEX).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.trait_reforger.organ_tip"), mouseX, mouseY);
+        } else if (isHovering(82, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(CRYSTAL_SLOT_INDEX).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.trait_reforger.crystal_tip"), mouseX, mouseY);
+        } else if (isHovering(116, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(OUTPUT_SLOT_INDEX).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.trait_reforger.output_tip"), mouseX, mouseY);
+        }
         // 存储按钮悬停提示
         if (menu.linkState != null
-                && mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                && mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.storage_link.tip",
                             Component.translatable(menu.linkState.nameKey)), mouseX, mouseY);
@@ -275,8 +291,8 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && menu.linkState != null) {
-            if (mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                    && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+            if (mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                    && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
                 menu.linkState.open = !menu.linkState.open;
                 return true;
             }

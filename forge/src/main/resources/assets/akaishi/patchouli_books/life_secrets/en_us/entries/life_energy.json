@@ -11,8 +11,13 @@
     },
     {
       "type": "patchouli:spotlight",
-      "item": "akaishi:akaishi_life_energy_cell",
-      "text": "$(bold)Storage:$(0) a single Life Energy Cell holds $(4)1,000,000$(0) Life Energy with a two-way buffer — charge and drain it freely. It's the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows.$(br2)Run the Matrix output into a pipe, then into a cell: a $(bold)stockpile-first line$(0) beats live-to-live production."
+      "item": "akaishi:akaishi_life_energy_cell_advanced",
+      "text": "$(bold)Storage:$(0) Life Energy Cells come in tiers — Basic $(4)1,000,000$(0) (crafted) → Advanced $(4)4,000,000$(0) → Super $(4)40,000,000$(0), upgraded step by step with high-tier components. Every cell has a two-way buffer you can freely charge and drain — the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_energy_cell_serializer",
+      "text": "$(bold)Cell Serializer:$(0) place 1 Life Energy Cell Serializer in the center and wrap it in an enclosed $(4)3x3x3 shell of 26 Life Energy Cells$(0) of any tier to form the structure (the core is hidden — right-click any shell cell to open its UI).$(br2)Once formed, the 26 shell cells and the core combine into a single pooled buffer whose capacity adds up per cell; attach a pipe to any shell to charge or drain the whole structure. Breaking it apart keeps each cell's own energy safe."
     },
     {
       "type": "patchouli:relations",

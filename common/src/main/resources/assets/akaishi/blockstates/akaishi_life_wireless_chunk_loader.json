@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "akaishi:block/akaishi_life_wireless_chunk_loader" }
+  }
+}

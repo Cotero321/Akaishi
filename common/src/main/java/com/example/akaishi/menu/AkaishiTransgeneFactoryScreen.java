@@ -44,15 +44,11 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
         int x = this.leftPos;
         int y = this.topPos;
         GuiWidgets.panel(gui, x, y, this.imageWidth, this.imageHeight);
-        // 生命能量条（5k/次，供能不足时呈现空槽）
+        // 生命能量条（5k/次，轨道常驻占位，供能不足时呈现空槽；规则 4）
         GuiWidgets.track(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H);
-        long life = this.menu.getLifeEnergy();
-        long cap = Math.max(1, this.menu.getLifeMax());
-        int lifeW = (int) (ENERGY_W * Math.max(0, Math.min(life, cap)) / cap);
-        if (lifeW > 0) {
-            gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + lifeW, y + ENERGY_Y + ENERGY_H, COLOR_LIFE);
-        }
-        // 材料槽（基因/缠怨藤/凋零玫瑰/固态物）+ 产物槽
+        GuiWidgets.bar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H,
+                this.menu.getLifeEnergy(), this.menu.getLifeMax(), COLOR_LIFE);
+        // 材料槽（基因/缠怨藤/催化素材/固态物）+ 产物槽
         GuiWidgets.slotBox(gui, x + 26, y + 30);
         GuiWidgets.slotBox(gui, x + 44, y + 30);
         GuiWidgets.slotBox(gui, x + 62, y + 30);
@@ -60,10 +56,9 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
         GuiWidgets.slotBox(gui, x + 134, y + 30);
         // 进度条
         GuiWidgets.track(gui, x + TRACK_X, y + TRACK_Y, TRACK_W, TRACK_H);
-        int pct = this.menu.getProgressPct();
-        if (this.menu.isWorking() && pct > 0) {
-            int w = (int) (TRACK_W * pct / 100.0F);
-            gui.fill(x + TRACK_X, y + TRACK_Y, x + TRACK_X + w, y + TRACK_Y + TRACK_H, COLOR_PROGRESS);
+        if (this.menu.isWorking()) {
+            GuiWidgets.bar(gui, x + TRACK_X, y + TRACK_Y, TRACK_W, TRACK_H,
+                    this.menu.getProgressPct(), 100, COLOR_PROGRESS);
         }
         // 玩家背包区
         GuiWidgets.playerInventory(gui, x, y);
@@ -73,7 +68,7 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         gui.drawString(this.font, this.title, 8, 6, TEXT, false);
         Component state = statusText();
-        gui.drawString(this.font, state, 8, 70, stateColor(), false);
+        gui.drawString(this.font, this.font.plainSubstrByWidth(state.getString(), 176 - 16), 8, 70, stateColor(), false);
         // 槽位角标说明
         gui.drawString(this.font, Component.literal(">"), 116, 33, TEXT_DIM, false);
     }
@@ -84,7 +79,7 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
             return Component.translatable("gui.akaishi.transgene_factory.working", this.menu.getProgressPct());
         }
         ItemStack gene = this.menu.slots.get(0).getItem();
-        if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isWitherSkeletonGene(gene)) {
+        if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isValidGene(gene)) {
             return Component.translatable("gui.akaishi.transgene_factory.gene_bad");
         }
         if (this.menu.getLifeEnergy() < ModConfig.transgeneFactoryLifeCost) {
@@ -98,13 +93,47 @@ public class AkaishiTransgeneFactoryScreen extends AbstractContainerScreen<Akais
             return TEXT_GREEN;
         }
         ItemStack gene = this.menu.slots.get(0).getItem();
-        if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isWitherSkeletonGene(gene)) {
+        if (!gene.isEmpty() && !AkaishiTransgeneFactoryBlockEntity.isValidGene(gene)) {
             return TEXT_RED;
         }
         if (this.menu.getLifeEnergy() < ModConfig.transgeneFactoryLifeCost) {
             return TEXT_RED;
         }
         return TEXT_DIM;
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        // 生命能量条悬停提示
+        if (isHovering(ENERGY_X, ENERGY_Y, ENERGY_W, ENERGY_H, mouseX, mouseY)) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.life", menu.getLifeEnergy(), menu.getLifeMax()),
+                    mouseX, mouseY);
+        }
+        // 进度条悬停提示
+        if (isHovering(TRACK_X, TRACK_Y, TRACK_W, TRACK_H, mouseX, mouseY)) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.progress", menu.getProgressPct()),
+                    mouseX, mouseY);
+        }
+        // 材料/产物空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(26, 30, 16, 16, mouseX, mouseY) && menu.slots.get(0).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.gene_slot_tip"), mouseX, mouseY);
+        } else if (isHovering(44, 30, 16, 16, mouseX, mouseY) && menu.slots.get(1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.twisting_slot_tip"), mouseX, mouseY);
+        } else if (isHovering(62, 30, 16, 16, mouseX, mouseY) && menu.slots.get(2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.rose_slot_tip"), mouseX, mouseY);
+        } else if (isHovering(80, 30, 16, 16, mouseX, mouseY) && menu.slots.get(3).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.solid_slot_tip"), mouseX, mouseY);
+        } else if (isHovering(134, 30, 16, 16, mouseX, mouseY) && menu.slots.get(4).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.transgene_factory.output_slot_tip"), mouseX, mouseY);
+        }
     }
 
     @Override

@@ -20,6 +20,8 @@ public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 2 + 输入槽 1），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 1;
+    /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
+    public static final int SLOT_INPUT = MachineUpgradeSlots.SLOT_COUNT;
 
     private final ContainerData data;
     private final Container input;

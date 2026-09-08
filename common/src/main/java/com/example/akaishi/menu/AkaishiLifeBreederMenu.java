@@ -53,10 +53,10 @@ public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
         this.blockPos = pos;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
-        // 与浮层第一行末尾两格坐标重叠，须随浮层开关失活让位）
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30,
+        // 固定面板右上角 y=8 顶部留白（规则 3）；与浮层第一行末尾两格坐标重叠，须随浮层开关失活让位）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
                 () -> linkState != null && linkState.open));
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30,
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
         // 器官输入槽：仅接受可继续培养（非原生、未达突变上限）的器官

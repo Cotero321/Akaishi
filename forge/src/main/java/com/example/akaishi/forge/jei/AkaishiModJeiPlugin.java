@@ -50,7 +50,9 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 new CompressorRecipeCategory(helper),
                 new PulverizerRecipeCategory(helper),
                 new TransformerRecipeCategory(helper),
-                new PlantCultivatorRecipeCategory(helper));
+                new PlantCultivatorRecipeCategory(helper),
+                // 转基因合成：凋零 / 烈焰基因序列 + 对应催化素材
+                new TransgeneRecipeCategory(helper));
     }
 
     @Override
@@ -71,6 +73,8 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(PulverizerRecipeCategory.TYPE, PulverizerRecipeCategory.getAll());
         registration.addRecipes(TransformerRecipeCategory.TYPE, TransformerRecipeCategory.getAll());
         registration.addRecipes(PlantCultivatorRecipeCategory.TYPE, PlantCultivatorRecipeCategory.getAll());
+        // 转基因合成配方（凋零藤 / 烈焰花种子）
+        registration.addRecipes(TransgeneRecipeCategory.TYPE, TransgeneRecipeCategory.TransgeneRecipe.getAll());
 
         // 催化器与收集器不是合成机器，用物品信息说明其功能与等级数值
         addIngredientInfo(registration, AkaishiCrystalBlocks.CHISHI_CATALYST_BASIC.get(), "jei.akaishi.catalyst_basic");
@@ -154,6 +158,17 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_CORE.get(), "jei.akaishi.wireless");
         addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_PORT.get(), "jei.akaishi.wireless");
         addIngredientInfo(registration, AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_PORT.get(), "jei.akaishi.wireless");
+
+        // ===== 生命能量无线体系：镜像赤能源无线（黄白生命配色多方块终端 + 生命无线口） =====
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_TERMINAL.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CORE.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_PORT.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_PORT.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_DIM_BRIDGE.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_LOADER.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_RANGE.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_LOSS.get(), "jei.akaishi.life_wireless");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_LOSS.get(), "jei.akaishi.life_wireless");
 
         // ===== 活化产物系列获取说明：活化结晶（7）/ 活化成分（7）/ 衰竭结晶 / 生命灰烬 =====
         // 活化结晶：7 种同机制（生命离心机分离活化衰竭液体，共用说明）

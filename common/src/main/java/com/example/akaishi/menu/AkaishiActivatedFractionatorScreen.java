@@ -22,13 +22,13 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_wireless_terminal.png");
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    private static final int ENERGY_Y = 26;
+    private static final int ENERGY_Y = 30;
     private static final int SLOT_Y = 52;
     private static final int PROGRESS_Y = 88;
     private static final int LABEL_Y = 44;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输入/输出槽行右侧） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 52;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 52;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排 y=8，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
 
     public AkaishiActivatedFractionatorScreen(AkaishiActivatedFractionatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -36,34 +36,16 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
         this.imageHeight = 198;
     }
 
-    /** 大数值缩写（沿用活化器样式） */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 带标签状态条：标签在轨道左侧，轨道整条填充不压字 */
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + 20, y + 1, TEXT, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, energy, max, color);
     }
 
     @Override
@@ -128,6 +110,23 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 业务槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        // 坐标取自 menu.slots 而非硬编码，避免 Menu 槽位坐标变更时悬停错位（与 AkaishiAutoCollectorScreen 一致）
+        var inputSlot = menu.slots.get(AkaishiActivatedFractionatorMenu.SLOT_INPUT);
+        if (isHovering(inputSlot.x, inputSlot.y, 16, 16, mouseX, mouseY) && inputSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.fractionator.input_tip"), mouseX, mouseY);
+        }
+        var out0Slot = menu.slots.get(AkaishiActivatedFractionatorMenu.SLOT_OUT0);
+        if (isHovering(out0Slot.x, out0Slot.y, 16, 16, mouseX, mouseY) && out0Slot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.fractionator.output_tip"), mouseX, mouseY);
+        }
+        var out1Slot = menu.slots.get(AkaishiActivatedFractionatorMenu.SLOT_OUT1);
+        if (isHovering(out1Slot.x, out1Slot.y, 16, 16, mouseX, mouseY) && out1Slot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.fractionator.output_tip"), mouseX, mouseY);
         }
     }
 }

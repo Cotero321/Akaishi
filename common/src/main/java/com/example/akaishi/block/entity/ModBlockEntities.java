@@ -52,8 +52,10 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiLifeAggregationConverterBlockEntity>> CHISHI_LIFE_AGGREGATION_CONVERTER;
     /** 生命转换架构（3×3×3 多方块主方块）方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiLifeConversionArchitectureBlockEntity>> CHISHI_LIFE_CONVERSION_ARCHITECTURE;
-    /** 生命能量储存器方块实体类型 */
+    /** 生命能量储存器方块实体类型（基础/高级/超级三档共用，等级由方块决定） */
     public static RegistrySupplier<BlockEntityType<AkaishiLifeEnergyCellBlockEntity>> CHISHI_LIFE_ENERGY_CELL;
+    /** 生命储存串联器（3×3×3 多方块主方块）方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeEnergyCellSerializerBlockEntity>> CHISHI_LIFE_ENERGY_CELL_SERIALIZER;
     /** 赤石能量聚合器方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiEnergyAggregatorBlockEntity>> CHISHI_ENERGY_AGGREGATOR;
     /** 赤石装备打造器方块实体类型 */
@@ -192,6 +194,14 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiWirelessOutputPortBlockEntity>> CHISHI_WIRELESS_OUTPUT_PORT;
     /** 区块加载构架方块实体：锁所属终端结构控制器区块（弱加载） */
     public static RegistrySupplier<BlockEntityType<AkaishiWirelessChunkLoaderBlockEntity>> CHISHI_WIRELESS_CHUNK_LOADER;
+    /** 生命无线终端方块实体类型（外墙主方块，LIFE 族网络生命能量中枢） */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeWirelessTerminalBlockEntity>> CHISHI_LIFE_WIRELESS_TERMINAL;
+    /** 生命无线输入口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeWirelessInputPortBlockEntity>> CHISHI_LIFE_WIRELESS_INPUT_PORT;
+    /** 生命无线输出口方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeWirelessOutputPortBlockEntity>> CHISHI_LIFE_WIRELESS_OUTPUT_PORT;
+    /** 生命无线区块加载构架方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeWirelessChunkLoaderBlockEntity>> CHISHI_LIFE_WIRELESS_CHUNK_LOADER;
     /** 聚变控制器方块实体类型（主方块，持有全部聚变状态） */
     public static RegistrySupplier<BlockEntityType<AkaishiFusionControllerBlockEntity>> CHISHI_FUSION_CONTROLLER;
     /** 聚变能量输出口方块实体类型（赤能源缓冲，纯发电） */
@@ -254,9 +264,13 @@ public final class ModBlockEntities {
         // 生命转换架构（3×3×3 多方块主方块）
         CHISHI_LIFE_CONVERSION_ARCHITECTURE = be("akaishi_life_conversion_architecture",
                 AkaishiLifeConversionArchitectureBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE);
-        // 生命能量储存器（纯生命能量存储）
+        // 生命能量储存器：基础/高级/超级三个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_LIFE_ENERGY_CELL = be("akaishi_life_energy_cell", AkaishiLifeEnergyCellBlockEntity::new,
-                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL);
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_ADVANCED,
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SUPER);
+        // 生命储存串联器（3×3×3 多方块主方块）
+        CHISHI_LIFE_ENERGY_CELL_SERIALIZER = be("akaishi_life_energy_cell_serializer",
+                AkaishiLifeEnergyCellSerializerBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SERIALIZER);
         // 赤石能量聚合器
         CHISHI_ENERGY_AGGREGATOR = be("akaishi_energy_aggregator", AkaishiEnergyAggregatorBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_AGGREGATOR);
@@ -471,6 +485,18 @@ public final class ModBlockEntities {
         // 区块加载构架（内腔功能件，持有 BE：自持中枢区块弱加载 ticket）
         CHISHI_WIRELESS_CHUNK_LOADER = be("akaishi_wireless_chunk_loader", AkaishiWirelessChunkLoaderBlockEntity::new,
                 AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_LOADER);
+        // ===== 无线生命能量 =====
+        // 终端（外墙主方块：按 LIFE 族注册网络、授权卡、绑定生命储能、中转口能量）
+        CHISHI_LIFE_WIRELESS_TERMINAL = be("akaishi_life_wireless_terminal", AkaishiLifeWirelessTerminalBlockEntity::new,
+                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_TERMINAL);
+        // 输入口（生命能量管道 → 终端网络的发送端）
+        CHISHI_LIFE_WIRELESS_INPUT_PORT = be("akaishi_life_wireless_input_port", AkaishiLifeWirelessInputPortBlockEntity::new,
+                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_PORT);
+        // 输出口（无线频道 → 生命能量管道的接收端）
+        CHISHI_LIFE_WIRELESS_OUTPUT_PORT = be("akaishi_life_wireless_output_port", AkaishiLifeWirelessOutputPortBlockEntity::new,
+                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_PORT);
+        CHISHI_LIFE_WIRELESS_CHUNK_LOADER = be("akaishi_life_wireless_chunk_loader",
+                AkaishiLifeWirelessChunkLoaderBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_LOADER);
         // ===== 聚变堆 =====
         // 控制器（多方块主方块，散热片也统一存放于此）
         CHISHI_FUSION_CONTROLLER = be("akaishi_fusion_controller", AkaishiFusionControllerBlockEntity::new,

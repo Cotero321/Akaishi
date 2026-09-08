@@ -31,9 +31,9 @@ public class AkaishiEnergyGeneratorMenu extends AbstractContainerMenu {
         // 燃料槽
         addSlot(new Slot(container, AkaishiEnergyGeneratorBlockEntity.FUEL_SLOT, 56, 17));
 
-        // 能源产生升级组件装配槽 5×2（最多 10 个，行距 18 避免槽位叠压）
-        int[] cols = {8, 26, 44, 62, 80};
-        int[] rows = {58, 76};
+        // 能源产生升级组件装配槽 5×2（最多 10 个）：固定右上角 y=8 起两行，X 从面板右缘向左排列
+        int[] cols = {80, 98, 116, 134, 152};
+        int[] rows = {8, 26};
         for (int r = 0; r < rows.length; r++) {
             for (int c = 0; c < cols.length; c++) {
                 addSlot(new SpeedUpgradeSlot(container, AkaishiEnergyGeneratorBlockEntity.UPGRADE_SLOT_START + r * cols.length + c,
@@ -41,7 +41,7 @@ public class AkaishiEnergyGeneratorMenu extends AbstractContainerMenu {
             }
         }
 
-        // 玩家背包 3×9（升级槽扩为两行 18 间距后整体下移）
+        // 玩家背包 3×9
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 96 + row * 18));

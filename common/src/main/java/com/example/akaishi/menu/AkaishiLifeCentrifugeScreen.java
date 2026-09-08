@@ -24,14 +24,14 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
     private static final int TEXT = 0xFF3F3F3F;
     private static final int LABEL_X = 20;
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    private static final int IN_Y = 22;
-    private static final int ENERGY_Y = 32;
-    private static final int PROGRESS_Y = 42;
-    /** 产物标签行（槽位 y=56 上方） */
-    private static final int LABEL_Y = 50;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，产物槽右侧避开进度条） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 56;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 56;
+    private static final int IN_Y = 28;
+    private static final int ENERGY_Y = 40;
+    private static final int PROGRESS_Y = 52;
+    /** 产物标签行（槽位 y=68 上方） */
+    private static final int LABEL_Y = 62;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排 y=8，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
 
     public AkaishiLifeCentrifugeScreen(AkaishiLifeCentrifugeMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -39,34 +39,16 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
         this.imageHeight = 198;
     }
 
-    /** 大数值缩写（沿用活化器样式） */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 带标签状态条：标签在轨道左侧，轨道整条填充不压字 */
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + LABEL_X, y + 1, TEXT, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, energy, max, color);
     }
 
     @Override
@@ -82,11 +64,11 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
         drawBar(gui, x, y + PROGRESS_Y, "gui.akaishi.centrifuge.progress",
                 menu.getProgress(), AkaishiLifeCentrifugeBlockEntity.BATCH_MB, 0xFFFFD030);
 
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位下方标签，上方为进度条）
+        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override
@@ -133,6 +115,17 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 输出槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(62, 68, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiLifeCentrifugeMenu.SLOT_OUT0).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.centrifuge.output_tip"), mouseX, mouseY);
+        }
+        if (isHovering(98, 68, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiLifeCentrifugeMenu.SLOT_OUT1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.centrifuge.output_tip"), mouseX, mouseY);
         }
     }
 }

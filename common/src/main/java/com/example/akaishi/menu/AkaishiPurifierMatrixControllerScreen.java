@@ -15,9 +15,9 @@ import net.minecraft.world.entity.player.Inventory;
 public class AkaishiPurifierMatrixControllerScreen extends AbstractContainerScreen<AkaishiPurifierMatrixControllerMenu> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_purifier_matrix.png");
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输入槽正下方空地，避开成型状态文字区） */
-    private static final int SPEED_SLOT_X = 56, SPEED_SLOT_Y = 53;
-    private static final int ENERGY_SLOT_X = 74, ENERGY_SLOT_Y = 53;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 Y=8，右缘避让右侧垂直能量条(153 起)） */
+    private static final int SPEED_SLOT_X = 116, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 134, ENERGY_SLOT_Y = 8;
 
     public AkaishiPurifierMatrixControllerScreen(AkaishiPurifierMatrixControllerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -48,13 +48,11 @@ public class AkaishiPurifierMatrixControllerScreen extends AbstractContainerScre
             gui.fill(x + 79, y + 36, x + 79 + arrowWidth, y + 52, 0xFFE8E8EA);
         }
 
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方独立标签，避免与状态文本重合）
+        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位左侧标签，避免与状态文本重合）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.speed_tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.energy_tag"),
-                x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y - 9, 0xFF707070, false);
+        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override

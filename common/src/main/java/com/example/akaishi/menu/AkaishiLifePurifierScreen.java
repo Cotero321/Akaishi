@@ -23,11 +23,11 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
     private static final int LIFE_BAR_Y = 36;
     /** 固化进度条区域（位于两条下方空档） */
     private static final int PROGRESS_X = 20, PROGRESS_Y = 48, PROGRESS_W = 88, PROGRESS_H = 8;
-    /** 机器槽位数量（输出槽，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = 1;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输出槽右侧避开条形区） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输出槽右侧，固定面板右上角并排 y=8 起，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 输出槽 GUI 位置（与 Menu 槽位坐标一致） */
+    private static final int OUTPUT_SLOT_X = 116, OUTPUT_SLOT_Y = 30;
 
     public AkaishiLifePurifierScreen(AkaishiLifePurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -35,31 +35,13 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (BAR_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x, y, x + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x, y, BAR_W, BAR_H, energy, max, color);
     }
 
     @Override
@@ -69,10 +51,7 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         // 机器槽位框（贴图无图形，自绘补齐；输出槽位于条形区右侧）
-        for (int i = 0; i < MACHINE_SLOTS; i++) {
-            var slot = menu.slots.get(i);
-            GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
-        }
+        GuiWidgets.slotBox(gui, x + OUTPUT_SLOT_X, y + OUTPUT_SLOT_Y);
 
         // 赤能源条（红）
         GuiWidgets.track(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, BAR_W, BAR_H);
@@ -91,7 +70,7 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override
@@ -104,12 +83,6 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
-
-        // 赤能源数值（生命能量数值经悬停提示展示，避免与条形区重叠）
-        Component akaishiText = Component.translatable("energy.akaishi.akaishi")
-                .append(Component.literal(" " + formatEnergy(menu.getAkaishiEnergy()) + " / " + formatEnergy(menu.getAkaishiMax())));
-        int w1 = this.font.width(akaishiText);
-        gui.drawString(this.font, akaishiText, this.leftPos + 88 - w1 / 2, this.topPos + CHISHI_BAR_Y - 10, 0xFF3F3F3F, false);
 
         // 悬停提示
         if (isHovering(CHISHI_BAR_X, CHISHI_BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
@@ -136,6 +109,12 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 输出槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(OUTPUT_SLOT_X, OUTPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiLifePurifierMenu.MACHINE_SLOT_END - 1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.life_purifier.output_tip"), mouseX, mouseY);
         }
     }
 }

@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 /**
- * 转基因域方块注册：转基因植物（凋零藤）的作物方块。
- * 根/茎为纯植物方块（无物品形态），由转基因植物种子（见 item 域）右键种植生成根，
- * 根随机刻长茎、成熟顶端可收获凝聚体。与 {@code AkaishiTransgeneItems} 同属
- * 转基因工厂-凋零藤作物体系。
+ * 转基因域方块注册：转基因植物（凋零藤 / 烈焰花）的作物方块。
+ * 根/茎、花株/花冠为纯植物方块（无物品形态），由转基因植物种子（见 item 域）右键种植生成根，
+ * 根随机刻长茎、成熟顶端可收获凝聚体（烈焰花体系同理：花株成株长花冠、盛开花冠收获凝聚物）。
+ * 与 {@code AkaishiTransgeneItems} 同属转基因工厂作物体系。
  * <p>
  * 从 ModBlocks 拆分出的域注册类。所有静态字段显式初始化为 null，由 {@link #register()}
  * 在 {@link AkaishiMod#init()} 阶段填充；任何消费方都须在 register() 之后访问。
@@ -23,6 +23,10 @@ public final class AkaishiTransgeneBlocks {
     public static RegistrySupplier<Block> CHISHI_WITHER_ROOT = null;
     /** 凋零藤茎：整株第 2/3 格（无物品、只能由根长出），成熟顶端可收凝聚体 */
     public static RegistrySupplier<Block> CHISHI_WITHER_STEM = null;
+    /** 烈焰花株：整株第 1 格（种子仅可种于灵魂沙），成株后随机刻长出花冠 */
+    public static RegistrySupplier<Block> CHISHI_BLAZE_FLOWER_ROOT = null;
+    /** 烈焰花冠：顶端开花格（无物品、只能由成株花株长出），盛开可收凝聚物 */
+    public static RegistrySupplier<Block> CHISHI_BLAZE_BLOOM = null;
 
     private AkaishiTransgeneBlocks() {
     }
@@ -35,5 +39,10 @@ public final class AkaishiTransgeneBlocks {
                 new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_root"), AkaishiWitherRootBlock::new);
         CHISHI_WITHER_STEM = blockRegistrar.register(
                 new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wither_stem"), AkaishiWitherStemBlock::new);
+        // 烈焰花株/花冠：纯植物方块（无物品），种子种下生成花株、成株花株随机刻长出花冠
+        CHISHI_BLAZE_FLOWER_ROOT = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_blaze_flower_root"), AkaishiBlazeFlowerRootBlock::new);
+        CHISHI_BLAZE_BLOOM = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_blaze_bloom"), AkaishiBlazeBloomBlock::new);
     }
 }

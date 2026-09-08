@@ -20,13 +20,13 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_wireless_terminal.png");
     private static final int TEXT = 0xFF3F3F3F;
-    private static final int ENERGY_Y = 22;
+    private static final int ENERGY_Y = 60;
     private static final int SLOT_Y = 40;
     private static final int LABEL_Y = 30;
-    private static final int PROGRESS_X = 26, PROGRESS_Y = 60, PROGRESS_W = 90, BAR_H = 8;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，机器槽行右侧） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 40;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 40;
+    private static final int PROGRESS_X = 26, PROGRESS_Y = 76, PROGRESS_W = 90, BAR_H = 8;
+    /** 升级槽固定面板右上角 Y=8（规则 3），能量/进度条下移至机器槽下方避让（规则 1） */
+    private static final int UPGRADE_Y = 8;
+    private static final int SPEED_SLOT_X = 134, ENERGY_SLOT_X = 152;
 
     public AkaishiItemReconstructorScreen(AkaishiItemReconstructorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -34,22 +34,9 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
         this.imageHeight = 198;
     }
 
-    /** 大数值缩写（沿用活化器样式） */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -62,11 +49,11 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
         GuiWidgets.slotBox(gui, x + 26, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 62, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 98, y + SLOT_Y);
-        // 升级槽（速度/能量，机器槽行右侧，纹理无图案需自绘框；标签置于槽位下方避让产物槽）
-        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
+        // 升级槽（速度/能量，固定面板右上角，纹理无图案需自绘框；标签置于槽位左侧）
+        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
+        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 20, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + UPGRADE_Y + 4, 0xFF707070, false);
 
         // 能量条
         GuiWidgets.track(gui, x + 20, y + ENERGY_Y, 136, BAR_H);
@@ -112,14 +99,25 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
                     formatEnergy(menu.getProgress()), formatEnergy(menu.getRequired()),
                     formatEnergy(menu.getCrystals())), mouseX, mouseY);
         }
+        // 机器槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        else if (isHovering(26, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.input_tip"), mouseX, mouseY);
+        } else if (isHovering(62, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(3).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.crystal_tip"), mouseX, mouseY);
+        } else if (isHovering(98, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(4).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.output_tip"), mouseX, mouseY);
+        }
         // 升级槽悬停提示
-        if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
+        if (isHovering(SPEED_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
                             "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
         }
-        if (isHovering(ENERGY_SLOT_X, ENERGY_SLOT_Y, 16, 16, mouseX, mouseY)) {
+        if (isHovering(ENERGY_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),

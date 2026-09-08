@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 
 import java.util.List;
 
@@ -92,6 +93,20 @@ public class AkaishiPotionCabinetScreen extends AbstractContainerScreen<AkaishiP
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         // 顶部为筛选按钮行，取消标题绘制避免与按钮重叠（库名经浮层/容器名可见）
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        // 药剂槽悬停：仅激活且空槽时提示用途（有物品时 vanilla 已显示药剂名，避免重复）
+        for (Slot slot : this.menu.slots) {
+            if (slot.isActive() && !slot.hasItem()
+                    && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.potion_cabinet.slot_tip"),
+                        mouseX, mouseY);
+                return;
+            }
+        }
     }
 
     @Override

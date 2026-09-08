@@ -1,6 +1,11 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "akaishi:block/akaishi_energy_cell_serializer"
+    "down": "akaishi:block/akaishi_life_conversion_architecture_bottom",
+    "up": "akaishi:block/akaishi_life_conversion_architecture_top",
+    "north": "akaishi:block/akaishi_life_conversion_architecture_front",
+    "south": "akaishi:block/akaishi_life_conversion_architecture_side",
+    "east": "akaishi:block/akaishi_life_conversion_architecture_side",
+    "west": "akaishi:block/akaishi_life_conversion_architecture_side"
   }
 }

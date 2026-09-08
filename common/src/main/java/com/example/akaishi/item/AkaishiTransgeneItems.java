@@ -10,8 +10,8 @@ import net.minecraft.world.item.Item;
 import java.util.function.Supplier;
 
 /**
- * 转基因域物品注册：转基因植物（凋零藤）体系的种子与收获物。
- * 均由转基因工厂（凋零骷髅基因 + 缠怨藤 + 凋零玫瑰 + 固态物）产出。
+ * 转基因域物品注册：转基因植物（凋零藤 / 烈焰花）体系的种子与收获物。
+ * 凋零藤系均由转基因工厂（凋零骷髅基因 + 缠怨藤 + 凋零玫瑰 + 固态物）产出。
  */
 public final class AkaishiTransgeneItems {
 
@@ -22,10 +22,16 @@ public final class AkaishiTransgeneItems {
     public static RegistrySupplier<Item> akaishiWitherSeed;
     /** 转基因植物：凋零藤凝聚体（成熟藤收获，凋零系高级原料/介质） */
     public static RegistrySupplier<Item> akaishiWitherCondensate;
+    /** 转基因植物：烈焰花种（仅可种于灵魂沙生成烈焰花株，烈焰系火种来源） */
+    public static RegistrySupplier<Item> akaishiBlazeSeed;
+    /** 转基因植物：烈焰凝聚物（盛开的烈焰花冠收获，烈焰系高级原料/介质） */
+    public static RegistrySupplier<Item> akaishiBlazeCondensate;
 
     public static void register() {
         akaishiWitherSeed = item("akaishi_wither_seed", () -> new AkaishiWitherSeedItem(new Item.Properties()));
         akaishiWitherCondensate = item("akaishi_wither_condensate");
+        akaishiBlazeSeed = item("akaishi_blaze_seed", () -> new AkaishiBlazeSeedItem(new Item.Properties()));
+        akaishiBlazeCondensate = item("akaishi_blaze_condensate");
     }
 
     private static RegistrySupplier<Item> item(String id) {

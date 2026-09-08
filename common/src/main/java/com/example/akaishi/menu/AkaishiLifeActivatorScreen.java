@@ -39,34 +39,16 @@ public class AkaishiLifeActivatorScreen extends AbstractContainerScreen<AkaishiL
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 绘制带标签的状态条：标签在轨道左侧，轨道整条填充不压字 */
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + LABEL_X, y + 1, 0xFF3F3F3F, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, energy, max, color);
     }
 
     @Override

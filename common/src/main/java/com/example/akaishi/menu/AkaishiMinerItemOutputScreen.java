@@ -50,6 +50,21 @@ public class AkaishiMinerItemOutputScreen extends AbstractContainerScreen<Akaish
     }
 
     @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        // 产物缓冲槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复）
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (isHovering(8 + col * 18, 40 + row * 18, 16, 16, mouseX, mouseY)
+                        && menu.slots.get(col + row * 9).getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, Component.translatable("gui.akaishi.miner.output"), mouseX, mouseY);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);

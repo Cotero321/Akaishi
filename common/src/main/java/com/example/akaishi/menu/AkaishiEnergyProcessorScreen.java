@@ -27,9 +27,11 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
     private static final int PROGRESS_Y = 74;
     /** 机器槽位数量（升级槽 2 + 输入槽 1，贴图无槽位图形需自绘框） */
     private static final int MACHINE_SLOTS = 3;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致） */
-    private static final int SPEED_SLOT_X = 152, SPEED_SLOT_Y = 6;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 24;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排留白 y=8 起，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 输入槽 GUI 位置（与 Menu 槽位坐标一致） */
+    private static final int INPUT_SLOT_X = 116, INPUT_SLOT_Y = 30;
 
     public AkaishiEnergyProcessorScreen(AkaishiEnergyProcessorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -37,22 +39,9 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 条内左侧固定标签区宽度（px），标签置于轨道左侧，填充从轨道右端开始避免覆盖文字 */
@@ -64,12 +53,7 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
         int trackX = x + LABEL_W;
         int trackW = BAR_W - LABEL_W;
         GuiWidgets.track(gui, trackX, y, trackW, BAR_H);
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (trackW * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(trackX, y, trackX + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, trackX, y, trackW, BAR_H, energy, max, color);
     }
 
     @Override
@@ -168,6 +152,12 @@ public class AkaishiEnergyProcessorScreen extends AbstractContainerScreen<Akaish
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 输入槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(INPUT_SLOT_X, INPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiEnergyProcessorMenu.MACHINE_SLOT_END - 1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.energy_processor.input_tip"), mouseX, mouseY);
         }
     }
 }

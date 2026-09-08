@@ -49,6 +49,8 @@ public final class WirelessNetworkManager {
         public final Set<PortKey> inputs = ConcurrentHashMap.newKeySet();
         /** 在线输出口位置 */
         public final Set<PortKey> outputs = ConcurrentHashMap.newKeySet();
+        /** 所属网络族（赤能源 / 生命能量；默认 CHISHI，旧注册路径与占位条目行为不变） */
+        public volatile WirelessFamily family = WirelessFamily.CHISHI;
 
         TerminalEntry(UUID id) {
             this.id = id;
@@ -65,11 +67,18 @@ public final class WirelessNetworkManager {
         return TERMINALS.computeIfAbsent(id, TerminalEntry::new);
     }
 
-    /** 终端每 tick 注册心跳与位置 */
+    /** 终端每 tick 注册心跳与位置（默认赤能源族，旧调用路径不变） */
     public static void registerTerminal(UUID id, ResourceKey<Level> dimension, BlockPos pos, long gameTick) {
+        registerTerminal(id, dimension, pos, gameTick, WirelessFamily.CHISHI);
+    }
+
+    /** 终端每 tick 注册心跳与位置，并声明所属网络族（生命终端注册走本重载） */
+    public static void registerTerminal(UUID id, ResourceKey<Level> dimension, BlockPos pos, long gameTick,
+                                        WirelessFamily family) {
         TerminalEntry e = entry(id);
         e.ref = new TerminalRef(dimension, pos.immutable());
         e.seen = gameTick;
+        e.family = family == null ? WirelessFamily.CHISHI : family;
     }
 
     /** 终端被拆/结构失效：解除在线（授权卡与口集合由 purge 兜底清理） */
@@ -133,15 +142,24 @@ public final class WirelessNetworkManager {
     }
 
     /**
-     * 认证查询：口绑定卡反查授权该卡的在线终端（参考 MEK 同卡配对）。
+     * 认证查询：口绑定卡反查授权该卡的在线赤能源终端（参考 MEK 同卡配对）。
      * 遍历注册表取首个匹配的在线终端；无则返回 null。
      */
     public static UUID findTerminalForCard(UUID card) {
+        return findTerminalForCard(card, WirelessFamily.CHISHI);
+    }
+
+    /**
+     * 族感知认证查询：仅返回「在线 + 所属网络族匹配 + 授权该卡」的终端，
+     * 跨族卡互不可见（生命能量卡不会命中赤能源终端，反之亦然）。
+     */
+    public static UUID findTerminalForCard(UUID card, WirelessFamily family) {
         if (card == null) {
             return null;
         }
+        WirelessFamily f = family == null ? WirelessFamily.CHISHI : family;
         for (TerminalEntry e : TERMINALS.values()) {
-            if (e.ref != null && e.authorizedCards.contains(card)) {
+            if (e.ref != null && e.family == f && e.authorizedCards.contains(card)) {
                 return e.id;
             }
         }

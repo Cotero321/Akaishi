@@ -63,6 +63,11 @@ public class AkaishiLifeConverterMenu extends AbstractContainerMenu {
         return data.get(4) == 1;
     }
 
+    /** 是否单台独立转换（生命聚合转换器；矩阵则走成型逻辑） */
+    public boolean isStandalone() {
+        return data.getCount() > 5 && data.get(5) == 1;
+    }
+
     @Override
     public boolean stillValid(Player player) {
         return true;

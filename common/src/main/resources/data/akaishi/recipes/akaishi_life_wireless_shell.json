@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "Q Q",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "Q": { "item": "minecraft:gold_ingot" },
+    "I": { "item": "akaishi:akaishi_machine_component" }
+  },
+  "result": { "item": "akaishi:akaishi_life_wireless_shell", "count": 4 }
+}

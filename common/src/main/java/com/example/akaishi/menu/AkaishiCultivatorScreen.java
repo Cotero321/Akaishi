@@ -20,13 +20,19 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
 
     private static final int PANEL_W = 176;
 
-    private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
+    /** 生命能量条区域（收窄右缘至 x128 避开右上角升级槽，下移 2px 避开存储按钮，规则 3/4） */
+    private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 18, BAR_W = 108, BAR_H = 8;
     private static final int PROGRESS_X = 56, PROGRESS_Y = 74, PROGRESS_W = 56, PROGRESS_H = 8;
     /** 机器槽位数量（升级槽 2 + 输入/材料槽 2，贴图无槽位图形需自绘框） */
     private static final int MACHINE_SLOTS = 4;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，能量条下方右侧空位；标签置于槽位下方避开能量条） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 输入/材料槽的 Menu 槽位索引（升级槽 2 后的样本或器官/固态物，空槽 tooltip 用） */
+    private static final int INPUT_SLOT_INDEX = 2;
+    private static final int SOLID_SLOT_INDEX = INPUT_SLOT_INDEX + 1;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 存储开关按钮（移置左上带，避开右上角升级槽、升级标签与标题；仅在相邻存储库时显示） */
+    private static final int STORE_X = 58, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
 
     public AkaishiCultivatorScreen(AkaishiCultivatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -34,21 +40,9 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
         this.imageHeight = 166;
     }
 
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -89,12 +83,12 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
                 x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
     }
 
-    /** 右上角"存储"开关按钮 */
+    /** 左上带"存储"开关按钮 */
     private void drawStorageButton(GuiGraphics gui, int x, int y) {
         boolean open = menu.linkState.open;
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 16, open ? 0xFF5B8731 : 0xFFB0B0B0);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + STORE_H, open ? 0xFF5B8731 : 0xFFB0B0B0);
         gui.drawString(this.font, Component.translatable("gui.akaishi.storage_link.open"),
-                x + PANEL_W - 38, y + 7, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
+                x + STORE_X + 2, y + STORE_Y + 1, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
     }
 
     /** 存储联动浮层：标题 + 18 槽位框 + 页码 + 翻页按钮 */
@@ -143,8 +137,8 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && menu.linkState != null) {
             // 存储开关按钮
-            if (mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                    && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+            if (mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                    && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
                 menu.linkState.open = !menu.linkState.open;
                 return true;
             }
@@ -196,8 +190,8 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
         }
         // 存储按钮悬停提示
         if (menu.linkState != null
-                && mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                && mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.storage_link.tip",
                             Component.translatable(menu.linkState.nameKey)), mouseX, mouseY);
@@ -214,6 +208,16 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 输入/材料空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(56, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(INPUT_SLOT_INDEX).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.cultivator.input_tip"), mouseX, mouseY);
+        } else if (isHovering(56, 52, 16, 16, mouseX, mouseY)
+                && menu.slots.get(SOLID_SLOT_INDEX).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.cultivator.solid_tip"), mouseX, mouseY);
         }
     }
 }

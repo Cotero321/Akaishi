@@ -110,6 +110,11 @@ public class AkaishiEquipmentForgerScreen extends AbstractContainerScreen<Akaish
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
 
         // 能量条悬停提示（M/K 缩写）
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
@@ -117,6 +122,24 @@ public class AkaishiEquipmentForgerScreen extends AbstractContainerScreen<Akaish
                     Component.translatable("gui.akaishi.energy",
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
+            return;
+        }
+        // 输入装备槽（下界合金装备待锻造）
+        var gearSlot = menu.slots.get(AkaishiEquipmentForgerBlockEntity.INPUT_GEAR_SLOT);
+        if (isHovering(gearSlot.x, gearSlot.y, 16, 16, mouseX, mouseY) && gearSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.forger.input_gear_slot"), mouseX, mouseY);
+            return;
+        }
+        // 输入材料槽（赤石锭）
+        var ingotSlot = menu.slots.get(AkaishiEquipmentForgerBlockEntity.INPUT_INGOT_SLOT);
+        if (isHovering(ingotSlot.x, ingotSlot.y, 16, 16, mouseX, mouseY) && ingotSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.forger.input_ingot_slot"), mouseX, mouseY);
+            return;
+        }
+        // 输出槽（锻造完成的赤石装备）
+        var outputSlot = menu.slots.get(AkaishiEquipmentForgerBlockEntity.OUTPUT_SLOT);
+        if (isHovering(outputSlot.x, outputSlot.y, 16, 16, mouseX, mouseY) && outputSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.forger.output_slot"), mouseX, mouseY);
         }
     }
 

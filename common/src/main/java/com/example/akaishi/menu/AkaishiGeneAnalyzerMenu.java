@@ -50,10 +50,10 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
         this.blockPos = pos;
 
         // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
-        // 置于输出槽右侧同行，避开右上角存储按钮；浮层打开时失活让位）
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30,
+        // 固定面板右上角 y=8 顶部留白（规则 3）；浮层打开时失活让位）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
                 () -> linkState != null && linkState.open));
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30,
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
         // 输入槽：仅接受纯度 ≥25 的生命样本（未达解构门槛只能用于药剂）

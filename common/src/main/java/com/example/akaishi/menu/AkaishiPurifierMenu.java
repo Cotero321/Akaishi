@@ -39,10 +39,10 @@ public class AkaishiPurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）。
-        // 置于燃料槽行左侧空地，避免贴紧输出槽(116,35)下方造成三格堆叠且标签不压槽
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 8, 53));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 26, 53));
+        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）。
+        // 右移避开右侧垂直能量条(153 起)，且与输出槽(116,35)垂直错开不堆叠
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 116, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 134, 8));
 
         // 方块槽：燃料 / 输入 / 输出
         // 燃料槽：仅燃料可放入；提纯矩阵成型后禁用（矩阵由外部赤能源驱动，不再烧燃料）

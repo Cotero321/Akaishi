@@ -36,9 +36,9 @@ public class AkaishiDecayPurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
+        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
         // 玩家背包 3 行 y=124 起，快捷栏 y=180（198 高 GUI，与 akaishi_wireless_terminal.png 槽位图案对齐）
         for (int row = 0; row < 3; row++) {

@@ -20,6 +20,9 @@ public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 2 + 输出槽 2），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 2;
+    /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
+    public static final int SLOT_OUT0 = MachineUpgradeSlots.SLOT_COUNT;
+    public static final int SLOT_OUT1 = MachineUpgradeSlots.SLOT_COUNT + 1;
 
     private final ContainerData data;
     private final Container output;
@@ -39,17 +42,17 @@ public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
         this.output = output;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；产物槽右侧）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 56));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 56));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
-        addSlot(new Slot(output, 0, 62, 56) {
+        addSlot(new Slot(output, 0, 62, 68) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false; // 输出槽只读：防止放入杂物卡死机器
             }
         });
-        addSlot(new Slot(output, 1, 98, 56) {
+        addSlot(new Slot(output, 1, 98, 68) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;

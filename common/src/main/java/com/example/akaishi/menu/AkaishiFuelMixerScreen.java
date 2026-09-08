@@ -28,15 +28,15 @@ public class AkaishiFuelMixerScreen extends AbstractContainerScreen<AkaishiFuelM
     private static final int LABEL_X = 20;
     /** 进度条轨道：位于标签右侧，整条填充 */
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，顶部并排） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 6;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 6;
-    /** 五条状态条整体上移（间距 10），进度条底缘 y70 避开物品栏文字（y72 起） */
-    private static final int IN1_Y = 22;
-    private static final int IN2_Y = 32;
-    private static final int OUT_Y = 42;
-    private static final int ENERGY_Y = 52;
-    private static final int PROGRESS_Y = 62;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，顶部并排留白 y=8 起） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 五条状态条整体下移（间距 10），升级槽下移避让；进度条底缘 y74 避开玩家背包槽（y84 起） */
+    private static final int IN1_Y = 26;
+    private static final int IN2_Y = 36;
+    private static final int OUT_Y = 46;
+    private static final int ENERGY_Y = 56;
+    private static final int PROGRESS_Y = 66;
 
     public AkaishiFuelMixerScreen(AkaishiFuelMixerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -44,34 +44,21 @@ public class AkaishiFuelMixerScreen extends AbstractContainerScreen<AkaishiFuelM
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写 */
-    private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
+    @Override
+    protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
+        gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFF3F3F3F, false);
     }
 
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+    /** 大数值缩写（复用统一 EnergyFormat） */
+    private static String formatEnergy(long v) {
+        return EnergyFormat.format(v);
     }
 
     /** 绘制带标签的能量/液体条：标签在轨道左侧，轨道整条填充不压字 */
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + LABEL_X, y + 1, 0xFF3F3F3F, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, energy, max, color);
     }
 
     @Override

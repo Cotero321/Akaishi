@@ -50,9 +50,12 @@ public class AkaishiPotionTableMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；右上能量条下方空位）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 固定面板右上角 y=8 顶部留白（规则 3）；与浮层第一行末尾两格坐标重叠，须随浮层开关失活让位）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
+                () -> linkState != null && linkState.open));
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
+                () -> linkState != null && linkState.open));
 
         // 样本槽：仅接受纯度 ≥25 的生命样本
         addSlot(new OverlayHidingSlot(container, AkaishiPotionTableBlockEntity.SAMPLE_SLOT, 56, 30,

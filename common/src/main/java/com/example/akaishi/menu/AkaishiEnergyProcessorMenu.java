@@ -36,9 +36,9 @@ public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 152, 6));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 24));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
         // 输入槽：只收生命固态物
         addSlot(new Slot(container, AkaishiEnergyProcessorBlockEntity.INPUT_SLOT, 116, 30) {

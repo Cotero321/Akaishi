@@ -34,9 +34,9 @@ public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
         // 燃料槽
         addSlot(new Slot(container, AkaishiGenMatrixControllerBlockEntity.FUEL_SLOT, 25, 42));
 
-        // 能源产生升级组件装配槽 5×2（最多 10 个，行距 18 避免槽位叠压）
-        int[] cols = {8, 26, 44, 62, 80};
-        int[] rows = {58, 76};
+        // 能源产生升级组件装配槽 5×2（最多 10 个）：固定面板右上角 y=8，5 列整齐（规则 3）
+        int[] cols = {80, 98, 116, 134, 152};
+        int[] rows = {8, 26};
         for (int r = 0; r < rows.length; r++) {
             for (int c = 0; c < cols.length; c++) {
                 addSlot(new SpeedUpgradeSlot(container,

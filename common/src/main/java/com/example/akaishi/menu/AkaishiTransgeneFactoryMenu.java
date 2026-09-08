@@ -15,7 +15,7 @@ import net.minecraft.world.item.Items;
 
 /**
  * 转基因工厂菜单。
- * 槽位：0=基因序列（凋零骷髅且纯度≥50）、1=缠怨藤、2=凋零玫瑰、3=生命能量固态物、4=产物（只读）。
+ * 槽位：0=基因序列（命中配方来源且纯度达标）、1=缠怨藤、2=催化素材（凋零玫瑰/烈焰粉）、3=生命能量固态物、4=产物（只读）。
  * 玩家背包从索引 5 开始（窗口高 198，背包 y=124/快捷栏 y=180）。
  */
 public class AkaishiTransgeneFactoryMenu extends AbstractContainerMenu {
@@ -43,11 +43,11 @@ public class AkaishiTransgeneFactoryMenu extends AbstractContainerMenu {
     }
 
     private void addMachineSlots(Container inventory, Inventory playerInventory) {
-        // 材料槽：0 基因（只收凋零骷髅基因）、1 缠怨藤、2 凋零玫瑰、3 固态物
+        // 材料槽：0 基因（只收命中配方的合法基因）、1 缠怨藤、2 催化素材（凋零玫瑰/烈焰粉）、3 固态物
         addSlot(new Slot(inventory, 0, 26, 30) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return AkaishiTransgeneFactoryBlockEntity.isWitherSkeletonGene(stack);
+                return AkaishiTransgeneFactoryBlockEntity.isValidGene(stack);
             }
         });
         addSlot(new Slot(inventory, 1, 44, 30) {
@@ -59,7 +59,7 @@ public class AkaishiTransgeneFactoryMenu extends AbstractContainerMenu {
         addSlot(new Slot(inventory, 2, 62, 30) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.is(Items.WITHER_ROSE);
+                return stack.is(Items.WITHER_ROSE) || stack.is(Items.BLAZE_POWDER);
             }
         });
         addSlot(new Slot(inventory, 3, 80, 30) {

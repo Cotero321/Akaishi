@@ -48,9 +48,11 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 30));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 30));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；浮层打开时隐藏）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
+                () -> linkState != null && linkState.open));
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
+                () -> linkState != null && linkState.open));
 
         // 器官输入槽：仅接受携带 ≥1 条突变词条的非原生器官
         addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.ORGAN_SLOT, 30, 30,

@@ -7,6 +7,8 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyCellArrayStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiWirelessTerminalMenu;
+import com.example.akaishi.wireless.IWirelessTerminal;
+import com.example.akaishi.wireless.WirelessFamily;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import com.example.akaishi.wireless.WirelessTerminalStructure;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -49,7 +51,8 @@ import java.util.UUID;
  * 与注册表同步持久化；输入口/输出口凭同 UUID 卡片接入本终端。
  * 终端 ID 与授权卡集合经 NBT 持久化；数据槽同步储能/容量（long 拆 4 槽）+ 状态 + 终端 ID 摘要。
  */
-public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements ExtendedMenuProvider, IDataCarrier {
+public class AkaishiWirelessTerminalBlockEntity extends BlockEntity
+        implements ExtendedMenuProvider, IDataCarrier, IWirelessTerminal {
 
     // ===== 数据槽 =====
     public static final int DATA_FORMED = 0;
@@ -367,6 +370,12 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity implements E
     /** 终端唯一 ID（网络注册表 key） */
     public UUID terminalId() {
         return terminalId;
+    }
+
+    /** 所属网络族：赤能源终端固定为 CHISHI（生命能量无线终端走另一族，见生命族实现） */
+    @Override
+    public WirelessFamily family() {
+        return WirelessFamily.CHISHI;
     }
 
     public boolean isFormed() {

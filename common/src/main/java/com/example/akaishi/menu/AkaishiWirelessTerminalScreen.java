@@ -39,6 +39,9 @@ public class AkaishiWirelessTerminalScreen extends AbstractContainerScreen<Akais
     private static final int BAR_W = 136;
     private static final int BAR_H = 8;
 
+    // 组件状态文本最大宽度（面板 176，留出右缘边距防出框/重叠）
+    private static final int COMPONENTS_MAX_W = 148;
+
     // 安全页：授权/移除按钮（与授权槽同排）
     private static final int BTN_X = 88;
     private static final int BTN_Y = 46;
@@ -106,10 +109,11 @@ public class AkaishiWirelessTerminalScreen extends AbstractContainerScreen<Akais
         gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.bound",
                 menu.getBoundSerializers()), x + 8, y + 72, TEXT, false);
         // 组件状态（跨维/区块加载/范围），长文本截断防出框
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.components",
+        String components = Component.translatable("gui.akaishi.wireless.terminal.components",
                 menu.isCrossDim() ? "OK" : "NO",
                 menu.isChunkLoad() ? "OK" : "NO",
-                menu.isChunkRange() ? "3x3" : "1x1"),
+                menu.isChunkRange() ? "3x3" : "1x1").getString();
+        gui.drawString(this.font, this.font.plainSubstrByWidth(components, COMPONENTS_MAX_W),
                 x + 8, y + 84, TEXT_DIM, false);
         // 区块加载状态：绿字显示当前弱加载区块数（区块加载免能量税）
         if (menu.isChunkLoad()) {

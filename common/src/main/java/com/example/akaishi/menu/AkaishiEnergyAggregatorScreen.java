@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.entity.AkaishiEnergyAggregatorBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -75,6 +76,11 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
 
         // 能量条悬停提示（M/K 缩写）
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
@@ -82,6 +88,18 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
                     Component.translatable("gui.akaishi.energy",
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
+            return;
+        }
+        // 输入槽（下界合金锭 / 母岩）
+        var inputSlot = menu.slots.get(AkaishiEnergyAggregatorBlockEntity.INPUT_SLOT);
+        if (isHovering(inputSlot.x, inputSlot.y, 16, 16, mouseX, mouseY) && inputSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.aggregator.input_slot"), mouseX, mouseY);
+            return;
+        }
+        // 输出槽（赤石锭 / 升级母岩）
+        var outputSlot = menu.slots.get(AkaishiEnergyAggregatorBlockEntity.OUTPUT_SLOT);
+        if (isHovering(outputSlot.x, outputSlot.y, 16, 16, mouseX, mouseY) && outputSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.aggregator.output_slot"), mouseX, mouseY);
         }
     }
 }

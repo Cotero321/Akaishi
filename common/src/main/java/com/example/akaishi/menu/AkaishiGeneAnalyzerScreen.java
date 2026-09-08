@@ -19,15 +19,17 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
 
     private static final int PANEL_W = 176;
 
-    /** 生命能量条区域 */
-    private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 16, BAR_W = 136, BAR_H = 8;
-    /** 解构进度条区域 */
-    private static final int PROGRESS_X = 60, PROGRESS_Y = 58, PROGRESS_W = 56, PROGRESS_H = 8;
+    /** 生命能量条区域（下移至机器槽下方，避开右上角升级槽；轨道常驻占位，规则 4） */
+    private static final int LIFE_BAR_X = 56, LIFE_BAR_Y = 52, BAR_W = 100, BAR_H = 8;
+    /** 解构进度条区域（与能量条同行对齐，底缘 y76 避开玩家背包槽 y84 起） */
+    private static final int PROGRESS_X = 56, PROGRESS_Y = 68, PROGRESS_W = 100, PROGRESS_H = 8;
     /** 机器槽位数量（升级槽 2 + 输入/输出槽 2，贴图无槽位图形需自绘框） */
     private static final int MACHINE_SLOTS = 4;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输出槽右侧同行，避开右上角存储按钮） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 存储开关按钮（移置中上带，避开右上角升级槽与左侧标题；仅在相邻存储库时显示） */
+    private static final int STORE_X = 90, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
 
     public AkaishiGeneAnalyzerScreen(AkaishiGeneAnalyzerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -35,22 +37,9 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -90,12 +79,13 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
         }
     }
 
-    /** 右上角"存储"开关按钮 */
+    /** 中上带"存储"开关按钮（避开右上角升级槽与左侧标题；覆盖在浮层之上可点击关闭） */
     private void drawStorageButton(GuiGraphics gui, int x, int y) {
         boolean open = menu.linkState.open;
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 16, open ? 0xFF5B8731 : 0xFFB0B0B0);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + STORE_H,
+                open ? 0xFF5B8731 : 0xFFB0B0B0);
         gui.drawString(this.font, Component.translatable("gui.akaishi.storage_link.open"),
-                x + PANEL_W - 38, y + 7, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
+                x + STORE_X + 2, y + STORE_Y + 1, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
     }
 
     /** 存储联动浮层：标题 + 18 槽位框 + 页码 + 翻页按钮 */
@@ -125,8 +115,8 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && menu.linkState != null) {
             // 存储开关按钮
-            if (mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                    && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+            if (mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                    && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
                 menu.linkState.open = !menu.linkState.open;
                 return true;
             }
@@ -180,6 +170,16 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
                             menu.getProgress(), menu.getSuccessRate()),
                     mouseX, mouseY);
         }
+        // 输入/输出空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(56, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.gene_analyzer.input_tip"), mouseX, mouseY);
+        } else if (isHovering(116, 30, 16, 16, mouseX, mouseY)
+                && menu.slots.get(3).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.gene_analyzer.output_tip"), mouseX, mouseY);
+        }
         // 升级槽悬停提示
         if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
@@ -195,8 +195,8 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
         }
         // 存储按钮悬停提示
         if (menu.linkState != null
-                && mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                && mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.storage_link.tip",
                             Component.translatable(menu.linkState.nameKey)), mouseX, mouseY);

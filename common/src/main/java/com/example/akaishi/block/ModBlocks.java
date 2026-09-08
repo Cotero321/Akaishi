@@ -55,9 +55,11 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_SUPER;
     public static RegistrySupplier<Block> CHISHI_PLASMA_TANK;
 
-    // —— 转基因域（AkaishiTransgeneBlocks）：转基因植物（凋零藤）——
+    // —— 转基因域（AkaishiTransgeneBlocks）：转基因植物（凋零藤 / 烈焰花）——
     public static RegistrySupplier<Block> CHISHI_WITHER_ROOT;
     public static RegistrySupplier<Block> CHISHI_WITHER_STEM;
+    public static RegistrySupplier<Block> CHISHI_BLAZE_FLOWER_ROOT;
+    public static RegistrySupplier<Block> CHISHI_BLAZE_BLOOM;
 
     // —— 衰竭域（AkaishiDecayBlocks）：区域治理与终态方块 ——
     public static RegistrySupplier<Block> CHISHI_DECAY_PURIFIER;
@@ -111,6 +113,8 @@ public final class ModBlocks {
         // —— 转基因域 ——
         CHISHI_WITHER_ROOT = AkaishiTransgeneBlocks.CHISHI_WITHER_ROOT;
         CHISHI_WITHER_STEM = AkaishiTransgeneBlocks.CHISHI_WITHER_STEM;
+        CHISHI_BLAZE_FLOWER_ROOT = AkaishiTransgeneBlocks.CHISHI_BLAZE_FLOWER_ROOT;
+        CHISHI_BLAZE_BLOOM = AkaishiTransgeneBlocks.CHISHI_BLAZE_BLOOM;
 
         // —— 衰竭域（注册在 init() 中先于本方法完成）——
         CHISHI_DECAY_PURIFIER = AkaishiDecayBlocks.CHISHI_DECAY_PURIFIER;

@@ -1,0 +1,25 @@
+{
+  "name": "Life Wireless Energy",
+  "icon": "akaishi:akaishi_life_wireless_terminal",
+  "category": "akaishi:life_intro",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_wireless_terminal",
+      "text": "Life wireless is the Life system's mirror of the akaishi wireless grid: it $(4)beams pipe-fed Life Energy straight to distant Input/Output Ports$(0) — no more forests of Life Energy pipes.$(br2)$(bold)Structure:$(0) a $(4)sealed hollow box$(0), edge length 5:$(li)Walls: Life Wireless Shell as the base, swappable for the Life Wireless Terminal / Controller$(li)Cavity: exactly 1 Life Wireless Core, plus air or modules of your choice$(li)Once formed, the Life Wireless Terminal acts as the network's energy hub."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Bound storage:$(0) the terminal auto-binds Life Energy Cells within $(4)1 block outside the structure$(0) as the network's battery pool — to grow capacity, just crowd more Life Energy Cells around the box.$(br2)$(bold)Send & receive:$(0) pipe Life Energy into an Input Port, then place an Output Port far away and pipe out of it — with both structures formed, energy sent at the input shows up in the pipes at the output, as if through an invisible pipe."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Cavity modules:$(0) the Dimension Bridge enables cross-dimensional links. The Chunk Loading Frame keeps the terminal and authenticated Input/Output Port chunks loaded; adding the Range Module expands each loaded area to $(4)3×3 chunks$(0).$(br2)The Input Loss Suppressor affects only input loss, while the Output Loss Suppressor affects only terminal-to-output loss. Both stack linearly from configuration, capped at $(4)90%$(0) reduction per direction."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Relation to akaishi wireless:$(0) gameplay is identical to the Wireless Akaishi Energy grid — only the energy type differs. Life wireless accepts Life Energy only; akaishi wireless accepts akaishi energy only.$(br2)Modules must stay in the cavity: placing them in a wall breaks the sealed structure and grants no function. Prepare Life Energy pipes, cells and crafting parts, then follow this entry's recipes."
+    }
+  ]
+}

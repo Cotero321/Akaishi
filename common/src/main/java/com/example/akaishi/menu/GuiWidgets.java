@@ -55,6 +55,19 @@ public final class GuiWidgets {
         gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
     }
 
+    /**
+     * 在轨道内绘制填充进度条：自动把 value 钳制到 [0,max]，按轨道宽 w 等比例填充。
+     * 末段不足 1px 时不绘制，保证与既有自绘进度条视觉一致。
+     */
+    public static void bar(GuiGraphics gui, int x, int y, int w, int h, long value, long max, int color) {
+        long clamped = Math.max(0, Math.min(value, max));
+        long cap = Math.max(1, max);
+        int barWidth = (int) (w * clamped / cap);
+        if (barWidth > 0) {
+            gui.fill(x, y, x + barWidth, y + h, color);
+        }
+    }
+
     /** 绘制 30×12 原版风格小按钮（内凹灰体），供频道切换等操作按钮复用 */
     public static void button(GuiGraphics gui, int x, int y) {
         button(gui, x, y, 30, 12);

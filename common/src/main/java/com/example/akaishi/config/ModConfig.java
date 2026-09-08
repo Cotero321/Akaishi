@@ -469,8 +469,8 @@ public final class ModConfig {
     public static volatile long fusionEnergyOutputBufferCapacity = 20_000_000_000L;
     /** 反应堆能量输出口缓冲容量 */
     public static volatile long reactorEnergyOutputBufferCapacity = 5_000_000_000L;
-    /** 生命能量电池：容量 */
-    public static volatile long lifeEnergyCellLifeCapacity = 1_000_000L;
+    /** 生命储存串联器：自身基础容量（成型后总容量 = 该值 + 26 个外壳储存器容量之和） */
+    public static volatile long lifeEnergyCellSerializerBaseCapacity = 2_000_000L;
     /** 等离子储罐：容量（mb） */
     public static volatile long plasmaTankCapacity = 16_000L;
 

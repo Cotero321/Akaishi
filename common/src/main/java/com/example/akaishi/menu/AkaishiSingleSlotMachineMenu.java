@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 单输入单输出处理机器菜单抽象基类（升级槽 2 + 输入 + 输出 + 玩家背包 + 数据槽）。
- * 槽位布局四台机器统一：输入(26,40)、输出(98,40)、速度升级(134,40)、能量升级(152,40)、
- * 背包 (8,124) 起（窗口高 198）。
+ * 槽位布局四台机器统一：输入(26,40)、输出(98,40)、速度升级(134,8)、能量升级(152,8)
+ * （升级槽固定面板右上角 Y=8），背包 (8,124) 起（窗口高 198）。
  */
 public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu {
 
@@ -34,9 +34,9 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
         this.inventory = inventory;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 40));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 40));
+        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         // 输入槽：排除升级组件（保证 shift 点击时升级组件只进升级槽）
         addSlot(new Slot(inventory, 0, 26, 40) {
             @Override

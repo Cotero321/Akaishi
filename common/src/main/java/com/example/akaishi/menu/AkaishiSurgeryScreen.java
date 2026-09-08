@@ -32,16 +32,21 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
     private static final int GRID_SPACING = 22;
     private static final int GRID_SIZE = 18;
     /** 能量条 */
-    private static final int ENERGY_X = 16, ENERGY_Y = 16, ENERGY_W = 96, ENERGY_H = 8;
+    private static final int ENERGY_X = 16, ENERGY_Y = 18, ENERGY_W = 80, ENERGY_H = 8;
     /** 手术进度条 */
     private static final int PROGRESS_X = 16, PROGRESS_Y = 104, PROGRESS_W = 136, PROGRESS_H = 8;
     /** 移植/摘除按钮（两按钮并排收窄，右缘须落在 176 宽面板内） */
     private static final int IMPLANT_X = 118, EXTRACT_X = 144, BTN_Y = 82, BTN_W = 24, BTN_H = 12;
     /** 按钮下方所需生命能量小字行（常驻可见，绿=足够/红=不足） */
     private static final int COST_Y = BTN_Y + BTN_H + 1;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，3×3 区右侧中部空位；标签置于槽位下方避开能量条） */
-    private static final int SPEED_SLOT_X = 86, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 104, ENERGY_SLOT_Y = 30;
+    /** 器官输入槽 / 固态物槽（左移：槽位与 Menu 坐标一致，文本右置于槽旁） */
+    private static final int ORG_SLOT_X = 108, ORG_SLOT_Y = 28;
+    private static final int SOLID_SLOT_X = 108, SOLID_SLOT_Y = 54;
+    /** 升级槽固定面板右上角 Y=8（规则 3），位于 3×3 区右上方；标签置于槽位左侧 */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 存储开关按钮（移置顶部中间，避开左上标题与右上角升级槽；仅在相邻存储库时显示） */
+    private static final int STORE_X = 72, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
 
     private static final int COLOR_BG = 0xFFC6C6C6;
     private static final int COLOR_PANEL = 0xFFB0B0B0;
@@ -58,6 +63,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         super(menu, inv, title);
         this.imageWidth = PANEL_W;
         this.imageHeight = PANEL_H;
+        // 标题固定左上角，避免与居中存储按钮（STORE_X=72）重叠（规则 5 不重叠）
+        this.titleLabelX = 8;
     }
 
     // ===== 可用性判断 =====
@@ -119,14 +126,10 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         // 主面板
         gui.fill(x + 6, y + 14, x + PANEL_W - 6, y + 112, COLOR_PANEL);
 
-        // 能量条
-        long energy = menu.getLifeEnergy();
-        long cap = Math.max(1, menu.getLifeMax());
-        int w = (int) (ENERGY_W * Math.max(0, Math.min(energy, cap)) / cap);
-        gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + ENERGY_W, y + ENERGY_Y + ENERGY_H, COLOR_LINE);
-        if (w > 0) {
-            gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + w, y + ENERGY_Y + ENERGY_H, COLOR_ENERGY);
-        }
+        // 能量条（轨道常驻占位，无论能量是否为 0 均显示；规则 4）
+        GuiWidgets.track(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H);
+        GuiWidgets.bar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H,
+                menu.getLifeEnergy(), menu.getLifeMax(), COLOR_ENERGY);
 
         // 手术进度条（手术中显示）
         if (isOperating()) {
@@ -164,18 +167,18 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         }
 
         // 器官输入槽 / 固态物槽
-        drawSlotBox(gui, x + 120, y + 28);
-        drawSlotBox(gui, x + 120, y + 54);
+        drawSlotBox(gui, x + ORG_SLOT_X, y + ORG_SLOT_Y);
+        drawSlotBox(gui, x + SOLID_SLOT_X, y + SOLID_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.surgery.organ_in"),
-                x + 138, y + 30, 0xFF3F3F3F, false);
+                x + ORG_SLOT_X + 20, y + ORG_SLOT_Y + 2, 0xFF3F3F3F, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.surgery.solid_in", menu.getSolidCount()),
-                x + 138, y + 56, 0xFF3F3F3F, false);
+                x + SOLID_SLOT_X + 20, y + SOLID_SLOT_Y + 2, 0xFF3F3F3F, false);
 
-        // 升级槽（速度/能量，自绘框 + 槽位下方标签，避开上方能量条）
+        // 升级槽（速度/能量，固定面板右上角，自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
+                x + SPEED_SLOT_X - 22, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
 
         // 移植/摘除按钮
         drawButton(gui, x + IMPLANT_X, y + BTN_Y, "gui.akaishi.surgery.implant", canImplant());
@@ -208,13 +211,14 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         }
     }
 
-    /** 右上角"存储"开关按钮 */
+    /** 左上角"存储"开关按钮（移置左侧，避免与右上角升级槽重叠） */
     private void drawStorageButton(GuiGraphics gui, int x, int y) {
         boolean open = menu.linkState.open;
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 16, open ? 0xFF5B8731 : 0xFFB0B0B0);
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 7, COLOR_LINE);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + STORE_H,
+                open ? 0xFF5B8731 : 0xFFB0B0B0);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + 1, COLOR_LINE);
         gui.drawString(this.font, Component.translatable("gui.akaishi.storage_link.open"),
-                x + PANEL_W - 38, y + 7, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
+                x + STORE_X + 2, y + STORE_Y + 1, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
     }
 
     /** 存储联动浮层：标题 + 页码 + 翻页按钮（槽位由 LinkedVaultSlot 自动渲染） */
@@ -248,29 +252,21 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
                 enabled ? 0xFF2E7D32 : 0xFF6F6F6F, false);
     }
 
-    /** 按钮下方所需生命能量小字（绿=能量足够/红=不足，颜色随当前能量实时变化） */
+    /** 按钮下方所需生命能量小字（绿=能量足够/红=不足，颜色随当前能量实时变化）；按 0.85 倍缩放显示 */
     private void drawCost(GuiGraphics gui, int x, int y, long cost, boolean enough) {
         Component costText = Component.translatable("gui.akaishi.surgery.cost", formatEnergy(cost));
-        gui.drawString(this.font, costText, x + (BTN_W - this.font.width(costText)) / 2, y,
-                enough ? 0xFF2E7D32 : 0xFFD64545, false);
+        final float scale = 0.85F;
+        int scaledW = (int) (this.font.width(costText) * scale);
+        gui.pose().pushPose();
+        gui.pose().translate(x + (BTN_W - scaledW) / 2, y, 0);
+        gui.pose().scale(scale, scale, 1.0F);
+        gui.drawString(this.font, costText, 0, 0, enough ? 0xFF2E7D32 : 0xFFD64545, false);
+        gui.pose().popPose();
     }
 
-    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出（与其他机器界面一致，避免"20000K"式错读） */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -297,8 +293,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
 
         // 存储按钮悬停提示（浮层打开时仍保留）
         if (menu.linkState != null
-                && mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                && mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.storage_link.tip",
                             Component.translatable(menu.linkState.nameKey)), mouseX, mouseY);
@@ -317,6 +313,16 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
                     Component.translatable("gui.akaishi.life", formatEnergy(menu.getLifeEnergy()),
                             formatEnergy(menu.getLifeMax())),
                     mouseX, mouseY);
+        }
+        // 器官输入/固态物槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(ORG_SLOT_X, ORG_SLOT_Y, 18, 18, mouseX, mouseY)
+                && menu.slots.get(2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.surgery.organ_slot_tip"), mouseX, mouseY);
+        } else if (isHovering(SOLID_SLOT_X, SOLID_SLOT_Y, 18, 18, mouseX, mouseY)
+                && menu.slots.get(3).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.surgery.solid_slot_tip"), mouseX, mouseY);
         }
         // 升级槽悬停提示（速度/能量倍率随组件数量提升）
         if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
@@ -368,8 +374,8 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         if (button == 0) {
             // 存储联动：开关按钮 / 浮层翻页（浮层打开时优先，避免与躯体槽点击冲突）
             if (menu.linkState != null) {
-                if (mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                        && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                if (mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                        && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
                     menu.linkState.open = !menu.linkState.open;
                     return true;
                 }

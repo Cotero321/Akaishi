@@ -251,7 +251,7 @@ public final class AkaishiConfigSync {
         ModConfig.genEnergyOutputPortBufferCapacity = AkaishiConfig.GEN_ENERGY_OUTPUT_BUFFER.get();
         ModConfig.fusionEnergyOutputBufferCapacity = AkaishiConfig.FUSION_ENERGY_OUTPUT_BUFFER.get();
         ModConfig.reactorEnergyOutputBufferCapacity = AkaishiConfig.REACTOR_ENERGY_OUTPUT_BUFFER.get();
-        ModConfig.lifeEnergyCellLifeCapacity = AkaishiConfig.LIFE_ENERGY_CELL_CAPACITY.get();
+        ModConfig.lifeEnergyCellSerializerBaseCapacity = AkaishiConfig.LIFE_ENERGY_CELL_SERIALIZER_CAPACITY.get();
         ModConfig.plasmaTankCapacity = AkaishiConfig.PLASMA_TANK_CAPACITY.get();
 
         // 培养机提纯与分馏机

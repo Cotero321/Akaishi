@@ -31,6 +31,8 @@ public class AkaishiLifeConverterScreen extends AbstractContainerScreen<AkaishiL
     /** 结构状态提示两行 */
     private static final int STATUS_Y1 = 66;
     private static final int STATUS_Y2 = 74;
+    /** 居中文案最大宽度（防超面板，规则2） */
+    private static final int TEXT_MAX_W = 156;
 
     public AkaishiLifeConverterScreen(AkaishiLifeConverterMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -38,33 +40,14 @@ public class AkaishiLifeConverterScreen extends AbstractContainerScreen<AkaishiL
         this.imageHeight = 166;
     }
 
-    /** 大数值单位缩写：>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    /** 保留 1 位小数，整数时去掉小数部分（2.0 → 2） */
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 绘制一条横向能量条 */
     private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (BAR_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x, y, x + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x, y, BAR_W, BAR_H, energy, max, color);
     }
 
     @Override
@@ -102,17 +85,27 @@ public class AkaishiLifeConverterScreen extends AbstractContainerScreen<AkaishiL
         int w2 = this.font.width(lifeText);
         gui.drawString(this.font, lifeText, this.leftPos + 88 - w2 / 2, this.topPos + LIFE_TEXT_Y, 0xFF3F3F3F, false);
 
-        // 结构状态提示两行（成型绿：45 倍；单台橙：独立工作）
+        // 结构状态提示两行（聚合器：单台·独立转换橙；矩阵：成型绿 45 倍 / 未成型橙）
+        boolean standalone = menu.isStandalone();
         boolean formed = menu.isFormed();
-        Component line1 = Component.translatable(formed
-                ? "gui.akaishi.life.formed" : "gui.akaishi.life.unformed");
-        Component line2 = Component.translatable(formed
-                ? "gui.akaishi.life.formed2" : "gui.akaishi.life.unformed2");
-        int w3 = this.font.width(line1);
-        int w4 = this.font.width(line2);
-        gui.drawString(this.font, line1, this.leftPos + 88 - w3 / 2, this.topPos + STATUS_Y1,
-                formed ? 0xFF55FF55 : 0xFFFFAA00, false);
-        gui.drawString(this.font, line2, this.leftPos + 88 - w4 / 2, this.topPos + STATUS_Y2, 0xFF808080, false);
+        Component line1;
+        Component line2;
+        if (standalone) {
+            line1 = Component.translatable("gui.akaishi.life.standalone");
+            line2 = Component.translatable("gui.akaishi.life.formed2");
+        } else {
+            line1 = Component.translatable(formed
+                    ? "gui.akaishi.life.formed" : "gui.akaishi.life.unformed");
+            line2 = Component.translatable(formed
+                    ? "gui.akaishi.life.formed2" : "gui.akaishi.life.unformed2");
+        }
+        // 超宽按面板宽度截断并加省略号，防超出面板（规则2）
+        int line1Color = standalone || !formed ? 0xFFFFAA00 : 0xFF55FF55;
+        String line1Str = this.font.plainSubstrByWidth(line1.getString(), TEXT_MAX_W);
+        String line2Str = this.font.plainSubstrByWidth(line2.getString(), TEXT_MAX_W);
+        gui.drawString(this.font, line1Str, this.leftPos + 88 - this.font.width(line1Str) / 2, this.topPos + STATUS_Y1,
+                line1Color, false);
+        gui.drawString(this.font, line2Str, this.leftPos + 88 - this.font.width(line2Str) / 2, this.topPos + STATUS_Y2, 0xFF808080, false);
 
         // 悬停提示
         if (isHovering(CHISHI_BAR_X, CHISHI_BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {

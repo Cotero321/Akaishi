@@ -19,9 +19,11 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
     private static final int TEXT = 0xFF3F3F3F;
 
     // 布局坐标（与 Menu 槽位一致）
-    protected static final int ENERGY_X = 20, ENERGY_Y = 22, ENERGY_W = 136, BAR_H = 8;
-    protected static final int PROGRESS_X = 26, PROGRESS_Y = 60, PROGRESS_W = 90;
+    // 升级槽固定面板右上角 Y=8，故能量/进度条下移至输入/输出槽下方，避免与升级槽重叠（规则 3/1）
+    protected static final int ENERGY_X = 20, ENERGY_Y = 60, ENERGY_W = 136, BAR_H = 8;
+    protected static final int PROGRESS_X = 20, PROGRESS_Y = 76, PROGRESS_W = 136;
     protected static final int INPUT_X = 26, OUTPUT_X = 98, SLOT_Y = 40;
+    protected static final int UPGRADE_Y = 8;
     protected static final int SPEED_SLOT_X = 134, ENERGY_SLOT_X = 152;
 
     protected AkaishiSingleSlotMachineScreen(T menu, Inventory inv, Component title) {
@@ -36,11 +38,11 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         int y = this.topPos;
         // 不透明背景面板（vanilla 灰，含四周内凹边框）
         GuiWidgets.panel(gui, x, y, this.imageWidth, this.imageHeight);
-        // 机器槽框（输入/输出/升级，纹理无图案需自绘）
+        // 机器槽框（输入/输出/升级，纹理无图案需自绘；升级槽固定在面板右上角）
         GuiWidgets.slotBox(gui, x + INPUT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + OUTPUT_X, y + SLOT_Y);
-        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SLOT_Y);
-        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + SLOT_Y);
+        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
+        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
         // 玩家背包 + 快捷栏槽框（解决物品栏背景看不到槽位的问题）
         GuiWidgets.playerInventory(gui, x, y);
         // 赤能源条（红）
@@ -67,7 +69,7 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         gui.drawString(this.font, Component.translatable("gui.akaishi.single_slot.input"), INPUT_X, 30, TEXT, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.single_slot.output"), OUTPUT_X, 30, TEXT, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                SPEED_SLOT_X, SLOT_Y + 20, 0xFF707070, false);
+                SPEED_SLOT_X - 36, UPGRADE_Y + 4, 0xFF707070, false);
         // 玩家背包标题（背包槽起点 y=124，标签置于其上方 8px）
         gui.drawString(this.font, Component.translatable("container.inventory"), 8, 116, TEXT, false);
     }
@@ -82,14 +84,22 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.single_slot.progress",
                     menu.getProgress(), menu.getRequired()), mouseX, mouseY);
         }
+        // 输入/输出槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        else if (isHovering(INPUT_X, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiSingleSlotMachineMenu.MACHINE_SLOT_END - 2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.single_slot.input_tip"), mouseX, mouseY);
+        } else if (isHovering(OUTPUT_X, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiSingleSlotMachineMenu.MACHINE_SLOT_END - 1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.single_slot.output_tip"), mouseX, mouseY);
+        }
         // 升级槽悬停提示（倍率与组件数）
-        if (isHovering(SPEED_SLOT_X, SLOT_Y, 16, 16, mouseX, mouseY)) {
+        if (isHovering(SPEED_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
                             "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
         }
-        if (isHovering(ENERGY_SLOT_X, SLOT_Y, 16, 16, mouseX, mouseY)) {
+        if (isHovering(ENERGY_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
@@ -97,21 +107,8 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         }
     }
 
-    /** 大数值缩写（沿用活化器样式） */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 }

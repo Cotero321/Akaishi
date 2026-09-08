@@ -20,6 +20,10 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 2 + 输入/输出槽 3），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 3;
+    /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
+    public static final int SLOT_INPUT = MachineUpgradeSlots.SLOT_COUNT;
+    public static final int SLOT_OUT0 = MachineUpgradeSlots.SLOT_COUNT + 1;
+    public static final int SLOT_OUT1 = MachineUpgradeSlots.SLOT_COUNT + 2;
 
     private final ContainerData data;
     private final Container input;
@@ -41,9 +45,9 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         this.output = output;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 52));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 52));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
         // 输入槽：仅 7 种活化结晶可放入
         addSlot(new Slot(input, 0, 44, 52) {

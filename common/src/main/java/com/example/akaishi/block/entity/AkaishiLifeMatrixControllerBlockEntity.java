@@ -32,9 +32,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 生命转换矩阵控制器：类反应堆式矩阵主方块（3×3×3）。
- * 结构成型后以 45 倍速率集中转换：每 tick 最多 45 次，每次消耗 10M 赤能源、产出 10 生命能量。
+ * 围成结构（3×3×3）后以矩阵倍率集中转换（每 tick 最多 ModConfig.lifeMatrixConversionsPerTick 次，默认 45x）；
+ * 未成型不转换。每次消耗 10M 赤能源、产出 10 生命能量。
  * 赤能源经能量输入口（或直接管道）注入，生命能量经能量输出口（仅管道抽取）输出。
- * 数据槽：0=赤能源，1=赤能源容量，2=生命能量，3=生命能量容量，4=结构状态（与旧菜单共用布局）。
+ * 数据槽：0=赤能源，1=赤能源容量，2=生命能量，3=生命能量容量，4=结构状态（1=矩阵成型）。
  */
 public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
@@ -77,7 +78,7 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
             formed = valid;
             changed = true;
         }
-        // 成型后按配置速率集中转换
+        // 成型后按配置速率集中转换（未成型不转换）
         if (formed) {
             for (int i = 0; i < ModConfig.lifeMatrixConversionsPerTick; i++) {
                 if (!convert()) {

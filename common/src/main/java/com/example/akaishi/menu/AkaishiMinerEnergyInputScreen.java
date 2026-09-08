@@ -23,20 +23,7 @@ public class AkaishiMinerEnergyInputScreen extends AbstractContainerScreen<Akais
     }
 
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(java.util.Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override

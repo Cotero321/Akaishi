@@ -32,29 +32,9 @@ public class AkaishiEnergyCellScreen extends AbstractContainerScreen<AkaishiEner
         this.imageHeight = 166;
     }
 
-    /** 大数值单位缩写：>=1T 万亿，>=1B 十亿，>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值单位缩写（复用统一 EnergyFormat：>=1T/1B/1M/1K） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000_000_000L) {
-            return trim(v / 1.0e12) + "T";
-        }
-        if (v >= 1_000_000_000L) {
-            return trim(v / 1.0e9) + "B";
-        }
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    /** 保留 1 位小数，整数时去掉小数部分（2.0 → 2） */
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -110,11 +90,15 @@ public class AkaishiEnergyCellScreen extends AbstractContainerScreen<AkaishiEner
                     Component.translatable("gui.akaishi.energy", formatEnergy(menu.getEnergy()), formatEnergy(menu.getMaxEnergy())),
                     mouseX, mouseY);
         }
-        // 悬停在充能槽上时显示便携单元状态提示
+        // 悬停在充能槽上：空槽显示用途提示，有单元显示当前储能量（规则9）
         if (isHovering(CELL_SLOT_X, CELL_SLOT_Y, 18, 18, mouseX, mouseY)) {
-            gui.renderTooltip(this.font,
-                    Component.translatable("gui.akaishi.cell.portable", formatEnergy(menu.getCellEnergy()), formatEnergy(menu.getCellMaxEnergy())),
-                    mouseX, mouseY);
+            if (menu.slots.get(0).getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.cell.cell_slot_tip"), mouseX, mouseY);
+            } else {
+                gui.renderTooltip(this.font,
+                        Component.translatable("gui.akaishi.cell.portable", formatEnergy(menu.getCellEnergy()), formatEnergy(menu.getCellMaxEnergy())),
+                        mouseX, mouseY);
+            }
         }
     }
 }

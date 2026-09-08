@@ -1,0 +1,34 @@
+{
+  "name": "Transgene Factory and Exotic Crops",
+  "icon": "akaishi:akaishi_transgene_factory",
+  "category": "akaishi:life_machines",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_transgene_factory",
+      "text": "The $(bold)Transgene Factory$(0) rewrites creature genes into plantable exotic crops. Each operation uses $(4)5,000 Life Energy$(0), 1 Life Essence Solid and 1 Twisting Vine, taking about 5 seconds by default; the sequence must come from the specified creature and have at least $(4)50$(0) purity.$(br2)$(bold)Two recipes:$(0)$(li)Wither Skeleton gene + Wither Rose → Wither Vine Seed$(li)Blaze gene + Blaze Powder → Blaze Flower Seed$(br2)The output slot only exports and supports hoppers or item pipes; its Life Energy interface only receives energy. Exact recipes are also available in JEI."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_wither_seed",
+      "title": "Wither Vine: Repeatable Condensate",
+      "text": "Wither Vine Seeds can be planted on top of any sturdy block. Random ticks grow the plant through a root, lower stem, and upper tip; the tip then progresses from bare vine to young fruit to ripe fruit.$(br2)$(bold)Harvest:$(0) right-click a ripe tip for 1 Wither Condensate. The tip resets to bare vine and fruits again. Breaking the tip outside Creative also drops 1 Condensate; breaking the root or its support returns the seed.$(br2)It is a stable crop with repeatable harvests and recoverable seeds."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_blaze_seed",
+      "title": "Blaze Flower: Soul Sand Bloom",
+      "text": "Blaze Flower Seeds $(4)can only be planted on Soul Sand$(0). The root grows from sprout to seedling to maturity; when space above is clear, it grows a bloom that progresses from bud to opening bloom to full bloom.$(br2)$(bold)Harvest:$(0) a full bloom emits light level 12. Right-click it for 1 Blaze Condensate; it resets to a bud and can bloom again. Breaking a full bloom outside Creative also drops Condensate.$(br2)Note: breaking the root or removing its Soul Sand support never returns a seed, so Blaze Flower Seeds cannot be renewed by harvesting."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_samples",
+        "akaishi:life_purifier",
+        "akaishi:life_energy"
+      ],
+      "text": "First obtain high-purity genes from $(l:akaishi:life_samples)Life Samples$(/l), then prepare Solids and Life Energy with the $(l:akaishi:life_purifier)Life Purifier$(/l)."
+    }
+  ]
+}

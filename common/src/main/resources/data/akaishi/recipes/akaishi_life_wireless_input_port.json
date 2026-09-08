@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "PWP",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "W": { "item": "akaishi:akaishi_advanced_component" },
+    "P": { "item": "akaishi:akaishi_life_energy_pipe" },
+    "I": { "item": "minecraft:gold_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_life_wireless_input_port", "count": 1 }
+}

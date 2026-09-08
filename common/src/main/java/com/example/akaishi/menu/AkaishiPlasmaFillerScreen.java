@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.Locale;
 
 /**
  * 离子体填装器界面（vanilla 灰色风格，198 高）：
@@ -23,14 +22,14 @@ public class AkaishiPlasmaFillerScreen extends AbstractContainerScreen<AkaishiPl
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_wireless_terminal.png");
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TRACK_X = 70, TRACK_W = 86, BAR_H = 8;
-    private static final int PLASMA0_Y = 20;
-    private static final int PLASMA1_Y = 32;
-    private static final int PLASMA2_Y = 44;
-    private static final int SLOT_Y = 60;
-    private static final int PROGRESS_Y = 78;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，进度条与玩家背包之间空档） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 96;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 96;
+    private static final int PLASMA0_Y = 30;
+    private static final int PLASMA1_Y = 42;
+    private static final int PLASMA2_Y = 54;
+    private static final int SLOT_Y = 66;
+    private static final int PROGRESS_Y = 90;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排 y=8，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
 
     public AkaishiPlasmaFillerScreen(AkaishiPlasmaFillerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -38,32 +37,15 @@ public class AkaishiPlasmaFillerScreen extends AbstractContainerScreen<AkaishiPl
         this.imageHeight = 198;
     }
 
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String format(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long value, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + 20, y + 1, TEXT, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(value, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, value, max, color);
     }
 
     @Override
@@ -86,11 +68,11 @@ public class AkaishiPlasmaFillerScreen extends AbstractContainerScreen<AkaishiPl
         drawBar(gui, x, y + PROGRESS_Y, "gui.akaishi.filler.progress",
                 menu.getProgress(), ModConfig.fillerProcessTicks, 0xFFFFD030);
 
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方标签）
+        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override
@@ -137,6 +119,22 @@ public class AkaishiPlasmaFillerScreen extends AbstractContainerScreen<AkaishiPl
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 业务槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(44, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiPlasmaFillerMenu.SLOT_ROD).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.plasma_filler.rod_tip"), mouseX, mouseY);
+        }
+        int[] outputSlots = {AkaishiPlasmaFillerMenu.SLOT_OUT0, AkaishiPlasmaFillerMenu.SLOT_OUT1, AkaishiPlasmaFillerMenu.SLOT_OUT2};
+        int[] outputXs = {80, 116, 152};
+        for (int i = 0; i < outputSlots.length; i++) {
+            if (isHovering(outputXs[i], SLOT_Y, 16, 16, mouseX, mouseY)
+                    && menu.slots.get(outputSlots[i]).getItem().isEmpty()) {
+                gui.renderTooltip(this.font,
+                        Component.translatable("gui.akaishi.plasma_filler.output_tip"), mouseX, mouseY);
+                break;
+            }
         }
     }
 }

@@ -270,9 +270,11 @@ public final class ModItems {
     public static RegistrySupplier<Item> activatedDragonComponent;
     public static RegistrySupplier<Item> activatedUltimateMixtureComponent;
 
-    // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤）——
+    // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花）——
     public static RegistrySupplier<Item> akaishiWitherSeed;
     public static RegistrySupplier<Item> akaishiWitherCondensate;
+    public static RegistrySupplier<Item> akaishiBlazeSeed;
+    public static RegistrySupplier<Item> akaishiBlazeCondensate;
 
     // —— 无线域（AkaishiWirelessItems）——
     public static RegistrySupplier<Item> akaishiWirelessComponent;
@@ -417,6 +419,8 @@ public final class ModItems {
         // —— 转基因域 ——
         akaishiWitherSeed = AkaishiTransgeneItems.akaishiWitherSeed;
         akaishiWitherCondensate = AkaishiTransgeneItems.akaishiWitherCondensate;
+        akaishiBlazeSeed = AkaishiTransgeneItems.akaishiBlazeSeed;
+        akaishiBlazeCondensate = AkaishiTransgeneItems.akaishiBlazeCondensate;
 
         // —— 无线域 ——
         akaishiWirelessComponent = AkaishiWirelessItems.akaishiWirelessComponent;

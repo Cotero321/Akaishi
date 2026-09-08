@@ -49,15 +49,15 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
-        // 坐标落在存储浮层面板带内（x80..98 / y24..42），浮层打开时必须失活让位 → OverlayHidingSlot）
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 86, 30,
+        // 升级槽（速度/能量各一格，固定面板右上角，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 坐标落在存储浮层面板带内（x134..152 / y8..26），浮层打开时必须失活让位 → OverlayHidingSlot）
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
                 () -> linkState != null && linkState.open));
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 104, 30,
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
         // 器官输入槽：仅接受器官物品（槽位匹配在服务端手术开始时校验）
-        addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.ORGAN_SLOT, 120, 28,
+        addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.ORGAN_SLOT, 108, 28,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -65,7 +65,7 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
             }
         });
         // 固态物槽：仅接受生命固态物
-        addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.SOLID_SLOT, 120, 54,
+        addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.SOLID_SLOT, 108, 54,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {

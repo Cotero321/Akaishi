@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.block.entity.AkaishiReactorFuelPortBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -40,5 +41,19 @@ public class AkaishiReactorFuelPortScreen extends AbstractContainerScreen<Akaish
         // 缓冲槽下方提示：燃料罐自动供给控制器、空罐自动回收（背包区上方空档）
         Component hint = Component.translatable("gui.akaishi.reactor.fuel_port_hint");
         gui.drawString(this.font, hint, this.leftPos + 8, this.topPos + 74, 0xFF707070, false);
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+
+        // 27 个燃料罐缓冲槽：空槽提示用途（每格限 1 罐，仅燃料罐可入内）
+        for (int i = 0; i < AkaishiReactorFuelPortBlockEntity.BUFFER_SLOTS; i++) {
+            var slot = this.menu.slots.get(i);
+            if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.fuel_port.slot"), mouseX, mouseY);
+                break;
+            }
+        }
     }
 }

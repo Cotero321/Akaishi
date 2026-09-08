@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiMinerControllerBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -37,20 +38,7 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
     }
 
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(java.util.Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -182,6 +170,14 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
             gui.renderTooltip(this.font, Component.translatable(overPrecise
                     ? "gui.akaishi.miner.mode_tip_precise"
                     : "gui.akaishi.miner.mode_tip_normal"), mouseX, mouseY);
+        }
+        // 产物暂存空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，规则 9）
+        for (int i = 0; i < AkaishiMinerControllerBlockEntity.OUTPUT_SLOTS; i++) {
+            var slot = menu.slots.get(i);
+            if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.miner.output_tip"), mouseX, mouseY);
+                break;
+            }
         }
     }
 }

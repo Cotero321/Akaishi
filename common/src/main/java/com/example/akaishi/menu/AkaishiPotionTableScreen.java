@@ -24,9 +24,15 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
     private static final int BTN_X = 8, BTN_W = 44, BTN_H = 20, BTN_STEP = 26;
     /** 制作进度条 */
     private static final int PROGRESS_X = 56, PROGRESS_Y = 76, PROGRESS_W = 96, PROGRESS_H = 8;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，右上能量条下方空位；标签置于槽位上方） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3；标签置于槽位下方） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 存储开关按钮（移置左上方，避免与右上角升级槽重叠；仅在相邻存储库时显示，规则 3） */
+    private static final int STORE_X = 8, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
+    /** 机器业务槽的 Menu 槽位索引（升级槽 2 后的样本/固态/输出，空槽 tooltip 用） */
+    private static final int SAMPLE_SLOT_INDEX = 2;
+    private static final int SOLID_SLOT_INDEX = SAMPLE_SLOT_INDEX + 1;
+    private static final int OUTPUT_SLOT_INDEX = SAMPLE_SLOT_INDEX + 2;
 
     private static final int COLOR_BG = 0xFFC6C6C6;
     private static final int COLOR_LINE = 0xFF373737;
@@ -63,14 +69,10 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
 
         gui.fill(x + 6, y + 14, x + PANEL_W - 6, y + PANEL_H - 7, 0xFFB0B0B0);
 
-        // 能量条
-        long energy = menu.getLifeEnergy();
-        long cap = Math.max(1, menu.getLifeMax());
-        int w = (int) (ENERGY_W * Math.max(0, Math.min(energy, cap)) / cap);
-        gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + ENERGY_W, y + ENERGY_Y + ENERGY_H, COLOR_LINE);
-        if (w > 0) {
-            gui.fill(x + ENERGY_X, y + ENERGY_Y, x + ENERGY_X + w, y + ENERGY_Y + ENERGY_H, COLOR_ENERGY);
-        }
+        // 能量条（绿，轨道常驻占位，无论能量是否为 0 均显示；规则 4）
+        GuiWidgets.track(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H);
+        GuiWidgets.bar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, ENERGY_H,
+                menu.getLifeEnergy(), menu.getLifeMax(), COLOR_ENERGY);
 
         // 制作进度条
         int p = (int) (PROGRESS_W * menu.getProgress() / 100.0F);
@@ -89,9 +91,9 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
             }
             drawSlotBox(gui, x + slot.x, y + slot.y);
         }
-        // 升级槽标签（槽位框已由上方循环自绘）
+        // 升级槽标签（槽位框已由上方循环自绘；置于槽位下方，避开顶部留白）
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
+                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
 
         // 存储联动：按钮 + 浮层
         if (menu.linkState != null) {
@@ -104,10 +106,11 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
 
     private void drawStorageButton(GuiGraphics gui, int x, int y) {
         boolean open = menu.linkState.open;
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 16, open ? 0xFF5B8731 : 0xFFB0B0B0);
-        gui.fill(x + PANEL_W - 40, y + 6, x + PANEL_W - 8, y + 7, COLOR_LINE);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + STORE_H,
+                open ? 0xFF5B8731 : 0xFFB0B0B0);
+        gui.fill(x + STORE_X, y + STORE_Y, x + STORE_X + STORE_W, y + STORE_Y + 1, COLOR_LINE);
         gui.drawString(this.font, Component.translatable("gui.akaishi.storage_link.open"),
-                x + PANEL_W - 38, y + 7, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
+                x + STORE_X + 2, y + STORE_Y + 1, open ? 0xFF2E7D32 : 0xFF3F3F3F, false);
     }
 
     private void drawStorageOverlay(GuiGraphics gui, int x, int y) {
@@ -213,10 +216,26 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
                         mouseX, mouseY);
             }
         }
+        // 样本/固态/输出空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名；存储浮层打开时其位置被覆盖，跳过）
+        if (menu.linkState == null || !menu.linkState.open) {
+            if (isHovering(56, 30, 16, 16, mouseX, mouseY)
+                    && menu.slots.get(SAMPLE_SLOT_INDEX).getItem().isEmpty()) {
+                gui.renderTooltip(this.font,
+                        Component.translatable("gui.akaishi.potion_table.sample_tip"), mouseX, mouseY);
+            } else if (isHovering(56, 56, 16, 16, mouseX, mouseY)
+                    && menu.slots.get(SOLID_SLOT_INDEX).getItem().isEmpty()) {
+                gui.renderTooltip(this.font,
+                        Component.translatable("gui.akaishi.potion_table.solid_tip"), mouseX, mouseY);
+            } else if (isHovering(116, 43, 16, 16, mouseX, mouseY)
+                    && menu.slots.get(OUTPUT_SLOT_INDEX).getItem().isEmpty()) {
+                gui.renderTooltip(this.font,
+                        Component.translatable("gui.akaishi.potion_table.output_tip"), mouseX, mouseY);
+            }
+        }
         // 存储按钮悬停提示
         if (menu.linkState != null
-                && mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+                && mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.storage_link.tip",
                             Component.translatable(menu.linkState.nameKey)), mouseX, mouseY);
@@ -226,8 +245,8 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && menu.linkState != null) {
-            if (mouseX >= this.leftPos + PANEL_W - 40 && mouseX < this.leftPos + PANEL_W - 8
-                    && mouseY >= this.topPos + 6 && mouseY < this.topPos + 16) {
+            if (mouseX >= this.leftPos + STORE_X && mouseX < this.leftPos + STORE_X + STORE_W
+                    && mouseY >= this.topPos + STORE_Y && mouseY < this.topPos + STORE_Y + STORE_H) {
                 menu.linkState.open = !menu.linkState.open;
                 return true;
             }

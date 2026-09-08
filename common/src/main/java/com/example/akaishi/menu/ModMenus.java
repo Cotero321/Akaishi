@@ -32,6 +32,8 @@ import com.example.akaishi.block.entity.AkaishiDecayPurifierBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeMatrixControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeActivatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeCentrifugeBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeEnergyCellBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeEnergyCellSerializerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemReconstructorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiSingleSlotMachineBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPlantCultivatorBlockEntity;
@@ -58,6 +60,7 @@ import com.example.akaishi.block.entity.AkaishiPurifierBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPurifierMatrixControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiUpgradeStationBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import dev.architectury.registry.menu.MenuRegistry;
@@ -89,8 +92,12 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiEnergyGeneratorMenu>> CHISHI_ENERGY_GENERATOR;
     /** 赤能源储存串联器（多方块主方块）菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiEnergyCellSerializerMenu>> CHISHI_ENERGY_CELL_SERIALIZER;
-    /** 生命转换菜单类型（生命聚合转换器 / 生命转换架构共用） */
+    /** 生命转换菜单类型（生命转换矩阵控制器） */
     public static RegistrySupplier<MenuType<AkaishiLifeConverterMenu>> CHISHI_LIFE_CONVERTER;
+    /** 生命能量储存器（分级电池）菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiLifeEnergyCellMenu>> CHISHI_LIFE_ENERGY_CELL;
+    /** 生命储存串联器（3×3×3 多方块主方块）菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiLifeEnergyCellSerializerMenu>> CHISHI_LIFE_ENERGY_CELL_SERIALIZER;
     /** 赤石能量聚合器菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiEnergyAggregatorMenu>> CHISHI_ENERGY_AGGREGATOR;
     /** 赤石装备打造器菜单类型 */
@@ -190,6 +197,10 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiWirelessPortMenu>> CHISHI_WIRELESS_PORT;
     /** 无线能源便捷终端菜单类型（手持物品，无方块实体） */
     public static RegistrySupplier<MenuType<AkaishiWirelessPortableTerminalMenu>> CHISHI_WIRELESS_PORTABLE_TERMINAL;
+    /** 无线生命能量终端菜单类型（终端方块主界面，四页互斥，赤版生命镜像） */
+    public static RegistrySupplier<MenuType<AkaishiLifeWirelessTerminalMenu>> CHISHI_LIFE_WIRELESS_TERMINAL;
+    /** 无线生命能量输入口/输出口菜单类型（共用，赤版生命镜像） */
+    public static RegistrySupplier<MenuType<AkaishiLifeWirelessPortMenu>> CHISHI_LIFE_WIRELESS_PORT;
     /** 聚变控制器菜单类型（三页：运行情况/燃料/热量） */
     public static RegistrySupplier<MenuType<AkaishiFusionControllerMenu>> CHISHI_FUSION_CONTROLLER;
     /** 聚变物品输入/输出口菜单类型（共用，27 槽缓冲） */
@@ -289,6 +300,38 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_converter"), () -> lifeType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(lifeType, AkaishiLifeConverterScreen::new));
+
+        // 生命能量储存器（单方块电池）：无机器槽位，同步生命能量/容量（long 4 槽）
+        MenuType<AkaishiLifeEnergyCellMenu> lifeCellType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiLifeEnergyCellBlockEntity cell) {
+                return new AkaishiLifeEnergyCellMenu(syncId, inv, cell.data());
+            }
+            return AkaishiLifeEnergyCellMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_LIFE_ENERGY_CELL = (RegistrySupplier<MenuType<AkaishiLifeEnergyCellMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_energy_cell"), () -> lifeCellType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeCellType, AkaishiLifeEnergyCellScreen::new));
+
+        // 生命储存串联器：无容器槽位，同步总生命能量/总容量（long 4 槽）+ 结构状态
+        MenuType<AkaishiLifeEnergyCellSerializerMenu> lifeSerializerType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiLifeEnergyCellSerializerBlockEntity serializer) {
+                return new AkaishiLifeEnergyCellSerializerMenu(syncId, inv, serializer.data());
+            }
+            return AkaishiLifeEnergyCellSerializerMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_LIFE_ENERGY_CELL_SERIALIZER = (RegistrySupplier<MenuType<AkaishiLifeEnergyCellSerializerMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_energy_cell_serializer"), () -> lifeSerializerType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeSerializerType, AkaishiLifeEnergyCellSerializerScreen::new));
 
         // 赤石能量聚合器
         MenuType<AkaishiEnergyAggregatorMenu> aggregatorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -1123,6 +1166,41 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_wireless_port"), () -> wirelessPortType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(wirelessPortType, AkaishiWirelessPortScreen::new));
+
+        // ===== 无线生命能量（赤版生命镜像，布局/槽位与赤版无线一致） =====
+        // 终端（外墙主方块）：数据槽布局与赤版无线终端相同；网络缓冲 = 方块坐标 + 初始页
+        MenuType<AkaishiLifeWirelessTerminalMenu> lifeTerminalType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            int page = buf.readInt();
+            Level level = inv.player.level();
+            AkaishiLifeWirelessTerminalMenu menu = level.getBlockEntity(pos) instanceof AkaishiLifeWirelessTerminalBlockEntity t
+                    ? new AkaishiLifeWirelessTerminalMenu(syncId, inv, t)
+                    : AkaishiLifeWirelessTerminalMenu.emptyMenu(syncId, inv);
+            menu.setInitialPage(page);
+            return menu;
+        });
+        CHISHI_LIFE_WIRELESS_TERMINAL = (RegistrySupplier<MenuType<AkaishiLifeWirelessTerminalMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_wireless_terminal"), () -> lifeTerminalType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeTerminalType, AkaishiLifeWirelessTerminalScreen::new));
+
+        // 端口（输入口/输出口共用）：数据槽/无机器槽布局与赤版口一致，无额外缓冲
+        MenuType<AkaishiLifeWirelessPortMenu> lifeWirelessPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof IWirelessPortHost host) {
+                return new AkaishiLifeWirelessPortMenu(syncId, inv, host);
+            }
+            return new AkaishiLifeWirelessPortMenu(syncId, inv,
+                    new SimpleContainerData(com.example.akaishi.block.entity.AkaishiLifeWirelessInputPortBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_LIFE_WIRELESS_PORT = (RegistrySupplier<MenuType<AkaishiLifeWirelessPortMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_wireless_port"), () -> lifeWirelessPortType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeWirelessPortType, AkaishiLifeWirelessPortScreen::new));
 
         // 便捷终端（手持物品）：无方块实体，服务端每 tick broadcastChanges 扫背包身份卡刷新数据槽
         MenuType<AkaishiWirelessPortableTerminalMenu> portableType = MenuRegistry.ofExtended((syncId, inv, buf) ->

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "akaishi:block/akaishi_blaze_flower_root_0"
+    },
+    "age=1": {
+      "model": "akaishi:block/akaishi_blaze_flower_root_1"
+    },
+    "age=2": {
+      "model": "akaishi:block/akaishi_blaze_flower_root_2"
+    }
+  }
+}

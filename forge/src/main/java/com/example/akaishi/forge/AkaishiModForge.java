@@ -6,10 +6,11 @@ import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
+import com.example.akaishi.block.AkaishiTransgeneBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
-import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiFluidPipeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
@@ -207,10 +208,12 @@ public final class AkaishiModForge {
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */
     private void onClientSetup(FMLClientSetupEvent event) {
         RenderTypeRegistry.register(RenderType.cutout(), AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER.get());
-        // 凋零藤根/茎为带透明像素的十字植物，须注册 cutout 否则透明区呈黑色
+        // 凋零藤和烈焰花为带透明像素的十字植物，须注册 cutout 否则透明区呈黑色
         RenderTypeRegistry.register(RenderType.cutout(),
-                ModBlocks.CHISHI_WITHER_ROOT.get(),
-                ModBlocks.CHISHI_WITHER_STEM.get());
+                AkaishiTransgeneBlocks.CHISHI_WITHER_ROOT.get(),
+                AkaishiTransgeneBlocks.CHISHI_WITHER_STEM.get(),
+                AkaishiTransgeneBlocks.CHISHI_BLAZE_FLOWER_ROOT.get(),
+                AkaishiTransgeneBlocks.CHISHI_BLAZE_BLOOM.get());
         // 衰竭木门/活板门贴图含镂空透明区，须注册 cutout，否则透明部分渲染为黑色
         RenderTypeRegistry.register(RenderType.cutout(),
                 AkaishiDecayBlocks.CHISHI_DECAY_DOOR.get(),
@@ -222,7 +225,8 @@ public final class AkaishiModForge {
                 AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get(),
                 AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get(),
                 AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get(),
-                AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get());
+                AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get(),
+                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS.get());
         // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
         // 钻机钻头：结构成型时从钻头底面打出向下的信标光束（客户端渲染器）

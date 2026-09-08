@@ -21,6 +21,10 @@ public class AkaishiFuelCannerScreen extends AbstractContainerScreen<AkaishiFuel
     /** 燃料名称文字行（进度条下方、空罐/满罐槽位上方） */
     private static final int FUEL_NAME_Y = 26;
 
+    /** 槽位坐标（与 Menu 槽位一致，供 tooltip 定位） */
+    private static final int INPUT_SLOT_X = 62, INPUT_SLOT_Y = 35;
+    private static final int OUTPUT_SLOT_X = 116, OUTPUT_SLOT_Y = 35;
+
     public AkaishiFuelCannerScreen(AkaishiFuelCannerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.imageWidth = 176;
@@ -28,12 +32,9 @@ public class AkaishiFuelCannerScreen extends AbstractContainerScreen<AkaishiFuel
     }
 
     private void drawBar(GuiGraphics gui, int x, int y, long energy, long max, int color) {
-        long clamped = Math.max(0, Math.min(energy, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (BAR_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x, y, x + barWidth, y + BAR_H, color);
-        }
+        // 轨道先画、再填充，保证液体为 0 时仍占位不缺条（规则4）
+        GuiWidgets.track(gui, x, y, BAR_W, BAR_H);
+        GuiWidgets.bar(gui, x, y, BAR_W, BAR_H, energy, max, color);
     }
 
     @Override
@@ -81,6 +82,17 @@ public class AkaishiFuelCannerScreen extends AbstractContainerScreen<AkaishiFuel
                     Component.translatable("gui.akaishi.fluid",
                             menu.getFluidAmount(), menu.getFluidMax()),
                     mouseX, mouseY);
+        }
+        // 业务槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(INPUT_SLOT_X, INPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(0).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.fuel_canner.input_tip"), mouseX, mouseY);
+        }
+        if (isHovering(OUTPUT_SLOT_X, OUTPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.fuel_canner.output_tip"), mouseX, mouseY);
         }
     }
 }

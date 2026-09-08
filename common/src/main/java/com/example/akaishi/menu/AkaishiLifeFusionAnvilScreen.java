@@ -61,6 +61,22 @@ public class AkaishiLifeFusionAnvilScreen extends AbstractContainerScreen<Akaish
     }
 
     @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        // 机器槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复）
+        if (isHovering(GEAR_X, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(0).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.life_fusion.armor_tip"), mouseX, mouseY);
+        } else if (isHovering(INGOT_X, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.life_fusion.ingot_tip"), mouseX, mouseY);
+        } else if (isHovering(OUTPUT_X, SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.life_fusion.output_tip"), mouseX, mouseY);
+        }
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0
                 && mouseX >= this.leftPos + FUSE_BTN_X && mouseX < this.leftPos + FUSE_BTN_X + FUSE_BTN_W

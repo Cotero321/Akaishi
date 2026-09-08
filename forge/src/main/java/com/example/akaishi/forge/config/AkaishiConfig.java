@@ -274,7 +274,7 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.LongValue GEN_ENERGY_OUTPUT_BUFFER;
     public static final ForgeConfigSpec.LongValue FUSION_ENERGY_OUTPUT_BUFFER;
     public static final ForgeConfigSpec.LongValue REACTOR_ENERGY_OUTPUT_BUFFER;
-    public static final ForgeConfigSpec.LongValue LIFE_ENERGY_CELL_CAPACITY;
+    public static final ForgeConfigSpec.LongValue LIFE_ENERGY_CELL_SERIALIZER_CAPACITY;
     public static final ForgeConfigSpec.LongValue PLASMA_TANK_CAPACITY;
 
     // ---- 培养机提纯与分馏机 ----
@@ -799,8 +799,8 @@ public final class AkaishiConfig {
                 .defineInRange("fusionEnergyOutputBufferCapacity", 20_000_000_000L, 0L, Long.MAX_VALUE);
         REACTOR_ENERGY_OUTPUT_BUFFER = b.comment("反应堆能量输出口缓冲容量")
                 .defineInRange("reactorEnergyOutputBufferCapacity", 5_000_000_000L, 0L, Long.MAX_VALUE);
-        LIFE_ENERGY_CELL_CAPACITY = b.comment("生命能量电池：容量")
-                .defineInRange("lifeEnergyCellLifeCapacity", 1_000_000L, 0L, Long.MAX_VALUE);
+        LIFE_ENERGY_CELL_SERIALIZER_CAPACITY = b.comment("生命储存串联器：自身基础容量（成型后总容量 = 该值 + 26 台外壳储存器容量之和；容量分级见各档储存器）")
+                .defineInRange("lifeEnergyCellSerializerBaseCapacity", 2_000_000L, 0L, Long.MAX_VALUE);
         PLASMA_TANK_CAPACITY = b.comment("等离子储罐：容量 (mb)")
                 .defineInRange("plasmaTankCapacity", 16_000L, 0L, Long.MAX_VALUE);
         b.pop();

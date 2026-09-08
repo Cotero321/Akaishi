@@ -18,17 +18,20 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_energy_cell.png");
 
-    /** 赤能源条区域（对齐贴图框 y=24..32，三条间距 12） */
-    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 24, BAR_W = 136, BAR_H = 8;
+    /** 赤能源条区域（对齐贴图框，三条间距 12；整体下移 2px 避开顶部并排升级槽） */
+    private static final int CHISHI_BAR_X = 20, CHISHI_BAR_Y = 26, BAR_W = 136, BAR_H = 8;
     /** 输出液体条区域 */
-    private static final int FLUID_BAR_Y = 36;
+    private static final int FLUID_BAR_Y = 38;
     /** 液化进度条区域 */
-    private static final int PROGRESS_Y = 48;
+    private static final int PROGRESS_Y = 50;
     /** 机器槽位数量（升级槽 2 + 输入/固态物槽 2，贴图无槽位图形需自绘框） */
     private static final int MACHINE_SLOTS = 4;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 58;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 58;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排 y=8 起，规则3） */
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 输入/固态物槽 GUI 位置（与 Menu 槽位坐标一致） */
+    private static final int INPUT_SLOT_X = 116, INPUT_SLOT_Y = 58;
+    private static final int SOLID_SLOT_X = 62, SOLID_SLOT_Y = 58;
     /** 液体条通用颜色（产物类型随输入物品而异，统一青色） */
     private static final int FLUID_COLOR = 0xFF40C8FF;
 
@@ -38,22 +41,9 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
         this.imageHeight = 166;
     }
 
-    /** 大数值缩写：>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     /** 条内左侧固定标签区宽度（px），标签置于轨道左侧，填充从轨道右端开始避免覆盖文字 */
@@ -65,12 +55,7 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
         int trackX = x + LABEL_W;
         int trackW = BAR_W - LABEL_W;
         GuiWidgets.track(gui, trackX, y, trackW, BAR_H);
-        long clamped = Math.max(0, Math.min(value, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (trackW * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(trackX, y, trackX + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, trackX, y, trackW, BAR_H, value, max, color);
     }
 
     @Override
@@ -136,6 +121,17 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 材料输入槽/生命固态物槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
+        if (isHovering(INPUT_SLOT_X, INPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiEnergyLiquefierMenu.MACHINE_SLOT_END - 2).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.energy_liquefier.input_tip"), mouseX, mouseY);
+        }
+        if (isHovering(SOLID_SLOT_X, SOLID_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiEnergyLiquefierMenu.MACHINE_SLOT_END - 1).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.energy_liquefier.solid_tip"), mouseX, mouseY);
         }
     }
 }

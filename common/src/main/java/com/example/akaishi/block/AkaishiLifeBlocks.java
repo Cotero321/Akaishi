@@ -1,6 +1,7 @@
 package com.example.akaishi.block;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.energy.LifeEnergyCellTier;
 import com.example.akaishi.energy.LifeEnergyType;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -25,8 +26,14 @@ public final class AkaishiLifeBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_AGGREGATION_CONVERTER = null;
     /** 生命转换架构（3×3×3 多方块主方块） */
     public static RegistrySupplier<Block> CHISHI_LIFE_CONVERSION_ARCHITECTURE = null;
-    /** 生命能量储存器（纯生命能量存储） */
+    /** 生命能量储存器·基础（纯生命能量存储，保留旧 id） */
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL = null;
+    /** 生命能量储存器·高级 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL_ADVANCED = null;
+    /** 生命能量储存器·超级 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL_SUPER = null;
+    /** 生命储存串联器（3×3×3 多方块主方块，聚合 26 台储存器容量） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL_SERIALIZER = null;
     /** 创造生命能量储存原件（无限输出测试方块） */
     public static RegistrySupplier<Block> CHISHI_CREATIVE_LIFE_CELL = null;
     /** 生命能量提纯器（赤能源驱动，1000 生命能量 + 10M 赤能源 → 1 生命能量固态物） */
@@ -58,6 +65,32 @@ public final class AkaishiLifeBlocks {
     /** 转基因工厂：凋零骷髅基因（纯度≥50）+ 缠怨藤 + 凋零玫瑰 + 固态物 → 凋零藤种子 */
     public static RegistrySupplier<Block> CHISHI_TRANSGENE_FACTORY = null;
 
+    // ===== 生命无线终端方块族（镜像赤能源无线族；能量走生命体系黄/白/金配色） =====
+    /** 生命无线终端外壳：生命无线终端多方块（5×5×5）墙面填充方块（纯结构判定，无方块实体） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_SHELL = null;
+    /** 生命无线终端结构玻璃：半透明观察窗，可替代生命无线终端外壳 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS = null;
+    /** 生命无线终端方块：外墙主方块（成型后为生命无线网络的能量中枢与 GUI 入口） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_TERMINAL = null;
+    /** 生命无线终端核心：内腔中心方块（恰 1 个），拆掉结构即失效 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_CORE = null;
+    /** 生命无线终端控制器：外墙纯结构件（无 GUI 无 BE） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_CONTROLLER = null;
+    /** 生命无线输入口：生命能量管道 → 生命无线网络的发送端（仅接收，不可抽取） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_INPUT_PORT = null;
+    /** 生命无线输出口：生命无线网络 → 生命能量管道的接收端（纯发电，仅可抽取） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_OUTPUT_PORT = null;
+    /** 生命无线跨维组件：内腔至少一个时解锁跨维传输 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_DIM_BRIDGE = null;
+    /** 生命无线区块加载构架：维持终端与已认证端口所在区块 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_CHUNK_LOADER = null;
+    /** 生命无线区块加载范围组件：将加载范围扩展为 3×3 区块 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_CHUNK_RANGE = null;
+    /** 生命无线输入损耗抑制组件 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_INPUT_LOSS = null;
+    /** 生命无线输出损耗抑制组件 */
+    public static RegistrySupplier<Block> CHISHI_LIFE_WIRELESS_OUTPUT_LOSS = null;
+
     private AkaishiLifeBlocks() {
     }
 
@@ -70,8 +103,16 @@ public final class AkaishiLifeBlocks {
                 AkaishiLifeAggregationConverterBlock::new);
         CHISHI_LIFE_CONVERSION_ARCHITECTURE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_conversion_architecture",
                 AkaishiLifeConversionArchitectureBlock::new);
+        // 生命能量储存器：基础（保留旧 id）/ 高级 / 超级，三档镜像赤能源储存单元分级
         CHISHI_LIFE_ENERGY_CELL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_cell",
-                AkaishiLifeEnergyCellBlock::new);
+                () -> new AkaishiLifeEnergyCellBlock(LifeEnergyCellTier.BASIC));
+        CHISHI_LIFE_ENERGY_CELL_ADVANCED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_cell_advanced",
+                () -> new AkaishiLifeEnergyCellBlock(LifeEnergyCellTier.ADVANCED));
+        CHISHI_LIFE_ENERGY_CELL_SUPER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_cell_super",
+                () -> new AkaishiLifeEnergyCellBlock(LifeEnergyCellTier.SUPER));
+        // 生命储存串联器（3×3×3 多方块主方块）
+        CHISHI_LIFE_ENERGY_CELL_SERIALIZER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_cell_serializer",
+                AkaishiLifeEnergyCellSerializerBlock::new);
         // 创造模式能量源（测试用，无限输出）：生命能量版（赤能源版在 AkaishiEnergyBlocks）
         CHISHI_CREATIVE_LIFE_CELL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "creative_life_energy_cell",
                 () -> new CreativeEnergySourceBlock(LifeEnergyType.INSTANCE));
@@ -92,5 +133,30 @@ public final class AkaishiLifeBlocks {
         CHISHI_POTION_CABINET = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_potion_cabinet", AkaishiPotionCabinetBlock::new);
         CHISHI_SAMPLE_VAULT = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_sample_vault", AkaishiSampleVaultBlock::new);
         CHISHI_TRANSGENE_FACTORY = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_transgene_factory", AkaishiTransgeneFactoryBlock::new);
+        // ===== 生命无线终端方块族（5×5×5 多方块，镜像赤能源无线族；结构玻璃复用 AkaishiStructureGlassBlock） =====
+        CHISHI_LIFE_WIRELESS_SHELL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_shell",
+                AkaishiLifeWirelessShellBlock::new);
+        CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_structure_glass",
+                AkaishiStructureGlassBlock::new);
+        CHISHI_LIFE_WIRELESS_TERMINAL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_terminal",
+                AkaishiLifeWirelessTerminalBlock::new);
+        CHISHI_LIFE_WIRELESS_CORE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_core",
+                AkaishiLifeWirelessCoreBlock::new);
+        CHISHI_LIFE_WIRELESS_CONTROLLER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_controller",
+                AkaishiLifeWirelessControllerBlock::new);
+        CHISHI_LIFE_WIRELESS_INPUT_PORT = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_input_port",
+                AkaishiLifeWirelessInputPortBlock::new);
+        CHISHI_LIFE_WIRELESS_OUTPUT_PORT = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_output_port",
+                AkaishiLifeWirelessOutputPortBlock::new);
+        CHISHI_LIFE_WIRELESS_DIM_BRIDGE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_dim_bridge",
+                AkaishiLifeWirelessDimBridgeBlock::new);
+        CHISHI_LIFE_WIRELESS_CHUNK_LOADER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_chunk_loader",
+                AkaishiLifeWirelessChunkLoaderBlock::new);
+        CHISHI_LIFE_WIRELESS_CHUNK_RANGE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_chunk_range",
+                AkaishiLifeWirelessChunkRangeBlock::new);
+        CHISHI_LIFE_WIRELESS_INPUT_LOSS = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_input_loss",
+                AkaishiLifeWirelessInputLossBlock::new);
+        CHISHI_LIFE_WIRELESS_OUTPUT_LOSS = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_wireless_output_loss",
+                AkaishiLifeWirelessOutputLossBlock::new);
     }
 }

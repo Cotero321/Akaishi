@@ -20,6 +20,11 @@ public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 2 + 反应棒 1 + 输出槽 3），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 4;
+    /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
+    public static final int SLOT_ROD = MachineUpgradeSlots.SLOT_COUNT;
+    public static final int SLOT_OUT0 = MachineUpgradeSlots.SLOT_COUNT + 1;
+    public static final int SLOT_OUT1 = MachineUpgradeSlots.SLOT_COUNT + 2;
+    public static final int SLOT_OUT2 = MachineUpgradeSlots.SLOT_COUNT + 3;
 
     private final ContainerData data;
     private final Container rods;
@@ -41,31 +46,31 @@ public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
         this.output = output;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；进度条下方空档）
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 96));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 96));
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
 
         // 反应棒槽：仅聚变反应棒可放入
-        addSlot(new Slot(rods, 0, 44, 60) {
+        addSlot(new Slot(rods, 0, 44, 66) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.is(ModItems.fusionRod.get());
             }
         });
         // 燃料棒输出槽只读
-        addSlot(new Slot(output, 0, 80, 60) {
+        addSlot(new Slot(output, 0, 80, 66) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         });
-        addSlot(new Slot(output, 1, 116, 60) {
+        addSlot(new Slot(output, 1, 116, 66) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         });
-        addSlot(new Slot(output, 2, 152, 60) {
+        addSlot(new Slot(output, 2, 152, 66) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;

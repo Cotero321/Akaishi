@@ -144,9 +144,55 @@ public final class ModCreativeTabs {
                                     if (AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE != null) {
                                         output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE.get()));
                                     }
-                                    // 生命能量储存器（纯生命能量存储）
+                                    // 生命能量储存器（基础/高级/超级三档）+ 生命储存串联器
                                     if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL != null) {
                                         output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_ADVANCED != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_ADVANCED.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SUPER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SUPER.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SERIALIZER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SERIALIZER.get()));
+                                    }
+                                    // 生命能量无线终端方块族（5×5×5 无线网络，镜像赤能源无线体系）
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_SHELL != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_SHELL.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CORE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CORE.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CONTROLLER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CONTROLLER.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_TERMINAL != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_TERMINAL.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_PORT.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_PORT != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_PORT.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_DIM_BRIDGE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_DIM_BRIDGE.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_LOADER != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_LOADER.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_RANGE != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_RANGE.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_LOSS != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_LOSS.get()));
+                                    }
+                                    if (AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_LOSS != null) {
+                                        output.accept(new ItemStack(AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_LOSS.get()));
                                     }
                                     // 赤石锭 + 赤红升级模板
                                     if (ModItems.akaishiIngot != null) {
@@ -626,12 +672,23 @@ public final class ModCreativeTabs {
                                     output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_SAND.get()));
                                     output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_GRAVEL.get()));
                                     output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_GRASS_BLOCK.get()));
+                                    // 衰变进化塔（衰竭净化机器：将衰竭产物净化回可用状态）
+                                    if (AkaishiDecayBlocks.CHISHI_DECAY_PURIFIER != null) {
+                                        output.accept(new ItemStack(AkaishiDecayBlocks.CHISHI_DECAY_PURIFIER.get()));
+                                    }
                                     // 凋零藤种子（转基因工厂产物）+ 成熟收获物：凋零凝聚体
                                     if (ModItems.akaishiWitherSeed != null) {
                                         output.accept(new ItemStack(ModItems.akaishiWitherSeed.get()));
                                     }
                                     if (ModItems.akaishiWitherCondensate != null) {
                                         output.accept(new ItemStack(ModItems.akaishiWitherCondensate.get()));
+                                    }
+                                    // 烈焰花种（转基因工厂产物）+ 盛开收获物：烈焰凝聚物
+                                    if (ModItems.akaishiBlazeSeed != null) {
+                                        output.accept(new ItemStack(ModItems.akaishiBlazeSeed.get()));
+                                    }
+                                    if (ModItems.akaishiBlazeCondensate != null) {
+                                        output.accept(new ItemStack(ModItems.akaishiBlazeCondensate.get()));
                                     }
                                     // 生命科技：样本采集器 + 生命样本 + 基因序列片段
                                     if (ModItems.sampleCollector != null) {

@@ -17,9 +17,9 @@ public class AkaishiPurifierScreen extends AbstractContainerScreen<AkaishiPurifi
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_purifier.png");
     /** 提纯矩阵成型版贴图：抹去燃料槽与火焰区域（矩阵由外部赤能源驱动，无燃料槽） */
     private static final ResourceLocation TEXTURE_MATRIX = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_purifier_matrix.png");
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，置于燃料槽行左侧空地，标签不压输出槽） */
-    private static final int SPEED_SLOT_X = 8, SPEED_SLOT_Y = 53;
-    private static final int ENERGY_SLOT_X = 26, ENERGY_SLOT_Y = 53;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 Y=8，右移避开右侧垂直能量条(153 起)） */
+    private static final int SPEED_SLOT_X = 116, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 134, ENERGY_SLOT_Y = 8;
 
     public AkaishiPurifierScreen(AkaishiPurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -34,12 +34,13 @@ public class AkaishiPurifierScreen extends AbstractContainerScreen<AkaishiPurifi
         // 成型态切换无燃料版贴图（燃料槽/火焰区域已抹除）
         gui.blit(menu.isFormed() ? TEXTURE_MATRIX : TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 赤石能量条：右侧垂直条，与贴图内底(153,18..62)对齐，从底部向上填充
+        // 赤石能量条：右侧垂直条(153,18..62)，轨道框恒绘（能量为 0 也占位，规则 4）+ 从底部向上内缩填充
+        GuiWidgets.track(gui, x + 153, y + 18, 10, 44);
         int maxEnergy = AkaishiPurifierBlockEntity.MAX_ENERGY;
         int energy = Math.max(0, Math.min(menu.getEnergy(), maxEnergy));
-        int energyHeight = (int) (44.0F * energy / maxEnergy);
+        int energyHeight = (int) Math.ceil(42.0 * energy / maxEnergy);
         if (energyHeight > 0) {
-            gui.fill(x + 153, y + 62 - energyHeight, x + 163, y + 62, 0xFFE03030);
+            gui.fill(x + 154, y + 61 - energyHeight, x + 162, y + 61, 0xFFE03030);
         }
 
         // 燃料火焰动画：仅未成型（有燃料槽）时绘制。火焰框位于燃料槽右侧空档（81,60..73），
@@ -60,11 +61,11 @@ public class AkaishiPurifierScreen extends AbstractContainerScreen<AkaishiPurifi
             gui.fill(x + 79, y + 36, x + 79 + arrowWidth, y + 52, 0xFFE8E8EA);
         }
 
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方标签）
+        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override

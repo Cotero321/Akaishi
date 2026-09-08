@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import java.util.Locale;
 
 /**
  * 聚变燃料聚合器界面（vanilla 灰色风格，198 高）：
@@ -31,6 +30,8 @@ public class AkaishiFusionFuelAggregatorScreen extends AbstractContainerScreen<A
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，顶部右侧避开条带区） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 输入槽 GUI 位置（与 Menu 槽位坐标一致） */
+    private static final int INPUT_SLOT_X = 44, INPUT_SLOT_Y = 20;
 
     public AkaishiFusionFuelAggregatorScreen(AkaishiFusionFuelAggregatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -38,32 +39,15 @@ public class AkaishiFusionFuelAggregatorScreen extends AbstractContainerScreen<A
         this.imageHeight = 198;
     }
 
+    /** 大数值缩写（复用统一 EnergyFormat） */
     private static String format(long v) {
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long value, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + 20, y + 1, TEXT, false);
         GuiWidgets.track(gui, x + TRACK_X, y, TRACK_W, BAR_H);
-        long clamped = Math.max(0, Math.min(value, max));
-        long cap = Math.max(1, max);
-        int barWidth = (int) (TRACK_W * clamped / cap);
-        if (barWidth > 0) {
-            gui.fill(x + TRACK_X, y, x + TRACK_X + barWidth, y + BAR_H, color);
-        }
+        GuiWidgets.bar(gui, x + TRACK_X, y, TRACK_W, BAR_H, value, max, color);
     }
 
     @Override
@@ -138,6 +122,12 @@ public class AkaishiFusionFuelAggregatorScreen extends AbstractContainerScreen<A
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
                     mouseX, mouseY);
+        }
+        // 输入槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
+        if (isHovering(INPUT_SLOT_X, INPUT_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.slots.get(AkaishiFusionFuelAggregatorMenu.SLOT_INPUT).getItem().isEmpty()) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.aggregator.input_tip"), mouseX, mouseY);
         }
     }
 }

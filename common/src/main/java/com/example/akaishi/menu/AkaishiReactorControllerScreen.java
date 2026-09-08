@@ -200,9 +200,15 @@ public class AkaishiReactorControllerScreen extends AbstractContainerScreen<Akai
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
 
-        // 悬停提示：废品条（状态页），含衰竭燃料种类数
-        if (menu.getPage() == 2 && isHovering(WASTE_X, WASTE_Y, WASTE_W, WASTE_H, mouseX, mouseY)) {
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+
+        int page = this.menu.getPage();
+        // 状态页：废品条悬停提示，含衰竭燃料种类数
+        if (page == 2 && isHovering(WASTE_X, WASTE_Y, WASTE_W, WASTE_H, mouseX, mouseY)) {
             Component tip = Component.translatable("gui.akaishi.reactor.waste",
                     EnergyFormat.format(menu.getWasteAmount()), EnergyFormat.format(menu.getWasteMax()));
             int types = menu.getWasteTypes();
@@ -210,6 +216,30 @@ public class AkaishiReactorControllerScreen extends AbstractContainerScreen<Akai
                 tip = tip.copy().append(Component.translatable("gui.akaishi.reactor.waste_types", types));
             }
             gui.renderTooltip(this.font, tip, mouseX, mouseY);
+            return;
+        }
+        // 燃料页：燃料槽（随结构内燃料棒数显隐），空槽提示用途
+        if (page == 0) {
+            int n = Math.max(0, Math.min(menu.getRodCount(), FUEL_COLS * FUEL_ROWS));
+            for (int i = 0; i < n; i++) {
+                var slot = menu.getSlot(i);
+                if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reactor.fuel_slot"), mouseX, mouseY);
+                    break;
+                }
+            }
+            return;
+        }
+        // 温度页：散热片槽（随结构散热组件数显隐），空槽提示用途
+        if (page == 1) {
+            int n = Math.max(0, Math.min(menu.getCoolerCount(), AkaishiReactorControllerMenu.COOLER_SLOT_COUNT));
+            for (int i = 0; i < n; i++) {
+                var slot = menu.getSlot(AkaishiReactorControllerMenu.COOLER_SLOT_START + i);
+                if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reactor.cooler_slot"), mouseX, mouseY);
+                    break;
+                }
+            }
         }
     }
 

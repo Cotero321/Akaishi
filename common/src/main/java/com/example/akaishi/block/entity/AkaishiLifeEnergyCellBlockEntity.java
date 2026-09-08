@@ -5,10 +5,12 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
-import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.block.AkaishiLifeEnergyCellBlock;
+import com.example.akaishi.block.AkaishiLifeEnergyCellSerializerBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
+import com.example.akaishi.energy.LifeEnergyCellTier;
 import com.example.akaishi.energy.LifeEnergyType;
-import com.example.akaishi.menu.AkaishiLifeConverterMenu;
+import com.example.akaishi.menu.AkaishiLifeEnergyCellMenu;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -25,18 +27,25 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 生命能量储存器方块实体：纯生命能量存储（双向缓冲，可充可放）。
- * 复用生命转换菜单/界面（数据槽 2/3 = 生命能量/容量），赤槽恒为 0。
+ * 容量由方块等级 {@link LifeEnergyCellTier} 决定；三档共用同一方块实体类型。
+ * 作为生命储存串联器外壳时，能量访问自动代理中心串联器的聚合存储。
+ * 独立简洁界面：数据槽 0/1=生命能量低/高位，2/3=容量低/高位（long 拆分，防超 int 截断）。
  */
 public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
+    /** 本方块等级（决定容量） */
+    private final LifeEnergyCellTier tier;
     private final AkaishiEnergyStorage energy;
-    /** 数据缓存：0/1=赤槽（恒 0，供菜单占位），2=生命能量，3=生命容量，4=结构状态（恒 0） */
+    /** 数据缓存：生命能量/容量各拆低/高位两个 int 槽（共 4 槽） */
     private final SimpleContainerData data;
 
     public AkaishiLifeEnergyCellBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_ENERGY_CELL.get(), pos, state);
-        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeEnergyCellLifeCapacity);
-        this.data = new SimpleContainerData(5);
+        this.tier = state.getBlock() instanceof AkaishiLifeEnergyCellBlock cellBlock
+                ? cellBlock.getTier()
+                : LifeEnergyCellTier.BASIC;
+        this.energy = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, tier.capacity);
+        this.data = new SimpleContainerData(4);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiLifeEnergyCellBlockEntity be) {
@@ -44,8 +53,10 @@ public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements Ext
     }
 
     private void tickServer() {
-        data.set(2, (int) energy.getEnergyStored());
-        data.set(3, (int) energy.getMaxEnergy());
+        data.set(0, (int) (energy.getEnergyStored() & 0xFFFFFFFFL));
+        data.set(1, (int) (energy.getEnergyStored() >>> 32));
+        data.set(2, (int) (energy.getMaxEnergy() & 0xFFFFFFFFL));
+        data.set(3, (int) (energy.getMaxEnergy() >>> 32));
     }
 
     public ContainerData data() {
@@ -58,13 +69,37 @@ public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements Ext
 
     @Override
     public IEnergyStorage getEnergyStorage() {
+        // 作为串联器外壳时：代理中心串联器的聚合存储（中心被 26 台储存器包围，管道只能经外壳接入整体结构）
+        AkaishiLifeEnergyCellSerializerBlockEntity center = findSerializerCenter();
+        if (center != null) {
+            return center.getEnergyStorage();
+        }
         return energy;
+    }
+
+    /** 在自身为中心的 3×3×3 范围内查找成型中的生命储存串联器主方块 */
+    public AkaishiLifeEnergyCellSerializerBlockEntity findSerializerCenter() {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    BlockPos p = worldPosition.offset(dx, dy, dz);
+                    BlockState s = level.getBlockState(p);
+                    if (s.getBlock() instanceof AkaishiLifeEnergyCellSerializerBlock && s.getValue(AkaishiLifeEnergyCellSerializerBlock.FORMED)) {
+                        if (level.getBlockEntity(p) instanceof AkaishiLifeEnergyCellSerializerBlockEntity be) {
+                            return be;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     public IEnergyStorage getEnergyStorage(IEnergyType type) {
         // 只暴露生命能量存储（赤管道通过类型匹配自动跳过本方块）
-        return type == LifeEnergyType.INSTANCE ? energy : null;
+        IEnergyStorage storage = getEnergyStorage();
+        return type == LifeEnergyType.INSTANCE && storage != null && storage.getType() == type ? storage : null;
     }
 
     @Override
@@ -79,12 +114,17 @@ public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements Ext
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.akaishi.akaishi_life_energy_cell");
+        return Component.translatable(switch (tier) {
+            case BASIC -> "block.akaishi.akaishi_life_energy_cell";
+            case ADVANCED -> "block.akaishi.akaishi_life_energy_cell_advanced";
+            case SUPER -> "block.akaishi.akaishi_life_energy_cell_super";
+            default -> "block.akaishi.akaishi_life_energy_cell";
+        });
     }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
-        return new AkaishiLifeConverterMenu(id, inv, data);
+        return new AkaishiLifeEnergyCellMenu(id, inv, data);
     }
 
     @Override

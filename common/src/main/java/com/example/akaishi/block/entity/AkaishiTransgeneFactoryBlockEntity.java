@@ -1,5 +1,7 @@
 package com.example.akaishi.block.entity;
 
+import java.util.List;
+
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
@@ -25,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -33,22 +36,30 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 转基因工厂方块实体（仅服务端驱动逻辑）。
- * 槽位：0=基因序列（须为凋零骷髅来源且纯度≥50）、1=缠怨藤、2=凋零玫瑰、3=生命能量固态物、4=产物。
- * 配方（转基因判定）：凋零骷髅基因 → 凋零藤。判定条件抽成配方记录，便于后续扩充其它转基因。
+ * 槽位：0=基因序列、1=缠怨藤（基底）、2=催化素材（凋零玫瑰/烈焰粉）、3=生命能量固态物（基底）、4=产物。
+ * 配方见 {@link #RECIPES}：基因来源命中配方且纯度达标、催化槽与该配方 catalyst 一致 → 产出对应种子。
  */
 public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, Container, IItemPipeDevice, IDataCarrier, IEnergyProvider {
 
-    /** 配方记录：基因来源生物 + 最低纯度（产物固化在产出步骤，扩展时按基因新增产出分支） */
-    private record GeneRecipe(String geneEntity, int minPurity) {
+    /**
+     * 转基因配方：基因来源生物 + 最低纯度 + 催化素材 + 产出种子。
+     * 各配方均需基底材料（缠怨藤 + 生命能量固态物），催化槽放入对应 catalyst 即锁定该配方。
+     * 公共静态结构，供 forge 层 JEI 读取展示。
+     */
+    public record TransgeneFactoryRecipe(String geneEntity, int minPurity, Item catalyst, Item output) {
     }
 
-    /** 凋零藤配方：凋零骷髅基因纯度≥50 + 缠怨藤 + 凋零玫瑰 + 固态物 → 凋零藤 */
-    private static final GeneRecipe WITHER_VINE_RECIPE = new GeneRecipe("minecraft:wither_skeleton", 50);
+    /** 配方表：凋零骷髅基因 + 凋零玫瑰 → 凋零藤种子；烈焰人基因 + 烈焰粉 → 烈焰花种 */
+    public static final List<TransgeneFactoryRecipe> RECIPES = List.of(
+            new TransgeneFactoryRecipe("minecraft:wither_skeleton", 50, Items.WITHER_ROSE, ModItems.akaishiWitherSeed.get()),
+            new TransgeneFactoryRecipe("minecraft:blaze", 50, Items.BLAZE_POWDER, ModItems.akaishiBlazeSeed.get())
+    );
 
     public static final int SLOT_GENE = 0;
     public static final int SLOT_VINE = 1;
-    public static final int SLOT_ROSE = 2;
+    /** 催化素材槽：凋零玫瑰（凋零骷髅配方）或烈焰粉（烈焰人配方） */
+    public static final int SLOT_CATALYST = 2;
     public static final int SLOT_SOLID = 3;
     public static final int SLOT_OUT = 4;
     public static final int SLOT_COUNT = 5;
@@ -91,15 +102,21 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
             progress++;
             if (progress >= ModConfig.transgeneFactoryProcessTicks) {
                 progress = 0;
-                // 扣除一次合成所需生命能量，并消耗材料
+                // 先在材料消耗前锁定命中配方（消耗后基因槽可能被清空，不能再据此匹配）
+                TransgeneFactoryRecipe recipe = matchingRecipe();
+                if (recipe == null) {
+                    return;
+                }
+                // 扣除一次合成所需生命能量，并消耗材料（基因/缠怨藤/催化素材/固态物各 1）
                 life.extractEnergy(ModConfig.transgeneFactoryLifeCost, false);
                 inventory.removeItem(SLOT_GENE, 1);
                 inventory.removeItem(SLOT_VINE, 1);
-                inventory.removeItem(SLOT_ROSE, 1);
+                inventory.removeItem(SLOT_CATALYST, 1);
                 inventory.removeItem(SLOT_SOLID, 1);
+                // 按命中配方产出对应种子
                 ItemStack out = inventory.getItem(SLOT_OUT);
                 if (out.isEmpty()) {
-                    inventory.setItem(SLOT_OUT, new ItemStack(ModItems.akaishiWitherSeed.get()));
+                    inventory.setItem(SLOT_OUT, new ItemStack(recipe.output()));
                 } else {
                     out.grow(1);
                 }
@@ -113,14 +130,13 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         }
     }
 
-    /** 合成条件：基因匹配当前配方 + 三种材料在位 + 生命能量充足 + 输出可容纳 */
+    /** 合成条件：基因命中某条配方（含纯度与催化槽匹配） + 基底材料在位 + 生命能量充足 + 输出可容纳对应种子 */
     private boolean canProcess() {
-        GeneRecipe recipe = matchingRecipe();
+        TransgeneFactoryRecipe recipe = matchingRecipe();
         if (recipe == null) {
             return false;
         }
         if (!inventory.getItem(SLOT_VINE).is(Items.TWISTING_VINES)
-                || !inventory.getItem(SLOT_ROSE).is(Items.WITHER_ROSE)
                 || !inventory.getItem(SLOT_SOLID).is(ModItems.akaishiLifeEssenceSolid.get())) {
             return false;
         }
@@ -128,30 +144,47 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
             return false;
         }
         ItemStack out = inventory.getItem(SLOT_OUT);
-        return out.isEmpty() || (out.is(ModItems.akaishiWitherSeed.get())
+        return out.isEmpty() || (out.is(recipe.output())
                 && out.getCount() < out.getMaxStackSize());
     }
 
-    /** 匹配可执行配方的凋零系基因（凋零骷髅 + 纯度达标） */
-    private GeneRecipe matchingRecipe() {
+    /** 匹配可执行配方：基因来源命中某条 RECIPES 且纯度达标，且催化槽物品为该条 catalyst */
+    private TransgeneFactoryRecipe matchingRecipe() {
         ItemStack gene = inventory.getItem(SLOT_GENE);
         if (gene.isEmpty() || !gene.is(ModItems.geneSequence.get())) {
             return null;
         }
         int purity = AkaishiGeneSequenceItem.getPurity(gene);
         String entity = AkaishiGeneSequenceItem.getEntityId(gene);
-        if (entity == null || purity < WITHER_VINE_RECIPE.minPurity()
-                || !entity.equals(WITHER_VINE_RECIPE.geneEntity())) {
+        if (entity == null) {
             return null;
         }
-        return WITHER_VINE_RECIPE;
+        ItemStack catalyst = inventory.getItem(SLOT_CATALYST);
+        for (TransgeneFactoryRecipe recipe : RECIPES) {
+            if (recipe.geneEntity().equals(entity) && purity >= recipe.minPurity()
+                    && !catalyst.isEmpty() && catalyst.is(recipe.catalyst())) {
+                return recipe;
+            }
+        }
+        return null;
     }
 
-    /** 校验基因是否"凋零骷髅且纯度≥50"（供 GUI/管道拒绝无效基因） */
-    public static boolean isWitherSkeletonGene(ItemStack stack) {
-        return !stack.isEmpty() && stack.is(ModItems.geneSequence.get())
-                && "minecraft:wither_skeleton".equals(AkaishiGeneSequenceItem.getEntityId(stack))
-                && AkaishiGeneSequenceItem.getPurity(stack) >= 50;
+    /** 校验基因能否被工厂受理：命中任意配方的基因来源且纯度达该配方下限（供 GUI/管道拒绝无效基因） */
+    public static boolean isValidGene(ItemStack stack) {
+        if (stack.isEmpty() || !stack.is(ModItems.geneSequence.get())) {
+            return false;
+        }
+        String entity = AkaishiGeneSequenceItem.getEntityId(stack);
+        if (entity == null) {
+            return false;
+        }
+        int purity = AkaishiGeneSequenceItem.getPurity(stack);
+        for (TransgeneFactoryRecipe recipe : RECIPES) {
+            if (recipe.geneEntity().equals(entity) && purity >= recipe.minPurity()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Container inventory() {
@@ -207,13 +240,14 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
 
     @Override
     public boolean canPlaceItem(int index, ItemStack stack) {
+        // 产物槽仅输出：机器自动放入产物，禁止漏斗/第三方反注（方向语义见 getPipeOutputSlots）
         if (index == SLOT_OUT) {
             return false;
         }
         return switch (index) {
-            case SLOT_GENE -> isWitherSkeletonGene(stack);
+            case SLOT_GENE -> isValidGene(stack);
             case SLOT_VINE -> stack.is(Items.TWISTING_VINES);
-            case SLOT_ROSE -> stack.is(Items.WITHER_ROSE);
+            case SLOT_CATALYST -> stack.is(Items.WITHER_ROSE) || stack.is(Items.BLAZE_POWDER);
             case SLOT_SOLID -> stack.is(ModItems.akaishiLifeEssenceSolid.get());
             default -> false;
         };
@@ -224,11 +258,11 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         inventory.clearContent();
     }
 
-    // ===== IItemPipeDevice：0~3 为输入（基因/藤/玫瑰/固态精华），4=产物可被第三方物流抽取 =====
+    // ===== IItemPipeDevice：0~3 为输入（基因/藤/催化素材/固态精华），4=产物可被第三方物流抽取 =====
 
     @Override
     public int[] getPipeInputSlots() {
-        return new int[]{SLOT_GENE, SLOT_VINE, SLOT_ROSE, SLOT_SOLID};
+        return new int[]{SLOT_GENE, SLOT_VINE, SLOT_CATALYST, SLOT_SOLID};
     }
 
     @Override

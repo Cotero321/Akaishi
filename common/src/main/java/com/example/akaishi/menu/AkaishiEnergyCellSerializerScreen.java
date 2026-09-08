@@ -22,6 +22,8 @@ public class AkaishiEnergyCellSerializerScreen extends AbstractContainerScreen<A
     private static final int BAR_Y = 24;
     private static final int BAR_W = 136;
     private static final int BAR_H = 8;
+    /** 居中状态文本最大宽度（防超出 176 面板，规则2） */
+    private static final int TEXT_MAX_W = 156;
 
     public AkaishiEnergyCellSerializerScreen(AkaishiEnergyCellSerializerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -29,29 +31,9 @@ public class AkaishiEnergyCellSerializerScreen extends AbstractContainerScreen<A
         this.imageHeight = 166;
     }
 
-    /** 大数值单位缩写：>=1T 万亿，>=1B 十亿，>=1M 百万，>=1K 千，否则原样输出 */
+    /** 大数值单位缩写（复用统一 EnergyFormat：>=1T/1B/1M/1K） */
     private static String formatEnergy(long v) {
-        if (v >= 1_000_000_000_000L) {
-            return trim(v / 1.0e12) + "T";
-        }
-        if (v >= 1_000_000_000L) {
-            return trim(v / 1.0e9) + "B";
-        }
-        if (v >= 1_000_000L) {
-            return trim(v / 1.0e6) + "M";
-        }
-        if (v >= 1_000L) {
-            return trim(v / 1.0e3) + "K";
-        }
-        return String.valueOf(v);
-    }
-
-    /** 保留 1 位小数，整数时去掉小数部分（2.0 → 2） */
-    private static String trim(double d) {
-        if (Math.abs(d - Math.round(d)) < 0.05) {
-            return String.valueOf((long) Math.round(d));
-        }
-        return String.format(Locale.ROOT, "%.1f", d);
+        return EnergyFormat.format(v);
     }
 
     @Override
@@ -87,12 +69,12 @@ public class AkaishiEnergyCellSerializerScreen extends AbstractContainerScreen<A
         int textWidth = this.font.width(text);
         gui.drawString(this.font, text, this.leftPos + 88 - textWidth / 2, this.topPos + 40, 0xFF3F3F3F, false);
 
-        // 结构状态提示（数值文本下方）
+        // 结构状态提示（数值文本下方；超宽按面板宽度截断加省略号，规则2）
         Component hint = menu.isFormed()
                 ? Component.translatable("gui.akaishi.serializer.formed", formatEnergy(menu.getMaxEnergy()))
                 : Component.translatable("gui.akaishi.serializer.unformed");
-        int hintWidth = this.font.width(hint);
-        gui.drawString(this.font, hint, this.leftPos + 88 - hintWidth / 2, this.topPos + 52,
+        String hintStr = this.font.plainSubstrByWidth(hint.getString(), TEXT_MAX_W);
+        gui.drawString(this.font, hintStr, this.leftPos + 88 - this.font.width(hintStr) / 2, this.topPos + 52,
                 menu.isFormed() ? 0xFF55FF55 : 0xFFFF5555, false);
 
         // 鼠标悬停在能量条上时显示名称与数值（单位缩写）

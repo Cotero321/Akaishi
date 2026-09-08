@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.entity.AkaishiAutoCollectorBlockEntity;
+import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -95,25 +96,46 @@ public class AkaishiAutoCollectorScreen extends AbstractContainerScreen<AkaishiA
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
 
-        // 悬停提示：能量条 / 进度条
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+
+        // 能量条悬停提示
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.energy", menu.getEnergy(), menu.getEnergyCapacity()),
                     mouseX, mouseY);
-        } else if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY)) {
+            return;
+        }
+        // 收集进度条悬停提示
+        if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.collect_progress", menu.getProgress()),
                     mouseX, mouseY);
+            return;
         }
-        // 升级槽悬停提示
-        if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
+        // 存储槽 27 格（索引 2..MACHINE_SLOT_END）：空槽提示用途
+        for (int i = MachineUpgradeSlots.SLOT_COUNT; i < AkaishiAutoCollectorMenu.MACHINE_SLOT_END; i++) {
+            var slot = menu.slots.get(i);
+            if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.collector.storage_slot"), mouseX, mouseY);
+                return;
+            }
+        }
+        // 升级槽悬停提示（速度，空槽也提示用途）
+        var speedSlot = menu.slots.get(MachineUpgradeSlots.SLOT_SPEED);
+        if (isHovering(speedSlot.x, speedSlot.y, 16, 16, mouseX, mouseY) && speedSlot.getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
                             "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
+            return;
         }
-        if (isHovering(ENERGY_SLOT_X, ENERGY_SLOT_Y, 16, 16, mouseX, mouseY)) {
+        // 升级槽悬停提示（能量，空槽也提示用途）
+        var energySlot = menu.slots.get(MachineUpgradeSlots.SLOT_ENERGY);
+        if (isHovering(energySlot.x, energySlot.y, 16, 16, mouseX, mouseY) && energySlot.getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),

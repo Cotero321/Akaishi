@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiSampleVaultBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -47,5 +48,26 @@ public class AkaishiSampleVaultScreen extends AbstractContainerScreen<AkaishiSam
     @Override
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         gui.drawString(this.font, this.title, this.titleLabelX, 4, 0xFF3F3F3F, false);
+    }
+
+    @Override
+    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(gui);
+        super.render(gui, mouseX, mouseY, partialTick);
+        this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+
+        // 54 个样本槽（6×9）：空槽提示用途（仅生命样本可入内，同 NBT 自动合并）
+        for (int i = 0; i < AkaishiSampleVaultBlockEntity.SAMPLE_SLOTS; i++) {
+            var slot = this.menu.slots.get(i);
+            if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.sample_vault.slot"), mouseX, mouseY);
+                break;
+            }
+        }
     }
 }

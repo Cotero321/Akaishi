@@ -57,6 +57,23 @@ public class AkaishiFusionItemPortScreen extends AbstractContainerScreen<Akaishi
     }
 
     @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        // 缓冲槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复）
+        Component tip = Component.translatable(menu.getKind() == AkaishiFusionItemPortMenu.BufferKind.INPUT_RODS
+                ? "gui.akaishi.fusion.item_input_hint" : "gui.akaishi.fusion.item_output_hint");
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (isHovering(BUFFER_X0 + col * 18, BUFFER_Y0 + row * 18, 16, 16, mouseX, mouseY)
+                        && menu.slots.get(col + row * 9).getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, tip, mouseX, mouseY);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);

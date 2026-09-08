@@ -19,14 +19,14 @@ public class AkaishiDecayPurifierScreen extends AbstractContainerScreen<AkaishiD
     private static final int TEXT_GREEN = 0xFF2E7D32;
     private static final int TEXT_RED = 0xFFB03030;
 
-    // 能量条（升级槽 y=30..46 下方空档）
+    // 能量条（升级槽固定右上角 y=8..26 下方空档）
     private static final int BAR_X = 20;
     private static final int BAR_Y = 58;
     private static final int BAR_W = 136;
     private static final int BAR_H = 8;
-    // 升级槽（与 Menu 槽位坐标一致）
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 30;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 30;
+    // 升级槽（与 Menu 槽位坐标一致，固定面板右上角 Y=8）
+    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
+    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
 
     public AkaishiDecayPurifierScreen(AkaishiDecayPurifierMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -48,11 +48,11 @@ public class AkaishiDecayPurifierScreen extends AbstractContainerScreen<AkaishiD
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + width, y + BAR_Y + BAR_H, 0xFFE03030);
         }
 
-        // 升级槽（速度/能量，贴图无图案需自绘框 + 槽位上方标签）
+        // 升级槽（速度/能量，贴图无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
         gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y - 9, 0xFF707070, false);
+                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
     }
 
     @Override

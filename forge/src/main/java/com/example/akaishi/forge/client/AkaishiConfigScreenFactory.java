@@ -194,7 +194,7 @@ public final class AkaishiConfigScreenFactory {
         longField(buffers, eb, "buffers.genEnergyOutputPortBufferCapacity", AkaishiConfig.GEN_ENERGY_OUTPUT_BUFFER);
         longField(buffers, eb, "buffers.fusionEnergyOutputBufferCapacity", AkaishiConfig.FUSION_ENERGY_OUTPUT_BUFFER);
         longField(buffers, eb, "buffers.reactorEnergyOutputBufferCapacity", AkaishiConfig.REACTOR_ENERGY_OUTPUT_BUFFER);
-        longField(buffers, eb, "buffers.lifeEnergyCellLifeCapacity", AkaishiConfig.LIFE_ENERGY_CELL_CAPACITY);
+        longField(buffers, eb, "buffers.lifeEnergyCellSerializerBaseCapacity", AkaishiConfig.LIFE_ENERGY_CELL_SERIALIZER_CAPACITY);
         longField(buffers, eb, "buffers.plasmaTankCapacity", AkaishiConfig.PLASMA_TANK_CAPACITY);
 
         // ===== 培养机提纯与分馏机 =====

@@ -102,6 +102,11 @@ public class AkaishiUpgradeStationScreen extends AbstractContainerScreen<Akaishi
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
 
         // 能量条悬停提示（M/K 缩写）
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
@@ -109,6 +114,24 @@ public class AkaishiUpgradeStationScreen extends AbstractContainerScreen<Akaishi
                     Component.translatable("gui.akaishi.energy",
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
+            return;
+        }
+        // 输入装备槽（赤石装备待升级）
+        var gearSlot = menu.slots.get(AkaishiUpgradeStationBlockEntity.INPUT_GEAR_SLOT);
+        if (isHovering(gearSlot.x, gearSlot.y, 16, 16, mouseX, mouseY) && gearSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.input_gear_slot"), mouseX, mouseY);
+            return;
+        }
+        // 输入模板槽（升级模板）
+        var templateSlot = menu.slots.get(AkaishiUpgradeStationBlockEntity.INPUT_TEMPLATE_SLOT);
+        if (isHovering(templateSlot.x, templateSlot.y, 16, 16, mouseX, mouseY) && templateSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.input_template_slot"), mouseX, mouseY);
+            return;
+        }
+        // 输出槽（升级完成的赤石装备）
+        var outputSlot = menu.slots.get(AkaishiUpgradeStationBlockEntity.OUTPUT_SLOT);
+        if (isHovering(outputSlot.x, outputSlot.y, 16, 16, mouseX, mouseY) && outputSlot.getItem().isEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.output_slot"), mouseX, mouseY);
         }
     }
 

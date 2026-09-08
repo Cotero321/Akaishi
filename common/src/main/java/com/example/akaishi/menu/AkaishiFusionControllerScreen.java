@@ -199,6 +199,34 @@ public class AkaishiFusionControllerScreen extends AbstractContainerScreen<Akais
     }
 
     @Override
+    protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        super.renderTooltip(gui, mouseX, mouseY);
+        AkaishiFusionControllerMenu m = this.menu;
+        if (m.getPage() == 1) {
+            // 燃料槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复）
+            int n = Math.max(0, Math.min(m.getFuelFrames(), FUEL_COLS * FUEL_ROWS));
+            for (int i = 0; i < n; i++) {
+                if (isHovering(FUEL_X0 + (i % FUEL_COLS) * 18, FUEL_Y0 + (i / FUEL_COLS) * 18, 16, 16, mouseX, mouseY)
+                        && m.getSlot(i).getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, Component.translatable("gui.akaishi.fusion.fuel_slot_tip"), mouseX, mouseY);
+                    return;
+                }
+            }
+        } else if (m.getPage() == 2) {
+            // 散热片槽悬停：仅空槽时提示用途
+            int sinkStart = AkaishiFusionControllerMenu.FUEL_SLOT_COUNT;
+            for (int i = 0; i < COOLER_COLS * COOLER_ROWS; i++) {
+                if (isHovering(COOLER_X0 + (i % COOLER_COLS) * 18, COOLER_Y0 + (i / COOLER_COLS) * COOLER_DY,
+                        16, 16, mouseX, mouseY)
+                        && m.getSlot(sinkStart + i).getItem().isEmpty()) {
+                    gui.renderTooltip(this.font, Component.translatable("gui.akaishi.fusion.cooler_slot_tip"), mouseX, mouseY);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
