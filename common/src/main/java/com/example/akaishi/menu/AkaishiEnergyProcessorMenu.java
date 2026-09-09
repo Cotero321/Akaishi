@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiEnergyProcessorBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,8 +15,9 @@ import net.minecraft.world.item.ItemStack;
 /**
  * 能量加工器菜单：1 个输入槽（生命固态物）+ 机器升级槽（速度/能量各一格）+ 赤能源/双输入罐/双输出罐/进度数据。
  * 槽位：0/1=升级槽 2=输入槽 3-38=玩家背包与快捷栏。
- * 数据槽：0/1=赤能量/赤容量 2/3=至纯能量入量/容量 4/5=复合能量入量/容量
- * 6/7=至纯燃料出量/容量 8/9=复合燃料出量/容量 10=加工进度百分比。
+ * 数据槽：long 值各占高低两槽（SimpleContainerData 仅支持 int）
+ * 0/1=赤能量 2/3=赤容量 4/5=至纯能量入量 6/7=至纯能量入容量 8/9=复合能量入量 10/11=复合能量入容量
+ * 12/13=至纯燃料出量 14/15=至纯燃料出容量 16/17=复合燃料出量 18/19=复合燃料出容量 20=加工进度百分比。
  */
 public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
 
@@ -60,43 +62,53 @@ public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
     }
 
     public long getAkaishiEnergy() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_ENERGY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_ENERGY,
+                AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_ENERGY_HIGH);
     }
 
     public long getAkaishiMax() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_CAPACITY,
+                AkaishiEnergyProcessorBlockEntity.DATA_CHISHI_CAPACITY_HIGH);
     }
 
     public long getPureInAmount() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_AMOUNT);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_AMOUNT,
+                AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_AMOUNT_HIGH);
     }
 
     public long getPureInMax() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_CAPACITY,
+                AkaishiEnergyProcessorBlockEntity.DATA_PURE_IN_CAPACITY_HIGH);
     }
 
     public long getCompoundInAmount() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_AMOUNT);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_AMOUNT,
+                AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_AMOUNT_HIGH);
     }
 
     public long getCompoundInMax() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_CAPACITY,
+                AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_IN_CAPACITY_HIGH);
     }
 
     public long getPureOutAmount() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_AMOUNT);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_AMOUNT,
+                AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_AMOUNT_HIGH);
     }
 
     public long getPureOutMax() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_CAPACITY,
+                AkaishiEnergyProcessorBlockEntity.DATA_PURE_OUT_CAPACITY_HIGH);
     }
 
     public long getCompoundOutAmount() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_AMOUNT);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_AMOUNT,
+                AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_AMOUNT_HIGH);
     }
 
     public long getCompoundOutMax() {
-        return data.get(AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_CAPACITY,
+                AkaishiEnergyProcessorBlockEntity.DATA_COMPOUND_OUT_CAPACITY_HIGH);
     }
 
     /** 加工进度（0-100） */

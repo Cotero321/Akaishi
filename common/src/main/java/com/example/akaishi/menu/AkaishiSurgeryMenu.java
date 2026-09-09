@@ -3,8 +3,9 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiSurgeryBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
-import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.life.body.IInstallableOrgan;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -56,12 +57,12 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
-        // 器官输入槽：仅接受器官物品（槽位匹配在服务端手术开始时校验）
+        // 器官输入槽：仅接受可安装器官（生物器官 / 机械义体；槽位匹配在服务端手术开始时校验）
         addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.ORGAN_SLOT, 108, 28,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof AkaishiOrganItem;
+                return IInstallableOrgan.slotOf(stack) != null;
             }
         });
         // 固态物槽：仅接受生命固态物
@@ -88,11 +89,13 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(AkaishiSurgeryBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiSurgeryBlockEntity.DATA_ENERGY,
+                AkaishiSurgeryBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(AkaishiSurgeryBlockEntity.DATA_CAPACITY);
+        return LongDataSlots.read(data, AkaishiSurgeryBlockEntity.DATA_CAPACITY,
+                AkaishiSurgeryBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 手术进度（0-100） */

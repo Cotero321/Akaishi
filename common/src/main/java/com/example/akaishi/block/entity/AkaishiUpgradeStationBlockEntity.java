@@ -12,6 +12,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiUpgradeStationMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -42,6 +43,16 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
 
+    // 同步槽位：能量/容量为 long，拆高低 32 位（SimpleContainerData 仅支持 int）
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_SELECTED_TYPE = 4;
+    public static final int DATA_GEAR_SLOTS = 5;
+    public static final int DATA_HAS_GEAR = 6;
+    public static final int DATA_SLOTS = 7;
+
     private final AkaishiEnergyStorage energy;
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -53,7 +64,7 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
         super(ModBlockEntities.CHISHI_UPGRADE_STATION.get(), pos, state);
         this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.upgradeStationEnergyCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT);
-        this.data = new SimpleContainerData(5);
+        this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiUpgradeStationBlockEntity be) {
@@ -61,14 +72,14 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
     }
 
     private void tickServer() {
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, (int) energy.getMaxEnergy());
-        data.set(2, selectedType);
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
+        data.set(DATA_SELECTED_TYPE, selectedType);
         ItemStack gear = inventory.getItem(INPUT_GEAR_SLOT);
         // 惰性初始化：give/创造模式直接取用的赤石装备无标签，放入后自动补齐
         AkaishiUpgradeHelper.ensureGear(gear);
-        data.set(3, AkaishiUpgradeHelper.isAkaishiGear(gear) ? AkaishiUpgradeHelper.getSlots(gear) : 0);
-        data.set(4, AkaishiUpgradeHelper.isAkaishiGear(gear) ? 1 : 0);
+        data.set(DATA_GEAR_SLOTS, AkaishiUpgradeHelper.isAkaishiGear(gear) ? AkaishiUpgradeHelper.getSlots(gear) : 0);
+        data.set(DATA_HAS_GEAR, AkaishiUpgradeHelper.isAkaishiGear(gear) ? 1 : 0);
         // 当前选中能力不适用于装备部位时，自动重置为第一个可用能力
         AkaishiUpgradeHelper.SpecialAbility[] abilities = AkaishiUpgradeHelper.SpecialAbility.values();
         if (selectedType < 0 || selectedType >= abilities.length || !abilities[selectedType].isApplicable(gear)) {

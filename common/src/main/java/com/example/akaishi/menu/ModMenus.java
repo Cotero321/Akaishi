@@ -3,12 +3,16 @@ package com.example.akaishi.menu;
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.AkaishiGenMatrixTier;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.block.entity.AbstractMechanicalMachineBlockEntity;
 import com.example.akaishi.block.entity.AkaishiAutoCollectorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiCatalystBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyAggregatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyCellBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyCellSerializerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiExhaustedBarrelBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMechanicalTemplateFactoryBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMechanicalProcessingFactoryBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMechanicalAssemblyStationBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyGeneratorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyLiquefierBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyProcessorBlockEntity;
@@ -111,6 +115,12 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiCatalystMenu>> CHISHI_CATALYST;
     /** 生命能量提纯器菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiLifePurifierMenu>> CHISHI_LIFE_PURIFIER;
+    /** 机械改造模板制造厂菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiMechanicalTemplateFactoryMenu>> CHISHI_MECHANICAL_TEMPLATE_FACTORY;
+    /** 机械改造加工制作厂菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiMechanicalProcessingFactoryMenu>> CHISHI_MECHANICAL_PROCESSING_FACTORY;
+    /** 机械改造组装加工台菜单类型 */
+    public static RegistrySupplier<MenuType<AkaishiMechanicalAssemblyStationMenu>> CHISHI_MECHANICAL_ASSEMBLY_STATION;
     /** 能量液化装置菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiEnergyLiquefierMenu>> CHISHI_ENERGY_LIQUEFIER;
     /** 能量加工器菜单类型 */
@@ -261,7 +271,8 @@ public final class ModMenus {
             }
             return new AkaishiEnergyGeneratorMenu(syncId, inv,
                     new SimpleContainer(AkaishiEnergyGeneratorBlockEntity.SLOT_COUNT),
-                    new SimpleContainerData(3));
+                    // 占位尺寸需与服务端一致：能量/燃烧/总燃烧/升级数 共 4 槽
+                    new SimpleContainerData(4));
         });
         CHISHI_ENERGY_GENERATOR = (RegistrySupplier<MenuType<AkaishiEnergyGeneratorMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -339,7 +350,8 @@ public final class ModMenus {
             Level level = inv.player.level();
             return level.getBlockEntity(pos) instanceof AkaishiEnergyAggregatorBlockEntity be
                     ? new AkaishiEnergyAggregatorMenu(syncId, inv, be)
-                    : new AkaishiEnergyAggregatorMenu(syncId, inv, new net.minecraft.world.SimpleContainer(2), new net.minecraft.world.inventory.SimpleContainerData(3));
+                    : new AkaishiEnergyAggregatorMenu(syncId, inv, new net.minecraft.world.SimpleContainer(2),
+                            new net.minecraft.world.inventory.SimpleContainerData(AkaishiEnergyAggregatorBlockEntity.DATA_SLOTS));
         });
         CHISHI_ENERGY_AGGREGATOR = (RegistrySupplier<MenuType<AkaishiEnergyAggregatorMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -353,7 +365,10 @@ public final class ModMenus {
             Level level = inv.player.level();
             return level.getBlockEntity(pos) instanceof AkaishiEquipmentForgerBlockEntity be
                     ? new AkaishiEquipmentForgerMenu(syncId, inv, be)
-                    : new AkaishiEquipmentForgerMenu(syncId, inv, new net.minecraft.world.SimpleContainer(3), new net.minecraft.world.inventory.SimpleContainerData(3));
+                    // 占位尺寸需与服务端一致：能量/容量各占高低两槽，共 DATA_SIZE=12 槽
+                    : new AkaishiEquipmentForgerMenu(syncId, inv,
+                            new net.minecraft.world.SimpleContainer(AkaishiEquipmentForgerBlockEntity.SLOT_COUNT),
+                            new net.minecraft.world.inventory.SimpleContainerData(AkaishiEquipmentForgerBlockEntity.DATA_SIZE));
         });
         CHISHI_EQUIPMENT_FORGER = (RegistrySupplier<MenuType<AkaishiEquipmentForgerMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -855,7 +870,7 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(decayPurifierType, AkaishiDecayPurifierScreen::new));
 
-        // 发生器矩阵控制器：1 燃料槽 + 10 升级槽 + 5 数据槽（能量/燃烧/总量/成型/升级数）
+        // 发生器矩阵控制器：1 燃料槽 + 10 升级槽 + 6 数据槽（能量低/高、燃烧、总量、成型、升级数）
         MenuType<AkaishiGenMatrixControllerMenu> genMatrixType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
@@ -865,7 +880,7 @@ public final class ModMenus {
             }
             return new AkaishiGenMatrixControllerMenu(syncId, inv,
                     new SimpleContainer(AkaishiGenMatrixControllerBlockEntity.TOTAL_SLOTS),
-                    new SimpleContainerData(5), AkaishiGenMatrixTier.BASIC);
+                    new SimpleContainerData(AkaishiGenMatrixControllerBlockEntity.DATA_SLOTS), AkaishiGenMatrixTier.BASIC);
         });
         CHISHI_GEN_MATRIX_CONTROLLER = (RegistrySupplier<MenuType<AkaishiGenMatrixControllerMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -1028,7 +1043,7 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(minerControllerType, AkaishiMinerControllerScreen::new));
 
-        // 矿机转口：产物缓冲 27 槽 + 3 数据槽（能量/容量/成型）
+        // 矿机转口：产物缓冲 27 槽 + 5 数据槽（能量/容量高低两槽 + 成型）
         MenuType<AkaishiMinerPortMenu> minerPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
@@ -1038,7 +1053,7 @@ public final class ModMenus {
             }
             return new AkaishiMinerPortMenu(syncId, inv,
                     new SimpleContainer(AkaishiMinerPortBlockEntity.BUFFER_SLOTS),
-                    new SimpleContainerData(3));
+                    new SimpleContainerData(AkaishiMinerPortBlockEntity.DATA_SLOTS));
         });
         CHISHI_MINER_PORT = (RegistrySupplier<MenuType<AkaishiMinerPortMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -1261,5 +1276,55 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_fusion_energy_output"), () -> fusionEnergyType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(fusionEnergyType, AkaishiFusionEnergyOutputScreen::new));
+
+        // ===== 机械改造三机 =====
+        // 模板制造厂
+        MenuType<AkaishiMechanicalTemplateFactoryMenu> mechTemplateType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            Level level = inv.player.level();
+            if (level.getBlockEntity(buf.readBlockPos()) instanceof AkaishiMechanicalTemplateFactoryBlockEntity be) {
+                return new AkaishiMechanicalTemplateFactoryMenu(syncId, inv, be);
+            }
+            return new AkaishiMechanicalTemplateFactoryMenu(syncId, inv,
+                    new SimpleContainer(AkaishiMechanicalTemplateFactoryBlockEntity.SLOT_COUNT),
+                    // 占位尺寸需与服务端一致：基类 10 槽 + 子类 2 槽
+                    new SimpleContainerData(12), new MachineUpgradeSlots());
+        });
+        CHISHI_MECHANICAL_TEMPLATE_FACTORY = (RegistrySupplier<MenuType<AkaishiMechanicalTemplateFactoryMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mechanical_template_factory"), () -> mechTemplateType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(mechTemplateType, AkaishiMechanicalTemplateFactoryScreen::new));
+        // 加工制作厂
+        MenuType<AkaishiMechanicalProcessingFactoryMenu> mechProcessType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            Level level = inv.player.level();
+            if (level.getBlockEntity(buf.readBlockPos()) instanceof AkaishiMechanicalProcessingFactoryBlockEntity be) {
+                return new AkaishiMechanicalProcessingFactoryMenu(syncId, inv, be);
+            }
+            return new AkaishiMechanicalProcessingFactoryMenu(syncId, inv,
+                    new SimpleContainer(AkaishiMechanicalProcessingFactoryBlockEntity.SLOT_COUNT),
+                    // 占位尺寸需与服务端一致：基类 10 槽（子类无额外槽）
+                    new SimpleContainerData(AbstractMechanicalMachineBlockEntity.DATA_EXTRA_BASE), new MachineUpgradeSlots());
+        });
+        CHISHI_MECHANICAL_PROCESSING_FACTORY = (RegistrySupplier<MenuType<AkaishiMechanicalProcessingFactoryMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mechanical_processing_factory"), () -> mechProcessType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(mechProcessType, AkaishiMechanicalProcessingFactoryScreen::new));
+        // 组装加工台
+        MenuType<AkaishiMechanicalAssemblyStationMenu> mechAssemblyType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            Level level = inv.player.level();
+            if (level.getBlockEntity(buf.readBlockPos()) instanceof AkaishiMechanicalAssemblyStationBlockEntity be) {
+                return new AkaishiMechanicalAssemblyStationMenu(syncId, inv, be);
+            }
+            return new AkaishiMechanicalAssemblyStationMenu(syncId, inv,
+                    new SimpleContainer(AkaishiMechanicalAssemblyStationBlockEntity.SLOT_COUNT),
+                    // 占位尺寸需与服务端一致：基类 10 槽（子类无额外槽）
+                    new SimpleContainerData(10), new MachineUpgradeSlots());
+        });
+        CHISHI_MECHANICAL_ASSEMBLY_STATION = (RegistrySupplier<MenuType<AkaishiMechanicalAssemblyStationMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mechanical_assembly_station"), () -> mechAssemblyType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(mechAssemblyType, AkaishiMechanicalAssemblyStationScreen::new));
     }
 }

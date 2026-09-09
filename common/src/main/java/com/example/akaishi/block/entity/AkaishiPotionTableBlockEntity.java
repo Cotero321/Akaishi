@@ -17,6 +17,7 @@ import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.menu.AkaishiPotionTableMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -56,12 +57,14 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
     public static final int SOLID_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
-    /** Menu 同步数据槽：0/1=生命能量/容量 2=进度% 3=模板索引（-1 未选择） */
-    public static final int DATA_SLOTS = 4;
+    /** Menu 同步数据槽：0/1=生命能量低/高 2/3=生命容量低/高 4=进度% 5=模板索引（-1 未选择） */
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_TEMPLATE = 3;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_TEMPLATE = 5;
+    public static final int DATA_SLOTS = 6;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -95,8 +98,8 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
         life.setMaxEnergy((long) (ModConfig.potionTableLifeCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) life.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, life.getMaxEnergy());
         data.set(DATA_TEMPLATE, templateIndex());
 
         PotionTemplate template = PotionRegistry.get(selectedTemplate);

@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiSingleSlotMachineBlockEntity;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -64,11 +65,13 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
     }
 
     public long getEnergy() {
-        return data.get(AkaishiSingleSlotMachineBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiSingleSlotMachineBlockEntity.DATA_ENERGY,
+                AkaishiSingleSlotMachineBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiSingleSlotMachineBlockEntity.DATA_CAPACITY);
+        return LongDataSlots.read(data, AkaishiSingleSlotMachineBlockEntity.DATA_CAPACITY,
+                AkaishiSingleSlotMachineBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     public long getProgress() {

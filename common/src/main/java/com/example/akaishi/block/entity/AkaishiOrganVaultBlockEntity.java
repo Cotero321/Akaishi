@@ -12,6 +12,7 @@ import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.menu.AkaishiOrganVaultMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -55,11 +56,14 @@ public class AkaishiOrganVaultBlockEntity extends BlockEntity implements
     /** 总槽位数（81 + 9 = 90） */
     public static final int SLOT_COUNT = TEMP_START + TEMP_SIZE;
 
-    /** Menu 同步数据：0/1=生命能量/容量 2=活性状态（1 活性 0 休眠） */
-    public static final int DATA_SLOTS = 3;
+    // Menu 同步数据：能量/容量为 long，各拆低/高 32 位两槽（SimpleContainerData 仅支持 int）
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_ACTIVE = 2;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    /** 活性状态（1 活性 0 休眠） */
+    public static final int DATA_ACTIVE = 4;
+    public static final int DATA_SLOTS = 5;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -88,8 +92,8 @@ public class AkaishiOrganVaultBlockEntity extends BlockEntity implements
         if (stored > 0) {
             life.extractEnergy(ModConfig.organVaultKeepCostPerTick, false);
         }
-        data.set(DATA_ENERGY, (int) stored);
-        data.set(DATA_CAPACITY, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, stored);
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, life.getMaxEnergy());
         data.set(DATA_ACTIVE, stored > 0 ? 1 : 0);
         setChanged();
     }

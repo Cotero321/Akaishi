@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiFuelCannerBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -54,11 +55,13 @@ public class AkaishiFuelCannerMenu extends AbstractContainerMenu {
     }
 
     public long getFluidAmount() {
-        return data.get(AkaishiFuelCannerBlockEntity.DATA_FLUID_AMOUNT);
+        return LongDataSlots.read(data, AkaishiFuelCannerBlockEntity.DATA_FLUID_AMOUNT,
+                AkaishiFuelCannerBlockEntity.DATA_FLUID_AMOUNT_HIGH);
     }
 
     public long getFluidMax() {
-        return data.get(AkaishiFuelCannerBlockEntity.DATA_FLUID_CAPACITY);
+        return LongDataSlots.read(data, AkaishiFuelCannerBlockEntity.DATA_FLUID_CAPACITY,
+                AkaishiFuelCannerBlockEntity.DATA_FLUID_CAPACITY_HIGH);
     }
 
     public String getFuelId() {

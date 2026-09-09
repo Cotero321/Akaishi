@@ -4,6 +4,7 @@ import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiPurifierBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -84,23 +85,24 @@ public class AkaishiPurifierMenu extends AbstractContainerMenu {
     }
 
     /** 当前赤石能量（GUI 能量条用） */
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiPurifierBlockEntity.DATA_ENERGY,
+                AkaishiPurifierBlockEntity.DATA_ENERGY_HIGH);
     }
 
     /** 当前燃料剩余时间（GUI 火焰动画用） */
     public int getBurnTime() {
-        return data.get(1);
+        return data.get(AkaishiPurifierBlockEntity.DATA_BURN_TIME);
     }
 
     /** 当前提纯进度（GUI 进度条用） */
     public int getProgress() {
-        return data.get(2);
+        return data.get(AkaishiPurifierBlockEntity.DATA_PROGRESS);
     }
 
     /** 燃料总时间（GUI 火焰动画分母） */
     public int getBurnTimeTotal() {
-        return data.get(3);
+        return data.get(AkaishiPurifierBlockEntity.DATA_BURN_TIME_TOTAL);
     }
 
     /** 是否提纯矩阵成型（GUI 据此切换无燃料版贴图并隐藏燃料槽/火焰） */

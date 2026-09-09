@@ -7,6 +7,7 @@ import com.example.akaishi.block.AkaishiFluidTankBlock;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.FluidTankTier;
 import com.example.akaishi.menu.AkaishiFluidTankMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -26,13 +27,16 @@ import java.util.List;
 /**
  * 液体储罐方块实体：单液体罐存储（双向：管道可注可抽）。
  * 容量由方块等级 {@link FluidTankTier} 决定，NBT 持久化液体。
- * 数据槽：0=液体量 1=容量（供界面显示）。
+ * 数据槽：0/1=液体量 2/3=容量（long 各占高低两槽，供界面显示）。
  */
 public class AkaishiFluidTankBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
-    public static final int DATA_SLOTS = 2;
+    // Menu 同步数据槽：液体量/容量为 long，各占高低 32 位两槽（SimpleContainerData 仅支持 int）
     public static final int DATA_AMOUNT = 0;
-    public static final int DATA_CAPACITY = 1;
+    public static final int DATA_AMOUNT_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_SLOTS = 4;
 
     private final FluidTankTier tier;
     private final FluidTank tank;
@@ -55,8 +59,8 @@ public class AkaishiFluidTankBlockEntity extends BlockEntity implements Extended
     }
 
     private void tickServer() {
-        data.set(DATA_AMOUNT, (int) tank.getAmount());
-        data.set(DATA_CAPACITY, (int) tank.getCapacity());
+        LongDataSlots.write(data, DATA_AMOUNT, DATA_AMOUNT_HIGH, tank.getAmount());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, tank.getCapacity());
     }
 
     public ContainerData data() {

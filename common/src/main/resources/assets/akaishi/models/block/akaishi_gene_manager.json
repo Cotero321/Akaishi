@@ -1,8 +1,71 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "bottom": "akaishi:block/machine_bottom",
-    "top": "akaishi:block/akaishi_gene_manager_top",
-    "side": "akaishi:block/akaishi_gene_manager_side"
-  }
+    "parent":  "minecraft:block/block",
+    "elements":  [
+                     {
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#side"
+                                                 },
+                                       "up":  {
+                                                  "texture":  "#top"
+                                              },
+                                       "west":  {
+                                                    "texture":  "#side"
+                                                },
+                                       "south":  {
+                                                     "texture":  "#side"
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#side"
+                                                },
+                                       "down":  {
+                                                    "texture":  "#bottom"
+                                                }
+                                   },
+                         "from":  [
+                                      0,
+                                      0,
+                                      0
+                                  ],
+                         "to":  [
+                                    16,
+                                    16,
+                                    16
+                                ]
+                     },
+                     {
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#side"
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#side"
+                                                 },
+                                       "west":  {
+                                                    "texture":  "#side"
+                                                },
+                                       "up":  {
+                                                  "texture":  "#top"
+                                              },
+                                       "east":  {
+                                                    "texture":  "#side"
+                                                }
+                                   },
+                         "from":  [
+                                      2,
+                                      2,
+                                      2
+                                  ],
+                         "to":  [
+                                    14,
+                                    14,
+                                    14
+                                ]
+                     }
+                 ],
+    "textures":  {
+                     "bottom":  "akaishi:block/akaishi_gene_manager_bottom",
+                     "top":  "akaishi:block/akaishi_gene_manager_top",
+                     "side":  "akaishi:block/akaishi_gene_manager_side"
+                 }
 }

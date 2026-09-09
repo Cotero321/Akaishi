@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiLifeCentrifugeBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +14,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 生命离心机菜单：升级槽（速度/能量）+ 2 机器输出槽（0=活化结晶主产物，1=衰竭结晶副产物）+ 玩家背包 + 5 数据槽。
+ * 生命离心机菜单：升级槽（速度/能量）+ 2 机器输出槽（0=活化结晶主产物，1=衰竭结晶副产物）+ 玩家背包 + 9 数据槽。
  * 输入为液体（经管道注入），无物品输入槽；输出物由玩家从 GUI 取出。
  */
 public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
@@ -71,22 +72,26 @@ public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY,
+                AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY_CAPACITY);
+        return LongDataSlots.read(data, AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY_CAPACITY,
+                AkaishiLifeCentrifugeBlockEntity.DATA_ENERGY_CAPACITY_HIGH);
     }
 
     public long getInAmount() {
-        return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_IN_AMOUNT);
+        return LongDataSlots.read(data, AkaishiLifeCentrifugeBlockEntity.DATA_IN_AMOUNT,
+                AkaishiLifeCentrifugeBlockEntity.DATA_IN_AMOUNT_HIGH);
     }
 
     public long getInMax() {
-        return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_IN_CAPACITY);
+        return LongDataSlots.read(data, AkaishiLifeCentrifugeBlockEntity.DATA_IN_CAPACITY,
+                AkaishiLifeCentrifugeBlockEntity.DATA_IN_CAPACITY_HIGH);
     }
 
-    /** 当前批次进度（mb，满 {@link AkaishiLifeCentrifugeBlockEntity#BATCH_MB} 结算） */
+    /** 当前批次进度（mb，满 {@link AkaishiLifeCentrifugeBlockEntity#BATCH_MB} 结算；受常量上限约束） */
     public long getProgress() {
         return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_PROGRESS);
     }

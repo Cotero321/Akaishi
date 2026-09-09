@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiMinerControllerBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 赤石矿机控制器菜单：产物暂存 6 格（只读）+ 玩家背包 + 挖矿模式切换按钮。
- * 数据槽：0=能量 1=容量 2=进度 3=总耗时 4=成型 5=速度升级 6=时运升级 7=储能升级 8=挖矿模式（0 正常 / 1 精准）。
+ * 数据槽：0/1=能量低/高 2/3=容量低/高 4=进度 5=总耗时 6=成型 7=速度升级 8=时运升级 9=储能升级 10=挖矿模式（0 正常 / 1 精准）。
  */
 public class AkaishiMinerControllerMenu extends AbstractContainerMenu {
 
@@ -69,12 +70,18 @@ public class AkaishiMinerControllerMenu extends AbstractContainerMenu {
         }
     }
 
-    public int getEnergy() {
-        return data.get(AkaishiMinerControllerBlockEntity.DATA_ENERGY);
+    /** 已存能量（long，终极储能升级后可达 250M） */
+    public long getEnergy() {
+        return LongDataSlots.read(data,
+                AkaishiMinerControllerBlockEntity.DATA_ENERGY,
+                AkaishiMinerControllerBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getCapacity() {
-        return data.get(AkaishiMinerControllerBlockEntity.DATA_CAPACITY);
+    /** 能量容量（long） */
+    public long getCapacity() {
+        return LongDataSlots.read(data,
+                AkaishiMinerControllerBlockEntity.DATA_CAPACITY,
+                AkaishiMinerControllerBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     public int getProgress() {

@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiLifeActivatorBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -9,8 +10,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 生命活化器菜单：无机器槽位（纯液体转化），仅玩家背包 + 7 个数据槽同步。
- * 数据槽：0/1=生命能量/容量 2/3=输入 4/5=输出 6=累计活化量。
+ * 生命活化器菜单：无机器槽位（纯液体转化），仅玩家背包 + 14 个数据槽同步。
+ * 数据槽：0/1=生命能量 2/3=生命容量 4/5=输入量 6/7=输入容量
+ * 8/9=输出量 10/11=输出容量 12/13=累计活化量（long 拆低/高 32 位双槽）。
  */
 public class AkaishiLifeActivatorMenu extends AbstractContainerMenu {
 
@@ -36,27 +38,33 @@ public class AkaishiLifeActivatorMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_LIFE_ENERGY);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_LIFE_ENERGY,
+                AkaishiLifeActivatorBlockEntity.DATA_LIFE_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_LIFE_CAPACITY);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_LIFE_CAPACITY,
+                AkaishiLifeActivatorBlockEntity.DATA_LIFE_CAPACITY_HIGH);
     }
 
     public long getInAmount() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_IN_AMOUNT);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_IN_AMOUNT,
+                AkaishiLifeActivatorBlockEntity.DATA_IN_AMOUNT_HIGH);
     }
 
     public long getInMax() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_IN_CAPACITY);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_IN_CAPACITY,
+                AkaishiLifeActivatorBlockEntity.DATA_IN_CAPACITY_HIGH);
     }
 
     public long getOutAmount() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_OUT_AMOUNT);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_OUT_AMOUNT,
+                AkaishiLifeActivatorBlockEntity.DATA_OUT_AMOUNT_HIGH);
     }
 
     public long getOutMax() {
-        return data.get(AkaishiLifeActivatorBlockEntity.DATA_OUT_CAPACITY);
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_OUT_CAPACITY,
+                AkaishiLifeActivatorBlockEntity.DATA_OUT_CAPACITY_HIGH);
     }
 
     /** 累计活化量（mb）：低/高 32 位双槽重组为 long，无精度损失 */

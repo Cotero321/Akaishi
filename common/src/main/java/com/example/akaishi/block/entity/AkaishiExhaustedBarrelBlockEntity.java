@@ -8,6 +8,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.fluid.MultiFluidTank;
 import com.example.akaishi.menu.AkaishiExhaustedBarrelMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -28,13 +29,15 @@ import java.util.List;
 /**
  * 衰竭保存桶方块实体：专储衰竭燃料（容量 1000L，带 GUI 液位显示）。
  * 仅接受衰竭燃料（7 种），管道可注可抽，NBT 持久化液体。
- * 数据槽：0=总液体量 1=容量（供界面显示）。
+ * 数据槽：0/1=总液体量 2/3=容量（long 各占高低两槽）。
  */
 public class AkaishiExhaustedBarrelBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
-    public static final int DATA_SLOTS = 2;
     public static final int DATA_AMOUNT = 0;
-    public static final int DATA_CAPACITY = 1;
+    public static final int DATA_AMOUNT_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_SLOTS = 4;
 
     private final MultiFluidTank tank;
     private final SimpleContainerData data;
@@ -64,8 +67,8 @@ public class AkaishiExhaustedBarrelBlockEntity extends BlockEntity implements Ex
     }
 
     private void tickServer() {
-        data.set(DATA_AMOUNT, (int) tank.getAmount());
-        data.set(DATA_CAPACITY, (int) tank.getCapacity());
+        LongDataSlots.write(data, DATA_AMOUNT, DATA_AMOUNT_HIGH, tank.getAmount());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, tank.getCapacity());
     }
 
     public ContainerData data() {

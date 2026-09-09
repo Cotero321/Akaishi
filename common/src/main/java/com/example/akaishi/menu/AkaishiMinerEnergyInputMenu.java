@@ -1,5 +1,7 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiMinerEnergyInputBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 矿机能量输入口菜单：无机器槽（纯能量缓冲），仅玩家背包 + 能量/容量/成型数据展示。
- * 数据槽：0=能量 1=容量 2=成型状态。
+ * 数据槽：0/1=能量 2/3=容量 4=成型状态（long 各占高低两槽）。
  */
 public class AkaishiMinerEnergyInputMenu extends AbstractContainerMenu {
 
@@ -33,17 +35,19 @@ public class AkaishiMinerEnergyInputMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiMinerEnergyInputBlockEntity.DATA_ENERGY,
+                AkaishiMinerEnergyInputBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getCapacity() {
-        return data.get(1);
+    public long getCapacity() {
+        return LongDataSlots.read(data, AkaishiMinerEnergyInputBlockEntity.DATA_CAPACITY,
+                AkaishiMinerEnergyInputBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 是否已与成型矿机连接 */
     public boolean isLinked() {
-        return data.get(2) == 1;
+        return data.get(AkaishiMinerEnergyInputBlockEntity.DATA_FORMED) == 1;
     }
 
     @Override
@@ -81,6 +85,7 @@ public class AkaishiMinerEnergyInputMenu extends AbstractContainerMenu {
 
     /** 供无方块实体兜底时使用的空菜单（数据全 0） */
     public static AkaishiMinerEnergyInputMenu emptyMenu(int id, Inventory inv) {
-        return new AkaishiMinerEnergyInputMenu(id, inv, new SimpleContainerData(3));
+        return new AkaishiMinerEnergyInputMenu(id, inv,
+                new SimpleContainerData(AkaishiMinerEnergyInputBlockEntity.DATA_SLOTS));
     }
 }

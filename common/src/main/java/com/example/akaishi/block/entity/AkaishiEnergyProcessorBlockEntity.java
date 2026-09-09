@@ -16,6 +16,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyProcessorMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -57,20 +58,31 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
 
     public static final int INPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;
-    /** Menu 同步数据槽：0/1=赤能量/赤容量 2/3=至纯能量入量/容量 4/5=复合能量入量/容量
-     *  6/7=至纯燃料出量/容量 8/9=复合燃料出量/容量 10=加工进度百分比 */
-    public static final int DATA_SLOTS = 11;
+    /** Menu 同步数据槽：long 值各占高低两槽（SimpleContainerData 仅支持 int）
+     *  0/1=赤能量 2/3=赤容量 4/5=至纯能量入量 6/7=至纯能量入容量 8/9=复合能量入量 10/11=复合能量入容量
+     *  12/13=至纯燃料出量 14/15=至纯燃料出容量 16/17=复合燃料出量 18/19=复合燃料出容量 20=加工进度百分比 */
     public static final int DATA_CHISHI_ENERGY = 0;
-    public static final int DATA_CHISHI_CAPACITY = 1;
-    public static final int DATA_PURE_IN_AMOUNT = 2;
-    public static final int DATA_PURE_IN_CAPACITY = 3;
-    public static final int DATA_COMPOUND_IN_AMOUNT = 4;
-    public static final int DATA_COMPOUND_IN_CAPACITY = 5;
-    public static final int DATA_PURE_OUT_AMOUNT = 6;
-    public static final int DATA_PURE_OUT_CAPACITY = 7;
-    public static final int DATA_COMPOUND_OUT_AMOUNT = 8;
-    public static final int DATA_COMPOUND_OUT_CAPACITY = 9;
-    public static final int DATA_PROGRESS = 10;
+    public static final int DATA_CHISHI_ENERGY_HIGH = 1;
+    public static final int DATA_CHISHI_CAPACITY = 2;
+    public static final int DATA_CHISHI_CAPACITY_HIGH = 3;
+    public static final int DATA_PURE_IN_AMOUNT = 4;
+    public static final int DATA_PURE_IN_AMOUNT_HIGH = 5;
+    public static final int DATA_PURE_IN_CAPACITY = 6;
+    public static final int DATA_PURE_IN_CAPACITY_HIGH = 7;
+    public static final int DATA_COMPOUND_IN_AMOUNT = 8;
+    public static final int DATA_COMPOUND_IN_AMOUNT_HIGH = 9;
+    public static final int DATA_COMPOUND_IN_CAPACITY = 10;
+    public static final int DATA_COMPOUND_IN_CAPACITY_HIGH = 11;
+    public static final int DATA_PURE_OUT_AMOUNT = 12;
+    public static final int DATA_PURE_OUT_AMOUNT_HIGH = 13;
+    public static final int DATA_PURE_OUT_CAPACITY = 14;
+    public static final int DATA_PURE_OUT_CAPACITY_HIGH = 15;
+    public static final int DATA_COMPOUND_OUT_AMOUNT = 16;
+    public static final int DATA_COMPOUND_OUT_AMOUNT_HIGH = 17;
+    public static final int DATA_COMPOUND_OUT_CAPACITY = 18;
+    public static final int DATA_COMPOUND_OUT_CAPACITY_HIGH = 19;
+    public static final int DATA_PROGRESS = 20;
+    public static final int DATA_SLOTS = 21;
 
     /** 加工配方：输入液体+固态物 → 输出液体（输入/输出量分离，可支持浓缩产出） */
     public record Recipe(Fluid inputFluid, Fluid outputFluid, long inputAmount, long outputAmount) {
@@ -135,16 +147,16 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
         akaishi.setMaxEnergy((long) (ModConfig.energyProcessorChishiCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
-        data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
-        data.set(DATA_PURE_IN_AMOUNT, (int) pureInTank.getAmount());
-        data.set(DATA_PURE_IN_CAPACITY, (int) pureInTank.getCapacity());
-        data.set(DATA_COMPOUND_IN_AMOUNT, (int) compoundInTank.getAmount());
-        data.set(DATA_COMPOUND_IN_CAPACITY, (int) compoundInTank.getCapacity());
-        data.set(DATA_PURE_OUT_AMOUNT, (int) pureOutTank.getAmount());
-        data.set(DATA_PURE_OUT_CAPACITY, (int) pureOutTank.getCapacity());
-        data.set(DATA_COMPOUND_OUT_AMOUNT, (int) compoundOutTank.getAmount());
-        data.set(DATA_COMPOUND_OUT_CAPACITY, (int) compoundOutTank.getCapacity());
+        LongDataSlots.write(data, DATA_CHISHI_ENERGY, DATA_CHISHI_ENERGY_HIGH, akaishi.getEnergyStored());
+        LongDataSlots.write(data, DATA_CHISHI_CAPACITY, DATA_CHISHI_CAPACITY_HIGH, akaishi.getMaxEnergy());
+        LongDataSlots.write(data, DATA_PURE_IN_AMOUNT, DATA_PURE_IN_AMOUNT_HIGH, pureInTank.getAmount());
+        LongDataSlots.write(data, DATA_PURE_IN_CAPACITY, DATA_PURE_IN_CAPACITY_HIGH, pureInTank.getCapacity());
+        LongDataSlots.write(data, DATA_COMPOUND_IN_AMOUNT, DATA_COMPOUND_IN_AMOUNT_HIGH, compoundInTank.getAmount());
+        LongDataSlots.write(data, DATA_COMPOUND_IN_CAPACITY, DATA_COMPOUND_IN_CAPACITY_HIGH, compoundInTank.getCapacity());
+        LongDataSlots.write(data, DATA_PURE_OUT_AMOUNT, DATA_PURE_OUT_AMOUNT_HIGH, pureOutTank.getAmount());
+        LongDataSlots.write(data, DATA_PURE_OUT_CAPACITY, DATA_PURE_OUT_CAPACITY_HIGH, pureOutTank.getCapacity());
+        LongDataSlots.write(data, DATA_COMPOUND_OUT_AMOUNT, DATA_COMPOUND_OUT_AMOUNT_HIGH, compoundOutTank.getAmount());
+        LongDataSlots.write(data, DATA_COMPOUND_OUT_CAPACITY, DATA_COMPOUND_OUT_CAPACITY_HIGH, compoundOutTank.getCapacity());
 
         ItemStack input = inventory.getItem(INPUT_SLOT);
         Recipe recipe = null;

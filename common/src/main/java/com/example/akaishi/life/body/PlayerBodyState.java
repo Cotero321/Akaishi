@@ -1,6 +1,7 @@
 package com.example.akaishi.life.body;
 
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.life.mechanical.MechanicalIntegration;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -46,6 +47,7 @@ public class PlayerBodyState implements IPlayerBodyState {
     private static final String TAG_BT_EXTRA = "bt_extra";
     private static final String TAG_BT_PCT = "bt_pct";
     private static final String TAG_BT_UNTIL = "bt_until";
+    private static final String TAG_MECHANICAL_INTEGRATION = "mechanical_integration";
 
     /** 槽位 → 器官物品 */
     private final Map<BodySlot, ItemStack> organs = new EnumMap<>(BodySlot.class);
@@ -58,6 +60,8 @@ public class PlayerBodyState implements IPlayerBodyState {
     private int btExtra;
     private int btPct;
     private long btUntil = -1L;
+    /** 机械器官整合度（只涨不降；load 时整体替换，故非 final） */
+    private MechanicalIntegration mechanicalIntegration = new MechanicalIntegration();
     /** 是否已完成原生器官填充（旧存档无此标记时自动补位） */
     private boolean initialized;
 
@@ -95,6 +99,12 @@ public class PlayerBodyState implements IPlayerBodyState {
         // 移植即产生基础排斥（原生器官为 0），并重置排异中和剂清洗额度
         setRejection(slot, AkaishiOrganItem.getBaseRejection(organ));
         AkaishiOrganItem.setWashUsed(organs.get(slot), 0);
+        // 机械义体按材料写入初始整合度，生物器官清零该槽位整合度
+        if (organ.getItem() instanceof IInstallableOrgan installable) {
+            mechanicalIntegration.set(slot, installable.initialIntegration(organ));
+        } else {
+            mechanicalIntegration.reset(slot);
+        }
         return true;
     }
 
@@ -105,8 +115,9 @@ public class PlayerBodyState implements IPlayerBodyState {
         if (removed == null || removed.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        // 摘除后排斥清零，槽位恢复为空（触发空槽惩罚）
+        // 摘除后排斥清零，槽位恢复为空（触发空槽惩罚）；机械整合度一并清除
         rejection.remove(slot);
+        mechanicalIntegration.reset(slot);
         // 摘除原部件造成生命值损失（仅服务端结算，创造模式豁免）
         if (player != null && !player.isCreative() && !player.isSpectator()) {
             if (!player.level().isClientSide) {
@@ -131,6 +142,11 @@ public class PlayerBodyState implements IPlayerBodyState {
     @Override
     public void addRejection(BodySlot slot, int amount) {
         setRejection(slot, getRejection(slot) + amount);
+    }
+
+    @Override
+    public MechanicalIntegration getMechanicalIntegration() {
+        return mechanicalIntegration;
     }
 
     // ===== 基因强化 =====
@@ -285,6 +301,8 @@ public class PlayerBodyState implements IPlayerBodyState {
             tag.putLong(TAG_BT_UNTIL, btUntil);
         }
         tag.putBoolean(TAG_INITIALIZED, initialized);
+        // 机械整合度（含浮点增长余数）
+        tag.put(TAG_MECHANICAL_INTEGRATION, mechanicalIntegration.save());
         return tag;
     }
 
@@ -331,6 +349,8 @@ public class PlayerBodyState implements IPlayerBodyState {
             btUntil = -1L;
         }
         initialized = tag.getBoolean(TAG_INITIALIZED);
+        // 机械整合度（整体替换）
+        mechanicalIntegration = MechanicalIntegration.load(tag.getCompound(TAG_MECHANICAL_INTEGRATION));
         // 加载后立即补位（旧存档/新玩家），保证躯体始终满位
         ensureInitialized();
     }

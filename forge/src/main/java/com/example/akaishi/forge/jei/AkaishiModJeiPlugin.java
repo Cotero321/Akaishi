@@ -5,6 +5,7 @@ import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
+import com.example.akaishi.block.AkaishiMechanicalBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
@@ -113,6 +114,15 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT.get(), "jei.akaishi.sample_vault");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT.get(), "jei.akaishi.organ_vault");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_POTION_CABINET.get(), "jei.akaishi.potion_cabinet");
+
+        // ===== 机械改造体系：模板制造厂 → 加工制作厂 → 组装加工台 → 机械义体 =====
+        addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY.get(), "jei.akaishi.mechanical_template_factory");
+        addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY.get(), "jei.akaishi.mechanical_processing_factory");
+        addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION.get(), "jei.akaishi.mechanical_assembly_station");
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.mechanicalPartTemplate.get(), "jei.akaishi.mechanical_part_template");
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.mechanicalProcessedPart.get(), "jei.akaishi.mechanical_processed_part");
+        // 机械义体成品（9 槽位同一机制，以心脏为代表说明；其余 8 件同族同机制）
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.mechanicalHeart.get(), "jei.akaishi.mechanical_organ");
 
         // ===== 反应堆体系：多方块发电（方块） =====
         addIngredientInfo(registration, AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get(), "jei.akaishi.reactor_controller");

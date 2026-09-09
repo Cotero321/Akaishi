@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiPlasmaFillerBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -89,11 +90,15 @@ public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
     }
 
     public long getPlasmaAmount(int index) {
-        return data.get(AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_AMOUNT + index * 2);
+        int offset = index * AkaishiPlasmaFillerBlockEntity.DATA_PLASMA_STRIDE;
+        return LongDataSlots.read(data, AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_AMOUNT + offset,
+                AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_AMOUNT_HIGH + offset);
     }
 
     public long getPlasmaCapacity(int index) {
-        return data.get(AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_CAPACITY + index * 2);
+        int offset = index * AkaishiPlasmaFillerBlockEntity.DATA_PLASMA_STRIDE;
+        return LongDataSlots.read(data, AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_CAPACITY + offset,
+                AkaishiPlasmaFillerBlockEntity.DATA_PLASMA0_CAPACITY_HIGH + offset);
     }
 
     public int getProgress() {

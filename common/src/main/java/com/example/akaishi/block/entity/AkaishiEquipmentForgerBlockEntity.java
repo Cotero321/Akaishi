@@ -12,6 +12,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEquipmentForgerMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -57,8 +58,15 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
         return ModConfig.equipmentForgerEnergyPerForge + points * AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE;
     }
 
-    /** data 布局：0=能量 1=最大 2=充能进度 3=剩余升级点 4-9=6 种属性已选次数 */
-    public static final int DATA_SIZE = 10;
+    /** data 布局：0/1=能量 2/3=最大 4=充能进度 5=剩余升级点 6-11=6 种属性已选次数（long 各占高低两槽） */
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_POINTS = 5;
+    public static final int DATA_BASE_START = 6;
+    public static final int DATA_SIZE = 12;
 
     /** 重铸配方：下界合金装备 → (赤石装备, 消耗锭数) */
     private static final Map<Item, ForgeRecipe> FORGE_RECIPES = Map.of(
@@ -109,14 +117,14 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
         lastOutputNonEmpty = outputNonEmpty;
 
         long stored = energy.getEnergyStored();
-        data.set(0, (int) stored);
-        data.set(1, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, stored);
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         // 充能进度（long 计算防溢出，费用按当前选点动态计算）
         long cost = getCurrentCost();
-        data.set(2, (int) Math.min(100, stored * 100L / cost));
-        data.set(3, upgradePoints);
+        data.set(DATA_PROGRESS, (int) Math.min(100, stored * 100L / cost));
+        data.set(DATA_POINTS, upgradePoints);
         for (int i = 0; i < baseCounts.length; i++) {
-            data.set(4 + i, baseCounts[i]);
+            data.set(DATA_BASE_START + i, baseCounts[i]);
         }
     }
 

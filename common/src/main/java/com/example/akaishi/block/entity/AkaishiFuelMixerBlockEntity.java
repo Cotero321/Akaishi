@@ -14,6 +14,7 @@ import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiFuelMixerMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -43,17 +44,26 @@ import java.util.List;
 public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    /** Menu 同步数据槽：0/1=赤能量/容量 2/3=输入1量/容量 4/5=输入2量/容量 6/7=输出量/容量 8=混合进度 */
-    public static final int DATA_SLOTS = 9;
+    /** Menu 同步数据槽：long 各占高低两槽 0/1=赤能量 2/3=赤容量 4/5=输入1量 6/7=输入1容量
+     *  8/9=输入2量 10/11=输入2容量 12/13=输出量 14/15=输出容量 16=混合进度 */
     public static final int DATA_CHISHI_ENERGY = 0;
-    public static final int DATA_CHISHI_CAPACITY = 1;
-    public static final int DATA_IN1_AMOUNT = 2;
-    public static final int DATA_IN1_CAPACITY = 3;
-    public static final int DATA_IN2_AMOUNT = 4;
-    public static final int DATA_IN2_CAPACITY = 5;
-    public static final int DATA_OUT_AMOUNT = 6;
-    public static final int DATA_OUT_CAPACITY = 7;
-    public static final int DATA_PROGRESS = 8;
+    public static final int DATA_CHISHI_ENERGY_HIGH = 1;
+    public static final int DATA_CHISHI_CAPACITY = 2;
+    public static final int DATA_CHISHI_CAPACITY_HIGH = 3;
+    public static final int DATA_IN1_AMOUNT = 4;
+    public static final int DATA_IN1_AMOUNT_HIGH = 5;
+    public static final int DATA_IN1_CAPACITY = 6;
+    public static final int DATA_IN1_CAPACITY_HIGH = 7;
+    public static final int DATA_IN2_AMOUNT = 8;
+    public static final int DATA_IN2_AMOUNT_HIGH = 9;
+    public static final int DATA_IN2_CAPACITY = 10;
+    public static final int DATA_IN2_CAPACITY_HIGH = 11;
+    public static final int DATA_OUT_AMOUNT = 12;
+    public static final int DATA_OUT_AMOUNT_HIGH = 13;
+    public static final int DATA_OUT_CAPACITY = 14;
+    public static final int DATA_OUT_CAPACITY_HIGH = 15;
+    public static final int DATA_PROGRESS = 16;
+    public static final int DATA_SLOTS = 17;
 
     /** 混合配方：两种输入液体 1:1:1 → 一种输出液体 */
     public record Recipe(Fluid in1, long in1Amount, Fluid in2, long in2Amount, Fluid out, long outAmount) {
@@ -121,14 +131,14 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
         akaishi.setMaxEnergy((long) (ModConfig.fuelMixerChishiCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
-        data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
-        data.set(DATA_IN1_AMOUNT, (int) in1Tank.getAmount());
-        data.set(DATA_IN1_CAPACITY, (int) in1Tank.getCapacity());
-        data.set(DATA_IN2_AMOUNT, (int) in2Tank.getAmount());
-        data.set(DATA_IN2_CAPACITY, (int) in2Tank.getCapacity());
-        data.set(DATA_OUT_AMOUNT, (int) outTank.getAmount());
-        data.set(DATA_OUT_CAPACITY, (int) outTank.getCapacity());
+        LongDataSlots.write(data, DATA_CHISHI_ENERGY, DATA_CHISHI_ENERGY_HIGH, akaishi.getEnergyStored());
+        LongDataSlots.write(data, DATA_CHISHI_CAPACITY, DATA_CHISHI_CAPACITY_HIGH, akaishi.getMaxEnergy());
+        LongDataSlots.write(data, DATA_IN1_AMOUNT, DATA_IN1_AMOUNT_HIGH, in1Tank.getAmount());
+        LongDataSlots.write(data, DATA_IN1_CAPACITY, DATA_IN1_CAPACITY_HIGH, in1Tank.getCapacity());
+        LongDataSlots.write(data, DATA_IN2_AMOUNT, DATA_IN2_AMOUNT_HIGH, in2Tank.getAmount());
+        LongDataSlots.write(data, DATA_IN2_CAPACITY, DATA_IN2_CAPACITY_HIGH, in2Tank.getCapacity());
+        LongDataSlots.write(data, DATA_OUT_AMOUNT, DATA_OUT_AMOUNT_HIGH, outTank.getAmount());
+        LongDataSlots.write(data, DATA_OUT_CAPACITY, DATA_OUT_CAPACITY_HIGH, outTank.getCapacity());
 
         Recipe recipe = recipeFor(in1Tank.getFluid(), in2Tank.getFluid());
         // 组合不匹配 / 输入不足 / 输出罐无法容纳 → 停机等待，丢弃进度防跨配方挪用

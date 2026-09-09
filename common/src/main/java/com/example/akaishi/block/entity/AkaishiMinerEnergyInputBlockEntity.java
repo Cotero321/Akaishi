@@ -9,6 +9,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerEnergyInputMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,10 +32,15 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AkaishiMinerEnergyInputBlockEntity extends BlockEntity
         implements ExtendedMenuProvider, IMinerPortDevice, IEnergyProvider, IDataCarrier {
 
-    public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_FORMED = 2;
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_FORMED = 4;
+    public static final int DATA_SLOTS = 5;
 
     private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.minerEnergyInputBufferCapacity);
-    private final SimpleContainerData data = new SimpleContainerData(3);
+    private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     private BlockPos controllerPos;
 
     public AkaishiMinerEnergyInputBlockEntity(BlockPos pos, BlockState state) {
@@ -46,8 +52,8 @@ public class AkaishiMinerEnergyInputBlockEntity extends BlockEntity
     }
 
     private void tickServer() {
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         // 控制器被拆/结构解散时清除关联坐标，避免悬空引用
         BlockEntity at = controllerPos == null ? null : level.getBlockEntity(controllerPos);
         if (controllerPos != null && !(at instanceof AkaishiMinerControllerBlockEntity)) {

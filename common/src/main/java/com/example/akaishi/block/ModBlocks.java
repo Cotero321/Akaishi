@@ -66,6 +66,11 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_DECAY_SOIL;
     public static RegistrySupplier<Block> CHISHI_DECAY_LOG;
 
+    // —— 机械域（AkaishiMechanicalBlocks）：模板制造厂 / 加工制作厂 / 组装加工台 ——
+    public static RegistrySupplier<Block> CHISHI_MECHANICAL_TEMPLATE_FACTORY;
+    public static RegistrySupplier<Block> CHISHI_MECHANICAL_PROCESSING_FACTORY;
+    public static RegistrySupplier<Block> CHISHI_MECHANICAL_ASSEMBLY_STATION;
+
     private ModBlocks() {
     }
 
@@ -75,6 +80,7 @@ public final class ModBlocks {
         AkaishiFoundationBlocks.register();
         AkaishiLogisticsBlocks.register();
         AkaishiTransgeneBlocks.register();
+        AkaishiMechanicalBlocks.register();
 
         // —— 基础域 ——
         RAW_CHISHI_BLOCK = AkaishiFoundationBlocks.RAW_CHISHI_BLOCK;
@@ -120,6 +126,11 @@ public final class ModBlocks {
         CHISHI_DECAY_PURIFIER = AkaishiDecayBlocks.CHISHI_DECAY_PURIFIER;
         CHISHI_DECAY_SOIL = AkaishiDecayBlocks.CHISHI_DECAY_SOIL;
         CHISHI_DECAY_LOG = AkaishiDecayBlocks.CHISHI_DECAY_LOG;
+
+        // —— 机械域 ——
+        CHISHI_MECHANICAL_TEMPLATE_FACTORY = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY;
+        CHISHI_MECHANICAL_PROCESSING_FACTORY = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY;
+        CHISHI_MECHANICAL_ASSEMBLY_STATION = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION;
     }
 
     /** 获取对应组合定义的方块（转发基础域，注册完成后可用） */

@@ -448,6 +448,44 @@ public final class ModConfig {
     /** 生命聚合转化器：生命能量缓冲容量 */
     public static volatile long lifeAggregationLifeCapacity = 100L;
 
+    // ==================== 机械改造机器 ====================
+    /** 机械三机赤能源缓冲容量（共用） */
+    public static volatile long mechanicalChishiCapacity = 100_000L;
+    /** 机械三机生命能量缓冲容量（共用） */
+    public static volatile long mechanicalLifeCapacity = 20_000L;
+    /** 模板制造厂：塑形一次赤能源消耗 */
+    public static volatile long mechTemplateChishiCost = 1_000L;
+    /** 模板制造厂：塑形一次生命能量消耗 */
+    public static volatile long mechTemplateLifeCost = 1_000L;
+    /** 模板制造厂：塑形一次耗时（tick，60=3s） */
+    public static volatile int mechTemplateTicks = 60;
+    /** 加工厂：器官基价赤能（下标=器官序数 0~8：眼/心/肺/内脏/肾/左臂/右臂/左腿/右腿），0=用内置默认 */
+    public static volatile long[] mechProcessChishiBase = new long[0];
+    /** 加工厂：器官基价生命能（下标同上），0=用内置默认 */
+    public static volatile long[] mechProcessLifeBase = new long[0];
+    /** 加工厂：器官耗时基价 tick（下标同上），0=用内置默认 */
+    public static volatile int[] mechProcessTicksBase = new int[0];
+    /** 加工厂：部件系数百分数（下标=部件序数 0~3 核心/模块/外壳/散热，120=×1.2），0=用内置默认 */
+    public static volatile int[] mechProcessPartFactor = new int[0];
+    /** 加工厂：材料消耗份数（下标=部件序数 0~3），0=用内置默认 */
+    public static volatile int[] mechProcessMaterialCount = new int[0];
+    /** 组装台：组装一次赤能源消耗（固定，与器官无关） */
+    public static volatile long mechAssemblyChishiCost = 2_000L;
+    /** 组装台：组装一次生命能量消耗（固定） */
+    public static volatile long mechAssemblyLifeCost = 2_000L;
+    /** 组装台：组装一次耗时（tick，80=4s） */
+    public static volatile int mechAssemblyTicks = 80;
+
+    // ==================== 机械义体属性换算 ====================
+    /** 机械义体：生命值权重 → 生命上限换算倍率（0=用内置默认） */
+    public static volatile double mechBodyHealthScale = 0.5;
+    /** 机械义体：攻击伤害权重 → 攻击伤害换算倍率（0=用内置默认） */
+    public static volatile double mechBodyAttackScale = 0.1;
+    /** 机械义体：攻击速度权重 → 攻击速度换算倍率（0=用内置默认） */
+    public static volatile double mechBodyAttackSpeedScale = 0.01;
+    /** 机械义体：移动速度权重 → 移动速度换算倍率（0=用内置默认） */
+    public static volatile double mechBodyMovementSpeedScale = 0.001;
+
     // ==================== 端口与电池缓冲 ====================
     /** 生命矩阵能量输入口缓冲容量 */
     public static volatile long lifeMatrixInputPortBufferCapacity = 100_000_000L;

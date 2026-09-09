@@ -10,6 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyAggregatorMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -59,14 +60,24 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
 
     private final AkaishiEnergyStorage energy;
     private final SimpleContainer inventory;
-    /** 同步数据：0=能量 1=容量 2=进度% 3=当前配方单次消耗 */
+    /** 同步数据：0/1=能量低/高，2/3=容量低/高，4=进度%，5/6=当前配方单次消耗低/高 */
     private final SimpleContainerData data;
+
+    // ===== 数据槽索引（能量/容量/消耗为 long，各占低/高 32 位两槽）=====
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_COST = 5;
+    public static final int DATA_COST_HIGH = 6;
+    public static final int DATA_SLOTS = 7;
 
     public AkaishiEnergyAggregatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_AGGREGATOR.get(), pos, state);
         this.energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyAggregatorEnergyCapacity);
         this.inventory = new SimpleContainer(SLOT_COUNT);
-        this.data = new SimpleContainerData(4);
+        this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiEnergyAggregatorBlockEntity be) {
@@ -91,11 +102,12 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
         }
         long stored = energy.getEnergyStored();
         long currentCost = recipe != null ? recipe.energy().getAsLong() : ModConfig.energyAggregatorEnergyPerIngot;
-        data.set(0, (int) stored);
-        data.set(1, (int) energy.getMaxEnergy());
+        // long 拆高低 32 位（SimpleContainerData 仅支持 int）
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, stored);
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         // 进度 = 当次聚合的充能进度（能量 / 当前配方消耗，long 计算防溢出）
-        data.set(2, (int) Math.min(100, stored * 100L / currentCost));
-        data.set(3, (int) currentCost);
+        data.set(DATA_PROGRESS, (int) Math.min(100, stored * 100L / currentCost));
+        LongDataSlots.write(data, DATA_COST, DATA_COST_HIGH, currentCost);
     }
 
     /** 条件：能量足够 + 输入匹配配方 + 输出可容纳产物 */

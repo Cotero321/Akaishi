@@ -2,6 +2,7 @@ package com.example.akaishi.life.organ;
 
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
+import com.example.akaishi.life.body.IInstallableOrgan;
 import com.example.akaishi.life.linkage.OrganLinkage;
 import com.example.akaishi.life.sample.SampleGroup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -36,7 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * NBT：gene_source（来源分组，决定品质）、entity_id（具体生物，决定特色效果）、
  * compat（适配度 0-100）、native（是否原生部件）。
  */
-public class AkaishiOrganItem extends Item {
+public class AkaishiOrganItem extends Item implements IInstallableOrgan {
 
     public static final String TAG_GENE_SOURCE = "gene_source";
     public static final String TAG_ENTITY = "entity_id";
@@ -125,6 +126,11 @@ public class AkaishiOrganItem extends Item {
     /** 器官栈 → 槽位（非器官物品返回 null；词条部位专属判定用） */
     public static BodySlot slotOf(ItemStack stack) {
         return stack.getItem() instanceof AkaishiOrganItem organ ? organ.slot : null;
+    }
+
+    @Override
+    public BodySlot bodySlot(ItemStack stack) {
+        return slot;
     }
 
     // ===== 读取 =====

@@ -1,15 +1,20 @@
-# Generate 16x16 textures for the chishi miner multiblock set
+# Generate 16x16 textures for the akaishi miner multiblock set
 # Pure ASCII content only (PS 5.1 GBK safety)
 Add-Type -AssemblyName System.Drawing
-$dir = Join-Path $PSScriptRoot 'common\src\main\resources\assets\template_mod\textures\block'
+$dir = Join-Path $PSScriptRoot 'common\src\main\resources\assets\akaishi\textures\block'
 if (-not (Test-Path $dir)) { Write-Error 'textures/block dir not found'; exit 1 }
 $itemDir = Split-Path $dir -Parent | Join-Path -ChildPath 'item'
 if (-not (Test-Path $itemDir)) { New-Item -ItemType Directory -Path $itemDir | Out-Null }
 
 function New-Canvas($plate) {
+    # Authoring grid is 16x16; Save-Png/Save-ItemPng upscale it with nearest-neighbor to 64x64.
     $bmp = New-Object System.Drawing.Bitmap(16,16)
     for ($y=0; $y -lt 16; $y++) { for ($x=0; $x -lt 16; $x++) { $bmp.SetPixel($x,$y,$plate) } }
     return $bmp
+}
+
+function Set-PixelScaled($bmp, $x, $y, $color) {
+    $bmp.SetPixel($x,$y,$color)
 }
 
 function Draw-Frame($bmp, $dark, $light, $rivet) {
@@ -55,15 +60,21 @@ function Draw-Star($bmp, $cx, $cy, $glow, $glowCol, $hi, $mid, $darkC) {
 
 function Save-Png($bmp, $name) {
     $path = Join-Path $dir $name
-    $bmp.Save($path,[System.Drawing.Imaging.ImageFormat]::Png)
-    $bmp.Dispose()
+    $out = New-Object System.Drawing.Bitmap(64,64)
+    $g = [System.Drawing.Graphics]::FromImage($out)
+    $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
+    $g.DrawImage($bmp,0,0,64,64); $g.Dispose(); $bmp.Dispose()
+    $out.Save($path,[System.Drawing.Imaging.ImageFormat]::Png); $out.Dispose()
     Write-Output ("wrote " + $name)
 }
 
 function Save-ItemPng($bmp, $name) {
     $path = Join-Path $itemDir $name
-    $bmp.Save($path,[System.Drawing.Imaging.ImageFormat]::Png)
-    $bmp.Dispose()
+    $out = New-Object System.Drawing.Bitmap(64,64)
+    $g = [System.Drawing.Graphics]::FromImage($out)
+    $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
+    $g.DrawImage($bmp,0,0,64,64); $g.Dispose(); $bmp.Dispose()
+    $out.Save($path,[System.Drawing.Imaging.ImageFormat]::Png); $out.Dispose()
     Write-Output ("wrote item " + $name)
 }
 
@@ -77,36 +88,36 @@ $steelRivet = [System.Drawing.Color]::FromArgb(255,120,130,160)
 # bottom: plain plate
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
-Save-Png $bmp 'chishi_miner_frame_bottom.png'
+Save-Png $bmp 'akaishi_miner_frame_bottom.png'
 # side: plate + two horizontal seams
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_frame_side.png'
+Save-Png $bmp 'akaishi_miner_frame_side.png'
 # top: plate + cross grid
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,7,$steelDark); $bmp.SetPixel(7,$x,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,8,$steelLight); $bmp.SetPixel(8,$x,$steelLight) }
-Save-Png $bmp 'chishi_miner_frame_top.png'
+Save-Png $bmp 'akaishi_miner_frame_top.png'
 
 # ===== upgrade frame (steel + blue plus sign on top) =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
-Save-Png $bmp 'chishi_miner_upgrade_frame_bottom.png'
+Save-Png $bmp 'akaishi_miner_upgrade_frame_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_upgrade_frame_side.png'
+Save-Png $bmp 'akaishi_miner_upgrade_frame_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $uHi = [System.Drawing.Color]::FromArgb(255,150,220,255)
 $uMid = [System.Drawing.Color]::FromArgb(255,70,160,220)
 foreach ($p in @(@(7,4),@(7,5),@(7,6),@(7,9),@(7,10),@(7,11),@(4,7),@(5,7),@(6,7),@(9,7),@(10,7),@(11,7))) { $bmp.SetPixel($p[0],$p[1],$uMid) }
 foreach ($p in @(@(7,7),@(7,8),@(8,7),@(6,7))) { $bmp.SetPixel($p[0],$p[1],$uHi) }
-Save-Png $bmp 'chishi_miner_upgrade_frame_top.png'
+Save-Png $bmp 'akaishi_miner_upgrade_frame_top.png'
 
 # ===== port (steel + gold ring outlet on top) =====
 $bmp = New-Canvas $steelPlate
@@ -114,11 +125,11 @@ Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
 for ($x=3; $x -lt 13; $x++) { $bmp.SetPixel($x,14,$steelDark) }
-Save-Png $bmp 'chishi_miner_port_side.png'
+Save-Png $bmp 'akaishi_miner_port_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=3; $x -lt 13; $x++) { $bmp.SetPixel($x,14,$steelDark) }
-Save-Png $bmp 'chishi_miner_port_bottom.png'
+Save-Png $bmp 'akaishi_miner_port_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $rHi = [System.Drawing.Color]::FromArgb(255,255,220,120)
@@ -127,43 +138,43 @@ $rDark = [System.Drawing.Color]::FromArgb(255,60,40,16)
 foreach ($p in @(@(5,5),@(10,5),@(5,10),@(10,10),@(7,7),@(8,8),@(8,7),@(7,8))) { $bmp.SetPixel($p[0],$p[1],$rMid) }
 foreach ($p in @(@(6,5),@(9,5),@(5,6),@(10,6),@(5,9),@(10,9),@(6,10),@(9,10),@(5,7),@(10,7),@(7,5),@(8,5),@(7,10),@(8,10),@(5,8),@(10,8))) { $bmp.SetPixel($p[0],$p[1],$rHi) }
 foreach ($p in @(@(6,6),@(9,6),@(6,9),@(9,9),@(7,6),@(8,6),@(6,7),@(6,8),@(9,7),@(9,8),@(7,9),@(8,9))) { $bmp.SetPixel($p[0],$p[1],$rDark) }
-Save-Png $bmp 'chishi_miner_port_top.png'
+Save-Png $bmp 'akaishi_miner_port_top.png'
 
 # ===== controller basic: steel + blue crystal core =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,14,$steelDark) }
-Save-Png $bmp 'chishi_miner_controller_basic_bottom.png'
+Save-Png $bmp 'akaishi_miner_controller_basic_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_controller_basic_side.png'
+Save-Png $bmp 'akaishi_miner_controller_basic_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $bHi = [System.Drawing.Color]::FromArgb(255,150,220,255)
 $bMid = [System.Drawing.Color]::FromArgb(255,70,160,220)
 $bDark = [System.Drawing.Color]::FromArgb(255,26,66,104)
 Draw-Crystal $bmp 8 8 $true $bHi $bHi $bMid $bDark
-Save-Png $bmp 'chishi_miner_controller_basic_top.png'
+Save-Png $bmp 'akaishi_miner_controller_basic_top.png'
 
 # ===== controller advanced: steel + gold-red star core =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,14,$steelDark) }
-Save-Png $bmp 'chishi_miner_controller_advanced_bottom.png'
+Save-Png $bmp 'akaishi_miner_controller_advanced_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_controller_advanced_side.png'
+Save-Png $bmp 'akaishi_miner_controller_advanced_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $aHi = [System.Drawing.Color]::FromArgb(255,255,220,120)
 $aMid = [System.Drawing.Color]::FromArgb(255,224,130,40)
 $aDark = [System.Drawing.Color]::FromArgb(255,110,58,30)
 Draw-Star $bmp 8 8 $true $aHi $aHi $aMid $aDark
-Save-Png $bmp 'chishi_miner_controller_advanced_top.png'
+Save-Png $bmp 'akaishi_miner_controller_advanced_top.png'
 
 # ===== controller super: deep violet plate + purple diamond core =====
 $vPlate = [System.Drawing.Color]::FromArgb(255,40,34,56)
@@ -173,12 +184,12 @@ $vRivet = [System.Drawing.Color]::FromArgb(255,140,120,190)
 $bmp = New-Canvas $vPlate
 Draw-Frame $bmp $vDark $vLight $vRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,14,$vDark) }
-Save-Png $bmp 'chishi_miner_controller_super_bottom.png'
+Save-Png $bmp 'akaishi_miner_controller_super_bottom.png'
 $bmp = New-Canvas $vPlate
 Draw-Frame $bmp $vDark $vLight $vRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$vDark); $bmp.SetPixel($x,10,$vDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$vLight); $bmp.SetPixel($x,11,$vLight) }
-Save-Png $bmp 'chishi_miner_controller_super_side.png'
+Save-Png $bmp 'akaishi_miner_controller_super_side.png'
 $bmp = New-Canvas $vPlate
 Draw-Frame $bmp $vDark $vLight $vRivet
 $sHi = [System.Drawing.Color]::FromArgb(255,220,170,255)
@@ -186,7 +197,7 @@ $sMid = [System.Drawing.Color]::FromArgb(255,150,90,220)
 $sDark = [System.Drawing.Color]::FromArgb(255,70,36,120)
 Draw-Crystal $bmp 8 8 $true $sHi $sHi $sMid $sDark
 $bmp.SetPixel(8,8,$sHi); $bmp.SetPixel(7,7,$sHi); $bmp.SetPixel(9,9,$sHi); $bmp.SetPixel(7,9,$sHi); $bmp.SetPixel(9,7,$sHi)
-Save-Png $bmp 'chishi_miner_controller_super_top.png'
+Save-Png $bmp 'akaishi_miner_controller_super_top.png'
 
 # ===== controller ultimate: obsidian plate + gold layered star =====
 $uPlate = [System.Drawing.Color]::FromArgb(255,22,20,24)
@@ -196,12 +207,12 @@ $uRivet = [System.Drawing.Color]::FromArgb(255,150,140,120)
 $bmp = New-Canvas $uPlate
 Draw-Frame $bmp $uDark $uLight $uRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,14,$uDark) }
-Save-Png $bmp 'chishi_miner_controller_ultimate_bottom.png'
+Save-Png $bmp 'akaishi_miner_controller_ultimate_bottom.png'
 $bmp = New-Canvas $uPlate
 Draw-Frame $bmp $uDark $uLight $uRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$uDark); $bmp.SetPixel($x,10,$uDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$uLight); $bmp.SetPixel($x,11,$uLight) }
-Save-Png $bmp 'chishi_miner_controller_ultimate_side.png'
+Save-Png $bmp 'akaishi_miner_controller_ultimate_side.png'
 $bmp = New-Canvas $uPlate
 Draw-Frame $bmp $uDark $uLight $uRivet
 $tHi = [System.Drawing.Color]::FromArgb(255,255,225,140)
@@ -209,7 +220,7 @@ $tMid = [System.Drawing.Color]::FromArgb(255,224,170,60)
 $tDark = [System.Drawing.Color]::FromArgb(255,120,84,30)
 Draw-Star $bmp 8 8 $true $tHi $tHi $tMid $tDark
 foreach ($p in @(@(0,1),@(0,-1),@(1,0),@(-1,0))) { $bmp.SetPixel(8+$p[0],8+$p[1],$tHi) }
-Save-Png $bmp 'chishi_miner_controller_ultimate_top.png'
+Save-Png $bmp 'akaishi_miner_controller_ultimate_top.png'
 
 # ===== upgrade item icons (16x16) =====
 # speed: blue up arrow
@@ -219,7 +230,7 @@ $tMid = [System.Drawing.Color]::FromArgb(255,70,160,220)
 $tDark = [System.Drawing.Color]::FromArgb(255,26,66,104)
 foreach ($p in @(@(7,3),@(8,3),@(7,4),@(8,4),@(6,5),@(9,5),@(5,6),@(10,6),@(4,7),@(11,7))) { $bmp.SetPixel($p[0],$p[1],$tHi) }
 foreach ($p in @(@(7,6),@(8,6),@(7,7),@(8,7),@(7,8),@(8,8),@(7,9),@(8,9),@(7,10),@(8,10),@(7,11),@(8,11),@(7,12),@(8,12))) { $bmp.SetPixel($p[0],$p[1],$tMid) }
-Save-ItemPng $bmp 'chishi_miner_speed_upgrade.png'
+Save-ItemPng $bmp 'akaishi_miner_speed_upgrade.png'
 
 # fortune: green clover
 $bmp = New-Object System.Drawing.Bitmap(16,16)
@@ -229,7 +240,7 @@ $fDark = [System.Drawing.Color]::FromArgb(255,30,110,44)
 foreach ($p in @(@(7,2),@(8,2),@(6,3),@(9,3),@(7,3),@(8,3),@(5,4),@(10,4),@(7,4),@(8,4),@(4,5),@(5,5),@(6,5),@(7,5),@(8,5),@(9,5),@(10,5),@(11,5),@(4,6),@(5,6),@(10,6),@(11,6))) { $bmp.SetPixel($p[0],$p[1],$fMid) }
 foreach ($p in @(@(7,6),@(8,6),@(6,4),@(9,4),@(7,5),@(8,5),@(6,6),@(9,6),@(7,7),@(8,7))) { $bmp.SetPixel($p[0],$p[1],$fHi) }
 foreach ($p in @(@(7,8),@(8,8),@(7,9),@(8,9),@(7,10),@(8,10),@(6,11),@(9,11),@(7,12),@(8,12))) { $bmp.SetPixel($p[0],$p[1],$fDark) }
-Save-ItemPng $bmp 'chishi_miner_fortune_upgrade.png'
+Save-ItemPng $bmp 'akaishi_miner_fortune_upgrade.png'
 
 # storage: yellow battery
 $bmp = New-Object System.Drawing.Bitmap(16,16)
@@ -240,6 +251,35 @@ foreach ($p in @(@(6,3),@(7,3),@(8,3),@(9,3),@(6,12),@(7,12),@(8,12),@(9,12),@(6
 foreach ($p in @(@(7,2),@(8,2))) { $bmp.SetPixel($p[0],$p[1],$gHi) }
 for ($y=4; $y -lt 12; $y++) { for ($x=7; $x -lt 9; $x++) { $bmp.SetPixel($x,$y,$gMid) } }
 foreach ($p in @(@(7,5),@(8,5),@(7,9),@(8,9))) { $bmp.SetPixel($p[0],$p[1],$gHi) }
-Save-ItemPng $bmp 'chishi_miner_storage_upgrade.png'
+Save-ItemPng $bmp 'akaishi_miner_storage_upgrade.png'
 
 Write-Output 'all miner textures generated'
+
+# Normalize every existing miner texture in both output folders. This also repairs legacy
+# 16x16 files that are referenced by miner block models but are not authored above.
+function Normalize-MinerPng($folder) {
+    Get-ChildItem -LiteralPath $folder -Filter '*miner*.png' -File | ForEach-Object {
+        $source = [System.Drawing.Image]::FromFile($_.FullName)
+        try {
+            if ($source.Width -eq 64 -and $source.Height -eq 64) { return }
+            $out = New-Object System.Drawing.Bitmap(64,64)
+            try {
+                $g = [System.Drawing.Graphics]::FromImage($out)
+                try {
+                    $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
+                    $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::Half
+                    $g.DrawImage($source,0,0,64,64)
+                } finally { $g.Dispose() }
+                $tmp = $_.FullName + '.tmp.png'
+                $out.Save($tmp,[System.Drawing.Imaging.ImageFormat]::Png)
+                $source.Dispose()
+                Remove-Item -LiteralPath $_.FullName -Force
+                Move-Item -LiteralPath $tmp -Destination $_.FullName -Force
+                Write-Output ("normalized " + $_.Name)
+            } finally { $out.Dispose() }
+        } finally { $source.Dispose() }
+    }
+}
+Normalize-MinerPng $dir
+Normalize-MinerPng $itemDir
+Write-Output 'all miner textures normalized to 64x64'

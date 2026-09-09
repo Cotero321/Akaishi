@@ -6,6 +6,7 @@ import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -98,11 +99,13 @@ public class AkaishiCultivatorMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiCultivatorBlockEntity.DATA_ENERGY,
+                AkaishiCultivatorBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiCultivatorBlockEntity.DATA_CAPACITY,
+                AkaishiCultivatorBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     public int getProgress() {

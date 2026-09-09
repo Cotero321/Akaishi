@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "akaishi:block/akaishi_energy_cell_basic"
-  }
+    "textures":  {
+                     "bottom":  "akaishi:block/akaishi_energy_cell_basic_bottom",
+                     "top":  "akaishi:block/akaishi_energy_cell_basic_top",
+                     "side":  "akaishi:block/akaishi_energy_cell_basic_side"
+                 },
+    "parent":  "minecraft:block/cube_bottom_top"
 }

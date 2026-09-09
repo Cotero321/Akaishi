@@ -2,11 +2,11 @@
 # Pure ASCII content only (PS 5.1 GBK safety)
 Add-Type -AssemblyName System.Drawing
 $root = Join-Path $PSScriptRoot 'common\src\main\resources'
-$blockstates = Join-Path $root 'assets\template_mod\blockstates'
-$modelsBlock = Join-Path $root 'assets\template_mod\models\block'
-$modelsItem  = Join-Path $root 'assets\template_mod\models\item'
-$loot        = Join-Path $root 'data\template_mod\loot_tables\blocks'
-$texDir      = Join-Path $root 'assets\template_mod\textures\block'
+$blockstates = Join-Path $root 'assets\akaishi\blockstates'
+$modelsBlock = Join-Path $root 'assets\akaishi\models\block'
+$modelsItem  = Join-Path $root 'assets\akaishi\models\item'
+$loot        = Join-Path $root 'data\akaishi\loot_tables\blocks'
+$texDir      = Join-Path $root 'assets\akaishi\textures\block'
 $utf8NoBom   = New-Object System.Text.UTF8Encoding $false
 
 function Write-Utf8([string]$path, [string]$content) {
@@ -14,19 +14,19 @@ function Write-Utf8([string]$path, [string]$content) {
 }
 
 $blocks = @(
-    'chishi_miner_speed_upgrade_block',
-    'chishi_miner_fortune_upgrade_block',
-    'chishi_miner_storage_upgrade_block'
+    'akaishi_miner_speed_upgrade_block',
+    'akaishi_miner_fortune_upgrade_block',
+    'akaishi_miner_storage_upgrade_block'
 )
 
 foreach ($b in $blocks) {
-    $bs = "{`n  `"variants`": {`n    `"`": {`n      `"model`": `"template_mod:block/$b`"`n    }`n  }`n}"
+    $bs = "{`n  `"variants`": {`n    `"`": {`n      `"model`": `"akaishi:block/$b`"`n    }`n  }`n}"
     Write-Utf8 (Join-Path $blockstates ($b + '.json')) $bs
-    $bm = "{`n  `"parent`": `"minecraft:block/cube_bottom_top`",`n  `"textures`": {`n    `"bottom`": `"template_mod:block/${b}_bottom`",`n    `"top`": `"template_mod:block/${b}_top`",`n    `"side`": `"template_mod:block/${b}_side`"`n  }`n}"
+    $bm = "{`n  `"parent`": `"minecraft:block/cube_bottom_top`",`n  `"textures`": {`n    `"bottom`": `"akaishi:block/${b}_bottom`",`n    `"top`": `"akaishi:block/${b}_top`",`n    `"side`": `"akaishi:block/${b}_side`"`n  }`n}"
     Write-Utf8 (Join-Path $modelsBlock ($b + '.json')) $bm
-    $im = "{`n  `"parent`": `"template_mod:block/$b`"`n}"
+    $im = "{`n  `"parent`": `"akaishi:block/$b`"`n}"
     Write-Utf8 (Join-Path $modelsItem ($b + '.json')) $im
-    $lt = "{`n  `"type`": `"minecraft:block`",`n  `"pools`": [`n    {`n      `"bonus_rolls`": 0.0,`n      `"conditions`": [`n        { `"condition`": `"minecraft:survives_explosion`" }`n      ],`n      `"entries`": [`n        {`n          `"type`": `"minecraft:item`",`n          `"name`": `"template_mod:$b`"`n        }`n      ],`n      `"rolls`": 1.0`n    }`n  ]`n}"
+    $lt = "{`n  `"type`": `"minecraft:block`",`n  `"pools`": [`n    {`n      `"bonus_rolls`": 0.0,`n      `"conditions`": [`n        { `"condition`": `"minecraft:survives_explosion`" }`n      ],`n      `"entries`": [`n        {`n          `"type`": `"minecraft:item`",`n          `"name`": `"akaishi:$b`"`n        }`n      ],`n      `"rolls`": 1.0`n    }`n  ]`n}"
     Write-Utf8 (Join-Path $loot ($b + '.json')) $lt
 }
 
@@ -63,12 +63,12 @@ $steelRivet = [System.Drawing.Color]::FromArgb(255,120,130,160)
 # ===== speed module: blue up-arrow on top =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
-Save-Png $bmp 'chishi_miner_speed_upgrade_block_bottom.png'
+Save-Png $bmp 'akaishi_miner_speed_upgrade_block_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_speed_upgrade_block_side.png'
+Save-Png $bmp 'akaishi_miner_speed_upgrade_block_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $sHi = [System.Drawing.Color]::FromArgb(255,150,220,255)
@@ -76,17 +76,17 @@ $sMid = [System.Drawing.Color]::FromArgb(255,70,160,220)
 $sDark = [System.Drawing.Color]::FromArgb(255,26,66,104)
 foreach ($p in @(@(7,3),@(8,3),@(7,4),@(8,4),@(6,5),@(9,5),@(5,6),@(10,6),@(4,7),@(11,7))) { $bmp.SetPixel($p[0],$p[1],$sHi) }
 foreach ($p in @(@(7,6),@(8,6),@(7,7),@(8,7),@(7,8),@(8,8),@(7,9),@(8,9),@(7,10),@(8,10),@(7,11),@(8,11),@(7,12),@(8,12))) { $bmp.SetPixel($p[0],$p[1],$sMid) }
-Save-Png $bmp 'chishi_miner_speed_upgrade_block_top.png'
+Save-Png $bmp 'akaishi_miner_speed_upgrade_block_top.png'
 
 # ===== fortune module: green clover on top =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
-Save-Png $bmp 'chishi_miner_fortune_upgrade_block_bottom.png'
+Save-Png $bmp 'akaishi_miner_fortune_upgrade_block_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_fortune_upgrade_block_side.png'
+Save-Png $bmp 'akaishi_miner_fortune_upgrade_block_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $fHi = [System.Drawing.Color]::FromArgb(255,170,255,170)
@@ -95,17 +95,17 @@ $fDark = [System.Drawing.Color]::FromArgb(255,30,110,44)
 foreach ($p in @(@(7,2),@(8,2),@(6,3),@(9,3),@(7,3),@(8,3),@(5,4),@(10,4),@(7,4),@(8,4),@(4,5),@(5,5),@(6,5),@(7,5),@(8,5),@(9,5),@(10,5),@(11,5),@(4,6),@(5,6),@(10,6),@(11,6))) { $bmp.SetPixel($p[0],$p[1],$fMid) }
 foreach ($p in @(@(7,6),@(8,6),@(6,4),@(9,4),@(7,5),@(8,5),@(6,6),@(9,6),@(7,7),@(8,7))) { $bmp.SetPixel($p[0],$p[1],$fHi) }
 foreach ($p in @(@(7,8),@(8,8),@(7,9),@(8,9),@(7,10),@(8,10),@(6,11),@(9,11),@(7,12),@(8,12))) { $bmp.SetPixel($p[0],$p[1],$fDark) }
-Save-Png $bmp 'chishi_miner_fortune_upgrade_block_top.png'
+Save-Png $bmp 'akaishi_miner_fortune_upgrade_block_top.png'
 
 # ===== storage module: yellow battery on top =====
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
-Save-Png $bmp 'chishi_miner_storage_upgrade_block_bottom.png'
+Save-Png $bmp 'akaishi_miner_storage_upgrade_block_bottom.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,5,$steelDark); $bmp.SetPixel($x,10,$steelDark) }
 for ($x=2; $x -lt 14; $x++) { $bmp.SetPixel($x,6,$steelLight); $bmp.SetPixel($x,11,$steelLight) }
-Save-Png $bmp 'chishi_miner_storage_upgrade_block_side.png'
+Save-Png $bmp 'akaishi_miner_storage_upgrade_block_side.png'
 $bmp = New-Canvas $steelPlate
 Draw-Frame $bmp $steelDark $steelLight $steelRivet
 $gHi = [System.Drawing.Color]::FromArgb(255,255,235,150)
@@ -115,6 +115,6 @@ foreach ($p in @(@(6,3),@(7,3),@(8,3),@(9,3),@(6,12),@(7,12),@(8,12),@(9,12),@(6
 foreach ($p in @(@(7,2),@(8,2))) { $bmp.SetPixel($p[0],$p[1],$gHi) }
 for ($y=4; $y -lt 12; $y++) { for ($x=7; $x -lt 9; $x++) { $bmp.SetPixel($x,$y,$gMid) } }
 foreach ($p in @(@(7,5),@(8,5),@(7,9),@(8,9))) { $bmp.SetPixel($p[0],$p[1],$gHi) }
-Save-Png $bmp 'chishi_miner_storage_upgrade_block_top.png'
+Save-Png $bmp 'akaishi_miner_storage_upgrade_block_top.png'
 
 Write-Output 'miner upgrade block resources generated'

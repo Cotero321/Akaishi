@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiLifePurifierBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 生命能量提纯器菜单：升级槽（速度/能量）+ 1 个输出槽（生命能量固态物，只出不进）+ 双能量/进度数据。
- * 数据槽：0/1=赤能量/赤容量 2/3=生命能量/生命容量 4=固化进度百分比。
+ * 数据槽：0/1=赤能量低/高 2/3=赤容量低/高 4/5=生命能量低/高 6/7=生命容量低/高 8=固化进度百分比。
  */
 public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
@@ -63,22 +64,26 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
     /** 当前赤能源储量 */
     public long getAkaishiEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiLifePurifierBlockEntity.DATA_AKAISHI_ENERGY,
+                AkaishiLifePurifierBlockEntity.DATA_AKAISHI_ENERGY_HIGH);
     }
 
     /** 赤能源容量 */
     public long getAkaishiMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiLifePurifierBlockEntity.DATA_AKAISHI_CAPACITY,
+                AkaishiLifePurifierBlockEntity.DATA_AKAISHI_CAPACITY_HIGH);
     }
 
     /** 当前生命能量储量 */
     public long getLifeEnergy() {
-        return data.get(2);
+        return LongDataSlots.read(data, AkaishiLifePurifierBlockEntity.DATA_LIFE_ENERGY,
+                AkaishiLifePurifierBlockEntity.DATA_LIFE_ENERGY_HIGH);
     }
 
     /** 生命能量容量 */
     public long getLifeMax() {
-        return data.get(3);
+        return LongDataSlots.read(data, AkaishiLifePurifierBlockEntity.DATA_LIFE_CAPACITY,
+                AkaishiLifePurifierBlockEntity.DATA_LIFE_CAPACITY_HIGH);
     }
 
     /** 固化进度（0-100） */

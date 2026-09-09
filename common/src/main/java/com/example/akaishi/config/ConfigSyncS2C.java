@@ -57,6 +57,23 @@ public final class ConfigSyncS2C {
             int[] cultivatorUpgradeSolid = readArray(buf);
             int[] cultivatorUpgradeTicks = readArray(buf);
             int cultivatorUpgradeCompatBonus = buf.readVarInt();
+            long[] mechProcessChishiBase = readLongArray(buf);
+            long[] mechProcessLifeBase = readLongArray(buf);
+            int[] mechProcessTicksBase = readArray(buf);
+            int[] mechProcessPartFactor = readArray(buf);
+            int[] mechProcessMaterialCount = readArray(buf);
+            long mechTemplateChishiCost = buf.readVarLong();
+            long mechTemplateLifeCost = buf.readVarLong();
+            int mechTemplateTicks = buf.readVarInt();
+            long mechAssemblyChishiCost = buf.readVarLong();
+            long mechAssemblyLifeCost = buf.readVarLong();
+            int mechAssemblyTicks = buf.readVarInt();
+            long mechanicalChishiCapacity = buf.readVarLong();
+            long mechanicalLifeCapacity = buf.readVarLong();
+            double mechBodyHealthScale = buf.readDouble();
+            double mechBodyAttackScale = buf.readDouble();
+            double mechBodyAttackSpeedScale = buf.readDouble();
+            double mechBodyMovementSpeedScale = buf.readDouble();
             Minecraft.getInstance().execute(() -> {
                 ModConfig.maxRejection = maxRejection;
                 ModConfig.reactorTempMax = reactorTempMax;
@@ -88,6 +105,23 @@ public final class ConfigSyncS2C {
                 ModConfig.cultivatorUpgradeSolid = cultivatorUpgradeSolid;
                 ModConfig.cultivatorUpgradeTicks = cultivatorUpgradeTicks;
                 ModConfig.cultivatorUpgradeCompatBonus = cultivatorUpgradeCompatBonus;
+                ModConfig.mechProcessChishiBase = mechProcessChishiBase;
+                ModConfig.mechProcessLifeBase = mechProcessLifeBase;
+                ModConfig.mechProcessTicksBase = mechProcessTicksBase;
+                ModConfig.mechProcessPartFactor = mechProcessPartFactor;
+                ModConfig.mechProcessMaterialCount = mechProcessMaterialCount;
+                ModConfig.mechTemplateChishiCost = mechTemplateChishiCost;
+                ModConfig.mechTemplateLifeCost = mechTemplateLifeCost;
+                ModConfig.mechTemplateTicks = mechTemplateTicks;
+                ModConfig.mechAssemblyChishiCost = mechAssemblyChishiCost;
+                ModConfig.mechAssemblyLifeCost = mechAssemblyLifeCost;
+                ModConfig.mechAssemblyTicks = mechAssemblyTicks;
+                ModConfig.mechanicalChishiCapacity = mechanicalChishiCapacity;
+                ModConfig.mechanicalLifeCapacity = mechanicalLifeCapacity;
+                ModConfig.mechBodyHealthScale = mechBodyHealthScale;
+                ModConfig.mechBodyAttackScale = mechBodyAttackScale;
+                ModConfig.mechBodyAttackSpeedScale = mechBodyAttackSpeedScale;
+                ModConfig.mechBodyMovementSpeedScale = mechBodyMovementSpeedScale;
             });
         });
     }
@@ -125,6 +159,23 @@ public final class ConfigSyncS2C {
         writeArray(buf, ModConfig.cultivatorUpgradeSolid);
         writeArray(buf, ModConfig.cultivatorUpgradeTicks);
         buf.writeVarInt(ModConfig.cultivatorUpgradeCompatBonus);
+        writeLongArray(buf, ModConfig.mechProcessChishiBase);
+        writeLongArray(buf, ModConfig.mechProcessLifeBase);
+        writeArray(buf, ModConfig.mechProcessTicksBase);
+        writeArray(buf, ModConfig.mechProcessPartFactor);
+        writeArray(buf, ModConfig.mechProcessMaterialCount);
+        buf.writeVarLong(ModConfig.mechTemplateChishiCost);
+        buf.writeVarLong(ModConfig.mechTemplateLifeCost);
+        buf.writeVarInt(ModConfig.mechTemplateTicks);
+        buf.writeVarLong(ModConfig.mechAssemblyChishiCost);
+        buf.writeVarLong(ModConfig.mechAssemblyLifeCost);
+        buf.writeVarInt(ModConfig.mechAssemblyTicks);
+        buf.writeVarLong(ModConfig.mechanicalChishiCapacity);
+        buf.writeVarLong(ModConfig.mechanicalLifeCapacity);
+        buf.writeDouble(ModConfig.mechBodyHealthScale);
+        buf.writeDouble(ModConfig.mechBodyAttackScale);
+        buf.writeDouble(ModConfig.mechBodyAttackSpeedScale);
+        buf.writeDouble(ModConfig.mechBodyMovementSpeedScale);
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }
 

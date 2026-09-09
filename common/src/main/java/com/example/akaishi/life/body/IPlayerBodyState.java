@@ -1,5 +1,6 @@
 package com.example.akaishi.life.body;
 
+import com.example.akaishi.life.mechanical.MechanicalIntegration;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,6 +36,11 @@ public interface IPlayerBodyState {
 
     /** 累加排斥值，超出 0-100 自动钳制 */
     void addRejection(BodySlot slot, int amount);
+
+    // ===== 机械器官整合度（只涨不降，随躯体持久化）=====
+
+    /** 机械器官整合度数据（每槽位整合值 + 浮点增长余数） */
+    MechanicalIntegration getMechanicalIntegration();
 
     // ===== 基因强化（永久药剂吸收，最多 GENE_CAPACITY 种不同来源）=====
 

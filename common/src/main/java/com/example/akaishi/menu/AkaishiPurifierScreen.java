@@ -37,7 +37,7 @@ public class AkaishiPurifierScreen extends AbstractContainerScreen<AkaishiPurifi
         // 赤石能量条：右侧垂直条(153,18..62)，轨道框恒绘（能量为 0 也占位，规则 4）+ 从底部向上内缩填充
         GuiWidgets.track(gui, x + 153, y + 18, 10, 44);
         int maxEnergy = AkaishiPurifierBlockEntity.MAX_ENERGY;
-        int energy = Math.max(0, Math.min(menu.getEnergy(), maxEnergy));
+        long energy = Math.max(0, Math.min(menu.getEnergy(), maxEnergy));
         int energyHeight = (int) Math.ceil(42.0 * energy / maxEnergy);
         if (energyHeight > 0) {
             gui.fill(x + 154, y + 61 - energyHeight, x + 162, y + 61, 0xFFE03030);

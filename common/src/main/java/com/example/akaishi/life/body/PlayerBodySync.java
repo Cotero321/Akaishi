@@ -66,6 +66,8 @@ public final class PlayerBodySync {
                 buf.writeItem(organ);
             }
             buf.writeInt(state.getRejection(slot));
+            // 机械整合度（0~100）：客户端 tooltip/面板展示用
+            buf.writeVarInt(state.getMechanicalIntegration().get(slot));
         }
         // 突破激活（单条：来源 + 额外适配 + 基础% + 截止时刻；无激活写 false）
         buf.writeBoolean(state.hasActiveBreakthrough());

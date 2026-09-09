@@ -1,0 +1,34 @@
+{
+  "name": "Mechanical Prosthetics",
+  "icon": "akaishi:akaishi_mechanical_heart",
+  "category": "akaishi:life_advanced",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mechanical_heart",
+      "text": "$(bold)Mechanical Prosthetics$(0) — a second path that complements organic organs: $(4)zero rejection$(0) and an $(4)integration$(0) value that only ever rises.$(br2)Implanted into its body slot via the \"$(l:akaishi:surgery)Surgery Chamber$(/l)\", it $(4)generates no rejection$(0), ignores adaptation, and never triggers enemy pairs or breakthrough. The trade-off: right after implanting only $(4)20%$(0) takes effect, and you must grow integration from 0 to 100 over time.$(br2)Nine finished pieces cover the nine slots: eye / heart / lung / viscera / kidney / left arm / right arm / left leg / right leg."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "One line, three machines",
+      "text": "$(li)1. $(l:akaishi:life_machines)Template Factory$(/l): universal shaping template + 1 life solid + both energies → 1 $(4)part template$(0) (choose the organ and part type in the GUI; DNA stays blank)$(li)2. Processing Factory: part template + matching material (core 3 / module 2 / shell 4 / cooling 2) + 1 life solid + both energies → $(4)processed part$(0); material tier sets part weight$(li)3. Assembly Station: one $(4)core / module / shell / cooling$(0) of the same organ + both energies → a $(4)finished prosthetic$(0)$(br2)The weights of all four parts together decide the finished stats."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Integration and stats",
+      "text": "$(bold)Integration$(0) (0-100, $(4)never drops$(0)):$(li)Grows a tiny amount per tick; only whole points count; a $(4)mechanical heart$(0) multiplies growth by 1.5, without one it is 0.5$(li)Same-source (all four parts share the same non-empty DNA) adds another ×1.3$(li)Effective ratio = 20% + integration × 80% / 100$(br2)$(bold)Five stats$(0): overall multiplier / health / attack / attack speed / move speed, applied to the player as \"weight × integration discount × config multiplier\".$(br2)$(bold)Synergies$(0) (auto bonuses when all four parts qualify): Balanced, Extreme, Iron Wall, Wind, Same Source — see the item tooltip.$(br2)Hover a slot in the \"$(l:akaishi:life_body)Body Scanner$(/l)\" to read the current integration."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_body",
+        "akaishi:surgery",
+        "akaishi:life_machines",
+        "akaishi:life_organs",
+        "akaishi:life_struct"
+      ],
+      "text": "Read first: how to make organic organs (Organ Anatomy) and perform surgery (Surgery Chamber); prosthetics run on the Life Machines line, and integration is monitored in Body & Decay."
+    }
+  ]
+}

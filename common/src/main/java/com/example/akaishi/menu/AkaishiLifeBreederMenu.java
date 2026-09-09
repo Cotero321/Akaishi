@@ -5,6 +5,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 生命培育器菜单：器官输入 + 基因序列 + 衰竭结晶 → 突变器官输出 + 背包。
- * 数据槽：0/1=生命能量/容量 2=培养进度% 3=序列纯度（客户端据此算成功率）。
+ * 数据槽：0/1=生命能量 2/3=生命容量 4=培养进度% 5=序列纯度（客户端据此算成功率）。
  */
 public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
 
@@ -106,11 +107,13 @@ public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiLifeBreederBlockEntity.DATA_LIFE_ENERGY,
+                AkaishiLifeBreederBlockEntity.DATA_LIFE_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiLifeBreederBlockEntity.DATA_LIFE_CAPACITY,
+                AkaishiLifeBreederBlockEntity.DATA_LIFE_CAPACITY_HIGH);
     }
 
     /** 培养进度（0-100） */

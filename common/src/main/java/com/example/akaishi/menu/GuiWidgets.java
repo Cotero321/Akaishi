@@ -1,6 +1,8 @@
 package com.example.akaishi.menu;
 
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 /**
  * 界面自绘控件工具：统一槽位框/按钮的绘制样式，供各 Screen 复用。
@@ -12,6 +14,7 @@ public final class GuiWidgets {
     private static final int COLOR_SLOT_DARK = 0xFF373737;
     private static final int COLOR_SLOT_LIGHT = 0xFFFFFFFF;
     private static final int COLOR_PANEL = 0xFFC6C6C6;
+    private static final int COLOR_PROGRESS = 0xFFFFD030;
 
     private GuiWidgets() {
     }
@@ -25,15 +28,15 @@ public final class GuiWidgets {
         gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
     }
 
-    /** 绘制玩家背包 3×9 + 快捷栏 1×9 槽位框（背包起点 y=124，快捷栏 y=180，与 Menu 槽位坐标一致） */
+    /** 绘制玩家背包 3×9 + 快捷栏 1×9 槽位框（背包起点 y=104，快捷栏 y=168，与 Menu 槽位坐标一致） */
     public static void playerInventory(GuiGraphics gui, int x, int y) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                slotBox(gui, x + 8 + col * 18, y + 124 + row * 18);
+                slotBox(gui, x + 8 + col * 18, y + 104 + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            slotBox(gui, x + 8 + col * 18, y + 180);
+            slotBox(gui, x + 8 + col * 18, y + 168);
         }
     }
 
@@ -68,6 +71,52 @@ public final class GuiWidgets {
         }
     }
 
+    /**
+     * 绘制"箭头即进度"的右箭头：矩形箭头体 + 三角尖头，内部按 pct(0~100) 从左侧填充黄色进度，
+     * 替代独立进度条；箭头方向指向输出槽，兼具方向与进度语义。坐标一律做越界钳制。
+     */
+    public static void progressArrow(GuiGraphics gui, int x, int y, int w, int h, float pct) {
+        if (w < 3 || h < 3) {
+            return;
+        }
+        // 尖头占 40% 宽，收窄区间足够长才能看出箭头形状
+        int head = Math.max(2, w * 2 / 5);
+        int bodyW = w - head;
+        int mid = h / 2;
+        float clamped = Math.max(0, Math.min(pct, 100));
+        // 进度覆盖整支箭头（含尖头），左 -> 右填充
+        int fill = (int) (w * clamped / 100f);
+
+        // 逐列计算上下边界：箭头体为满高，尖头对称收窄至中线
+        for (int i = 0; i < w; i++) {
+            int top;
+            int bottom;
+            if (i < bodyW) {
+                top = 0;
+                bottom = h - 1;
+            } else {
+                int k = i - bodyW;                       // 0 .. head-1
+                int half = Math.round((h / 2f) * (head - k) / (float) head) - 1;
+                if (half < 0) {
+                    half = 0;
+                }
+                top = mid - half;
+                bottom = mid + half;
+            }
+            for (int j = top; j <= bottom; j++) {
+                int c;
+                if (j == top || j == bottom) {
+                    c = COLOR_SLOT_DARK;                 // 上下描边勾出箭头轮廓
+                } else if (i < fill) {
+                    c = COLOR_PROGRESS;                  // 已完成：黄色
+                } else {
+                    c = COLOR_SLOT;                      // 未完成：浅灰
+                }
+                gui.fill(x + i, y + j, x + i + 1, y + j + 1, c);
+            }
+        }
+    }
+
     /** 绘制 30×12 原版风格小按钮（内凹灰体），供频道切换等操作按钮复用 */
     public static void button(GuiGraphics gui, int x, int y) {
         button(gui, x, y, 30, 12);
@@ -80,5 +129,39 @@ public final class GuiWidgets {
         gui.fill(x, y, x + 1, y + h, COLOR_SLOT_DARK);
         gui.fill(x, y + h - 1, x + w, y + h, COLOR_SLOT_LIGHT);
         gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
+    }
+
+    /**
+     * 绘制"下拉式选择"框体：灰底内凹框 + 右侧下箭头(chevron)，供模板厂选择器官/部件。
+     */
+    public static void dropdown(GuiGraphics gui, int x, int y, int w, int h) {
+        gui.fill(x, y, x + w, y + h, COLOR_SLOT);
+        gui.fill(x, y, x + w, y + 1, COLOR_SLOT_DARK);
+        gui.fill(x, y, x + 1, y + h, COLOR_SLOT_DARK);
+        gui.fill(x, y + h - 1, x + w, y + h, COLOR_SLOT_LIGHT);
+        gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
+        // 右侧下箭头 chevron
+        int cx = x + w - 9;
+        int cy = y + 3;
+        int color = 0xFF3F3F3F;
+        for (int i = 0; i < 4; i++) {
+            gui.fill(cx + i, cy + i, cx + i + 1, cy + i + 3, color);
+        }
+    }
+
+    /**
+     * 绘制带居中文本的按钮；enabled=false 时压暗整体并淡化文字（用于条件不满足时的置灰）。
+     * 供机械三机"制作"按钮等操作按钮复用。
+     */
+    public static void buttonText(GuiGraphics gui, Font font, int x, int y, int w, int h,
+                                  Component text, boolean enabled) {
+        button(gui, x, y, w, h);
+        if (!enabled) {
+            // 禁用态：近不透明黑罩压暗按钮体（0x88000000 压暗不足，会被误认为仍可点），文字同步调暗
+            gui.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0xD8000000);
+        }
+        int tw = font.width(text);
+        gui.drawString(font, text, x + (w - tw) / 2, y + (h - 8) / 2,
+                enabled ? 0xFF202020 : 0xFF909090, false);
     }
 }

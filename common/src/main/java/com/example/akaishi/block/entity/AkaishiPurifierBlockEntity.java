@@ -15,6 +15,7 @@ import com.example.akaishi.menu.AkaishiPurifierMenu;
 import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -47,10 +48,15 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     public static final int INPUT_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
-    /** 与 Menu 同步的数据槽数量（0=能量 1=燃烧时间 2=进度 3=燃烧总时间 4=矩阵成型标记） */
-    public static final int DATA_SLOTS = 5;
+    // Menu 同步数据槽：能量为 long，拆高低 32 位（SimpleContainerData 仅支持 int）
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_BURN_TIME = 2;
+    public static final int DATA_PROGRESS = 3;
+    public static final int DATA_BURN_TIME_TOTAL = 4;
     /** data 索引：提纯矩阵成型标记（1=成型，GUI 据此隐藏燃料槽与火焰） */
-    public static final int DATA_FORMED = 4;
+    public static final int DATA_FORMED = 5;
+    public static final int DATA_SLOTS = 6;
 
     /** 最大能量存储 */
     public static final int MAX_ENERGY = 10000;
@@ -64,7 +70,7 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     private final SimpleContainer inventory;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
-    /** 与 Menu 同步的数据缓存：0=能量 1=燃烧时间 2=进度百分比 3=燃烧总时间 4=矩阵成型标记 */
+    /** 与 Menu 同步的数据缓存（能量占高低两槽，见 DATA_* 常量） */
     private final SimpleContainerData data;
     private AkaishiEnergyStorage energy;
 
@@ -109,11 +115,11 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
         boolean matrixFormed = this.matrixFormed;
 
         // 写入数据缓存：Menu 的 broadcastChanges 每 tick 据此同步到客户端 GUI
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, burnTime);
-        data.set(2, (int) (progressEnergy * 100 / needed()));
-        data.set(3, burnTimeTotal);
-        data.set(4, matrixFormed ? 1 : 0);
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        data.set(DATA_BURN_TIME, burnTime);
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / needed()));
+        data.set(DATA_BURN_TIME_TOTAL, burnTimeTotal);
+        data.set(DATA_FORMED, matrixFormed ? 1 : 0);
 
         // 1) 燃烧燃料产生赤石能量（矩阵成型后禁用：耗能远超自产，统一由管道外部供能）
         if (!matrixFormed && energy.getEnergyStored() < energy.getMaxEnergy()) {

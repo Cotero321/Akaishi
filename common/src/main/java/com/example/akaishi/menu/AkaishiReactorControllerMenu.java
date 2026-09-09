@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorCoolerBlockEntity;
 import com.example.akaishi.reactor.ReactorStructure;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * 反应堆控制器菜单：10 个燃料槽（每根燃料棒解锁 1 槽）+ 20 个散热片槽（温度页审视/更换）
  * + 玩家背包。
- * 数据槽（14 个）：温度/成型/棒数/有效散热/散热%/废品量/废品容量/高温警告/活跃槽/产率/耗速/废品满/散热片耐久/散热组件数。
+ * 数据槽（16 个）：温度/成型/棒数/有效散热/散热%/废品量/废品容量/高温警告/活跃槽/产率(low+high)/耗速/废品满/散热片耐久/散热组件数/废品种类。
  * 界面通过 {@link AkaishiReactorControllerScreen} 分"燃料/温度/状态"三页展示，机器槽位随页签激活。
  */
 public class AkaishiReactorControllerMenu extends AbstractContainerMenu {
@@ -160,7 +161,8 @@ public class AkaishiReactorControllerMenu extends AbstractContainerMenu {
     }
 
     public long getEnergyPerTick() {
-        return data.get(AkaishiReactorControllerBlockEntity.DATA_ENERGY_PER_TICK) & 0xFFFFFFFFL;
+        return LongDataSlots.read(data, AkaishiReactorControllerBlockEntity.DATA_ENERGY_PER_TICK,
+                AkaishiReactorControllerBlockEntity.DATA_ENERGY_PER_TICK_HIGH);
     }
 
     public double getFuelDrainPerTick() {

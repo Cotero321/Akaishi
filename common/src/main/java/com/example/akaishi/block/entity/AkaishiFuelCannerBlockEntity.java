@@ -9,6 +9,7 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.item.AkaishiFuelCellItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFuelCannerMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -43,10 +44,12 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
     public static final int SLOT_COUNT = 2;
-    /** Menu 同步数据槽：0/1=输入液体量/容量 */
-    public static final int DATA_SLOTS = 2;
+    /** Menu 同步数据槽：long 各占高低两槽 0/1=输入液体量 2/3=输入液体容量 */
     public static final int DATA_FLUID_AMOUNT = 0;
-    public static final int DATA_FLUID_CAPACITY = 1;
+    public static final int DATA_FLUID_AMOUNT_HIGH = 1;
+    public static final int DATA_FLUID_CAPACITY = 2;
+    public static final int DATA_FLUID_CAPACITY_HIGH = 3;
+    public static final int DATA_SLOTS = 4;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -75,8 +78,8 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
     }
 
     private void tickServer() {
-        data.set(DATA_FLUID_AMOUNT, (int) liquidTank.getAmount());
-        data.set(DATA_FLUID_CAPACITY, (int) liquidTank.getCapacity());
+        LongDataSlots.write(data, DATA_FLUID_AMOUNT, DATA_FLUID_AMOUNT_HIGH, liquidTank.getAmount());
+        LongDataSlots.write(data, DATA_FLUID_CAPACITY, DATA_FLUID_CAPACITY_HIGH, liquidTank.getCapacity());
 
         ItemStack in = inventory.getItem(INPUT_SLOT);
         // 输入槽必须为燃料罐，输出槽必须空（成品满罐不可堆叠，仅占 1 格）

@@ -4,6 +4,7 @@ import com.example.akaishi.block.entity.AkaishiTraitReforgerBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -95,11 +96,13 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiTraitReforgerBlockEntity.DATA_ENERGY,
+                AkaishiTraitReforgerBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiTraitReforgerBlockEntity.DATA_CAPACITY,
+                AkaishiTraitReforgerBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 重铸进度（0-100） */

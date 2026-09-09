@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiActivatedFractionatorBlockEntity;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -82,11 +83,13 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return data.get(AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY,
+                AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY_CAPACITY);
+        return LongDataSlots.read(data, AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY_CAPACITY,
+                AkaishiActivatedFractionatorBlockEntity.DATA_ENERGY_CAPACITY_HIGH);
     }
 
     /** 当前加工进度（tick，满 {@link com.example.akaishi.config.ModConfig#fractionatorProcessTicks} 结算） */

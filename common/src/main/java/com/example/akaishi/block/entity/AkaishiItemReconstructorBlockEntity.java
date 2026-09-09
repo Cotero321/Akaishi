@@ -12,6 +12,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiItemReconstructorMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -61,16 +62,18 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
             Map.entry(Items.SNOWBALL, new ReconstructRecipe(Items.GHAST_TEAR, 32))
     );
 
-    // ===== 数据槽 =====
-    public static final int DATA_SLOTS = 5;
+    // ===== 数据槽（long 各占高低两槽）=====
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_ENERGY_CAPACITY = 1;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_ENERGY_CAPACITY = 2;
+    public static final int DATA_ENERGY_CAPACITY_HIGH = 3;
     /** 当前批次进度（已消耗结晶数） */
-    public static final int DATA_PROGRESS = 2;
+    public static final int DATA_PROGRESS = 4;
     /** 当前配方所需结晶总数（无配方为 0） */
-    public static final int DATA_REQUIRED = 3;
+    public static final int DATA_REQUIRED = 5;
     /** 结晶槽存量 */
-    public static final int DATA_CRYSTALS = 4;
+    public static final int DATA_CRYSTALS = 6;
+    public static final int DATA_SLOTS = 7;
 
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage energy;
@@ -102,8 +105,8 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
         energy.setMaxEnergy((long) (ModConfig.reconstructorEnergyCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_ENERGY_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_ENERGY_CAPACITY, DATA_ENERGY_CAPACITY_HIGH, energy.getMaxEnergy());
         data.set(DATA_CRYSTALS, inventory.getItem(1).getCount());
 
         ItemStack inputStack = inventory.getItem(0);

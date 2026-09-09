@@ -4,8 +4,8 @@ import com.example.akaishi.block.entity.AkaishiSurgeryBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
+import com.example.akaishi.life.body.IInstallableOrgan;
 import com.example.akaishi.life.body.PlayerBodyState;
-import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -87,7 +87,7 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
             return false;
         }
         ItemStack organ = menu.getOrganInput();
-        if (!(organ.getItem() instanceof AkaishiOrganItem item) || item.slot != target) {
+        if (IInstallableOrgan.slotOf(organ) != target) {
             return false;
         }
         return menu.getSolidCount() >= ModConfig.surgeryImplantSolidCost

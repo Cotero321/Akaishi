@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "bottom": "akaishi:block/machine_bottom",
+    "bottom": "akaishi:block/akaishi_cultivator_bottom",
     "top": "akaishi:block/akaishi_cultivator_top",
     "side": "akaishi:block/akaishi_cultivator_side"
   }

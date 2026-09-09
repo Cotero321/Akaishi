@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiOrganVaultBlockEntity;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -94,11 +95,13 @@ public class AkaishiOrganVaultMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(AkaishiOrganVaultBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiOrganVaultBlockEntity.DATA_ENERGY,
+                AkaishiOrganVaultBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(AkaishiOrganVaultBlockEntity.DATA_CAPACITY);
+        return LongDataSlots.read(data, AkaishiOrganVaultBlockEntity.DATA_CAPACITY,
+                AkaishiOrganVaultBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 活性状态（1 活性 0 休眠） */

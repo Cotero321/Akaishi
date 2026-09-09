@@ -4,6 +4,7 @@ import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiPurifierMatrixControllerBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 提纯矩阵控制器菜单：升级槽（速度/能量）+ 2 个方块槽（输入/输出）+ 玩家背包槽。
- * 数据槽：0=能量，1=提纯进度，2=结构状态。
+ * 数据槽见 {@code DATA_*} 常量（能量占高低两槽）。
  */
 public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
 
@@ -75,17 +76,18 @@ public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiPurifierMatrixControllerBlockEntity.DATA_ENERGY,
+                AkaishiPurifierMatrixControllerBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public int getProgress() {
-        return data.get(1);
+        return data.get(AkaishiPurifierMatrixControllerBlockEntity.DATA_PROGRESS);
     }
 
     /** 结构是否完整激活 */
     public boolean isFormed() {
-        return data.get(2) == 1;
+        return data.get(AkaishiPurifierMatrixControllerBlockEntity.DATA_FORMED) == 1;
     }
 
     /** 速度升级组件数量（0~8） */

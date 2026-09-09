@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiUpgradeStationBlockEntity;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,7 +29,7 @@ public class AkaishiUpgradeStationMenu extends AbstractContainerMenu {
     public AkaishiUpgradeStationMenu(int id, Inventory inv, AkaishiUpgradeStationBlockEntity be) {
         super(ModMenus.CHISHI_UPGRADE_STATION.get(), id);
         this.container = be != null ? be.inventory() : new SimpleContainer(AkaishiUpgradeStationBlockEntity.SLOT_COUNT);
-        this.data = be != null ? be.data() : new SimpleContainerData(5);
+        this.data = be != null ? be.data() : new SimpleContainerData(AkaishiUpgradeStationBlockEntity.DATA_SLOTS);
         this.be = be;
 
         // 方块槽：装备 / 模板输入左侧，输出右侧
@@ -47,27 +48,29 @@ public class AkaishiUpgradeStationMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiUpgradeStationBlockEntity.DATA_ENERGY,
+                AkaishiUpgradeStationBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getMaxEnergy() {
-        return data.get(1);
+    public long getMaxEnergy() {
+        return LongDataSlots.read(data, AkaishiUpgradeStationBlockEntity.DATA_CAPACITY,
+                AkaishiUpgradeStationBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 当前选择的升级类型序号 */
     public int getSelectedType() {
-        return data.get(2);
+        return data.get(AkaishiUpgradeStationBlockEntity.DATA_SELECTED_TYPE);
     }
 
     /** 装备剩余升级槽位 */
     public int getSlots() {
-        return data.get(3);
+        return data.get(AkaishiUpgradeStationBlockEntity.DATA_GEAR_SLOTS);
     }
 
     /** 输入槽是否放入了赤石装备 */
     public boolean hasGear() {
-        return data.get(4) == 1;
+        return data.get(AkaishiUpgradeStationBlockEntity.DATA_HAS_GEAR) == 1;
     }
 
     @Override

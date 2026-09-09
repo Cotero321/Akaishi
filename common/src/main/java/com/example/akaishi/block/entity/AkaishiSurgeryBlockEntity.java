@@ -11,6 +11,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
+import com.example.akaishi.life.body.IInstallableOrgan;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
 import com.example.akaishi.life.body.PlayerBodySync;
@@ -19,6 +20,7 @@ import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.menu.AkaishiSurgeryMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -56,14 +58,20 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
     public static final int ORGAN_SLOT = 0;
     public static final int SOLID_SLOT = 1;
     public static final int SLOT_COUNT = 2;
-    /** Menu 同步数据槽：0/1=生命能量/容量 2=进度% 3=操作类型 4=目标槽位索引 5=固态数量 */
-    public static final int DATA_SLOTS = 6;
+    // Menu 同步数据槽：能量/容量为 long，各拆低/高 32 位两槽（SimpleContainerData 仅支持 int）
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_OPERATION = 3;
-    public static final int DATA_TARGET = 4;
-    public static final int DATA_SOLID = 5;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    /** 手术进度百分比（0-100） */
+    public static final int DATA_PROGRESS = 4;
+    /** 操作类型（0 无 / 1 移植 / 2 摘除） */
+    public static final int DATA_OPERATION = 5;
+    /** 目标槽位索引 */
+    public static final int DATA_TARGET = 6;
+    /** 固态物数量 */
+    public static final int DATA_SOLID = 7;
+    public static final int DATA_SLOTS = 8;
 
     /** 操作类型 */
     public static final int OP_NONE = 0;
@@ -103,8 +111,8 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
         life.setMaxEnergy((long) (ModConfig.surgeryLifeCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) life.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, life.getMaxEnergy());
         data.set(DATA_SOLID, inventory.getItem(SOLID_SLOT).getCount());
 
         if (operationType != OP_NONE) {
@@ -156,7 +164,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         }
         if (type == OP_IMPLANT) {
             ItemStack organ = inventory.getItem(ORGAN_SLOT);
-            if (!(organ.getItem() instanceof AkaishiOrganItem item) || item.slot != target) {
+            if (IInstallableOrgan.slotOf(organ) != target) {
                 return;
             }
             if (state.isOccupied(target)) {
@@ -198,7 +206,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         BodySlot target = BodySlot.values()[Math.max(0, Math.min(BodySlot.values().length - 1, targetSlot))];
         if (operationType == OP_IMPLANT) {
             ItemStack organ = inventory.getItem(ORGAN_SLOT);
-            if (organ.getItem() instanceof AkaishiOrganItem item && item.slot == target
+            if (IInstallableOrgan.slotOf(organ) == target
                     && !state.isOccupied(target) && hasResources(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost)) {
                 consume(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost);
                 state.implantOrgan(target, organ);

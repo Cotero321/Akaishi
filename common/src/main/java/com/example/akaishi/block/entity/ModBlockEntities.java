@@ -8,6 +8,7 @@ import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiMechanicalBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
@@ -210,6 +211,12 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiFusionItemInputPortBlockEntity>> CHISHI_FUSION_ITEM_INPUT;
     /** 聚变物品输出口方块实体类型（生命灰烬缓冲 27 槽） */
     public static RegistrySupplier<BlockEntityType<AkaishiFusionItemOutputPortBlockEntity>> CHISHI_FUSION_ITEM_OUTPUT;
+    /** 机械改造模板制造厂方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiMechanicalTemplateFactoryBlockEntity>> CHISHI_MECHANICAL_TEMPLATE_FACTORY;
+    /** 机械改造加工制作厂方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiMechanicalProcessingFactoryBlockEntity>> CHISHI_MECHANICAL_PROCESSING_FACTORY;
+    /** 机械改造组装加工台方块实体类型 */
+    public static RegistrySupplier<BlockEntityType<AkaishiMechanicalAssemblyStationBlockEntity>> CHISHI_MECHANICAL_ASSEMBLY_STATION;
 
     private ModBlockEntities() {
     }
@@ -510,5 +517,15 @@ public final class ModBlockEntities {
         // 物品输出口（生命灰烬缓冲）
         CHISHI_FUSION_ITEM_OUTPUT = be("akaishi_fusion_item_output", AkaishiFusionItemOutputPortBlockEntity::new,
                 AkaishiFusionBlocks.CHISHI_FUSION_ITEM_OUTPUT);
+        // ===== 机械改造 =====
+        // 模板制造厂（通用模板 + 固态物 + 双能源 → 部位模板）
+        CHISHI_MECHANICAL_TEMPLATE_FACTORY = be("akaishi_mechanical_template_factory",
+                AkaishiMechanicalTemplateFactoryBlockEntity::new, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY);
+        // 加工制作厂（部位模板 + 材料 + 固态物 + 双能源 → 加工件）
+        CHISHI_MECHANICAL_PROCESSING_FACTORY = be("akaishi_mechanical_processing_factory",
+                AkaishiMechanicalProcessingFactoryBlockEntity::new, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY);
+        // 组装加工台（四加工件 + 双能源 → 成品器官）
+        CHISHI_MECHANICAL_ASSEMBLY_STATION = be("akaishi_mechanical_assembly_station",
+                AkaishiMechanicalAssemblyStationBlockEntity::new, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION);
     }
 }

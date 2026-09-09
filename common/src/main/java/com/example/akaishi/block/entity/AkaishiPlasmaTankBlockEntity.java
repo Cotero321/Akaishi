@@ -7,6 +7,7 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiFluidTankMenu;
 import com.example.akaishi.menu.ModMenus;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -27,13 +28,15 @@ import java.util.List;
 /**
  * 等离子体燃料储罐方块实体：单个等离子体专用罐。
  * 罐层拒收非等离子体液体（fill 覆写），管道对接仅限等离子体管道（isPlasmaTank=true）。
- * 数据槽：0=液体量 1=容量（供界面显示，复用液体储罐界面）。
+ * 数据槽：0/1=液体量 2/3=容量（供界面显示，复用液体储罐界面）。
  */
 public class AkaishiPlasmaTankBlockEntity extends BlockEntity implements ExtendedMenuProvider, IFluidPipeDevice, IDataCarrier {
 
-    public static final int DATA_SLOTS = 2;
     public static final int DATA_AMOUNT = 0;
-    public static final int DATA_CAPACITY = 1;
+    public static final int DATA_AMOUNT_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_SLOTS = 4;
 
     private final FluidTank tank;
     private final SimpleContainerData data;
@@ -62,8 +65,8 @@ public class AkaishiPlasmaTankBlockEntity extends BlockEntity implements Extende
     }
 
     private void tickServer() {
-        data.set(DATA_AMOUNT, (int) tank.getAmount());
-        data.set(DATA_CAPACITY, (int) tank.getCapacity());
+        LongDataSlots.write(data, DATA_AMOUNT, DATA_AMOUNT_HIGH, tank.getAmount());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, tank.getCapacity());
     }
 
     public ContainerData data() {

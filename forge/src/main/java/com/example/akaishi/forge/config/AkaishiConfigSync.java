@@ -240,6 +240,25 @@ public final class AkaishiConfigSync {
         ModConfig.lifeAggregationConversionOutput = AkaishiConfig.LIFE_AGGREGATION_OUTPUT.get();
         ModConfig.lifeAggregationChishiCapacity = AkaishiConfig.LIFE_AGGREGATION_CHISHI_CAPACITY.get();
         ModConfig.lifeAggregationLifeCapacity = AkaishiConfig.LIFE_AGGREGATION_LIFE_CAPACITY.get();
+        // 机械改造机器
+        ModConfig.mechanicalChishiCapacity = AkaishiConfig.MECH_CHISHI_CAPACITY.get();
+        ModConfig.mechanicalLifeCapacity = AkaishiConfig.MECH_LIFE_CAPACITY.get();
+        ModConfig.mechTemplateChishiCost = AkaishiConfig.MECH_TEMPLATE_CHISHI_COST.get();
+        ModConfig.mechTemplateLifeCost = AkaishiConfig.MECH_TEMPLATE_LIFE_COST.get();
+        ModConfig.mechTemplateTicks = AkaishiConfig.MECH_TEMPLATE_TICKS.get();
+        ModConfig.mechProcessChishiBase = toLongArray(AkaishiConfig.MECH_PROCESS_CHISHI_BASE.get());
+        ModConfig.mechProcessLifeBase = toLongArray(AkaishiConfig.MECH_PROCESS_LIFE_BASE.get());
+        ModConfig.mechProcessTicksBase = toIntArray(AkaishiConfig.MECH_PROCESS_TICKS_BASE.get());
+        ModConfig.mechProcessPartFactor = toIntArray(AkaishiConfig.MECH_PROCESS_PART_FACTOR.get());
+        ModConfig.mechProcessMaterialCount = toIntArray(AkaishiConfig.MECH_PROCESS_MATERIAL_COUNT.get());
+        ModConfig.mechAssemblyChishiCost = AkaishiConfig.MECH_ASSEMBLY_CHISHI_COST.get();
+        ModConfig.mechAssemblyLifeCost = AkaishiConfig.MECH_ASSEMBLY_LIFE_COST.get();
+        ModConfig.mechAssemblyTicks = AkaishiConfig.MECH_ASSEMBLY_TICKS.get();
+        // 机械义体属性换算
+        ModConfig.mechBodyHealthScale = AkaishiConfig.MECH_BODY_HEALTH_SCALE.get();
+        ModConfig.mechBodyAttackScale = AkaishiConfig.MECH_BODY_ATTACK_SCALE.get();
+        ModConfig.mechBodyAttackSpeedScale = AkaishiConfig.MECH_BODY_ATTACK_SPEED_SCALE.get();
+        ModConfig.mechBodyMovementSpeedScale = AkaishiConfig.MECH_BODY_MOVEMENT_SPEED_SCALE.get();
         // 端口与电池缓冲
         ModConfig.lifeMatrixInputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_INPUT_PORT_BUFFER.get();
         ModConfig.lifeMatrixOutputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_OUTPUT_PORT_BUFFER.get();

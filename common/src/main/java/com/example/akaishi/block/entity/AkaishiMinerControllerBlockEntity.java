@@ -15,6 +15,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerControllerMenu;
 import com.example.akaishi.multiblock.AkaishiMinerStructure;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -55,16 +56,18 @@ import java.util.Set;
  * 产物先入暂存槽再推送给结构端口（顶层中心转口 / 立柱物品输出口等 IMinerOutputSink）；
  * 能量由端口（转口/能量输入口）各自限量转发注入；升级模块（速度/时运/储能方块）
  * 安装在升级框架位置上，控制器扫描生效。
- * 数据槽：0=能量 1=容量 2=进度 3=总耗时 4=成型 5=速度升级 6=时运升级 7=储能升级 8=挖矿模式（0 正常 / 1 精准）。
+ * 数据槽：0/1=能量低/高 2/3=容量低/高 4=进度 5=总耗时 6=成型 7=速度升级 8=时运升级 9=储能升级 10=挖矿模式（0 正常 / 1 精准）。
  */
 public class AkaishiMinerControllerBlockEntity extends BlockEntity
         implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     /** 产物暂存槽数（等待推送给转口） */
     public static final int OUTPUT_SLOTS = 6;
-    public static final int DATA_COUNT = 9;
-    public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_PROGRESS = 2, DATA_REQUIRED = 3,
-            DATA_FORMED = 4, DATA_SPEED = 5, DATA_FORTUNE = 6, DATA_STORAGE = 7, DATA_MODE = 8;
+    /** Menu 同步数据槽（能量/容量为 long，终极储能升级后可达 250M，远超 int） */
+    public static final int DATA_COUNT = 11;
+    public static final int DATA_ENERGY = 0, DATA_ENERGY_HIGH = 1, DATA_CAPACITY = 2, DATA_CAPACITY_HIGH = 3,
+            DATA_PROGRESS = 4, DATA_REQUIRED = 5, DATA_FORMED = 6, DATA_SPEED = 7, DATA_FORTUNE = 8,
+            DATA_STORAGE = 9, DATA_MODE = 10;
     /** 速度升级：每级 +12.5% 挖矿速率 */
     public static final double SPEED_STEP = 0.125;
     /** 速度升级：每级 +10% 能耗 */
@@ -155,8 +158,8 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
         boolean changed = false;
         AkaishiMinerTier t = tier();
         energy.setMaxEnergy((long) (t.maxEnergy * (1.0 + STORAGE_STEP * storageCount)));
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         data.set(DATA_PROGRESS, progress);
         data.set(DATA_REQUIRED, ModConfig.minerTicksBase);
         // 模式槽同步 + 产出池定期重扫（首个 tick 先扫一次，之后每 100 tick；矿物标签增删即时接入）

@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiEnergyLiquefierBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -66,19 +67,23 @@ public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
     }
 
     public long getAkaishiEnergy() {
-        return data.get(AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_ENERGY);
+        return LongDataSlots.read(data, AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_ENERGY,
+                AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_ENERGY_HIGH);
     }
 
     public long getAkaishiMax() {
-        return data.get(AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_CAPACITY,
+                AkaishiEnergyLiquefierBlockEntity.DATA_CHISHI_CAPACITY_HIGH);
     }
 
     public long getFluidAmount() {
-        return data.get(AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_AMOUNT);
+        return LongDataSlots.read(data, AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_AMOUNT,
+                AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_AMOUNT_HIGH);
     }
 
     public long getFluidMax() {
-        return data.get(AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_CAPACITY);
+        return LongDataSlots.read(data, AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_CAPACITY,
+                AkaishiEnergyLiquefierBlockEntity.DATA_FLUID_CAPACITY_HIGH);
     }
 
     /** 液化进度（0-100） */

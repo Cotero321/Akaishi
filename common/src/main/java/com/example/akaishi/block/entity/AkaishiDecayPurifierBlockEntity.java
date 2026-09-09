@@ -10,6 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiDecayPurifierMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,16 +32,18 @@ import net.minecraft.world.level.block.state.BlockState;
  * 升级加成：速度升级提升净化速度（每级 +12.5%），能量升级扩容缓冲（每级 +50%）。
  * 净化速度为浮点累加（speedAccum），避免 (int) 截断导致 1~7 级速度升级无效。
  * 无区域在范围内时待机不耗能。
- * GUI 数据槽：0=能量 1=容量 2=净化中标志 3=范围内区域数。
+ * GUI 数据槽：0/1=能量 2/3=容量 4=净化中标志 5=范围内区域数。
  */
 public class AkaishiDecayPurifierBlockEntity extends BlockEntity
         implements IUpgradeableMachine, IEnergyProvider, ExtendedMenuProvider, IDataCarrier {
 
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_WORKING = 2;
-    public static final int DATA_ZONE_COUNT = 3;
-    public static final int DATA_SLOTS = 4;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_WORKING = 4;
+    public static final int DATA_ZONE_COUNT = 5;
+    public static final int DATA_SLOTS = 6;
 
     private final AkaishiEnergyStorage energy;
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
@@ -91,8 +94,8 @@ public class AkaishiDecayPurifierBlockEntity extends BlockEntity
     }
 
     private void syncData(int zoneCount) {
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         data.set(DATA_WORKING, working ? 1 : 0);
         data.set(DATA_ZONE_COUNT, zoneCount);
     }

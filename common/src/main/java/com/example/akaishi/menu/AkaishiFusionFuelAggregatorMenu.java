@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiFusionFuelAggregatorBlockEntity;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,7 +15,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 聚变燃料聚合器菜单：升级槽（速度/能量）+ 1 输入槽（仅活化成分）+ 玩家背包 + 9 数据槽（能量/进度/3 等离子体罐量）。
+ * 聚变燃料聚合器菜单：升级槽（速度/能量）+ 1 输入槽（仅活化成分）+ 玩家背包 + 17 数据槽（能量/进度/3 等离子体罐量）。
  */
 public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
 
@@ -65,11 +66,15 @@ public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return data.get(AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY_CAPACITY);
+        return LongDataSlots.read(data,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY_CAPACITY,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_ENERGY_CAPACITY_HIGH);
     }
 
     public int getProgress() {
@@ -77,11 +82,17 @@ public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
     }
 
     public long getPlasmaAmount(int index) {
-        return data.get(AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_AMOUNT + index * 2);
+        int offset = index * AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA_STRIDE;
+        return LongDataSlots.read(data,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_AMOUNT + offset,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_AMOUNT_HIGH + offset);
     }
 
     public long getPlasmaCapacity(int index) {
-        return data.get(AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_CAPACITY + index * 2);
+        int offset = index * AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA_STRIDE;
+        return LongDataSlots.read(data,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_CAPACITY + offset,
+                AkaishiFusionFuelAggregatorBlockEntity.DATA_PLASMA0_CAPACITY_HIGH + offset);
     }
 
     /** 速度升级组件数量（0~8） */

@@ -19,6 +19,8 @@ public final class ClientBodyData {
 
     private static final Map<BodySlot, ItemStack> ORGANS = new EnumMap<>(BodySlot.class);
     private static final Map<BodySlot, Integer> REJECTION = new EnumMap<>(BodySlot.class);
+    /** 机械整合度（0~100），未安装机械器官为 0 */
+    private static final Map<BodySlot, Integer> INTEGRATION = new EnumMap<>(BodySlot.class);
     /** 已吸收基因强化：生物来源 → 适配加成（吸收顺序） */
     private static final Map<String, Integer> GENE_BONUSES = new LinkedHashMap<>();
     /** 突破激活（客户端镜像：无激活时 entity 空串、until=-1） */
@@ -38,6 +40,7 @@ public final class ClientBodyData {
     public static void apply(FriendlyByteBuf buf) {
         ORGANS.clear();
         REJECTION.clear();
+        INTEGRATION.clear();
         GENE_BONUSES.clear();
         int geneCount = buf.readVarInt();
         for (int i = 0; i < geneCount; i++) {
@@ -52,10 +55,12 @@ public final class ClientBodyData {
             boolean hasOrgan = buf.readBoolean();
             ItemStack organ = hasOrgan ? buf.readItem() : ItemStack.EMPTY;
             int rejection = buf.readInt();
+            int integration = buf.readVarInt();
             // 顺序解析，id 仅作校验兜底
             if (slot.getId().equals(id)) {
                 ORGANS.put(slot, organ);
                 REJECTION.put(slot, rejection);
+                INTEGRATION.put(slot, integration);
             }
         }
         // 突破激活镜像（顺序与发送端一致：在槽位数据之后）
@@ -95,6 +100,11 @@ public final class ClientBodyData {
 
     public static int getRejection(BodySlot slot) {
         return REJECTION.getOrDefault(slot, 0);
+    }
+
+    /** 机械器官整合度（0~100，客户端镜像；非机械槽位恒 0） */
+    public static int getIntegration(BodySlot slot) {
+        return INTEGRATION.getOrDefault(slot, 0);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiMinerPortBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 矿机转口菜单：产物缓冲 27 格（9×3，只读供管道/漏斗抽取）+ 玩家背包。
- * 数据槽：0=能量 1=容量 2=成型状态。
+ * 数据槽：0/1=能量低/高 2/3=容量低/高 4=成型状态。
  */
 public class AkaishiMinerPortMenu extends AbstractContainerMenu {
 
@@ -60,12 +61,14 @@ public class AkaishiMinerPortMenu extends AbstractContainerMenu {
         }
     }
 
-    public int getEnergy() {
-        return data.get(AkaishiMinerPortBlockEntity.DATA_ENERGY);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiMinerPortBlockEntity.DATA_ENERGY,
+                AkaishiMinerPortBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getCapacity() {
-        return data.get(AkaishiMinerPortBlockEntity.DATA_CAPACITY);
+    public long getCapacity() {
+        return LongDataSlots.read(data, AkaishiMinerPortBlockEntity.DATA_CAPACITY,
+                AkaishiMinerPortBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 是否已与成型矿机连接 */

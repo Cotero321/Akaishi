@@ -20,6 +20,7 @@ import com.example.akaishi.menu.AkaishiPurifierMatrixControllerMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -44,7 +45,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 提纯矩阵控制器：类反应堆式矩阵主方块（3×3×3）。
  * 结构成型后消耗赤能源集中提纯：粗制赤石块→1 精华，赤石水晶块→4 精华。
  * 能量经能量输入口（或直接管道）注入，原料/产物经物品输入/输出口流转。
- * 数据槽：0=能量，1=进度百分比，2=结构状态。
+ * 数据槽见 {@code DATA_*} 常量（能量占高低两槽）。
  */
 public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
         implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
@@ -52,7 +53,12 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
     public static final int SLOT_COUNT = 2;
-    public static final int DATA_SLOTS = 3;
+    // Menu 同步数据槽：能量为 long，拆高低 32 位（SimpleContainerData 仅支持 int）
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_PROGRESS = 2;
+    public static final int DATA_FORMED = 3;
+    public static final int DATA_SLOTS = 4;
 
     /** 最大能量存储（与旧提纯器一致） */
     public static final int MAX_ENERGY = 10000;
@@ -88,7 +94,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
         boolean changed = false;
         // 动态扩容：能量升级组件生效时按倍率提升能量上限
         energy.setMaxEnergy((long) (MAX_ENERGY * getEnergyCapacityMultiplier()));
-        data.set(0, (int) energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
 
         boolean formed = getBlockState().getValue(AkaishiPurifierMatrixControllerBlock.FORMED);
         // 成型后每 10 tick 校验一次即可（结构变化不频繁，减少扫描开销）
@@ -109,7 +115,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
             formed = valid;
             changed = true;
         }
-        data.set(2, formed ? 1 : 0);
+        data.set(DATA_FORMED, formed ? 1 : 0);
 
         // 单件提纯赤能源需求（配置 [machine] costMultiplier 全局放大；每 tick 抽取额同步放大 → 吞吐不变、仅增耗能）
         long costTotal = (long) (ModConfig.purifierMatrixTotalCost * ModConfig.machineCostMultiplier);
@@ -137,7 +143,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
             // 无有效输入或输出已满：重置进度
             progressEnergy = 0;
         }
-        data.set(1, (int) (progressEnergy * 100 / costTotal));
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
 
         if (changed) {
             setChanged();

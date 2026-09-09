@@ -41,8 +41,8 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
 
         // 赤能源条（红色）
         GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
-        long max = Math.max(1, menu.getMaxEnergy());
-        int energyWidth = (int) (BAR_W * Math.max(0, Math.min(menu.getEnergy(), menu.getMaxEnergy())) / max);
+        long max = Math.max(1L, menu.getMaxEnergy());
+        int energyWidth = (int) (BAR_W * Math.max(0L, Math.min(menu.getEnergy(), menu.getMaxEnergy())) / max);
         if (energyWidth > 0) {
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + energyWidth, y + BAR_Y + BAR_H, 0xFFE03030);
         }
@@ -64,7 +64,7 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
                         EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                 20, 50, 0xE0E0E0, false);
         // 可合成次数文本（按当前配方消耗计算，母岩升级/赤石锭聚合通用）
-        int cost = Math.max(1, menu.getCurrentCost());
+        long cost = Math.max(1L, menu.getCurrentCost());
         gui.drawString(this.font,
                 Component.translatable("gui.akaishi.craft_times",
                         menu.getEnergy() / cost),

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "SDS",
+    "ISI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "S": { "item": "akaishi:akaishi_life_essence_solid" },
+    "D": { "item": "minecraft:redstone" }
+  },
+  "result": { "item": "akaishi:akaishi_generic_part_mould", "count": 2 }
+}

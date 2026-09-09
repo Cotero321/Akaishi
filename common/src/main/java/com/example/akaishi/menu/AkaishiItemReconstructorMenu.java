@@ -4,6 +4,7 @@ import com.example.akaishi.block.entity.AkaishiItemReconstructorBlockEntity;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -77,11 +78,13 @@ public class AkaishiItemReconstructorMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return data.get(AkaishiItemReconstructorBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiItemReconstructorBlockEntity.DATA_ENERGY,
+                AkaishiItemReconstructorBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiItemReconstructorBlockEntity.DATA_ENERGY_CAPACITY);
+        return LongDataSlots.read(data, AkaishiItemReconstructorBlockEntity.DATA_ENERGY_CAPACITY,
+                AkaishiItemReconstructorBlockEntity.DATA_ENERGY_CAPACITY_HIGH);
     }
 
     public long getProgress() {

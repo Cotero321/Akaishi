@@ -12,6 +12,7 @@ import com.example.akaishi.fluid.ReactorFuels;
 import com.example.akaishi.item.AkaishiFuelCellItem;
 import com.example.akaishi.menu.AkaishiReactorControllerMenu;
 import com.example.akaishi.reactor.ReactorStructure;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -77,7 +78,9 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
     public static final int DATA_COOLER_COUNT = 13;
     /** 废品罐内衰竭燃料种类数（客户端 tooltip 展示） */
     public static final int DATA_WASTE_TYPES = 14;
-    public static final int DATA_SLOTS = 15;
+    /** 每 tick 产能高 32 位（{@link #DATA_ENERGY_PER_TICK} 为低 32 位；产能可被配置放大到超过 int） */
+    public static final int DATA_ENERGY_PER_TICK_HIGH = 15;
+    public static final int DATA_SLOTS = 16;
 
     private final SimpleContainer fuelSlots;
     private final SimpleContainerData data;
@@ -477,7 +480,7 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
         data.set(DATA_WASTE_CAPACITY, (int) wasteTank.getCapacity());
         data.set(DATA_WARNING, temp >= ModConfig.reactorTempWarn ? 1 : 0);
         data.set(DATA_ACTIVE_SLOTS, activeSlots);
-        data.set(DATA_ENERGY_PER_TICK, (int) Math.min(Integer.MAX_VALUE, energyPerTick));
+        LongDataSlots.write(data, DATA_ENERGY_PER_TICK, DATA_ENERGY_PER_TICK_HIGH, energyPerTick);
         data.set(DATA_FUEL_DRAIN, (int) (fuelDrainPerTick * 1000));
         data.set(DATA_WASTE_FULL, wasteTank.isFull() ? 1 : 0);
         data.set(DATA_COOLER_DURABILITY, minCoolerDurability());

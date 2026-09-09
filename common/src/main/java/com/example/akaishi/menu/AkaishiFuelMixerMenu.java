@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiFuelMixerBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +12,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 燃料混合器菜单：机器升级槽（速度/能量各一格，顶部并排）+ 玩家背包 + 9 个数据槽同步。
+ * 燃料混合器菜单：机器升级槽（速度/能量各一格，顶部并排）+ 玩家背包 + 17 个数据槽同步。
  * 槽位：0/1=升级槽 2-37=玩家背包与快捷栏。
  * 数据槽：0/1=赤能量/容量 2/3=输入1 4/5=输入2 6/7=输出 8=混合进度。
  */
@@ -48,35 +49,43 @@ public class AkaishiFuelMixerMenu extends AbstractContainerMenu {
     }
 
     public long getAkaishiEnergy() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_CHISHI_ENERGY);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_CHISHI_ENERGY,
+                AkaishiFuelMixerBlockEntity.DATA_CHISHI_ENERGY_HIGH);
     }
 
     public long getAkaishiMax() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_CHISHI_CAPACITY);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_CHISHI_CAPACITY,
+                AkaishiFuelMixerBlockEntity.DATA_CHISHI_CAPACITY_HIGH);
     }
 
     public long getIn1Amount() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_IN1_AMOUNT);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_IN1_AMOUNT,
+                AkaishiFuelMixerBlockEntity.DATA_IN1_AMOUNT_HIGH);
     }
 
     public long getIn1Max() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_IN1_CAPACITY);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_IN1_CAPACITY,
+                AkaishiFuelMixerBlockEntity.DATA_IN1_CAPACITY_HIGH);
     }
 
     public long getIn2Amount() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_IN2_AMOUNT);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_IN2_AMOUNT,
+                AkaishiFuelMixerBlockEntity.DATA_IN2_AMOUNT_HIGH);
     }
 
     public long getIn2Max() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_IN2_CAPACITY);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_IN2_CAPACITY,
+                AkaishiFuelMixerBlockEntity.DATA_IN2_CAPACITY_HIGH);
     }
 
     public long getOutAmount() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_OUT_AMOUNT);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_OUT_AMOUNT,
+                AkaishiFuelMixerBlockEntity.DATA_OUT_AMOUNT_HIGH);
     }
 
     public long getOutMax() {
-        return data.get(AkaishiFuelMixerBlockEntity.DATA_OUT_CAPACITY);
+        return LongDataSlots.read(data, AkaishiFuelMixerBlockEntity.DATA_OUT_CAPACITY,
+                AkaishiFuelMixerBlockEntity.DATA_OUT_CAPACITY_HIGH);
     }
 
     /** 混合进度（0-100） */

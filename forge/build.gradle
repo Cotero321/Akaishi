@@ -193,3 +193,9 @@ sourceSets {
 processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// dev 运行前强制重编 common：forge dev 直接加载 common/build/classes/java/main（无 common jar），
+// 不重编会导致 common 改动不生效（IDE 的 bin/main 不参与运行）
+tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
+    dependsOn(":common:classes")
+}

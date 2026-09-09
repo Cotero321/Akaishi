@@ -10,6 +10,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPlasmaFillerMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -44,15 +45,15 @@ import java.util.List;
 public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    // ===== 数据槽 =====
-    public static final int DATA_SLOTS = 7;
+    // ===== 数据槽（long 各占高低两槽）=====
+    /** 每只等离子体罐占 4 槽（量低/高 + 容量低/高），按罐序偏移 */
+    public static final int DATA_PLASMA_STRIDE = 4;
     public static final int DATA_PLASMA0_AMOUNT = 0;
-    public static final int DATA_PLASMA0_CAPACITY = 1;
-    public static final int DATA_PLASMA1_AMOUNT = 2;
-    public static final int DATA_PLASMA1_CAPACITY = 3;
-    public static final int DATA_PLASMA2_AMOUNT = 4;
-    public static final int DATA_PLASMA2_CAPACITY = 5;
-    public static final int DATA_PROGRESS = 6;
+    public static final int DATA_PLASMA0_AMOUNT_HIGH = 1;
+    public static final int DATA_PLASMA0_CAPACITY = 2;
+    public static final int DATA_PLASMA0_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = DATA_PLASMA0_AMOUNT + 3 * DATA_PLASMA_STRIDE;   // = 12
+    public static final int DATA_SLOTS = DATA_PROGRESS + 1;                                 // = 13
 
     private final SimpleContainerData data;
     /** 等离子体输入罐（0=混合，1=下界，2=末地；仅本类流体可入） */
@@ -115,8 +116,11 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
         data.set(DATA_PROGRESS, progress);
         for (int i = 0; i < plasmaTanks.size(); i++) {
             FluidTank tank = plasmaTanks.get(i);
-            data.set(DATA_PLASMA0_AMOUNT + i * 2, (int) tank.getAmount());
-            data.set(DATA_PLASMA0_CAPACITY + i * 2, (int) tank.getCapacity());
+            int offset = i * DATA_PLASMA_STRIDE;
+            LongDataSlots.write(data, DATA_PLASMA0_AMOUNT + offset,
+                    DATA_PLASMA0_AMOUNT_HIGH + offset, tank.getAmount());
+            LongDataSlots.write(data, DATA_PLASMA0_CAPACITY + offset,
+                    DATA_PLASMA0_CAPACITY_HIGH + offset, tank.getCapacity());
         }
 
         // 已在加工：校验当前罐条件仍满足，否则清零

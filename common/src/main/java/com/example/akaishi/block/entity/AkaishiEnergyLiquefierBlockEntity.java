@@ -16,6 +16,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyLiquefierMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -58,13 +59,18 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
     /** 生命能量固态物槽（末地/幽匿/巨龙燃料液化消耗） */
     public static final int SOLID_SLOT = 1;
     public static final int SLOT_COUNT = 2;
-    /** Menu 同步数据槽：0/1=赤能量/赤容量 2/3=输出液体量/容量 4=液化进度百分比 */
-    public static final int DATA_SLOTS = 5;
+    // Menu 同步数据槽：能量/容量/液体量/液体容量均为 long，拆高低 32 位（SimpleContainerData 仅支持 int）
     public static final int DATA_CHISHI_ENERGY = 0;
-    public static final int DATA_CHISHI_CAPACITY = 1;
-    public static final int DATA_FLUID_AMOUNT = 2;
-    public static final int DATA_FLUID_CAPACITY = 3;
-    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_CHISHI_ENERGY_HIGH = 1;
+    public static final int DATA_CHISHI_CAPACITY = 2;
+    public static final int DATA_CHISHI_CAPACITY_HIGH = 3;
+    public static final int DATA_FLUID_AMOUNT = 4;
+    public static final int DATA_FLUID_AMOUNT_HIGH = 5;
+    public static final int DATA_FLUID_CAPACITY = 6;
+    public static final int DATA_FLUID_CAPACITY_HIGH = 7;
+    /** 液化进度百分比 */
+    public static final int DATA_PROGRESS = 8;
+    public static final int DATA_SLOTS = 9;
 
     /** 液化配方定义：输入物品 → 产物液体；needsSolid 标记是否需消耗生命能量固态物 */
     public record Recipe(ItemStack input, long cost, long amount, Fluid output, boolean needsSolid) {
@@ -139,10 +145,10 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
         akaishi.setMaxEnergy((long) (ModConfig.energyLiquefierChishiCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_CHISHI_ENERGY, (int) akaishi.getEnergyStored());
-        data.set(DATA_CHISHI_CAPACITY, (int) akaishi.getMaxEnergy());
-        data.set(DATA_FLUID_AMOUNT, (int) outputTank.getAmount());
-        data.set(DATA_FLUID_CAPACITY, (int) outputTank.getCapacity());
+        LongDataSlots.write(data, DATA_CHISHI_ENERGY, DATA_CHISHI_ENERGY_HIGH, akaishi.getEnergyStored());
+        LongDataSlots.write(data, DATA_CHISHI_CAPACITY, DATA_CHISHI_CAPACITY_HIGH, akaishi.getMaxEnergy());
+        LongDataSlots.write(data, DATA_FLUID_AMOUNT, DATA_FLUID_AMOUNT_HIGH, outputTank.getAmount());
+        LongDataSlots.write(data, DATA_FLUID_CAPACITY, DATA_FLUID_CAPACITY_HIGH, outputTank.getCapacity());
 
         Recipe recipe = recipeFor(inventory.getItem(INPUT_SLOT));
         if (recipe == null) {

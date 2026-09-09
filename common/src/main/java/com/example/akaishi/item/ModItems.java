@@ -281,6 +281,30 @@ public final class ModItems {
     public static RegistrySupplier<Item> akaishiWirelessPortableTerminal;
     public static RegistrySupplier<Item> akaishiWirelessIdentityCard;
 
+    // —— 机械域（AkaishiMechanicalItems）——
+    public static RegistrySupplier<Item> mechanicalEye;
+    public static RegistrySupplier<Item> mechanicalHeart;
+    public static RegistrySupplier<Item> mechanicalLungs;
+    public static RegistrySupplier<Item> mechanicalViscera;
+    public static RegistrySupplier<Item> mechanicalKidneys;
+    public static RegistrySupplier<Item> mechanicalLeftArm;
+    public static RegistrySupplier<Item> mechanicalRightArm;
+    public static RegistrySupplier<Item> mechanicalLeftLeg;
+    public static RegistrySupplier<Item> mechanicalRightLeg;
+    public static RegistrySupplier<Item> mechanicalPartTemplate;
+    public static RegistrySupplier<Item> mechanicalProcessedPart;
+    /** 通用部件塑形模板（工作台合成原料） */
+    public static RegistrySupplier<Item> genericPartMould;
+    public static RegistrySupplier<Item> redstoneAlloyIngot;
+    public static RegistrySupplier<Item> ceramicCompositePlate;
+    public static RegistrySupplier<Item> resistantSteelIngot;
+    public static RegistrySupplier<Item> precisionAlloyIngot;
+    public static RegistrySupplier<Item> polymerizedRedstoneCore;
+    public static RegistrySupplier<Item> bioCeramicPlate;
+    public static RegistrySupplier<Item> refinedCore;
+    public static RegistrySupplier<Item> alloySteelIngot;
+    public static RegistrySupplier<Item> psionicCompositeIngot;
+
     private ModItems() {
     }
 
@@ -293,6 +317,7 @@ public final class ModItems {
         AkaishiLifeItems.register();
         AkaishiTransgeneItems.register();
         AkaishiWirelessItems.register();
+        AkaishiMechanicalItems.register();
 
         // —— 赤石基础域 ——
         akaishiCrystal = AkaishiBaseItems.akaishiCrystal;
@@ -426,5 +451,28 @@ public final class ModItems {
         akaishiWirelessComponent = AkaishiWirelessItems.akaishiWirelessComponent;
         akaishiWirelessPortableTerminal = AkaishiWirelessItems.akaishiWirelessPortableTerminal;
         akaishiWirelessIdentityCard = AkaishiWirelessItems.akaishiWirelessIdentityCard;
+
+        // —— 机械域 ——
+        mechanicalEye = AkaishiMechanicalItems.mechanicalEye;
+        mechanicalHeart = AkaishiMechanicalItems.mechanicalHeart;
+        mechanicalLungs = AkaishiMechanicalItems.mechanicalLungs;
+        mechanicalViscera = AkaishiMechanicalItems.mechanicalViscera;
+        mechanicalKidneys = AkaishiMechanicalItems.mechanicalKidneys;
+        mechanicalLeftArm = AkaishiMechanicalItems.mechanicalLeftArm;
+        mechanicalRightArm = AkaishiMechanicalItems.mechanicalRightArm;
+        mechanicalLeftLeg = AkaishiMechanicalItems.mechanicalLeftLeg;
+        mechanicalRightLeg = AkaishiMechanicalItems.mechanicalRightLeg;
+        mechanicalPartTemplate = AkaishiMechanicalItems.mechanicalPartTemplate;
+        mechanicalProcessedPart = AkaishiMechanicalItems.mechanicalProcessedPart;
+        genericPartMould = AkaishiMechanicalItems.genericPartMould;
+        redstoneAlloyIngot = AkaishiMechanicalItems.redstoneAlloyIngot;
+        ceramicCompositePlate = AkaishiMechanicalItems.ceramicCompositePlate;
+        resistantSteelIngot = AkaishiMechanicalItems.resistantSteelIngot;
+        precisionAlloyIngot = AkaishiMechanicalItems.precisionAlloyIngot;
+        polymerizedRedstoneCore = AkaishiMechanicalItems.polymerizedRedstoneCore;
+        bioCeramicPlate = AkaishiMechanicalItems.bioCeramicPlate;
+        refinedCore = AkaishiMechanicalItems.refinedCore;
+        alloySteelIngot = AkaishiMechanicalItems.alloySteelIngot;
+        psionicCompositeIngot = AkaishiMechanicalItems.psionicCompositeIngot;
     }
 }

@@ -64,22 +64,22 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
 
     /** 当前赤石能量（GUI 能量条用） */
     public int getEnergy() {
-        return data.get(0);
+        return data.get(AkaishiAutoCollectorBlockEntity.DATA_ENERGY);
     }
 
     /** 能量容量（GUI 能量条分母） */
     public int getEnergyCapacity() {
-        return data.get(1);
+        return data.get(AkaishiAutoCollectorBlockEntity.DATA_CAPACITY);
     }
 
     /** 当前收集进度百分比（GUI 进度条用） */
     public int getProgress() {
-        return data.get(2);
+        return data.get(AkaishiAutoCollectorBlockEntity.DATA_PROGRESS);
     }
 
     /** 工作状态：0=待机 1=能量不足 2=工作中 */
     public int getStatus() {
-        return data.get(3);
+        return data.get(AkaishiAutoCollectorBlockEntity.DATA_STATUS);
     }
 
     /** 速度升级组件数量（0~8） */

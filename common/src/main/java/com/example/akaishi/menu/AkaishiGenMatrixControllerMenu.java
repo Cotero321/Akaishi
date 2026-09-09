@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.AkaishiGenMatrixTier;
 import com.example.akaishi.block.entity.AkaishiGenMatrixControllerBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 发生器矩阵控制器菜单：1 个燃料槽 + 10 个升级组件槽 + 玩家背包槽。
- * 数据槽：0=能量，1=燃烧能量，2=燃料总能量，3=结构状态，4=升级组件数。
+ * 数据槽：0/1=能量低/高，2=燃烧能量，3=燃料总能量，4=结构状态，5=升级组件数。
  */
 public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
 
@@ -59,26 +60,29 @@ public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    /** 已存能量（long，容量可超 int） */
+    public long getEnergy() {
+        return LongDataSlots.read(data,
+                AkaishiGenMatrixControllerBlockEntity.DATA_ENERGY,
+                AkaishiGenMatrixControllerBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public int getBurnTime() {
-        return data.get(1);
+        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_BURN);
     }
 
     public int getBurnTimeTotal() {
-        return data.get(2);
+        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_BURN_TOTAL);
     }
 
     /** 结构是否完整激活 */
     public boolean isFormed() {
-        return data.get(3) == 1;
+        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_FORMED) == 1;
     }
 
     /** 已装配的加速组件数量（0-10） */
     public int getUpgradeCount() {
-        return data.get(4);
+        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_UPGRADES);
     }
 
     /** 当前加速倍率（供界面显示） */

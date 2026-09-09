@@ -14,7 +14,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 public class DecayEffect extends MobEffect {
 
     public DecayEffect() {
-        super(MobEffectCategory.HARMFUL, 0x5A8A4A);
+        // 0x6C4696 取自衰竭家族紫调色阶中段，与 textures/mob_effect/decay.png 及衰变方块/物品识别色一致
+        super(MobEffectCategory.HARMFUL, 0x6C4696);
     }
 
     @Override

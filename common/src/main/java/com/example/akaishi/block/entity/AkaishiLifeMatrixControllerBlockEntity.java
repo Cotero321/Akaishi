@@ -15,6 +15,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeConverterMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -35,11 +36,24 @@ import net.minecraft.world.level.block.state.BlockState;
  * 围成结构（3×3×3）后以矩阵倍率集中转换（每 tick 最多 ModConfig.lifeMatrixConversionsPerTick 次，默认 45x）；
  * 未成型不转换。每次消耗 10M 赤能源、产出 10 生命能量。
  * 赤能源经能量输入口（或直接管道）注入，生命能量经能量输出口（仅管道抽取）输出。
- * 数据槽：0=赤能源，1=赤能源容量，2=生命能量，3=生命能量容量，4=结构状态（1=矩阵成型）。
+ * 数据槽：0/1=赤能源低/高，2/3=赤能源容量低/高，4/5=生命能量低/高，6/7=生命能量容量低/高，
+ * 8=结构状态（1=矩阵成型）。
  */
 public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
-    public static final int DATA_SLOTS = 5;
+    /** 数据槽总数（与 AkaishiLifeConverterMenu 布局一致，无独立转换标记） */
+    public static final int DATA_SLOTS = 9;
+
+    // ===== 数据槽索引（能量/容量为 long，各占低/高 32 位两槽）=====
+    public static final int DATA_CHISHI = 0;
+    public static final int DATA_CHISHI_HIGH = 1;
+    public static final int DATA_CHISHI_CAP = 2;
+    public static final int DATA_CHISHI_CAP_HIGH = 3;
+    public static final int DATA_LIFE = 4;
+    public static final int DATA_LIFE_HIGH = 5;
+    public static final int DATA_LIFE_CAP = 6;
+    public static final int DATA_LIFE_CAP_HIGH = 7;
+    public static final int DATA_FORMED = 8;
 
     private final AkaishiEnergyStorage akaishi;
     private final AkaishiEnergyStorage life;
@@ -87,12 +101,12 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
                 changed = true;
             }
         }
-        // 同步数据到 GUI（与 AkaishiLifeConverterMenu 共用布局）
-        data.set(0, (int) akaishi.getEnergyStored());
-        data.set(1, (int) akaishi.getMaxEnergy());
-        data.set(2, (int) life.getEnergyStored());
-        data.set(3, (int) life.getMaxEnergy());
-        data.set(4, formed ? 1 : 0);
+        // 同步数据到 GUI（与 AkaishiLifeConverterMenu 共用布局，long 拆高低 32 位）
+        LongDataSlots.write(data, DATA_CHISHI, DATA_CHISHI_HIGH, akaishi.getEnergyStored());
+        LongDataSlots.write(data, DATA_CHISHI_CAP, DATA_CHISHI_CAP_HIGH, akaishi.getMaxEnergy());
+        LongDataSlots.write(data, DATA_LIFE, DATA_LIFE_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_LIFE_CAP, DATA_LIFE_CAP_HIGH, life.getMaxEnergy());
+        data.set(DATA_FORMED, formed ? 1 : 0);
 
         if (changed) {
             setChanged();

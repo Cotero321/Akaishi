@@ -16,6 +16,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeCentrifugeMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -51,14 +52,18 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
     /** 每批产出所需的活化燃料量（mb） */
     public static final long BATCH_MB = 1000L;
 
-    // ===== 数据槽 =====
-    public static final int DATA_SLOTS = 5;
+    // ===== 数据槽（long 拆低/高 32 位双槽同步，避免 int 溢出）=====
+    public static final int DATA_SLOTS = 9;
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_ENERGY_CAPACITY = 1;
-    public static final int DATA_IN_AMOUNT = 2;
-    public static final int DATA_IN_CAPACITY = 3;
-    /** 当前批次累计分离量（mb，满 BATCH_MB 结算一次） */
-    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_ENERGY_CAPACITY = 2;
+    public static final int DATA_ENERGY_CAPACITY_HIGH = 3;
+    public static final int DATA_IN_AMOUNT = 4;
+    public static final int DATA_IN_AMOUNT_HIGH = 5;
+    public static final int DATA_IN_CAPACITY = 6;
+    public static final int DATA_IN_CAPACITY_HIGH = 7;
+    /** 当前批次累计分离量（mb，满 BATCH_MB 结算一次；受常量上限约束，int 安全） */
+    public static final int DATA_PROGRESS = 8;
 
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage energy;
@@ -98,10 +103,10 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升能量上限
         energy.setMaxEnergy((long) (ModConfig.lifeCentrifugeEnergyCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_ENERGY_CAPACITY, (int) energy.getMaxEnergy());
-        data.set(DATA_IN_AMOUNT, (int) inTank.getAmount());
-        data.set(DATA_IN_CAPACITY, (int) inTank.getCapacity());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_ENERGY_CAPACITY, DATA_ENERGY_CAPACITY_HIGH, energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_IN_AMOUNT, DATA_IN_AMOUNT_HIGH, inTank.getAmount());
+        LongDataSlots.write(data, DATA_IN_CAPACITY, DATA_IN_CAPACITY_HIGH, inTank.getCapacity());
         data.set(DATA_PROGRESS, (int) progress);
 
         Fluid fluid = inTank.getFluid();

@@ -12,6 +12,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifePurifierMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -42,9 +43,13 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
 
     public static final int OUTPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;
-    /** Menu 同步数据槽：0/1=赤能量/赤容量 2/3=生命能量/生命容量 4=固化进度百分比 */
-    public static final int DATA_SLOTS = 5;
-    public static final int DATA_PROGRESS = 4;
+    /** Menu 同步数据槽：long 各占高低两槽（0/1=赤能量 2/3=赤容量 4/5=生命能量 6/7=生命容量 8=固化进度%） */
+    public static final int DATA_AKAISHI_ENERGY = 0, DATA_AKAISHI_ENERGY_HIGH = 1;
+    public static final int DATA_AKAISHI_CAPACITY = 2, DATA_AKAISHI_CAPACITY_HIGH = 3;
+    public static final int DATA_LIFE_ENERGY = 4, DATA_LIFE_ENERGY_HIGH = 5;
+    public static final int DATA_LIFE_CAPACITY = 6, DATA_LIFE_CAPACITY_HIGH = 7;
+    public static final int DATA_PROGRESS = 8;
+    public static final int DATA_SLOTS = 9;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -80,11 +85,11 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
         // 单件赤能源需求（配置 [machine] costMultiplier 全局放大；进度/抽取额同步乘，吞吐不变、仅增耗能）
         long costTotal = (long) (ModConfig.lifePurifierTotalCost * ModConfig.machineCostMultiplier);
         // 同步数据到 GUI（Menu 的 broadcastChanges 据此下发客户端）
-        data.set(0, (int) akaishi.getEnergyStored());
-        data.set(1, (int) akaishi.getMaxEnergy());
-        data.set(2, (int) life.getEnergyStored());
-        data.set(3, (int) life.getMaxEnergy());
-        data.set(4, (int) (progressEnergy * 100 / costTotal));
+        LongDataSlots.write(data, DATA_AKAISHI_ENERGY, DATA_AKAISHI_ENERGY_HIGH, akaishi.getEnergyStored());
+        LongDataSlots.write(data, DATA_AKAISHI_CAPACITY, DATA_AKAISHI_CAPACITY_HIGH, akaishi.getMaxEnergy());
+        LongDataSlots.write(data, DATA_LIFE_ENERGY, DATA_LIFE_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_LIFE_CAPACITY, DATA_LIFE_CAPACITY_HIGH, life.getMaxEnergy());
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
 
         boolean changed = false;
         // 原料（生命能量）与输出满足条件时投入赤能源推进进度；赤能源不足时进度暂停不清零

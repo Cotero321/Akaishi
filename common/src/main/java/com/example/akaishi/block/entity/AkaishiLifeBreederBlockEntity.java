@@ -16,6 +16,7 @@ import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiLifeBreederMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -55,11 +56,15 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
     public static final int CRYSTAL_SLOT = 2;
     public static final int OUTPUT_SLOT = 3;
     public static final int SLOT_COUNT = 4;
-    /** Menu 同步数据槽：0/1=生命能量/容量 2=培养进度百分比 3=序列纯度 */
-    public static final int DATA_SLOTS = 4;
-    public static final int DATA_PROGRESS = 2;
+    /** Menu 同步数据槽：0/1=生命能量 2/3=生命容量 4=培养进度百分比 5=序列纯度（long 拆双槽） */
+    public static final int DATA_SLOTS = 6;
+    public static final int DATA_LIFE_ENERGY = 0;
+    public static final int DATA_LIFE_ENERGY_HIGH = 1;
+    public static final int DATA_LIFE_CAPACITY = 2;
+    public static final int DATA_LIFE_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
     /** 序列纯度同步槽：客户端据此实时计算成功率展示（物品槽同步在结算消耗后可能滞后） */
-    public static final int DATA_PURITY = 3;
+    public static final int DATA_PURITY = 5;
 
     /** 成功率 = 纯度 25→35%、纯度 100→70% 线性插值；纯度越纯越接近 70% 封顶 */
     public static float successRate(int purity) {
@@ -99,8 +104,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容生命能量缓冲（倍率变化时自动夹取）
         life.setMaxEnergy((long) (ModConfig.lifeBreederLifeCapacity * getEnergyCapacityMultiplier()));
-        data.set(0, (int) life.getEnergyStored());
-        data.set(1, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_LIFE_ENERGY, DATA_LIFE_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_LIFE_CAPACITY, DATA_LIFE_CAPACITY_HIGH, life.getMaxEnergy());
         // 同步当前序列纯度（供客户端实时计算成功率，序列为空时置 0）
         ItemStack sequence = inventory.getItem(SEQUENCE_SLOT);
         data.set(DATA_PURITY, sequence.getItem() instanceof AkaishiGeneSequenceItem
@@ -125,7 +130,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             speedAccum = 0;
         }
         // 进度数据槽在状态变更后写入：停机/完成当帧即同步新值，避免残留旧进度
-        data.set(2, progress * 100 / ModConfig.lifeBreederProcessTicks);
+        data.set(DATA_PROGRESS, progress * 100 / ModConfig.lifeBreederProcessTicks);
         if (changed) {
             setChanged();
         }

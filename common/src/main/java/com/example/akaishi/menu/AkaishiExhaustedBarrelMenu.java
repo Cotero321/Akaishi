@@ -1,5 +1,7 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiExhaustedBarrelBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 衰竭保存桶菜单：无机器槽位，仅玩家背包 + 液体量/容量数据。
- * 数据槽：0=液体量 1=容量。
+ * 数据槽：0/1=液体量 2/3=容量（long 各占高低两槽）。
  */
 public class AkaishiExhaustedBarrelMenu extends AbstractContainerMenu {
 
@@ -35,12 +37,14 @@ public class AkaishiExhaustedBarrelMenu extends AbstractContainerMenu {
 
     /** 当前液体储量（mb） */
     public long getFluidAmount() {
-        return data.get(0) & 0xFFFFFFFFL;
+        return LongDataSlots.read(data, AkaishiExhaustedBarrelBlockEntity.DATA_AMOUNT,
+                AkaishiExhaustedBarrelBlockEntity.DATA_AMOUNT_HIGH);
     }
 
     /** 液体容量上限（mb） */
     public long getFluidMax() {
-        return data.get(1) & 0xFFFFFFFFL;
+        return LongDataSlots.read(data, AkaishiExhaustedBarrelBlockEntity.DATA_CAPACITY,
+                AkaishiExhaustedBarrelBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     @Override
@@ -55,6 +59,6 @@ public class AkaishiExhaustedBarrelMenu extends AbstractContainerMenu {
 
     /** 供无方块实体兜底时使用的空菜单（数据全 0） */
     public static AkaishiExhaustedBarrelMenu emptyMenu(int id, Inventory inv) {
-        return new AkaishiExhaustedBarrelMenu(id, inv, new SimpleContainerData(2));
+        return new AkaishiExhaustedBarrelMenu(id, inv, new SimpleContainerData(AkaishiExhaustedBarrelBlockEntity.DATA_SLOTS));
     }
 }

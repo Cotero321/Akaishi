@@ -175,6 +175,44 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.DoubleValue MACHINE_WORK_SPEED;
     public static final ForgeConfigSpec.DoubleValue MACHINE_COST_MULTIPLIER;
 
+    // ==================== 机械改造机器 ====================
+    /** 机械三机赤能源缓冲容量（共用） */
+    public static final ForgeConfigSpec.LongValue MECH_CHISHI_CAPACITY;
+    /** 机械三机生命能量缓冲容量（共用） */
+    public static final ForgeConfigSpec.LongValue MECH_LIFE_CAPACITY;
+    /** 模板制造厂：塑形一次赤能源消耗 */
+    public static final ForgeConfigSpec.LongValue MECH_TEMPLATE_CHISHI_COST;
+    /** 模板制造厂：塑形一次生命能量消耗 */
+    public static final ForgeConfigSpec.LongValue MECH_TEMPLATE_LIFE_COST;
+    /** 模板制造厂：塑形一次耗时（tick） */
+    public static final ForgeConfigSpec.IntValue MECH_TEMPLATE_TICKS;
+    /** 加工厂：器官基价赤能（下标=器官序数 0~8），0=用内置默认 */
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Long>> MECH_PROCESS_CHISHI_BASE;
+    /** 加工厂：器官基价生命能（下标同上），0=用内置默认 */
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Long>> MECH_PROCESS_LIFE_BASE;
+    /** 加工厂：器官耗时基价 tick（下标同上），0=用内置默认 */
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> MECH_PROCESS_TICKS_BASE;
+    /** 加工厂：部件系数百分数（下标=部件序数 0~3），0=用内置默认 */
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> MECH_PROCESS_PART_FACTOR;
+    /** 加工厂：材料消耗份数（下标=部件序数 0~3），0=用内置默认 */
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> MECH_PROCESS_MATERIAL_COUNT;
+    /** 组装台：组装一次赤能源消耗（固定） */
+    public static final ForgeConfigSpec.LongValue MECH_ASSEMBLY_CHISHI_COST;
+    /** 组装台：组装一次生命能量消耗（固定） */
+    public static final ForgeConfigSpec.LongValue MECH_ASSEMBLY_LIFE_COST;
+    /** 组装台：组装一次耗时（tick） */
+    public static final ForgeConfigSpec.IntValue MECH_ASSEMBLY_TICKS;
+
+    // ==================== 机械义体属性换算 ====================
+    /** 机械义体：生命值权重 → 生命上限换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_HEALTH_SCALE;
+    /** 机械义体：攻击伤害权重 → 攻击伤害换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_ATTACK_SCALE;
+    /** 机械义体：攻击速度权重 → 攻击速度换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_ATTACK_SPEED_SCALE;
+    /** 机械义体：移动速度权重 → 移动速度换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_MOVEMENT_SPEED_SCALE;
+
     // ==================== 机制开关 ====================
     public static final ForgeConfigSpec.BooleanValue DECAY_ZONE_ENABLED;
     public static final ForgeConfigSpec.BooleanValue SUNLIGHT_BURN_ENABLED;
@@ -591,6 +629,53 @@ public final class AkaishiConfig {
                         (Object o) -> o instanceof Number n && n.intValue() >= 0);
         CULTIVATOR_UPGRADE_COMPAT_BONUS = b.comment("升级成功获得的适配加成；0 = 用内置 +8")
                 .defineInRange("compatBonus", 8, 0, 100);
+        b.pop();
+
+        // ==================== 机械改造机器 ====================
+        b.push("mechanical_machines");
+        MECH_CHISHI_CAPACITY = b.comment("机械三机赤能源缓冲容量（共用）")
+                .defineInRange("chishiCapacity", 100_000L, 0L, Long.MAX_VALUE);
+        MECH_LIFE_CAPACITY = b.comment("机械三机生命能量缓冲容量（共用）")
+                .defineInRange("lifeCapacity", 20_000L, 0L, Long.MAX_VALUE);
+        MECH_TEMPLATE_CHISHI_COST = b.comment("模板制造厂：塑形一次赤能源消耗")
+                .defineInRange("templateChishiCost", 1_000L, 0L, Long.MAX_VALUE);
+        MECH_TEMPLATE_LIFE_COST = b.comment("模板制造厂：塑形一次生命能量消耗")
+                .defineInRange("templateLifeCost", 1_000L, 0L, Long.MAX_VALUE);
+        MECH_TEMPLATE_TICKS = b.comment("模板制造厂：塑形一次耗时 (tick)")
+                .defineInRange("templateTicks", 60, 1, Integer.MAX_VALUE);
+        MECH_PROCESS_CHISHI_BASE = b.comment("加工厂：器官基价赤能（下标=器官序数 0~8：眼/心/肺/内脏/肾/左臂/右臂/左腿/右腿）；0 = 用内置默认")
+                .defineList("processChishiBase", List.of(2_000L, 4_000L, 2_000L, 4_000L, 2_000L, 3_000L, 3_000L, 3_000L, 3_000L),
+                        (Object o) -> o instanceof Number n && n.longValue() >= 0);
+        MECH_PROCESS_LIFE_BASE = b.comment("加工厂：器官基价生命能（下标同上）；0 = 用内置默认")
+                .defineList("processLifeBase", List.of(2_000L, 4_000L, 2_000L, 4_000L, 2_000L, 2_000L, 2_000L, 2_000L, 2_000L),
+                        (Object o) -> o instanceof Number n && n.longValue() >= 0);
+        MECH_PROCESS_TICKS_BASE = b.comment("加工厂：器官耗时基价 tick（下标同上）；0 = 用内置默认")
+                .defineList("processTicksBase", List.of(80, 160, 80, 160, 80, 120, 120, 120, 120),
+                        (Object o) -> o instanceof Number n && n.intValue() >= 0);
+        MECH_PROCESS_PART_FACTOR = b.comment("加工厂：部件系数百分数（下标=部件序数 0~3：核心/模块/外壳/散热；核心 120=×1.2、模块 100、外壳 90、散热 110）；0 = 用内置默认")
+                .defineList("processPartFactor", List.of(120, 100, 90, 110),
+                        (Object o) -> o instanceof Number n && n.intValue() >= 0);
+        MECH_PROCESS_MATERIAL_COUNT = b.comment("加工厂：材料消耗份数（下标=部件序数 0~3：核心 3/模块 2/外壳 4/散热 2，与材料等级无关）；0 = 用内置默认")
+                .defineList("processMaterialCount", List.of(3, 2, 4, 2),
+                        (Object o) -> o instanceof Number n && n.intValue() >= 0);
+        MECH_ASSEMBLY_CHISHI_COST = b.comment("组装台：组装一次赤能源消耗（固定，与器官无关）")
+                .defineInRange("assemblyChishiCost", 2_000L, 0L, Long.MAX_VALUE);
+        MECH_ASSEMBLY_LIFE_COST = b.comment("组装台：组装一次生命能量消耗（固定）")
+                .defineInRange("assemblyLifeCost", 2_000L, 0L, Long.MAX_VALUE);
+        MECH_ASSEMBLY_TICKS = b.comment("组装台：组装一次耗时 (tick)")
+                .defineInRange("assemblyTicks", 80, 1, Integer.MAX_VALUE);
+        b.pop();
+
+        // ==================== 机械义体属性换算 ====================
+        b.push("mechanical_body");
+        MECH_BODY_HEALTH_SCALE = b.comment("机械义体：生命值权重 → 生命上限换算倍率（最终生命 = 权重 × 整合度倍率 × 该倍率）；0 = 用内置 0.5")
+                .defineInRange("healthScale", 0.5, 0.0, 1000.0);
+        MECH_BODY_ATTACK_SCALE = b.comment("机械义体：攻击伤害权重 → 攻击伤害换算倍率；0 = 用内置 0.1")
+                .defineInRange("attackScale", 0.1, 0.0, 1000.0);
+        MECH_BODY_ATTACK_SPEED_SCALE = b.comment("机械义体：攻击速度权重 → 攻击速度换算倍率；0 = 用内置 0.01")
+                .defineInRange("attackSpeedScale", 0.01, 0.0, 1000.0);
+        MECH_BODY_MOVEMENT_SPEED_SCALE = b.comment("机械义体：移动速度权重 → 移动速度换算倍率；0 = 用内置 0.001")
+                .defineInRange("movementSpeedScale", 0.001, 0.0, 1000.0);
         b.pop();
 
         // ==================== 机器全局倍率 ====================

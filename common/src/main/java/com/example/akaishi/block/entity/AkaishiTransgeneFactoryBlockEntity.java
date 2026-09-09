@@ -13,6 +13,7 @@ import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiTransgeneFactoryMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -63,12 +64,14 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     public static final int SLOT_SOLID = 3;
     public static final int SLOT_OUT = 4;
     public static final int SLOT_COUNT = 5;
-    /** Menu 同步数据槽：0=能量、1=能量上限、2=进度百分比、3=是否工作中 */
-    public static final int DATA_SLOTS = 4;
+    /** Menu 同步数据槽：long 各占高低两槽 0/1=生命能量 2/3=能量上限 4=进度百分比 5=是否工作中 */
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_MAX = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_WORKING = 3;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_MAX = 2;
+    public static final int DATA_MAX_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_WORKING = 5;
+    public static final int DATA_SLOTS = 6;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -94,8 +97,8 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     }
 
     private void tickServer() {
-        data.set(DATA_ENERGY, (int) Math.min(Integer.MAX_VALUE, life.getEnergyStored()));
-        data.set(DATA_MAX, (int) Math.min(Integer.MAX_VALUE, ModConfig.transgeneFactoryLifeCapacity));
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_MAX, DATA_MAX_HIGH, ModConfig.transgeneFactoryLifeCapacity);
         data.set(DATA_PROGRESS, progress * 100 / ModConfig.transgeneFactoryProcessTicks);
         data.set(DATA_WORKING, canProcess() ? 1 : 0);
         if (canProcess()) {

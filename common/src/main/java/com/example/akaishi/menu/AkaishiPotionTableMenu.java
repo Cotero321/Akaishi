@@ -6,6 +6,7 @@ import com.example.akaishi.block.entity.AkaishiSampleVaultBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 药剂台菜单：样本槽 + 固态物槽 + 药剂输出槽 + 背包。
- * 数据槽：0/1=生命能量/容量 2=制作进度% 3=当前模板索引（-1 未选择）。
+ * 数据槽：0/1=生命能量低/高 2/3=容量低/高 4=制作进度% 5=当前模板索引（-1 未选择）。
  * 模板选择经 C2S 包写入服务端（见 AkaishiPotionSync）。
  */
 public class AkaishiPotionTableMenu extends AbstractContainerMenu {
@@ -100,11 +101,13 @@ public class AkaishiPotionTableMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(AkaishiPotionTableBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiPotionTableBlockEntity.DATA_ENERGY,
+                AkaishiPotionTableBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(AkaishiPotionTableBlockEntity.DATA_CAPACITY);
+        return LongDataSlots.read(data, AkaishiPotionTableBlockEntity.DATA_CAPACITY,
+                AkaishiPotionTableBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 制作进度（0-100） */

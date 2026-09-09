@@ -39,7 +39,7 @@ foreach ($n in @('helmet', 'chestplate', 'leggings', 'boots')) {
     }
 }
 
-# ===== life fusion armor layer textures (worn on body, keep 64x32 UV layout) =====
+# ===== life fusion armor layer textures (128x64 UV layout for HumanoidModel) =====
 foreach ($n in @(1, 2)) {
     $src = Join-Path $armorDir ('akaishi_layer_' + $n + '.png')
     if (Test-Path $src) {

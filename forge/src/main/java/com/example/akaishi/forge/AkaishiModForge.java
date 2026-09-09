@@ -18,10 +18,13 @@ import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
+import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
 import com.example.akaishi.forge.client.AkaishiConfigScreenFactory;
 import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
+import com.example.akaishi.forge.client.mechanical.MechanicalPartRenderer;
+import com.example.akaishi.forge.client.model.MechanicalPartGeometryLoader;
 import com.example.akaishi.forge.config.AkaishiConfig;
 import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.fluid.ForgeFluidBridge;
@@ -79,6 +82,8 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -171,6 +176,17 @@ public final class AkaishiModForge {
                     event.register(AkaishiLifeSystemTests.class);
                 });
 
+        // 原生动力护甲层：分件几何绑定到人形骨骼，不依赖 Geo/GeckoLib。
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (EntityRenderersEvent.RegisterLayerDefinitions event) -> event.registerLayerDefinition(
+                        AkaishiMekaSuitArmorModel.LAYER, AkaishiMekaSuitArmorModel::createLayer));
+
+        // 注册机械部件模型加载器（IGeometryLoader：方案4）
+        FMLJavaModLoadingContext.get().getModEventBus()
+                .addListener((ModelEvent.RegisterGeometryLoaders event) -> {
+                    event.register("mechanical_part", new MechanicalPartGeometryLoader());
+                });
+
         // Curios 饰品集成：通用事件（击杀/挖掘/受伤）走游戏总线；装备与每 tick 由 Curios 自动驱动
         MinecraftForge.EVENT_BUS.register(AkaishiCurioIntegration.INSTANCE);
 
@@ -235,6 +251,9 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
         // Mods 列表"配置"按钮 → Cloth Config 游戏内配置界面
         AkaishiConfigScreenFactory.register();
+
+        // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
+        MechanicalPartRenderer.initialize();
     }
 
     /**

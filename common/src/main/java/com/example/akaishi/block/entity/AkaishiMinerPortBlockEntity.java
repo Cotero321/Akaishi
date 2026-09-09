@@ -11,6 +11,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerPortMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -41,7 +42,11 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
     /** 产物缓冲槽数 */
     public static final int BUFFER_SLOTS = 27;
 
-    public static final int DATA_ENERGY = 0, DATA_CAPACITY = 1, DATA_FORMED = 2;
+    /** 数据槽：long 各占高低两槽（0/1=能量 2/3=容量 4=成型状态） */
+    public static final int DATA_ENERGY = 0, DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2, DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_FORMED = 4;
+    public static final int DATA_SLOTS = 5;
 
     private final SimpleContainer buffer = new SimpleContainer(BUFFER_SLOTS) {
         @Override
@@ -51,7 +56,7 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         }
     };
     private final AkaishiEnergyStorage energy = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.minerPortBufferCapacity);
-    private final SimpleContainerData data = new SimpleContainerData(3);
+    private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     private BlockPos controllerPos;
 
     public AkaishiMinerPortBlockEntity(BlockPos pos, BlockState state) {
@@ -63,8 +68,8 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
     }
 
     private void tickServer() {
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         // 控制器被拆/结构解散时清除关联坐标，避免悬空引用
         BlockEntity at = controllerPos == null ? null : level.getBlockEntity(controllerPos);
         if (controllerPos != null && !(at instanceof AkaishiMinerControllerBlockEntity)) {
@@ -74,7 +79,7 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         AkaishiMinerControllerBlockEntity controller = at instanceof AkaishiMinerControllerBlockEntity c ? c : null;
         boolean formed = controller != null
                 && controller.getBlockState().getValue(AkaishiMinerControllerBlock.FORMED);
-        data.set(2, formed ? 1 : 0);
+        data.set(DATA_FORMED, formed ? 1 : 0);
         if (!formed) {
             return;
         }

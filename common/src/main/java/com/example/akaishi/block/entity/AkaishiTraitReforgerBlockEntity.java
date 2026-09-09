@@ -14,6 +14,7 @@ import com.example.akaishi.life.organ.MutantTrait;
 import com.example.akaishi.menu.AkaishiTraitReforgerMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -51,11 +52,15 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
     public static final int CRYSTAL_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
-    /** Menu 同步数据槽：0/1=生命能量/容量 2=重铸进度% 3=词条总数 4=目标词条序号 */
-    public static final int DATA_SLOTS = 5;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_COUNT = 3;
-    public static final int DATA_TARGET = 4;
+    /** Menu 同步数据槽：0/1=生命能量低/高 2/3=生命容量低/高 4=重铸进度% 5=词条总数 6=目标词条序号 */
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_COUNT = 5;
+    public static final int DATA_TARGET = 6;
+    public static final int DATA_SLOTS = 7;
 
     /** 衰竭结晶消耗 = 稀有度 × 基数（1/2/3 档 → 2/4/6） */
     public static int crystalCost(int rarity) {
@@ -94,8 +99,8 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 机器升级：能量升级动态扩容生命能量缓冲（倍率变化时自动夹取）
         life.setMaxEnergy((long) (ModConfig.traitReforgerLifeCapacity * getEnergyCapacityMultiplier()));
-        data.set(0, (int) life.getEnergyStored());
-        data.set(1, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, life.getMaxEnergy());
 
         // 词条总数与目标序号随器官状态自愈：器官换掉/词条数缩水时钳制目标
         ItemStack organ = inventory.getItem(ORGAN_SLOT);

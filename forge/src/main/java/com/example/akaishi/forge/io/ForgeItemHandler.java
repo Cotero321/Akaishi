@@ -65,7 +65,7 @@ public final class ForgeItemHandler implements IItemHandlerModifiable {
     @NotNull
     @Override
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        if (stack.isEmpty() || !inRange(slot) || !canInsert[slot]) {
+        if (stack.isEmpty() || !inRange(slot) || !canInsert[slot] || !container.canPlaceItem(slot, stack)) {
             return stack; // 越界/空栈/非输入槽（仅输出机器）→ 原样退回
         }
         ItemStack existing = container.getItem(slot);
@@ -113,7 +113,7 @@ public final class ForgeItemHandler implements IItemHandlerModifiable {
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
-        if (!inRange(slot) || !canInsert[slot]) {
+        if (!inRange(slot) || !canInsert[slot] || !container.canPlaceItem(slot, stack)) {
             return;
         }
         container.setItem(slot, stack);
@@ -121,6 +121,6 @@ public final class ForgeItemHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        return inRange(slot) && canInsert[slot];
+        return inRange(slot) && canInsert[slot] && container.canPlaceItem(slot, stack);
     }
 }

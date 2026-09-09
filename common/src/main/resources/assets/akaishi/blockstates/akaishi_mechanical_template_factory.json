@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "akaishi:block/akaishi_mechanical_template_factory"
+    }
+  }
+}

@@ -18,6 +18,7 @@ import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiLifeStructMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -58,10 +59,14 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
     public static final int SOLID_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     public static final int SLOT_COUNT = 3;
-    /** Menu 同步数据槽：0/1=生命能量/容量 2=进度% 3=目标槽位索引 */
-    public static final int DATA_SLOTS = 4;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_TARGET = 3;
+    /** Menu 同步数据槽：0/1=生命能量 2/3=生命容量 4=进度% 5=目标槽位索引（long 拆双槽） */
+    public static final int DATA_SLOTS = 6;
+    public static final int DATA_LIFE_ENERGY = 0;
+    public static final int DATA_LIFE_ENERGY_HIGH = 1;
+    public static final int DATA_LIFE_CAPACITY = 2;
+    public static final int DATA_LIFE_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_TARGET = 5;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -95,8 +100,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
     private void tickServer() {
         // 动态扩容：能量升级组件生效时按倍率提升生命能量上限
         life.setMaxEnergy((long) (ModConfig.lifeStructLifeCapacity * getEnergyCapacityMultiplier()));
-        data.set(0, (int) life.getEnergyStored());
-        data.set(1, (int) life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_LIFE_ENERGY, DATA_LIFE_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_LIFE_CAPACITY, DATA_LIFE_CAPACITY_HIGH, life.getMaxEnergy());
 
         boolean changed = false;
         refreshTarget();

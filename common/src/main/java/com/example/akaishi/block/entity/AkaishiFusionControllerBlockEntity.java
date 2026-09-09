@@ -9,6 +9,7 @@ import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionControllerMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -62,9 +63,10 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     public static final int DATA_COOLER_DURABILITY = 10;
     public static final int DATA_SPEED_X100 = 11;
     public static final int DATA_ASH_AMOUNT = 12;
+    public static final int DATA_ASH_AMOUNT_HIGH = 13;
     /** 过热停产剩余冷却（秒，服务端写入） */
-    public static final int DATA_OVERHEAT_COOLDOWN = 13;
-    public static final int DATA_SLOTS = 14;
+    public static final int DATA_OVERHEAT_COOLDOWN = 14;
+    public static final int DATA_SLOTS = 15;
 
     /** 过热停产时长：超温跳闸后强制冷却 5 分钟（20 tick/秒 × 300 秒），期间无法恢复燃烧 */
     private static final int OVERHEAT_COOLDOWN_TICKS = 20 * 60 * 5;
@@ -429,7 +431,7 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         data.set(DATA_OVERHEATED, overheated ? 1 : 0);
         data.set(DATA_COOLER_DURABILITY, lowestCoolerDurability());
         data.set(DATA_SPEED_X100, speedPercent);
-        data.set(DATA_ASH_AMOUNT, (int) Math.min(Integer.MAX_VALUE, ashAmount));
+        LongDataSlots.write(data, DATA_ASH_AMOUNT, DATA_ASH_AMOUNT_HIGH, ashAmount);
         // 过热停产剩余秒（向上取整，供 GUI 倒计时显示）
         data.set(DATA_OVERHEAT_COOLDOWN, (overheatCooldown + 19) / 20);
     }

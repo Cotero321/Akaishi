@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiDecayPurifierBlockEntity;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -53,11 +54,13 @@ public class AkaishiDecayPurifierMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return data.get(AkaishiDecayPurifierBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiDecayPurifierBlockEntity.DATA_ENERGY,
+                AkaishiDecayPurifierBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getEnergyCapacity() {
-        return data.get(AkaishiDecayPurifierBlockEntity.DATA_CAPACITY);
+        return LongDataSlots.read(data, AkaishiDecayPurifierBlockEntity.DATA_CAPACITY,
+                AkaishiDecayPurifierBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 是否正在净化（有区域且能量充足） */

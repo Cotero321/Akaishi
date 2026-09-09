@@ -4,6 +4,7 @@ import com.example.akaishi.block.entity.AkaishiGeneAnalyzerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiSampleVaultBlockEntity;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 生命分析台菜单：输入槽（纯度 ≥25 样本）+ 输出槽（基因序列片段）+ 背包。
- * 数据槽：0/1=生命能量/容量 2=解构进度百分比。
+ * 数据槽：0/1=生命能量低/高 2/3=容量低/高 4=解构进度百分比。
  */
 public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
 
@@ -89,11 +90,13 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiGeneAnalyzerBlockEntity.DATA_ENERGY,
+                AkaishiGeneAnalyzerBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiGeneAnalyzerBlockEntity.DATA_CAPACITY,
+                AkaishiGeneAnalyzerBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 解构进度（0-100） */

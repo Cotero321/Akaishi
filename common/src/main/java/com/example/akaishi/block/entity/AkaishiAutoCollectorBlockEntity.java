@@ -43,7 +43,11 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
     public static final int STORAGE_SIZE = 27;
     /** 能量缓冲容量 */
     public static final int MAX_ENERGY = 50000;
-    /** 与 Menu 同步的数据槽数量（0=能量 1=容量 2=收集进度% 3=状态） */
+    /** 与 Menu 同步的数据槽（0=能量 1=容量 2=收集进度% 3=状态；能量上限固定 5 万×5 倍率，int 安全） */
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_CAPACITY = 1;
+    public static final int DATA_PROGRESS = 2;
+    public static final int DATA_STATUS = 3;
     public static final int DATA_SLOTS = 4;
     public static final int DATA_STATUS_IDLE = 0;    // 范围内无水晶簇，待机
     public static final int DATA_STATUS_NO_ENERGY = 1; // 能量不足，暂停
@@ -112,10 +116,10 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
             }
             setChanged();
         }
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, (int) energy.getMaxEnergy());
-        data.set(2, (int) (progressTicks * 100L / tier.workTicks));
-        data.set(3, status);
+        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
+        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        data.set(DATA_PROGRESS, (int) (progressTicks * 100L / tier.workTicks));
+        data.set(DATA_STATUS, status);
     }
 
     /** 在 3×3×3 范围内查找第一颗水晶簇 */

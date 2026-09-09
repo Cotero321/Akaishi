@@ -10,6 +10,7 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.fluid.MultiFluidTank;
 import com.example.akaishi.menu.AkaishiLifeActivatorMenu;
 import dev.architectury.fluid.FluidStack;
@@ -43,18 +44,25 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice {
 
     /**
-     * Menu 同步数据槽：0/1=生命能量/容量 2/3=输入量/容量 4/5=输出量/容量
-     * 6/7=累计活化量（低 32 位 / 高 32 位，long 拆两槽无损同步，避免 int 溢出）
+     * Menu 同步数据槽：每个 long 拆低/高 32 位两槽无损同步，避免 int 溢出。
+     * 0/1=生命能量 2/3=生命容量 4/5=输入量 6/7=输入容量
+     * 8/9=输出量 10/11=输出容量 12/13=累计活化量
      */
-    public static final int DATA_SLOTS = 8;
+    public static final int DATA_SLOTS = 14;
     public static final int DATA_LIFE_ENERGY = 0;
-    public static final int DATA_LIFE_CAPACITY = 1;
-    public static final int DATA_IN_AMOUNT = 2;
-    public static final int DATA_IN_CAPACITY = 3;
-    public static final int DATA_OUT_AMOUNT = 4;
-    public static final int DATA_OUT_CAPACITY = 5;
-    public static final int DATA_PROCESSED_LOW = 6;
-    public static final int DATA_PROCESSED_HIGH = 7;
+    public static final int DATA_LIFE_ENERGY_HIGH = 1;
+    public static final int DATA_LIFE_CAPACITY = 2;
+    public static final int DATA_LIFE_CAPACITY_HIGH = 3;
+    public static final int DATA_IN_AMOUNT = 4;
+    public static final int DATA_IN_AMOUNT_HIGH = 5;
+    public static final int DATA_IN_CAPACITY = 6;
+    public static final int DATA_IN_CAPACITY_HIGH = 7;
+    public static final int DATA_OUT_AMOUNT = 8;
+    public static final int DATA_OUT_AMOUNT_HIGH = 9;
+    public static final int DATA_OUT_CAPACITY = 10;
+    public static final int DATA_OUT_CAPACITY_HIGH = 11;
+    public static final int DATA_PROCESSED_LOW = 12;
+    public static final int DATA_PROCESSED_HIGH = 13;
 
     /** 生命能量容量 / 每 1mb 转化成本 / 罐容量 / 转化速率均由 {@link com.example.akaishi.config.ModConfig} 提供 */
 
@@ -108,12 +116,12 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
     }
 
     private void tickServer() {
-        data.set(DATA_LIFE_ENERGY, (int) life.getEnergyStored());
-        data.set(DATA_LIFE_CAPACITY, (int) life.getMaxEnergy());
-        data.set(DATA_IN_AMOUNT, (int) inTank.getAmount());
-        data.set(DATA_IN_CAPACITY, (int) inTank.getCapacity());
-        data.set(DATA_OUT_AMOUNT, (int) outTank.getAmount());
-        data.set(DATA_OUT_CAPACITY, (int) outTank.getCapacity());
+        LongDataSlots.write(data, DATA_LIFE_ENERGY, DATA_LIFE_ENERGY_HIGH, life.getEnergyStored());
+        LongDataSlots.write(data, DATA_LIFE_CAPACITY, DATA_LIFE_CAPACITY_HIGH, life.getMaxEnergy());
+        LongDataSlots.write(data, DATA_IN_AMOUNT, DATA_IN_AMOUNT_HIGH, inTank.getAmount());
+        LongDataSlots.write(data, DATA_IN_CAPACITY, DATA_IN_CAPACITY_HIGH, inTank.getCapacity());
+        LongDataSlots.write(data, DATA_OUT_AMOUNT, DATA_OUT_AMOUNT_HIGH, outTank.getAmount());
+        LongDataSlots.write(data, DATA_OUT_CAPACITY, DATA_OUT_CAPACITY_HIGH, outTank.getCapacity());
 
         Fluid fuel = inTank.getFluid();
         Fluid activated = ModFluids.activatedFuelFor(fuel);

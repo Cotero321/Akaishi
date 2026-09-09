@@ -7,6 +7,14 @@ import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
 import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.linkage.OrganLinkage;
+import com.example.akaishi.item.MechanicalOrganItem;
+import com.example.akaishi.life.mechanical.MechanicalAssembledStats;
+import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
+import com.example.akaishi.life.mechanical.MechanicalIntegrationService;
+import com.example.akaishi.life.mechanical.MechanicalMaterial;
+import com.example.akaishi.life.mechanical.MechanicalOrganType;
+import com.example.akaishi.life.mechanical.MechanicalPartTemplate;
+import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.life.organ.OrganPassive;
@@ -116,6 +124,8 @@ public final class AkaishiBodyPassiveHandler {
         if (state.tickBreakthrough(player.level().getGameTime())) {
             player.displayClientMessage(Component.translatable("message.akaishi.potion.breakthrough_end"), true);
         }
+        // 机械整合度增长：先累加再重建，使本 tick 的整合度变化立即反映到属性摘要
+        tickMechanicalIntegration(state);
         rebuildAttributes(player, state);
         applyLifeFusionSet(player);
         applyPassives(player, state);
@@ -237,6 +247,30 @@ public final class AkaishiBodyPassiveHandler {
                 next.add(new AppliedAttr(organ.slot().name(), e.getKey()));
             }
         }
+        // 2.5) 机械义体：五维按「整合度折扣 × 配置换算倍率」挂载
+        //      机械义体排斥恒 0、不参与适配度/突破/天敌体系，故走独立挂载路径
+        for (BodySlot slot : BodySlot.values()) {
+            ItemStack organ = state.getOrgan(slot);
+            if (!(organ.getItem() instanceof MechanicalOrganItem)) {
+                continue;
+            }
+            MechanicalAssembledStats stats = MechanicalOrganItem.getStats(organ);
+            if (stats == null) {
+                continue;
+            }
+            // 整合度只涨不降：0% 整合也有 20% 生效，满整合 100%
+            double integration = MechanicalIntegrationService.getEffectiveMultiplier(
+                    state.getMechanicalIntegration().get(slot));
+            MechanicalAssembledStats eff = stats.applyIntegration(integration);
+            // 生命沿用生物器官的百分比聚合口径（+value/20 即 +5%×value）；换算倍率 0=用内置默认
+            healthPct += eff.health() * mechScale(ModConfig.mechBodyHealthScale, 0.5) / BASE_HEALTH;
+            mountMechanicalAttribute(player, next, slot, Attributes.ATTACK_DAMAGE,
+                    eff.attackDamage() * mechScale(ModConfig.mechBodyAttackScale, 0.1));
+            mountMechanicalAttribute(player, next, slot, Attributes.ATTACK_SPEED,
+                    eff.attackSpeed() * mechScale(ModConfig.mechBodyAttackSpeedScale, 0.01));
+            mountMechanicalAttribute(player, next, slot, Attributes.MOVEMENT_SPEED,
+                    eff.movementSpeed() * mechScale(ModConfig.mechBodyMovementSpeedScale, 0.001));
+        }
         // 生命融合套装·BOSS/龙肢体：移植 BOSS 或龙族来源器官时额外 +10 最大生命
         if (AkaishiLifeFusionSet.isFullSet(player) && AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state)) {
             healthPct += AkaishiLifeFusionSet.BOSS_DRAGON_HEALTH_BONUS / BASE_HEALTH;
@@ -264,6 +298,68 @@ public final class AkaishiBodyPassiveHandler {
         return UUID.nameUUIDFromBytes((key + ":" + attribute.getDescriptionId()).getBytes(StandardCharsets.UTF_8));
     }
 
+    /** 挂载单条机械义体属性修饰（值≈0 跳过；同槽位同属性与生物器官共用 UUID，槽位互斥不会冲突） */
+    private static void mountMechanicalAttribute(Player player, List<AppliedAttr> next,
+                                                 BodySlot slot, Attribute attribute, double value) {
+        if (Math.abs(value) < 1e-9) {
+            return;
+        }
+        AttributeInstance inst = player.getAttribute(attribute);
+        if (inst == null) {
+            return;
+        }
+        UUID uuid = uuidOf(slot.name(), attribute);
+        if (inst.getModifier(uuid) != null) {
+            inst.removeModifier(uuid);
+        }
+        inst.addTransientModifier(new AttributeModifier(uuid, "Akaishi mechanical organ", value, ADD));
+        next.add(new AppliedAttr(slot.name(), attribute));
+    }
+
+    /** 机械义体换算倍率：配置值 >0 用配置，否则回退内置默认（规则：0 = 不覆盖） */
+    private static double mechScale(double configured, double builtin) {
+        return configured > 0.0 ? configured : builtin;
+    }
+
+    /**
+     * 机械整合度增长：从已安装机械义体重建简化部件模板。
+     * 成品 NBT 只保留四个材料 ID（不存 DNA），故 DNA 一律回退 akaishi:none——
+     * 副作用：同源加速（1.3）对成品义体不生效，其余材料/机械心脏修正正常。
+     */
+    private static void tickMechanicalIntegration(IPlayerBodyState state) {
+        List<BodySlot> slots = new ArrayList<>();
+        Map<BodySlot, MechanicalPartTemplate> templates = new HashMap<>();
+        Map<BodySlot, MechanicalOrganType> types = new HashMap<>();
+        boolean hasMechanicalHeart = false;
+        for (BodySlot slot : BodySlot.values()) {
+            ItemStack organ = state.getOrgan(slot);
+            if (!(organ.getItem() instanceof MechanicalOrganItem)) {
+                continue;
+            }
+            MechanicalOrganType type = MechanicalOrganItem.getOrganType(organ);
+            if (type == null) {
+                continue;
+            }
+            slots.add(slot);
+            types.put(slot, type);
+            if (type == MechanicalOrganType.HEART) {
+                hasMechanicalHeart = true;
+            }
+            List<String> materialIds = MechanicalOrganItem.getMaterialIds(organ);
+            MechanicalMaterial material = materialIds.isEmpty()
+                    ? null : MechanicalMaterial.get(materialIds.get(0));
+            if (material != null) {
+                templates.put(slot, new MechanicalPartTemplate(type, MechanicalPartType.CORE,
+                        material, MechanicalDnaProfile.get("akaishi:none")));
+            }
+        }
+        if (slots.isEmpty()) {
+            return;
+        }
+        MechanicalIntegrationService.tick(state.getMechanicalIntegration(),
+                slots, hasMechanicalHeart, templates, types);
+    }
+
     /** 摘要：各槽位器官来源/品质/适配度 + 排斥值 + 空槽 + 基因强化 + 突破激活 + 生命融合装备（变化才触发重建） */
     private static String digestOf(IPlayerBodyState state, Player player) {
         StringBuilder sb = new StringBuilder();
@@ -283,7 +379,9 @@ public final class AkaishiBodyPassiveHandler {
                             .append(':').append(AkaishiOrganItem.getMutations(organ));
                 }
             }
-            sb.append(':').append(state.getRejection(slot)).append(';');
+            // 整合度参与摘要：机械义体整合度增长需即时刷新属性面板
+            sb.append(':').append(state.getRejection(slot))
+                    .append(':').append(state.getMechanicalIntegration().get(slot)).append(';');
         }
         // 突破激活（激活开始/结束/数值变化时触发属性重建，属性随激活生效/回落）
         sb.append("BT").append(state.getBreakthroughEntity()).append(':')

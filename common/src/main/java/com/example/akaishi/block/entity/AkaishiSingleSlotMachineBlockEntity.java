@@ -10,6 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -50,11 +51,14 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
     public static final int SLOT_COUNT = 2;
 
     // ===== 数据槽（Menu 同步）=====
+    // 能量/容量为 long，各占低/高 32 位两槽（SimpleContainerData 仅支持 int，直接强转会溢出）
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_REQUIRED = 3;
-    public static final int DATA_SLOTS = 4;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_REQUIRED = 5;
+    public static final int DATA_SLOTS = 6;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -104,8 +108,8 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
     protected void tickServer() {
         // 能量升级动态扩容（倍率变化实时生效，容量缩小时自动夹取）
         energy.setMaxEnergy((long) (baseCapacity() * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
 
         ItemStack inputStack = inventory.getItem(SLOT_INPUT);
         Item input = inputStack.getItem();

@@ -28,6 +28,8 @@ import com.example.akaishi.menu.AkaishiTraitReforgerSync;
 import com.example.akaishi.menu.AkaishiGeneManagerSync;
 import com.example.akaishi.menu.AkaishiOrganVaultSync;
 import com.example.akaishi.menu.ModMenus;
+import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
+import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.sound.ModSounds;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
@@ -43,6 +45,9 @@ public final class AkaishiMod {
     /** 通用初始化入口，由各平台加载器的入口类调用 */
     public static void init() {
         EnergyTypeRegistry.register(AkaishiEnergyType.INSTANCE);
+        // 机械域注册表默认项：材料 / DNA 模板（渲染预合成与部件校验依赖该注册）
+        MechanicalMaterial.registerDefaults();
+        MechanicalDnaProfile.registerDefaults();
         ModItems.register();
         // 衰竭域须先于方块门面注册：ModBlocks 门面会转发其字段引用
         AkaishiDecayBlocks.register();
@@ -85,6 +90,10 @@ public final class AkaishiMod {
         AkaishiTraitReforgerSync.register();
         // 器官储藏库切页包（C2S 接收器）
         AkaishiOrganVaultSync.register();
+        // 模板制造厂目标模板选择包（C2S 接收器）
+        com.example.akaishi.menu.MechanicalSelectSync.register();
+        // 机械三机单次制作请求包（C2S 接收器）
+        com.example.akaishi.menu.MechanicalCraftSync.register();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
         ModSounds.touch();
     }

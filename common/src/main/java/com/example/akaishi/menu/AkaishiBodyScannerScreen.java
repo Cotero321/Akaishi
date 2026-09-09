@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.item.MechanicalOrganItem;
 import com.example.akaishi.life.body.BodyOverviewEntry;
 import com.example.akaishi.life.body.BodyPassiveEntry;
 import com.example.akaishi.life.body.BodySlot;
@@ -383,6 +384,11 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
                 this.minecraft.options.advancedItemTooltips ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL));
         tip.add(Component.literal("§7" + Component.translatable("gui.akaishi.body_scanner.rejection_row",
                 ClientBodyData.getRejection(slot)).getString()));
+        // 机械义体额外显示整合度（生物器官无此概念）
+        if (organ.getItem() instanceof MechanicalOrganItem) {
+            tip.add(Component.literal("§7" + Component.translatable("gui.akaishi.body_scanner.integration_row",
+                    ClientBodyData.getIntegration(slot)).getString()));
+        }
         return tip;
     }
 

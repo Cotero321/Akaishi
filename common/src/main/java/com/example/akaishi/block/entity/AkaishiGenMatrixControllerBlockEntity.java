@@ -15,6 +15,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
 import com.example.akaishi.menu.AkaishiGenMatrixControllerMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -39,7 +40,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * 发生器矩阵控制器：类反应堆式矩阵主方块（低级/高级由方块等级决定）。
  * 结构扫描以自身为中心，半径内（低级 1 / 高级 2）所有位置必须为矩阵外壳或端口；
  * 成型后以对应倍率集中产能，能量经能量输出口对外输出，燃料经燃料输入口注入。
- * 数据槽：0=能量，1=燃烧能量，2=燃料总能量，3=结构状态，4=升级组件数。
+ * 数据槽：0/1=能量低/高（long 拆分，容量可超 int），2=燃烧能量，3=燃料总能量，4=结构状态，5=升级组件数。
  */
 public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
@@ -50,8 +51,17 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
     public static final int UPGRADE_SLOTS = 10;
     public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
+    /** Menu 同步数据槽（能量为 long，拆低/高 32 位，容量最高 50,000,000 远超 int） */
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_BURN = 2;
+    public static final int DATA_BURN_TOTAL = 3;
+    public static final int DATA_FORMED = 4;
+    public static final int DATA_UPGRADES = 5;
+    public static final int DATA_SLOTS = 6;
+
     private final SimpleContainer inventory;
-    private final SimpleContainerData data = new SimpleContainerData(5);
+    private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     private final AkaishiEnergyStorage energy;
     private int burnEnergy;
     private int burnEnergyTotal;
@@ -99,11 +109,11 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
 
     private void tickServer() {
         boolean changed = false;
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, burnEnergy);
-        data.set(2, burnEnergyTotal);
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        data.set(DATA_BURN, burnEnergy);
+        data.set(DATA_BURN_TOTAL, burnEnergyTotal);
         int upgrades = getUpgradeCount();
-        data.set(4, upgrades);
+        data.set(DATA_UPGRADES, upgrades);
 
         boolean formed = getBlockState().getValue(AkaishiGenMatrixControllerBlock.FORMED);
         // 成型后每 10 tick 校验一次即可（结构变化不频繁，减少扫描开销）
@@ -124,7 +134,7 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
             formed = valid;
             changed = true;
         }
-        data.set(3, formed ? 1 : 0);
+        data.set(DATA_FORMED, formed ? 1 : 0);
 
         // 成型后以对应倍率集中产能（低级 45 倍 / 高级 200 倍）
         AkaishiGenMatrixTier t = tier();

@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEnergyAggregatorBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -41,22 +42,25 @@ public class AkaishiEnergyAggregatorMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiEnergyAggregatorBlockEntity.DATA_ENERGY,
+                AkaishiEnergyAggregatorBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getMaxEnergy() {
-        return data.get(1);
+    public long getMaxEnergy() {
+        return LongDataSlots.read(data, AkaishiEnergyAggregatorBlockEntity.DATA_CAPACITY,
+                AkaishiEnergyAggregatorBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 聚合进度（能量百分比 0-100） */
     public int getProgress() {
-        return data.get(2);
+        return data.get(AkaishiEnergyAggregatorBlockEntity.DATA_PROGRESS);
     }
 
     /** 当前配方单次消耗（赤石锭聚合或母岩升级） */
-    public int getCurrentCost() {
-        return data.get(3);
+    public long getCurrentCost() {
+        return LongDataSlots.read(data, AkaishiEnergyAggregatorBlockEntity.DATA_COST,
+                AkaishiEnergyAggregatorBlockEntity.DATA_COST_HIGH);
     }
 
     @Override

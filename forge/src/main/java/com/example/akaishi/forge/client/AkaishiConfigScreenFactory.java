@@ -91,6 +91,29 @@ public final class AkaishiConfigScreenFactory {
         doubleField(machine, eb, "machine.workSpeed", AkaishiConfig.MACHINE_WORK_SPEED);
         doubleField(machine, eb, "machine.costMultiplier", AkaishiConfig.MACHINE_COST_MULTIPLIER);
 
+        // ===== 机械改造机器 =====
+        ConfigCategory mechMachines = category(builder, "mechanical_machines");
+        longField(mechMachines, eb, "mechanical_machines.chishiCapacity", AkaishiConfig.MECH_CHISHI_CAPACITY);
+        longField(mechMachines, eb, "mechanical_machines.lifeCapacity", AkaishiConfig.MECH_LIFE_CAPACITY);
+        longField(mechMachines, eb, "mechanical_machines.templateChishiCost", AkaishiConfig.MECH_TEMPLATE_CHISHI_COST);
+        longField(mechMachines, eb, "mechanical_machines.templateLifeCost", AkaishiConfig.MECH_TEMPLATE_LIFE_COST);
+        intField(mechMachines, eb, "mechanical_machines.templateTicks", AkaishiConfig.MECH_TEMPLATE_TICKS);
+        longList(mechMachines, eb, "mechanical_machines.processChishiBase", AkaishiConfig.MECH_PROCESS_CHISHI_BASE);
+        longList(mechMachines, eb, "mechanical_machines.processLifeBase", AkaishiConfig.MECH_PROCESS_LIFE_BASE);
+        intList(mechMachines, eb, "mechanical_machines.processTicksBase", AkaishiConfig.MECH_PROCESS_TICKS_BASE);
+        intList(mechMachines, eb, "mechanical_machines.processPartFactor", AkaishiConfig.MECH_PROCESS_PART_FACTOR);
+        intList(mechMachines, eb, "mechanical_machines.processMaterialCount", AkaishiConfig.MECH_PROCESS_MATERIAL_COUNT);
+        longField(mechMachines, eb, "mechanical_machines.assemblyChishiCost", AkaishiConfig.MECH_ASSEMBLY_CHISHI_COST);
+        longField(mechMachines, eb, "mechanical_machines.assemblyLifeCost", AkaishiConfig.MECH_ASSEMBLY_LIFE_COST);
+        intField(mechMachines, eb, "mechanical_machines.assemblyTicks", AkaishiConfig.MECH_ASSEMBLY_TICKS);
+
+        // ===== 机械义体属性换算 =====
+        ConfigCategory mechBody = category(builder, "mechanical_body");
+        doubleField(mechBody, eb, "mechanical_body.healthScale", AkaishiConfig.MECH_BODY_HEALTH_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.attackScale", AkaishiConfig.MECH_BODY_ATTACK_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.attackSpeedScale", AkaishiConfig.MECH_BODY_ATTACK_SPEED_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.movementSpeedScale", AkaishiConfig.MECH_BODY_MOVEMENT_SPEED_SCALE);
+
         ConfigCategory toggles = category(builder, "toggles");
         booleanToggle(toggles, eb, "toggles.decayZone", AkaishiConfig.DECAY_ZONE_ENABLED);
         booleanToggle(toggles, eb, "toggles.sunlightBurn", AkaishiConfig.SUNLIGHT_BURN_ENABLED);

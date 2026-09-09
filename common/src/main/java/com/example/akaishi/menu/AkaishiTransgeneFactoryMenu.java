@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiTransgeneFactoryBlockEntity;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -124,11 +125,13 @@ public class AkaishiTransgeneFactoryMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(AkaishiTransgeneFactoryBlockEntity.DATA_ENERGY);
+        return LongDataSlots.read(data, AkaishiTransgeneFactoryBlockEntity.DATA_ENERGY,
+                AkaishiTransgeneFactoryBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(AkaishiTransgeneFactoryBlockEntity.DATA_MAX);
+        return LongDataSlots.read(data, AkaishiTransgeneFactoryBlockEntity.DATA_MAX,
+                AkaishiTransgeneFactoryBlockEntity.DATA_MAX_HIGH);
     }
 
     public int getProgressPct() {

@@ -15,6 +15,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionFuelAggregatorMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -51,17 +52,19 @@ import java.util.List;
 public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
 
-    // ===== 数据槽 =====
-    public static final int DATA_SLOTS = 9;
+    // ===== 数据槽（long 各占高低两槽）=====
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_ENERGY_CAPACITY = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_PLASMA0_AMOUNT = 3;
-    public static final int DATA_PLASMA0_CAPACITY = 4;
-    public static final int DATA_PLASMA1_AMOUNT = 5;
-    public static final int DATA_PLASMA1_CAPACITY = 6;
-    public static final int DATA_PLASMA2_AMOUNT = 7;
-    public static final int DATA_PLASMA2_CAPACITY = 8;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_ENERGY_CAPACITY = 2;
+    public static final int DATA_ENERGY_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    /** 每个等离子体罐占 4 槽（量低/高 + 容量低/高），按罐序偏移 */
+    public static final int DATA_PLASMA_STRIDE = 4;
+    public static final int DATA_PLASMA0_AMOUNT = 5;
+    public static final int DATA_PLASMA0_AMOUNT_HIGH = 6;
+    public static final int DATA_PLASMA0_CAPACITY = 7;
+    public static final int DATA_PLASMA0_CAPACITY_HIGH = 8;
+    public static final int DATA_SLOTS = 5 + 3 * DATA_PLASMA_STRIDE;
 
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage energy;
@@ -119,13 +122,16 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
     private void tickServer() {
         // 机器升级：能量升级动态扩容能量缓冲（倍率变化时自动夹取）
         energy.setMaxEnergy((long) (ModConfig.aggregatorEnergyCapacity * getEnergyCapacityMultiplier()));
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_ENERGY_CAPACITY, (int) energy.getMaxEnergy());
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_ENERGY_CAPACITY, DATA_ENERGY_CAPACITY_HIGH, energy.getMaxEnergy());
         data.set(DATA_PROGRESS, progress);
         for (int i = 0; i < plasmaTanks.size(); i++) {
             FluidTank tank = plasmaTanks.get(i);
-            data.set(DATA_PLASMA0_AMOUNT + i * 2, (int) tank.getAmount());
-            data.set(DATA_PLASMA0_CAPACITY + i * 2, (int) tank.getCapacity());
+            int offset = i * DATA_PLASMA_STRIDE;
+            LongDataSlots.write(data, DATA_PLASMA0_AMOUNT + offset,
+                    DATA_PLASMA0_AMOUNT_HIGH + offset, tank.getAmount());
+            LongDataSlots.write(data, DATA_PLASMA0_CAPACITY + offset,
+                    DATA_PLASMA0_CAPACITY_HIGH + offset, tank.getCapacity());
         }
 
         ItemStack inputStack = input.getItem(0);

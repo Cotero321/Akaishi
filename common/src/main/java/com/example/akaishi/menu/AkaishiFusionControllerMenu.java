@@ -4,6 +4,7 @@ import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.fusion.FusionStructure;
 import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,7 +15,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 聚变控制器菜单：4 个燃料槽 + 10 个散热片槽 + 13 个数据槽 + 玩家背包。
+ * 聚变控制器菜单：4 个燃料槽 + 10 个散热片槽 + 15 个数据槽 + 玩家背包。
  * <p>
  * 界面分三页（运行情况/燃料/热量），机器槽位随页签激活：
  * <ul>
@@ -175,9 +176,11 @@ public class AkaishiFusionControllerMenu extends AbstractContainerMenu {
         return data.get(AkaishiFusionControllerBlockEntity.DATA_SPEED_X100);
     }
 
-    /** 已积累生命灰烬数 */
-    public int getAshAmount() {
-        return data.get(AkaishiFusionControllerBlockEntity.DATA_ASH_AMOUNT);
+    /** 已积累生命灰烬数（low/high 两槽重组） */
+    public long getAshAmount() {
+        return LongDataSlots.read(data,
+                AkaishiFusionControllerBlockEntity.DATA_ASH_AMOUNT,
+                AkaishiFusionControllerBlockEntity.DATA_ASH_AMOUNT_HIGH);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.example.akaishi.block.entity.AkaishiEquipmentForgerBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -64,27 +65,29 @@ public class AkaishiEquipmentForgerMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    public int getEnergy() {
-        return data.get(0);
+    public long getEnergy() {
+        return LongDataSlots.read(data, AkaishiEquipmentForgerBlockEntity.DATA_ENERGY,
+                AkaishiEquipmentForgerBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    public int getMaxEnergy() {
-        return data.get(1);
+    public long getMaxEnergy() {
+        return LongDataSlots.read(data, AkaishiEquipmentForgerBlockEntity.DATA_CAPACITY,
+                AkaishiEquipmentForgerBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 锻造充能进度（能量百分比 0-100） */
     public int getProgress() {
-        return data.get(2);
+        return data.get(AkaishiEquipmentForgerBlockEntity.DATA_PROGRESS);
     }
 
     /** 剩余基础升级点 */
     public int getUpgradePoints() {
-        return data.get(3);
+        return data.get(AkaishiEquipmentForgerBlockEntity.DATA_POINTS);
     }
 
     /** 指定属性已选升级次数 */
     public int getBaseCount(int typeId) {
-        return data.get(4 + typeId);
+        return data.get(AkaishiEquipmentForgerBlockEntity.DATA_BASE_START + typeId);
     }
 
     /** 输入槽装备（供 Screen 决定是否显示效率按钮等条件选项） */
@@ -108,14 +111,14 @@ public class AkaishiEquipmentForgerMenu extends AbstractContainerMenu {
         }
         long cost = ModConfig.equipmentForgerEnergyPerForge
                 + totalPoints() * AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE;
-        return data.get(0) >= cost;
+        return getEnergy() >= cost;
     }
 
-    /** 当前已选升级点数（data 4-8 求和） */
+    /** 当前已选升级点数（data 6-11 求和） */
     private long totalPoints() {
         long points = 0;
         for (int i = 0; i < AkaishiUpgradeHelper.UpgradeType.values().length; i++) {
-            points += data.get(4 + i);
+            points += data.get(AkaishiEquipmentForgerBlockEntity.DATA_BASE_START + i);
         }
         return points;
     }
