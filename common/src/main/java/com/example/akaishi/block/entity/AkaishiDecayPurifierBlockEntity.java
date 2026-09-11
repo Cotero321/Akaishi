@@ -8,6 +8,8 @@ import com.example.akaishi.decay.DecayZoneManager;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiDecayPurifierMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -51,6 +53,8 @@ public class AkaishiDecayPurifierBlockEntity extends BlockEntity
     /** 净化量浮点余量累加器（防速度倍率截断精度丢失） */
     private float speedAccum;
     private boolean working;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.DECAY_PURIFIER_HUM, 0.4F, 1.0F);
 
     public AkaishiDecayPurifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_DECAY_PURIFIER.get(), pos, state);
@@ -82,6 +86,7 @@ public class AkaishiDecayPurifierBlockEntity extends BlockEntity
         }
         working = true;
         energy.extractEnergy(perTick, false);
+        hum.tick(level, worldPosition);
         // 净化速度 = 基础 × 速度倍率；余量累加防截断，避免 1~7 级速度升级全部无效
         speedAccum += ModConfig.decayPurifierTicksPerTick * getSpeedMultiplier();
         long ticks = (long) speedAccum;

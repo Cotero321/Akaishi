@@ -10,6 +10,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifePurifierMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -59,6 +61,8 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     /** 已投入的赤能源（能量池模式，满 ModConfig.lifePurifierTotalCost 完成一次） */
     private long progressEnergy;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.LIFE_PURIFIER_HUM, 0.4F, 1.0F);
 
     public AkaishiLifePurifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_PURIFIER.get(), pos, state);
@@ -99,6 +103,7 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
                     akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
+                hum.tick(level, worldPosition);
                 progressEnergy += extract;
                 if (progressEnergy >= costTotal) {
                     progressEnergy -= costTotal;

@@ -8,6 +8,8 @@ import com.example.akaishi.block.AkaishiGeodeBlock;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiCatalystMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -44,6 +46,9 @@ public class AkaishiCatalystBlockEntity extends BlockEntity implements IEnergyPr
     /** 当前是否在催化（能量充足） */
     private boolean working;
 
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.CATALYST_HUM, 0.4F, 1.0F);
+
     public AkaishiCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_CATALYST.get(), pos, state);
         this.tier = state.getBlock() instanceof AkaishiCatalystBlock block
@@ -70,6 +75,7 @@ public class AkaishiCatalystBlockEntity extends BlockEntity implements IEnergyPr
         }
         working = true;
         energy.extractEnergy(tier.energyCost, false);
+        hum.tick(level, worldPosition);
         int half = tier.range / 2;
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         for (int dx = -half; dx <= half; dx++) {

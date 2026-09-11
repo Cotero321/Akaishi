@@ -18,6 +18,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPurifierMatrixControllerMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -72,6 +74,8 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
     private long progressEnergy;
     /** 最近一次成型的箱体范围（解除端口关联时使用） */
     private BlockPos boxMin, boxMax;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.PURIFIER_MATRIX_HUM, 0.4F, 1.0F);
 
     public AkaishiPurifierMatrixControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_PURIFIER_MATRIX_CONTROLLER.get(), pos, state);
@@ -125,6 +129,7 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
                     energy.getEnergyStored());
             if (extract > 0) {
                 energy.extractEnergy(extract, false);
+                hum.tick(level, worldPosition);
                 progressEnergy += extract;
                 if (progressEnergy >= costTotal) {
                     progressEnergy -= costTotal;

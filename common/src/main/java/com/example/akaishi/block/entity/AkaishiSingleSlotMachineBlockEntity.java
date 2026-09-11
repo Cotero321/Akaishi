@@ -8,14 +8,17 @@ import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
+import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -69,6 +72,8 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
     protected int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
     private float speedAccum;
+    /** 运转音播放器（延迟创建，音色由子类提供） */
+    private MachineHum hum;
 
     protected AkaishiSingleSlotMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -95,6 +100,17 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
 
     /** 每 tick 消耗的赤能源 */
     protected abstract long energyPerTick();
+
+    /** 本机运转音色（子类提供，每台机器独立音色） */
+    protected abstract RegistrySupplier<SoundEvent> humSound();
+
+    /** 惰性创建运转音播放器（首次工作时初始化，避免构造期访问子类字段） */
+    private MachineHum hum() {
+        if (hum == null) {
+            hum = new MachineHum(humSound(), 0.4F, 1.0F);
+        }
+        return hum;
+    }
 
     /** 加工是否消耗输入物品（植物培养机种子保留 → 覆写 false） */
     protected boolean consumesInput() {
@@ -135,6 +151,7 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         }
         // 推进：每 tick 扣能量，进度按速度倍率累加（小数余量防截断）
         energy.extractEnergy(perTick, false);
+        hum().tick(level, worldPosition);
         speedAccum += getSpeedMultiplier();
         int delta = (int) speedAccum;
         if (delta > 0) {

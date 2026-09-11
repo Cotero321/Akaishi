@@ -74,6 +74,16 @@ public final class ConfigSyncS2C {
             double mechBodyAttackScale = buf.readDouble();
             double mechBodyAttackSpeedScale = buf.readDouble();
             double mechBodyMovementSpeedScale = buf.readDouble();
+            double mechBodyArmorScale = buf.readDouble();
+            double mechBodyCritChanceScale = buf.readDouble();
+            double mechBodyCritDamageScale = buf.readDouble();
+            double mechBodyRangeScale = buf.readDouble();
+            double mechBodyDodgeScale = buf.readDouble();
+            boolean combatCritEnabled = buf.readBoolean();
+            boolean combatDodgeEnabled = buf.readBoolean();
+            double combatCritChanceCap = buf.readDouble();
+            double combatCritDamageCap = buf.readDouble();
+            double combatDodgeChanceCap = buf.readDouble();
             Minecraft.getInstance().execute(() -> {
                 ModConfig.maxRejection = maxRejection;
                 ModConfig.reactorTempMax = reactorTempMax;
@@ -122,6 +132,16 @@ public final class ConfigSyncS2C {
                 ModConfig.mechBodyAttackScale = mechBodyAttackScale;
                 ModConfig.mechBodyAttackSpeedScale = mechBodyAttackSpeedScale;
                 ModConfig.mechBodyMovementSpeedScale = mechBodyMovementSpeedScale;
+                ModConfig.mechBodyArmorScale = mechBodyArmorScale;
+                ModConfig.mechBodyCritChanceScale = mechBodyCritChanceScale;
+                ModConfig.mechBodyCritDamageScale = mechBodyCritDamageScale;
+                ModConfig.mechBodyRangeScale = mechBodyRangeScale;
+                ModConfig.mechBodyDodgeScale = mechBodyDodgeScale;
+                ModConfig.combatCritEnabled = combatCritEnabled;
+                ModConfig.combatDodgeEnabled = combatDodgeEnabled;
+                ModConfig.combatCritChanceCap = combatCritChanceCap;
+                ModConfig.combatCritDamageCap = combatCritDamageCap;
+                ModConfig.combatDodgeChanceCap = combatDodgeChanceCap;
             });
         });
     }
@@ -176,6 +196,16 @@ public final class ConfigSyncS2C {
         buf.writeDouble(ModConfig.mechBodyAttackScale);
         buf.writeDouble(ModConfig.mechBodyAttackSpeedScale);
         buf.writeDouble(ModConfig.mechBodyMovementSpeedScale);
+        buf.writeDouble(ModConfig.mechBodyArmorScale);
+        buf.writeDouble(ModConfig.mechBodyCritChanceScale);
+        buf.writeDouble(ModConfig.mechBodyCritDamageScale);
+        buf.writeDouble(ModConfig.mechBodyRangeScale);
+        buf.writeDouble(ModConfig.mechBodyDodgeScale);
+        buf.writeBoolean(ModConfig.combatCritEnabled);
+        buf.writeBoolean(ModConfig.combatDodgeEnabled);
+        buf.writeDouble(ModConfig.combatCritChanceCap);
+        buf.writeDouble(ModConfig.combatCritDamageCap);
+        buf.writeDouble(ModConfig.combatDodgeChanceCap);
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }
 

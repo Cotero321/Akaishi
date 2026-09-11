@@ -15,6 +15,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiMinerControllerMenu;
 import com.example.akaishi.multiblock.AkaishiMinerStructure;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -131,6 +133,8 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
     private List<OreEntry> orePool = DEFAULT_POOL;
     /** 产出池刷新节流计数（每 100 tick 重扫一次矿物标签，成本极低） */
     private int orePoolTick;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.MINER_HUM, 0.4F, 1.0F);
 
     public AkaishiMinerControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_MINER_CONTROLLER.get(), pos, state);
@@ -217,6 +221,7 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
                         * ModConfig.machineCostMultiplier);
                 if (energy.getEnergyStored() >= cost) {
                     energy.extractEnergy(cost, false);
+                    hum.tick(level, worldPosition);
                     speedAccum += t.rateMultiplier * (1.0 + SPEED_STEP * speedCount) * ModConfig.machineWorkSpeed;
                     int delta = (int) speedAccum;
                     if (delta > 0) {

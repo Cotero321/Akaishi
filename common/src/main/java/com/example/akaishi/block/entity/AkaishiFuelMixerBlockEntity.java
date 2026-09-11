@@ -12,6 +12,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiFuelMixerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -98,6 +100,8 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
     private long progressEnergy;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.FUEL_MIXER_HUM, 0.4F, 1.0F);
 
     public AkaishiFuelMixerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUEL_MIXER.get(), pos, state);
@@ -155,6 +159,7 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
                 akaishi.getEnergyStored());
         if (extract > 0) {
             akaishi.extractEnergy(extract, false);
+            hum.tick(level, worldPosition);
             progressEnergy += extract;
             if (progressEnergy >= costTotal) {
                 progressEnergy -= costTotal;

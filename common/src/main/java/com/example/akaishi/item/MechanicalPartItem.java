@@ -3,7 +3,10 @@ package com.example.akaishi.item;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
+import com.example.akaishi.life.mechanical.MechanicalPartTemplate;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
+import com.example.akaishi.life.mechanical.MechanicalPartWeight;
+import com.example.akaishi.life.mechanical.MechanicalProperty;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -113,29 +116,48 @@ public class MechanicalPartItem extends Item {
         String materialId = getMaterialId(stack);
         MechanicalOrganType organType = getOrganType(stack);
         boolean processed = isProcessed(stack);
+        MechanicalMaterial material = materialId != null && !materialId.isEmpty()
+                ? MechanicalMaterial.get(materialId) : null;
+        MechanicalDnaProfile dna = MechanicalDnaProfile.get(getDnaProfileId(stack));
 
         // 部件类型
         if (partType != null) {
             tooltip.add(Component.translatable("tooltip.akaishi.mechanical.part_type",
                     Component.translatable("mechanical.part." + partType.name().toLowerCase())));
         }
-        // 材料
-        if (materialId != null && !materialId.isEmpty()) {
-            MechanicalMaterial mat = MechanicalMaterial.get(materialId);
-            if (mat != null) {
-                tooltip.add(Component.translatable("tooltip.akaishi.mechanical.material",
-                        Component.translatable(mat.descriptionKey())));
-            }
+        // 材料（已注册显示译名，未知 id 直接回显原值，避免信息丢失）
+        if (material != null) {
+            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.material",
+                    Component.translatable(material.descriptionKey())));
+        } else if (materialId != null && !materialId.isEmpty()) {
+            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.material",
+                    Component.literal(materialId)));
         }
         // 器官类型
         if (organType != null) {
             tooltip.add(Component.translatable("tooltip.akaishi.mechanical.organ_type",
                     Component.translatable("mechanical.organ." + organType.name().toLowerCase())));
         }
+        // DNA 来源
+        if (dna != null && !MechanicalDnaProfile.NONE_ID.equals(dna.id())) {
+            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.dna",
+                    Component.translatable(dna.descriptionKey())));
+        }
+        // 十维权重（基础 + 材料 + DNA 修正，逐项 clamp 0~5；复用模板聚合逻辑保证与机器一致）
+        if (organType != null && partType != null && material != null) {
+            MechanicalDnaProfile dnaProfile = dna != null
+                    ? dna : MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
+            MechanicalPartWeight weight = new MechanicalPartTemplate(organType, partType, material, dnaProfile)
+                    .totalWeight();
+            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.weights"));
+            for (MechanicalProperty prop : MechanicalProperty.values()) {
+                tooltip.add(Component.translatable(prop.tooltipKey(),
+                        Component.literal(String.valueOf(weight.get(prop)))));
+            }
+        }
         // 加工标记
         if (processed) {
             tooltip.add(Component.translatable("tooltip.akaishi.mechanical.processed"));
         }
     }
-
-    }
+}

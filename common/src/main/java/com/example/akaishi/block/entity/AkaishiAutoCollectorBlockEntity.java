@@ -11,6 +11,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiAutoCollectorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -55,6 +57,8 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
 
     private final AkaishiAutoCollectorBlock.CollectorTier tier;
     private final AkaishiEnergyStorage energy;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.AUTO_COLLECTOR_HUM, 0.4F, 1.0F);
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
@@ -99,6 +103,7 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
         } else {
             status = DATA_STATUS_WORKING;
             energy.extractEnergy(tier.energyCost, false);
+            hum.tick(level, worldPosition);
             // 速度升级：每级 +12.5%，8 级封顶 2 倍速（小数余量累积避免截断）
             speedAccum += getSpeedMultiplier();
             int delta = (int) speedAccum;

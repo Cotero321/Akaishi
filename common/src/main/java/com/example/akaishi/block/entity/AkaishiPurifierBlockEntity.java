@@ -12,6 +12,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPurifierMenu;
+import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
@@ -22,7 +23,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -78,8 +78,8 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     private int burnTimeTotal;
     /** 已投入提纯能量（能量池模式，满 {@link #needed()} 完成一次） */
     private long progressEnergy;
-    /** 运转音播放冷却（tick） */
-    private int humCooldown;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.PURIFIER_HUM, 0.4F, 1.0F);
     /** 提纯矩阵成型缓存（每 tick 仅读缓存，仅邻居方块变化时重扫） */
     private boolean matrixFormed;
     /** 矩阵结构待重扫标记（外壳放置/移除、区块加载时置位） */
@@ -148,11 +148,7 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
             if (extract > 0) {
                 energy.extractEnergy(extract, false);
                 progressEnergy += extract;
-                // 运转声（循环）：每 15 tick 重播短音
-                if (--humCooldown <= 0) {
-                    level.playSound(null, worldPosition, ModSounds.MACHINE_HUM.get(), SoundSource.BLOCKS, 0.4f, 1.0f);
-                    humCooldown = 15;
-                }
+                hum.tick(level, worldPosition);
                 if (progressEnergy >= needed()) {
                     progressEnergy -= needed();
                     inventory.removeItem(INPUT_SLOT, 1);

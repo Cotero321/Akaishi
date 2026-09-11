@@ -1,5 +1,6 @@
 package com.example.akaishi.life.sequence;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
@@ -36,7 +37,7 @@ public class AkaishiGeneSequenceItem extends Item {
     public static ItemStack createFromSample(ItemStack sample) {
         ItemStack stack = new ItemStack(ModItems.geneSequence.get());
         CompoundTag tag = stack.getOrCreateTag();
-        SampleGroup group = AkaishiLifeSampleItem.getGroup(sample);
+        ISampleGroup group = AkaishiLifeSampleItem.getGroup(sample);
         if (group != null) {
             tag.putString(TAG_GROUP, group.getId());
         }
@@ -49,7 +50,7 @@ public class AkaishiGeneSequenceItem extends Item {
     }
 
     /** 来源分组（无 NBT 返回 null） */
-    public static SampleGroup getGroup(ItemStack stack) {
+    public static ISampleGroup getGroup(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null ? SampleGroup.byId(tag.getString(TAG_GROUP)) : null;
     }
@@ -76,7 +77,7 @@ public class AkaishiGeneSequenceItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        SampleGroup group = getGroup(stack);
+        ISampleGroup group = getGroup(stack);
         if (group != null) {
             tooltip.add(Component.translatable("gui.akaishi.gene_sequence.group",
                     Component.translatable(group.getNameKey())));

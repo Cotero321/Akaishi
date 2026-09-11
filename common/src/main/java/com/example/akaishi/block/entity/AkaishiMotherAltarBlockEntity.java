@@ -3,6 +3,8 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.multiblock.AkaishiMotherAltarStructure;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -91,6 +93,8 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity implements IDataC
                 worldPosition.getX() + 0.5, worldPosition.getY() + 1.2, worldPosition.getZ() + 0.5, result);
         item.setDeltaMovement(0.0, 0.35, 0.0);
         level.addFreshEntity(item);
+        // 仪式为单次结算，播放一次性运转音
+        MachineHum.playOnce(level, worldPosition, ModSounds.MOTHER_ALTAR_HUM, 0.4F, 1.0F);
         if (level instanceof ServerLevel serverLevel) {
             double range = 32.0 * 32.0;
             for (ServerPlayer player : serverLevel.players()) {

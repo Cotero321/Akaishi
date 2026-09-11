@@ -12,8 +12,11 @@ import com.example.akaishi.life.mechanical.MechanicalOrganType;
 import com.example.akaishi.life.mechanical.MechanicalPartTemplate;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.menu.AkaishiMechanicalAssemblyStationMenu;
+import com.example.akaishi.sound.ModSounds;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -65,6 +68,11 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
     @Override
     protected Component getMachineName() {
         return Component.translatable("block.akaishi.akaishi_mechanical_assembly_station");
+    }
+
+    @Override
+    protected RegistrySupplier<SoundEvent> humSound() {
+        return ModSounds.MECHANICAL_ASSEMBLY_HUM;
     }
 
     @Override
@@ -140,15 +148,34 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
             MechanicalPartType part = MechanicalPartItem.getPartType(stack);
             String materialId = MechanicalPartItem.getMaterialId(stack);
             String dnaId = MechanicalPartItem.getDnaProfileId(stack);
+            // 未知材料/脏 NBT 回退铁材料，避免模板构造 material.distribution() 空指针
             MechanicalMaterial material = MechanicalMaterial.get(materialId != null ? materialId : "akaishi:iron");
-            MechanicalDnaProfile dna = dnaId != null ? MechanicalDnaProfile.get(dnaId) : MechanicalDnaProfile.get("akaishi:none");
+            if (material == null) {
+                material = MechanicalMaterial.get("akaishi:iron");
+            }
+            MechanicalDnaProfile dna = dnaId != null ? MechanicalDnaProfile.get(dnaId) : null;
+            if (dna == null) {
+                dna = MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
+            }
             templates.add(new MechanicalPartTemplate(organ, part, material, dna));
             materialIds.add(material != null ? material.id() : "akaishi:iron");
+        }
+
+        // DNA 同源标记：四部件来源完全一致且非空源才写入成品（运行时同源协同 / 整合加速据此判定）
+        String dnaId = null;
+        for (MechanicalPartTemplate t : templates) {
+            String id = t.dnaProfile().id();
+            if (MechanicalDnaProfile.NONE_ID.equals(id) || (dnaId != null && !dnaId.equals(id))) {
+                dnaId = null;
+                break;
+            }
+            dnaId = id;
         }
 
         MechanicalOrganType organ = templates.get(0).organType();
         MechanicalAssembledStats stats = MechanicalOrganResolver.resolve(organ, templates);
         ItemStack result = MechanicalOrganItem.create(stats, materialIds);
+        MechanicalOrganItem.setDnaProfileId(result, dnaId);
         setItem(SLOT_OUTPUT, result);
         for (int slot = SLOT_CORE; slot <= SLOT_COOLING; slot++) {
             setItem(slot, ItemStack.EMPTY);

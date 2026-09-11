@@ -477,14 +477,41 @@ public final class ModConfig {
     public static volatile int mechAssemblyTicks = 80;
 
     // ==================== 机械义体属性换算 ====================
-    /** 机械义体：生命值权重 → 生命上限换算倍率（0=用内置默认） */
-    public static volatile double mechBodyHealthScale = 0.5;
-    /** 机械义体：攻击伤害权重 → 攻击伤害换算倍率（0=用内置默认） */
-    public static volatile double mechBodyAttackScale = 0.1;
-    /** 机械义体：攻击速度权重 → 攻击速度换算倍率（0=用内置默认） */
+    // 口径：实际加成 = 聚合权重 × 整合度折扣 × 总体倍率 × 该倍率；数值按「÷10 归一」定档
+    /** 机械义体：生命值权重 → 生命上限换算倍率（0=用内置默认 0.03） */
+    public static volatile double mechBodyHealthScale = 0.03;
+    /** 机械义体：攻击伤害权重 → 攻击伤害换算倍率（0=用内置默认 0.03） */
+    public static volatile double mechBodyAttackScale = 0.03;
+    /** 机械义体：攻击速度权重 → 攻击速度换算倍率（0=用内置默认 0.01） */
     public static volatile double mechBodyAttackSpeedScale = 0.01;
-    /** 机械义体：移动速度权重 → 移动速度换算倍率（0=用内置默认） */
-    public static volatile double mechBodyMovementSpeedScale = 0.001;
+    /** 机械义体：移动速度权重 → 移动速度换算倍率（0=用内置默认 0.01） */
+    public static volatile double mechBodyMovementSpeedScale = 0.01;
+    /** 机械义体：护甲权重 → 护甲值换算倍率（0=用内置默认 0.02） */
+    public static volatile double mechBodyArmorScale = 0.02;
+    /** 机械义体：暴击率权重 → 暴击率换算倍率（0=用内置默认 0.1） */
+    public static volatile double mechBodyCritChanceScale = 0.1;
+    /** 机械义体：暴击伤害权重 → 暴击伤害换算倍率（0=用内置默认 0.2） */
+    public static volatile double mechBodyCritDamageScale = 0.2;
+    /** 机械义体：攻击范围权重 → 攻击距离换算倍率（0=用内置默认 0.02） */
+    public static volatile double mechBodyRangeScale = 0.02;
+    /** 机械义体：闪避权重 → 闪避率换算倍率（0=用内置默认 0.1，最终受闪避上限约束） */
+    public static volatile double mechBodyDodgeScale = 0.1;
+
+    // ==================== 基因属性权重 ====================
+    /** 基因属性权重：生物专精轴最大加成比例（0=用内置默认 0.25） */
+    public static volatile double geneWeightStrength = 0.25;
+
+    // ==================== 底层战斗（暴击/闪避） ====================
+    /** 暴击总开关（false 时暴击率/暴击伤害不参与结算） */
+    public static volatile boolean combatCritEnabled = true;
+    /** 闪避总开关（false 时闪避不参与结算） */
+    public static volatile boolean combatDodgeEnabled = true;
+    /** 暴击率上限（0=用内置 1.0） */
+    public static volatile double combatCritChanceCap = 1.0;
+    /** 暴击伤害上限（追加倍率口径，0=用内置 5.0） */
+    public static volatile double combatCritDamageCap = 5.0;
+    /** 闪避上限（0=用内置 0.8） */
+    public static volatile double combatDodgeChanceCap = 0.8;
 
     // ==================== 端口与电池缓冲 ====================
     /** 生命矩阵能量输入口缓冲容量 */

@@ -5,15 +5,17 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.MutantTrait;
-import com.example.akaishi.life.sample.SampleGroup;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiLifeBreederMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -82,6 +84,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
     private int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
     private float speedAccum;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.LIFE_BREEDER_HUM, 0.4F, 1.0F);
 
     public AkaishiLifeBreederBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_BREEDER.get(), pos, state);
@@ -119,6 +123,7 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             if (delta > 0) {
                 speedAccum -= delta;
                 progress += delta;
+                hum.tick(level, worldPosition);
             }
             if (progress >= ModConfig.lifeBreederProcessTicks) {
                 progress = 0;
@@ -147,8 +152,14 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
             return false;
         }
         // 同组催化：序列基因来源分组必须与器官一致（异源序列无法引导定向突变）
-        SampleGroup organGroup = AkaishiOrganItem.getSource(organ);
+        ISampleGroup organGroup = AkaishiOrganItem.getSource(organ);
         if (organGroup == null || AkaishiGeneSequenceItem.getGroup(sequence) != organGroup) {
+            return false;
+        }
+        // 候选池校验：纯度解锁稀有度下若无未携带且部位合法词条，roll 必返回 null → 提前停机避免白耗材料
+        int purity = AkaishiGeneSequenceItem.getPurity(sequence);
+        if (!MutantTrait.hasCandidates(MutantTrait.maxRarity(purity),
+                AkaishiOrganItem.getMutations(organ), AkaishiOrganItem.slotOf(organ))) {
             return false;
         }
         if (!inventory.getItem(CRYSTAL_SLOT).is(ModItems.exhaustedCrystal.get())

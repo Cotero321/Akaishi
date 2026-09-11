@@ -15,6 +15,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeConverterMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -60,6 +62,8 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     /** 最近一次成型的箱体范围（解除端口关联时使用） */
     private BlockPos boxMin, boxMax;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.LIFE_MATRIX_HUM, 0.4F, 1.0F);
 
     public AkaishiLifeMatrixControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_MATRIX_CONTROLLER.get(), pos, state);
@@ -94,11 +98,17 @@ public class AkaishiLifeMatrixControllerBlockEntity extends BlockEntity implemen
         }
         // 成型后按配置速率集中转换（未成型不转换）
         if (formed) {
+            boolean converted = false;
             for (int i = 0; i < ModConfig.lifeMatrixConversionsPerTick; i++) {
                 if (!convert()) {
                     break;
                 }
                 changed = true;
+                converted = true;
+            }
+            // 本 tick 确有转换（真实消耗赤能源）才发声，避免空转与逐次重放
+            if (converted) {
+                hum.tick(level, worldPosition);
             }
         }
         // 同步数据到 GUI（与 AkaishiLifeConverterMenu 共用布局，long 拆高低 32 位）

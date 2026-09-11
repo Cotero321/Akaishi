@@ -3,6 +3,7 @@ package com.example.akaishi.item;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.OrganEffectResolver;
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.life.sample.SampleGroup;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +65,7 @@ public final class AkaishiLifeFusionSet {
             return false;
         }
         for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
-            SampleGroup group = OrganEffectResolver.groupOf(AkaishiOrganItem.getEntityId(organ.stack()), player.level());
+            ISampleGroup group = OrganEffectResolver.groupOf(AkaishiOrganItem.getEntityId(organ.stack()), player.level());
             if (group == SampleGroup.BOSS || group == SampleGroup.DRAGON) {
                 return true;
             }

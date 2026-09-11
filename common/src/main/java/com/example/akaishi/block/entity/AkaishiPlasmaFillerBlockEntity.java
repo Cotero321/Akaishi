@@ -8,6 +8,8 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPlasmaFillerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -69,6 +71,8 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
     private float speedAccum;
     /** 当前加工罐索引（-1 无加工） */
     private int currentIdx = -1;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.PLASMA_FILLER_HUM, 0.4F, 1.0F);
 
     public AkaishiPlasmaFillerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_PLASMA_FILLER.get(), pos, state);
@@ -151,6 +155,7 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
         if (delta > 0) {
             speedAccum -= delta;
             progress += delta;
+            hum.tick(level, worldPosition);
         }
         if (progress >= ModConfig.fillerProcessTicks) {
             progress = 0;

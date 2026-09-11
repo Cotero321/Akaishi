@@ -1,5 +1,7 @@
 package com.example.akaishi.forge.life;
 
+import com.example.akaishi.combat.CombatTuning;
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
 import com.example.akaishi.life.organ.OrganEffectResolver;
@@ -8,6 +10,7 @@ import com.example.akaishi.life.organ.OrganSpecial;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.SampleGroup;
 import com.example.akaishi.item.AkaishiLifeFusionSet;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,6 +21,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.DragonFireball;
 import net.minecraft.world.entity.projectile.WitherSkull;
@@ -124,6 +128,20 @@ public final class AkaishiBodyCombatHandler {
         if (synergy.group() == SampleGroup.UNDEAD && attacker.level().isNight()) {
             amount *= synergy.isMajor() ? 1.15F : 1.10F;
         }
+        // 底层暴击：暴击率命中时按暴击伤害属性放大本次伤害（暴击伤害 0.5 → 最终 ×1.5）；
+        // 开关与上限由配置裁剪（上限 0 = 用内置），钳制后避免配置被手改成超人倍率
+        if (CombatTuning.critEnabled()) {
+            // 机械义体暴击强化并入同一次判定：与器官暴击属性求和后统一裁剪，避免二次暴击叠加
+            float critChance = Math.min(
+                    combatAttribute(attacker, ModCombatAttributes.CRIT_CHANCE)
+                            + AkaishiMechanicalEffectHandler.critBonus(state),
+                    CombatTuning.critChanceCap());
+            if (critChance > 0.0F && attacker.getRandom().nextFloat() < critChance) {
+                float critDamage = Math.min(combatAttribute(attacker, ModCombatAttributes.CRIT_DAMAGE),
+                        CombatTuning.critDamageCap());
+                amount *= 1.0F + critDamage;
+            }
+        }
         event.setAmount(amount);
         // 满级特殊弹射物（凋零骷髅头/龙息）；生命融合套装 + BOSS/龙肢体时强化（冷却减半，弹射更频繁）
         boolean enhanced = isBossDragonEnhanced(attacker);
@@ -140,6 +158,20 @@ public final class AkaishiBodyCombatHandler {
         // 火焰免疫（烈焰之心/末影龙之心）：直接吞掉火焰/岩浆类伤害；着火状态的清除由被动 tick 负责
         if (OrganEffectResolver.hasPassive(state, OrganPassive.FIRE_IMMUNE)
                 && event.getSource().is(DamageTypeTags.IS_FIRE)) {
+            event.setCanceled(true);
+            return;
+        }
+        // 底层闪避：判定成功后完全免疫该次物理伤害；仅物理来源参与闪避——
+        // 火焰/爆炸，以及穿透护甲的非物理来源（魔法/溺水/窒息/摔落/凋零/虚空等）一律不参与；
+        // 开关与上限由配置裁剪（上限 0 = 用内置），默认留缺口避免物理无敌
+        float dodgeChance = Math.min(combatAttribute(victim, ModCombatAttributes.DODGE_CHANCE),
+                CombatTuning.dodgeChanceCap());
+        if (CombatTuning.dodgeEnabled()
+                && dodgeChance > 0.0F
+                && !event.getSource().is(DamageTypeTags.IS_FIRE)
+                && !event.getSource().is(DamageTypeTags.IS_EXPLOSION)
+                && !event.getSource().is(DamageTypeTags.BYPASSES_ARMOR)
+                && victim.getRandom().nextFloat() < dodgeChance) {
             event.setCanceled(true);
             return;
         }
@@ -236,6 +268,15 @@ public final class AkaishiBodyCombatHandler {
         if (!target.hasEffect(effect)) {
             target.addEffect(new MobEffectInstance(effect, durationTicks, amplifier, false, false));
         }
+    }
+
+    /** 读取底层战斗属性：属性未注册或该实体无此属性时返回 0（不参与结算） */
+    private static float combatAttribute(LivingEntity entity, RegistrySupplier<Attribute> supplier) {
+        Attribute attribute = supplier != null ? supplier.get() : null;
+        if (attribute == null || entity.getAttribute(attribute) == null) {
+            return 0.0F;
+        }
+        return (float) entity.getAttributeValue(attribute);
     }
 
     /** 满级特殊弹射物：器官品质 IV 且对应特殊效果时发射（不破坏方块，伤害较低） */

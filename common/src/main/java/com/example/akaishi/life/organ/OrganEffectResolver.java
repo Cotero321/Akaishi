@@ -1,7 +1,9 @@
 package com.example.akaishi.life.organ;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
+import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.sample.SampleGroup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,15 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 器官效果解析器：从玩家躯体状态解析"当前生效"的器官效果。
- * - 排斥值达到上限（100）的槽位器官视为完全排异失效（属性/被动/特殊全部不生效）
+ * - 排斥值达到上限（PlayerBodyState.maxRejection()，配置可调，默认 100）的槽位器官视为完全排异失效
  * - 原生器官（原装部件）无效果，不参与任何加成
  * - 天敌生物器官冲突：同时移植天敌双方的器官 → 双方全部失效并触发排斥惩罚
  * common 供平台生效层（forge tick/事件）统一调用，避免效果判定逻辑散落平台侧。
  */
 public final class OrganEffectResolver {
-
-    /** 器官失效的排斥阈值（排斥达到该值器官完全失效） */
-    public static final int MAX_SAFE_REJECTION = 100;
 
     /** 单个生效器官的解析结果 */
     public record ActiveOrgan(BodySlot slot, ItemStack stack, QualityTier tier, OrganEffect effect) {
@@ -61,9 +61,9 @@ public final class OrganEffectResolver {
             if (!(organ.getItem() instanceof AkaishiOrganItem)) {
                 continue;
             }
-            // 原生器官无效果；排斥达上限 → 完全排异失效
+            // 原生器官无效果；排斥达上限（与 setRejection 钳制同源）→ 完全排异失效
             if (AkaishiOrganItem.isNative(organ)
-                    || state.getRejection(slot) >= MAX_SAFE_REJECTION
+                    || state.getRejection(slot) >= PlayerBodyState.maxRejection()
                     || conflicts.contains(slot)) {
                 continue;
             }
@@ -131,9 +131,9 @@ public final class OrganEffectResolver {
         return false;
     }
 
-    /** 是否拥有指定独特机制（任意生效器官） */
-    public static boolean hasSpecial(IPlayerBodyState state, OrganSpecial special) {
-        for (ActiveOrgan organ : collect(state)) {
+    /** 是否拥有指定特殊效果（任意生效器官）；预收集版复用同一份生效器官列表，避免每 tick 重复全量收集 */
+    public static boolean hasSpecial(List<ActiveOrgan> organs, OrganSpecial special) {
+        for (ActiveOrgan organ : organs) {
             if (organ.effect() != null && organ.effect().special() == special) {
                 return true;
             }
@@ -141,14 +141,28 @@ public final class OrganEffectResolver {
         return false;
     }
 
+    public static boolean hasSpecial(IPlayerBodyState state, OrganSpecial special) {
+        return hasSpecial(collect(state), special);
+    }
+
     /** 是否拥有指定被动技能（任意生效器官） */
     public static boolean hasPassive(IPlayerBodyState state, OrganPassive passive) {
         return countPassive(state, passive) > 0;
     }
 
+    /** 预收集版：复用同一份生效器官列表 */
+    public static boolean hasPassive(List<ActiveOrgan> organs, OrganPassive passive) {
+        return countPassive(organs, passive) > 0;
+    }
+
     /** 指定被动技能的持有数量（多器官可叠加，含突变词条被动） */
     public static int countPassive(IPlayerBodyState state, OrganPassive passive) {
         return strengthsOf(state, passive).count();
+    }
+
+    /** 预收集版：复用同一份生效器官列表 */
+    public static int countPassive(List<ActiveOrgan> organs, OrganPassive passive) {
+        return strengthsOf(organs, passive).count();
     }
 
     /** 被动持有强度：数量维度（跨器官叠加）+ 品质维度（携带该被动的最强来源器官品质序号，I=0 ~ IV=3）。
@@ -163,9 +177,14 @@ public final class OrganEffectResolver {
 
     /** 聚合统计指定被动：来源数（count）+ 最高来源品质序号（maxTierOrd） */
     public static PassiveStrengths strengthsOf(IPlayerBodyState state, OrganPassive passive) {
+        return strengthsOf(collect(state), passive);
+    }
+
+    /** 预收集版：复用同一份生效器官列表（每 tick 只 collect 一次，避免对每个被动重复全量收集） */
+    public static PassiveStrengths strengthsOf(List<ActiveOrgan> organs, OrganPassive passive) {
         int count = 0;
         int maxOrd = -1;
-        for (ActiveOrgan organ : collect(state)) {
+        for (ActiveOrgan organ : organs) {
             boolean hit = false;
             for (OrganPassive p : passivesOf(organ.stack(), organ.effect())) {
                 if (p == passive) {
@@ -222,15 +241,15 @@ public final class OrganEffectResolver {
     }
 
     /** 生物 id → 生态分组（以空世界实体分类，结果缓存；不可采样/null 亦缓存避免重复创建） */
-    private static final Map<String, Optional<SampleGroup>> GROUP_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Optional<ISampleGroup>> GROUP_CACHE = new ConcurrentHashMap<>();
 
-    public static SampleGroup groupOf(String entityId, Level level) {
-        Optional<SampleGroup> cached = GROUP_CACHE.get(entityId);
+    public static ISampleGroup groupOf(String entityId, Level level) {
+        Optional<ISampleGroup> cached = GROUP_CACHE.get(entityId);
         if (cached != null) {
             return cached.orElse(null);
         }
         ResourceLocation id = ResourceLocation.tryParse(entityId);
-        SampleGroup group = null;
+        ISampleGroup group = null;
         if (id != null) {
             Optional<EntityType<?>> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id);
             if (type.isPresent()) {
@@ -245,7 +264,7 @@ public final class OrganEffectResolver {
     }
 
     /** 生态套装档位：同组移植 ≥3 件激活小共鸣，≥6 件升级为大共鸣（9 槽中过半） */
-    public record Synergy(SampleGroup group, int count) {
+    public record Synergy(ISampleGroup group, int count) {
         public boolean isActive() {
             return group != null && count >= 3;
         }
@@ -263,20 +282,20 @@ public final class OrganEffectResolver {
         if (state == null) {
             return new Synergy(null, 0);
         }
-        Map<SampleGroup, Integer> counts = new EnumMap<>(SampleGroup.class);
+        Map<ISampleGroup, Integer> counts = new HashMap<>();
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             if (!(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)) {
                 continue;
             }
-            SampleGroup group = groupOf(AkaishiOrganItem.getEntityId(organ), level);
+            ISampleGroup group = groupOf(AkaishiOrganItem.getEntityId(organ), level);
             if (group != null) {
                 counts.merge(group, 1, Integer::sum);
             }
         }
-        SampleGroup best = null;
+        ISampleGroup best = null;
         int bestCount = 0;
-        for (Map.Entry<SampleGroup, Integer> entry : counts.entrySet()) {
+        for (Map.Entry<ISampleGroup, Integer> entry : counts.entrySet()) {
             if (entry.getValue() > bestCount) {
                 bestCount = entry.getValue();
                 best = entry.getKey();

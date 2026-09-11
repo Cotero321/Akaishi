@@ -1,5 +1,6 @@
 package com.example.akaishi.life.sample;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.item.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -30,7 +31,7 @@ public class AkaishiLifeSampleItem extends Item {
     }
 
     /** 构造一个生命样本物品 */
-    public static ItemStack create(SampleGroup group, int purity, String entityId) {
+    public static ItemStack create(ISampleGroup group, int purity, String entityId) {
         ItemStack stack = new ItemStack(ModItems.lifeSample.get());
         CompoundTag tag = stack.getOrCreateTag();
         tag.putString(TAG_GROUP, group.getId());
@@ -43,7 +44,7 @@ public class AkaishiLifeSampleItem extends Item {
      * 按分组随机生成样本（采集专用）：纯度偏斜低值——60% 落在 0-49、25% 落在 50-74、
      * 15% 落在 75-100，保证高纯度样本稀有。随机纯度规则统一收敛在此处。
      */
-    public static ItemStack createRolled(SampleGroup group, String entityId, RandomSource random) {
+    public static ItemStack createRolled(ISampleGroup group, String entityId, RandomSource random) {
         int r = random.nextInt(100);
         int purity;
         if (r < 60) {
@@ -57,7 +58,7 @@ public class AkaishiLifeSampleItem extends Item {
     }
 
     /** 样本来源分组（无 NBT 返回 null） */
-    public static SampleGroup getGroup(ItemStack stack) {
+    public static ISampleGroup getGroup(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null ? SampleGroup.byId(tag.getString(TAG_GROUP)) : null;
     }
@@ -81,7 +82,7 @@ public class AkaishiLifeSampleItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        SampleGroup group = getGroup(stack);
+        ISampleGroup group = getGroup(stack);
         if (group != null) {
             // 来源分组 + 纯度（绿色显示纯度）
             tooltip.add(Component.translatable("gui.akaishi.life_sample.info",

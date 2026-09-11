@@ -2,6 +2,7 @@ package com.example.akaishi.life.sample;
 
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.EnergyFormat;
 import net.minecraft.nbt.CompoundTag;
@@ -100,7 +101,7 @@ public class AkaishiSampleCollectorItem extends Item {
         if (collector.isEmpty() || !(collector.getItem() instanceof AkaishiSampleCollectorItem)) {
             return RESULT_NONE;
         }
-        SampleGroup group = SampleGroup.of(target);
+        ISampleGroup group = SampleGroup.of(target);
         if (group == null) {
             return RESULT_NONE;
         }

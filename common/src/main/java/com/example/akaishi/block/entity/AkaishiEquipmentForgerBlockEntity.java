@@ -12,6 +12,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEquipmentForgerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -239,6 +241,8 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
         upgradePoints = AkaishiUpgradeHelper.FORGE_UPGRADE_POINTS;
         java.util.Arrays.fill(baseCounts, 0);
         setChanged();
+        // 锻造为单次动作，播放一次性运转音
+        MachineHum.playOnce(level, worldPosition, ModSounds.EQUIPMENT_FORGER_HUM, 0.4F, 1.0F);
     }
 
     @Override

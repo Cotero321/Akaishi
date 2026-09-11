@@ -14,6 +14,8 @@ import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.fluid.MultiFluidTank;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeCentrifugeMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -74,6 +76,8 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     private long progress;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.LIFE_CENTRIFUGE_HUM, 0.4F, 1.0F);
 
     public AkaishiLifeCentrifugeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_CENTRIFUGE.get(), pos, state);
@@ -128,6 +132,7 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         }
         inTank.drain(fluid, rate, false);
         energy.extractEnergy(rate * unitCost, false);
+        hum.tick(level, worldPosition);
         progress += rate;
         // 每满一批结算一次（速率低于阈值，单 tick 至多结算 1 批）
         while (progress >= BATCH_MB) {

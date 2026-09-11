@@ -12,6 +12,8 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.MutantTrait;
 import com.example.akaishi.menu.AkaishiTraitReforgerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -70,6 +72,8 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage life;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.TRAIT_REFORGER_HUM, 0.4F, 1.0F);
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     private int progress;
@@ -120,6 +124,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
             if (delta > 0) {
                 speedAccum -= delta;
                 progress += delta;
+                hum.tick(level, worldPosition);
             }
             if (progress >= ModConfig.traitReforgerProcessTicks) {
                 progress = 0;
@@ -160,7 +165,7 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
         }
         // 候选不足（该稀有度池内的其他词条已全部携带）时无法启动，避免无效消耗
         List<MutantTrait> mutations = AkaishiOrganItem.getMutations(organ);
-        if (!MutantTrait.hasCandidates(old.getRarity(), mutations)) {
+        if (!MutantTrait.hasCandidates(old.getRarity(), mutations, AkaishiOrganItem.slotOf(organ))) {
             return false;
         }
         int cost = crystalCost(old.getRarity());

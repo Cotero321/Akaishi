@@ -12,6 +12,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyGeneratorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -56,6 +58,9 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     private int burnTime;
     private int burnTimeTotal;
+
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.ENERGY_GENERATOR_HUM, 0.4F, 1.0F);
 
     public AkaishiEnergyGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_GENERATOR.get(), pos, state);
@@ -106,6 +111,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
                 burnTime--;
                 // 升级组件：每个 ×1.75 倍产出速度、减少 1% 产出（净倍率 1.75^n × (1-0.01n)）
                 energy.addEnergy((long) (ModConfig.energyGeneratorGenerateRate * getBoostMultiplier(upgrades)), false);
+                hum.tick(level, worldPosition);
                 changed = true;
             }
         }

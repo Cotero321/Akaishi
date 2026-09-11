@@ -21,7 +21,7 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
     // 槽位（与 Menu 坐标一致）
-    private static final int INPUT_MOULD_X = 26, INPUT_SOLID_X = 44, INPUT_Y = 56;
+    private static final int INPUT_MOULD_X = 26, INPUT_SOLID_X = 44, INPUT_DNA_X = 62, INPUT_Y = 56;
     private static final int OUTPUT_X = 116, OUTPUT_Y = 56;
     // 箭头即进度（指向输出槽）
     private static final int ARROW_X = 86, ARROW_Y = 56, ARROW_W = 22, ARROW_H = 18;
@@ -77,9 +77,10 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
 
-        // 输入（通用模板 / 固态物）与输出（部位模板）
+        // 输入（通用模板 / 固态物 / DNA）与输出（部位模板）
         GuiWidgets.slotBox(gui, x + INPUT_MOULD_X, y + INPUT_Y);
         GuiWidgets.slotBox(gui, x + INPUT_SOLID_X, y + INPUT_Y);
+        GuiWidgets.slotBox(gui, x + INPUT_DNA_X, y + INPUT_Y);
         GuiWidgets.slotBox(gui, x + OUTPUT_X, y + OUTPUT_Y);
 
         // 箭头即进度（指向输出槽）
@@ -198,14 +199,17 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
         if (slotTip(gui, MachineUpgradeSlots.SLOT_ENERGY, "gui.akaishi.upgrade.energy.hint", mouseX, mouseY)) {
             return;
         }
-        // 机器槽（通用模板 / 固态物 / 输出）
+        // 机器槽（通用模板 / 固态物 / DNA / 输出）
         if (slotTip(gui, AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT, "gui.akaishi.mech.template_mould_slot", mouseX, mouseY)) {
             return;
         }
         if (slotTip(gui, AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 1, "gui.akaishi.mech.solid_slot", mouseX, mouseY)) {
             return;
         }
-        slotTip(gui, AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 2, "gui.akaishi.mech.output_slot", mouseX, mouseY);
+        if (slotTip(gui, AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 2, "gui.akaishi.mech.dna_slot", mouseX, mouseY)) {
+            return;
+        }
+        slotTip(gui, AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 3, "gui.akaishi.mech.output_slot", mouseX, mouseY);
     }
 
     /** 空槽悬浮提示：命中且槽位为空时渲染对应键，返回是否已提示 */

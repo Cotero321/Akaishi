@@ -4,7 +4,10 @@ import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiCompressorMenu;
+import com.example.akaishi.sound.ModSounds;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -75,5 +78,10 @@ public class AkaishiCompressorBlockEntity extends AkaishiSingleSlotMachineBlockE
     @Override
     protected String nameKey() {
         return "akaishi.akaishi_compressor";
+    }
+
+    @Override
+    protected RegistrySupplier<SoundEvent> humSound() {
+        return ModSounds.COMPRESSOR_HUM;
     }
 }

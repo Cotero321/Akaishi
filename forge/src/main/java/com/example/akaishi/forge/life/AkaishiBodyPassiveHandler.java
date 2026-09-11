@@ -1,5 +1,6 @@
 package com.example.akaishi.forge.life;
 
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.body.BodyGeneHelper;
 import com.example.akaishi.life.body.BodySlot;
@@ -9,13 +10,16 @@ import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.linkage.OrganLinkage;
 import com.example.akaishi.item.MechanicalOrganItem;
 import com.example.akaishi.life.mechanical.MechanicalAssembledStats;
+import com.example.akaishi.life.mechanical.MechanicalAttributeMatrix;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalIntegrationService;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
 import com.example.akaishi.life.mechanical.MechanicalPartTemplate;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
+import com.example.akaishi.life.mechanical.MechanicalProperty;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.life.organ.AttributeWeightRegistry;
 import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.life.organ.OrganPassive;
 import com.example.akaishi.life.organ.OrganSpecial;
@@ -128,13 +132,15 @@ public final class AkaishiBodyPassiveHandler {
         tickMechanicalIntegration(state);
         rebuildAttributes(player, state);
         applyLifeFusionSet(player);
-        applyPassives(player, state);
+        // 每 tick 只全量收集一次生效器官，被动/长臂/套装/特殊共用，避免对每个被动重复解析
+        List<OrganEffectResolver.ActiveOrgan> organs = OrganEffectResolver.collect(state);
+        applyPassives(player, state, organs);
         applySynergy(player, state);
         tickRejection(player, state);
         tickConflict(player, state);
         applyOverload(player, state);
         applySlotDebuffs(player, state);
-        tickSpecial(player, state);
+        tickSpecial(player, organs);
     }
 
     /** 重生克隆后立即重建（供 PlayerBodyCapability.onPlayerClone 调用）：
@@ -153,7 +159,7 @@ public final class AkaishiBodyPassiveHandler {
         REACH_CACHE.remove(player);
         rebuildAttributes(player, state);
         applyLifeFusionSet(player);
-        applyPassives(player, state);
+        applyPassives(player, state, OrganEffectResolver.collect(state));
     }
 
     /** 进食增强（鸡砂囊·食物恢复）：食物饥饿与饱和 +25% */
@@ -211,6 +217,8 @@ public final class AkaishiBodyPassiveHandler {
                 ? AkaishiLifeFusionSet.ORGAN_STRENGTH_MULTIPLIER : 1.0;
         for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
             double compatFactor = BodyGeneHelper.effectiveCompat(state, organ.stack(), gearCompat) / 100.0;
+            // 基因属性权重：按来源专精轴放大长项、衰减弱势轴，叠加于基础公式（正交于适配度）
+            String entityId = AkaishiOrganItem.getEntityId(organ.stack());
             // 突破激活且来源匹配：正数基础值乘 (1+pct/100)，负数基础值词条期间跳过
             boolean btActive = state.isBreakthroughActive(AkaishiOrganItem.getEntityId(organ.stack()));
             double breakthroughFactor = btActive ? 1.0 + state.getBreakthroughPct() / 100.0 : 1.0;
@@ -222,7 +230,8 @@ public final class AkaishiBodyPassiveHandler {
                 if (btActive && base < 0) {
                     continue; // 负基础值词条：突破激活期内暂时失效
                 }
-                double value = base * breakthroughFactor * organ.tier().getMultiplier() * compatFactor * strengthMult;
+                double value = base * breakthroughFactor * organ.tier().getMultiplier() * compatFactor * strengthMult
+                        * AttributeWeightRegistry.multiplier(entityId, organ.slot(), b.attribute(), base);
                 if (b.attribute() == Attributes.MAX_HEALTH) {
                     // 生命加成按基础生命百分比计算：value/20 即 +value×5%
                     healthPct += value / BASE_HEALTH;
@@ -247,8 +256,9 @@ public final class AkaishiBodyPassiveHandler {
                 next.add(new AppliedAttr(organ.slot().name(), e.getKey()));
             }
         }
-        // 2.5) 机械义体：五维按「整合度折扣 × 配置换算倍率」挂载
-        //      机械义体排斥恒 0、不参与适配度/突破/天敌体系，故走独立挂载路径
+        // 2.5) 机械义体：十维按「整合度折扣 × 总体倍率 × 配置换算倍率」挂载
+        //      机械义体排斥恒 0、不参与适配度/突破/天敌体系，故走独立挂载路径；
+        //      合法性由机械独立矩阵（槽位 × 属性）裁定——义眼不给护甲、义腿不给攻击等
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             if (!(organ.getItem() instanceof MechanicalOrganItem)) {
@@ -258,18 +268,42 @@ public final class AkaishiBodyPassiveHandler {
             if (stats == null) {
                 continue;
             }
+            MechanicalOrganType type = stats.organType();
             // 整合度只涨不降：0% 整合也有 20% 生效，满整合 100%
             double integration = MechanicalIntegrationService.getEffectiveMultiplier(
                     state.getMechanicalIntegration().get(slot));
             MechanicalAssembledStats eff = stats.applyIntegration(integration);
-            // 生命沿用生物器官的百分比聚合口径（+value/20 即 +5%×value）；换算倍率 0=用内置默认
-            healthPct += eff.health() * mechScale(ModConfig.mechBodyHealthScale, 0.5) / BASE_HEALTH;
-            mountMechanicalAttribute(player, next, slot, Attributes.ATTACK_DAMAGE,
-                    eff.attackDamage() * mechScale(ModConfig.mechBodyAttackScale, 0.1));
-            mountMechanicalAttribute(player, next, slot, Attributes.ATTACK_SPEED,
-                    eff.attackSpeed() * mechScale(ModConfig.mechBodyAttackSpeedScale, 0.01));
-            mountMechanicalAttribute(player, next, slot, Attributes.MOVEMENT_SPEED,
-                    eff.movementSpeed() * mechScale(ModConfig.mechBodyMovementSpeedScale, 0.001));
+            // 总体倍率轴：倍化九属性最终值（不受整合度折扣，1.0 起算）
+            double om = eff.overallMultiplier();
+            // 生命沿用生物器官的百分比聚合口径（+value/20 即 +5%×value）
+            if (MechanicalAttributeMatrix.allows(type, MechanicalProperty.HEALTH)) {
+                healthPct += eff.get(MechanicalProperty.HEALTH) * om
+                        * mechScale(ModConfig.mechBodyHealthScale, 0.03) / BASE_HEALTH;
+            }
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.ATTACK_DAMAGE, Attributes.ATTACK_DAMAGE,
+                    ModConfig.mechBodyAttackScale, 0.03);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.ATTACK_SPEED, Attributes.ATTACK_SPEED,
+                    ModConfig.mechBodyAttackSpeedScale, 0.01);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.MOVEMENT_SPEED, Attributes.MOVEMENT_SPEED,
+                    ModConfig.mechBodyMovementSpeedScale, 0.01);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.ARMOR, Attributes.ARMOR,
+                    ModConfig.mechBodyArmorScale, 0.02);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.CRIT_CHANCE, ModCombatAttributes.CRIT_CHANCE.get(),
+                    ModConfig.mechBodyCritChanceScale, 0.1);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.CRIT_DAMAGE, ModCombatAttributes.CRIT_DAMAGE.get(),
+                    ModConfig.mechBodyCritDamageScale, 0.2);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.RANGE, ForgeMod.ENTITY_REACH.get(),
+                    ModConfig.mechBodyRangeScale, 0.02);
+            mountMechanical(player, next, slot, type, eff, om,
+                    MechanicalProperty.DODGE, ModCombatAttributes.DODGE_CHANCE.get(),
+                    ModConfig.mechBodyDodgeScale, 0.1);
         }
         // 生命融合套装·BOSS/龙肢体：移植 BOSS 或龙族来源器官时额外 +10 最大生命
         if (AkaishiLifeFusionSet.isFullSet(player) && AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state)) {
@@ -298,6 +332,21 @@ public final class AkaishiBodyPassiveHandler {
         return UUID.nameUUIDFromBytes((key + ":" + attribute.getDescriptionId()).getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * 挂载单条机械义体属性：先过机械独立矩阵（槽位 × 属性），再按「整合后权重 × 总体倍率 × 换算倍率」取值。
+     * 换算倍率 0 = 用内置默认值。
+     */
+    private static void mountMechanical(Player player, List<AppliedAttr> next, BodySlot slot,
+                                        MechanicalOrganType type, MechanicalAssembledStats eff,
+                                        double om, MechanicalProperty prop, Attribute attribute,
+                                        double configuredScale, double builtinScale) {
+        if (!MechanicalAttributeMatrix.allows(type, prop)) {
+            return;
+        }
+        mountMechanicalAttribute(player, next, slot, attribute,
+                eff.get(prop) * om * mechScale(configuredScale, builtinScale));
+    }
+
     /** 挂载单条机械义体属性修饰（值≈0 跳过；同槽位同属性与生物器官共用 UUID，槽位互斥不会冲突） */
     private static void mountMechanicalAttribute(Player player, List<AppliedAttr> next,
                                                  BodySlot slot, Attribute attribute, double value) {
@@ -323,8 +372,7 @@ public final class AkaishiBodyPassiveHandler {
 
     /**
      * 机械整合度增长：从已安装机械义体重建简化部件模板。
-     * 成品 NBT 只保留四个材料 ID（不存 DNA），故 DNA 一律回退 akaishi:none——
-     * 副作用：同源加速（1.3）对成品义体不生效，其余材料/机械心脏修正正常。
+     * 成品 NBT 保留 DNA 来源 id（四部件同源时才有值），故同源加速（1.3）对同源义体正常生效。
      */
     private static void tickMechanicalIntegration(IPlayerBodyState state) {
         List<BodySlot> slots = new ArrayList<>();
@@ -349,8 +397,11 @@ public final class AkaishiBodyPassiveHandler {
             MechanicalMaterial material = materialIds.isEmpty()
                     ? null : MechanicalMaterial.get(materialIds.get(0));
             if (material != null) {
+                // DNA 来源由成品 NBT 透传（四部件同源时才有值），缺省回退 none
+                MechanicalDnaProfile dna = MechanicalDnaProfile.get(
+                        MechanicalOrganItem.getDnaProfileId(organ));
                 templates.put(slot, new MechanicalPartTemplate(type, MechanicalPartType.CORE,
-                        material, MechanicalDnaProfile.get("akaishi:none")));
+                        material, dna != null ? dna : MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID)));
             }
         }
         if (slots.isEmpty()) {
@@ -376,8 +427,11 @@ public final class AkaishiBodyPassiveHandler {
                             .append(AkaishiOrganItem.getTier(organ)).append(':')
                             .append(AkaishiOrganItem.getCompat(organ))
                             // 突变词条参与摘要：突变变更需触发属性重建
-                            .append(':').append(AkaishiOrganItem.getMutations(organ));
+                    .append(':').append(AkaishiOrganItem.getMutations(organ));
                 }
+            } else if (organ.getItem() instanceof MechanicalOrganItem) {
+                // 成品 NBT 参与摘要：更换材料/DNA 不同的同类成品时属性面板需即时刷新
+                sb.append("mech").append(organ.hasTag() ? organ.getTag().hashCode() : 0);
             }
             // 整合度参与摘要：机械义体整合度增长需即时刷新属性面板
             sb.append(':').append(state.getRejection(slot))
@@ -390,20 +444,22 @@ public final class AkaishiBodyPassiveHandler {
                 .append(state.getBreakthroughUntil()).append(';');
         // 生命融合装备穿戴件数（+2 全基因适配 / 全套器官强度与 +10 生命随穿脱即时触发重建）
         sb.append("LF").append(AkaishiLifeFusionSet.countWorn(player)).append(';');
+        // 基因属性权重强度（配置热重载后即时触发重建，属性面板随 k 变化）
+        sb.append("GW").append(ModConfig.geneWeightStrength).append(';');
         return sb.toString();
     }
 
     // ===== 被动技能（常驻/被动触发） =====
 
-    private static void applyPassives(Player player, IPlayerBodyState state) {
+    private static void applyPassives(Player player, IPlayerBodyState state, List<OrganEffectResolver.ActiveOrgan> organs) {
         // 长臂被动走 Forge 专属属性（ENTITY_REACH），无条件同步以防摘除后残留
-        syncReach(player, state);
+        syncReach(player, organs);
         // 被动按来源数聚合后统一生效：跨器官同被动叠加 → 强度升级（数量 × 效果等级/范围）；
         // 携带来源的最高品质同时抬升数值型被动（品质阶梯：I 级行为与旧版一致）
         for (OrganPassive passive : OrganPassive.values()) {
-            OrganEffectResolver.PassiveStrengths s = OrganEffectResolver.strengthsOf(state, passive);
+            OrganEffectResolver.PassiveStrengths s = OrganEffectResolver.strengthsOf(organs, passive);
             if (s.count() > 0) {
-                applyPassive(player, state, passive, s.count(), s.maxTierOrd());
+                applyPassive(player, state, organs, passive, s.count(), s.maxTierOrd());
             }
         }
     }
@@ -442,9 +498,9 @@ public final class AkaishiBodyPassiveHandler {
      * 同步近战攻击距离：统计 LONG_REACH 数量 × 每臂加成，挂到 ForgeMod.ENTITY_REACH。
      * 数量无变化跳过；摘除全部后移除修饰符，避免属性残留。
      */
-    private static void syncReach(Player player, IPlayerBodyState state) {
+    private static void syncReach(Player player, List<OrganEffectResolver.ActiveOrgan> organs) {
         int arms = 0;
-        for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
+        for (OrganEffectResolver.ActiveOrgan organ : organs) {
             if (OrganEffectResolver.passivesOf(organ.stack(), organ.effect()).contains(OrganPassive.LONG_REACH)) {
                 arms++;
             }
@@ -471,7 +527,8 @@ public final class AkaishiBodyPassiveHandler {
      * 常驻被动生效：count = 跨器官来源数（≥2 时强度升级），tierOrd = 最强来源品质序号（0~3，品质阶梯）。
      * 覆盖型/免疫型被动无强度维度，重复来源只保证生效一次（不产生额外叠加）。
      */
-    private static void applyPassive(Player player, IPlayerBodyState state, OrganPassive passive, int count, int tierOrd) {
+    private static void applyPassive(Player player, IPlayerBodyState state, List<OrganEffectResolver.ActiveOrgan> organs,
+                                     OrganPassive passive, int count, int tierOrd) {
         switch (passive) {
             case JUMP_BOOST -> applyPotion(player, MobEffects.JUMP, Math.min(count, 3));
             case NIGHT_VISION -> applyPotion(player, MobEffects.NIGHT_VISION, 0);
@@ -535,7 +592,7 @@ public final class AkaishiBodyPassiveHandler {
                         && level.dimensionType().hasSkyLight()
                         && level.canSeeSky(player.blockPosition())
                         && !player.hasEffect(MobEffects.FIRE_RESISTANCE)
-                        && !OrganEffectResolver.hasPassive(state, OrganPassive.FIRE_IMMUNE)) {
+                        && !OrganEffectResolver.hasPassive(organs, OrganPassive.FIRE_IMMUNE)) {
                     player.setSecondsOnFire(3);
                 }
             }
@@ -671,7 +728,8 @@ public final class AkaishiBodyPassiveHandler {
     /**
      * 移植器官适配度低于阈值时，该部位持续承受负面效果：
      * 眼→黑暗 / 心·肺→虚弱 / 内体→饥饿 / 肾→中毒 / 臂→挖掘疲劳 / 腿→缓慢。
-     * 适配度 ≥80 无 / 60-79 轻度 / <60 重度。每 6 秒刷新一次。
+     * 适配度 ≥ slotDebuffCleanThreshold（默认 70）无；&lt; slotDebuffSevereThreshold（默认 45）重度；
+     * 其余轻度。每 6 秒刷新一次。
      */
     private static void applySlotDebuffs(Player player, IPlayerBodyState state) {
         if (player.tickCount % 120 != 0) {
@@ -740,9 +798,9 @@ public final class AkaishiBodyPassiveHandler {
 
     // ===== 独特机制（tick 类） =====
 
-    private static void tickSpecial(Player player, IPlayerBodyState state) {
+    private static void tickSpecial(Player player, List<OrganEffectResolver.ActiveOrgan> organs) {
         // 末影怕水：接触水源时瞬移躲避并损失生命值（10 秒冷却）
-        if (OrganEffectResolver.hasSpecial(state, OrganSpecial.ENDER_WATER_FEAR)
+        if (OrganEffectResolver.hasSpecial(organs, OrganSpecial.ENDER_WATER_FEAR)
                 && player.isInWater()
                 && player.tickCount - WATER_FEAR_COOLDOWN.getOrDefault(player, -1000) > 200) {
             WATER_FEAR_COOLDOWN.put(player, player.tickCount);

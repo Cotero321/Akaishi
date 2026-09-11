@@ -10,6 +10,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiActivatedFractionatorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -69,6 +71,8 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
     private float speedAccum;
     /** 当前输入的活化结晶种类（跨配方错配防御：换料清零进度） */
     private Item currentInput;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.ACTIVATED_FRACTIONATOR_HUM, 0.4F, 1.0F);
 
     public AkaishiActivatedFractionatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ACTIVATED_FRACTIONATOR.get(), pos, state);
@@ -124,6 +128,7 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
         if (delta > 0) {
             speedAccum -= delta;
             progress += delta;
+            hum.tick(level, worldPosition);
         }
         if (progress >= ModConfig.fractionatorProcessTicks) {
             if (canFit(component)) {

@@ -7,13 +7,13 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.OrganEffectRegistry;
-import com.example.akaishi.life.sample.SampleGroup;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiLifeStructMenu;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
@@ -179,7 +179,7 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
     /** 完成构造：消耗材料，产出器官（完整度 = 序列纯度 − 随机损耗） */
     private void complete() {
         ItemStack input = inventory.getItem(INPUT_SLOT);
-        SampleGroup group = AkaishiGeneSequenceItem.getGroup(input);
+        ISampleGroup group = AkaishiGeneSequenceItem.getGroup(input);
         String entityId = AkaishiGeneSequenceItem.getEntityId(input);
         BodySlot target = BodySlot.values()[clampTarget()];
         int seqPurity = AkaishiGeneSequenceItem.getPurity(input);

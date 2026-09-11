@@ -430,7 +430,9 @@ public class MechanicalPartRenderer extends BlockEntityWithoutLevelRenderer
 
     @Nullable
     private static BufferedImage loadMaterialTexture(String materialId) {
-        ResourceLocation id = new ResourceLocation(materialId);
+        // 脏 NBT 可能给出非法资源名，非法直接放弃（调用方回退形状纹理），避免渲染线程抛异常
+        ResourceLocation id = ResourceLocation.tryParse(materialId);
+        if (id == null) return null;
         return loadTexture(String.format(MATERIAL_PATH, id.getNamespace(), id.getPath()));
     }
 

@@ -1,8 +1,10 @@
 package com.example.akaishi.life.organ;
 
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.life.body.BodySlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +16,11 @@ import java.util.Set;
  * 设计原则：
  * - 每个生物只注册有特色的器官，没有默认全量值（不同生物可用器官不同）
  * - 属性覆盖槽位模板（null 表示沿用模板），被动/特殊效果是特色来源
+ * - 属性必须落在「属性↔槽位合法性矩阵」允许的槽位上（矩阵真源见 {@link OrganRegistry}）：
+ *   暴击率仅眼、暴击伤害仅双臂、闪避仅双腿；攻击限肾/双臂；攻速限双臂；护甲/护甲韧性限内体；
+ *   最大生命限心；幸运限内体；移速限双腿。惩罚型负值同样受限（代价须落在本槽位合法轴，
+ *   否则迁槽或折入该槽位主属性）。
+ * - 被动按语义归位：感知（敌意高亮）→眼、命中特效→臂、滑翔→臂、跳跃/游泳/缓冲→腿、白呼吸→肺。
  * - 新生物逐个补充注册即可，无需改动其他代码
  */
 public final class OrganEffectRegistry {
@@ -22,24 +29,31 @@ public final class OrganEffectRegistry {
     private static final Map<String, Map<BodySlot, OrganEffect>> EFFECTS = new HashMap<>();
 
     static {
-        // ===== 牛：牛心（+生命）、牛胃（吃小麦/禁肉）、牛腿（+攻击-速度）=====
+        // ===== 牛：牛心（+生命）、牛胃（吃小麦/禁肉）、牛前蹄（+攻击）、牛腿（慢速稳盘）=====
         register("minecraft:cow", BodySlot.HEART, new OrganEffect("minecraft:cow", BodySlot.HEART,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 3.0)), null, null));
         register("minecraft:cow", BodySlot.VISCERA, new OrganEffect("minecraft:cow", BodySlot.VISCERA,
                 null, null, OrganSpecial.COW_STOMACH));
+        // 攻击迁至双臂：蹄踢是肢体发力，腿只保留"下盘稳"语义（慢速 + 击退抗）
+        register("minecraft:cow", BodySlot.LEFT_ARM, new OrganEffect("minecraft:cow", BodySlot.LEFT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0)), null, null));
+        register("minecraft:cow", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:cow", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0)), null, null));
         register("minecraft:cow", BodySlot.LEFT_LEG, new OrganEffect("minecraft:cow", BodySlot.LEFT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)), null, null));
         register("minecraft:cow", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:cow", BodySlot.RIGHT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)), null, null));
 
-        // ===== 兔：兔腿（跳跃提升 + 摔落减免）=====
+        // ===== 兔：兔腿（+闪避，跳跃提升 + 摔落减免）=====
         register("minecraft:rabbit", BodySlot.LEFT_LEG, new OrganEffect("minecraft:rabbit", BodySlot.LEFT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)),
                 List.of(OrganPassive.JUMP_BOOST, OrganPassive.FALL_IMMUNE), null));
         register("minecraft:rabbit", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:rabbit", BodySlot.RIGHT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)),
                 List.of(OrganPassive.JUMP_BOOST, OrganPassive.FALL_IMMUNE), null));
 
         // ===== 猫：猫眼（夜视）+ 猫爪（攻速，敏捷刺客）=====
@@ -63,20 +77,26 @@ public final class OrganEffectRegistry {
                 List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.75)),
                 List.of(OrganPassive.JUMP_ATTACK_BOOST), null));
         register("minecraft:fox", BodySlot.LEFT_LEG, new OrganEffect("minecraft:fox", BodySlot.LEFT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)), null, null));
         register("minecraft:fox", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:fox", BodySlot.RIGHT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)), null, null));
 
-        // ===== 蝙蝠：回声定位耳（侦测敌意生物高亮）=====
-        register("minecraft:bat", BodySlot.VISCERA, new OrganEffect("minecraft:bat", BodySlot.VISCERA,
+        // ===== 蝙蝠：回声定位耳（侦测敌意生物高亮——感知归眼）=====
+        register("minecraft:bat", BodySlot.EYE, new OrganEffect("minecraft:bat", BodySlot.EYE,
                 null, List.of(OrganPassive.ENEMY_GLOW), null));
 
-        // ===== 蜘蛛：蛛丝腺（攻击减速目标）=====
-        register("minecraft:spider", BodySlot.VISCERA, new OrganEffect("minecraft:spider", BodySlot.VISCERA,
-                null, List.of(OrganPassive.SLOW_ON_HIT), null));
+        // ===== 蜘蛛：蛛丝腺（攻击减速目标——命中特效归臂）=====
+        register("minecraft:spider", BodySlot.LEFT_ARM, new OrganEffect("minecraft:spider", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.SLOW_ON_HIT), null));
+        register("minecraft:spider", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:spider", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.SLOW_ON_HIT), null));
 
-        // ===== 史莱姆：黏液腺（弹性：跳跃 + 摔落免疫）=====
-        register("minecraft:slime", BodySlot.LUNGS, new OrganEffect("minecraft:slime", BodySlot.LUNGS,
+        // ===== 史莱姆：黏液腺（弹性：跳跃 + 摔落免疫——弹跳属腿部位移，肺为呼吸槽不承载）=====
+        register("minecraft:slime", BodySlot.LEFT_LEG, new OrganEffect("minecraft:slime", BodySlot.LEFT_LEG,
+                null, List.of(OrganPassive.JUMP_BOOST, OrganPassive.FALL_IMMUNE), null));
+        register("minecraft:slime", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:slime", BodySlot.RIGHT_LEG,
                 null, List.of(OrganPassive.JUMP_BOOST, OrganPassive.FALL_IMMUNE), null));
 
         // ===== 鸡：鸡砂囊（食物恢复 +25%）+ 鸡腿（轻落，摔落减免）=====
@@ -107,40 +127,42 @@ public final class OrganEffectRegistry {
         register("minecraft:horse", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:horse", BodySlot.RIGHT_LEG,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.03)), null, null));
 
-        // ===== 铁傀儡：傀儡核心（重装，负面：笨重缓慢）=====
+        // ===== 铁傀儡：傀儡核心（重装坦核——笨重的移速/攻速代价折入生命净额；护甲轴归内体、击退抗归双臂）=====
         register("minecraft:iron_golem", BodySlot.HEART, new OrganEffect("minecraft:iron_golem", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 4.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 2.0),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.03),
-                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, -1.0)), null, null));
-        // ===== 铁傀儡：巨铁臂（重拳长挥——原版铁傀儡攻击判定全村最大，双臂各攻 +1.0 + 攻击距离 +0.75）=====
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 2.5)), null, null));
+        // ===== 铁傀儡：巨铁臂（重拳长挥——原版铁傀儡攻击判定全村最大，双臂各攻 +1.0 + 重拳暴击伤害 + 攻击距离）=====
         register("minecraft:iron_golem", BodySlot.LEFT_ARM, new OrganEffect("minecraft:iron_golem", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.20),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1)),
                 List.of(OrganPassive.LONG_REACH), null));
         register("minecraft:iron_golem", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:iron_golem", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.20),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1)),
                 List.of(OrganPassive.LONG_REACH), null));
 
-        // ===== 海豚：海豚鳍（游泳加速）=====
-        register("minecraft:dolphin", BodySlot.LUNGS, new OrganEffect("minecraft:dolphin", BodySlot.LUNGS,
+        // ===== 海豚：海豚尾鳍（游泳加速——摆动推进属腿部位移）=====
+        register("minecraft:dolphin", BodySlot.LEFT_LEG, new OrganEffect("minecraft:dolphin", BodySlot.LEFT_LEG,
+                null, List.of(OrganPassive.SWIM_BOOST), null));
+        register("minecraft:dolphin", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:dolphin", BodySlot.RIGHT_LEG,
                 null, List.of(OrganPassive.SWIM_BOOST), null));
 
         // ===== 发光鱿鱼：发光腺（自身发光）=====
         register("minecraft:glow_squid", BodySlot.VISCERA, new OrganEffect("minecraft:glow_squid", BodySlot.VISCERA,
                 null, List.of(OrganPassive.GLOW), null));
 
-        // ===== 北极熊：熊掌（重击，负面：笨重）=====
+        // ===== 北极熊：熊掌（重击 + 暴击伤害，代价：挥击迟缓——移速属腿轴，改扣攻速）=====
         register("minecraft:polar_bear", BodySlot.LEFT_ARM, new OrganEffect("minecraft:polar_bear", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.5),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.01)), null, null));
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15),
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, -0.1)), null, null));
         register("minecraft:polar_bear", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:polar_bear", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.5),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.01)), null, null));
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15),
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, -0.1)), null, null));
 
         // ===== 悦灵：悦灵之心（自动拾取掉落物）=====
         register("minecraft:allay", BodySlot.HEART, new OrganEffect("minecraft:allay", BodySlot.HEART,
@@ -150,19 +172,26 @@ public final class OrganEffectRegistry {
         register("minecraft:bee", BodySlot.VISCERA, new OrganEffect("minecraft:bee", BodySlot.VISCERA,
                 null, List.of(OrganPassive.POISON_ON_HIT), null));
 
-        // ===== 僵尸：僵尸心脏（力量，负面：怕火）=====
+        // ===== 僵尸：僵尸心脏（沿用心脏模板生命 +2，留再生/怕火）+ 僵尸腐臂（+攻击）=====
         register("minecraft:zombie", BodySlot.HEART, new OrganEffect("minecraft:zombie", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0)),
-                List.of(OrganPassive.REGEN, OrganPassive.FIRE_WEAKNESS), null));
+                null, List.of(OrganPassive.REGEN, OrganPassive.FIRE_WEAKNESS), null));
+        register("minecraft:zombie", BodySlot.LEFT_ARM, new OrganEffect("minecraft:zombie", BodySlot.LEFT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0)), null, null));
+        register("minecraft:zombie", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:zombie", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0)), null, null));
 
-        // ===== 骷髅：骷髅骨架（骨甲 + 弹射物强化）+ 枯骨双臂（亡灵最低基础臂——轻灵快剑）=====
+        // ===== 骷髅：骷髅骨架（内体模板幸运/韧性 + 骨壳护甲 + 弹射物强化）+ 枯骨双臂（轻骨快剑）+ 白骨之瞳（+暴击率）=====
         register("minecraft:skeleton", BodySlot.VISCERA, new OrganEffect("minecraft:skeleton", BodySlot.VISCERA,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ARMOR, 1.0)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.5),
+                        new OrganTemplate.AttributeBonus(Attributes.ARMOR_TOUGHNESS, 0.5),
+                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 0.5)),
                 List.of(OrganPassive.PROJECTILE_BOOST), null));
         register("minecraft:skeleton", BodySlot.LEFT_ARM, new OrganEffect("minecraft:skeleton", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.5)), null, null));
         register("minecraft:skeleton", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:skeleton", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.5)), null, null));
+        register("minecraft:skeleton", BodySlot.EYE, new OrganEffect("minecraft:skeleton", BodySlot.EYE,
+                List.of(new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_CHANCE.get(), 0.05)), null, null));
 
         // ===== 末影人：末影核心（瞬移闪避，负面：怕水）+ 末影臂（长臂挥击）=====
         register("minecraft:enderman", BodySlot.HEART, new OrganEffect("minecraft:enderman", BodySlot.HEART,
@@ -184,29 +213,38 @@ public final class OrganEffectRegistry {
         register("minecraft:guardian", BodySlot.VISCERA, new OrganEffect("minecraft:guardian", BodySlot.VISCERA,
                 null, List.of(OrganPassive.THORNS), null));
 
-        // ===== 凋灵：凋灵核心（攻击凋零 + 再生，满级出凋零骷髅头）=====
+        // ===== 凋灵：凋灵核心（厚血 + 凋零 + 再生；护甲已折算入生命，满级出凋零骷髅头）=====
         register("minecraft:wither", BodySlot.HEART, new OrganEffect("minecraft:wither", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 4.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 2.0)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 6.0)),
                 List.of(OrganPassive.WITHER_ON_HIT, OrganPassive.REGEN), OrganSpecial.WITHER_SKULL));
 
-        // ===== 末影龙：龙之心（终局顶级，满级出龙息）=====
+        // ===== 末影龙：龙之心（终局顶级厚血，满级出龙息）+ 龙鳞内壁（韧性，护甲归内体轴）=====
         register("minecraft:ender_dragon", BodySlot.HEART, new OrganEffect("minecraft:ender_dragon", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 6.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 3.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR_TOUGHNESS, 2.0)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 9.0)),
                 List.of(OrganPassive.REGEN, OrganPassive.FIRE_IMMUNE), OrganSpecial.DRAGON_BREATH));
+        register("minecraft:ender_dragon", BodySlot.VISCERA, new OrganEffect("minecraft:ender_dragon", BodySlot.VISCERA,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ARMOR_TOUGHNESS, 2.0)), null, null));
 
-        // ===== 青蛙：蛙皮（两栖：水下呼吸 + 跳跃）=====
+        // ===== 青蛙：蛙皮（两栖：水下呼吸留肺）+ 蛙腿（弹跳属腿部）=====
         register("minecraft:frog", BodySlot.LUNGS, new OrganEffect("minecraft:frog", BodySlot.LUNGS,
-                null, List.of(OrganPassive.WATER_BREATHING, OrganPassive.JUMP_BOOST), null));
+                null, List.of(OrganPassive.WATER_BREATHING), null));
+        register("minecraft:frog", BodySlot.LEFT_LEG, new OrganEffect("minecraft:frog", BodySlot.LEFT_LEG,
+                null, List.of(OrganPassive.JUMP_BOOST), null));
+        register("minecraft:frog", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:frog", BodySlot.RIGHT_LEG,
+                null, List.of(OrganPassive.JUMP_BOOST), null));
 
-        // ===== 海龟：龟之心（水下攻击强化）+ 龟甲（护甲，坚壳）=====
+        // ===== 海龟：龟之心（水下攻击强化）+ 龟甲（内体模板幸运/韧性 + 坚壳护甲）+ 龟甲臂（+攻击）=====
         register("minecraft:turtle", BodySlot.HEART, new OrganEffect("minecraft:turtle", BodySlot.HEART,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 1.0)),
                 List.of(OrganPassive.WATER_ATTACK_BOOST), null));
         register("minecraft:turtle", BodySlot.VISCERA, new OrganEffect("minecraft:turtle", BodySlot.VISCERA,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ARMOR, 1.0)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.5),
+                        new OrganTemplate.AttributeBonus(Attributes.ARMOR_TOUGHNESS, 0.5),
+                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 0.5)), null, null));
+        register("minecraft:turtle", BodySlot.LEFT_ARM, new OrganEffect("minecraft:turtle", BodySlot.LEFT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.75)), null, null));
+        register("minecraft:turtle", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:turtle", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.75)), null, null));
 
         // ===== 鳕鱼：鱼鳃（水下呼吸）=====
         register("minecraft:cod", BodySlot.LUNGS, new OrganEffect("minecraft:cod", BodySlot.LUNGS,
@@ -224,22 +262,24 @@ public final class OrganEffectRegistry {
         register("minecraft:creeper", BodySlot.VISCERA, new OrganEffect("minecraft:creeper", BodySlot.VISCERA,
                 null, null, null));
 
-        // ===== 熊猫：熊掌拍击（+攻击，笨重憨厚移速慢）=====
+        // ===== 熊猫：熊掌拍击（+攻击，笨重憨厚——移速属腿轴，改扣攻速）=====
         register("minecraft:panda", BodySlot.LEFT_ARM, new OrganEffect("minecraft:panda", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02)), null, null));
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, -0.15)), null, null));
         register("minecraft:panda", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:panda", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.02)), null, null));
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, -0.15)), null, null));
 
-        // ===== 豹猫：轻灵猫腿（高移速 + 跳跃提升）=====
+        // ===== 豹猫：轻灵猫腿（高移速 + 闪避 + 跳跃提升）=====
         register("minecraft:ocelot", BodySlot.LEFT_LEG, new OrganEffect("minecraft:ocelot", BodySlot.LEFT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.025)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.025),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)),
                 List.of(OrganPassive.JUMP_BOOST), null));
         register("minecraft:ocelot", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:ocelot", BodySlot.RIGHT_LEG,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.025)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.025),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.DODGE_CHANCE.get(), 0.05)),
                 List.of(OrganPassive.JUMP_BOOST), null));
 
         // ===== 羊驼：稳如驼峰（移速 + 击退抗性，久战不倒）=====
@@ -274,19 +314,19 @@ public final class OrganEffectRegistry {
                 List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.01),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.08)), null, null));
 
-        // ===== 尸壳：烈日枯臂（+攻击，皮糙护甲）=====
+        // ===== 尸壳：烈日枯臂（+攻击，皮糙肉厚不易被推动）=====
         register("minecraft:husk", BodySlot.LEFT_ARM, new OrganEffect("minecraft:husk", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 0.5)), null, null));
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1)), null, null));
         register("minecraft:husk", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:husk", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 0.5)), null, null));
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1)), null, null));
 
-        // ===== 流浪者：冰箭腿（命中减速目标，同其箭矢）=====
-        register("minecraft:stray", BodySlot.LEFT_LEG, new OrganEffect("minecraft:stray", BodySlot.LEFT_LEG,
-                null, List.of(OrganPassive.SLOW_ON_HIT), null));
-        register("minecraft:stray", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:stray", BodySlot.RIGHT_LEG,
-                null, List.of(OrganPassive.SLOW_ON_HIT), null));
+        // ===== 流浪者：冰箭臂（命中减速目标，同其箭矢——命中特效归臂）=====
+        register("minecraft:stray", BodySlot.LEFT_ARM, new OrganEffect("minecraft:stray", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.SLOW_ON_HIT), null));
+        register("minecraft:stray", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:stray", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.SLOW_ON_HIT), null));
 
         // ===== 骆驼：沙漠高腿（高移速 + 击退抗，沙漠坐骑）=====
         register("minecraft:camel", BodySlot.LEFT_LEG, new OrganEffect("minecraft:camel", BodySlot.LEFT_LEG,
@@ -314,10 +354,9 @@ public final class OrganEffectRegistry {
                 List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02),
                         new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.1)), null, null));
 
-        // ===== 潜影贝：浮空石壳（高击退抗 + 护甲，稳如磐石）=====
+        // ===== 潜影贝：藏珍内体（击退抗性属肢体域、内体不可承载，改挂内体合法属性「幸运」）=====
         register("minecraft:shulker", BodySlot.VISCERA, new OrganEffect("minecraft:shulker", BodySlot.VISCERA,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.15),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 0.5)), null, null));
+                List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.5)), null, null));
 
         // ===== 河豚：毒刺皮（荆棘反伤，近战者自食其果）=====
         register("minecraft:pufferfish", BodySlot.VISCERA, new OrganEffect("minecraft:pufferfish", BodySlot.VISCERA,
@@ -331,17 +370,23 @@ public final class OrganEffectRegistry {
         register("minecraft:squid", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:squid", BodySlot.RIGHT_ARM,
                 List.of(), List.of(OrganPassive.LONG_REACH), null));
 
-        // ===== 鹦鹉：滑翔羽肺（空中缓降）=====
-        register("minecraft:parrot", BodySlot.LUNGS, new OrganEffect("minecraft:parrot", BodySlot.LUNGS,
-                null, List.of(OrganPassive.GLIDE), null));
+        // ===== 鹦鹉：滑翔羽臂（空中缓降——滑翔属臂部姿态控制）=====
+        register("minecraft:parrot", BodySlot.LEFT_ARM, new OrganEffect("minecraft:parrot", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.GLIDE), null));
+        register("minecraft:parrot", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:parrot", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.GLIDE), null));
 
-        // ===== 洞穴蜘蛛：剧毒眼（命中中毒——蜘蛛眼本为剧毒材料）=====
-        register("minecraft:cave_spider", BodySlot.EYE, new OrganEffect("minecraft:cave_spider", BodySlot.EYE,
-                null, List.of(OrganPassive.POISON_ON_HIT), null));
+        // ===== 洞穴蜘蛛：剧毒螯臂（命中中毒——螯肢注毒属命中特效）=====
+        register("minecraft:cave_spider", BodySlot.LEFT_ARM, new OrganEffect("minecraft:cave_spider", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.POISON_ON_HIT), null));
+        register("minecraft:cave_spider", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:cave_spider", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.POISON_ON_HIT), null));
 
-        // ===== 僵尸村民：奸商眼光（幸运 +0.5，交易寻获好运）=====
-        register("minecraft:zombie_villager", BodySlot.EYE, new OrganEffect("minecraft:zombie_villager", BodySlot.EYE,
+        // ===== 僵尸村民：奸商胃（幸运迁内体，交易寻获好运）+ 死白眼（沿用眼部模板：暴击率）=====
+        register("minecraft:zombie_villager", BodySlot.VISCERA, new OrganEffect("minecraft:zombie_villager", BodySlot.VISCERA,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.5)), null, null));
+        register("minecraft:zombie_villager", BodySlot.EYE, new OrganEffect("minecraft:zombie_villager", BodySlot.EYE,
+                null, null, null));
 
         // ===== 僵尸猪灵：秽土排毒肾（每 5 秒清除中毒——肾脏系开张）+ 秽金双臂（下界剑士的标配臂）=====
         register("minecraft:zombified_piglin", BodySlot.KIDNEYS, new OrganEffect("minecraft:zombified_piglin", BodySlot.KIDNEYS,
@@ -355,67 +400,93 @@ public final class OrganEffectRegistry {
         register("minecraft:sniffer", BodySlot.VISCERA, new OrganEffect("minecraft:sniffer", BodySlot.VISCERA,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.8)), null, null));
 
-        // ===== 幻翼：夜航滑翔（空中缓降——夜行猎手；负面：阳光灼晒——夜行者见光即燃）=====
-        register("minecraft:phantom", BodySlot.LUNGS, new OrganEffect("minecraft:phantom", BodySlot.LUNGS,
-                null, List.of(OrganPassive.GLIDE, OrganPassive.SUNLIGHT_BURN), null));
+        // ===== 幻翼：夜航滑翔臂（空中缓降——夜行猎手；负面：阳光灼晒——夜行者见光即燃）=====
+        register("minecraft:phantom", BodySlot.LEFT_ARM, new OrganEffect("minecraft:phantom", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.GLIDE, OrganPassive.SUNLIGHT_BURN), null));
+        register("minecraft:phantom", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:phantom", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.GLIDE, OrganPassive.SUNLIGHT_BURN), null));
 
         // ===== 末影螨：末影空间感知（受击瞬移闪避——眼槽瞬移流）=====
         register("minecraft:endermite", BodySlot.EYE, new OrganEffect("minecraft:endermite", BodySlot.EYE,
                 null, List.of(OrganPassive.TELEPORT_DODGE), null));
 
-        // ===== 远古守卫者：激光聚焦（命中附加挖掘疲劳——克制采矿）=====
-        register("minecraft:elder_guardian", BodySlot.EYE, new OrganEffect("minecraft:elder_guardian", BodySlot.EYE,
-                null, List.of(OrganPassive.FATIGUE_ON_HIT), null));
+        // ===== 远古守卫者：激光聚焦臂（命中附加挖掘疲劳——克制采矿，命中特效归臂）=====
+        register("minecraft:elder_guardian", BodySlot.LEFT_ARM, new OrganEffect("minecraft:elder_guardian", BodySlot.LEFT_ARM,
+                List.of(), List.of(OrganPassive.FATIGUE_ON_HIT), null));
+        register("minecraft:elder_guardian", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:elder_guardian", BodySlot.RIGHT_ARM,
+                List.of(), List.of(OrganPassive.FATIGUE_ON_HIT), null));
 
         // ===== 雪傀儡：寒髓代谢（免疫冰冻并清除缓慢——肾脏系第二条）=====
         register("minecraft:snow_golem", BodySlot.KIDNEYS, new OrganEffect("minecraft:snow_golem", BodySlot.KIDNEYS,
                 null, List.of(OrganPassive.ANTIFREEZE), null));
 
-        // ===== 循声守卫：震怒之心（厚血坚甲 + 声呐侦测敌意 + 满级直线音爆）=====
+        // ===== 循声守卫：震怒之心（厚血 + 声呐侦测敌意 + 满级直线音爆）+ 幽匿坚臂（+攻击，坚臂抗推）=====
         register("minecraft:warden", BodySlot.HEART, new OrganEffect("minecraft:warden", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 4.0),
-                        new OrganTemplate.AttributeBonus(Attributes.ARMOR, 1.0)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 4.0)),
                 List.of(OrganPassive.ENEMY_GLOW), OrganSpecial.SONIC_BOOM));
+        register("minecraft:warden", BodySlot.LEFT_ARM, new OrganEffect("minecraft:warden", BodySlot.LEFT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.75),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.15)), null, null));
+        register("minecraft:warden", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:warden", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 0.75),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.15)), null, null));
 
         // ===== 诅咒器官（高风险高回报）=====
-        // 恶魂：怨灵之怒（攻击 +2.0 全库最高，代价火焰伤害 +50%——怒引火上身）
+        // 恶魂：怨灵之怒（沿用内体模板幸运/韧性，暴击率迁其浮游巨眼，代价火焰伤害 +50%——怒引火上身）
         register("minecraft:ghast", BodySlot.VISCERA, new OrganEffect("minecraft:ghast", BodySlot.VISCERA,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 2.0)),
-                List.of(OrganPassive.FIRE_WEAKNESS), null));
+                null, List.of(OrganPassive.FIRE_WEAKNESS), null));
 
-        // 僵尸疣猪兽：狂暴之心（生命 +6，代价移速 -12%/击退抗 -20%——鲁莽失衡之躯）
+        // 僵尸疣猪兽：狂暴之心（生命 +5——鲁莽失衡的移速/击退抗代价折入生命净额）+ 尸变狂暴臂（尸化激素劣化残留——攻速 +0.2）
         register("minecraft:zoglin", BodySlot.HEART, new OrganEffect("minecraft:zoglin", BodySlot.HEART,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 6.0),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, -0.012),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, -0.2)),
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, 5.0)),
                 null, null));
+        register("minecraft:zoglin", BodySlot.LEFT_ARM, new OrganEffect("minecraft:zoglin", BodySlot.LEFT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.2)), null, null));
+        register("minecraft:zoglin", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:zoglin", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.2)), null, null));
 
-        // 卫道士：狂怒臂（攻击 +1.5 全臂最高，代价生命 -1/臂——狂怒消耗生命）
+        // 卫道士：狂怒臂（攻击 +1.5 全臂最高 + 斧劈暴击伤害 + 狂怒激素催动连斩攻速 +0.4；代价弃甲失衡易被击退 + 高代谢饥饿加剧）
         register("minecraft:vindicator", BodySlot.LEFT_ARM, new OrganEffect("minecraft:vindicator", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.5),
-                        new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, -1.0)),
-                null, null));
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15),
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.4),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, -0.1)),
+                List.of(OrganPassive.RAPID_EXHAUSTION), null));
         register("minecraft:vindicator", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:vindicator", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.5),
-                        new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, -1.0)),
-                null, null));
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15),
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.4),
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, -0.1)),
+                List.of(OrganPassive.RAPID_EXHAUSTION), null));
 
         // ===== 下界系（异变族，2026 基因完善化）=====
-        // 猪灵：贪婪金瞳（眼槽——寻金血脉带来好运，恰逢眼槽冷门）
-        register("minecraft:piglin", BodySlot.EYE, new OrganEffect("minecraft:piglin", BodySlot.EYE,
+        // 猪灵：贪婪内腑（幸运迁内体——寻金血脉的好运落消化系）+ 贪婪金瞳（沿用眼部模板：暴击率）
+        register("minecraft:piglin", BodySlot.VISCERA, new OrganEffect("minecraft:piglin", BodySlot.VISCERA,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.LUCK, 0.75)), null, null));
-        // 猪灵蛮兵：金斧蛮臂（双臂最高纯攻击加成，金甲护体加击退抗）
+        register("minecraft:piglin", BodySlot.EYE, new OrganEffect("minecraft:piglin", BodySlot.EYE,
+                null, null, null));
+        // 猪灵蛮兵：金斧蛮臂（双臂最高纯攻击加成，金甲护体加击退抗，斧劈重击加暴击伤害）
         register("minecraft:piglin_brute", BodySlot.LEFT_ARM, new OrganEffect("minecraft:piglin_brute", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.25),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)), null, null));
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15)), null, null));
         register("minecraft:piglin_brute", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:piglin_brute", BodySlot.RIGHT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.25),
-                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05)), null, null));
-        // 疣猪兽：冲撞兽心（攻击+速度——命中的一瞬把目标顶开，呼应蓄力冲撞）
+                        new OrganTemplate.AttributeBonus(Attributes.KNOCKBACK_RESISTANCE, 0.05),
+                        new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_DAMAGE.get(), 0.15)), null, null));
+        // 疣猪兽：冲撞兽心（沿用心脏模板生命 +2，留命中击退）+ 狂暴激素臂（冲撞发力——攻击 +1.0 + 攻速 +0.35）+ 冲刺兽腿（+移速）
         register("minecraft:hoglin", BodySlot.HEART, new OrganEffect("minecraft:hoglin", BodySlot.HEART,
+                null, List.of(OrganPassive.KNOCKBACK_ON_HIT), null));
+        register("minecraft:hoglin", BodySlot.LEFT_ARM, new OrganEffect("minecraft:hoglin", BodySlot.LEFT_ARM,
                 List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
-                        new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)),
-                List.of(OrganPassive.KNOCKBACK_ON_HIT), null));
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.35)), null, null));
+        register("minecraft:hoglin", BodySlot.RIGHT_ARM, new OrganEffect("minecraft:hoglin", BodySlot.RIGHT_ARM,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_DAMAGE, 1.0),
+                        new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.35)), null, null));
+        register("minecraft:hoglin", BodySlot.LEFT_LEG, new OrganEffect("minecraft:hoglin", BodySlot.LEFT_LEG,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)), null, null));
+        register("minecraft:hoglin", BodySlot.RIGHT_LEG, new OrganEffect("minecraft:hoglin", BodySlot.RIGHT_LEG,
+                List.of(new OrganTemplate.AttributeBonus(Attributes.MOVEMENT_SPEED, 0.02)), null, null));
         // 岩浆怪：炽热熔肺（熔岩在体内循环如肺——命中点燃而非免疫火焰，与烈焰人心错开）
         register("minecraft:magma_cube", BodySlot.LUNGS, new OrganEffect("minecraft:magma_cube", BodySlot.LUNGS,
                 null, List.of(OrganPassive.IGNITE_ON_HIT), null));
@@ -429,17 +500,7 @@ public final class OrganEffectRegistry {
                 null, List.of(OrganPassive.BLAST_RESIST), null));
 
         // ===== 肾脏补全（内分泌/滤排系——变异生理才有差异化代谢，哺乳同质不硬塞）=====
-        // 疣猪兽：狂暴激素肾（发狂冲动由肾上激素驱动——攻击速度 +0.35，无代价内分泌增益）
-        register("minecraft:hoglin", BodySlot.KIDNEYS, new OrganEffect("minecraft:hoglin", BodySlot.KIDNEYS,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.35)), null, null));
-        // 僵尸疣猪兽：尸变狂暴肾（尸化激素劣化——攻速 +0.3 但躯壳衰败扣 1 生命）
-        register("minecraft:zoglin", BodySlot.KIDNEYS, new OrganEffect("minecraft:zoglin", BodySlot.KIDNEYS,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.3),
-                        new OrganTemplate.AttributeBonus(Attributes.MAX_HEALTH, -1.0)), null, null));
-        // 卫道士：狂怒副肾（副肾素催动斧狂连斩——攻速 +0.4，代价：高代谢饥饿加剧——狂怒以食量为薪）
-        register("minecraft:vindicator", BodySlot.KIDNEYS, new OrganEffect("minecraft:vindicator", BodySlot.KIDNEYS,
-                List.of(new OrganTemplate.AttributeBonus(Attributes.ATTACK_SPEED, 0.4)),
-                List.of(OrganPassive.RAPID_EXHAUSTION), null));
+        // 注：原肾系"攻速"激素增益已按矩阵收窄（攻速限双臂）迁至各生物双臂，肾槽只保留代谢/滤排类被动
         // 骆驼：稳态代谢肾（沙漠储水——体液恒定不受粘滞减速拖累，激活 SLOW_IMMUNE 首宿主）
         register("minecraft:camel", BodySlot.KIDNEYS, new OrganEffect("minecraft:camel", BodySlot.KIDNEYS,
                 null, List.of(OrganPassive.SLOW_IMMUNE), null));
@@ -451,15 +512,16 @@ public final class OrganEffectRegistry {
         // 蜘蛛：八目夜视（节肢八单眼夜猎——黑处见如白昼，填补温血猫之外的夜视第二宿主）
         register("minecraft:spider", BodySlot.EYE, new OrganEffect("minecraft:spider", BodySlot.EYE,
                 null, List.of(OrganPassive.NIGHT_VISION), null));
-        // 恶魂：怨魂瞄眼（本体即浮游巨眼+火球手——投射物伤害加成挂其瞄准之眼）
+        // 恶魂：怨魂瞄眼（本体即浮游巨眼+火球手——暴击率 +0.10 挂其瞄准之眼 + 投射物伤害加成）
         register("minecraft:ghast", BodySlot.EYE, new OrganEffect("minecraft:ghast", BodySlot.EYE,
-                null, List.of(OrganPassive.PROJECTILE_BOOST), null));
+                List.of(new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_CHANCE.get(), 0.10)),
+                List.of(OrganPassive.PROJECTILE_BOOST), null));
         // 烈焰人：热像之眼（烈焰热感知——敌意生物热源高亮显形，常驻索敌）
         register("minecraft:blaze", BodySlot.EYE, new OrganEffect("minecraft:blaze", BodySlot.EYE,
                 null, List.of(OrganPassive.ENEMY_GLOW), null));
-        // 流浪者：霜瞳冻视（冰系亡灵射手——目之所击命中使目标减速，冰川瞳冻住猎物）
+        // 流浪者：霜瞳冻视（冰系亡灵射手——瞄准之眼带暴击；命中减速迁其持弓之臂）
         register("minecraft:stray", BodySlot.EYE, new OrganEffect("minecraft:stray", BodySlot.EYE,
-                null, List.of(OrganPassive.SLOW_ON_HIT), null));
+                List.of(new OrganTemplate.AttributeBonus(ModCombatAttributes.CRIT_CHANCE.get(), 0.05)), null, null));
     }
 
     private OrganEffectRegistry() {
@@ -502,5 +564,14 @@ public final class OrganEffectRegistry {
     /** 已注册器官的来源生物 id 集合（一致性测试/诊断用） */
     public static Set<String> registeredSources() {
         return Set.copyOf(EFFECTS.keySet());
+    }
+
+    /** 全部（生物×槽位）效果快照（矩阵/一致性核对用，静态数据故无并发问题） */
+    public static List<OrganEffect> allEffects() {
+        List<OrganEffect> all = new ArrayList<>();
+        for (Map<BodySlot, OrganEffect> map : EFFECTS.values()) {
+            all.addAll(map.values());
+        }
+        return List.copyOf(all);
     }
 }

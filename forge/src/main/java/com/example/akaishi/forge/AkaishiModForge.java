@@ -16,6 +16,7 @@ import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
 import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
@@ -35,6 +36,7 @@ import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
 import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
 import com.example.akaishi.forge.life.AkaishiLifeInteraction;
+import com.example.akaishi.forge.life.AkaishiMechanicalEffectHandler;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
@@ -56,6 +58,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -77,6 +80,7 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -176,6 +180,11 @@ public final class AkaishiModForge {
                     event.register(AkaishiLifeSystemTests.class);
                 });
 
+        // 底层战斗属性（暴击率/暴击伤害/闪避）挂到玩家：
+        // 必须走 EntityAttributeModificationEvent 增量追加，不可用 EntityAttributeCreationEvent.put 覆盖
+        // 玩家属性供应商，否则会丢失全部原版属性并触发 "Registry Object not present" 崩溃。
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onEntityAttributeModification);
+
         // 原生动力护甲层：分件几何绑定到人形骨骼，不依赖 Geo/GeckoLib。
         FMLJavaModLoadingContext.get().getModEventBus().addListener(
                 (EntityRenderersEvent.RegisterLayerDefinitions event) -> event.registerLayerDefinition(
@@ -200,6 +209,8 @@ public final class AkaishiModForge {
         // 器官运行时处理器：属性/被动/排斥/冲突 tick + 战斗效果（移植系统核心，必须注册才生效）
         MinecraftForge.EVENT_BUS.register(AkaishiBodyPassiveHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(AkaishiBodyCombatHandler.INSTANCE);
+        // 机械义体特殊效果（DNA 授予）：tick / 受击 / 击退消费，缺注册则义体效果不可见亦无效
+        MinecraftForge.EVENT_BUS.register(AkaishiMechanicalEffectHandler.INSTANCE);
 
         // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
         MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
@@ -254,6 +265,16 @@ public final class AkaishiModForge {
 
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();
+    }
+
+    /**
+     * 把底层战斗属性（暴击率/暴击伤害/闪避）挂到玩家。
+     * 用 ModificationEvent 在原版属性供应商上增量追加，保留全部原版属性。
+     */
+    private void onEntityAttributeModification(EntityAttributeModificationEvent event) {
+        event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_CHANCE.get());
+        event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_DAMAGE.get());
+        event.add(EntityType.PLAYER, ModCombatAttributes.DODGE_CHANCE.get());
     }
 
     /**

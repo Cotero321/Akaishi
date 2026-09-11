@@ -9,6 +9,8 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.item.AkaishiFuelCellItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFuelCannerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
@@ -54,6 +56,8 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private final FluidTank liquidTank;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.FUEL_CANNER_HUM, 0.4F, 1.0F);
 
     public AkaishiFuelCannerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUEL_CANNER.get(), pos, state);
@@ -110,6 +114,7 @@ public class AkaishiFuelCannerBlockEntity extends BlockEntity implements
             return;
         }
         liquidTank.drain(toFill, false);
+        hum.tick(level, worldPosition);
         AkaishiFuelCellItem.setFluid(in, tankFluid, current + (int) toFill);
 
         if (AkaishiFuelCellItem.getAmount(in) >= AkaishiFuelCellItem.CAPACITY) {

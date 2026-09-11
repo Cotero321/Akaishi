@@ -5,7 +5,10 @@ import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPulverizerMenu;
+import com.example.akaishi.sound.ModSounds;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -102,5 +105,10 @@ public class AkaishiPulverizerBlockEntity extends AkaishiSingleSlotMachineBlockE
     @Override
     protected String nameKey() {
         return "akaishi.akaishi_pulverizer";
+    }
+
+    @Override
+    protected RegistrySupplier<SoundEvent> humSound() {
+        return ModSounds.PULVERIZER_HUM;
     }
 }

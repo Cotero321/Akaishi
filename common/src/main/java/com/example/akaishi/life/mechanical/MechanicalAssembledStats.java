@@ -1,60 +1,46 @@
 package com.example.akaishi.life.mechanical;
 
+import com.example.akaishi.api.mechanical.IMechanicalDnaEffect;
+
 import java.util.List;
 
 /**
  * 机械器官/义体的聚合最终属性。
  * 由组装加工台在四个部件的基础上计算得出。
- * 包含：聚合五维值、总体倍率系数、触发的协同加成。
+ * 值按 {@link MechanicalProperty#ordinal()} 索引存储，含倍率轴与九属性。
  *
  * 整合度折扣：通过 {@link #applyIntegration(double)} 获取整合后的实际生效值。
- * 0% 整合度 = 20% 生效，100% 整合度 = 100% 生效。
+ * 0% 整合度 = 20% 生效，100% 整合度 = 100% 生效；倍率轴不受折扣影响。
  */
 public class MechanicalAssembledStats {
 
     private final MechanicalOrganType organType;
-    private final double overallMultiplier;   // 总体倍率系数 1.0~2.0+
-    private final double health;              // 最终生命值加成（满整合）
-    private final double attackDamage;        // 最终攻击伤害加成（满整合）
-    private final double attackSpeed;         // 最终攻击速度加成（满整合）
-    private final double movementSpeed;       // 最终移动速度加成（满整合）
+    /** 各属性满整合值（含倍率轴），按 MechanicalProperty 序数索引 */
+    private final double[] values;
     private final List<String> synergyBonuses; // 已触发的协同加成描述键
-    private final List<MechanicalSpecialEffect> effects; // 激活的特殊效果
+    private final List<IMechanicalDnaEffect> effects; // 激活的特殊效果（内置 + 附属）
 
-    public MechanicalAssembledStats(MechanicalOrganType organType,
-                                    double overallMultiplier, double health,
-                                    double attackDamage, double attackSpeed,
-                                    double movementSpeed,
+    public MechanicalAssembledStats(MechanicalOrganType organType, double[] values,
                                     List<String> synergyBonuses,
-                                    List<MechanicalSpecialEffect> effects) {
+                                    List<IMechanicalDnaEffect> effects) {
         this.organType = organType;
-        this.overallMultiplier = overallMultiplier;
-        this.health = health;
-        this.attackDamage = attackDamage;
-        this.attackSpeed = attackSpeed;
-        this.movementSpeed = movementSpeed;
+        this.values = values;
         this.synergyBonuses = synergyBonuses;
         this.effects = effects;
     }
 
     public MechanicalOrganType organType() { return organType; }
-    public double overallMultiplier() { return overallMultiplier; }
-    public double health() { return health; }
-    public double attackDamage() { return attackDamage; }
-    public double attackSpeed() { return attackSpeed; }
-    public double movementSpeed() { return movementSpeed; }
     public List<String> synergyBonuses() { return synergyBonuses; }
-    public List<MechanicalSpecialEffect> effects() { return effects; }
+    public List<IMechanicalDnaEffect> effects() { return effects; }
 
     /** 获取指定属性的满整合值 */
     public double get(MechanicalProperty prop) {
-        return switch (prop) {
-            case OVERALL_MULTIPLIER -> overallMultiplier;
-            case HEALTH -> health;
-            case ATTACK_DAMAGE -> attackDamage;
-            case ATTACK_SPEED -> attackSpeed;
-            case MOVEMENT_SPEED -> movementSpeed;
-        };
+        return values[prop.ordinal()];
+    }
+
+    /** 总体倍率系数（1.0 起的乘算基础） */
+    public double overallMultiplier() {
+        return values[MechanicalProperty.OVERALL_MULTIPLIER.ordinal()];
     }
 
     /**
@@ -65,21 +51,18 @@ public class MechanicalAssembledStats {
      * @return 整合后的实际生效属性
      */
     public MechanicalAssembledStats applyIntegration(double integrationMultiplier) {
-        return new MechanicalAssembledStats(
-                organType,
-                overallMultiplier, // 总体倍率本身不受整合度影响（它是乘算基础）
-                health * integrationMultiplier,
-                attackDamage * integrationMultiplier,
-                attackSpeed * integrationMultiplier,
-                movementSpeed * integrationMultiplier,
-                synergyBonuses,
-                effects
-        );
+        double[] scaled = new double[values.length];
+        for (MechanicalProperty prop : MechanicalProperty.values()) {
+            // 倍率轴是乘算基础，不受整合度折扣
+            scaled[prop.ordinal()] = prop == MechanicalProperty.OVERALL_MULTIPLIER
+                    ? values[prop.ordinal()]
+                    : values[prop.ordinal()] * integrationMultiplier;
+        }
+        return new MechanicalAssembledStats(organType, scaled, synergyBonuses, effects);
     }
 
     /**
-     * 获取整合后的实际属性值。
-     * 总体倍率不受整合度影响。
+     * 获取整合后的实际属性值。总体倍率不受整合度影响。
      *
      * @param prop 属性类型
      * @param integrationMultiplier 整合度系数 0.2~1.0
@@ -87,8 +70,8 @@ public class MechanicalAssembledStats {
      */
     public double getEffective(MechanicalProperty prop, double integrationMultiplier) {
         if (prop == MechanicalProperty.OVERALL_MULTIPLIER) {
-            return overallMultiplier;
+            return values[prop.ordinal()];
         }
-        return get(prop) * integrationMultiplier;
+        return values[prop.ordinal()] * integrationMultiplier;
     }
 }

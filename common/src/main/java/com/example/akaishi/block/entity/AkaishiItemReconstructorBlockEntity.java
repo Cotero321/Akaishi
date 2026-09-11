@@ -10,6 +10,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiItemReconstructorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -77,6 +79,8 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
 
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage energy;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.ITEM_RECONSTRUCTOR_HUM, 0.4F, 1.0F);
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     /** 物品槽：0=原料，1=衰竭结晶（代价），2=产物 */
@@ -139,6 +143,7 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
             // 每子步：消耗 1 结晶 + 能量，进度 +1；满代价结算 1 产物
             crystalStack.shrink(1);
             energy.extractEnergy(ModConfig.reconstructorCostPerCrystal, false);
+            hum.tick(level, worldPosition);
             progress++;
             if (progress >= recipe.crystalCost()) {
                 inputStack.shrink(1);

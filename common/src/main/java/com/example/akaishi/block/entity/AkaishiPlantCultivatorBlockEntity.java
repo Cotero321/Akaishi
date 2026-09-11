@@ -2,7 +2,10 @@ package com.example.akaishi.block.entity;
 
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.menu.AkaishiPlantCultivatorMenu;
+import com.example.akaishi.sound.ModSounds;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -80,5 +83,10 @@ public class AkaishiPlantCultivatorBlockEntity extends AkaishiSingleSlotMachineB
     @Override
     protected String nameKey() {
         return "akaishi.akaishi_plant_cultivator";
+    }
+
+    @Override
+    protected RegistrySupplier<SoundEvent> humSound() {
+        return ModSounds.PLANT_CULTIVATOR_HUM;
     }
 }

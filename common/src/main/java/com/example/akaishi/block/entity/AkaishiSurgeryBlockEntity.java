@@ -18,6 +18,8 @@ import com.example.akaishi.life.body.PlayerBodySync;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.menu.AkaishiSurgeryMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -81,6 +83,8 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage life;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.SURGERY_HUM, 0.4F, 1.0F);
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
     private int progress;
@@ -128,6 +132,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
                 if (delta > 0) {
                     speedAccum -= delta;
                     progress += delta;
+                    hum.tick(level, worldPosition);
                 }
                 if (progress >= ModConfig.surgeryProcessTicks) {
                     completeOperation();

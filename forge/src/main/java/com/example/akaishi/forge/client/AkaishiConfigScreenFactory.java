@@ -113,6 +113,23 @@ public final class AkaishiConfigScreenFactory {
         doubleField(mechBody, eb, "mechanical_body.attackScale", AkaishiConfig.MECH_BODY_ATTACK_SCALE);
         doubleField(mechBody, eb, "mechanical_body.attackSpeedScale", AkaishiConfig.MECH_BODY_ATTACK_SPEED_SCALE);
         doubleField(mechBody, eb, "mechanical_body.movementSpeedScale", AkaishiConfig.MECH_BODY_MOVEMENT_SPEED_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.armorScale", AkaishiConfig.MECH_BODY_ARMOR_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.critChanceScale", AkaishiConfig.MECH_BODY_CRIT_CHANCE_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.critDamageScale", AkaishiConfig.MECH_BODY_CRIT_DAMAGE_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.rangeScale", AkaishiConfig.MECH_BODY_RANGE_SCALE);
+        doubleField(mechBody, eb, "mechanical_body.dodgeScale", AkaishiConfig.MECH_BODY_DODGE_SCALE);
+
+        // ===== 基因属性权重 =====
+        ConfigCategory geneWeight = category(builder, "gene_weight");
+        doubleField(geneWeight, eb, "gene_weight.strength", AkaishiConfig.GENE_WEIGHT_STRENGTH);
+
+        // ===== 底层战斗（暴击/闪避）=====
+        ConfigCategory combat = category(builder, "combat");
+        booleanToggle(combat, eb, "combat.critEnabled", AkaishiConfig.COMBAT_CRIT_ENABLED);
+        booleanToggle(combat, eb, "combat.dodgeEnabled", AkaishiConfig.COMBAT_DODGE_ENABLED);
+        doubleField(combat, eb, "combat.critChanceCap", AkaishiConfig.COMBAT_CRIT_CHANCE_CAP);
+        doubleField(combat, eb, "combat.critDamageCap", AkaishiConfig.COMBAT_CRIT_DAMAGE_CAP);
+        doubleField(combat, eb, "combat.dodgeChanceCap", AkaishiConfig.COMBAT_DODGE_CHANCE_CAP);
 
         ConfigCategory toggles = category(builder, "toggles");
         booleanToggle(toggles, eb, "toggles.decayZone", AkaishiConfig.DECAY_ZONE_ENABLED);

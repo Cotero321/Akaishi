@@ -16,7 +16,7 @@ import java.util.List;
  * 由 Forge 默认 getArmorTexture 自动定位，无需在 common 覆写 Forge 专属接口。
  * tooltip 展示已生效升级与剩余槽位。
  */
-public class AkaishiArmorItem extends ArmorItem {
+public class AkaishiArmorItem extends ArmorItem implements IPoweredArmor {
 
     public AkaishiArmorItem(Type type, Properties properties) {
         super(AkaishiArmorMaterial.MATERIAL, type, properties);

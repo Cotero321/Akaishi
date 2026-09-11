@@ -10,6 +10,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyAggregatorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -62,6 +64,9 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
     private final SimpleContainer inventory;
     /** 同步数据：0/1=能量低/高，2/3=容量低/高，4=进度%，5/6=当前配方单次消耗低/高 */
     private final SimpleContainerData data;
+
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.ENERGY_AGGREGATOR_HUM, 0.4F, 1.0F);
 
     // ===== 数据槽索引（能量/容量/消耗为 long，各占低/高 32 位两槽）=====
     public static final int DATA_ENERGY = 0;
@@ -123,6 +128,7 @@ public class AkaishiEnergyAggregatorBlockEntity extends BlockEntity implements E
     /** 执行聚合：消耗能量 + 1 输入 → 产出 1 配方产物 */
     private void process(Recipe recipe) {
         energy.extractEnergy(recipe.energy().getAsLong(), false);
+        hum.tick(level, worldPosition);
         inventory.removeItem(INPUT_SLOT, 1);
         ItemStack result = new ItemStack(recipe.output().get());
         ItemStack output = inventory.getItem(OUTPUT_SLOT);

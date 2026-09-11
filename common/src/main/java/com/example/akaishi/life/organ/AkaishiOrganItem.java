@@ -1,5 +1,7 @@
 package com.example.akaishi.life.organ;
 
+import com.example.akaishi.api.life.ISampleGroup;
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IInstallableOrgan;
@@ -69,7 +71,7 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
     // ===== 工厂 =====
 
     /** 构造一个指定槽位 + 基因来源 + 具体生物的器官物品（品质 = 来源初始等级，适配度 = 区间内随机偏低） */
-    public static ItemStack create(BodySlot slot, SampleGroup source, String entityId) {
+    public static ItemStack create(BodySlot slot, ISampleGroup source, String entityId) {
         return create(slot, source, entityId, 0);
     }
 
@@ -78,7 +80,7 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
      * 适配度 = 分组区间内随机偏置：纯度越高越接近区间上限（基因质量 → 契合质量，OrganLinkage.compatRoll）。
      * 未记录纯度（0）时行为与旧版一致（纯随机偏下端）。
      */
-    public static ItemStack create(BodySlot slot, SampleGroup source, String entityId, int purity) {
+    public static ItemStack create(BodySlot slot, ISampleGroup source, String entityId, int purity) {
         ItemStack stack = new ItemStack(of(slot));
         CompoundTag tag = stack.getOrCreateTag();
         tag.putString(TAG_GENE_SOURCE, source.getId());
@@ -136,7 +138,7 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
     // ===== 读取 =====
 
     /** 基因来源（未定型/原生返回 null） */
-    public static SampleGroup getSource(ItemStack stack) {
+    public static ISampleGroup getSource(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null ? SampleGroup.byId(tag.getString(TAG_GENE_SOURCE)) : null;
     }
@@ -171,7 +173,7 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
         if (tag != null && tag.contains(TAG_COMPAT)) {
             return Math.max(0, Math.min(MAX_COMPAT, tag.getInt(TAG_COMPAT)));
         }
-        SampleGroup source = getSource(stack);
+        ISampleGroup source = getSource(stack);
         return source != null ? source.getCompatMin() : NATIVE_COMPAT;
     }
 
@@ -299,7 +301,7 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
             tooltip.add(Component.translatable("gui.akaishi.organ.native"));
             return;
         }
-        SampleGroup source = getSource(stack);
+        ISampleGroup source = getSource(stack);
         QualityTier tier = getTier(stack);
         if (source == null || tier == null) {
             // 未定型器官（创造模式直接取用）：提示需培养舱定型
@@ -333,7 +335,9 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
             tooltip.add(Component.translatable("gui.akaishi.organ.purity", purity));
         }
         double compatFactor = compat / 100.0;
-        // 实际生效数值 = 基础值 × 品质倍率 × 适配度（forge 层同公式；突破倍率仅移植后加成）
+        // 实际生效数值 = 基础值 × 品质倍率 × 适配度 × 基因属性权重（静态预估；
+        // 适配度取 NBT 原始值，运行时 forge 层用 effectiveCompat 另含基因/装备加成可超 100；
+        // 突破倍率 / 融合套装强度为运行时动态量，不在此静态预估）
         double scale = tier.getMultiplier() * compatFactor;
         // 生物特色效果（未注册时回退槽位模板属性，槽位无模板返回空列表）
         OrganEffect effect = OrganEffectRegistry.get(getEntityId(stack), slot);
@@ -342,17 +346,18 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
         OrganTemplate slotTemplate = OrganRegistry.get(slot);
         Map<Attribute, Double> merged = new LinkedHashMap<>();
         if (effect != null && effect.attributes() != null) {
-            mergeBonuses(merged, effect.attributes(), scale);
+            mergeBonuses(merged, effect.attributes(), scale, entityId, slot);
         } else if (slotTemplate != null) {
-            mergeBonuses(merged, slotTemplate.bonuses(), scale);
+            mergeBonuses(merged, slotTemplate.bonuses(), scale, entityId, slot);
         }
         for (MutantTrait mutation : mutations) {
-            mergeBonuses(merged, mutation.attributes(), scale);
+            mergeBonuses(merged, mutation.attributes(), scale, entityId, slot);
         }
         for (Map.Entry<Attribute, Double> entry : merged.entrySet()) {
             double value = entry.getValue();
-            // 移动速度基础值为小秒速（+0.03），tooltip 按百分比展示更直观（+3%）
-            boolean percent = Attributes.MOVEMENT_SPEED.equals(entry.getKey());
+            // 比率型属性（移速 0.03 / 暴击率 0.05 等）基础值都是小数，按百分比展示更直观（+3% / +5%）
+            boolean percent = Attributes.MOVEMENT_SPEED.equals(entry.getKey())
+                    || entry.getKey().getDescriptionId().startsWith(ModCombatAttributes.LANG_PREFIX);
             String text = percent ? formatPercent(value * 100.0) : formatValue(value);
             tooltip.add(Component.translatable(value < 0 ? "gui.akaishi.organ.attribute_neg" : "gui.akaishi.organ.attribute",
                     text, Component.translatable(entry.getKey().getDescriptionId())));
@@ -394,11 +399,14 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
         tooltip.add(Component.translatable("gui.akaishi.organ.hint"));
     }
 
-    /** 属性归并：一组属性条目（本体/词条）按同属性求和并入 merged（已乘品质×适配缩放） */
+    /** 属性归并：一组属性条目（本体/词条）按同属性求和并入 merged（已乘品质×适配缩放×来源专精×槽位亲和） */
     private static void mergeBonuses(Map<Attribute, Double> merged,
-                                     List<OrganTemplate.AttributeBonus> bonuses, double scale) {
+                                     List<OrganTemplate.AttributeBonus> bonuses, double scale, String entityId,
+                                     BodySlot slot) {
         for (OrganTemplate.AttributeBonus bonus : bonuses) {
-            merged.merge(bonus.attribute(), bonus.base() * scale, Double::sum);
+            // 逐条叠加来源专精权重 × 槽位轴亲和，与运行时生效公式同口径
+            double weight = AttributeWeightRegistry.multiplier(entityId, slot, bonus.attribute(), bonus.base());
+            merged.merge(bonus.attribute(), bonus.base() * scale * weight, Double::sum);
         }
     }
 

@@ -259,6 +259,19 @@ public final class AkaishiConfigSync {
         ModConfig.mechBodyAttackScale = AkaishiConfig.MECH_BODY_ATTACK_SCALE.get();
         ModConfig.mechBodyAttackSpeedScale = AkaishiConfig.MECH_BODY_ATTACK_SPEED_SCALE.get();
         ModConfig.mechBodyMovementSpeedScale = AkaishiConfig.MECH_BODY_MOVEMENT_SPEED_SCALE.get();
+        ModConfig.mechBodyArmorScale = AkaishiConfig.MECH_BODY_ARMOR_SCALE.get();
+        ModConfig.mechBodyCritChanceScale = AkaishiConfig.MECH_BODY_CRIT_CHANCE_SCALE.get();
+        ModConfig.mechBodyCritDamageScale = AkaishiConfig.MECH_BODY_CRIT_DAMAGE_SCALE.get();
+        ModConfig.mechBodyRangeScale = AkaishiConfig.MECH_BODY_RANGE_SCALE.get();
+        ModConfig.mechBodyDodgeScale = AkaishiConfig.MECH_BODY_DODGE_SCALE.get();
+        // 基因属性权重
+        ModConfig.geneWeightStrength = AkaishiConfig.GENE_WEIGHT_STRENGTH.get();
+        // 底层战斗（暴击/闪避）
+        ModConfig.combatCritEnabled = AkaishiConfig.COMBAT_CRIT_ENABLED.get();
+        ModConfig.combatDodgeEnabled = AkaishiConfig.COMBAT_DODGE_ENABLED.get();
+        ModConfig.combatCritChanceCap = AkaishiConfig.COMBAT_CRIT_CHANCE_CAP.get();
+        ModConfig.combatCritDamageCap = AkaishiConfig.COMBAT_CRIT_DAMAGE_CAP.get();
+        ModConfig.combatDodgeChanceCap = AkaishiConfig.COMBAT_DODGE_CHANCE_CAP.get();
         // 端口与电池缓冲
         ModConfig.lifeMatrixInputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_INPUT_PORT_BUFFER.get();
         ModConfig.lifeMatrixOutputPortBufferCapacity = AkaishiConfig.LIFE_MATRIX_OUTPUT_PORT_BUFFER.get();

@@ -8,6 +8,8 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeConverterMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -39,6 +41,8 @@ public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity impl
     private final AkaishiEnergyStorage akaishi;
     private final AkaishiEnergyStorage life;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.LIFE_AGGREGATION_HUM, 0.4F, 1.0F);
 
     public AkaishiLifeAggregationConverterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_LIFE_AGGREGATION_CONVERTER.get(), pos, state);
@@ -68,6 +72,7 @@ public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity impl
         if (akaishi.getEnergyStored() >= ModConfig.lifeAggregationConversionCost
                 && life.getEnergyStored() + ModConfig.lifeAggregationConversionOutput <= life.getMaxEnergy()) {
             akaishi.extractEnergy(ModConfig.lifeAggregationConversionCost, false);
+            hum.tick(level, worldPosition);
             life.addEnergy(ModConfig.lifeAggregationConversionOutput, false);
             return true;
         }

@@ -14,7 +14,7 @@ import java.util.List;
  * 套装效果说明（每件/全套/条件）由 AkaishiLifeFusionTooltip 追加；
  * 实时穿戴状态（已穿件数/激活情况）由 forge 端 ItemTooltipEvent 注入。
  */
-public class AkaishiLifeFusionArmorItem extends ArmorItem {
+public class AkaishiLifeFusionArmorItem extends ArmorItem implements IPoweredArmor {
 
     public AkaishiLifeFusionArmorItem(Type type, Properties properties) {
         super(AkaishiLifeFusionArmorMaterial.MATERIAL, type, properties);

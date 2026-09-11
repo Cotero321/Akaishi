@@ -9,6 +9,8 @@ import com.example.akaishi.item.AkaishiFusionHeatSinkItem;
 import com.example.akaishi.item.AkaishiPlasmaRodItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionControllerMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -99,6 +101,9 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
 
     /** 最近一次成功扫描的结构（未成型为 null） */
     private FusionStructure.Result structure;
+
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.FUSION_CONTROLLER_HUM, 0.4F, 1.0F);
 
     // ===== 结构扫描缓存 =====
     private static final int SCAN_INTERVAL = 20;
@@ -289,6 +294,7 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
                 AkaishiPlasmaRodItem.setEnergy(rod, energy - actual);
             }
         }
+        hum.tick(level, worldPosition);
 
         yieldPerTick = (long) (consumed * temperatureCoefficient());
         // 温度目标：基础 + 产热 − 散热（散热 = 控制器散热片总效率 × 框架乘数 × 每%抵消 + 末地棒散热加成）

@@ -13,6 +13,7 @@ import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.decay.DecayZoneManager;
 import com.example.akaishi.decay.DecayZoneSync;
 import com.example.akaishi.effect.ModEffects;
@@ -66,6 +67,8 @@ public final class AkaishiMod {
         ModMenus.register();
         // 自定义状态效果（衰变）
         ModEffects.register();
+        // 底层战斗属性（暴击率/暴击伤害/闪避）：两条数值线共用的属性载体
+        ModCombatAttributes.register();
         // 衰竭区域：服务端每 tick 结算减益/环境转化/生物转化
         TickEvent.SERVER_LEVEL_POST.register(DecayZoneManager::serverTick);
         // 衰竭区域污染强度同步：服务端周期推送玩家所在区域强度（伪群系氛围）

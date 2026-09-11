@@ -1,7 +1,7 @@
 package com.example.akaishi.life.organ;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.life.sample.SampleGroup;
 
 /**
  * 器官品质等级：由基因来源分组决定（温血 I → 龙族 IV）。
@@ -55,16 +55,17 @@ public enum QualityTier {
         return i < arr.length && arr[i] > 0 ? arr[i] : def;
     }
 
-    /** 由基因来源分组映射品质等级 */
-    public static QualityTier of(SampleGroup source) {
+    /** 由基因来源分组映射品质等级（档位由分组自身声明，扩展分组可自定义） */
+    public static QualityTier of(ISampleGroup source) {
         if (source == null) {
             return null;
         }
-        return switch (source) {
-            case WARM_BLOODED -> I;
-            case UNDEAD, EXPLOSIVE, ABERRATION -> II;
-            case ENDER -> III;
-            case BOSS, DRAGON -> IV;
+        return switch (source.getQualityTier()) {
+            case 1 -> I;
+            case 2 -> II;
+            case 3 -> III;
+            case 4 -> IV;
+            default -> null;
         };
     }
 

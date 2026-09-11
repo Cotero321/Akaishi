@@ -1,9 +1,9 @@
 package com.example.akaishi.life.linkage;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.QualityTier;
-import com.example.akaishi.life.sample.SampleGroup;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Random;
@@ -33,7 +33,7 @@ public final class OrganLinkage {
     }
 
     /** 分组排斥系数（无来源回退 1.0） */
-    public static double rejectionFactorOf(SampleGroup source) {
+    public static double rejectionFactorOf(ISampleGroup source) {
         return source != null ? source.getRejectionFactor() : 1.0;
     }
 
@@ -66,7 +66,7 @@ public final class OrganLinkage {
      * compat = min + range × (纯度权重 × purity/100 + 随机权重 × rand²)。
      * rand² 保持"随机偏下端"的原始分布特性，纯度仅将整体向区间上限牵引。
      */
-    public static int compatRoll(SampleGroup source, int purity, Random random) {
+    public static int compatRoll(ISampleGroup source, int purity, Random random) {
         if (source == null) {
             return AkaishiOrganItem.NATIVE_COMPAT;
         }
@@ -82,7 +82,7 @@ public final class OrganLinkage {
      * 预留：未来接入玩家维度（习得契合/天生亲和）、基因组合效应、基因等级等，
      * 新维度只需在此扩展签名与计算，调用方无需感知。
      */
-    public static double affinityOf(SampleGroup source, String entityId) {
+    public static double affinityOf(ISampleGroup source, String entityId) {
         return rejectionFactorOf(source);
     }
 }

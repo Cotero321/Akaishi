@@ -212,6 +212,32 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.DoubleValue MECH_BODY_ATTACK_SPEED_SCALE;
     /** 机械义体：移动速度权重 → 移动速度换算倍率 */
     public static final ForgeConfigSpec.DoubleValue MECH_BODY_MOVEMENT_SPEED_SCALE;
+    /** 机械义体：护甲权重 → 护甲值换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_ARMOR_SCALE;
+    /** 机械义体：暴击率权重 → 暴击率换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_CRIT_CHANCE_SCALE;
+    /** 机械义体：暴击伤害权重 → 暴击伤害换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_CRIT_DAMAGE_SCALE;
+    /** 机械义体：攻击范围权重 → 攻击距离换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_RANGE_SCALE;
+    /** 机械义体：闪避权重 → 闪避率换算倍率 */
+    public static final ForgeConfigSpec.DoubleValue MECH_BODY_DODGE_SCALE;
+
+    // ==================== 基因属性权重 ====================
+    /** 基因属性权重：生物专精属性轴的最大加成比例（最强轴 ×(1+k)） */
+    public static final ForgeConfigSpec.DoubleValue GENE_WEIGHT_STRENGTH;
+
+    // ==================== 底层战斗（暴击/闪避） ====================
+    /** 底层战斗：暴击总开关 */
+    public static final ForgeConfigSpec.BooleanValue COMBAT_CRIT_ENABLED;
+    /** 底层战斗：闪避总开关 */
+    public static final ForgeConfigSpec.BooleanValue COMBAT_DODGE_ENABLED;
+    /** 底层战斗：暴击率上限 */
+    public static final ForgeConfigSpec.DoubleValue COMBAT_CRIT_CHANCE_CAP;
+    /** 底层战斗：暴击伤害上限（追加倍率口径） */
+    public static final ForgeConfigSpec.DoubleValue COMBAT_CRIT_DAMAGE_CAP;
+    /** 底层战斗：闪避上限 */
+    public static final ForgeConfigSpec.DoubleValue COMBAT_DODGE_CHANCE_CAP;
 
     // ==================== 机制开关 ====================
     public static final ForgeConfigSpec.BooleanValue DECAY_ZONE_ENABLED;
@@ -668,14 +694,44 @@ public final class AkaishiConfig {
 
         // ==================== 机械义体属性换算 ====================
         b.push("mechanical_body");
-        MECH_BODY_HEALTH_SCALE = b.comment("机械义体：生命值权重 → 生命上限换算倍率（最终生命 = 权重 × 整合度倍率 × 该倍率）；0 = 用内置 0.5")
-                .defineInRange("healthScale", 0.5, 0.0, 1000.0);
-        MECH_BODY_ATTACK_SCALE = b.comment("机械义体：攻击伤害权重 → 攻击伤害换算倍率；0 = 用内置 0.1")
-                .defineInRange("attackScale", 0.1, 0.0, 1000.0);
+        MECH_BODY_HEALTH_SCALE = b.comment("机械义体：生命值权重 → 生命上限换算倍率（实际加成 = 聚合权重 × 整合度折扣 × 总体倍率 × 该倍率）；0 = 用内置 0.03")
+                .defineInRange("healthScale", 0.03, 0.0, 1000.0);
+        MECH_BODY_ATTACK_SCALE = b.comment("机械义体：攻击伤害权重 → 攻击伤害换算倍率；0 = 用内置 0.03")
+                .defineInRange("attackScale", 0.03, 0.0, 1000.0);
         MECH_BODY_ATTACK_SPEED_SCALE = b.comment("机械义体：攻击速度权重 → 攻击速度换算倍率；0 = 用内置 0.01")
                 .defineInRange("attackSpeedScale", 0.01, 0.0, 1000.0);
-        MECH_BODY_MOVEMENT_SPEED_SCALE = b.comment("机械义体：移动速度权重 → 移动速度换算倍率；0 = 用内置 0.001")
-                .defineInRange("movementSpeedScale", 0.001, 0.0, 1000.0);
+        MECH_BODY_MOVEMENT_SPEED_SCALE = b.comment("机械义体：移动速度权重 → 移动速度换算倍率；0 = 用内置 0.01")
+                .defineInRange("movementSpeedScale", 0.01, 0.0, 1000.0);
+        MECH_BODY_ARMOR_SCALE = b.comment("机械义体：护甲权重 → 护甲值换算倍率；0 = 用内置 0.02")
+                .defineInRange("armorScale", 0.02, 0.0, 1000.0);
+        MECH_BODY_CRIT_CHANCE_SCALE = b.comment("机械义体：暴击率权重 → 暴击率换算倍率（最终受暴击率上限约束）；0 = 用内置 0.1")
+                .defineInRange("critChanceScale", 0.1, 0.0, 1000.0);
+        MECH_BODY_CRIT_DAMAGE_SCALE = b.comment("机械义体：暴击伤害权重 → 暴击伤害换算倍率（追加倍率口径，最终受暴击伤害上限约束）；0 = 用内置 0.2")
+                .defineInRange("critDamageScale", 0.2, 0.0, 1000.0);
+        MECH_BODY_RANGE_SCALE = b.comment("机械义体：攻击范围权重 → 攻击距离换算倍率（单位：格）；0 = 用内置 0.02")
+                .defineInRange("rangeScale", 0.02, 0.0, 1000.0);
+        MECH_BODY_DODGE_SCALE = b.comment("机械义体：闪避权重 → 闪避率换算倍率（最终受闪避上限约束）；0 = 用内置 0.1")
+                .defineInRange("dodgeScale", 0.1, 0.0, 1000.0);
+        b.pop();
+
+        // ==================== 基因属性权重 ====================
+        b.push("gene_weight");
+        GENE_WEIGHT_STRENGTH = b.comment("基因属性权重：生物专精轴最大加成比例（最强轴 ×(1+k)，其余按强度占比递减）；0 = 用内置 0.25")
+                .defineInRange("strength", 0.25, 0.0, 2.0);
+        b.pop();
+
+        // ==================== 底层战斗（暴击/闪避） ====================
+        b.push("combat");
+        COMBAT_CRIT_ENABLED = b.comment("底层战斗：暴击总开关；false 时暴击率/暴击伤害不参与结算")
+                .define("critEnabled", true);
+        COMBAT_DODGE_ENABLED = b.comment("底层战斗：闪避总开关；false 时闪避不参与结算")
+                .define("dodgeEnabled", true);
+        COMBAT_CRIT_CHANCE_CAP = b.comment("底层战斗：暴击率上限（0~1）；0 = 用内置 1.0")
+                .defineInRange("critChanceCap", 1.0, 0.0, 1.0);
+        COMBAT_CRIT_DAMAGE_CAP = b.comment("底层战斗：暴击伤害上限（追加倍率，0.5 = 最终 ×1.5）；0 = 用内置 5.0")
+                .defineInRange("critDamageCap", 5.0, 0.0, 100.0);
+        COMBAT_DODGE_CHANCE_CAP = b.comment("底层战斗：闪避上限（0~1）；0 = 用内置 0.8")
+                .defineInRange("dodgeChanceCap", 0.8, 0.0, 1.0);
         b.pop();
 
         // ==================== 机器全局倍率 ====================

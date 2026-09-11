@@ -7,7 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
-/** Forge 客户端护甲扩展：为赤石护甲提供原生分件模型。 */
+/** Forge 客户端护甲扩展：为动力装甲（赤石/生命融合）提供原生分件模型。 */
 public final class AkaishiArmorClientExtensions implements IClientItemExtensions {
     public static final AkaishiArmorClientExtensions INSTANCE = new AkaishiArmorClientExtensions();
 

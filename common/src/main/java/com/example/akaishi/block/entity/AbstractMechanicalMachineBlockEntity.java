@@ -9,15 +9,18 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.life.mechanical.MechanicalMachineCosts;
+import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -64,6 +67,8 @@ public abstract class AbstractMechanicalMachineBlockEntity extends BlockEntity
     private long progressLife;
     /** 单次制作请求：为 true 时才累计进度，完成一次后自动清除 */
     private boolean craftRequested;
+    /** 运转音播放器（延迟创建，音色由子类提供） */
+    private MachineHum hum;
 
     protected AbstractMechanicalMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int slotCount) {
         super(type, pos, state);
@@ -121,6 +126,17 @@ public abstract class AbstractMechanicalMachineBlockEntity extends BlockEntity
 
     /** 双进度池均满时执行：消耗物品/产出（进度已在基类扣减） */
     protected abstract void onProgressCompleted();
+
+    /** 本机运转音色（子类提供，基类统一负责播放节奏） */
+    protected abstract RegistrySupplier<SoundEvent> humSound();
+
+    /** 延迟创建运转音播放器（仅服务端 tick 调用，无并发问题） */
+    private MachineHum hum() {
+        if (hum == null) {
+            hum = new MachineHum(humSound(), 0.4F, 1.0F);
+        }
+        return hum;
+    }
 
     // ==================== 服务端 tick ====================
 
@@ -184,6 +200,10 @@ public abstract class AbstractMechanicalMachineBlockEntity extends BlockEntity
             life.extractEnergy(extractL, false);
             progressLife += extractL;
             changed = true;
+        }
+        // 实际推进时播放本机运转音
+        if (extractA > 0 || extractL > 0) {
+            hum().tick(level, worldPosition);
         }
 
         if (progressAkaishi >= aCost && progressLife >= lCost) {

@@ -13,6 +13,8 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionFuelAggregatorMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -79,6 +81,9 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
     private float speedAccum;
     /** 当前加工的等离子体种类（跨类换料清零进度） */
     private Fluid currentPlasma;
+
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.FUSION_FUEL_AGGREGATOR_HUM, 0.4F, 1.0F);
 
     public AkaishiFusionFuelAggregatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_FUSION_FUEL_AGGREGATOR.get(), pos, state);
@@ -164,6 +169,7 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         if (delta > 0) {
             speedAccum -= delta;
             progress += delta;
+            hum.tick(level, worldPosition);
         }
         if (progress >= ModConfig.aggregatorProcessTicks) {
             progress = 0;

@@ -13,6 +13,8 @@ import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiTransgeneFactoryMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -76,6 +78,8 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage life;
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.TRANSGENE_FACTORY_HUM, 0.4F, 1.0F);
     /** 当前合成进度（tick） */
     private int progress;
 
@@ -103,6 +107,7 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         data.set(DATA_WORKING, canProcess() ? 1 : 0);
         if (canProcess()) {
             progress++;
+            hum.tick(level, worldPosition);
             if (progress >= ModConfig.transgeneFactoryProcessTicks) {
                 progress = 0;
                 // 先在材料消耗前锁定命中配方（消耗后基因槽可能被清空，不能再据此匹配）

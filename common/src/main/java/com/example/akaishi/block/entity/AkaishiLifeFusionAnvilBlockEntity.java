@@ -4,6 +4,8 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeFusionAnvilMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -97,6 +99,8 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
         }
         inventory.setItem(OUTPUT_SLOT, result);
         setChanged();
+        // 融合为单次动作，播放一次性运转音
+        MachineHum.playOnce(level, worldPosition, ModSounds.LIFE_FUSION_ANVIL_HUM, 0.4F, 1.0F);
     }
 
     public SimpleContainer inventory() {

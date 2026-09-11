@@ -9,8 +9,11 @@ import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.menu.AkaishiMechanicalProcessingFactoryMenu;
+import com.example.akaishi.sound.ModSounds;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -57,6 +60,11 @@ public class AkaishiMechanicalProcessingFactoryBlockEntity extends AbstractMecha
     @Override
     protected Component getMachineName() {
         return Component.translatable("block.akaishi.akaishi_mechanical_processing_factory");
+    }
+
+    @Override
+    protected RegistrySupplier<SoundEvent> humSound() {
+        return ModSounds.MECHANICAL_PROCESSING_HUM;
     }
 
     @Override
@@ -152,8 +160,15 @@ public class AkaishiMechanicalProcessingFactoryBlockEntity extends AbstractMecha
         removeItem(SLOT_SOLID, 1);
         removeItem(SLOT_TEMPLATE, 1);
 
+        // 未知材料/脏 NBT 回退铁材料；未知 DNA 回退无调校，避免 createProcessed 内 id() 空指针
         MechanicalMaterial material = MechanicalMaterial.get(materialId);
-        MechanicalDnaProfile dna = dnaId != null ? MechanicalDnaProfile.get(dnaId) : MechanicalDnaProfile.get("akaishi:none");
+        if (material == null) {
+            material = MechanicalMaterial.get("akaishi:iron");
+        }
+        MechanicalDnaProfile dna = dnaId != null ? MechanicalDnaProfile.get(dnaId) : null;
+        if (dna == null) {
+            dna = MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
+        }
         ItemStack result = MechanicalPartItem.createProcessed(organ, part, material, dna);
         ItemStack out = getItem(SLOT_OUTPUT);
         if (out.isEmpty()) {

@@ -15,6 +15,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
 import com.example.akaishi.menu.AkaishiGenMatrixControllerMenu;
 import com.example.akaishi.multiblock.MatrixStructure;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -65,6 +67,10 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
     private final AkaishiEnergyStorage energy;
     private int burnEnergy;
     private int burnEnergyTotal;
+
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.GEN_MATRIX_HUM, 0.4F, 1.0F);
+
     /** 最近一次成型的箱体范围（解除端口关联时使用） */
     private BlockPos boxMin, boxMax;
 
@@ -153,6 +159,7 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
                 int consume = Math.min(t.generateRate, burnEnergy);
                 burnEnergy -= consume;
                 energy.addEnergy((long) (consume * getBoostMultiplier(upgrades)), false);
+                hum.tick(level, worldPosition);
                 changed = true;
             }
         }

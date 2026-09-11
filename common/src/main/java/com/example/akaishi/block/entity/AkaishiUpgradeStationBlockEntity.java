@@ -12,6 +12,8 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiUpgradeStationMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -127,6 +129,8 @@ public class AkaishiUpgradeStationBlockEntity extends BlockEntity implements Ext
         inventory.setItem(OUTPUT_SLOT, gear.copy());
         inventory.removeItem(INPUT_GEAR_SLOT, 1);
         setChanged();
+        // 升级为单次动作，播放一次性运转音
+        MachineHum.playOnce(level, worldPosition, ModSounds.UPGRADE_STATION_HUM, 0.4F, 1.0F);
     }
 
     @Override

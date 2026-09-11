@@ -17,12 +17,6 @@
       "akaishi:reactor_explosion"
     ]
   },
-  "machine_hum": {
-    "subtitle": "subtitles.akaishi.machine_hum",
-    "sounds": [
-      { "name": "akaishi:machine_hum", "stream": true }
-    ]
-  },
   "activator_bubble": {
     "subtitle": "subtitles.akaishi.activator_bubble",
     "sounds": [
@@ -40,5 +34,165 @@
     "sounds": [
       "akaishi:decay_leak"
     ]
+  },
+  "energy_generator_hum": {
+    "subtitle": "subtitles.akaishi.energy_generator_hum",
+    "sounds": [ { "name": "akaishi:energy_generator_hum", "stream": true } ]
+  },
+  "energy_processor_hum": {
+    "subtitle": "subtitles.akaishi.energy_processor_hum",
+    "sounds": [ { "name": "akaishi:energy_processor_hum", "stream": true } ]
+  },
+  "energy_liquefier_hum": {
+    "subtitle": "subtitles.akaishi.energy_liquefier_hum",
+    "sounds": [ { "name": "akaishi:energy_liquefier_hum", "stream": true } ]
+  },
+  "energy_aggregator_hum": {
+    "subtitle": "subtitles.akaishi.energy_aggregator_hum",
+    "sounds": [ { "name": "akaishi:energy_aggregator_hum", "stream": true } ]
+  },
+  "gen_matrix_hum": {
+    "subtitle": "subtitles.akaishi.gen_matrix_hum",
+    "sounds": [ { "name": "akaishi:gen_matrix_hum", "stream": true } ]
+  },
+  "compressor_hum": {
+    "subtitle": "subtitles.akaishi.compressor_hum",
+    "sounds": [ { "name": "akaishi:compressor_hum", "stream": true } ]
+  },
+  "pulverizer_hum": {
+    "subtitle": "subtitles.akaishi.pulverizer_hum",
+    "sounds": [ { "name": "akaishi:pulverizer_hum", "stream": true } ]
+  },
+  "transformer_hum": {
+    "subtitle": "subtitles.akaishi.transformer_hum",
+    "sounds": [ { "name": "akaishi:transformer_hum", "stream": true } ]
+  },
+  "catalyst_hum": {
+    "subtitle": "subtitles.akaishi.catalyst_hum",
+    "sounds": [ { "name": "akaishi:catalyst_hum", "stream": true } ]
+  },
+  "fuel_mixer_hum": {
+    "subtitle": "subtitles.akaishi.fuel_mixer_hum",
+    "sounds": [ { "name": "akaishi:fuel_mixer_hum", "stream": true } ]
+  },
+  "fuel_canner_hum": {
+    "subtitle": "subtitles.akaishi.fuel_canner_hum",
+    "sounds": [ { "name": "akaishi:fuel_canner_hum", "stream": true } ]
+  },
+  "purifier_hum": {
+    "subtitle": "subtitles.akaishi.purifier_hum",
+    "sounds": [ { "name": "akaishi:purifier_hum", "stream": true } ]
+  },
+  "decay_purifier_hum": {
+    "subtitle": "subtitles.akaishi.decay_purifier_hum",
+    "sounds": [ { "name": "akaishi:decay_purifier_hum", "stream": true } ]
+  },
+  "life_purifier_hum": {
+    "subtitle": "subtitles.akaishi.life_purifier_hum",
+    "sounds": [ { "name": "akaishi:life_purifier_hum", "stream": true } ]
+  },
+  "purifier_matrix_hum": {
+    "subtitle": "subtitles.akaishi.purifier_matrix_hum",
+    "sounds": [ { "name": "akaishi:purifier_matrix_hum", "stream": true } ]
+  },
+  "life_breeder_hum": {
+    "subtitle": "subtitles.akaishi.life_breeder_hum",
+    "sounds": [ { "name": "akaishi:life_breeder_hum", "stream": true } ]
+  },
+  "life_centrifuge_hum": {
+    "subtitle": "subtitles.akaishi.life_centrifuge_hum",
+    "sounds": [ { "name": "akaishi:life_centrifuge_hum", "stream": true } ]
+  },
+  "life_aggregation_hum": {
+    "subtitle": "subtitles.akaishi.life_aggregation_hum",
+    "sounds": [ { "name": "akaishi:life_aggregation_hum", "stream": true } ]
+  },
+  "life_fusion_anvil_hum": {
+    "subtitle": "subtitles.akaishi.life_fusion_anvil_hum",
+    "sounds": [ { "name": "akaishi:life_fusion_anvil_hum", "stream": true } ]
+  },
+  "life_matrix_hum": {
+    "subtitle": "subtitles.akaishi.life_matrix_hum",
+    "sounds": [ { "name": "akaishi:life_matrix_hum", "stream": true } ]
+  },
+  "fusion_controller_hum": {
+    "subtitle": "subtitles.akaishi.fusion_controller_hum",
+    "sounds": [ { "name": "akaishi:fusion_controller_hum", "stream": true } ]
+  },
+  "fusion_fuel_aggregator_hum": {
+    "subtitle": "subtitles.akaishi.fusion_fuel_aggregator_hum",
+    "sounds": [ { "name": "akaishi:fusion_fuel_aggregator_hum", "stream": true } ]
+  },
+  "plasma_filler_hum": {
+    "subtitle": "subtitles.akaishi.plasma_filler_hum",
+    "sounds": [ { "name": "akaishi:plasma_filler_hum", "stream": true } ]
+  },
+  "activated_fractionator_hum": {
+    "subtitle": "subtitles.akaishi.activated_fractionator_hum",
+    "sounds": [ { "name": "akaishi:activated_fractionator_hum", "stream": true } ]
+  },
+  "miner_hum": {
+    "subtitle": "subtitles.akaishi.miner_hum",
+    "sounds": [ { "name": "akaishi:miner_hum", "stream": true } ]
+  },
+  "gene_analyzer_hum": {
+    "subtitle": "subtitles.akaishi.gene_analyzer_hum",
+    "sounds": [ { "name": "akaishi:gene_analyzer_hum", "stream": true } ]
+  },
+  "transgene_factory_hum": {
+    "subtitle": "subtitles.akaishi.transgene_factory_hum",
+    "sounds": [ { "name": "akaishi:transgene_factory_hum", "stream": true } ]
+  },
+  "cultivator_hum": {
+    "subtitle": "subtitles.akaishi.cultivator_hum",
+    "sounds": [ { "name": "akaishi:cultivator_hum", "stream": true } ]
+  },
+  "plant_cultivator_hum": {
+    "subtitle": "subtitles.akaishi.plant_cultivator_hum",
+    "sounds": [ { "name": "akaishi:plant_cultivator_hum", "stream": true } ]
+  },
+  "surgery_hum": {
+    "subtitle": "subtitles.akaishi.surgery_hum",
+    "sounds": [ { "name": "akaishi:surgery_hum", "stream": true } ]
+  },
+  "mechanical_template_factory_hum": {
+    "subtitle": "subtitles.akaishi.mechanical_template_factory_hum",
+    "sounds": [ { "name": "akaishi:mechanical_template_factory_hum", "stream": true } ]
+  },
+  "mechanical_processing_hum": {
+    "subtitle": "subtitles.akaishi.mechanical_processing_hum",
+    "sounds": [ { "name": "akaishi:mechanical_processing_hum", "stream": true } ]
+  },
+  "mechanical_assembly_hum": {
+    "subtitle": "subtitles.akaishi.mechanical_assembly_hum",
+    "sounds": [ { "name": "akaishi:mechanical_assembly_hum", "stream": true } ]
+  },
+  "upgrade_station_hum": {
+    "subtitle": "subtitles.akaishi.upgrade_station_hum",
+    "sounds": [ { "name": "akaishi:upgrade_station_hum", "stream": true } ]
+  },
+  "equipment_forger_hum": {
+    "subtitle": "subtitles.akaishi.equipment_forger_hum",
+    "sounds": [ { "name": "akaishi:equipment_forger_hum", "stream": true } ]
+  },
+  "item_reconstructor_hum": {
+    "subtitle": "subtitles.akaishi.item_reconstructor_hum",
+    "sounds": [ { "name": "akaishi:item_reconstructor_hum", "stream": true } ]
+  },
+  "trait_reforger_hum": {
+    "subtitle": "subtitles.akaishi.trait_reforger_hum",
+    "sounds": [ { "name": "akaishi:trait_reforger_hum", "stream": true } ]
+  },
+  "potion_table_hum": {
+    "subtitle": "subtitles.akaishi.potion_table_hum",
+    "sounds": [ { "name": "akaishi:potion_table_hum", "stream": true } ]
+  },
+  "mother_altar_hum": {
+    "subtitle": "subtitles.akaishi.mother_altar_hum",
+    "sounds": [ { "name": "akaishi:mother_altar_hum", "stream": true } ]
+  },
+  "auto_collector_hum": {
+    "subtitle": "subtitles.akaishi.auto_collector_hum",
+    "sounds": [ { "name": "akaishi:auto_collector_hum", "stream": true } ]
   }
 }

@@ -1,11 +1,13 @@
 package com.example.akaishi.forge.life;
 
+import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.item.AkaishiLifeFusionSet;
 import com.example.akaishi.item.AkaishiLifeFusionTooltip;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
+import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import com.example.akaishi.life.organ.OrganEffectResolver;
 import com.example.akaishi.life.sample.SampleGroup;
@@ -52,11 +54,11 @@ public final class AkaishiLifeFusionTooltipHandler {
             if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)) {
                 continue;
             }
-            // 与服务器生效判定一致：排斥满 100 的器官视为完全失效
-            if (ClientBodyData.getRejection(slot) >= OrganEffectResolver.MAX_SAFE_REJECTION) {
+            // 与服务器生效判定一致：排斥达上限（配置可调，经 ConfigSyncS2C 同步）的器官视为完全失效
+            if (ClientBodyData.getRejection(slot) >= PlayerBodyState.maxRejection()) {
                 continue;
             }
-            SampleGroup group = OrganEffectResolver.groupOf(AkaishiOrganItem.getEntityId(organ), player.level());
+            ISampleGroup group = OrganEffectResolver.groupOf(AkaishiOrganItem.getEntityId(organ), player.level());
             if (group == SampleGroup.BOSS || group == SampleGroup.DRAGON) {
                 return true;
             }

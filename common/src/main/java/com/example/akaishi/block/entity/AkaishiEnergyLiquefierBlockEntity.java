@@ -14,6 +14,8 @@ import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyLiquefierMenu;
+import com.example.akaishi.sound.MachineHum;
+import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
@@ -118,6 +120,9 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
 
+    /** 运转音播放器（本机音色） */
+    private final MachineHum hum = new MachineHum(ModSounds.ENERGY_LIQUEFIER_HUM, 0.4F, 1.0F);
+
     public AkaishiEnergyLiquefierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ENERGY_LIQUEFIER.get(), pos, state);
         this.akaishi = new AkaishiEnergyStorage(AkaishiEnergyType.INSTANCE, ModConfig.energyLiquefierChishiCapacity);
@@ -179,6 +184,7 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
                     akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
+                hum.tick(level, worldPosition);
                 progressEnergy += extract;
                 if (progressEnergy >= costTotal) {
                     progressEnergy -= costTotal;
