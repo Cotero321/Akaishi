@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 词条重铸仪菜单：器官输入 + 衰竭结晶 → 重铸器官输出 + 背包。
- * 数据槽：0/1=生命能量/容量 2=重铸进度% 3=词条总数 4=目标词条序号。
+ * 数据槽：0/1=生命能量（long 拆双槽）2/3=生命容量（long 拆双槽）4=重铸进度% 5=词条总数 6=目标词条序号。
  * 目标词条选择经 C2S 包写入服务端（见 AkaishiTraitReforgerSync）。
  */
 public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
@@ -55,8 +55,8 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
-        // 器官输入槽：仅接受携带 ≥1 条突变词条的非原生器官
-        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.ORGAN_SLOT, 30, 30,
+        // 器官输入槽：仅接受携带 ≥1 条突变词条的非原生器官（y=34：让开上方 y=24~32 的能量条，避免槽位压条）
+        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.ORGAN_SLOT, 30, 34,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -66,7 +66,7 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
             }
         });
         // 衰竭结晶槽：仅接受衰竭结晶
-        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.CRYSTAL_SLOT, 82, 30,
+        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.CRYSTAL_SLOT, 82, 34,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -74,7 +74,7 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
             }
         });
         // 产物槽：只出不进（重铸器官 NBT 不可合并）
-        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.OUTPUT_SLOT, 116, 30,
+        addSlot(new OverlayHidingSlot(container, AkaishiTraitReforgerBlockEntity.OUTPUT_SLOT, 116, 34,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -84,11 +84,11 @@ public class AkaishiTraitReforgerMenu extends AbstractContainerMenu {
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 90 + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inv, col, 8 + col * 18, 142));
+            addSlot(new Slot(inv, col, 8 + col * 18, 148));
         }
         addDataSlots(data);
         // 存储联动：3 格内存在存储库时注入联动槽

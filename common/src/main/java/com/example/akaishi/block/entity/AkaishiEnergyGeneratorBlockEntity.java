@@ -14,6 +14,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyGeneratorMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 赤能源发生机方块实体：燃烧赤石材料产生赤能源（单方块 75/tick）。
  * 作为 3x3 多方块结构外壳时（formed=true）休眠，不再独立燃烧。
- * 数据槽：0=能量，1=燃烧时间，2=燃烧总时间。
+ * 数据槽：能量/燃烧时间/燃烧总时间取值均可能超过 short ±32767，各自拆低/高两槽同步。
  */
 public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
@@ -51,6 +52,16 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     /** 最大能量存储（10M，容纳满配升级约 145 tick 产出） */
     public static final int MAX_ENERGY = 10_000_000;
+
+    // ===== 数据槽（> short 的值一律拆低/高两槽） =====
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_BURN = 2;
+    public static final int DATA_BURN_HIGH = 3;
+    public static final int DATA_BURN_TOTAL = 4;
+    public static final int DATA_BURN_TOTAL_HIGH = 5;
+    public static final int DATA_UPGRADES = 6;
+    public static final int DATA_SLOTS = 7;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
@@ -72,7 +83,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
                 AkaishiEnergyGeneratorBlockEntity.this.setChanged();
             }
         };
-        this.data = new SimpleContainerData(4);
+        this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
     /** 加速倍率：n 个组件 → 1.75^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 242 倍 */
@@ -88,11 +99,12 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     private void tickServer() {
         boolean changed = false;
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, burnTime);
-        data.set(2, burnTimeTotal);
+        // 能量（上限 10M）与燃烧进度（最大 72000）均超过 short，需拆两槽同步
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_BURN, DATA_BURN_HIGH, burnTime);
+        LongDataSlots.write(data, DATA_BURN_TOTAL, DATA_BURN_TOTAL_HIGH, burnTimeTotal);
         int upgrades = getUpgradeCount();
-        data.set(3, upgrades);
+        data.set(DATA_UPGRADES, upgrades);
 
         // formed=true 表示被多方块结构征用为外壳：休眠，不独立燃烧
         boolean formed = getBlockState().getValue(com.example.akaishi.block.AkaishiEnergyGeneratorBlock.FORMED);

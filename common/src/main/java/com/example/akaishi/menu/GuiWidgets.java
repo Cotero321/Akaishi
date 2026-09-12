@@ -28,15 +28,26 @@ public final class GuiWidgets {
         gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
     }
 
-    /** 绘制玩家背包 3×9 + 快捷栏 1×9 槽位框（背包起点 y=104，快捷栏 y=168，与 Menu 槽位坐标一致） */
+    /** 绘制玩家背包 3×9 + 快捷栏 1×9 槽位框（机械三机布局：背包起点 y=104，快捷栏 y=168） */
     public static void playerInventory(GuiGraphics gui, int x, int y) {
+        playerInventory(gui, x, y, 104, 168);
+    }
+
+    /**
+     * 绘制玩家背包 3×9 + 快捷栏 1×9 槽位框，坐标由调用方按其 Menu 的槽位定义传入，
+     * 保证槽框与实际可交互槽位严格对齐（各界面背包/快捷栏 y 并不一致）。
+     *
+     * @param invTop 背包首行 y（相对 GUI 原点）
+     * @param hotbar 快捷栏 y（相对 GUI 原点）
+     */
+    public static void playerInventory(GuiGraphics gui, int x, int y, int invTop, int hotbar) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                slotBox(gui, x + 8 + col * 18, y + 104 + row * 18);
+                slotBox(gui, x + 8 + col * 18, y + invTop + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            slotBox(gui, x + 8 + col * 18, y + 168);
+            slotBox(gui, x + 8 + col * 18, y + hotbar);
         }
     }
 

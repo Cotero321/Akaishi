@@ -12,7 +12,8 @@ import net.minecraft.world.item.ItemStack;
 /**
  * 机器升级槽：2 格（速度格/能量格），mayPlace 按组件类型互斥。
  * 单格最多堆叠 8 个（物品 maxStackSize 限制），堆叠数即等级：
- * 速度每级 +12.5%（封顶 +100%），能量每级 +50% 容量（封顶 +400%）。
+ * 速度每级 +100%（即 1+数量，封顶 8×），能量每级 +50% 容量（封顶 +400%）。
+ * 速度升级同时抬高耗能：耗能倍率 = min(1+速度数量, 4)（封顶 4×）。
  */
 public class MachineUpgradeSlots extends SimpleContainer {
 
@@ -58,9 +59,14 @@ public class MachineUpgradeSlots extends SimpleContainer {
         return getItem(SLOT_ENERGY).getCount();
     }
 
-    /** 速度倍率：1 + 0.125 × 数量，8 个封顶 2.0；再乘配置 [machine] workSpeed 全局速度倍率（默认 1.0 = 不变） */
+    /** 速度倍率：1 + 数量，8 个封顶 8.0；再乘配置 [machine] workSpeed 全局速度倍率（默认 1.0 = 不变） */
     public float getSpeedMultiplier() {
-        return (1F + 0.125F * getSpeedCount()) * (float) ModConfig.machineWorkSpeed;
+        return Math.min(1F + getSpeedCount(), 8F) * (float) ModConfig.machineWorkSpeed;
+    }
+
+    /** 耗能倍率：随速度升级抬高，8 个封顶 4.0（每 tick 耗电功率 / 单次加工耗能的上限） */
+    public float getEnergyCostMultiplier() {
+        return Math.min(1F + getSpeedCount(), 4F);
     }
 
     /** 容量倍率：1 + 0.5 × 数量，8 个封顶 5.0 */

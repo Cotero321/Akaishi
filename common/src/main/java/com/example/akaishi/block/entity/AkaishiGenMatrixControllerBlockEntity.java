@@ -53,14 +53,17 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
     public static final int UPGRADE_SLOTS = 10;
     public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
-    /** Menu 同步数据槽（能量为 long，拆低/高 32 位，容量最高 50,000,000 远超 int） */
+    /** Menu 同步数据槽（能量为 long，拆低/高 32 位，容量最高 50,000,000 远超 int；
+     *  燃烧能量/燃料总能量最高 1620 万亦超 short ±32767，各自拆两槽） */
     public static final int DATA_ENERGY = 0;
     public static final int DATA_ENERGY_HIGH = 1;
     public static final int DATA_BURN = 2;
-    public static final int DATA_BURN_TOTAL = 3;
-    public static final int DATA_FORMED = 4;
-    public static final int DATA_UPGRADES = 5;
-    public static final int DATA_SLOTS = 6;
+    public static final int DATA_BURN_HIGH = 3;
+    public static final int DATA_BURN_TOTAL = 4;
+    public static final int DATA_BURN_TOTAL_HIGH = 5;
+    public static final int DATA_FORMED = 6;
+    public static final int DATA_UPGRADES = 7;
+    public static final int DATA_SLOTS = 8;
 
     private final SimpleContainer inventory;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
@@ -116,8 +119,9 @@ public class AkaishiGenMatrixControllerBlockEntity extends BlockEntity implement
     private void tickServer() {
         boolean changed = false;
         LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
-        data.set(DATA_BURN, burnEnergy);
-        data.set(DATA_BURN_TOTAL, burnEnergyTotal);
+        // 燃烧能量/燃料总能量最高 1620 万 > short，拆两槽同步
+        LongDataSlots.write(data, DATA_BURN, DATA_BURN_HIGH, burnEnergy);
+        LongDataSlots.write(data, DATA_BURN_TOTAL, DATA_BURN_TOTAL_HIGH, burnEnergyTotal);
         int upgrades = getUpgradeCount();
         data.set(DATA_UPGRADES, upgrades);
 

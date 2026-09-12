@@ -6,6 +6,7 @@ import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.organ.OrganEffectRegistry;
 import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,7 +21,7 @@ import java.util.List;
 
 /**
  * 生命结构台菜单：输入槽（基因序列）+ 材料槽（固态物）+ 输出槽（器官）+ 背包。
- * 数据槽：0/1=生命能量/容量 2=构造进度% 3=目标槽位索引（BodySlot.values()）。
+ * 数据槽：0/1=生命能量（long 拆双槽）2/3=生命容量（long 拆双槽）4=构造进度% 5=目标槽位索引（BodySlot.values()）。
  */
 public class AkaishiLifeStructMenu extends AbstractContainerMenu {
 
@@ -101,11 +102,13 @@ public class AkaishiLifeStructMenu extends AbstractContainerMenu {
     }
 
     public long getLifeEnergy() {
-        return data.get(0);
+        return LongDataSlots.read(data, AkaishiLifeStructBlockEntity.DATA_LIFE_ENERGY,
+                AkaishiLifeStructBlockEntity.DATA_LIFE_ENERGY_HIGH);
     }
 
     public long getLifeMax() {
-        return data.get(1);
+        return LongDataSlots.read(data, AkaishiLifeStructBlockEntity.DATA_LIFE_CAPACITY,
+                AkaishiLifeStructBlockEntity.DATA_LIFE_CAPACITY_HIGH);
     }
 
     /** 构造进度（0-100） */

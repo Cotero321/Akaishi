@@ -3,10 +3,12 @@
 // 原理：
 //   1) 7 个家族各持「暗色底 + 亮色强调」一对识别色，与早期预览配色保持一致；
 //   2) 晶体 = 多面宝石（暗色轮廓 + 受光面 + 高光条 + 核心宝石 + 底部碎屑）；
-//   3) 组件 = 电路板（板底 + 走线 + 中央芯片 + 铜引脚），延续 akaishi_advanced_component 的形制；
+//   3) 组件 = 六角能量芯（六角外壳 + 内凹面板 + 能量环 + 白热核心），贴合「聚合为等离子体」的燃料语义；
 //   4) 透明背景 + 厚暗色轮廓，与项目内既有 32x32 物品图标风格统一。
-// 幂等：首次运行备份原图到 gui_layouts/activated_mixture_backup/，之后始终以备份为源。
-// 用法：node rework_activated_mixture_assets.js
+// 幂等：绘制完全确定，重复运行输出一致；首次运行备份原图到 gui_layouts/activated_mixture_backup/。
+// 用法：node rework_activated_mixture_assets.js            写入组件贴图 + 出预览
+//       node rework_activated_mixture_assets.js --preview  仅出预览，不写贴图
+// 注意：只重制「组件」贴图，晶体贴图仅参与预览对照，永不写盘。
 const fs = require('fs'), path = require('path'), zlib = require('zlib');
 const ROOT = __dirname;
 const DIR = path.join(ROOT, 'common/src/main/resources/assets/akaishi/textures/item');
@@ -15,8 +17,6 @@ const PREVIEW = path.join(ROOT, 'gui_layouts/activated_mixture_rework_preview.pn
 
 const W = 32, H = 32;
 const OUT = [18, 20, 24];            // 统一暗色轮廓
-const COPPER = [201, 138, 66];       // 铜引脚
-const SILICON = [24, 27, 32];        // 芯片基体
 
 // 家族识别色：dark 为底/暗面，light 为受光面/核心
 const FAMILIES = {
@@ -96,29 +96,42 @@ function crystal(px, pal) {
   outline(px, mask);
 }
 
-// 组件：电路板
+// 六角轮廓辅助：多边形命中 + 六角顶点
+function inPoly(pts, x, y) {
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [xi, yi] = pts[i], [xj, yj] = pts[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function hexPts(cx, cy, r) { const p = []; for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return p; }
+
+// 组件：六角能量芯（六角外壳 + 内凹面板 + 能量环 + 白热核心）
 function component(px, pal) {
   const mask = new Uint8Array(W * H);
-  const bx0 = 6, bx1 = 25, by0 = 7, by1 = 24;
-  fillRect(px, mask, bx0, by0, bx1, by1, pal.dark);
-  // 板面受光/背光边
-  for (let x = bx0; x <= bx1; x++) { put(px, x, by0, mix(pal.dark, pal.light, 0.45)); put(px, x, by1, mix(pal.dark, OUT, 0.3)); }
-  for (let y = by0; y <= by1; y++) { put(px, bx0, y, mix(pal.dark, pal.light, 0.45)); put(px, bx1, y, mix(pal.dark, OUT, 0.3)); }
-  // 走线（L 形）
-  for (let x = 8; x <= 14; x++) put(px, x, 10, pal.light);
-  for (let y = 10; y <= 16; y++) put(px, 8, y, pal.light);
-  for (let x = 17; x <= 23; x++) put(px, x, 20, mix(pal.dark, pal.light, 0.7));
-  for (let y = 13; y <= 20; y++) put(px, 23, y, mix(pal.dark, pal.light, 0.7));
-  // 中央芯片 + 核心
-  fillRect(px, mask, 11, 12, 20, 19, SILICON);
-  fillRect(px, mask, 14, 14, 17, 17, pal.light);
-  put(px, 14, 14, mix(pal.light, [255, 255, 255], 0.5));
-  // 铜引脚
-  for (const y of [10, 13, 16, 19]) {
-    fillRect(px, mask, 4, y, 5, y, COPPER);
-    fillRect(px, mask, 26, y, 27, y, COPPER);
+  const cx = 16, cy = 16;
+  const outer = hexPts(cx, cy, 12), inner = hexPts(cx, cy, 8.6);
+  // 六角外壳
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (inPoly(outer, x, y)) { put(px, x, y, pal.dark); mark(mask, x, y); }
+  // 伪立体：左侧受光 / 右侧背光（与晶体光向一致）
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (!inPoly(outer, x, y) || inPoly(inner, x, y)) continue;
+    put(px, x, y, x < cx ? mix(pal.dark, pal.light, 0.45) : mix(pal.dark, OUT, 0.28));
   }
-  for (const x of [9, 13, 17, 21]) fillRect(px, mask, x, 25, x, 26, COPPER);
+  // 内凹六角面板
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (inPoly(inner, x, y)) { put(px, x, y, mix(pal.dark, OUT, 0.5)); mark(mask, x, y); }
+  // 能量环
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const d = Math.hypot(x - cx, y - cy);
+    if (d >= 5.2 && d <= 6.6) { put(px, x, y, pal.light); mark(mask, x, y); }
+  }
+  // 白热核心
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const d = Math.hypot(x - cx, y - cy);
+    if (d <= 3.4) { put(px, x, y, mix(pal.light, [255, 255, 255], 0.45)); mark(mask, x, y); }
+    if (d <= 1.6) put(px, x, y, [255, 255, 255]);
+  }
   outline(px, mask);
 }
 
@@ -142,7 +155,9 @@ function blit(dst, DW, src, SW, SH, ox, oy, f) {
 }
 
 function main() {
-  fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  const previewOnly = process.argv.includes('--preview');
+  fs.mkdirSync(path.dirname(PREVIEW), { recursive: true });
+  if (!previewOnly) fs.mkdirSync(BACKUP_DIR, { recursive: true });
   const fams = Object.keys(FAMILIES);
   const cells = [];
   for (const fam of fams) {
@@ -150,11 +165,14 @@ function main() {
     const pair = {};
     for (const kind of ['component', 'crystal']) {
       const name = `akaishi_activated_${fam}_${kind}`;
-      const bak = path.join(BACKUP_DIR, name + '.png');
-      if (!fs.existsSync(bak)) fs.copyFileSync(path.join(DIR, name + '.png'), bak);
       const px = Buffer.alloc(W * H * 4);
       if (kind === 'crystal') crystal(px, pal); else component(px, pal);
-      fs.writeFileSync(path.join(DIR, name + '.png'), writePng(W, H, px));
+      // 仅组件写盘（晶体保持磁盘原样，只用于预览对照）
+      if (kind === 'component' && !previewOnly) {
+        const bak = path.join(BACKUP_DIR, name + '.png');
+        if (!fs.existsSync(bak)) fs.copyFileSync(path.join(DIR, name + '.png'), bak);
+        fs.writeFileSync(path.join(DIR, name + '.png'), writePng(W, H, px));
+      }
       pair[kind] = px;
       let opaque = 0;
       for (let i = 3; i < px.length; i += 4) if (px[i] === 255) opaque++;
@@ -172,7 +190,7 @@ function main() {
     blit(sheet, PW, pair.component, W, H, i * cw + pad, ch + pad, f);
   });
   fs.writeFileSync(PREVIEW, writePng(PW, PH, sheet));
-  console.log('共重制 ' + (fams.length * 2) + ' 张（7 家族 x 组件/晶体）');
+  console.log('重制 ' + fams.length + ' 张组件贴图' + (previewOnly ? '（预览模式，未写盘）' : '（已写盘，原件已备份）'));
   console.log('预览: ' + path.relative(ROOT, PREVIEW));
   return 0;
 }

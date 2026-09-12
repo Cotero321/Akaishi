@@ -142,7 +142,7 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
 
         // 2) 消耗能量提纯输入（能量不足时进度暂停，不清零）
         //    未成型：每 tick 5，共 500（100 tick/次）；成型：每 tick 150，共 500（3.34 tick/次 = 30 倍，耗能率同步 30 倍）
-        //    速度升级：消耗率 ×(1+12.5%/级)，消耗与产出速率同步提升
+        //    速度升级：消耗率 ×速度倍率（封顶 8×），单件总耗 ×耗能倍率（封顶 4×）
         if (canProcess()) {
             long extract = Math.min((long) (rate() * getSpeedMultiplier()), energy.getEnergyStored());
             if (extract > 0) {
@@ -172,15 +172,16 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     }
 
     /** 当前模式完成一次提纯所需总能量（矩阵成型与单台一致，均为 500）；
-     *  乘配置 [machine] costMultiplier 全局放大单件能耗（判定/扣减/进度显示共用，口径一致） */
+     *  乘配置 [machine] costMultiplier 与速度升级耗能倍率（封顶 4×）（判定/扣减/进度显示共用，口径一致） */
     private long needed() {
-        return (long) (ModConfig.purifierTotalCost * ModConfig.machineCostMultiplier);
+        return (long) (ModConfig.purifierTotalCost * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
     }
 
     /** 当前模式每 tick 提纯消耗能量（矩阵成型 150，未成型 5）；
-     *  与 needed() 同乘 costMultiplier → 保持吞吐不变、仅放大单件耗能 */
+     *  与 needed() 同乘 costMultiplier 与耗能倍率 → 保持速度只决定快慢、单件耗能放大 */
     private long rate() {
-        return (long) ((matrixFormed ? ModConfig.purifierRateFormed : ModConfig.purifierEnergyPerTick) * ModConfig.machineCostMultiplier);
+        return (long) ((matrixFormed ? ModConfig.purifierRateFormed : ModConfig.purifierEnergyPerTick)
+                * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
     }
 
     /** 当前成型缓存值（供外壳查询，不触发扫描） */

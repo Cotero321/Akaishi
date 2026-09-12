@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "down": "akaishi:block/akaishi_life_energy_cell_bottom",
-    "up": "akaishi:block/akaishi_life_energy_cell_top",
-    "north": "akaishi:block/akaishi_life_energy_cell_front",
-    "south": "akaishi:block/akaishi_life_energy_cell_side",
-    "east": "akaishi:block/akaishi_life_energy_cell_side",
-    "west": "akaishi:block/akaishi_life_energy_cell_side"
+    "down": "akaishi:block/akaishi_life_energy_cell_serializer_bottom",
+    "up": "akaishi:block/akaishi_life_energy_cell_serializer_top",
+    "north": "akaishi:block/akaishi_life_energy_cell_serializer_front",
+    "south": "akaishi:block/akaishi_life_energy_cell_serializer_side",
+    "east": "akaishi:block/akaishi_life_energy_cell_serializer_side",
+    "west": "akaishi:block/akaishi_life_energy_cell_serializer_side"
   }
 }

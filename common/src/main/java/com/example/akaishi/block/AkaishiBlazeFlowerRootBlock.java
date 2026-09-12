@@ -26,7 +26,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class AkaishiBlazeFlowerRootBlock extends BushBlock {
 
-    private static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
+    /** 各年岁外形：萌发矮丛 / 幼苗半高 / 成株满高，与三段模型（_0/_1/_2）逐段对齐 */
+    private static final VoxelShape[] SHAPES = new VoxelShape[]{
+            Block.box(4.0D, 0.0D, 4.0D, 12.0D, 5.0D, 12.0D),
+            Block.box(3.0D, 0.0D, 3.0D, 13.0D, 15.0D, 13.0D),
+            Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D)
+    };
     /** 年岁推进 / 成株开花的概率（每随机刻） */
     private static final float GROW_CHANCE = 0.35F;
     /** 年岁：0 萌发 / 1 幼苗 / 2 成株（成株后可长出花冠） */
@@ -55,7 +60,7 @@ public class AkaishiBlazeFlowerRootBlock extends BushBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        return SHAPES[state.getValue(AGE)];
     }
 
     /** 存活要求：下方必须是灵魂沙 */

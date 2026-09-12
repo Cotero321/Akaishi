@@ -130,7 +130,7 @@ public class AkaishiFuelMixerScreen extends AbstractContainerScreen<AkaishiFuelM
         } else if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
-                            "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
+                            "x" + (1F + menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
         } else if (isHovering(ENERGY_SLOT_X, ENERGY_SLOT_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,

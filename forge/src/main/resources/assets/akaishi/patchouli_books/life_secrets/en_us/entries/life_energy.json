@@ -12,7 +12,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_energy_cell_advanced",
-      "text": "$(bold)Storage:$(0) Life Energy Cells come in tiers — Basic $(4)1,000,000$(0) (crafted) → Advanced $(4)4,000,000$(0) → Super $(4)40,000,000$(0), upgraded step by step with high-tier components. Every cell has a two-way buffer you can freely charge and drain — the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows."
+      "text": "$(bold)Storage:$(0) Life Energy Cells come in tiers — Basic $(4)1,000,000$(0) (crafted) → Advanced $(4)4,000,000$(0) → Super $(4)40,000,000$(0), upgraded step by step with high-tier components. Every cell has a two-way buffer you can freely charge and drain — the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows. Pipes come in four tiers (per-tick throughput): Basic $(4)1000$(0) → Intermediate $(4)4000$(0) → Advanced $(4)16000$(0) → Ultimate $(4)64000$(0), upgraded step by step as a cross of the previous tier x4 plus metal dust."
     },
     {
       "type": "patchouli:spotlight",

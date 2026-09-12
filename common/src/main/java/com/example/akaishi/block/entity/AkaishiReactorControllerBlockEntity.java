@@ -80,7 +80,11 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
     public static final int DATA_WASTE_TYPES = 14;
     /** 每 tick 产能高 32 位（{@link #DATA_ENERGY_PER_TICK} 为低 32 位；产能可被配置放大到超过 int） */
     public static final int DATA_ENERGY_PER_TICK_HIGH = 15;
-    public static final int DATA_SLOTS = 16;
+    /** 废液当前量高 16 位（低 16 位见 {@link #DATA_WASTE_AMOUNT}；容量可配置到超过 short 上限） */
+    public static final int DATA_WASTE_AMOUNT_HIGH = 16;
+    /** 废液容量高 16 位（低 16 位见 {@link #DATA_WASTE_CAPACITY}） */
+    public static final int DATA_WASTE_CAPACITY_HIGH = 17;
+    public static final int DATA_SLOTS = 18;
 
     private final SimpleContainer fuelSlots;
     private final SimpleContainerData data;
@@ -476,8 +480,9 @@ public class AkaishiReactorControllerBlockEntity extends BlockEntity implements 
         data.set(DATA_ROD_COUNT, structure == null ? 0 : structure.rodCount);
         data.set(DATA_EFFECTIVE_COOLERS, structure == null ? 0 : structure.effectiveCoolers);
         data.set(DATA_COOLING_PERCENT, structure == null ? 0 : structure.coolingPercent);
-        data.set(DATA_WASTE_AMOUNT, (int) wasteTank.getAmount());
-        data.set(DATA_WASTE_CAPACITY, (int) wasteTank.getCapacity());
+        // 废液量/容量可超过 short 上限（容量由配置 reactorWasteCapacity 决定），拆 2 槽同步
+        LongDataSlots.writeInt(data, DATA_WASTE_AMOUNT, DATA_WASTE_AMOUNT_HIGH, (int) wasteTank.getAmount());
+        LongDataSlots.writeInt(data, DATA_WASTE_CAPACITY, DATA_WASTE_CAPACITY_HIGH, (int) wasteTank.getCapacity());
         data.set(DATA_WARNING, temp >= ModConfig.reactorTempWarn ? 1 : 0);
         data.set(DATA_ACTIVE_SLOTS, activeSlots);
         LongDataSlots.write(data, DATA_ENERGY_PER_TICK, DATA_ENERGY_PER_TICK_HIGH, energyPerTick);

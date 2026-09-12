@@ -121,11 +121,13 @@ public class AkaishiPurifierMatrixControllerBlockEntity extends BlockEntity
         }
         data.set(DATA_FORMED, formed ? 1 : 0);
 
-        // 单件提纯赤能源需求（配置 [machine] costMultiplier 全局放大；每 tick 抽取额同步放大 → 吞吐不变、仅增耗能）
-        long costTotal = (long) (ModConfig.purifierMatrixTotalCost * ModConfig.machineCostMultiplier);
-        // 成型后集中提纯：消耗能量推进进度，不足时暂停不清零（速度升级：消耗率 ×(1+12.5%/级)）
+        // 单件提纯赤能源需求（配置 [machine] costMultiplier 全局放大 + 速度升级耗能倍率，封顶 4×；每 tick 抽取额同步放大 → 速度只决定快慢、总耗放大）
+        long costTotal = (long) (ModConfig.purifierMatrixTotalCost * ModConfig.machineCostMultiplier
+                * getEnergyCostMultiplier());
+        // 成型后集中提纯：消耗能量推进进度，不足时暂停不清零（速度升级：消耗率 ×速度倍率，封顶 8×）
         if (formed && canProcess()) {
-            long extract = Math.min((long) (ModConfig.purifierMatrixRateFormed * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+            long extract = Math.min((long) (ModConfig.purifierMatrixRateFormed * getSpeedMultiplier()
+                            * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
                     energy.getEnergyStored());
             if (extract > 0) {
                 energy.extractEnergy(extract, false);

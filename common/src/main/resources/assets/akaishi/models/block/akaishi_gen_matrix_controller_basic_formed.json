@@ -1,6 +1,20 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/block",
   "textures": {
-    "all": "akaishi:block/akaishi_gen_matrix_controller_basic_formed"
-  }
+    "top": "akaishi:block/akaishi_gen_matrix_controller_basic_formed",
+    "bottom": "akaishi:block/akaishi_gen_matrix_controller_basic_formed",
+    "side": "akaishi:block/akaishi_gen_matrix_controller_basic_formed",
+    "front": "akaishi:block/akaishi_gen_matrix_controller_basic_formed"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {"texture": "#bottom"}, "up": {"texture": "#top"},
+        "north": {"texture": "#side"}, "south": {"texture": "#front"},
+        "west": {"texture": "#side"}, "east": {"texture": "#side"}
+      }
+    }
+  ]
 }

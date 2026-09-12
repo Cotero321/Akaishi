@@ -96,7 +96,7 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         if (isHovering(SPEED_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
-                            "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
+                            "x" + (1F + menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
         }
         if (isHovering(ENERGY_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {

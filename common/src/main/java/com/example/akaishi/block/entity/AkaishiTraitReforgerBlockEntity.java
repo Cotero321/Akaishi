@@ -173,7 +173,8 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
                 || inventory.getItem(CRYSTAL_SLOT).getCount() < cost) {
             return false;
         }
-        if (life.getEnergyStored() < ModConfig.traitReforgerLifeCost) {
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        if (life.getEnergyStored() < (long) (ModConfig.traitReforgerLifeCost * getEnergyCostMultiplier())) {
             return false;
         }
         // 产物槽必须为空：重铸后器官 NBT 与既有物品不同，无法合并堆叠
@@ -188,7 +189,8 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
             return;
         }
         int cost = crystalCost(old.getRarity());
-        life.extractEnergy(ModConfig.traitReforgerLifeCost, false);
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        life.extractEnergy((long) (ModConfig.traitReforgerLifeCost * getEnergyCostMultiplier()), false);
         inventory.getItem(CRYSTAL_SLOT).shrink(cost);
 
         ItemStack result = organ.copy();

@@ -154,8 +154,10 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
             speedAccum = 0;
             currentPlasma = target;
         }
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        long craftCost = (long) (ModConfig.aggregatorCostPerCraft * getEnergyCostMultiplier());
         // tick 前检查能量足够才扣费
-        if (energy.getEnergyStored() < ModConfig.aggregatorCostPerCraft) {
+        if (energy.getEnergyStored() < craftCost) {
             return;
         }
         FluidTank tank = plasmaTanks.get(indexOf(target));
@@ -163,7 +165,7 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         if (tank.getAmount() + ModConfig.aggregatorProducePerCraft > tank.getCapacity()) {
             return;
         }
-        // 机器升级：速度升级提升每 tick 加工进度（+1 → 每级 +12.5%，8 级 2 倍速；小数余量累积避免截断）
+        // 机器升级：速度升级提升每 tick 加工进度（每级 +100%，8 级 8 倍速；小数余量累积避免截断）
         speedAccum += getSpeedMultiplier();
         int delta = (int) speedAccum;
         if (delta > 0) {
@@ -174,7 +176,7 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         if (progress >= ModConfig.aggregatorProcessTicks) {
             progress = 0;
             inputStack.shrink(1);
-            energy.extractEnergy(ModConfig.aggregatorCostPerCraft, false);
+            energy.extractEnergy(craftCost, false);
             tank.fill(FluidStack.create(target, ModConfig.aggregatorProducePerCraft), false);
         }
         setChanged();

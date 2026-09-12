@@ -55,8 +55,8 @@ public class AkaishiMinerControllerScreen extends AbstractContainerScreen<Akaish
                 GuiWidgets.slotBox(gui, x + c, y + r);
             }
         }
-        // 玩家背包 + 快捷栏槽框
-        GuiWidgets.playerInventory(gui, x, y);
+        // 玩家背包 + 快捷栏槽框（坐标须与 AkaishiMinerControllerMenu 的 124/180 严格一致）
+        GuiWidgets.playerInventory(gui, x, y, 124, 180);
         // 能量条
         GuiWidgets.track(gui, x + 20, y + 22, 136, BAR_H);
         long max = Math.max(1, menu.getCapacity());

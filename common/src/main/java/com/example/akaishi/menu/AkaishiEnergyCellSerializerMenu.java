@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,19 +39,19 @@ public class AkaishiEnergyCellSerializerMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
-    /** 当前总储量（long 由 4 个 int 槽重组：0/1 低位/高位） */
+    /** 当前总储量（槽 0..3 为 64 位拆 4 个 16 位段，支持大容量串联储能） */
     public long getEnergy() {
-        return ((long) data.get(1) << 32) | (data.get(0) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 0, 1, 2, 3);
     }
 
-    /** 总容量上限（long 由 4 个 int 槽重组：2/3 低位/高位） */
+    /** 总容量上限（槽 4..7） */
     public long getMaxEnergy() {
-        return ((long) data.get(3) << 32) | (data.get(2) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 4, 5, 6, 7);
     }
 
-    /** 结构是否成型 */
+    /** 结构是否成型（槽 8） */
     public boolean isFormed() {
-        return data.get(4) == 1;
+        return data.get(8) == 1;
     }
 
     @Override
@@ -66,6 +67,6 @@ public class AkaishiEnergyCellSerializerMenu extends AbstractContainerMenu {
 
     /** 供无方块实体兜底时使用的空菜单（数据全 0） */
     public static AkaishiEnergyCellSerializerMenu emptyMenu(int id, Inventory inv) {
-        return new AkaishiEnergyCellSerializerMenu(id, inv, new SimpleContainerData(5));
+        return new AkaishiEnergyCellSerializerMenu(id, inv, new SimpleContainerData(9));
     }
 }

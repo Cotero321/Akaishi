@@ -184,7 +184,8 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
         // 提纯模式：纯度 <100 的样本（按纯度区间分档）
         if (input.getItem() instanceof AkaishiLifeSampleItem sampleItem) {
             int purity = AkaishiLifeSampleItem.getPurity(input);
-            long cost = purifyCost(purity);
+            // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+            long cost = (long) (purifyCost(purity) * getEnergyCostMultiplier());
             int solid = purifySolid(purity);
             if (purity < 100 && hasSolid(solid) && life.getEnergyStored() >= cost) {
                 if (mode != MODE_PURIFY) {
@@ -216,7 +217,8 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
         else if (input.getItem() instanceof AkaishiOrganItem) {
             QualityTier tier = AkaishiOrganItem.getTier(input);
             if (tier != null && tier.next() != null) {
-                long cost = upgradeCost(tier);
+                // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+                long cost = (long) (upgradeCost(tier) * getEnergyCostMultiplier());
                 int solid = upgradeSolid(tier);
                 if (hasSolid(solid) && life.getEnergyStored() >= cost) {
                     if (mode != MODE_UPGRADE) {

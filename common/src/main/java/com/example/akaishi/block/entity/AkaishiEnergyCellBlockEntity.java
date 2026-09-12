@@ -10,6 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.EnergyCellTier;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.menu.AkaishiEnergyCellMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -33,8 +34,13 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class AkaishiEnergyCellBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
-    /** data 布局：0/1=能量低/高位，2/3=容量低/高位，4/5=便携单元能量低/高位，6/7=便携单元容量低/高位 */
-    public static final int DATA_SIZE = 8;
+    /** data 布局（64 位 long 拆 4 槽，支持超级单元 200 亿容量）：
+     *  0..3=方块能量，4..7=方块容量，8..11=便携单元能量，12..15=便携单元容量 */
+    public static final int DATA_SIZE = 16;
+    public static final int DATA_ENERGY = 0;
+    public static final int DATA_CAPACITY = 4;
+    public static final int DATA_CELL_ENERGY = 8;
+    public static final int DATA_CELL_CAPACITY = 12;
 
     /** 数据缓存：long 能量拆 4 个 int 槽同步（0=能量低位，1=能量高位，2=容量低位，3=容量高位） */
     private final SimpleContainerData data;
@@ -58,22 +64,18 @@ public class AkaishiEnergyCellBlockEntity extends BlockEntity implements Extende
     private void tickServer() {
         // 为便携单元充能（速率取方块与便携单元传输速率中的较小者）
         chargePortableCell();
-        // 同步当前能量与容量到 GUI：long 拆 4 个 int 槽，Menu 侧重组（Menu 的 broadcastChanges 负责下发）
+        // 同步当前能量与容量到 GUI：long 拆 4 槽（64 位），Menu 侧重组（Menu 的 broadcastChanges 负责下发）
         long stored = energy.getEnergyStored();
         long max = energy.getMaxEnergy();
-        data.set(0, (int) stored);
-        data.set(1, (int) (stored >>> 32));
-        data.set(2, (int) max);
-        data.set(3, (int) (max >>> 32));
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY + 1, DATA_ENERGY + 2, DATA_ENERGY + 3, stored);
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY + 1, DATA_CAPACITY + 2, DATA_CAPACITY + 3, max);
         ItemStack cellStack = cellSlot.getItem(0);
         long cellStored = cellStack.getItem() instanceof AkaishiPortableEnergyCell portable
                 ? portable.getEnergyStored(cellStack) : 0;
         long cellMax = cellStack.getItem() instanceof AkaishiPortableEnergyCell portable2
                 ? portable2.getMaxEnergy() : 0;
-        data.set(4, (int) cellStored);
-        data.set(5, (int) (cellStored >>> 32));
-        data.set(6, (int) cellMax);
-        data.set(7, (int) (cellMax >>> 32));
+        LongDataSlots.write(data, DATA_CELL_ENERGY, DATA_CELL_ENERGY + 1, DATA_CELL_ENERGY + 2, DATA_CELL_ENERGY + 3, cellStored);
+        LongDataSlots.write(data, DATA_CELL_CAPACITY, DATA_CELL_CAPACITY + 1, DATA_CELL_CAPACITY + 2, DATA_CELL_CAPACITY + 3, cellMax);
     }
 
     /** 方块能量 → 便携单元注入（作为串联器外壳时经代理读取中心存储） */

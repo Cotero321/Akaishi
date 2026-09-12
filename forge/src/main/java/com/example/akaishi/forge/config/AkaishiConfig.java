@@ -512,7 +512,9 @@ public final class AkaishiConfig {
         b.push("decay_purifier");
         DECAY_PURIFIER_ENERGY_CAPACITY = b.comment("Akaishi energy buffer capacity")
                 .defineInRange("energyCapacity", 1_000_000L, 1L, Long.MAX_VALUE);
-        DECAY_PURIFIER_RANGE = b.comment("Purification range in blocks (euclidean distance to zone center)")
+        DECAY_PURIFIER_RANGE = b.comment("Purification range in blocks: a zone is always reached when the tower "
+                        + "stands inside it (horizontal distance <= zone radius); otherwise the tower reaches "
+                        + "zones whose center is within this euclidean distance")
                 .defineInRange("range", 80, 1, Integer.MAX_VALUE);
         DECAY_PURIFIER_COST_PER_TICK = b.comment("Akaishi energy consumed per tick while purifying")
                 .defineInRange("costPerTick", 2_000L, 1L, Long.MAX_VALUE);

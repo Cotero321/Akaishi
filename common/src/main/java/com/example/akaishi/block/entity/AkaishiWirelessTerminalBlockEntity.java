@@ -7,6 +7,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyCellArrayStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiWirelessTerminalMenu;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.IWirelessTerminal;
 import com.example.akaishi.wireless.WirelessFamily;
 import com.example.akaishi.wireless.WirelessNetworkManager;
@@ -75,7 +76,14 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity
     public static final int DATA_CHUNK_LOADED = 15;
     /** 区块加载能量税停用标志（1=因能量不足关闭网络区块加载）——已废弃：税已移除，槽位保留以免索引错位 */
     public static final int DATA_TAX_DISABLED = 16;
-    public static final int DATA_SLOTS = 17;
+    /** 储能 64 位高段：储能/容量超过 2^31（超级串联器 5200 亿）时，低 32 位槽 1..4 无法承载，追加高 32 位槽 */
+    public static final int DATA_STORED_HIGH2 = 17;
+    public static final int DATA_STORED_HIGH3 = 18;
+    public static final int DATA_CAPACITY_HIGH2 = 19;
+    public static final int DATA_CAPACITY_HIGH3 = 20;
+    /** 终端 ID 高 16 位（低 16 位见 {@link #DATA_TERMINAL_ID}）：数据槽仅 16 位有效，8 位 hex 短 ID 需拆 2 槽 */
+    public static final int DATA_TERMINAL_ID_HIGH = 21;
+    public static final int DATA_SLOTS = 22;
 
     /** 绑定储能单元的搜索半径：结构外围 1 格（单元单方块直接贴身布置即可，范围小不误扫无关方块） */
     private static final int BIND_RANGE = 1;
@@ -175,10 +183,8 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity
         lastStored = stored;
         lastMax = max;
         data.set(DATA_FORMED, formed ? 1 : 0);
-        data.set(DATA_STORED_LOW, (int) stored);
-        data.set(DATA_STORED_HIGH, (int) (stored >>> 32));
-        data.set(DATA_CAPACITY_LOW, (int) max);
-        data.set(DATA_CAPACITY_HIGH, (int) (max >>> 32));
+        LongDataSlots.write(data, DATA_STORED_LOW, DATA_STORED_HIGH, DATA_STORED_HIGH2, DATA_STORED_HIGH3, stored);
+        LongDataSlots.write(data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, DATA_CAPACITY_HIGH2, DATA_CAPACITY_HIGH3, max);
         data.set(DATA_INPUT_COUNT, WirelessNetworkManager.inputCount(terminalId));
         data.set(DATA_OUTPUT_COUNT, WirelessNetworkManager.outputCount(terminalId));
         data.set(DATA_BOUND_SERIALIZERS, cachedMembers.size());
@@ -190,8 +196,10 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity
         data.set(DATA_TAX_DISABLED, 0); // 废弃占位：区块加载税已移除，槽位保留以免后续索引错位
         data.set(DATA_INPUT_LOSS, structure == null ? 0 : structure.inputLossCount);
         data.set(DATA_OUTPUT_LOSS, structure == null ? 0 : structure.outputLossCount);
-        // 终端短 ID（UUID 前 4 字节）：GUI 8 位 hex 与身份卡/终端显示格式一致
-        data.set(DATA_TERMINAL_ID, (int) (terminalId.getMostSignificantBits() >>> 32));
+        // 终端短 ID（UUID 高 32 位）：GUI 8 位 hex 与身份卡/终端显示格式一致；
+        // 数据槽每槽仅 16 位有效，拆低/高 2 槽同步，避免高 16 位被截断
+        LongDataSlots.writeInt(data, DATA_TERMINAL_ID, DATA_TERMINAL_ID_HIGH,
+                (int) (terminalId.getMostSignificantBits() >>> 32));
     }
 
     // ===== 网络区块弱加载 =====

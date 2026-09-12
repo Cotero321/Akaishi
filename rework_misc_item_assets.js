@@ -1,10 +1,11 @@
 // 零散物品图标重制（工业机械 + 生物科技风）。
-// 目标（8 张，32x32 RGBA8）：
+// 目标（7 张，32x32 RGBA8）：
 //   dragon_mixture / end_mixture —— 密封试剂瓶（瓶身玻璃 + 有色液体 + 瓶塞）
 //   fuel_cell —— 燃料罐（金属罐体 + 观察窗液位）
 //   portable_akaishi_cell_basic/advanced/super —— 便携能量单元（电池 + 发光核心窗）
 //   cooling_base —— 冷却基底（底板 + 蛇形冷却管）
-//   akaishi_redstone_alloy_ingot —— 红石合金锭（斜面锭体 + 红石纹路）
+// 注：合金锭（含 akaishi_redstone_alloy_ingot）统一由 rework_ingot_mould_assets.js 处理，
+//     本脚本不再写锭类贴图，避免双源互相覆盖。
 // 统一规范：透明底 + 厚暗色轮廓 + 左上受光/右下背光 + 细微颗粒。
 // 幂等：首次运行备份原图到 gui_layouts/misc_item_backup/，之后始终以备份为源。
 // 用法：node rework_misc_item_assets.js
@@ -130,21 +131,7 @@ function coolingBase(px, pal) {
   outline(px, mask); grain(px, mask);
 }
 
-// 红石合金锭：斜面锭体 + 红石纹路
-function ingot(px, pal) {
-  const mask = new Uint8Array(W * H);
-  // 顶面（向右上倾斜的平行四边形）
-  for (let y = 10; y <= 14; y++) { const off = 14 - y; for (let x = 9 + off; x <= 23 + off; x++) { put(px, x, y, pal.light); mark(mask, x, y); } }
-  // 正面
-  fillRect(px, mask, 8, 15, 24, 22, pal.base);
-  // 底边阴影
-  fillRect(px, mask, 9, 23, 23, 23, pal.dark);
-  // 侧面受光/背光
-  for (let y = 15; y <= 23; y++) { put(px, 8, y, pal.light); put(px, 24, y, pal.dark); }
-  // 红石纹路
-  for (let x = 11; x <= 21; x += 2) { put(px, x, 17, pal.glow); put(px, x + 1, 20, pal.glow); }
-  outline(px, mask); grain(px, mask);
-}
+// 红石合金锭：改由 rework_ingot_mould_assets.js 处理（描边重着色），此处不再实现
 
 const PALS = {
   dragon_mixture: { base: [168, 44, 120], light: [240, 116, 194], dark: [86, 18, 66] },
@@ -154,14 +141,12 @@ const PALS = {
   portable_akaishi_cell_advanced: { base: [86, 94, 112], core: [72, 150, 240], light: [152, 208, 255], dark: [42, 48, 62] },
   portable_akaishi_cell_super: { base: [104, 88, 124], core: [176, 110, 240], light: [228, 182, 255], dark: [54, 42, 70] },
   cooling_base: { base: [110, 124, 138], fin: [156, 174, 190], light: [204, 220, 234], dark: [60, 70, 82], pipe: [64, 176, 190], pipeDark: [32, 104, 120], pipeHi: [156, 236, 240] },
-  akaishi_redstone_alloy_ingot: { base: [150, 44, 40], light: [216, 78, 64], dark: [84, 20, 20], glow: [255, 122, 92] },
 };
 const KINDS = {
   dragon_mixture: vial, end_mixture: vial,
   fuel_cell: canister,
   portable_akaishi_cell_basic: battery, portable_akaishi_cell_advanced: battery, portable_akaishi_cell_super: battery,
   cooling_base: coolingBase,
-  akaishi_redstone_alloy_ingot: ingot,
 };
 
 function checker(w, h, cell) {

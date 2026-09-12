@@ -1,6 +1,8 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.block.entity.AkaishiEnergyCellBlockEntity;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -48,24 +50,36 @@ public class AkaishiEnergyCellMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
-    /** 当前赤能源储量（long 由 4 个 int 槽重组：0/1 低位/高位） */
+    /** 当前赤能源储量（槽 0..3 为 64 位拆 4 个 16 位段） */
     public long getEnergy() {
-        return ((long) data.get(1) << 32) | (data.get(0) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiEnergyCellBlockEntity.DATA_ENERGY,
+                AkaishiEnergyCellBlockEntity.DATA_ENERGY + 1,
+                AkaishiEnergyCellBlockEntity.DATA_ENERGY + 2,
+                AkaishiEnergyCellBlockEntity.DATA_ENERGY + 3);
     }
 
-    /** 容量上限（long 由 4 个 int 槽重组：2/3 低位/高位） */
+    /** 容量上限（槽 4..7） */
     public long getMaxEnergy() {
-        return ((long) data.get(3) << 32) | (data.get(2) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiEnergyCellBlockEntity.DATA_CAPACITY,
+                AkaishiEnergyCellBlockEntity.DATA_CAPACITY + 1,
+                AkaishiEnergyCellBlockEntity.DATA_CAPACITY + 2,
+                AkaishiEnergyCellBlockEntity.DATA_CAPACITY + 3);
     }
 
-    /** 便携单元当前能量（4/5 低位/高位） */
+    /** 便携单元当前能量（槽 8..11） */
     public long getCellEnergy() {
-        return ((long) data.get(5) << 32) | (data.get(4) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiEnergyCellBlockEntity.DATA_CELL_ENERGY,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_ENERGY + 1,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_ENERGY + 2,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_ENERGY + 3);
     }
 
-    /** 便携单元容量（6/7 低位/高位） */
+    /** 便携单元容量（槽 12..15） */
     public long getCellMaxEnergy() {
-        return ((long) data.get(7) << 32) | (data.get(6) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiEnergyCellBlockEntity.DATA_CELL_CAPACITY,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_CAPACITY + 1,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_CAPACITY + 2,
+                AkaishiEnergyCellBlockEntity.DATA_CELL_CAPACITY + 3);
     }
 
     /** 充能槽是否有便携单元 */
@@ -120,6 +134,6 @@ public class AkaishiEnergyCellMenu extends AbstractContainerMenu {
 
     /** 供无方块实体兜底时使用的空菜单（数据全 0） */
     public static AkaishiEnergyCellMenu emptyMenu(int id, Inventory inv) {
-        return new AkaishiEnergyCellMenu(id, inv, new SimpleContainer(1), new net.minecraft.world.inventory.SimpleContainerData(8));
+        return new AkaishiEnergyCellMenu(id, inv, new SimpleContainer(1), new net.minecraft.world.inventory.SimpleContainerData(AkaishiEnergyCellBlockEntity.DATA_SIZE));
     }
 }

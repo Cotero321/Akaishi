@@ -142,8 +142,8 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         data.set(DATA_PROGRESS, progress);
 
         // 无配方 / 输入不足 / 输出不可容纳 / 能量不足 → 待机
-        // （运行能耗 = energyPerTick × 配置 [machine] costMultiplier，判定与扣费口径一致）
-        long perTick = (long) (energyPerTick() * ModConfig.machineCostMultiplier);
+        // （运行能耗 = energyPerTick × 配置 [machine] costMultiplier × 速度升级耗能倍率，判定与扣费口径一致）
+        long perTick = (long) (energyPerTick() * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
         int have = consumesInput() ? inputStack.getCount() : 1;
         if (recipe == null || inputStack.isEmpty() || have < recipe.inputCount()
                 || !canFitOutput(recipe.output()) || energy.getEnergyStored() < perTick) {

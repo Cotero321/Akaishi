@@ -15,7 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,7 @@ public class AkaishiFusionControllerBlock extends AkaishiMachineBlock {
 
     /** 结构成型标记：成型时启用燃烧逻辑并切换外观 */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public AkaishiFusionControllerBlock() {
         super(Properties.of()
@@ -36,12 +39,21 @@ public class AkaishiFusionControllerBlock extends AkaishiMachineBlock {
                 .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
                 .requiresCorrectToolForDrops());
-        this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(FORMED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(FORMED);
+        builder.add(FACING, FORMED);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        return this.defaultBlockState()
+                .setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(FORMED, false);
     }
 
     @Nullable

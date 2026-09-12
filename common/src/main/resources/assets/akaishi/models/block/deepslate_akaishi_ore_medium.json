@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "akaishi:block/template_ore_overlay",
   "textures": {
-    "all": "akaishi:block/deepslate_akaishi_ore_medium"
+    "base": "akaishi:block/deepslate_akaishi_ore_medium",
+    "ore": "akaishi:block/deepslate_akaishi_ore_medium_overlay"
   }
 }

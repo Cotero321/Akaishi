@@ -1,0 +1,11 @@
+{
+  "parent": "akaishi:block/akaishi_miner_controller_advanced",
+  "textures": {
+    "particle": "akaishi:block/akaishi_miner_controller_advanced_side_formed",
+    "up": "akaishi:block/akaishi_miner_controller_advanced_top_formed",
+    "north": "akaishi:block/akaishi_miner_controller_advanced_front_formed",
+    "south": "akaishi:block/akaishi_miner_controller_advanced_side_formed",
+    "west": "akaishi:block/akaishi_miner_controller_advanced_side_formed",
+    "east": "akaishi:block/akaishi_miner_controller_advanced_side_formed"
+  }
+}

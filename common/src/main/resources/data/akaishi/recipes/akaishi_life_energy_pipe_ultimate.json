@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PDP",
+    " P "
+  ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_life_energy_pipe_elite" },
+    "D": { "item": "akaishi:diamond_dust" }
+  },
+  "result": { "item": "akaishi:akaishi_life_energy_pipe_ultimate", "count": 1 }
+}

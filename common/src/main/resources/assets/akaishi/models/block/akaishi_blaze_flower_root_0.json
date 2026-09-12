@@ -1,6 +1,56 @@
 {
-  "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "akaishi:block/akaishi_blaze_flower_root_0"
-  }
+    "particle": "akaishi:block/akaishi_blaze_flower_root_0",
+    "leaf": "akaishi:block/akaishi_blaze_flower_root_0"
+  },
+  "elements": [
+    {
+      "from": [5, 0, 5],
+      "to": [11, 2, 11],
+      "faces": {
+        "up": { "texture": "#leaf" },
+        "down": { "texture": "#leaf" },
+        "north": { "texture": "#leaf" },
+        "south": { "texture": "#leaf" },
+        "east": { "texture": "#leaf" },
+        "west": { "texture": "#leaf" }
+      }
+    },
+    {
+      "from": [7, 2, 7],
+      "to": [9, 5, 9],
+      "faces": {
+        "up": { "texture": "#leaf" },
+        "down": { "texture": "#leaf" },
+        "north": { "texture": "#leaf" },
+        "south": { "texture": "#leaf" },
+        "east": { "texture": "#leaf" },
+        "west": { "texture": "#leaf" }
+      }
+    },
+    {
+      "from": [4, 2, 7],
+      "to": [7, 3, 9],
+      "faces": {
+        "up": { "texture": "#leaf" },
+        "down": { "texture": "#leaf" },
+        "north": { "texture": "#leaf" },
+        "south": { "texture": "#leaf" },
+        "east": { "texture": "#leaf" },
+        "west": { "texture": "#leaf" }
+      }
+    },
+    {
+      "from": [9, 2, 7],
+      "to": [12, 3, 9],
+      "faces": {
+        "up": { "texture": "#leaf" },
+        "down": { "texture": "#leaf" },
+        "north": { "texture": "#leaf" },
+        "south": { "texture": "#leaf" },
+        "east": { "texture": "#leaf" },
+        "west": { "texture": "#leaf" }
+      }
+    }
+  ]
 }

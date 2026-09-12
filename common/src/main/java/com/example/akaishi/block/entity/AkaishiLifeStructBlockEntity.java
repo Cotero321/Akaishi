@@ -122,8 +122,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
             progress = 0;
             speedAccum = 0;
         }
-        data.set(2, progress * 100 / ModConfig.lifeStructProcessTicks);
-        data.set(3, targetSlot);
+        data.set(DATA_PROGRESS, progress * 100 / ModConfig.lifeStructProcessTicks);
+        data.set(DATA_TARGET, targetSlot);
         if (changed) {
             setChanged();
         }
@@ -162,7 +162,9 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         if (targetSlot < 0 || !availableContains(BodySlot.values()[targetSlot])) {
             return false;
         }
-        if (!hasSolid(ModConfig.lifeStructSolidCost) || life.getEnergyStored() < ModConfig.lifeStructLifeCost) {
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        if (!hasSolid(ModConfig.lifeStructSolidCost)
+                || life.getEnergyStored() < (long) (ModConfig.lifeStructLifeCost * getEnergyCostMultiplier())) {
             return false;
         }
         // 产物槽必须为空：每次产出的器官纯度/适配度 NBT 均随机生成，与旧产物无法正确合并，
@@ -184,7 +186,8 @@ public class AkaishiLifeStructBlockEntity extends BlockEntity implements
         BodySlot target = BodySlot.values()[clampTarget()];
         int seqPurity = AkaishiGeneSequenceItem.getPurity(input);
 
-        life.extractEnergy(ModConfig.lifeStructLifeCost, false);
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        life.extractEnergy((long) (ModConfig.lifeStructLifeCost * getEnergyCostMultiplier()), false);
         inventory.getItem(SOLID_SLOT).shrink(ModConfig.lifeStructSolidCost);
         input.shrink(1);
 

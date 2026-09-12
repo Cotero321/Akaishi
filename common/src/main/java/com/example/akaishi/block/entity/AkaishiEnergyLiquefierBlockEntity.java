@@ -174,13 +174,14 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
             data.set(DATA_PROGRESS, 0);
             return;
         }
-        // 配置 [machine] costMultiplier：单件赤能源需求与每 tick 抽取额同步放大 → 只增耗能、吞吐不变
-        long costTotal = (long) (recipe.cost * ModConfig.machineCostMultiplier);
+        // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
+        long costTotal = (long) (recipe.cost * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
         // 目标罐：通用输出罐（产物与罐中异常液体不一致时 fill 会拒绝，安全）
         boolean changed = false;
         if (canAdd(outputTank, recipe.amount)) {
             // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）
-            long extract = Math.min((long) (ModConfig.energyLiquefierChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+            long extract = Math.min((long) (ModConfig.energyLiquefierChishiRate * getSpeedMultiplier()
+                            * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
                     akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);

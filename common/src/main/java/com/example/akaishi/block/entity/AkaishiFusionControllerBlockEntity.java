@@ -52,23 +52,25 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     public static final int MAX_FUEL_SLOTS = FusionStructure.MAX_FUEL_FRAMES;
 
     // ===== 数据槽 =====
+    /** 当前温度低 16 位段（温度上限 1.6 亿 > short ±32767，须拆两槽同步） */
     public static final int DATA_TEMP = 0;
-    public static final int DATA_FORMED = 1;
-    public static final int DATA_FUEL_FRAMES = 2;
-    public static final int DATA_EFFICIENCY_FRAMES = 3;
-    public static final int DATA_COOLER_COUNT = 4;
-    public static final int DATA_COOLING_PERCENT = 5;
-    public static final int DATA_ACTIVE_SLOTS = 6;
-    public static final int DATA_YIELD_LOW = 7;
-    public static final int DATA_YIELD_HIGH = 8;
-    public static final int DATA_OVERHEATED = 9;
-    public static final int DATA_COOLER_DURABILITY = 10;
-    public static final int DATA_SPEED_X100 = 11;
-    public static final int DATA_ASH_AMOUNT = 12;
-    public static final int DATA_ASH_AMOUNT_HIGH = 13;
+    public static final int DATA_TEMP_HIGH = 1;
+    public static final int DATA_FORMED = 2;
+    public static final int DATA_FUEL_FRAMES = 3;
+    public static final int DATA_EFFICIENCY_FRAMES = 4;
+    public static final int DATA_COOLER_COUNT = 5;
+    public static final int DATA_COOLING_PERCENT = 6;
+    public static final int DATA_ACTIVE_SLOTS = 7;
+    public static final int DATA_YIELD_LOW = 8;
+    public static final int DATA_YIELD_HIGH = 9;
+    public static final int DATA_OVERHEATED = 10;
+    public static final int DATA_COOLER_DURABILITY = 11;
+    public static final int DATA_SPEED_X100 = 12;
+    public static final int DATA_ASH_AMOUNT = 13;
+    public static final int DATA_ASH_AMOUNT_HIGH = 14;
     /** 过热停产剩余冷却（秒，服务端写入） */
-    public static final int DATA_OVERHEAT_COOLDOWN = 14;
-    public static final int DATA_SLOTS = 15;
+    public static final int DATA_OVERHEAT_COOLDOWN = 15;
+    public static final int DATA_SLOTS = 16;
 
     /** 过热停产时长：超温跳闸后强制冷却 5 分钟（20 tick/秒 × 300 秒），期间无法恢复燃烧 */
     private static final int OVERHEAT_COOLDOWN_TICKS = 20 * 60 * 5;
@@ -425,15 +427,15 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
     // ===== 数据同步 =====
 
     private void updateData() {
-        data.set(DATA_TEMP, (int) temp);
+        // 温度上限 1.6 亿 > short，拆两槽同步（2 槽足够，取值 < 2^32）
+        LongDataSlots.write(data, DATA_TEMP, DATA_TEMP_HIGH, (long) temp);
         data.set(DATA_FORMED, formedState() ? 1 : 0);
         data.set(DATA_FUEL_FRAMES, structure == null ? 0 : structure.fuelFrames);
         data.set(DATA_EFFICIENCY_FRAMES, structure == null ? 0 : structure.efficiencyFrames);
         data.set(DATA_COOLER_COUNT, structure == null ? 0 : structure.coolerFrames.size());
         data.set(DATA_COOLING_PERCENT, activeCoolingPercent());
         data.set(DATA_ACTIVE_SLOTS, activeSlots);
-        data.set(DATA_YIELD_LOW, (int) yieldPerTick);
-        data.set(DATA_YIELD_HIGH, (int) (yieldPerTick >>> 32));
+        LongDataSlots.write(data, DATA_YIELD_LOW, DATA_YIELD_HIGH, yieldPerTick);
         data.set(DATA_OVERHEATED, overheated ? 1 : 0);
         data.set(DATA_COOLER_DURABILITY, lowestCoolerDurability());
         data.set(DATA_SPEED_X100, speedPercent);

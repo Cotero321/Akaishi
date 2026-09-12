@@ -21,7 +21,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class AkaishiWitherRootBlock extends BushBlock {
 
-    private static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
+    /** 外形：底盘 + 四向根须外扩至 2~14，主干贯通整格（模型：akaishi_wither_root） */
+    private static final VoxelShape SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
     /** 每随机刻长出第一节茎的概率（生长条件后续再补） */
     private static final float GROW_CHANCE = 0.35F;
 

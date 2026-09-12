@@ -114,15 +114,17 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
             speedAccum = 0;
             currentInput = component;
         }
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        long craftCost = (long) (ModConfig.fractionatorCostPerCraft * getEnergyCostMultiplier());
         // tick 前检查能量足够才扣费（能量不足 → 暂停，进度保持）
-        if (energy.getEnergyStored() < ModConfig.fractionatorCostPerCraft) {
+        if (energy.getEnergyStored() < craftCost) {
             return;
         }
         // 产物槽不可容纳（加工中满仓）→ 暂停等待腾出
         if (progress < ModConfig.fractionatorProcessTicks && !canFit(component)) {
             return;
         }
-        // 机器升级：速度升级提升每 tick 加工进度（+1 → 每级 +12.5%，8 级 2 倍速；小数余量累积避免截断）
+        // 机器升级：速度升级提升每 tick 加工进度（每级 +100%，8 级 8 倍速；小数余量累积避免截断）
         speedAccum += getSpeedMultiplier();
         int delta = (int) speedAccum;
         if (delta > 0) {
@@ -134,7 +136,7 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
             if (canFit(component)) {
                 progress = 0;
                 inputStack.shrink(1);
-                energy.extractEnergy(ModConfig.fractionatorCostPerCraft, false);
+                energy.extractEnergy(craftCost, false);
                 addOutput(0, component);
                 addOutput(1, ModItems.exhaustedCrystal.get());
             }

@@ -8,6 +8,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiReactorEnergyOutputMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -25,12 +26,12 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 能量输出口方块实体：反应堆产出的赤能源缓冲罐（纯发电，管道只能抽取）。
  * 控制器每 tick 将赤能源灌入本罐，液体管道/能量网络从此抽取。
- * 右键打开能量查看界面（能量/容量经 4 个 int 数据槽同步）。
+ * 右键打开能量查看界面（能量/容量各经 4 个 int 数据槽同步，共 8 槽）。
  */
 public class AkaishiReactorEnergyOutputBlockEntity extends BlockEntity implements IEnergyProvider, ExtendedMenuProvider, IDataCarrier {
 
-    /** 数据槽：0/1=能量低/高位，2/3=容量低/高位（long 拆分同步） */
-    public static final int DATA_SLOTS = 4;
+    /** 数据槽：能量占 0..3、容量占 4..7（各 4 段 16 位，容量 50 亿超 32 位需完整同步） */
+    public static final int DATA_SLOTS = 8;
 
     private final AkaishiEnergyStorage energy;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
@@ -51,13 +52,11 @@ public class AkaishiReactorEnergyOutputBlockEntity extends BlockEntity implement
             controllerPos = null;
             setChanged();
         }
-        // 同步能量/容量到 GUI（long 拆 4 个 int 槽，Menu 侧重组）
+        // 同步能量/容量到 GUI（4 槽版：低 32 位 + 高 32 位，避免超 2^32 截断）
         long stored = energy.getEnergyStored();
         long max = energy.getMaxEnergy();
-        data.set(0, (int) stored);
-        data.set(1, (int) (stored >>> 32));
-        data.set(2, (int) max);
-        data.set(3, (int) (max >>> 32));
+        LongDataSlots.write(data, 0, 1, 2, 3, stored);
+        LongDataSlots.write(data, 4, 5, 6, 7, max);
     }
 
     public ContainerData data() {

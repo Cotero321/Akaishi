@@ -262,9 +262,10 @@ public final class ModBlockEntities {
         // 超级发生器架构核心（5×5×5 多方块主方块）
         CHISHI_SUPER_GENERATOR_CORE = be("akaishi_super_generator_core", AkaishiSuperGeneratorCoreBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_SUPER_GENERATOR_CORE);
-        // 生命能量管道（独立方块实体类型，传输生命能量）
+        // 生命能量管道：基础/中级/高级/超级四个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_LIFE_ENERGY_PIPE = be("akaishi_life_energy_pipe", AkaishiLifeEnergyPipeBlockEntity::new,
-                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE);
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ADVANCED,
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE);
         // 生命聚合转换器（单方块 / 外壳）
         CHISHI_LIFE_AGGREGATION_CONVERTER = be("akaishi_life_aggregation_converter",
                 AkaishiLifeAggregationConverterBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER);

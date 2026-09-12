@@ -11,6 +11,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyCellTier;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeEnergyCellMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -53,10 +54,8 @@ public class AkaishiLifeEnergyCellBlockEntity extends BlockEntity implements Ext
     }
 
     private void tickServer() {
-        data.set(0, (int) (energy.getEnergyStored() & 0xFFFFFFFFL));
-        data.set(1, (int) (energy.getEnergyStored() >>> 32));
-        data.set(2, (int) (energy.getMaxEnergy() & 0xFFFFFFFFL));
-        data.set(3, (int) (energy.getMaxEnergy() >>> 32));
+        LongDataSlots.write(data, 0, 1, energy.getEnergyStored());
+        LongDataSlots.write(data, 2, 3, energy.getMaxEnergy());
     }
 
     public ContainerData data() {

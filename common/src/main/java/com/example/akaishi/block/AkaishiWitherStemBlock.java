@@ -32,7 +32,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class AkaishiWitherStemBlock extends BushBlock {
 
-    private static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
+    /** 外形：主干 + 节瘤 + 侧刺，横向展至 4~12（模型：akaishi_wither_stem 系列） */
+    private static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
     /** 每随机刻第 2 格长出第 3 格的概率（生长条件后续再补） */
     private static final float GROW_CHANCE = 0.35F;
     /** 结果阶段推进概率（每随机刻） */

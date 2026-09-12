@@ -12,6 +12,7 @@ import com.example.akaishi.energy.AkaishiEnergyCellArrayStorage;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeEnergyCellSerializerMenu;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -60,13 +61,11 @@ public class AkaishiLifeEnergyCellSerializerBlockEntity extends BlockEntity impl
             level.setBlock(worldPosition, blockState.setValue(AkaishiLifeEnergyCellSerializerBlock.FORMED, formed), 3);
         }
 
-        // 同步总能量/总容量（long 拆 4 槽）+ 结构状态到 GUI
+        // 同步总能量/总容量（long 拆 2 槽，峰值 10.42 亿 < 2^32 不截断）+ 结构状态到 GUI
         long stored = arrayStorage.getEnergyStored();
         long max = arrayStorage.getMaxEnergy();
-        data.set(0, (int) stored);
-        data.set(1, (int) (stored >>> 32));
-        data.set(2, (int) max);
-        data.set(3, (int) (max >>> 32));
+        LongDataSlots.write(data, 0, 1, stored);
+        LongDataSlots.write(data, 2, 3, max);
         data.set(4, formed ? 1 : 0);
     }
 

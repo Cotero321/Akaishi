@@ -1,4 +1,4 @@
 {
   "parent": "minecraft:block/cube_all",
-  "textures": { "all": "akaishi:block/akaishi_life_wireless_core" }
+  "textures": { "all": "akaishi:block/akaishi_life_wireless_dim_bridge" }
 }

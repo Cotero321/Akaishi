@@ -33,8 +33,8 @@ public class AkaishiMinerItemOutputScreen extends AbstractContainerScreen<Akaish
                 GuiWidgets.slotBox(gui, x + 8 + col * 18, y + 40 + row * 18);
             }
         }
-        // 玩家背包 + 快捷栏槽框
-        GuiWidgets.playerInventory(gui, x, y);
+        // 玩家背包 + 快捷栏槽框（坐标须与 AkaishiMinerItemOutputMenu 的 124/180 严格一致）
+        GuiWidgets.playerInventory(gui, x, y, 124, 180);
     }
 
     @Override

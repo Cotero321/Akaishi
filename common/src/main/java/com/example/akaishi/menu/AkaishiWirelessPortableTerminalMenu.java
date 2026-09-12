@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +32,16 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
     public static final int DATA_OUTPUT_COUNT = 6;
     public static final int DATA_CARD_HASH = 7;
     public static final int DATA_TERMINAL_HASH = 8;
-    public static final int DATA_SLOTS = 9;
+    /** 卡短 ID 高 16 位（低 16 位见 {@link #DATA_CARD_HASH}）：数据槽仅 16 位有效，8 位 hex 短 ID 需拆 2 槽 */
+    public static final int DATA_CARD_HASH_HIGH = 9;
+    /** 终端短 ID 高 16 位（低 16 位见 {@link #DATA_TERMINAL_HASH}） */
+    public static final int DATA_TERMINAL_HASH_HIGH = 10;
+    /** 储能 64 位高段：终端储能/容量超过 2^31（超级串联器 5200 亿）时，低 32 位槽 0..3 无法承载，追加高 32 位槽 */
+    public static final int DATA_STORED_HIGH2 = 11;
+    public static final int DATA_STORED_HIGH3 = 12;
+    public static final int DATA_CAPACITY_HIGH2 = 13;
+    public static final int DATA_CAPACITY_HIGH3 = 14;
+    public static final int DATA_SLOTS = 15;
 
     private final ContainerData data = new SimpleContainerData(DATA_SLOTS);
     private final Player player;
@@ -64,7 +74,8 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
         ItemStack card = findCard(player);
         // 服务端逻辑：为背包新卡生成唯一卡号，保证能反查授权终端
         UUID cardUuid = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.ensureUuid(card);
-        data.set(DATA_CARD_HASH, cardUuid == null ? 0 : (int) (cardUuid.getMostSignificantBits() >>> 32));
+        LongDataSlots.writeInt(data, DATA_CARD_HASH, DATA_CARD_HASH_HIGH,
+                cardUuid == null ? 0 : (int) (cardUuid.getMostSignificantBits() >>> 32));
 
         UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid);
         boolean formed = false;
@@ -73,7 +84,8 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
         int input = 0;
         int output = 0;
         if (terminalId != null) {
-            data.set(DATA_TERMINAL_HASH, (int) (terminalId.getMostSignificantBits() >>> 32));
+            LongDataSlots.writeInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH,
+                    (int) (terminalId.getMostSignificantBits() >>> 32));
             WirelessNetworkManager.TerminalRef tr = WirelessNetworkManager.terminalOf(terminalId);
             if (tr != null && tr.dimension().equals(level.dimension())
                     && level.getBlockEntity(tr.pos()) instanceof AkaishiWirelessTerminalBlockEntity t && t.isFormed()) {
@@ -84,12 +96,10 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
                 output = WirelessNetworkManager.outputCount(terminalId);
             }
         } else {
-            data.set(DATA_TERMINAL_HASH, 0);
+            LongDataSlots.writeInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH, 0);
         }
-        data.set(DATA_STORED_LOW, (int) stored);
-        data.set(DATA_STORED_HIGH, (int) (stored >>> 32));
-        data.set(DATA_CAPACITY_LOW, (int) max);
-        data.set(DATA_CAPACITY_HIGH, (int) (max >>> 32));
+        LongDataSlots.write(data, DATA_STORED_LOW, DATA_STORED_HIGH, DATA_STORED_HIGH2, DATA_STORED_HIGH3, stored);
+        LongDataSlots.write(data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, DATA_CAPACITY_HIGH2, DATA_CAPACITY_HIGH3, max);
         data.set(DATA_FORMED, formed ? 1 : 0);
         data.set(DATA_INPUT_COUNT, input);
         data.set(DATA_OUTPUT_COUNT, output);
@@ -107,11 +117,11 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return ((long) data.get(DATA_STORED_HIGH) << 32) | (data.get(DATA_STORED_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, DATA_STORED_LOW, DATA_STORED_HIGH, DATA_STORED_HIGH2, DATA_STORED_HIGH3);
     }
 
     public long getMaxEnergy() {
-        return ((long) data.get(DATA_CAPACITY_HIGH) << 32) | (data.get(DATA_CAPACITY_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, DATA_CAPACITY_HIGH2, DATA_CAPACITY_HIGH3);
     }
 
     public boolean isFormed() {
@@ -126,14 +136,14 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
         return data.get(DATA_OUTPUT_COUNT);
     }
 
-    /** 背包身份卡短 ID（8 位 hex；0=未持有卡） */
+    /** 背包身份卡短 ID（8 位 hex；0=未持有卡；低/高 2 槽按 16 位段重组） */
     public int getCardHash() {
-        return data.get(DATA_CARD_HASH);
+        return LongDataSlots.readInt(data, DATA_CARD_HASH, DATA_CARD_HASH_HIGH);
     }
 
-    /** 认证终端短 ID（8 位 hex；0=未连接） */
+    /** 认证终端短 ID（8 位 hex；0=未连接；低/高 2 槽按 16 位段重组） */
     public int getTerminalHash() {
-        return data.get(DATA_TERMINAL_HASH);
+        return LongDataSlots.readInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH);
     }
 
     @Override

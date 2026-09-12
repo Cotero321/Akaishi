@@ -25,7 +25,7 @@ public final class AkaishiConfigScreenFactory {
     private AkaishiConfigScreenFactory() {
     }
 
-    /** 注册 Mods 界面配置按钮（onClientSetup 客户端调用） */
+    /** 注册 Mods 界面配置按钮（模组构造阶段，仅物理客户端调用） */
     public static void register() {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(
@@ -279,9 +279,12 @@ public final class AkaishiConfigScreenFactory {
 
     private static void longList(ConfigCategory cat, ConfigEntryBuilder eb, String key,
                                  ForgeConfigSpec.ConfigValue<List<? extends Long>> spec) {
+        // TOML 中的纯整数会被 NightConfig 读回 Integer，不能按 Long 强转，否则界面构建抛 ClassCastException
         List<Long> current = new ArrayList<>();
-        for (Long v : spec.get()) {
-            current.add(v);
+        for (Object v : spec.get()) {
+            if (v instanceof Number n) {
+                current.add(n.longValue());
+            }
         }
         cat.addEntry(eb.startLongList(Component.translatable("config.akaishi." + key), current)
                 .setSaveConsumer(v -> spec.set(new ArrayList<>(v)))
@@ -297,9 +300,12 @@ public final class AkaishiConfigScreenFactory {
 
     private static void intList(ConfigCategory cat, ConfigEntryBuilder eb, String key,
                                 ForgeConfigSpec.ConfigValue<List<? extends Integer>> spec) {
+        // 同上：按 Number 取值，兼容手改配置写入的 Long/Integer 混用
         List<Integer> current = new ArrayList<>();
-        for (Integer v : spec.get()) {
-            current.add(v);
+        for (Object v : spec.get()) {
+            if (v instanceof Number n) {
+                current.add(n.intValue());
+            }
         }
         cat.addEntry(eb.startIntList(Component.translatable("config.akaishi." + key), current)
                 .setSaveConsumer(v -> spec.set(new ArrayList<>(v)))
@@ -308,9 +314,12 @@ public final class AkaishiConfigScreenFactory {
 
     private static void doubleList(ConfigCategory cat, ConfigEntryBuilder eb, String key,
                                    ForgeConfigSpec.ConfigValue<List<? extends Double>> spec) {
+        // 同上：手改配置写 [0, 0] 时读回为 Integer，按 Number 取值避免强转失败
         List<Double> current = new ArrayList<>();
-        for (Double v : spec.get()) {
-            current.add(v);
+        for (Object v : spec.get()) {
+            if (v instanceof Number n) {
+                current.add(n.doubleValue());
+            }
         }
         cat.addEntry(eb.startDoubleList(Component.translatable("config.akaishi." + key), current)
                 .setSaveConsumer(v -> spec.set(new ArrayList<>(v)))

@@ -67,11 +67,10 @@ public class AkaishiLifeActivatorMenu extends AbstractContainerMenu {
                 AkaishiLifeActivatorBlockEntity.DATA_OUT_CAPACITY_HIGH);
     }
 
-    /** 累计活化量（mb）：低/高 32 位双槽重组为 long，无精度损失 */
+    /** 累计活化量（mb）：槽 DATA_PROCESSED_LOW/HIGH 为低/高 16 位段 */
     public long getProcessed() {
-        long low = data.get(AkaishiLifeActivatorBlockEntity.DATA_PROCESSED_LOW) & 0xFFFFFFFFL;
-        long high = (long) data.get(AkaishiLifeActivatorBlockEntity.DATA_PROCESSED_HIGH) << 32;
-        return high | low;
+        return LongDataSlots.read(data, AkaishiLifeActivatorBlockEntity.DATA_PROCESSED_LOW,
+                AkaishiLifeActivatorBlockEntity.DATA_PROCESSED_HIGH);
     }
 
     @Override

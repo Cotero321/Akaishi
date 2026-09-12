@@ -15,7 +15,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 聚变控制器菜单：4 个燃料槽 + 10 个散热片槽 + 15 个数据槽 + 玩家背包。
+ * 聚变控制器菜单：4 个燃料槽 + 10 个散热片槽 + 16 个数据槽 + 玩家背包。
  * <p>
  * 界面分三页（运行情况/燃料/热量），机器槽位随页签激活：
  * <ul>
@@ -124,7 +124,9 @@ public class AkaishiFusionControllerMenu extends AbstractContainerMenu {
     // ===== 数据读取（供界面显示） =====
 
     public int getTemp() {
-        return data.get(AkaishiFusionControllerBlockEntity.DATA_TEMP);
+        // 温度上限 1.6 亿 > short：由低/高两槽重组（仍 < Integer.MAX_VALUE）
+        return (int) LongDataSlots.read(data, AkaishiFusionControllerBlockEntity.DATA_TEMP,
+                AkaishiFusionControllerBlockEntity.DATA_TEMP_HIGH);
     }
 
     public boolean isFormed() {
@@ -156,10 +158,10 @@ public class AkaishiFusionControllerMenu extends AbstractContainerMenu {
         return data.get(AkaishiFusionControllerBlockEntity.DATA_ACTIVE_SLOTS);
     }
 
-    /** 当前产率（赤能源/tick，long 由 7/8 低位/高位重组） */
+    /** 当前产率（赤能源/tick，槽 7/8 为低/高 16 位段） */
     public long getYieldPerTick() {
-        return ((long) data.get(AkaishiFusionControllerBlockEntity.DATA_YIELD_HIGH) << 32)
-                | (data.get(AkaishiFusionControllerBlockEntity.DATA_YIELD_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiFusionControllerBlockEntity.DATA_YIELD_LOW,
+                AkaishiFusionControllerBlockEntity.DATA_YIELD_HIGH);
     }
 
     public boolean isOverheated() {

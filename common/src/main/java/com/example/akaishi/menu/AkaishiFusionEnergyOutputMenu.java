@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,7 +11,8 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 聚变能量输出口菜单：无机器槽位，仅玩家背包 + 能量/容量数据展示。
- * 能量与容量为 long，拆 4 个 int 数据槽同步（0/1=能量低/高位，2/3=容量低/高位）。
+ * 能量与容量为 long，各拆 4 个 int 数据槽同步（0..3=能量 4 段，4..7=容量 4 段）。
+ * 容量配置达 200 亿（超 2^32），必须用 4 槽版避免高位截断。
  */
 public class AkaishiFusionEnergyOutputMenu extends AbstractContainerMenu {
 
@@ -33,14 +35,14 @@ public class AkaishiFusionEnergyOutputMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
-    /** 缓冲能量（long 由 0/1 低位/高位重组） */
+    /** 缓冲能量（槽 0..3 为 4 个 16 位段） */
     public long getEnergy() {
-        return ((long) data.get(1) << 32) | (data.get(0) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 0, 1, 2, 3);
     }
 
-    /** 缓冲容量（long 由 2/3 低位/高位重组） */
+    /** 缓冲容量（槽 4..7 为 4 个 16 位段） */
     public long getMaxEnergy() {
-        return ((long) data.get(3) << 32) | (data.get(2) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 4, 5, 6, 7);
     }
 
     @Override
@@ -78,6 +80,6 @@ public class AkaishiFusionEnergyOutputMenu extends AbstractContainerMenu {
 
     /** 供无方块实体兜底时使用的空菜单（数据全 0） */
     public static AkaishiFusionEnergyOutputMenu emptyMenu(int id, Inventory inv) {
-        return new AkaishiFusionEnergyOutputMenu(id, inv, new SimpleContainerData(4));
+        return new AkaishiFusionEnergyOutputMenu(id, inv, new SimpleContainerData(8));
     }
 }

@@ -1,6 +1,56 @@
 {
-  "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "akaishi:block/akaishi_wither_stem"
-  }
+    "particle": "akaishi:block/akaishi_wither_stem",
+    "stem": "akaishi:block/akaishi_wither_stem"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 16, 9],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [6, 7, 6],
+      "to": [10, 9, 10],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [4, 5, 7],
+      "to": [7, 6, 9],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [9, 11, 7],
+      "to": [12, 12, 9],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    }
+  ]
 }

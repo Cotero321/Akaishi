@@ -2,6 +2,7 @@ package com.example.akaishi.block;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.energy.LifeEnergyCellTier;
+import com.example.akaishi.energy.LifeEnergyPipeTier;
 import com.example.akaishi.energy.LifeEnergyType;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -20,8 +21,14 @@ import net.minecraft.world.level.block.Block;
  */
 public final class AkaishiLifeBlocks {
 
-    /** 生命能量管道（传输生命能量类型） */
+    /** 生命能量管道（基础，传输生命能量类型，1000/tick） */
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE = null;
+    /** 生命能量管道（中级，4000/tick） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_ADVANCED = null;
+    /** 生命能量管道（高级，16000/tick） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_ELITE = null;
+    /** 生命能量管道（超级，64000/tick） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_ULTIMATE = null;
     /** 生命聚合转换器（消耗赤能源聚合生命能量，单方块 / 生命转换架构外壳） */
     public static RegistrySupplier<Block> CHISHI_LIFE_AGGREGATION_CONVERTER = null;
     /** 生命转换架构（3×3×3 多方块主方块） */
@@ -97,8 +104,15 @@ public final class AkaishiLifeBlocks {
     /** 注册全部生命系统方块（由 AkaishiMod.init 调用） */
     public static void register() {
         Registrar<Block> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
+        // 生命能量管道（基础/中级/高级/超级），速率对齐物品管道分级
         CHISHI_LIFE_ENERGY_PIPE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe",
-                AkaishiLifeEnergyPipeBlock::new);
+                () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.BASIC));
+        CHISHI_LIFE_ENERGY_PIPE_ADVANCED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_advanced",
+                () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.ADVANCED));
+        CHISHI_LIFE_ENERGY_PIPE_ELITE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_elite",
+                () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.ELITE));
+        CHISHI_LIFE_ENERGY_PIPE_ULTIMATE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_ultimate",
+                () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.ULTIMATE));
         CHISHI_LIFE_AGGREGATION_CONVERTER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_aggregation_converter",
                 AkaishiLifeAggregationConverterBlock::new);
         CHISHI_LIFE_CONVERSION_ARCHITECTURE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_conversion_architecture",

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "bottom": "akaishi:block/akaishi_miner_controller_advanced_bottom",
-    "top": "akaishi:block/akaishi_miner_controller_advanced_top",
-    "side": "akaishi:block/akaishi_miner_controller_advanced_side"
+    "particle": "akaishi:block/akaishi_miner_controller_advanced_side",
+    "down": "akaishi:block/akaishi_miner_controller_advanced_bottom",
+    "up": "akaishi:block/akaishi_miner_controller_advanced_top",
+    "north": "akaishi:block/akaishi_miner_controller_advanced_front",
+    "south": "akaishi:block/akaishi_miner_controller_advanced_side",
+    "west": "akaishi:block/akaishi_miner_controller_advanced_side",
+    "east": "akaishi:block/akaishi_miner_controller_advanced_side"
   }
 }

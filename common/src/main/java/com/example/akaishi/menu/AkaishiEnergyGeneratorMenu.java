@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEnergyGeneratorBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -55,21 +56,25 @@ public class AkaishiEnergyGeneratorMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
+    /** 当前能量（拆低/高两槽重组，上限 10M > short） */
     public int getEnergy() {
-        return data.get(0);
+        return (int) LongDataSlots.read(data, AkaishiEnergyGeneratorBlockEntity.DATA_ENERGY,
+                AkaishiEnergyGeneratorBlockEntity.DATA_ENERGY_HIGH);
     }
 
     public int getBurnTime() {
-        return data.get(1);
+        return (int) LongDataSlots.read(data, AkaishiEnergyGeneratorBlockEntity.DATA_BURN,
+                AkaishiEnergyGeneratorBlockEntity.DATA_BURN_HIGH);
     }
 
     public int getBurnTimeTotal() {
-        return data.get(2);
+        return (int) LongDataSlots.read(data, AkaishiEnergyGeneratorBlockEntity.DATA_BURN_TOTAL,
+                AkaishiEnergyGeneratorBlockEntity.DATA_BURN_TOTAL_HIGH);
     }
 
     /** 已装配的加速组件数量（0-10） */
     public int getUpgradeCount() {
-        return data.get(3);
+        return data.get(AkaishiEnergyGeneratorBlockEntity.DATA_UPGRADES);
     }
 
     /** 当前加速倍率（供界面显示） */

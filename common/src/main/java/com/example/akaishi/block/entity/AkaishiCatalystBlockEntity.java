@@ -10,6 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiCatalystMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 赤石催化器方块实体：每 tick 消耗赤能源，对范围内每个母岩执行一次"催化生长尝试"，
  * 成功率 = 等级效率（20%-50%），与母岩自身随机 tick 叠加，大幅提升水晶簇产出。
- * GUI 数据槽：0=能量，1=容量，2=工作标志（1=能量充足正在催化）。
+ * GUI 数据槽：能量/容量上限 50000 超 short ±32767，各拆低/高两槽；工作标志单槽。
  */
 public class AkaishiCatalystBlockEntity extends BlockEntity implements IEnergyProvider, ExtendedMenuProvider, IDataCarrier {
 
@@ -36,9 +37,11 @@ public class AkaishiCatalystBlockEntity extends BlockEntity implements IEnergyPr
     public static final int MAX_ENERGY = 50000;
 
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_WORKING = 2;
-    public static final int DATA_SLOTS = 3;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_WORKING = 4;
+    public static final int DATA_SLOTS = 5;
 
     private final AkaishiCatalystBlock.CatalystTier tier;
     private final AkaishiEnergyStorage energy;
@@ -64,9 +67,9 @@ public class AkaishiCatalystBlockEntity extends BlockEntity implements IEnergyPr
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        // 同步 GUI：能量/容量/工作标志
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, MAX_ENERGY);
+        // 同步 GUI：能量/容量（50000 > short，各拆两槽）/工作标志
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, MAX_ENERGY);
         data.set(DATA_WORKING, working ? 1 : 0);
 
         if (energy.getEnergyStored() < tier.energyCost) {

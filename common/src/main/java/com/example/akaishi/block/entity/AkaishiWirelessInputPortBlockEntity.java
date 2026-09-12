@@ -7,6 +7,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiWirelessPortMenu;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import com.example.akaishi.wireless.WirelessTransferUtil;
@@ -48,7 +49,11 @@ public class AkaishiWirelessInputPortBlockEntity extends BlockEntity implements 
     public static final int DATA_AUTHENTICATED = 6;
     /** 方向标志（1=输出口，0=输入口；供客户端 GUI 显示方向提示） */
     public static final int DATA_IS_OUTPUT = 7;
-    public static final int DATA_SLOTS = 8;
+    /** 绑定卡短 ID 高 16 位（低 16 位见 {@link #DATA_CARD_HASH}）：数据槽仅 16 位有效，8 位 hex 短 ID 需拆 2 槽 */
+    public static final int DATA_CARD_HASH_HIGH = 8;
+    /** 认证终端短 ID 高 16 位（低 16 位见 {@link #DATA_TERMINAL_HASH}） */
+    public static final int DATA_TERMINAL_HASH_HIGH = 9;
+    public static final int DATA_SLOTS = 10;
 
     private final AkaishiEnergyStorage buffer;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
@@ -103,12 +108,12 @@ public class AkaishiWirelessInputPortBlockEntity extends BlockEntity implements 
         // 同步数据槽
         long stored = buffer.getEnergyStored();
         long max = buffer.getMaxEnergy();
-        data.set(DATA_STORED_LOW, (int) stored);
-        data.set(DATA_STORED_HIGH, (int) (stored >>> 32));
-        data.set(DATA_CAPACITY_LOW, (int) max);
-        data.set(DATA_CAPACITY_HIGH, (int) (max >>> 32));
-        data.set(DATA_CARD_HASH, boundCard == null ? 0 : shortHash(boundCard));
-        data.set(DATA_TERMINAL_HASH, authenticatedTerminal == null ? 0 : shortHash(authenticatedTerminal));
+        LongDataSlots.write(data, DATA_STORED_LOW, DATA_STORED_HIGH, stored);
+        LongDataSlots.write(data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, max);
+        LongDataSlots.writeInt(data, DATA_CARD_HASH, DATA_CARD_HASH_HIGH,
+                boundCard == null ? 0 : shortHash(boundCard));
+        LongDataSlots.writeInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH,
+                authenticatedTerminal == null ? 0 : shortHash(authenticatedTerminal));
         data.set(DATA_AUTHENTICATED, authenticatedTerminal != null ? 1 : 0);
         data.set(DATA_IS_OUTPUT, 0);
     }

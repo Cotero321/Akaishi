@@ -1,6 +1,81 @@
 {
-  "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "akaishi:block/akaishi_wither_root"
-  }
+    "particle": "akaishi:block/akaishi_wither_root",
+    "root": "akaishi:block/akaishi_wither_root",
+    "stem": "akaishi:block/akaishi_wither_stem"
+  },
+  "elements": [
+    {
+      "from": [5, 0, 5],
+      "to": [11, 4, 11],
+      "faces": {
+        "up": { "texture": "#root" },
+        "down": { "texture": "#root" },
+        "north": { "texture": "#root" },
+        "south": { "texture": "#root" },
+        "east": { "texture": "#root" },
+        "west": { "texture": "#root" }
+      }
+    },
+    {
+      "from": [6, 4, 6],
+      "to": [10, 16, 10],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [6, 0, 2],
+      "to": [9, 2, 5],
+      "faces": {
+        "up": { "texture": "#root" },
+        "down": { "texture": "#root" },
+        "north": { "texture": "#root" },
+        "south": { "texture": "#root" },
+        "east": { "texture": "#root" },
+        "west": { "texture": "#root" }
+      }
+    },
+    {
+      "from": [7, 0, 11],
+      "to": [10, 2, 14],
+      "faces": {
+        "up": { "texture": "#root" },
+        "down": { "texture": "#root" },
+        "north": { "texture": "#root" },
+        "south": { "texture": "#root" },
+        "east": { "texture": "#root" },
+        "west": { "texture": "#root" }
+      }
+    },
+    {
+      "from": [2, 0, 6],
+      "to": [5, 2, 9],
+      "faces": {
+        "up": { "texture": "#root" },
+        "down": { "texture": "#root" },
+        "north": { "texture": "#root" },
+        "south": { "texture": "#root" },
+        "east": { "texture": "#root" },
+        "west": { "texture": "#root" }
+      }
+    },
+    {
+      "from": [11, 0, 7],
+      "to": [14, 2, 10],
+      "faces": {
+        "up": { "texture": "#root" },
+        "down": { "texture": "#root" },
+        "north": { "texture": "#root" },
+        "south": { "texture": "#root" },
+        "east": { "texture": "#root" },
+        "west": { "texture": "#root" }
+      }
+    }
+  ]
 }

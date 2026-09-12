@@ -1,0 +1,64 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "#base",
+    "base": "akaishi:block/akaishi_ore_low",
+    "ore": "akaishi:block/akaishi_ore_low_overlay"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "down" },
+        "up": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "up" },
+        "north": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "north" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "south" },
+        "west": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "west" },
+        "east": { "uv": [0, 0, 16, 16], "texture": "#base", "cullface": "east" }
+      }
+    },
+    {
+      "from": [0, 0, -0.5],
+      "to": [16, 16, -0.48],
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "north" }
+      }
+    },
+    {
+      "from": [0, 0, 16.48],
+      "to": [16, 16, 16.5],
+      "faces": {
+        "south": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "south" }
+      }
+    },
+    {
+      "from": [-0.5, 0, 0],
+      "to": [-0.48, 16, 16],
+      "faces": {
+        "west": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "west" }
+      }
+    },
+    {
+      "from": [16.48, 0, 0],
+      "to": [16.5, 16, 16],
+      "faces": {
+        "east": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "east" }
+      }
+    },
+    {
+      "from": [0, -0.5, 0],
+      "to": [16, -0.48, 16],
+      "faces": {
+        "down": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "down" }
+      }
+    },
+    {
+      "from": [0, 16.48, 0],
+      "to": [16, 16.5, 16],
+      "faces": {
+        "up": { "uv": [0, 0, 16, 16], "texture": "#ore", "cullface": "up" }
+      }
+    }
+  ]
+}

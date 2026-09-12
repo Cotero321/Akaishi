@@ -144,9 +144,8 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
             level.playSound(null, worldPosition, ModSounds.ACTIVATOR_BUBBLE.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
             soundCooldown = 15;
         }
-        // long 拆低/高 32 位两槽同步，GUI 侧重组，避免单槽 int 溢出丢失精度
-        data.set(DATA_PROCESSED_LOW, (int) processed);
-        data.set(DATA_PROCESSED_HIGH, (int) (processed >>> 32));
+        // 累计活化量拆低/高 16 位段同步，GUI 侧经 LongDataSlots 重组
+        LongDataSlots.write(data, DATA_PROCESSED_LOW, DATA_PROCESSED_HIGH, processed);
         setChanged();
     }
 

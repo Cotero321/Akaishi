@@ -1,7 +1,12 @@
 {
   "variants": {
-    "": {
-      "model": "akaishi:block/akaishi_miner_controller_ultimate"
-    }
+    "facing=north,formed=false": { "model": "akaishi:block/akaishi_miner_controller_ultimate" },
+    "facing=east,formed=false": { "model": "akaishi:block/akaishi_miner_controller_ultimate", "y": 90 },
+    "facing=south,formed=false": { "model": "akaishi:block/akaishi_miner_controller_ultimate", "y": 180 },
+    "facing=west,formed=false": { "model": "akaishi:block/akaishi_miner_controller_ultimate", "y": 270 },
+    "facing=north,formed=true": { "model": "akaishi:block/akaishi_miner_controller_ultimate_formed" },
+    "facing=east,formed=true": { "model": "akaishi:block/akaishi_miner_controller_ultimate_formed", "y": 90 },
+    "facing=south,formed=true": { "model": "akaishi:block/akaishi_miner_controller_ultimate_formed", "y": 180 },
+    "facing=west,formed=true": { "model": "akaishi:block/akaishi_miner_controller_ultimate_formed", "y": 270 }
   }
 }

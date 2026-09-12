@@ -145,11 +145,13 @@ public class AkaishiReactorControllerMenu extends AbstractContainerMenu {
     }
 
     public long getWasteAmount() {
-        return data.get(AkaishiReactorControllerBlockEntity.DATA_WASTE_AMOUNT) & 0xFFFFFFFFL;
+        return LongDataSlots.readInt(data, AkaishiReactorControllerBlockEntity.DATA_WASTE_AMOUNT,
+                AkaishiReactorControllerBlockEntity.DATA_WASTE_AMOUNT_HIGH) & 0xFFFFFFFFL;
     }
 
     public long getWasteMax() {
-        return data.get(AkaishiReactorControllerBlockEntity.DATA_WASTE_CAPACITY) & 0xFFFFFFFFL;
+        return LongDataSlots.readInt(data, AkaishiReactorControllerBlockEntity.DATA_WASTE_CAPACITY,
+                AkaishiReactorControllerBlockEntity.DATA_WASTE_CAPACITY_HIGH) & 0xFFFFFFFFL;
     }
 
     public boolean isWarning() {

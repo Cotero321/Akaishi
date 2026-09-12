@@ -271,8 +271,8 @@ public final class ModMenus {
             }
             return new AkaishiEnergyGeneratorMenu(syncId, inv,
                     new SimpleContainer(AkaishiEnergyGeneratorBlockEntity.SLOT_COUNT),
-                    // 占位尺寸需与服务端一致：能量/燃烧/总燃烧/升级数 共 4 槽
-                    new SimpleContainerData(4));
+                    // 占位尺寸需与服务端一致：能量/燃烧/总燃烧（各 2 槽）+ 升级数 共 7 槽
+                    new SimpleContainerData(AkaishiEnergyGeneratorBlockEntity.DATA_SLOTS));
         });
         CHISHI_ENERGY_GENERATOR = (RegistrySupplier<MenuType<AkaishiEnergyGeneratorMenu>>) (Object) RegistrarManager
                 .get(AkaishiMod.MOD_ID).get(Registries.MENU)
@@ -870,7 +870,7 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(decayPurifierType, AkaishiDecayPurifierScreen::new));
 
-        // 发生器矩阵控制器：1 燃料槽 + 10 升级槽 + 6 数据槽（能量低/高、燃烧、总量、成型、升级数）
+        // 发生器矩阵控制器：1 燃料槽 + 10 升级槽 + 8 数据槽（能量/燃烧/总量各低高两槽、成型、升级数）
         MenuType<AkaishiGenMatrixControllerMenu> genMatrixType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
@@ -1165,7 +1165,7 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(terminalType, AkaishiWirelessTerminalScreen::new));
 
-        // 端口（输入口/输出口共用）：8 数据槽（缓冲储能 long + 卡/终端短 ID + 认证态 + 方向），无机器槽
+        // 端口（输入口/输出口共用）：10 数据槽（缓冲储能 long + 卡/终端短 ID 各拆 2 槽 + 认证态 + 方向），无机器槽
         MenuType<AkaishiWirelessPortMenu> wirelessPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();
@@ -1227,7 +1227,7 @@ public final class ModMenus {
                 MenuRegistry.registerScreenFactory(portableType, AkaishiWirelessPortableTerminalScreen::new));
 
         // ===== 聚变堆 =====
-        // 控制器：4 燃料槽 + 10 散热片槽 + 13 数据槽，三页界面（散热片槽直连控制器容器）
+        // 控制器：4 燃料槽 + 10 散热片槽 + 16 数据槽，三页界面（散热片槽直连控制器容器）
         MenuType<AkaishiFusionControllerMenu> fusionType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
             Level level = inv.player.level();

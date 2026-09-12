@@ -1,10 +1,12 @@
 {
   "variants": {
-    "formed=false": {
-      "model": "akaishi:block/akaishi_fusion_controller"
-    },
-    "formed=true": {
-      "model": "akaishi:block/akaishi_fusion_controller_formed"
-    }
+    "facing=north,formed=false": { "model": "akaishi:block/akaishi_fusion_controller" },
+    "facing=east,formed=false": { "model": "akaishi:block/akaishi_fusion_controller", "y": 90 },
+    "facing=south,formed=false": { "model": "akaishi:block/akaishi_fusion_controller", "y": 180 },
+    "facing=west,formed=false": { "model": "akaishi:block/akaishi_fusion_controller", "y": 270 },
+    "facing=north,formed=true": { "model": "akaishi:block/akaishi_fusion_controller_formed" },
+    "facing=east,formed=true": { "model": "akaishi:block/akaishi_fusion_controller_formed", "y": 90 },
+    "facing=south,formed=true": { "model": "akaishi:block/akaishi_fusion_controller_formed", "y": 180 },
+    "facing=west,formed=true": { "model": "akaishi:block/akaishi_fusion_controller_formed", "y": 270 }
   }
 }

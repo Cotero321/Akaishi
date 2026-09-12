@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * 发生器矩阵控制器菜单：1 个燃料槽 + 10 个升级组件槽 + 玩家背包槽。
- * 数据槽：0/1=能量低/高，2=燃烧能量，3=燃料总能量，4=结构状态，5=升级组件数。
+ * 数据槽：0/1=能量低/高，2/3=燃烧能量低/高，4/5=燃料总能量低/高，6=结构状态，7=升级组件数。
  */
 public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
 
@@ -68,11 +68,13 @@ public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
     }
 
     public int getBurnTime() {
-        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_BURN);
+        return (int) LongDataSlots.read(data, AkaishiGenMatrixControllerBlockEntity.DATA_BURN,
+                AkaishiGenMatrixControllerBlockEntity.DATA_BURN_HIGH);
     }
 
     public int getBurnTimeTotal() {
-        return data.get(AkaishiGenMatrixControllerBlockEntity.DATA_BURN_TOTAL);
+        return (int) LongDataSlots.read(data, AkaishiGenMatrixControllerBlockEntity.DATA_BURN_TOTAL,
+                AkaishiGenMatrixControllerBlockEntity.DATA_BURN_TOTAL_HIGH);
     }
 
     /** 结构是否完整激活 */

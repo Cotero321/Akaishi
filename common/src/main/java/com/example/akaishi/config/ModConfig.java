@@ -157,7 +157,7 @@ public final class ModConfig {
     // ==================== 衰变净化塔 ====================
     /** 净化塔赤能源缓冲容量 */
     public static volatile long decayPurifierEnergyCapacity = 1_000_000L;
-    /** 净化作用范围（格，塔心到区域中心的欧氏距离） */
+    /** 净化作用范围（格）：塔位于区域球内(水平)或塔心到区域中心的欧氏距离 ≤ 该值 */
     public static volatile int decayPurifierRange = 80;
     /** 每 tick 净化消耗的赤能源 */
     public static volatile long decayPurifierCostPerTick = 2_000L;

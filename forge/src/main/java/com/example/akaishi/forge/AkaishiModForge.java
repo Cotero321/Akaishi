@@ -5,9 +5,11 @@ import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
+import com.example.akaishi.block.AkaishiFoundationBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiTransgeneBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
@@ -68,6 +70,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
@@ -94,6 +97,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -228,6 +233,9 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> ModCommands.build(event.getDispatcher()));
 
+        // Mods 菜单在模组构造阶段收集配置扩展点，必须此时注册才能显示配置按钮。
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AkaishiConfigScreenFactory::register);
+
         // 客户端：赤石水晶簇贴图含透明像素，须注册 cutout 渲染，否则透明区域渲染成黑色块
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
     }
@@ -245,6 +253,13 @@ public final class AkaishiModForge {
         RenderTypeRegistry.register(RenderType.cutout(),
                 AkaishiDecayBlocks.CHISHI_DECAY_DOOR.get(),
                 AkaishiDecayBlocks.CHISHI_DECAY_TRAPDOOR.get());
+        // 16 种矿石为「底材 cube_all + 外凸 1/16 格矿斑层」两层：矿斑层贴图透明底，
+        // 必须注册 cutout，否则透明区渲染成黑色；正面两层重合、斜看产生视差立体感
+        List<Block> oreBlocks = new ArrayList<>(AkaishiFoundationBlocks.ALL_ORES.size());
+        for (AkaishiOreDef def : AkaishiFoundationBlocks.ALL_ORES) {
+            oreBlocks.add(AkaishiFoundationBlocks.get(def));
+        }
+        RenderTypeRegistry.register(RenderType.cutout(), oreBlocks.toArray(new Block[0]));
         // 结构玻璃为半透明材质，注册 translucent 才能正确混合显示内部结构
         RenderTypeRegistry.register(RenderType.translucent(),
                 AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get(),
@@ -260,8 +275,6 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINER_DRILL_BIT.get(), DrillBitBeaconRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
-        // Mods 列表"配置"按钮 → Cloth Config 游戏内配置界面
-        AkaishiConfigScreenFactory.register();
 
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();

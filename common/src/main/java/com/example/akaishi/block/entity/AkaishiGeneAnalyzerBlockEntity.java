@@ -110,7 +110,7 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
 
         boolean changed = false;
         if (canProcess()) {
-            // 机器升级：速度升级提升每 tick 解构进度（+1 → 每级 +12.5%，8 级 2 倍速；小数余量累积避免截断）
+            // 机器升级：速度升级提升每 tick 解构进度（每级 +100%，8 级 8 倍速；小数余量累积避免截断）
             speedAccum += getSpeedMultiplier();
             int delta = (int) speedAccum;
             if (delta > 0) {
@@ -120,7 +120,8 @@ public class AkaishiGeneAnalyzerBlockEntity extends BlockEntity implements
             }
             if (progress >= ModConfig.geneAnalyzerProcessTicks) {
                 progress = 0;
-                life.extractEnergy(ModConfig.geneAnalyzerLifeCost, false);
+                // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+                life.extractEnergy((long) (ModConfig.geneAnalyzerLifeCost * getEnergyCostMultiplier()), false);
                 // 无论成败样本都消耗；先取 NBT 再扣减
                 ItemStack sample = inventory.getItem(INPUT_SLOT);
                 ItemStack sequence = AkaishiGeneSequenceItem.createFromSample(sample);

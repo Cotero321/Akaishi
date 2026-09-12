@@ -1,6 +1,69 @@
 {
-  "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "akaishi:block/akaishi_wither_stem_fruit_ripe"
-  }
+    "particle": "akaishi:block/akaishi_wither_stem_fruit_ripe",
+    "stem": "akaishi:block/akaishi_wither_stem",
+    "fruit": "akaishi:block/akaishi_wither_stem_fruit_ripe"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 16, 9],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [6, 7, 6],
+      "to": [10, 9, 10],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [9, 8, 8],
+      "to": [12, 9, 10],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    },
+    {
+      "from": [9, 3, 5],
+      "to": [14, 10, 11],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    },
+    {
+      "from": [10, 1, 7],
+      "to": [13, 3, 10],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    }
+  ]
 }

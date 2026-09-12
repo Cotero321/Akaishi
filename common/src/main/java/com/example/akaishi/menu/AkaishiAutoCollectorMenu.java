@@ -3,6 +3,7 @@ package com.example.akaishi.menu;
 import com.example.akaishi.block.entity.AkaishiAutoCollectorBlockEntity;
 import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -62,14 +63,16 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
         addDataSlots(data);
     }
 
-    /** 当前赤石能量（GUI 能量条用） */
+    /** 当前赤石能量（GUI 能量条用；容量最高 25 万，拆两槽重组） */
     public int getEnergy() {
-        return data.get(AkaishiAutoCollectorBlockEntity.DATA_ENERGY);
+        return (int) LongDataSlots.read(data, AkaishiAutoCollectorBlockEntity.DATA_ENERGY,
+                AkaishiAutoCollectorBlockEntity.DATA_ENERGY_HIGH);
     }
 
-    /** 能量容量（GUI 能量条分母） */
+    /** 能量容量（GUI 能量条分母；拆两槽重组） */
     public int getEnergyCapacity() {
-        return data.get(AkaishiAutoCollectorBlockEntity.DATA_CAPACITY);
+        return (int) LongDataSlots.read(data, AkaishiAutoCollectorBlockEntity.DATA_CAPACITY,
+                AkaishiAutoCollectorBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 当前收集进度百分比（GUI 进度条用） */

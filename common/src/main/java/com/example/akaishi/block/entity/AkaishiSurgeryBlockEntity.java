@@ -255,13 +255,15 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
 
     private boolean hasResources(int solid, long lifeCost) {
         ItemStack solidStack = inventory.getItem(SOLID_SLOT);
+        // 单次手术耗能 = 基础 × 速度升级耗能倍率（封顶 4×），判定与扣费口径一致
+        long scaled = (long) (lifeCost * getEnergyCostMultiplier());
         return solidStack.is(ModItems.akaishiLifeEssenceSolid.get())
                 && solidStack.getCount() >= solid
-                && life.getEnergyStored() >= lifeCost;
+                && life.getEnergyStored() >= scaled;
     }
 
     private void consume(int solid, long lifeCost) {
-        life.extractEnergy(lifeCost, false);
+        life.extractEnergy((long) (lifeCost * getEnergyCostMultiplier()), false);
         inventory.getItem(SOLID_SLOT).shrink(solid);
     }
 

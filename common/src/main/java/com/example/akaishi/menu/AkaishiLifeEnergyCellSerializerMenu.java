@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -34,14 +35,14 @@ public class AkaishiLifeEnergyCellSerializerMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
-    /** 当前总储量（long 由 4 个 int 槽重组：0/1 低位/高位） */
+    /** 当前总储量（槽 0/1 为低/高 16 位段） */
     public long getEnergy() {
-        return ((long) data.get(1) << 32) | (data.get(0) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 0, 1);
     }
 
-    /** 总容量上限（long 由 4 个 int 槽重组：2/3 低位/高位） */
+    /** 总容量上限（槽 2/3 为低/高 16 位段） */
     public long getMaxEnergy() {
-        return ((long) data.get(3) << 32) | (data.get(2) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, 2, 3);
     }
 
     /** 结构是否成型 */

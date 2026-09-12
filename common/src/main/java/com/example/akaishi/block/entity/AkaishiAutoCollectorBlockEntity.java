@@ -15,6 +15,7 @@ import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.upgrade.IUpgradeableMachine;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
+import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -45,12 +46,14 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
     public static final int STORAGE_SIZE = 27;
     /** 能量缓冲容量 */
     public static final int MAX_ENERGY = 50000;
-    /** 与 Menu 同步的数据槽（0=能量 1=容量 2=收集进度% 3=状态；能量上限固定 5 万×5 倍率，int 安全） */
+    /** 与 Menu 同步的数据槽（能量/容量上限 5 万×能量升级倍率，超 short ±32767，各拆低/高两槽） */
     public static final int DATA_ENERGY = 0;
-    public static final int DATA_CAPACITY = 1;
-    public static final int DATA_PROGRESS = 2;
-    public static final int DATA_STATUS = 3;
-    public static final int DATA_SLOTS = 4;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_CAPACITY = 2;
+    public static final int DATA_CAPACITY_HIGH = 3;
+    public static final int DATA_PROGRESS = 4;
+    public static final int DATA_STATUS = 5;
+    public static final int DATA_SLOTS = 6;
     public static final int DATA_STATUS_IDLE = 0;    // 范围内无水晶簇，待机
     public static final int DATA_STATUS_NO_ENERGY = 1; // 能量不足，暂停
     public static final int DATA_STATUS_WORKING = 2; // 正在收集
@@ -92,19 +95,21 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
         // 动态扩容：能量升级组件生效时按倍率提升能量上限
         energy.setMaxEnergy((long) (MAX_ENERGY * getEnergyCapacityMultiplier()));
         // 状态判定：0=待机（无目标） 1=能量不足 2=工作中
+        // 运行能耗 = 基础耗能 × 速度升级耗能倍率（判定与扣费口径一致）
+        long energyCost = (long) (tier.energyCost * getEnergyCostMultiplier());
         BlockPos cluster = findCluster();
         int status;
         if (cluster == null) {
             status = DATA_STATUS_IDLE;
             progressTicks = 0;
             speedAccum = 0;
-        } else if (energy.getEnergyStored() < tier.energyCost) {
+        } else if (energy.getEnergyStored() < energyCost) {
             status = DATA_STATUS_NO_ENERGY;
         } else {
             status = DATA_STATUS_WORKING;
-            energy.extractEnergy(tier.energyCost, false);
+            energy.extractEnergy(energyCost, false);
             hum.tick(level, worldPosition);
-            // 速度升级：每级 +12.5%，8 级封顶 2 倍速（小数余量累积避免截断）
+            // 速度升级：每级 +100%，8 级封顶 8 倍速（小数余量累积避免截断）
             speedAccum += getSpeedMultiplier();
             int delta = (int) speedAccum;
             if (delta > 0) {
@@ -121,8 +126,9 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
             }
             setChanged();
         }
-        data.set(DATA_ENERGY, (int) energy.getEnergyStored());
-        data.set(DATA_CAPACITY, (int) energy.getMaxEnergy());
+        // 能量/容量拆两槽同步（容量随能量升级最高 25 万，超 short）
+        LongDataSlots.write(data, DATA_ENERGY, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.write(data, DATA_CAPACITY, DATA_CAPACITY_HIGH, energy.getMaxEnergy());
         data.set(DATA_PROGRESS, (int) (progressTicks * 100L / tier.workTicks));
         data.set(DATA_STATUS, status);
     }

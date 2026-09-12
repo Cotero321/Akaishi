@@ -132,14 +132,14 @@ public final class DecayZoneManager extends SavedData {
 
     /**
      * 统计指定位置范围内、同维度的衰竭区域数量（净化塔 GUI 展示用）。
-     * 距离按区域中心到塔心的欧氏距离判定，范围含边界。
+     * 命中条件见 {@link #inReach}：塔位于区域球内，或塔心到区域中心的欧氏距离 ≤ range。
      */
     public static int countZonesInRange(ServerLevel level, BlockPos center, int range) {
         DecayZoneManager mgr = get(level);
         String dim = level.dimension().location().toString();
         int n = 0;
         for (DecayZone zone : mgr.zones) {
-            if (zone.dimension().equals(dim) && inRange(center, zone.center(), range)) {
+            if (zone.dimension().equals(dim) && inReach(center, zone, range)) {
                 n++;
             }
         }
@@ -161,7 +161,7 @@ public final class DecayZoneManager extends SavedData {
         int removed = 0;
         boolean changed = false;
         for (DecayZone zone : mgr.zones) {
-            if (!zone.dimension().equals(dim) || !inRange(center, zone.center(), range)) {
+            if (!zone.dimension().equals(dim) || !inReach(center, zone, range)) {
                 continue;
             }
             if (zone.purify(ticks)) {
@@ -176,11 +176,24 @@ public final class DecayZoneManager extends SavedData {
         return removed;
     }
 
-    /** 塔心到区域中心的欧氏距离是否 ≤ 范围（平方比较避免开方） */
-    private static boolean inRange(BlockPos from, BlockPos to, int range) {
-        long dx = from.getX() - to.getX();
-        long dy = from.getY() - to.getY();
-        long dz = from.getZ() - to.getZ();
+    /**
+     * 净化命中判定：塔位于区域球内，或塔心到区域中心的欧氏距离 ≤ range。
+     * <p>
+     * 衰竭区域半径 48~1296 格（3 的次方区块梯度），远大于塔的默认作用范围 80 格，而区域中心
+     * 就是泄漏点本身——玩家不可能把塔压在正在腐化的泄漏点上，只会建在区域内侧或边缘，
+     * 此时到中心的距离轻易超过 range。若只比较"塔心↔区域中心"的欧氏距离，塔即便站在区域内
+     * 也会被判为不在范围，表现为"检测不到附近的衰竭区域"。
+     * 故塔在区域内一律命中；水平距离比较忽略高度差（与 {@link #isSpawnBlocked} 口径一致），
+     * 避免泄漏点在地下/山顶时因 Y 差把同水平范围内的塔挤出判定。
+     */
+    private static boolean inReach(BlockPos purifier, DecayZone zone, int range) {
+        long dx = purifier.getX() - zone.center().getX();
+        long dz = purifier.getZ() - zone.center().getZ();
+        long horizSq = dx * dx + dz * dz;
+        if (horizSq <= (long) zone.radius() * zone.radius()) {
+            return true;
+        }
+        long dy = purifier.getY() - zone.center().getY();
         return dx * dx + dy * dy + dz * dz <= (long) range * range;
     }
 

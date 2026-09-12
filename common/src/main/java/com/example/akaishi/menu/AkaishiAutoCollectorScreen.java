@@ -129,7 +129,7 @@ public class AkaishiAutoCollectorScreen extends AbstractContainerScreen<AkaishiA
         if (isHovering(speedSlot.x, speedSlot.y, 16, 16, mouseX, mouseY) && speedSlot.getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
-                            "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
+                            "x" + (1F + menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
             return;
         }

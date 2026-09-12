@@ -1,6 +1,29 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/block",
   "textures": {
-    "all": "akaishi:block/akaishi_gen_matrix_controller_advanced"
-  }
+    "top": "akaishi:block/akaishi_gen_matrix_controller_advanced",
+    "bottom": "akaishi:block/akaishi_gen_matrix_controller_advanced",
+    "side": "akaishi:block/akaishi_gen_matrix_controller_advanced",
+    "front": "akaishi:block/akaishi_gen_matrix_controller_advanced"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {"texture": "#bottom"}, "up": {"texture": "#top"},
+        "north": {"texture": "#side"}, "south": {"texture": "#front"},
+        "west": {"texture": "#side"}, "east": {"texture": "#side"}
+      }
+    },
+    {
+      "from": [2, 2, 0],
+      "to": [14, 14, 1],
+      "faces": {
+        "north": {"texture": "#front"}, "south": {"texture": "#front"},
+        "west": {"texture": "#front"}, "east": {"texture": "#front"},
+        "up": {"texture": "#front"}, "down": {"texture": "#front"}
+      }
+    }
+  ]
 }

@@ -142,9 +142,10 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
             return false;
         }
         ItemStack solid = inventory.getItem(SOLID_SLOT);
+        // 单次加工耗能 = 模板基础 × 速度升级耗能倍率（封顶 4×）
         if (!solid.is(ModItems.akaishiLifeEssenceSolid.get())
                 || solid.getCount() < template.solidCost()
-                || life.getEnergyStored() < template.lifeCost()) {
+                || life.getEnergyStored() < (long) (template.lifeCost() * getEnergyCostMultiplier())) {
             return false;
         }
         ItemStack output = inventory.getItem(OUTPUT_SLOT);
@@ -186,7 +187,8 @@ public class AkaishiPotionTableBlockEntity extends BlockEntity implements
         // 扣消耗：1 样本 + 模板固态物 + 模板生命能量
         sample.shrink(1);
         inventory.getItem(SOLID_SLOT).shrink(template.solidCost());
-        life.extractEnergy(template.lifeCost(), false);
+        // 单次加工耗能 = 模板基础 × 速度升级耗能倍率（封顶 4×）
+        life.extractEnergy((long) (template.lifeCost() * getEnergyCostMultiplier()), false);
         progress = 0;
         setChanged();
     }

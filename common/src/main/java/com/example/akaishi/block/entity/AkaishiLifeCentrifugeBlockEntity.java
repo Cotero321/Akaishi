@@ -121,8 +121,9 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         if (main == null || !canFit(0, main) || !canFit(1, ModItems.exhaustedCrystal.get())) {
             return; // 输出槽不可容纳完整一批，暂停分离
         }
-        // 单位成本 = costPerMb × 配置 [machine] costMultiplier（afford 按此口径限流，防超扣）
-        long unitCost = (long) (ModConfig.lifeCentrifugeCostPerMb * ModConfig.machineCostMultiplier);
+        // 单位成本 = costPerMb × 配置 [machine] costMultiplier × 速度升级耗能倍率（封顶 4×）（afford 按此口径限流，防超扣）
+        long unitCost = (long) (ModConfig.lifeCentrifugeCostPerMb * ModConfig.machineCostMultiplier
+                * getEnergyCostMultiplier());
         long afford = energy.getEnergyStored() / unitCost;
         // 速度升级：每 tick 分离量按倍率提升（消耗率随之上升，能量不足时由 afford 限流）
         long rate = (long) (Math.min(Math.min(ModConfig.lifeCentrifugeConvertRate, inTank.getAmount(fluid)), afford)

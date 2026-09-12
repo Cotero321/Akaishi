@@ -166,7 +166,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
                 || inventory.getItem(CRYSTAL_SLOT).getCount() < ModConfig.lifeBreederCrystalCost) {
             return false;
         }
-        if (life.getEnergyStored() < ModConfig.lifeBreederLifeCost) {
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        if (life.getEnergyStored() < (long) (ModConfig.lifeBreederLifeCost * getEnergyCostMultiplier())) {
             return false;
         }
         // 产物槽必须为空：突变器官 NBT 与既有物品不同，无法合并堆叠
@@ -179,7 +180,8 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
         ItemStack sequence = inventory.getItem(SEQUENCE_SLOT);
         int purity = AkaishiGeneSequenceItem.getPurity(sequence);
 
-        life.extractEnergy(ModConfig.lifeBreederLifeCost, false);
+        // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        life.extractEnergy((long) (ModConfig.lifeBreederLifeCost * getEnergyCostMultiplier()), false);
         inventory.getItem(CRYSTAL_SLOT).shrink(ModConfig.lifeBreederCrystalCost);
         sequence.shrink(1);
 

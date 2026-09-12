@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -129,13 +130,17 @@ public class AkaishiWirelessTerminalMenu extends AbstractContainerMenu {
     // ===== 数据槽读取 =====
 
     public long getEnergy() {
-        return ((long) data.get(AkaishiWirelessTerminalBlockEntity.DATA_STORED_HIGH) << 32)
-                | (data.get(AkaishiWirelessTerminalBlockEntity.DATA_STORED_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiWirelessTerminalBlockEntity.DATA_STORED_LOW,
+                AkaishiWirelessTerminalBlockEntity.DATA_STORED_HIGH,
+                AkaishiWirelessTerminalBlockEntity.DATA_STORED_HIGH2,
+                AkaishiWirelessTerminalBlockEntity.DATA_STORED_HIGH3);
     }
 
     public long getMaxEnergy() {
-        return ((long) data.get(AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_HIGH) << 32)
-                | (data.get(AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_LOW,
+                AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_HIGH,
+                AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_HIGH2,
+                AkaishiWirelessTerminalBlockEntity.DATA_CAPACITY_HIGH3);
     }
 
     public boolean isFormed() {
@@ -188,9 +193,11 @@ public class AkaishiWirelessTerminalMenu extends AbstractContainerMenu {
         return data.get(AkaishiWirelessTerminalBlockEntity.DATA_OUTPUT_LOSS);
     }
 
-    /** 终端短 ID（8 位 hex，与身份卡 ID 同格式） */
+    /** 终端短 ID（8 位 hex，与身份卡 ID 同格式；低/高 2 槽按 16 位段重组） */
     public String getTerminalShortId() {
-        return String.format("%08X", data.get(AkaishiWirelessTerminalBlockEntity.DATA_TERMINAL_ID));
+        return String.format("%08X", LongDataSlots.readInt(data,
+                AkaishiWirelessTerminalBlockEntity.DATA_TERMINAL_ID,
+                AkaishiWirelessTerminalBlockEntity.DATA_TERMINAL_ID_HIGH));
     }
 
     @Override

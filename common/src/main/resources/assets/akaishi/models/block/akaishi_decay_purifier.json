@@ -1,8 +1,46 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/block",
   "textures": {
     "bottom": "akaishi:block/akaishi_decay_purifier_bottom",
     "top": "akaishi:block/akaishi_decay_purifier_top",
     "side": "akaishi:block/akaishi_decay_purifier_side"
-  }
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 5, 16],
+      "faces": {
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "east": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "up": { "texture": "#top" },
+        "down": { "texture": "#bottom" }
+      }
+    },
+    {
+      "from": [2, 5, 2],
+      "to": [14, 11, 14],
+      "faces": {
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "east": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "up": { "texture": "#top" },
+        "down": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [5, 11, 5],
+      "to": [11, 16, 11],
+      "faces": {
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "east": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "up": { "texture": "#top" },
+        "down": { "texture": "#side" }
+      }
+    }
+  ]
 }

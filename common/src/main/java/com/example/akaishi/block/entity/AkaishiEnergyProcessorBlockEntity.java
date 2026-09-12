@@ -194,9 +194,11 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         boolean changed = false;
         if (canProcess(inputTank, outputTank, recipe)) {
             // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
-            // 配置 [machine] costMultiplier：单件赤能源需求与每 tick 抽取额同步放大 → 只增耗能、吞吐不变
-            long costTotal = (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier);
-            long extract = Math.min((long) (ModConfig.energyProcessorChishiRate * getSpeedMultiplier() * ModConfig.machineCostMultiplier),
+            // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
+            long costTotal = (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier
+                    * getEnergyCostMultiplier());
+            long extract = Math.min((long) (ModConfig.energyProcessorChishiRate * getSpeedMultiplier()
+                            * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
                     akaishi.getEnergyStored());
             if (extract > 0) {
                 akaishi.extractEnergy(extract, false);
@@ -217,7 +219,8 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         } else {
             progressEnergy = 0;
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier)));
+        data.set(DATA_PROGRESS, (int) (progressEnergy * 100
+                / (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier * getEnergyCostMultiplier())));
         if (changed) {
             setChanged();
         }

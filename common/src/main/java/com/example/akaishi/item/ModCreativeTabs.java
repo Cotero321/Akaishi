@@ -231,8 +231,11 @@ public final class ModCreativeTabs {
         accept(output, ModItems.akaishiOrganRightArm);
         accept(output, ModItems.akaishiOrganLeftLeg);
         accept(output, ModItems.akaishiOrganRightLeg);
-        // 生命能量体系：管道 + 聚合转换器 + 转换架构
+        // 生命能量体系：管道（基础/中级/高级/超级）+ 聚合转换器 + 转换架构
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE);
+        accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ADVANCED);
+        accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE);
+        accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE);
         // 生命能量储存器（基础/高级/超级）+ 串联器

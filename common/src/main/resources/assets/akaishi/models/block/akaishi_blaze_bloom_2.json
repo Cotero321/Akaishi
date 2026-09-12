@@ -1,6 +1,92 @@
 {
-  "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "akaishi:block/akaishi_blaze_bloom_2"
-  }
+    "particle": "akaishi:block/akaishi_blaze_bloom_2",
+    "bloom": "akaishi:block/akaishi_blaze_bloom_2"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 4, 9],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [5, 4, 5],
+      "to": [11, 6, 11],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [6, 6, 6],
+      "to": [10, 11, 10],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [5, 6, 3],
+      "to": [11, 10, 7],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [5, 6, 9],
+      "to": [11, 10, 13],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [3, 6, 5],
+      "to": [7, 10, 11],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [9, 6, 5],
+      "to": [13, 10, 11],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    }
+  ]
 }

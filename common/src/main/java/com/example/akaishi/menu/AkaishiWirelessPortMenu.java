@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiWirelessInputPortBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -63,23 +64,25 @@ public class AkaishiWirelessPortMenu extends AbstractContainerMenu {
     }
 
     public long getEnergy() {
-        return ((long) data.get(AkaishiWirelessInputPortBlockEntity.DATA_STORED_HIGH) << 32)
-                | (data.get(AkaishiWirelessInputPortBlockEntity.DATA_STORED_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiWirelessInputPortBlockEntity.DATA_STORED_LOW,
+                AkaishiWirelessInputPortBlockEntity.DATA_STORED_HIGH);
     }
 
     public long getMaxEnergy() {
-        return ((long) data.get(AkaishiWirelessInputPortBlockEntity.DATA_CAPACITY_HIGH) << 32)
-                | (data.get(AkaishiWirelessInputPortBlockEntity.DATA_CAPACITY_LOW) & 0xFFFFFFFFL);
+        return LongDataSlots.read(data, AkaishiWirelessInputPortBlockEntity.DATA_CAPACITY_LOW,
+                AkaishiWirelessInputPortBlockEntity.DATA_CAPACITY_HIGH);
     }
 
-    /** 绑定卡短 ID（8 位 hex；0=未绑定） */
+    /** 绑定卡短 ID（8 位 hex；0=未绑定；低/高 2 槽按 16 位段重组） */
     public int getCardHash() {
-        return data.get(AkaishiWirelessInputPortBlockEntity.DATA_CARD_HASH);
+        return LongDataSlots.readInt(data, AkaishiWirelessInputPortBlockEntity.DATA_CARD_HASH,
+                AkaishiWirelessInputPortBlockEntity.DATA_CARD_HASH_HIGH);
     }
 
-    /** 认证终端短 ID（8 位 hex；0=未认证） */
+    /** 认证终端短 ID（8 位 hex；0=未认证；低/高 2 槽按 16 位段重组） */
     public int getTerminalHash() {
-        return data.get(AkaishiWirelessInputPortBlockEntity.DATA_TERMINAL_HASH);
+        return LongDataSlots.readInt(data, AkaishiWirelessInputPortBlockEntity.DATA_TERMINAL_HASH,
+                AkaishiWirelessInputPortBlockEntity.DATA_TERMINAL_HASH_HIGH);
     }
 
     public boolean isAuthenticated() {

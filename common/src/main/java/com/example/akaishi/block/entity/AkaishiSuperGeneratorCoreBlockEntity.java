@@ -9,6 +9,7 @@ import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.AkaishiFuels;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -48,6 +49,17 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
     private static final int TOTAL_ENERGY_NUMERATOR = 9;
     private static final int TOTAL_ENERGY_DENOMINATOR = 4;
 
+    // ===== 数据槽（1.20.1 每槽仅 16 位有效，能量/燃料能量可超 short 上限，拆 2 槽同步） =====
+    public static final int DATA_ENERGY_LOW = 0;
+    public static final int DATA_ENERGY_HIGH = 1;
+    public static final int DATA_BURN_LOW = 2;
+    public static final int DATA_BURN_HIGH = 3;
+    public static final int DATA_BURN_TOTAL_LOW = 4;
+    public static final int DATA_BURN_TOTAL_HIGH = 5;
+    public static final int DATA_FORMED = 6;
+    public static final int DATA_UPGRADES = 7;
+    public static final int DATA_SLOTS = 8;
+
     private final SimpleContainer inventory;
     private final SimpleContainerData data;
     private AkaishiEnergyStorage energy;
@@ -65,7 +77,7 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
                 AkaishiSuperGeneratorCoreBlockEntity.this.setChanged();
             }
         };
-        this.data = new SimpleContainerData(5);
+        this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
     /** 加速倍率：n 个组件 → 1.75^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 242 倍 */
@@ -92,11 +104,11 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
 
     private void tickServer() {
         boolean changed = false;
-        data.set(0, (int) energy.getEnergyStored());
-        data.set(1, burnEnergy);
-        data.set(2, burnEnergyTotal);
+        LongDataSlots.write(data, DATA_ENERGY_LOW, DATA_ENERGY_HIGH, energy.getEnergyStored());
+        LongDataSlots.writeInt(data, DATA_BURN_LOW, DATA_BURN_HIGH, burnEnergy);
+        LongDataSlots.writeInt(data, DATA_BURN_TOTAL_LOW, DATA_BURN_TOTAL_HIGH, burnEnergyTotal);
         int upgrades = getUpgradeCount();
-        data.set(4, upgrades);
+        data.set(DATA_UPGRADES, upgrades);
 
         boolean formed = getBlockState().getValue(AkaishiSuperGeneratorCoreBlock.FORMED);
         boolean valid = isStructureValid();
@@ -105,7 +117,7 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
             formed = valid;
             changed = true;
         }
-        data.set(3, formed ? 1 : 0);
+        data.set(DATA_FORMED, formed ? 1 : 0);
 
         // 结构完整时以 200 倍速率集中产能，燃料总产能精确为单台的 3 倍
         if (formed && energy.getEnergyStored() < MAX_ENERGY) {

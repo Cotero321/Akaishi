@@ -20,15 +20,15 @@ import java.util.List;
 public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiTraitReforgerMenu> {
 
     private static final int PANEL_W = 176;
-    private static final int PANEL_H = 166;
-    /** 能量条 */
+    private static final int PANEL_H = 172;
+    /** 能量条（y=24~32，槽位行下移后独占该带，不再被槽位压住） */
     private static final int ENERGY_X = 16, ENERGY_Y = 24, ENERGY_W = 96, ENERGY_H = 8;
     /** 词条序号按钮（行内 1..4，点击选择目标词条） */
-    private static final int BTN_X0 = 8, BTN_Y = 50, BTN_STEP = 42, BTN_W = 38, BTN_H = 14;
+    private static final int BTN_X0 = 8, BTN_Y = 54, BTN_STEP = 42, BTN_W = 38, BTN_H = 14;
     /** 状态提示行（进度条上方） */
-    private static final int STATUS_Y = 67;
+    private static final int STATUS_Y = 70;
     /** 重铸进度条 */
-    private static final int PROGRESS_X = 56, PROGRESS_Y = 76, PROGRESS_W = 96, PROGRESS_H = 8;
+    private static final int PROGRESS_X = 56, PROGRESS_Y = 80, PROGRESS_W = 96, PROGRESS_H = 8;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3；标签置于槽位左侧） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
@@ -242,7 +242,7 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
         if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
-                            "x" + (1F + 0.125F * menu.getSpeedUpgradeCount())),
+                            "x" + (1F + menu.getSpeedUpgradeCount())),
                     mouseX, mouseY);
         }
         if (isHovering(ENERGY_SLOT_X, ENERGY_SLOT_Y, 16, 16, mouseX, mouseY)) {
@@ -252,15 +252,15 @@ public class AkaishiTraitReforgerScreen extends AbstractContainerScreen<AkaishiT
                     mouseX, mouseY);
         }
         // 器官输入/衰竭结晶/输出空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
-        if (isHovering(30, 30, 16, 16, mouseX, mouseY)
+        if (isHovering(30, 34, 16, 16, mouseX, mouseY)
                 && menu.slots.get(ORGAN_SLOT_INDEX).getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.trait_reforger.organ_tip"), mouseX, mouseY);
-        } else if (isHovering(82, 30, 16, 16, mouseX, mouseY)
+        } else if (isHovering(82, 34, 16, 16, mouseX, mouseY)
                 && menu.slots.get(CRYSTAL_SLOT_INDEX).getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.trait_reforger.crystal_tip"), mouseX, mouseY);
-        } else if (isHovering(116, 30, 16, 16, mouseX, mouseY)
+        } else if (isHovering(116, 34, 16, 16, mouseX, mouseY)
                 && menu.slots.get(OUTPUT_SLOT_INDEX).getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.trait_reforger.output_tip"), mouseX, mouseY);

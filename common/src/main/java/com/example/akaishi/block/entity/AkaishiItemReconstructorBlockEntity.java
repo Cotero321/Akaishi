@@ -134,15 +134,17 @@ public class AkaishiItemReconstructorBlockEntity extends BlockEntity implements
             return; // 结晶槽为空或非衰竭结晶
         }
         // 机器升级：速度升级每 tick 多处理若干子步（每子步消耗 1 结晶 + 能量）
+        // 单步耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        long stepCost = (long) (ModConfig.reconstructorCostPerCrystal * getEnergyCostMultiplier());
         int steps = (int) getSpeedMultiplier();
         for (int s = 0; s < steps && !crystalStack.isEmpty()
-                && energy.getEnergyStored() >= ModConfig.reconstructorCostPerCrystal; s++) {
+                && energy.getEnergyStored() >= stepCost; s++) {
             if (!canFitOutput(recipe.output())) {
                 break; // 产物槽不可容纳 → 暂停等待腾出
             }
             // 每子步：消耗 1 结晶 + 能量，进度 +1；满代价结算 1 产物
             crystalStack.shrink(1);
-            energy.extractEnergy(ModConfig.reconstructorCostPerCrystal, false);
+            energy.extractEnergy(stepCost, false);
             hum.tick(level, worldPosition);
             progress++;
             if (progress >= recipe.crystalCost()) {

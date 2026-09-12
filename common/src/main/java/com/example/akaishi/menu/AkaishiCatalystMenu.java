@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiCatalystBlockEntity;
+import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -33,12 +34,16 @@ public class AkaishiCatalystMenu extends AbstractContainerMenu {
         this.addDataSlots(data);
     }
 
+    /** 当前能量（50000 > short，拆两槽重组） */
     public int getEnergy() {
-        return data.get(AkaishiCatalystBlockEntity.DATA_ENERGY);
+        return (int) LongDataSlots.read(data, AkaishiCatalystBlockEntity.DATA_ENERGY,
+                AkaishiCatalystBlockEntity.DATA_ENERGY_HIGH);
     }
 
+    /** 能量容量（50000 > short，拆两槽重组） */
     public int getEnergyCapacity() {
-        return data.get(AkaishiCatalystBlockEntity.DATA_CAPACITY);
+        return (int) LongDataSlots.read(data, AkaishiCatalystBlockEntity.DATA_CAPACITY,
+                AkaishiCatalystBlockEntity.DATA_CAPACITY_HIGH);
     }
 
     /** 是否正在催化（能量充足） */

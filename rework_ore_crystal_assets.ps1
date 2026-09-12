@@ -1,4 +1,4 @@
-﻿param([switch]$PreviewOnly)
+param([switch]$PreviewOnly)
 # 重制矿石 / 晶体 / 晶洞 / 催化剂 / 收集器家族材质为 32x32。
 # 自然矿物（矿石/晶洞/晶块/粗制块/精华块）走赤石晶簇画法；
 # 机器件（催化剂/收集器）走暗红机壳 + 品阶色环的工业画法。
@@ -115,36 +115,8 @@ function DrawCrystalBlock($bmp, $n) {
   }
 }
 
-# 粗制赤石块：土黄原矿底 + 赤石颗粒
-function DrawRawBlock($bmp, $n) {
-  DrawRock $bmp $n (Color 200 161 106) (Color 184 143 92) (Color 216 176 128) 26
-  for ($i = 0; $i -lt 24; $i++) {
-    $x = Next-Rand $n; $y = Next-Rand $n
-    if ((Next-Rand 100) -lt 25) { $bmp.SetPixel($x, $y, $oreHi) } else { $bmp.SetPixel($x, $y, $oreCore) }
-  }
-  for ($i = 0; $i -lt 4; $i++) {
-    DrawGem $bmp $n (Next-Rand $n) (Next-Rand $n) 1 $oreCore $oreDeep $oreHi $oreDeep
-  }
-}
+# 注：raw_akaishi_block / akaishi_essence_block 已迁到 rework_redstone_family_assets.js 统一出图
 
-# 浓缩赤石精华块：深红底 + 同心发光菱形核心
-function DrawEssenceBlock($bmp, $n) {
-  DrawRock $bmp $n (Color 48 8 8) (Color 32 4 4) (Color 122 26 26) 22
-  $glow = Color 200 50 50
-  $glow2 = Color 168 40 40
-  $cx = 16; $cy = 16
-  for ($dy = -10; $dy -le 10; $dy++) {
-    for ($dx = -10; $dx -le 10; $dx++) {
-      $d = [Math]::Abs($dx) + [Math]::Abs($dy)
-      if ($d -gt 10) { continue }
-      $x = $cx + $dx; $y = $cy + $dy
-      if ($x -lt 0 -or $y -lt 0 -or $x -ge $n -or $y -ge $n) { continue }
-      if ($d -le 3) { $bmp.SetPixel($x, $y, $glow) }
-      elseif ($d -le 6 -or $d -eq 10) { $bmp.SetPixel($x, $y, $glow2) }
-    }
-  }
-  for ($dy = -1; $dy -le 1; $dy++) { for ($dx = -1; $dx -le 1; $dx++) { $bmp.SetPixel($cx + $dx, $cy + $dy, (Color 255 144 144)) } }
-}
 
 # 机壳通用：1px 外缘 + 3px 框架 + 内部底板 + 四角铆钉
 function DrawMachineShell($bmp, $n, $edge, $frame, $base, $rivet) {
@@ -282,10 +254,6 @@ SaveFace 32 'akaishi_geode_pristine.png' { param($b, $n) DrawGeode $b $n (Color 
 Seed-Rng 601
 SaveFace 32 'akaishi_crystal_block.png' { param($b, $n) DrawCrystalBlock $b $n }
 SaveFace 32 'akaishi_crystal_cluster.png' { param($b, $n) DrawCluster $b $n }
-Seed-Rng 602
-SaveFace 32 'raw_akaishi_block.png' { param($b, $n) DrawRawBlock $b $n }
-Seed-Rng 603
-SaveFace 32 'akaishi_essence_block.png' { param($b, $n) DrawEssenceBlock $b $n }
 
 # ---- 催化剂 / 收集器：品阶色与旧资产一致（灰 / 赤红 / 橙金 / 亮金）----
 $basic = Color 150 158 166

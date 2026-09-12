@@ -31,7 +31,8 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * 衰变净化塔方块实体：每 tick 消耗赤能源，削减范围内同维度衰竭区域的剩余时间。
  * <p>
- * 升级加成：速度升级提升净化速度（每级 +12.5%），能量升级扩容缓冲（每级 +50%）。
+ * 升级加成：速度升级提升净化速度（每级 +100%，封顶 8×），能量升级扩容缓冲（每级 +50%）。
+ * 速度升级同步抬高耗能（耗能倍率 = min(1+速度数量, 4)）。
  * 净化速度为浮点累加（speedAccum），避免 (int) 截断导致 1~7 级速度升级无效。
  * 无区域在范围内时待机不耗能。
  * GUI 数据槽：0/1=能量 2/3=容量 4=净化中标志 5=范围内区域数。
@@ -76,8 +77,8 @@ public class AkaishiDecayPurifierBlockEntity extends BlockEntity
         long stored = energy.getEnergyStored();
         long max = energy.getMaxEnergy();
 
-        // 待机：无区域可净化或能量不足（运行能耗 = 基础 × 配置 [machine] costMultiplier，判定与扣费口径一致）
-        long perTick = (long) (ModConfig.decayPurifierCostPerTick * ModConfig.machineCostMultiplier);
+        // 待机：无区域可净化或能量不足（运行能耗 = 基础 × 配置 [machine] costMultiplier × 速度升级耗能倍率，判定与扣费口径一致）
+        long perTick = (long) (ModConfig.decayPurifierCostPerTick * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
         if (zoneCount <= 0 || stored < perTick) {
             working = false;
             speedAccum = 0;

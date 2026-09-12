@@ -154,8 +154,10 @@ public abstract class AbstractMechanicalMachineBlockEntity extends BlockEntity
         LongDataSlots.write(data, DATA_AKAISHI_MAX, DATA_AKAISHI_MAX + 1, akaishi.getMaxEnergy());
         LongDataSlots.write(data, DATA_LIFE, DATA_LIFE + 1, life.getEnergyStored());
         LongDataSlots.write(data, DATA_LIFE_MAX, DATA_LIFE_MAX + 1, life.getMaxEnergy());
-        long aCost = Math.max(1, chishiCostTotal());
-        long lCost = Math.max(1, lifeCostTotal());
+        // 单次总耗能 = 基础成本 × 速度升级耗能倍率（封顶 4×），速度只加快推进、不改总成本
+        float costMult = getEnergyCostMultiplier();
+        long aCost = Math.max(1, (long) (chishiCostTotal() * costMult));
+        long lCost = Math.max(1, (long) (lifeCostTotal() * costMult));
         int pct = (int) Math.min(100, Math.min(progressAkaishi * 100 / aCost, progressLife * 100 / lCost));
         data.set(DATA_PROGRESS, pct);
 
