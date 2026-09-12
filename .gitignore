@@ -1,54 +1,42 @@
-
+# ---- Gradle / 构建产物 ----
 .gradle/
 build/
 out/
 bin/
-
-
-/common/build/
-/common/.gradle/
-/common/bin/
-/common/run/
-
-/forge/build/
-/forge/.gradle/
-/forge/bin/
-/forge/run/
-
 run/
 logs/
 *.log
 
+# ---- Architectury 构建时自动生成的临时源码（每次编译重建，禁止提交）----
 **/.architectury-transformer/
+**/.tmp_arch_src/
+
+# ---- IDE ----
 .classpath
 .project
 .settings/
 .metadata/
 .factorypath
 *.launch
-
 .idea/
 *.iml
 *.iws
 *.ipr
-
-
 .vscode/
 *.code-workspace
 
-
+# ---- 操作系统 ----
 .DS_Store
 .AppleDouble
 .LSOverride
-
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
+# ---- 编辑器 / 临时文件 ----
 *~
 .directory
-
 *.tmp
 *.bak
 *.swp
@@ -57,29 +45,13 @@ $RECYCLE.BIN/
 *.orig
 *.rej
 
+# ---- 本地配置 ----
 local.properties
 gradle-local.properties
 
+# ---- AI / 编辑器工具目录 ----
 /.claude/
-/MCP-Reborn-1.20
 /.windsurf
-/1.0.0
-/tectonic
-/ReTerraForged
-/terralith
-
-/common/.gradle
-**/.gradle/
-.gradle/
-/worldgen-roadweaver-analysis.md
-/nbt
-/AGENTS.md
 /.cursor/rules/mc.mdc
-/assets/
 /.kiro/
-/LostCities-1.20
-/twilightforest-fabric/
-/PasterDreamGradle/
-/server/
-/Oh-The-Biomes-Weve-Gone/
-/MCP-Reborn-1.21
+/AGENTS.md

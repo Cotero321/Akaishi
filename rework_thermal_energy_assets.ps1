@@ -1,9 +1,0 @@
-$ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.Drawing
-$root = Join-Path $PSScriptRoot 'common/src/main/resources/assets/akaishi'
-$targets = @{
-  cooling_base='#477b89'; dragon_mixture='#b13b6e'; end_mixture='#705bd0'; fuel_cell='#d07b32'; fusion_heat_sink_life='#46b78b'; fusion_heat_sink_tier1='#66818d'; fusion_heat_sink_tier2='#3e9eaa'; fusion_heat_sink_tier3='#4c75c9'; fusion_heat_sink_tier4='#8757c7'; fusion_heat_sink_tier5='#c04d9a'; heat_sink_exquisite='#d0a84b'; heat_sink_fine='#7b9cc7'; heat_sink_good='#5ba66a'; heat_sink_normal='#78828c'; heat_sink_poor='#765b52'; heat_sink_ultimate='#e3d35a'; portable_akaishi_cell_advanced='#4b9ec1'; portable_akaishi_cell_basic='#71808a'; portable_akaishi_cell_super='#b648c9'
-}
-$dir=Join-Path $root 'textures/item'; New-Item -ItemType Directory -Force $dir | Out-Null
-foreach($entry in $targets.GetEnumerator()) { $bmp=New-Object Drawing.Bitmap 32,32; $g=[Drawing.Graphics]::FromImage($bmp); $g.Clear([Drawing.Color]::FromArgb(0,0,0,0)); $c=[Drawing.ColorTranslator]::FromHtml($entry.Value); $dark=[Drawing.Color]::FromArgb([Math]::Max(0,$c.R-45),[Math]::Max(0,$c.G-45),[Math]::Max(0,$c.B-45)); $light=[Drawing.Color]::FromArgb([Math]::Min(255,$c.R+55),[Math]::Min(255,$c.G+55),[Math]::Min(255,$c.B+55)); $g.FillRectangle((New-Object Drawing.SolidBrush $dark),5,4,22,24); $g.FillRectangle((New-Object Drawing.SolidBrush $c),7,6,18,20); $g.FillRectangle((New-Object Drawing.SolidBrush $light),9,8,5,4); $p=New-Object Drawing.Pen $light,2; $g.DrawLine($p,9,23,23,9); $g.DrawRectangle((New-Object Drawing.Pen $dark,1),5,4,21,23); $g.Dispose(); $bmp.Save((Join-Path $dir ($entry.Key+'.png')),[Drawing.Imaging.ImageFormat]::Png); $bmp.Dispose() }
-Write-Output "generated $($targets.Count) target textures"
