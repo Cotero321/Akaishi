@@ -13,6 +13,10 @@
       "text": "$(bold)Slot map (Curios):$(0)$(li)rings -> ring$(li)bracelets -> hands$(li)pendants -> necklace$(li)charms -> charm$(li)chest trinkets -> body$(li)bangles -> bracelet$(li)waist trinkets -> belt$(br2)Wrong slot? It won't equip. Check which slots you have unlocked before you wear anything."
     },
     {
+      "type": "patchouli:text",
+      "text": "$(bold)Akaishi extension slots:$(0) as your Akaishi progress advances, four extra slots grow on your body. All four names are masked by gibberish (they flicker in-game and cannot be read), so tell them apart by the icon colour at the bottom of the slot: red / gold / green / aqua map to slots one through four.$(br2)Thresholds are counted in completed nodes on the Akaishi Path advancement tree: slot one needs 1 node, slot two needs 2, slot three needs 3, slot four needs 4.$(br2)Tune each threshold under the \"Akaishi curio extension slots\" config category; turn off \"Extension slots require progress\" to open all four at once."
+    },
+    {
       "type": "patchouli:relations",
       "entries": [
         "akaishi:curios_income",

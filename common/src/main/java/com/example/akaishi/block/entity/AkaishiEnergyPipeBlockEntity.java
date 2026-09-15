@@ -193,16 +193,22 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
                 }
             }
         }
-        // 缓存网络总传输速率：用 long 累加（终极管道 5000 万/段，1024 段上限可达 512 亿，int 会溢出为负）
+        // 缓存网络总传输速率：用 long 累加（终极管道 5000 万/段，1024 段上限可达 512 亿，int 会溢出为负）。
+        // 网络含无限管道时直接置为 Long.MAX_VALUE 哨兵（不参与求和，避免溢出），传输端据此跳过速率截断
         long rate = 0;
+        boolean infinite = false;
         for (BlockPos pipe : pipes) {
             if (level.getBlockEntity(pipe) instanceof AkaishiEnergyPipeBlockEntity pb
                     && level.getBlockState(pipe).getBlock() instanceof AkaishiEnergyPipeBlock pbBlock) {
+                if (pbBlock.isInfinite()) {
+                    infinite = true;
+                    break;
+                }
                 rate += pbBlock.getTransferRate();
             }
         }
         this.cachedPipes = pipes;
-        this.cachedNetworkRate = rate;
+        this.cachedNetworkRate = infinite ? Long.MAX_VALUE : rate;
         this.networkDirty = false;
     }
 
@@ -283,6 +289,7 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
         // Mekanism 式缓冲中转：先把能量从源抽入网络缓冲，再统一推给汇。
         // 避免"源→汇"直连时双向缓冲（储存单元）既被抽又被灌造成的回流与能量搬运。
         long buffer = 0;
+        // 无限网络（networkRate = Long.MAX_VALUE）时 min 直接取 totalDemand，即一次填满所有空缺
         long toExtract = Math.min(networkRate, totalDemand);
         for (IEnergyStorage source : pureSources) {
             if (toExtract <= 0) {

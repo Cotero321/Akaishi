@@ -110,6 +110,8 @@ public final class ModItems {
     public static final String LIFE_BOOK_ID = "akaishi_life_book";
     /** 基因详解：Patchouli 手册物品，右键打开 akaishi:gene_detail */
     public static final String GENE_BOOK_ID = "akaishi_gene_book";
+    /** 山羊头旗帜图案：织布机图案物，选用 akaishi:goat_skull 徽记 */
+    public static final String GOAT_SKULL_BANNER_PATTERN_ID = "goat_skull_banner_pattern";
     /** 赤石采集手环（hands 槽）：挖掘方块概率掉落赤石晶 */
     public static final String GATHERING_BRACELET_ID = "akaishi_gathering_bracelet";
     /** 赤石防火吊坠（necklace 槽）：消耗赤能源维持防火 */
@@ -139,10 +141,14 @@ public final class ModItems {
     public static final String POTION_ID = "akaishi_potion";
     /** 排异中和剂：消耗品，减轻已移植非原生器官的排斥 */
     public static final String REJECTION_SERUM_ID = "akaishi_rejection_serum";
+    /** 生命能量权杖：右键发射器选定，再右键目标方块完成坐标绑定 */
+    public static final String LIFE_ENERGY_WAND_ID = "akaishi_life_energy_wand";
     /** 无线能源便捷组件 ID */
     public static final String WIRELESS_COMPONENT_ID = "akaishi_wireless_component";
     /** 无线能源便捷终端 ID */
     public static final String WIRELESS_PORTABLE_TERMINAL_ID = "akaishi_wireless_portable_terminal";
+    /** 无线生命便捷终端 ID（赤版生命镜像） */
+    public static final String LIFE_WIRELESS_PORTABLE_TERMINAL_ID = "akaishi_life_wireless_portable_terminal";
     /** 终端身份卡 ID（无线网络认证钥匙） */
     public static final String WIRELESS_IDENTITY_CARD_ID = "akaishi_wireless_identity_card";
 
@@ -199,6 +205,7 @@ public final class ModItems {
     public static RegistrySupplier<Item> akaishiDiary;
     public static RegistrySupplier<Item> lifeBook;
     public static RegistrySupplier<Item> geneBook;
+    public static RegistrySupplier<Item> goatSkullBannerPattern;
 
     // —— 能源域（AkaishiEnergyItems）——
     public static RegistrySupplier<Item> akaishiDebugTool;
@@ -245,6 +252,7 @@ public final class ModItems {
     public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
+    public static RegistrySupplier<Item> lifeEnergyWand;
     public static RegistrySupplier<Item> akaishiOrganEye;
     public static RegistrySupplier<Item> akaishiOrganHeart;
     public static RegistrySupplier<Item> akaishiOrganLungs;
@@ -270,15 +278,18 @@ public final class ModItems {
     public static RegistrySupplier<Item> activatedDragonComponent;
     public static RegistrySupplier<Item> activatedUltimateMixtureComponent;
 
-    // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花）——
+    // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓）——
     public static RegistrySupplier<Item> akaishiWitherSeed;
     public static RegistrySupplier<Item> akaishiWitherCondensate;
     public static RegistrySupplier<Item> akaishiBlazeSeed;
     public static RegistrySupplier<Item> akaishiBlazeCondensate;
+    public static RegistrySupplier<Item> akaishiCurseVineSeed;
+    public static RegistrySupplier<Item> akaishiCurseBlossom;
 
     // —— 无线域（AkaishiWirelessItems）——
     public static RegistrySupplier<Item> akaishiWirelessComponent;
     public static RegistrySupplier<Item> akaishiWirelessPortableTerminal;
+    public static RegistrySupplier<Item> akaishiLifeWirelessPortableTerminal;
     public static RegistrySupplier<Item> akaishiWirelessIdentityCard;
 
     // —— 机械域（AkaishiMechanicalItems）——
@@ -370,6 +381,7 @@ public final class ModItems {
         akaishiDiary = AkaishiBaseItems.akaishiDiary;
         lifeBook = AkaishiBaseItems.lifeBook;
         geneBook = AkaishiBaseItems.geneBook;
+        goatSkullBannerPattern = AkaishiBaseItems.goatSkullBannerPattern;
 
         // —— 能源域 ——
         akaishiDebugTool = AkaishiEnergyItems.akaishiDebugTool;
@@ -416,6 +428,7 @@ public final class ModItems {
         lifeFusionBoots = AkaishiLifeItems.lifeFusionBoots;
         akaishiPotion = AkaishiLifeItems.akaishiPotion;
         rejectionSerum = AkaishiLifeItems.rejectionSerum;
+        lifeEnergyWand = AkaishiLifeItems.lifeEnergyWand;
         akaishiOrganEye = AkaishiLifeItems.akaishiOrganEye;
         akaishiOrganHeart = AkaishiLifeItems.akaishiOrganHeart;
         akaishiOrganLungs = AkaishiLifeItems.akaishiOrganLungs;
@@ -446,10 +459,13 @@ public final class ModItems {
         akaishiWitherCondensate = AkaishiTransgeneItems.akaishiWitherCondensate;
         akaishiBlazeSeed = AkaishiTransgeneItems.akaishiBlazeSeed;
         akaishiBlazeCondensate = AkaishiTransgeneItems.akaishiBlazeCondensate;
+        akaishiCurseVineSeed = AkaishiTransgeneItems.akaishiCurseVineSeed;
+        akaishiCurseBlossom = AkaishiTransgeneItems.akaishiCurseBlossom;
 
         // —— 无线域 ——
         akaishiWirelessComponent = AkaishiWirelessItems.akaishiWirelessComponent;
         akaishiWirelessPortableTerminal = AkaishiWirelessItems.akaishiWirelessPortableTerminal;
+        akaishiLifeWirelessPortableTerminal = AkaishiWirelessItems.akaishiLifeWirelessPortableTerminal;
         akaishiWirelessIdentityCard = AkaishiWirelessItems.akaishiWirelessIdentityCard;
 
         // —— 机械域 ——

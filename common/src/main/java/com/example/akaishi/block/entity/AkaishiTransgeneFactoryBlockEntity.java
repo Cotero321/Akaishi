@@ -39,29 +39,36 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 转基因工厂方块实体（仅服务端驱动逻辑）。
- * 槽位：0=基因序列、1=缠怨藤（基底）、2=催化素材（凋零玫瑰/烈焰粉）、3=生命能量固态物（基底）、4=产物。
- * 配方见 {@link #RECIPES}：基因来源命中配方且纯度达标、催化槽与该配方 catalyst 一致 → 产出对应种子。
+ * 槽位：0=基因序列、1=基底藤（缠怨藤/垂泪藤）、2=催化素材（凋零玫瑰/烈焰粉/光浆果）、3=生命能量固态物（基底）、4=产物。
+ * 配方见 {@link #RECIPES}：基因来源命中配方且纯度达标、基底藤与催化槽与该配方一致 → 产出对应种子。
  */
 public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         ExtendedMenuProvider, Container, IItemPipeDevice, IDataCarrier, IEnergyProvider {
 
     /**
-     * 转基因配方：基因来源生物 + 最低纯度 + 催化素材 + 产出种子。
-     * 各配方均需基底材料（缠怨藤 + 生命能量固态物），催化槽放入对应 catalyst 即锁定该配方。
-     * 公共静态结构，供 forge 层 JEI 读取展示。
+     * 转基因配方：基因来源生物 + 最低纯度 + 基底藤 + 催化素材 + 产出种子。
+     * 各配方均需基底材料（基底藤 + 生命能量固态物），基底槽放入对应 baseVine、
+     * 催化槽放入对应 catalyst 即锁定该配方。公共静态结构，供 forge 层 JEI 读取展示。
      */
-    public record TransgeneFactoryRecipe(String geneEntity, int minPurity, Item catalyst, Item output) {
+    public record TransgeneFactoryRecipe(String geneEntity, int minPurity, Item baseVine, Item catalyst, Item output) {
     }
 
-    /** 配方表：凋零骷髅基因 + 凋零玫瑰 → 凋零藤种子；烈焰人基因 + 烈焰粉 → 烈焰花种 */
+    /**
+     * 配方表：
+     * 凋零骷髅基因 + 缠怨藤 + 凋零玫瑰 → 凋零藤种子；
+     * 烈焰人基因 + 缠怨藤 + 烈焰粉 → 烈焰花种；
+     * 恶魂基因 + 垂泪藤 + 光浆果 → 咒怨垂蔓种子。
+     */
     public static final List<TransgeneFactoryRecipe> RECIPES = List.of(
-            new TransgeneFactoryRecipe("minecraft:wither_skeleton", 50, Items.WITHER_ROSE, ModItems.akaishiWitherSeed.get()),
-            new TransgeneFactoryRecipe("minecraft:blaze", 50, Items.BLAZE_POWDER, ModItems.akaishiBlazeSeed.get())
+            new TransgeneFactoryRecipe("minecraft:wither_skeleton", 50, Items.TWISTING_VINES, Items.WITHER_ROSE, ModItems.akaishiWitherSeed.get()),
+            new TransgeneFactoryRecipe("minecraft:blaze", 50, Items.TWISTING_VINES, Items.BLAZE_POWDER, ModItems.akaishiBlazeSeed.get()),
+            new TransgeneFactoryRecipe("minecraft:ghast", 50, Items.WEEPING_VINES, Items.GLOW_BERRIES, ModItems.akaishiCurseVineSeed.get())
     );
 
     public static final int SLOT_GENE = 0;
+    /** 基底藤槽：缠怨藤（凋零骷髅/烈焰人配方）或垂泪藤（恶魂配方） */
     public static final int SLOT_VINE = 1;
-    /** 催化素材槽：凋零玫瑰（凋零骷髅配方）或烈焰粉（烈焰人配方） */
+    /** 催化素材槽：凋零玫瑰 / 烈焰粉 / 光浆果，与基底藤共同锁定命中的配方 */
     public static final int SLOT_CATALYST = 2;
     public static final int SLOT_SOLID = 3;
     public static final int SLOT_OUT = 4;
@@ -138,14 +145,13 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         }
     }
 
-    /** 合成条件：基因命中某条配方（含纯度与催化槽匹配） + 基底材料在位 + 生命能量充足 + 输出可容纳对应种子 */
+    /** 合成条件：基因命中某条配方（含纯度、基底藤与催化槽匹配） + 固态物在位 + 生命能量充足 + 输出可容纳对应种子 */
     private boolean canProcess() {
         TransgeneFactoryRecipe recipe = matchingRecipe();
         if (recipe == null) {
             return false;
         }
-        if (!inventory.getItem(SLOT_VINE).is(Items.TWISTING_VINES)
-                || !inventory.getItem(SLOT_SOLID).is(ModItems.akaishiLifeEssenceSolid.get())) {
+        if (!inventory.getItem(SLOT_SOLID).is(ModItems.akaishiLifeEssenceSolid.get())) {
             return false;
         }
         if (life.getEnergyStored() < ModConfig.transgeneFactoryLifeCost) {
@@ -156,7 +162,7 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
                 && out.getCount() < out.getMaxStackSize());
     }
 
-    /** 匹配可执行配方：基因来源命中某条 RECIPES 且纯度达标，且催化槽物品为该条 catalyst */
+    /** 匹配可执行配方：基因来源命中某条 RECIPES 且纯度达标，且基底藤与催化槽物品分别与该条 baseVine/catalyst 一致 */
     private TransgeneFactoryRecipe matchingRecipe() {
         ItemStack gene = inventory.getItem(SLOT_GENE);
         if (gene.isEmpty() || !gene.is(ModItems.geneSequence.get())) {
@@ -167,9 +173,11 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         if (entity == null) {
             return null;
         }
+        ItemStack vine = inventory.getItem(SLOT_VINE);
         ItemStack catalyst = inventory.getItem(SLOT_CATALYST);
         for (TransgeneFactoryRecipe recipe : RECIPES) {
             if (recipe.geneEntity().equals(entity) && purity >= recipe.minPurity()
+                    && !vine.isEmpty() && vine.is(recipe.baseVine())
                     && !catalyst.isEmpty() && catalyst.is(recipe.catalyst())) {
                 return recipe;
             }
@@ -254,8 +262,9 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         }
         return switch (index) {
             case SLOT_GENE -> isValidGene(stack);
-            case SLOT_VINE -> stack.is(Items.TWISTING_VINES);
-            case SLOT_CATALYST -> stack.is(Items.WITHER_ROSE) || stack.is(Items.BLAZE_POWDER);
+            case SLOT_VINE -> stack.is(Items.TWISTING_VINES) || stack.is(Items.WEEPING_VINES);
+            case SLOT_CATALYST -> stack.is(Items.WITHER_ROSE) || stack.is(Items.BLAZE_POWDER)
+                    || stack.is(Items.GLOW_BERRIES);
             case SLOT_SOLID -> stack.is(ModItems.akaishiLifeEssenceSolid.get());
             default -> false;
         };

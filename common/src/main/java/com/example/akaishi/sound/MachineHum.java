@@ -44,6 +44,15 @@ public final class MachineHum {
     }
 
     /**
+     * 重置冷却使下一个 tick 立即发声。
+     * 用于"停机后重新启用"：停用期间 tick 不被调用，冷却会冻结在 interval，
+     * 若直接复用需空等一整段间隔（长循环氛围音可达数秒）才重新出声。
+     */
+    public void restart() {
+        cooldown = 1;
+    }
+
+    /**
      * 一次性播放机器音：用于按钮锻造 / 融合 / 仪式等单次动作（非循环运转），不占冷却。
      * 仅服务端调用，{@code level.playSound(null, ...)} 会广播给附近玩家。
      */

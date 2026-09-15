@@ -39,6 +39,8 @@ public final class AkaishiLifeItems {
     public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
+    /** 生命能量权杖：为发射器绑定目标坐标 */
+    public static RegistrySupplier<Item> lifeEnergyWand;
     public static RegistrySupplier<Item> akaishiOrganEye;
     public static RegistrySupplier<Item> akaishiOrganHeart;
     public static RegistrySupplier<Item> akaishiOrganLungs;
@@ -90,6 +92,8 @@ public final class AkaishiLifeItems {
                 () -> new AkaishiPotionItem(new Item.Properties().stacksTo(16)));
         rejectionSerum = item(ModItems.REJECTION_SERUM_ID,
                 () -> new AkaishiRejectionSerumItem(new Item.Properties().stacksTo(16)));
+        // 生命能量权杖：为能量发射器绑定目标坐标（两步式：选发射器 → 点目标方块）
+        lifeEnergyWand = item(ModItems.LIFE_ENERGY_WAND_ID, AkaishiLifeEnergyWandItem::new);
         // 器官物品（9 槽位各一，基因来源/品质存 NBT，不可堆叠）
         akaishiOrganEye = organ(BodySlot.EYE);
         akaishiOrganHeart = organ(BodySlot.HEART);

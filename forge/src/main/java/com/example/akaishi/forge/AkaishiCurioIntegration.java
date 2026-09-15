@@ -1,6 +1,7 @@
 package com.example.akaishi.forge;
 
 import com.example.akaishi.item.curio.AkaishiCurioItem;
+import com.example.akaishi.wireless.PortableSupplyService;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -71,5 +72,39 @@ public final class AkaishiCurioIntegration {
                 }
             }
         });
+    }
+
+    /**
+     * 便携终端「随身供能」的平台承接器：给已装备的赤石饰品充能。
+     * common 侧不可见 Curios API，故在此实现并注册到 {@link PortableSupplyService}。
+     */
+    private static final PortableSupplyService.PlatformSink SUPPLY_SINK = new PortableSupplyService.PlatformSink() {
+        @Override
+        public long demand(Player player, long max) {
+            long[] demand = {0};
+            forEachCurio(player, stack -> {
+                if (demand[0] < max && stack.getItem() instanceof AkaishiCurioItem curio) {
+                    long gap = curio.getCapacity() - curio.getEnergyStored(stack);
+                    demand[0] += Math.min(max - demand[0], gap);
+                }
+            });
+            return demand[0];
+        }
+
+        @Override
+        public long charge(Player player, long amount) {
+            long[] remaining = {amount};
+            forEachCurio(player, stack -> {
+                if (remaining[0] > 0 && stack.getItem() instanceof AkaishiCurioItem curio) {
+                    remaining[0] -= curio.addEnergy(stack, remaining[0], false);
+                }
+            });
+            return amount - remaining[0];
+        }
+    };
+
+    /** 注册随身供能的平台承接器（由平台初始化调用一次） */
+    public static void installSupplySink() {
+        PortableSupplyService.setPlatformSink(SUPPLY_SINK);
     }
 }

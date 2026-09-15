@@ -7,19 +7,25 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transgene_factory",
-      "text": "The $(bold)Transgene Factory$(0) rewrites creature genes into plantable exotic crops. Each operation uses $(4)5,000 Life Energy$(0), 1 Life Essence Solid and 1 Twisting Vine, taking about 5 seconds by default; the sequence must come from the specified creature and have at least $(4)50$(0) purity.$(br2)$(bold)Two recipes:$(0)$(li)Wither Skeleton gene + Wither Rose → Wither Vine Seed$(li)Blaze gene + Blaze Powder → Blaze Flower Seed$(br2)The output slot only exports and supports hoppers or item pipes; its Life Energy interface only receives energy. Exact recipes are also available in JEI."
+      "text": "The $(bold)Transgene Factory$(0) rewrites creature genes into plantable exotic crops. Each operation uses $(4)5,000 Life Energy$(0), 1 Life Essence Solid, 1 base vine and 1 catalyst, taking about 5 seconds by default; the sequence must come from the specified creature and have at least $(4)50$(0) purity.$(br2)$(bold)Three recipes:$(0)$(li)Wither Skeleton gene + Twisting Vine + Wither Rose → Wither Vine Seed$(li)Blaze gene + Twisting Vine + Blaze Powder → Blaze Flower Seed$(li)Ghast gene + Weeping Vines + Glow Berries → Curse Vine Seed$(br2)The output slot only exports and supports hoppers or item pipes; its Life Energy interface only receives energy. Exact recipes are also available in JEI."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_wither_seed",
-      "title": "Wither Vine: Repeatable Condensate",
-      "text": "Wither Vine Seeds can be planted on top of any sturdy block. Random ticks grow the plant through a root, lower stem, and upper tip; the tip then progresses from bare vine to young fruit to ripe fruit.$(br2)$(bold)Harvest:$(0) right-click a ripe tip for 1 Wither Condensate. The tip resets to bare vine and fruits again. Breaking the tip outside Creative also drops 1 Condensate; breaking the root or its support returns the seed.$(br2)It is a stable crop with repeatable harvests and recoverable seeds."
+      "title": "Wither Vine: Repeatable Fruit",
+      "text": "Wither Vine Seeds can be planted on top of any sturdy block. Random ticks grow the plant through a root, lower stem, and upper tip; the tip then progresses from bare vine to young fruit to ripe fruit.$(br2)$(bold)Harvest:$(0) right-click a ripe tip for 1 Wither Fruit. The tip resets to bare vine and fruits again. Breaking the tip outside Creative also drops 1 Wither Fruit; breaking the root or its support returns the seed.$(br2)It is a stable crop with repeatable harvests and recoverable seeds."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_blaze_seed",
       "title": "Blaze Flower: Soul Sand Bloom",
-      "text": "Blaze Flower Seeds $(4)can only be planted on Soul Sand$(0). The root grows from sprout to seedling to maturity; when space above is clear, it grows a bloom that progresses from bud to opening bloom to full bloom.$(br2)$(bold)Harvest:$(0) a full bloom emits light level 12. Right-click it for 1 Blaze Condensate; it resets to a bud and can bloom again. Breaking a full bloom outside Creative also drops Condensate.$(br2)Note: breaking the root or removing its Soul Sand support never returns a seed, so Blaze Flower Seeds cannot be renewed by harvesting."
+      "text": "Blaze Flower Seeds $(4)can only be planted on Soul Sand$(0). The root grows from sprout to seedling to maturity; when space above is clear, it grows a bloom that progresses from bud to opening bloom to full bloom.$(br2)$(bold)Harvest:$(0) a full bloom emits light level 12. Right-click it for 1 Blaze Petal; it resets to a bud and can bloom again. Breaking a full bloom outside Creative also drops Blaze Petal.$(br2)Note: breaking the root or removing its Soul Sand support never returns a seed, so Blaze Flower Seeds cannot be renewed by harvesting."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_curse_vine_seed",
+      "title": "Curse Vine: Weeping Blossom",
+      "text": "Curse Vine Seeds can be planted on the underside of any sturdy block. Random ticks grow the vine downward from the root, one stem segment at a time, up to $(4)5 blocks long in total$(0) (1 root + 4 stems). Once the lowest segment is reached, it enters the fruiting stage: bare vine, young blossom, ripe curse blossom.$(br2)$(bold)Harvest:$(0) right-click a ripe lowest segment for 1 Curse Blossom; it resets to bare vine and fruits again. Breaking that segment outside Creative also drops 1 Curse Blossom; breaking the root or its ceiling support returns the seed."
     },
     {
       "type": "patchouli:relations",

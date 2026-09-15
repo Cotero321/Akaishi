@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  L",
+    " A ",
+    "A  "
+  ],
+  "key": {
+    "L": { "item": "akaishi:akaishi_life_essence_solid" },
+    "A": { "item": "akaishi:akaishi_advanced_component" }
+  },
+  "result": { "item": "akaishi:akaishi_life_energy_wand", "count": 1 }
+}

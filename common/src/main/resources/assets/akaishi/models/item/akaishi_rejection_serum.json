@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "akaishi:item/akaishi_potion"
+    "layer0": "akaishi:item/akaishi_rejection_serum"
   }
 }

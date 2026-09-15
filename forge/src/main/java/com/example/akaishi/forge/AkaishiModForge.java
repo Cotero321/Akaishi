@@ -20,12 +20,18 @@ import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
+import com.example.akaishi.entity.ModEntities;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
+import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
 import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
 import com.example.akaishi.forge.client.AkaishiConfigScreenFactory;
 import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
+import com.example.akaishi.forge.client.LifeEnergyEmitterRenderer;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
+import com.example.akaishi.forge.client.AkaishiUnnameableHandler;
+import com.example.akaishi.forge.client.AkaishiUnnameableOverlay;
+import com.example.akaishi.forge.client.AkaishiUnnameablePostHandler;
 import com.example.akaishi.forge.client.mechanical.MechanicalPartRenderer;
 import com.example.akaishi.forge.client.model.MechanicalPartGeometryLoader;
 import com.example.akaishi.forge.config.AkaishiConfig;
@@ -41,16 +47,19 @@ import com.example.akaishi.forge.life.AkaishiLifeInteraction;
 import com.example.akaishi.forge.life.AkaishiMechanicalEffectHandler;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
+import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
 import com.example.akaishi.gametest.AkaishiLifeSystemTests;
 import com.example.akaishi.item.AkaishiLifeFusionSet;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.wireless.PortableSupplyService;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -86,11 +95,13 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -141,6 +152,14 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer serverPlayer) {
                 ConfigSyncS2C.sendToPlayer(serverPlayer);
+                // 登录即按已有赤石进度补齐饰品扩展槽（永久修饰符随 Curios NBT 持久化）
+                AkaishiCurioSlotUnlocker.sync(serverPlayer);
+            }
+        });
+        // 获得进度后即时判定开槽（事件驱动，不做逐 tick 轮询）
+        MinecraftForge.EVENT_BUS.addListener((AdvancementEvent.AdvancementEarnEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                AkaishiCurioSlotUnlocker.sync(serverPlayer);
             }
         });
 
@@ -203,6 +222,8 @@ public final class AkaishiModForge {
 
         // Curios 饰品集成：通用事件（击杀/挖掘/受伤）走游戏总线；装备与每 tick 由 Curios 自动驱动
         MinecraftForge.EVENT_BUS.register(AkaishiCurioIntegration.INSTANCE);
+        // 便携终端「随身供能」：注册 Curios 饰品充能承接器（common 侧不可见 Curios API）
+        AkaishiCurioIntegration.installSupplySink();
 
         // 玩家躯体状态（9 槽位器官/肢体）：capability 挂载 + 向 common 注入访问器
         PlayerBodyCapability.init();
@@ -220,11 +241,14 @@ public final class AkaishiModForge {
         // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
         MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
 
-        // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（伤害上限/免疫击退/免疫负面）
+        // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
 
         // 衰竭区域死寂：区域内禁止生物自然生成
         MinecraftForge.EVENT_BUS.register(AkaishiDecaySpawnBlocker.INSTANCE);
+
+        // 祭坛成型静音：屏蔽四个结构信标的环境音/激活音（取消位置音事件，无需 Mixin）
+        MinecraftForge.EVENT_BUS.register(AkaishiAltarSoundMuter.INSTANCE);
 
         // 调用通用初始化逻辑
         AkaishiMod.init();
@@ -238,6 +262,14 @@ public final class AkaishiModForge {
 
         // 客户端：赤石水晶簇贴图含透明像素，须注册 cutout 渲染，否则透明区域渲染成黑色块
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+
+        // 「不可名状」HUD 叠加层：RegisterGuiOverlaysEvent 属于 IModBusEvent，必须走 mod 事件总线
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegisterOverlays);
+    }
+
+    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字 */
+    private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
+        event.registerAboveAll("unnameable_overlay", new AkaishiUnnameableOverlay());
     }
 
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */
@@ -273,8 +305,16 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
         // 钻机钻头：结构成型时从钻头底面打出向下的信标光束（客户端渲染器）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINER_DRILL_BIT.get(), DrillBitBeaconRenderer::new);
+        // 能量发射器：头部朝向与蓄能光效（方块实体渲染器）
+        BlockEntityRenderers.register(ModBlockEntities.CHISHI_LIFE_ENERGY_EMITTER.get(), LifeEnergyEmitterRenderer::new);
+        // 生命能量弹：相机朝向的发光公告板
+        EntityRenderers.register(ModEntities.LIFE_ENERGY_PROJECTILE.get(), AkaishiLifeEnergyProjectileRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
+        // 「不可名状」视野扭曲：相机滚转/抖动与 FOV 脉动
+        MinecraftForge.EVENT_BUS.register(AkaishiUnnameableHandler.INSTANCE);
+        // 「不可名状」后处理：整帧对比度提升 + 电视机花白
+        MinecraftForge.EVENT_BUS.register(AkaishiUnnameablePostHandler.INSTANCE);
 
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();
@@ -423,6 +463,8 @@ public final class AkaishiModForge {
         if (player.isDeadOrDying()) {
             return;
         }
+        // 便携终端「随身供能」：若已开启且终端内腔含便捷传输构架，从绑定终端抽能注入背包单元/已装备饰品（限速 10M/tick）
+        PortableSupplyService.tick(player);
         // 收集背包中全部便携单元（物品栏 36 格 + 副手；护甲槽无法放入非护甲）
         List<ItemStack> cells = new ArrayList<>();
         Inventory inv = player.getInventory();

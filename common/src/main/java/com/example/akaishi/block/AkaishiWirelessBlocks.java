@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 /**
  * 无线赤能源方块族注册表（无线终端多方块体系）。
  * <p>
- * 从 ModBlocks 拆分出的域注册类：14 个无线终端/端口/组件方块。字段由
+ * 从 ModBlocks 拆分出的域注册类：15 个无线终端/端口/组件方块。字段由
  * {@link #register()} 在 {@link com.example.akaishi.AkaishiMod#init()} 阶段填充，
  * 消费方须在 register() 之后访问。
  */
@@ -42,6 +42,8 @@ public final class AkaishiWirelessBlocks {
     public static RegistrySupplier<Block> CHISHI_WIRELESS_INPUT_LOSS = null;
     /** 输出损耗抑制组件：内腔每个降低输出口方向损耗（可叠加） */
     public static RegistrySupplier<Block> CHISHI_WIRELESS_OUTPUT_LOSS = null;
+    /** 便捷传输构架：内腔 ≥1 个解锁便携终端「随身供能」功能 */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_TRANSMIT_FRAME = null;
 
     private AkaishiWirelessBlocks() {
     }
@@ -62,5 +64,6 @@ public final class AkaishiWirelessBlocks {
         CHISHI_WIRELESS_CHUNK_RANGE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_wireless_chunk_range", AkaishiWirelessChunkRangeBlock::new);
         CHISHI_WIRELESS_INPUT_LOSS = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_wireless_input_loss", AkaishiWirelessInputLossBlock::new);
         CHISHI_WIRELESS_OUTPUT_LOSS = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_wireless_output_loss", AkaishiWirelessOutputLossBlock::new);
+        CHISHI_WIRELESS_TRANSMIT_FRAME = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_wireless_transmit_frame", AkaishiWirelessTransmitFrameBlock::new);
     }
 }

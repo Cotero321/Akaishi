@@ -20,14 +20,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * JEI 展示的"转基因合成"配方类别（转基因工厂）：
- * 怪物基因序列 + 缠怨藤 + 催化素材（凋零玫瑰/烈焰粉）+ 生命能量固态物 → 转基因植物种子。
+ * 怪物基因序列 + 基底藤 + 催化素材（凋零玫瑰/烈焰粉/光浆果）+ 生命能量固态物 → 转基因植物种子。
  * 配方数据直接复用 {@link AkaishiTransgeneFactoryBlockEntity#RECIPES}，保证与机器逻辑一致。
  * 布局自绘原版灰面板：输入 26/44/62/80,30 基因/藤/催化/固态物，输出 134,30；下方为基因条件与能量耗时说明。
  */
@@ -71,7 +70,7 @@ public class TransgeneRecipeCategory implements IRecipeCategory<TransgeneRecipeC
         builder.addSlot(RecipeIngredientRole.INPUT, 26, 30)
                 .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.geneSequence.get()));
         builder.addSlot(RecipeIngredientRole.INPUT, 44, 30)
-                .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.TWISTING_VINES));
+                .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.baseVine()));
         builder.addSlot(RecipeIngredientRole.INPUT, 62, 30)
                 .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.catalyst()));
         builder.addSlot(RecipeIngredientRole.INPUT, 80, 30)
@@ -110,13 +109,14 @@ public class TransgeneRecipeCategory implements IRecipeCategory<TransgeneRecipeC
     }
 
     /** 转基因合成配方展示数据（源自机器配方表） */
-    public record TransgeneRecipe(Item catalyst, Item output) {
+    public record TransgeneRecipe(Item baseVine, Item catalyst, Item output) {
 
-        /** 全部配方：凋零骷髅基因 + 凋零玫瑰 → 凋零藤种子；烈焰人基因 + 烈焰粉 → 烈焰花种 */
+        /** 全部配方：凋零骷髅基因 + 缠怨藤 + 凋零玫瑰 → 凋零藤种子；
+         *  烈焰人基因 + 缠怨藤 + 烈焰粉 → 烈焰花种；恶魂基因 + 垂泪藤 + 光浆果 → 咒怨垂蔓种子 */
         public static List<TransgeneRecipe> getAll() {
             List<TransgeneRecipe> list = new ArrayList<>();
             for (AkaishiTransgeneFactoryBlockEntity.TransgeneFactoryRecipe r : AkaishiTransgeneFactoryBlockEntity.RECIPES) {
-                list.add(new TransgeneRecipe(r.catalyst(), r.output()));
+                list.add(new TransgeneRecipe(r.baseVine(), r.catalyst(), r.output()));
             }
             return list;
         }

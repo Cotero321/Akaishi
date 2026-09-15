@@ -288,6 +288,12 @@ public final class ModConfig {
     /** 躯体超载 debuff（全身总排斥预算惩罚） */
     public static volatile boolean overloadEnabled = true;
 
+    // ==================== 赤石饰品扩展槽 ====================
+    /** 扩展槽是否需要赤石进度解锁（false = 四槽始终开启） */
+    public static volatile boolean curioSlotUnlockRequired = true;
+    /** 四槽各自所需进度节点数（0 = 无条件开启） */
+    public static volatile int[] curioSlotUnlockThresholds = {1, 2, 3, 4};
+
     // ==================== 生命研究机器 ====================
     /** 基因分析仪：解构一次消耗的生命能量 */
     public static volatile long geneAnalyzerLifeCost = 5_000L;

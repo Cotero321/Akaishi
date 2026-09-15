@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "PDP",
+    " P "
+  ],
+  "key": {
+    "P": { "item": "akaishi:akaishi_item_pipe_ultimate" },
+    "D": { "item": "minecraft:nether_star" }
+  },
+  "result": { "item": "akaishi:akaishi_item_pipe_infinite", "count": 1 }
+}

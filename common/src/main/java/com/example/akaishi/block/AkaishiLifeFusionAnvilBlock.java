@@ -24,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiLifeFusionAnvilBlock extends AkaishiMachineBlock {
 
     public AkaishiLifeFusionAnvilBlock() {
-        super(Properties.of().mapColor(MapColor.METAL).strength(5.0F, 1200.0F).sound(SoundType.ANVIL));
+        // 非满方块模型（铁砧造型），必须关闭遮挡剔除，否则相邻方块贴面会被剔除出现透洞
+        super(Properties.of().mapColor(MapColor.METAL).strength(5.0F, 1200.0F).sound(SoundType.ANVIL).noOcclusion());
     }
 
     @Nullable

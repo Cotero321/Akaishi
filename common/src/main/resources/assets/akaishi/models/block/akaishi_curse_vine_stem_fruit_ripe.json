@@ -1,0 +1,69 @@
+{
+  "textures": {
+    "particle": "akaishi:block/akaishi_curse_vine_stem_fruit_ripe",
+    "stem": "akaishi:block/akaishi_curse_vine_stem",
+    "fruit": "akaishi:block/akaishi_curse_vine_stem_fruit_ripe"
+  },
+  "elements": [
+    {
+      "from": [7, 5, 7],
+      "to": [9, 16, 9],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [6, 7, 6],
+      "to": [10, 9, 10],
+      "faces": {
+        "up": { "texture": "#stem" },
+        "down": { "texture": "#stem" },
+        "north": { "texture": "#stem" },
+        "south": { "texture": "#stem" },
+        "east": { "texture": "#stem" },
+        "west": { "texture": "#stem" }
+      }
+    },
+    {
+      "from": [7, 3, 7],
+      "to": [9, 6, 9],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    },
+    {
+      "from": [6, 2, 6],
+      "to": [10, 4, 10],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    },
+    {
+      "from": [5, 0, 5],
+      "to": [11, 3, 11],
+      "faces": {
+        "up": { "texture": "#fruit" },
+        "down": { "texture": "#fruit" },
+        "north": { "texture": "#fruit" },
+        "south": { "texture": "#fruit" },
+        "east": { "texture": "#fruit" },
+        "west": { "texture": "#fruit" }
+      }
+    }
+  ]
+}

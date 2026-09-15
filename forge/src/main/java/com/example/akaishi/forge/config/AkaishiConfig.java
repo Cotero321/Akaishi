@@ -244,6 +244,10 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.BooleanValue SUNLIGHT_BURN_ENABLED;
     public static final ForgeConfigSpec.BooleanValue OVERLOAD_ENABLED;
 
+    // ---- 赤石饰品扩展槽 ----
+    public static final ForgeConfigSpec.BooleanValue CURIO_SLOT_UNLOCK_REQUIRED;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> CURIO_SLOT_UNLOCK_THRESHOLDS;
+
     // ---- 生命研究机器 ----
     public static final ForgeConfigSpec.LongValue GENE_ANALYZER_LIFE_COST;
     public static final ForgeConfigSpec.LongValue GENE_ANALYZER_LIFE_CAPACITY;
@@ -752,6 +756,15 @@ public final class AkaishiConfig {
                 .define("sunlightBurn", true);
         OVERLOAD_ENABLED = b.comment("躯体超载减益（按总排斥结算）是否生效")
                 .define("overload", true);
+        b.pop();
+
+        // ==================== 赤石饰品扩展槽 ====================
+        b.push("curio_slots");
+        CURIO_SLOT_UNLOCK_REQUIRED = b.comment("赤石饰品扩展槽是否需要进度解锁（false = 四个扩展槽始终开启）")
+                .define("unlockRequired", true);
+        CURIO_SLOT_UNLOCK_THRESHOLDS = b.comment("四个扩展槽各自所需的赤石进度节点数 [槽1, 槽2, 槽3, 槽4]；0 = 该槽无条件开启")
+                .defineList("unlockThresholds", List.of(1, 2, 3, 4),
+                        (Object o) -> o instanceof Number n && n.intValue() >= 0);
         b.pop();
 
         // ==================== 生命研究机器 ====================

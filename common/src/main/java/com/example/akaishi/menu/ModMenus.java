@@ -38,6 +38,8 @@ import com.example.akaishi.block.entity.AkaishiLifeActivatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeCentrifugeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeEnergyCellBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeEnergyCellSerializerBlockEntity;
+import com.example.akaishi.block.entity.AkaishiLifeEnergyEmitterBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemReconstructorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiSingleSlotMachineBlockEntity;
 import com.example.akaishi.block.entity.AkaishiPlantCultivatorBlockEntity;
@@ -211,12 +213,18 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiLifeWirelessTerminalMenu>> CHISHI_LIFE_WIRELESS_TERMINAL;
     /** 无线生命能量输入口/输出口菜单类型（共用，赤版生命镜像） */
     public static RegistrySupplier<MenuType<AkaishiLifeWirelessPortMenu>> CHISHI_LIFE_WIRELESS_PORT;
+    /** 无线生命便捷终端菜单类型（手持物品，无方块实体，赤版生命镜像） */
+    public static RegistrySupplier<MenuType<AkaishiLifeWirelessPortableTerminalMenu>> CHISHI_LIFE_WIRELESS_PORTABLE_TERMINAL;
     /** 聚变控制器菜单类型（三页：运行情况/燃料/热量） */
     public static RegistrySupplier<MenuType<AkaishiFusionControllerMenu>> CHISHI_FUSION_CONTROLLER;
     /** 聚变物品输入/输出口菜单类型（共用，27 槽缓冲） */
     public static RegistrySupplier<MenuType<AkaishiFusionItemPortMenu>> CHISHI_FUSION_ITEM_PORT;
     /** 聚变能量输出口菜单类型（能量缓冲展示） */
     public static RegistrySupplier<MenuType<AkaishiFusionEnergyOutputMenu>> CHISHI_FUSION_ENERGY_OUTPUT;
+    /** 生命能量发射器菜单类型（能量条 + 绑定坐标/射程展示） */
+    public static RegistrySupplier<MenuType<AkaishiLifeEnergyEmitterMenu>> CHISHI_LIFE_ENERGY_EMITTER;
+    /** 合并母神祭坛菜单类型（结构等级展示 + 单物品供奉槽） */
+    public static RegistrySupplier<MenuType<AkaishiMotherAltarMenu>> CHISHI_MOTHER_ALTAR;
 
     private ModMenus() {
     }
@@ -343,6 +351,22 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_energy_cell_serializer"), () -> lifeSerializerType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(lifeSerializerType, AkaishiLifeEnergyCellSerializerScreen::new));
+
+        // 生命能量发射器：无机器槽位，同步生命能量/容量（long 4 槽）+ 绑定坐标
+        MenuType<AkaishiLifeEnergyEmitterMenu> lifeEmitterType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiLifeEnergyEmitterBlockEntity emitter) {
+                return new AkaishiLifeEnergyEmitterMenu(syncId, inv, emitter.data(), emitter.getTarget());
+            }
+            return AkaishiLifeEnergyEmitterMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_LIFE_ENERGY_EMITTER = (RegistrySupplier<MenuType<AkaishiLifeEnergyEmitterMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_energy_emitter"), () -> lifeEmitterType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifeEmitterType, AkaishiLifeEnergyEmitterScreen::new));
 
         // 赤石能量聚合器
         MenuType<AkaishiEnergyAggregatorMenu> aggregatorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -1226,6 +1250,15 @@ public final class ModMenus {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(portableType, AkaishiWirelessPortableTerminalScreen::new));
 
+        // 生命便捷终端（手持物品，赤版生命镜像）：无方块实体，服务端每 tick 按生命族扫背包身份卡刷新数据槽
+        MenuType<AkaishiLifeWirelessPortableTerminalMenu> lifePortableType = MenuRegistry.ofExtended((syncId, inv, buf) ->
+                new AkaishiLifeWirelessPortableTerminalMenu(syncId, inv, inv.player));
+        CHISHI_LIFE_WIRELESS_PORTABLE_TERMINAL = (RegistrySupplier<MenuType<AkaishiLifeWirelessPortableTerminalMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_wireless_portable_terminal"), () -> lifePortableType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(lifePortableType, AkaishiLifeWirelessPortableTerminalScreen::new));
+
         // ===== 聚变堆 =====
         // 控制器：4 燃料槽 + 10 散热片槽 + 16 数据槽，三页界面（散热片槽直连控制器容器）
         MenuType<AkaishiFusionControllerMenu> fusionType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -1326,5 +1359,21 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mechanical_assembly_station"), () -> mechAssemblyType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(mechAssemblyType, AkaishiMechanicalAssemblyStationScreen::new));
+
+        // 合并母神祭坛：同步结构等级（1 槽）+ 单物品供奉槽
+        MenuType<AkaishiMotherAltarMenu> motherAltarType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiMotherAltarBlockEntity altar) {
+                return new AkaishiMotherAltarMenu(syncId, inv, altar.altarSlot(), altar.data());
+            }
+            return AkaishiMotherAltarMenu.emptyMenu(syncId, inv);
+        });
+        CHISHI_MOTHER_ALTAR = (RegistrySupplier<MenuType<AkaishiMotherAltarMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mother_altar"), () -> motherAltarType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(motherAltarType, AkaishiMotherAltarScreen::new));
     }
 }

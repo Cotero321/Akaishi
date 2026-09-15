@@ -22,9 +22,25 @@ public interface IInstallableOrgan {
         return 0;
     }
 
+    /**
+     * 是否已具备移植资格：未定型的生物器官（无基因来源）不可植入——
+     * 其来源 id 为 null，若进入躯体将在每 tick 的生态/属性结算中被解引用而崩溃。
+     * 机械义体与原生器官恒为 true。
+     */
+    default boolean readyForSurgery(ItemStack stack) {
+        return true;
+    }
+
     /** 物品栈 → 槽位（不可安装物品返回 null） */
     @Nullable
     static BodySlot slotOf(ItemStack stack) {
         return stack.getItem() instanceof IInstallableOrgan organ ? organ.bodySlot(stack) : null;
+    }
+
+    /** 物品栈是否可进入手术仓器官槽（可安装且已定型） */
+    static boolean installableForSurgery(ItemStack stack) {
+        return stack.getItem() instanceof IInstallableOrgan organ
+                && organ.bodySlot(stack) != null
+                && organ.readyForSurgery(stack);
     }
 }

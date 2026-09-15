@@ -2,7 +2,9 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
+import com.example.akaishi.item.AkaishiWirelessPortableTerminalItem;
 import com.example.akaishi.util.LongDataSlots;
+import com.example.akaishi.wireless.PortableSupplyService;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -16,12 +18,16 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 /**
- * 无线能源便捷终端菜单（手持物品，只读遥控面板，参考 AE2 无线终端）：
+ * 无线能源便捷终端菜单（手持物品，遥控面板，参考 AE2 无线终端）：
  * 无方块实体；服务端每 tick broadcastChanges 扫描玩家背包中的身份卡（取第一张），
  * 反查授权该卡的在线终端并把其状态（成型/储能/口统计/卡与终端短 ID）写入数据槽，
- * 随原版数据槽同步推送给客户端。手持终端不传输能量，仅作状态面板。
+ * 随原版数据槽同步推送给客户端。终端本身不参与物品搬运，但可经「随身供能」开关
+ * 把绑定终端储能持续注入玩家随身承接物（背包单元/已装备饰品），详见 {@link PortableSupplyService}。
  */
 public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
+
+    /** 服务端按钮：切换「随身供能」开关 */
+    public static final int BTN_TOGGLE_SUPPLY = 0;
 
     public static final int DATA_STORED_LOW = 0;
     public static final int DATA_STORED_HIGH = 1;
@@ -41,7 +47,11 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
     public static final int DATA_STORED_HIGH3 = 12;
     public static final int DATA_CAPACITY_HIGH2 = 13;
     public static final int DATA_CAPACITY_HIGH3 = 14;
-    public static final int DATA_SLOTS = 15;
+    /** 「随身供能」开关状态：1=开（便携终端物品 NBT 持久化） */
+    public static final int DATA_SUPPLY_ENABLED = 15;
+    /** 「随身供能」是否已解锁：1=终端内腔含 ≥1 便捷传输构架 */
+    public static final int DATA_SUPPLY_UNLOCKED = 16;
+    public static final int DATA_SLOTS = 17;
 
     private final ContainerData data = new SimpleContainerData(DATA_SLOTS);
     private final Player player;
@@ -79,6 +89,7 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
 
         UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid);
         boolean formed = false;
+        boolean supplyUnlocked = false;
         long stored = 0;
         long max = 0;
         int input = 0;
@@ -94,6 +105,7 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
                 max = t.cachedMax();
                 input = WirelessNetworkManager.inputCount(terminalId);
                 output = WirelessNetworkManager.outputCount(terminalId);
+                supplyUnlocked = t.hasTransmitFrame();
             }
         } else {
             LongDataSlots.writeInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH, 0);
@@ -103,6 +115,42 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
         data.set(DATA_FORMED, formed ? 1 : 0);
         data.set(DATA_INPUT_COUNT, input);
         data.set(DATA_OUTPUT_COUNT, output);
+        data.set(DATA_SUPPLY_UNLOCKED, supplyUnlocked ? 1 : 0);
+        // 开关状态取自玩家背包中便携终端物品的 NBT（同一台终端由 tick 服务消费）
+        ItemStack portable = findPortable(player);
+        data.set(DATA_SUPPLY_ENABLED, !portable.isEmpty() && PortableSupplyService.isEnabled(portable) ? 1 : 0);
+    }
+
+    /**
+     * 切换「随身供能」开关（服务端经物品 NBT 持久化）。
+     * 未解锁（终端内腔无便捷传输构架）时禁止开启，关闭不受限。
+     */
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id != BTN_TOGGLE_SUPPLY || player.level().isClientSide) {
+            return false;
+        }
+        ItemStack portable = findPortable(player);
+        if (portable.isEmpty()) {
+            return false;
+        }
+        boolean enabled = PortableSupplyService.isEnabled(portable);
+        if (!enabled && !isSupplyUnlocked()) {
+            return false; // 未解锁不允许开启
+        }
+        PortableSupplyService.setEnabled(portable, !enabled);
+        return true;
+    }
+
+    /** 扫描玩家背包取第一台无线能源便捷终端（未持有则空栈） */
+    public static ItemStack findPortable(Player player) {
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack s = player.getInventory().getItem(i);
+            if (s.getItem() instanceof AkaishiWirelessPortableTerminalItem) {
+                return s;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     /** 扫描玩家背包取第一张身份卡（未持有则空栈） */
@@ -144,6 +192,16 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
     /** 认证终端短 ID（8 位 hex；0=未连接；低/高 2 槽按 16 位段重组） */
     public int getTerminalHash() {
         return LongDataSlots.readInt(data, DATA_TERMINAL_HASH, DATA_TERMINAL_HASH_HIGH);
+    }
+
+    /** 「随身供能」开关是否已开启 */
+    public boolean isSupplyEnabled() {
+        return data.get(DATA_SUPPLY_ENABLED) == 1;
+    }
+
+    /** 「随身供能」是否已解锁（终端内腔含便捷传输构架） */
+    public boolean isSupplyUnlocked() {
+        return data.get(DATA_SUPPLY_UNLOCKED) == 1;
     }
 
     @Override

@@ -1,7 +1,22 @@
 {
   "variants": {
-    "": {
+    "formed=false,red=false": {
       "model": "akaishi:block/akaishi_mother_altar"
+    },
+    "formed=false,red=true": {
+      "model": "akaishi:block/akaishi_mother_altar_red"
+    },
+    "formed=true,corner=0": {
+      "model": "akaishi:block/akaishi_mother_altar_formed_0"
+    },
+    "formed=true,corner=1": {
+      "model": "akaishi:block/akaishi_mother_altar_formed_1"
+    },
+    "formed=true,corner=2": {
+      "model": "akaishi:block/akaishi_mother_altar_formed_2"
+    },
+    "formed=true,corner=3": {
+      "model": "akaishi:block/akaishi_mother_altar_formed_3"
     }
   }
 }

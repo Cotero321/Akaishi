@@ -172,6 +172,11 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
             if (IInstallableOrgan.slotOf(organ) != target) {
                 return;
             }
+            // 未定型器官（无基因来源/品质）拒绝入体：其来源 id 为 null，入体后每 tick 结算会崩溃
+            if (!IInstallableOrgan.installableForSurgery(organ)) {
+                player.sendSystemMessage(Component.translatable("message.akaishi.surgery.unformed_organ"));
+                return;
+            }
             if (state.isOccupied(target)) {
                 return;
             }
@@ -211,7 +216,7 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         BodySlot target = BodySlot.values()[Math.max(0, Math.min(BodySlot.values().length - 1, targetSlot))];
         if (operationType == OP_IMPLANT) {
             ItemStack organ = inventory.getItem(ORGAN_SLOT);
-            if (IInstallableOrgan.slotOf(organ) == target
+            if (IInstallableOrgan.installableForSurgery(organ) && IInstallableOrgan.slotOf(organ) == target
                     && !state.isOccupied(target) && hasResources(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost)) {
                 consume(ModConfig.surgeryImplantSolidCost, ModConfig.surgeryImplantLifeCost);
                 state.implantOrgan(target, organ);

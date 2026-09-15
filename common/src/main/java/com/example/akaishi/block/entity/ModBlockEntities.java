@@ -57,6 +57,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiLifeEnergyCellBlockEntity>> CHISHI_LIFE_ENERGY_CELL;
     /** 生命储存串联器（3×3×3 多方块主方块）方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiLifeEnergyCellSerializerBlockEntity>> CHISHI_LIFE_ENERGY_CELL_SERIALIZER;
+    /** 生命能量发射器方块实体类型（抽能蓄满后朝绑定坐标发射能量弹） */
+    public static RegistrySupplier<BlockEntityType<AkaishiLifeEnergyEmitterBlockEntity>> CHISHI_LIFE_ENERGY_EMITTER;
     /** 赤石能量聚合器方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiEnergyAggregatorBlockEntity>> CHISHI_ENERGY_AGGREGATOR;
     /** 赤石装备打造器方块实体类型 */
@@ -248,10 +250,11 @@ public final class ModBlockEntities {
         CHISHI_ENERGY_CELL = be("akaishi_energy_cell", AkaishiEnergyCellBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_BASIC, AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_ADVANCED,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_CELL_SUPER);
-        // 管道：基础/高级/精英/终极四个方块共用一个方块实体类型，等级由方块本身决定
+        // 管道：基础/高级/精英/终极/无限五个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_ENERGY_PIPE = be("akaishi_energy_pipe", AkaishiEnergyPipeBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ADVANCED,
-                AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ELITE, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ULTIMATE);
+                AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ELITE, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ULTIMATE,
+                AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_INFINITE);
         CHISHI_ENERGY_GENERATOR = be("akaishi_energy_generator", AkaishiEnergyGeneratorBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_GENERATOR);
         CHISHI_ENERGY_ASSEMBLY = be("akaishi_energy_assembly", AkaishiEnergyAssemblyBlockEntity::new,
@@ -262,10 +265,11 @@ public final class ModBlockEntities {
         // 超级发生器架构核心（5×5×5 多方块主方块）
         CHISHI_SUPER_GENERATOR_CORE = be("akaishi_super_generator_core", AkaishiSuperGeneratorCoreBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_SUPER_GENERATOR_CORE);
-        // 生命能量管道：基础/中级/高级/超级四个方块共用一个方块实体类型，等级由方块本身决定
+        // 生命能量管道：基础/中级/高级/超级/无限五个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_LIFE_ENERGY_PIPE = be("akaishi_life_energy_pipe", AkaishiLifeEnergyPipeBlockEntity::new,
                 AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ADVANCED,
-                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE);
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE,
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_INFINITE);
         // 生命聚合转换器（单方块 / 外壳）
         CHISHI_LIFE_AGGREGATION_CONVERTER = be("akaishi_life_aggregation_converter",
                 AkaishiLifeAggregationConverterBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER);
@@ -279,6 +283,9 @@ public final class ModBlockEntities {
         // 生命储存串联器（3×3×3 多方块主方块）
         CHISHI_LIFE_ENERGY_CELL_SERIALIZER = be("akaishi_life_energy_cell_serializer",
                 AkaishiLifeEnergyCellSerializerBlockEntity::new, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SERIALIZER);
+        // 生命能量发射器（抽能蓄满后朝绑定坐标发射能量弹）
+        CHISHI_LIFE_ENERGY_EMITTER = be("akaishi_life_energy_emitter", AkaishiLifeEnergyEmitterBlockEntity::new,
+                AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_EMITTER);
         // 赤石能量聚合器
         CHISHI_ENERGY_AGGREGATOR = be("akaishi_energy_aggregator", AkaishiEnergyAggregatorBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_ENERGY_AGGREGATOR);
@@ -302,10 +309,11 @@ public final class ModBlockEntities {
         CHISHI_AUTO_COLLECTOR = be("akaishi_auto_collector", AkaishiAutoCollectorBlockEntity::new,
                 AkaishiCrystalBlocks.CHISHI_COLLECTOR_BASIC, AkaishiCrystalBlocks.CHISHI_COLLECTOR_MEDIUM,
                 AkaishiCrystalBlocks.CHISHI_COLLECTOR_ADVANCED, AkaishiCrystalBlocks.CHISHI_COLLECTOR_ULTIMATE);
-        // 物品管道：基础/高级/精英/终极四个方块共用一个方块实体类型，等级由方块本身决定
+        // 物品管道：基础/高级/精英/终极/无限五个方块共用一个方块实体类型，等级由方块本身决定
         CHISHI_ITEM_PIPE = be("akaishi_item_pipe", AkaishiItemPipeBlockEntity::new,
                 ModBlocks.CHISHI_ITEM_PIPE, ModBlocks.CHISHI_ITEM_PIPE_ADVANCED,
-                ModBlocks.CHISHI_ITEM_PIPE_ELITE, ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE);
+                ModBlocks.CHISHI_ITEM_PIPE_ELITE, ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE,
+                ModBlocks.CHISHI_ITEM_PIPE_INFINITE);
         // 生命能量提纯器（赤能源驱动，输出生命能量固态物）
         CHISHI_LIFE_PURIFIER = be("akaishi_life_purifier", AkaishiLifePurifierBlockEntity::new,
                 AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER);

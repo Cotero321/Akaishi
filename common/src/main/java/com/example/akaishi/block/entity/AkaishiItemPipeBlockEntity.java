@@ -190,16 +190,22 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
                 }
             }
         }
-        // 缓存网络总传输速率（各段管道速率之和），避免每 tick 重算
+        // 缓存网络总传输速率（各段管道速率之和），避免每 tick 重算。
+        // 网络含无限管道时直接置为 Long.MAX_VALUE 哨兵（不参与求和，避免溢出），传输端据此不再限速
         long rate = 0;
+        boolean infinite = false;
         for (BlockPos pipe : pipes) {
             if (level.getBlockEntity(pipe) instanceof AkaishiItemPipeBlockEntity
                     && level.getBlockState(pipe).getBlock() instanceof AkaishiItemPipeBlock pb) {
+                if (pb.isInfinite()) {
+                    infinite = true;
+                    break;
+                }
                 rate += pb.getTransferRate();
             }
         }
         this.cachedPipes = pipes;
-        this.cachedNetworkRate = rate;
+        this.cachedNetworkRate = infinite ? Long.MAX_VALUE : rate;
         this.networkDirty = false;
     }
 
@@ -271,6 +277,7 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
 
         // 传输：从源输出槽抽取（最多 networkRate 个），立即插入汇输入槽；插不进的退回源。
         // 优先抽取纯源，再抽双向缓冲；插入时跳过与源相同的设备，避免物品原地搬运回流。
+        // 无限网络（networkRate = Long.MAX_VALUE）时额度恒不为零，会一直搬到源抽空/汇填满为止
         long remainingRate = networkRate;
         for (DeviceEntry source : pureSources) {
             remainingRate = transferFromSource(source, sinks, remainingRate);

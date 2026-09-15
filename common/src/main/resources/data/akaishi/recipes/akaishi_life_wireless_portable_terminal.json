@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "WTW",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "W": { "item": "akaishi:akaishi_advanced_component" },
+    "T": { "item": "akaishi:akaishi_life_wireless_terminal" },
+    "I": { "item": "akaishi:akaishi_ingot" }
+  },
+  "result": { "item": "akaishi:akaishi_life_wireless_portable_terminal", "count": 1 }
+}

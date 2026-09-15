@@ -10,7 +10,8 @@ import net.minecraft.world.item.Item;
 import java.util.function.Supplier;
 
 /**
- * 无线域物品注册：无线能源便捷组件（合成材料）、便捷终端（手持频道遥控面板）与终端身份卡。
+ * 无线域物品注册：无线能源便捷组件（合成材料）、赤能源/生命便捷终端（手持遥控面板）
+ * 与终端身份卡（两族共用认证凭证）。
  */
 public final class AkaishiWirelessItems {
 
@@ -19,6 +20,7 @@ public final class AkaishiWirelessItems {
 
     public static RegistrySupplier<Item> akaishiWirelessComponent;
     public static RegistrySupplier<Item> akaishiWirelessPortableTerminal;
+    public static RegistrySupplier<Item> akaishiLifeWirelessPortableTerminal;
     public static RegistrySupplier<Item> akaishiWirelessIdentityCard;
 
     public static void register() {
@@ -27,6 +29,9 @@ public final class AkaishiWirelessItems {
         // 便捷终端：手持频道遥控面板（查看/切换频道）
         akaishiWirelessPortableTerminal = item("akaishi_wireless_portable_terminal",
                 () -> new AkaishiWirelessPortableTerminalItem(new Item.Properties().stacksTo(1)));
+        // 生命便捷终端：赤版生命镜像，按生命族反查授权其身份卡的在线生命终端
+        akaishiLifeWirelessPortableTerminal = item("akaishi_life_wireless_portable_terminal",
+                () -> new AkaishiLifeWirelessPortableTerminalItem(new Item.Properties().stacksTo(1)));
         // 终端身份卡：无线网络认证钥匙（唯一 UUID + 等级）
         akaishiWirelessIdentityCard = item("akaishi_wireless_identity_card",
                 () -> new AkaishiWirelessIdentityCardItem(new Item.Properties().stacksTo(1)));

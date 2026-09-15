@@ -437,7 +437,8 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             ItemStack organ = ClientBodyData.getOrgan(slot);
             if (organ.getItem() instanceof AkaishiOrganItem && !AkaishiOrganItem.isNative(organ)) {
                 String id = AkaishiOrganItem.getEntityId(organ);
-                if (!id.isEmpty()) {
+                // 未定型 / 无来源器官的 id 为 null，不参与同源汇总
+                if (id != null && !id.isEmpty()) {
                     counts.merge(id, 1, Integer::sum);
                 }
             }

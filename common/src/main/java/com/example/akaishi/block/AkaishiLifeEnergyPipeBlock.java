@@ -39,6 +39,11 @@ public class AkaishiLifeEnergyPipeBlock extends AkaishiEnergyPipeBlock {
         return tier.transferRate;
     }
 
+    @Override
+    public boolean isInfinite() {
+        return tier.isInfinite();
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

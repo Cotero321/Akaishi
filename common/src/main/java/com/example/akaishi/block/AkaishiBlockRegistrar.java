@@ -33,4 +33,13 @@ public final class AkaishiBlockRegistrar {
                         () -> new BlockItem(block.get(), new Item.Properties()));
         return block;
     }
+
+    /**
+     * 仅注册方块本体，不注册 BlockItem。
+     * <p>用于随结构生成的「技术方块」（如巨坛封印）：玩家无法自行获取，进入创造栏与创造栏物品反而会留下孤儿物品。
+     */
+    public static RegistrySupplier<Block> registerBlockOnly(Registrar<Block> registrar, String id,
+                                                            Supplier<Block> factory) {
+        return registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, id), factory);
+    }
 }

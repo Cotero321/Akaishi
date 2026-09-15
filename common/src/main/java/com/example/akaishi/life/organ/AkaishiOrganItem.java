@@ -110,6 +110,11 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
         return tag != null && tag.getBoolean(TAG_NATIVE);
     }
 
+    /** 是否未定型（无基因来源/品质且非原生）：不可移植，需先在部件培养舱定型 */
+    public static boolean isUnformed(ItemStack stack) {
+        return !isNative(stack) && (getSource(stack) == null || getTier(stack) == null);
+    }
+
     /** 槽位 → 物品实例（与 ModItems 注册对应） */
     public static Item of(BodySlot slot) {
         return switch (slot) {
@@ -133,6 +138,12 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
     @Override
     public BodySlot bodySlot(ItemStack stack) {
         return slot;
+    }
+
+    /** 未定型器官禁止进入手术仓（其来源 id 为 null，入体后每 tick 结算会崩溃） */
+    @Override
+    public boolean readyForSurgery(ItemStack stack) {
+        return !isUnformed(stack);
     }
 
     // ===== 读取 =====

@@ -65,6 +65,11 @@ public class AkaishiEnergyPipeBlock extends BaseEntityBlock {
         return tier.transferRate;
     }
 
+    /** 是否无限速率管道：传输时不再受网络速率上限约束，一次搬空/填满 */
+    public boolean isInfinite() {
+        return tier.isInfinite();
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);

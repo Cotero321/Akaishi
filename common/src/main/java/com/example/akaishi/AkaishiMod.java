@@ -18,6 +18,8 @@ import com.example.akaishi.decay.DecayZoneManager;
 import com.example.akaishi.decay.DecayZoneSync;
 import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.energy.AkaishiEnergyType;
+import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.item.AkaishiBannerPatterns;
 import com.example.akaishi.item.ModCreativeTabs;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.config.ConfigSyncS2C;
@@ -49,6 +51,8 @@ public final class AkaishiMod {
         // 机械域注册表默认项：材料 / DNA 模板（渲染预合成与部件校验依赖该注册）
         MechanicalMaterial.registerDefaults();
         MechanicalDnaProfile.registerDefaults();
+        // 旗帜图案域：须先于物品域注册（山羊头旗帜图案物品引用其标签）
+        AkaishiBannerPatterns.register();
         ModItems.register();
         // 衰竭域须先于方块门面注册：ModBlocks 门面会转发其字段引用
         AkaishiDecayBlocks.register();
@@ -63,6 +67,8 @@ public final class AkaishiMod {
         AkaishiLifeBlocks.register();
         AkaishiMatrixBlocks.register();
         ModBlockEntities.register();
+        // 实体类型：能量弹等（不依赖方块，随注册表事件求值）
+        ModEntities.register();
         ModCreativeTabs.register();
         ModMenus.register();
         // 自定义状态效果（衰变）

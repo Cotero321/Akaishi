@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "akaishi:block/akaishi_life_energy_emitter_bottom",
+    "up": "akaishi:block/akaishi_life_energy_emitter_top",
+    "north": "akaishi:block/akaishi_life_energy_emitter_front",
+    "south": "akaishi:block/akaishi_life_energy_emitter_side",
+    "east": "akaishi:block/akaishi_life_energy_emitter_side",
+    "west": "akaishi:block/akaishi_life_energy_emitter_side"
+  }
+}

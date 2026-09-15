@@ -92,11 +92,13 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_ADVANCED.get(), "jei.akaishi.item_pipe_advanced");
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_ELITE.get(), "jei.akaishi.item_pipe_elite");
         addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE.get(), "jei.akaishi.item_pipe_ultimate");
+        addIngredientInfo(registration, ModBlocks.CHISHI_ITEM_PIPE_INFINITE.get(), "jei.akaishi.item_pipe_infinite");
         // 生命能量管道（4 级）：生命能量专属网络中继，与赤能源管道物理隔离
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE.get(), "jei.akaishi.life_energy_pipe_basic");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ADVANCED.get(), "jei.akaishi.life_energy_pipe_advanced");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE.get(), "jei.akaishi.life_energy_pipe_elite");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE.get(), "jei.akaishi.life_energy_pipe_ultimate");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_INFINITE.get(), "jei.akaishi.life_energy_pipe_infinite");
         // 生命能量提纯器与固态物：双能量输入的固化设备，用物品信息说明数值
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER.get(), "jei.akaishi.life_purifier");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.akaishiLifeEssenceSolid.get(), "jei.akaishi.life_essence_solid");

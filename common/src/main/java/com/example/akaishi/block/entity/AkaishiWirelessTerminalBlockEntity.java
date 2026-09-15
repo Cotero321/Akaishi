@@ -395,6 +395,11 @@ public class AkaishiWirelessTerminalBlockEntity extends BlockEntity
         return structure != null && structure.crossDimCount > 0;
     }
 
+    /** 是否已解锁便携终端「随身供能」（内腔含 ≥1 便捷传输构架） */
+    public boolean hasTransmitFrame() {
+        return structure != null && structure.transmitFrameCount > 0;
+    }
+
     /** 输入口方向损耗削减比例（0-0.9，内腔输入损耗抑制组件提供） */
     public double inputLossReduction() {
         return structure == null ? 0.0 : Math.min(0.9, structure.inputLossCount * ModConfig.wirelessLossReductionPerModule);

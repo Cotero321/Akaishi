@@ -25,14 +25,14 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 /**
  * 烈焰花冠：烈焰花丛的顶端第 2 格，由成株花株随机刻长出（无物品形态，不可手持放置）。
  * 花态三段：花蕾/初绽/盛开（age 0~2）；盛开时自发光（亮度 12，不引燃）。
- * 盛开后右键采摘必定得 1 烈焰凝聚物并回到花蕾继续开花；非创造挖掘盛开花冠同样得 1 凝聚物。
+ * 盛开后右键采摘必定得 1 烈焰花瓣并回到花蕾继续开花；非创造挖掘盛开花冠同样得 1 烈焰花瓣。
  */
 public class AkaishiBlazeBloomBlock extends BushBlock {
 
     private static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
     /** 花态推进概率（每随机刻） */
     private static final float GROW_CHANCE = 0.35F;
-    /** 花态：0 花蕾 / 1 初绽 / 2 盛开（可采摘凝聚物，自发光） */
+    /** 花态：0 花蕾 / 1 初绽 / 2 盛开（可采摘烈焰花瓣，自发光） */
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 2);
 
     public AkaishiBlazeBloomBlock() {
@@ -77,7 +77,7 @@ public class AkaishiBlazeBloomBlock extends BushBlock {
         }
     }
 
-    /** 右键采摘：仅盛开（age 2）且下方是花株（植株顶端）时收获 1 烈焰凝聚物，花冠回到花蕾继续开花 */
+    /** 右键采摘：仅盛开（age 2）且下方是花株（植株顶端）时收获 1 烈焰花瓣，花冠回到花蕾继续开花 */
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                 InteractionHand hand, BlockHitResult hit) {
@@ -92,7 +92,7 @@ public class AkaishiBlazeBloomBlock extends BushBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    /** 非创造挖掘盛开花冠必定掉 1 烈焰凝聚物（花株基座被拆导致的坍塌不在此列） */
+    /** 非创造挖掘盛开花冠必定掉 1 烈焰花瓣（花株基座被拆导致的坍塌不在此列） */
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide && !player.getAbilities().instabuild

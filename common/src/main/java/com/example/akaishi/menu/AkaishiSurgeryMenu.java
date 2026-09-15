@@ -57,12 +57,12 @@ public class AkaishiSurgeryMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
 
-        // 器官输入槽：仅接受可安装器官（生物器官 / 机械义体；槽位匹配在服务端手术开始时校验）
+        // 器官输入槽：仅接受可安装且已定型的器官（生物器官 / 机械义体；槽位匹配在服务端手术开始时校验）
         addSlot(new OverlayHidingSlot(container, AkaishiSurgeryBlockEntity.ORGAN_SLOT, 108, 28,
                 () -> linkState != null && linkState.open) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return IInstallableOrgan.slotOf(stack) != null;
+                return IInstallableOrgan.installableForSurgery(stack);
             }
         });
         // 固态物槽：仅接受生命固态物

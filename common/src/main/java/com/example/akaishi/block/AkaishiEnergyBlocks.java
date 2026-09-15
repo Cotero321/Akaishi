@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Block;
 /**
  * 赤能源（赤石能量体系）方块族注册表。
  * <p>
- * 从 ModBlocks 拆分出的域注册类：3 级能量储存单元、4 级能量管道、赤能源发生机、
+ * 从 ModBlocks 拆分出的域注册类：3 级能量储存单元、5 级能量管道（基础/高级/精英/终极/无限）、赤能源发生机、
  * 小型组合结构、储存串联器、超级发生器核心、赤石能量聚合器、能量液化/加工、
  * 创造能量源（赤能源版）。围绕「发电 → 传输 → 储存 → 液化燃料」的赤能源主线。
  * 所有静态字段显式初始化为 null，由 {@link #register()} 在 {@link AkaishiMod#init()}
@@ -35,6 +35,8 @@ public final class AkaishiEnergyBlocks {
     public static RegistrySupplier<Block> CHISHI_ENERGY_PIPE_ELITE = null;
     /** 赤能源管道（终极） */
     public static RegistrySupplier<Block> CHISHI_ENERGY_PIPE_ULTIMATE = null;
+    /** 赤能源管道（无限，无速率上限，终局） */
+    public static RegistrySupplier<Block> CHISHI_ENERGY_PIPE_INFINITE = null;
     /** 赤能源发生机（燃烧赤石材料产赤能源，单方块 / 多方块外壳） */
     public static RegistrySupplier<Block> CHISHI_ENERGY_GENERATOR = null;
     /** 小型赤能源组合结构（多方块主方块） */
@@ -66,7 +68,7 @@ public final class AkaishiEnergyBlocks {
         CHISHI_ENERGY_CELL_SUPER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_cell_super",
                 () -> new AkaishiEnergyCellBlock(EnergyCellTier.SUPER));
 
-        // 赤能源管道（基础/高级/精英/终极）
+        // 赤能源管道（基础/高级/精英/终极/无限）
         CHISHI_ENERGY_PIPE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_pipe",
                 () -> new AkaishiEnergyPipeBlock(EnergyPipeTier.BASIC));
         CHISHI_ENERGY_PIPE_ADVANCED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_pipe_advanced",
@@ -75,6 +77,8 @@ public final class AkaishiEnergyBlocks {
                 () -> new AkaishiEnergyPipeBlock(EnergyPipeTier.ELITE));
         CHISHI_ENERGY_PIPE_ULTIMATE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_pipe_ultimate",
                 () -> new AkaishiEnergyPipeBlock(EnergyPipeTier.ULTIMATE));
+        CHISHI_ENERGY_PIPE_INFINITE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_pipe_infinite",
+                () -> new AkaishiEnergyPipeBlock(EnergyPipeTier.INFINITE));
 
         // 赤能源发生机 + 小型赤能源组合结构（含各自 BlockItem）
         CHISHI_ENERGY_GENERATOR = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_energy_generator",

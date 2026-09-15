@@ -1,0 +1,19 @@
+{
+  "entities": ["minecraft:player"],
+  "slots": [
+    "back",
+    "belt",
+    "body",
+    "bracelet",
+    "charm",
+    "curio",
+    "hands",
+    "head",
+    "necklace",
+    "ring",
+    "akaishi_socket_1",
+    "akaishi_socket_2",
+    "akaishi_socket_3",
+    "akaishi_socket_4"
+  ]
+}

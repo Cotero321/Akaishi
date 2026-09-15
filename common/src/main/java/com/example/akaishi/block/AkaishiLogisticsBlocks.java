@@ -29,6 +29,8 @@ public final class AkaishiLogisticsBlocks {
     public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_ELITE = null;
     /** 物品管道（终极）：64 个/tick */
     public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_ULTIMATE = null;
+    /** 物品管道（无限，无速率上限，终局） */
+    public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_INFINITE = null;
     /** 液体管道：传输下界能量/燃料液体，可对接 MEK 等外部液体方块 */
     public static RegistrySupplier<Block> CHISHI_FLUID_PIPE = null;
     /** 封闭性衰竭管道：废料专用（单缓冲） */
@@ -51,11 +53,12 @@ public final class AkaishiLogisticsBlocks {
     public static void register() {
         Registrar<Block> blockRegistrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
 
-        // 物品管道（4 级）：物流网络中继，传输物品到相连容器/机器，终极 64 个/tick
+        // 物品管道（5 级）：物流网络中继，传输物品到相连容器/机器，终极 64 个/tick，无限无上限
         CHISHI_ITEM_PIPE = registerItemPipe(blockRegistrar, "akaishi_item_pipe", AkaishiItemPipeBlock.ItemPipeTier.BASIC);
         CHISHI_ITEM_PIPE_ADVANCED = registerItemPipe(blockRegistrar, "akaishi_item_pipe_advanced", AkaishiItemPipeBlock.ItemPipeTier.ADVANCED);
         CHISHI_ITEM_PIPE_ELITE = registerItemPipe(blockRegistrar, "akaishi_item_pipe_elite", AkaishiItemPipeBlock.ItemPipeTier.ELITE);
         CHISHI_ITEM_PIPE_ULTIMATE = registerItemPipe(blockRegistrar, "akaishi_item_pipe_ultimate", AkaishiItemPipeBlock.ItemPipeTier.ULTIMATE);
+        CHISHI_ITEM_PIPE_INFINITE = registerItemPipe(blockRegistrar, "akaishi_item_pipe_infinite", AkaishiItemPipeBlock.ItemPipeTier.INFINITE);
 
         // 液体管道（单级，传输下界能量/燃料液体）
         CHISHI_FLUID_PIPE = AkaishiBlockRegistrar.registerMachineBlock(blockRegistrar, "akaishi_fluid_pipe", AkaishiFluidPipeBlock::new);

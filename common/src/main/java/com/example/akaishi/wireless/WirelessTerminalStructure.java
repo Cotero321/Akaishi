@@ -10,6 +10,7 @@ import com.example.akaishi.block.AkaishiWirelessOutputLossBlock;
 import com.example.akaishi.block.AkaishiWirelessSecurityBlock;
 import com.example.akaishi.block.AkaishiWirelessShellBlock;
 import com.example.akaishi.block.AkaishiWirelessTerminalBlock;
+import com.example.akaishi.block.AkaishiWirelessTransmitFrameBlock;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
 import net.minecraft.core.BlockPos;
@@ -23,7 +24,7 @@ import java.util.List;
  * 无线赤能源终端多方块结构扫描器（固定边长 5）。
  * <p>
  * 结构约束：单层封闭 5×5×5 箱体；墙面由终端方块/安全方块/控制器/外壳组成，
- * 内腔中心恰好 1 个终端核心，其余为空气或组件（跨维/区块加载/范围/损耗抑制）。
+ * 内腔中心恰好 1 个终端核心，其余为空气或组件（跨维/区块加载/范围/损耗抑制/便捷传输构架）。
  * 终端方块是墙面的一部分（主方块，承载 GUI）。
  * <p>
  * 算法：沿 3 轴双向数连续墙块得到箱体跨度；对无法从终端方块数出的轴（终端方块在该轴墙面内部）
@@ -54,9 +55,12 @@ public final class WirelessTerminalStructure {
         public final int inputLossCount;
         /** 内腔输出损耗抑制组件数量（线性降低输出口方向损耗） */
         public final int outputLossCount;
+        /** 内腔便捷传输构架数量（≥1 解锁便携终端「随身供能」） */
+        public final int transmitFrameCount;
 
         Result(BlockPos min, BlockPos max, List<BlockPos> shells, BlockPos terminalCore, int crossDimCount,
-               int chunkLoaderCount, int chunkRangeCount, int inputLossCount, int outputLossCount) {
+               int chunkLoaderCount, int chunkRangeCount, int inputLossCount, int outputLossCount,
+               int transmitFrameCount) {
             this.min = min;
             this.max = max;
             this.shells = shells;
@@ -66,6 +70,7 @@ public final class WirelessTerminalStructure {
             this.chunkRangeCount = chunkRangeCount;
             this.inputLossCount = inputLossCount;
             this.outputLossCount = outputLossCount;
+            this.transmitFrameCount = transmitFrameCount;
         }
     }
 
@@ -145,6 +150,7 @@ public final class WirelessTerminalStructure {
         int chunkRangeCount = 0;
         int inputLossCount = 0;
         int outputLossCount = 0;
+        int transmitFrameCount = 0;
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
@@ -175,6 +181,8 @@ public final class WirelessTerminalStructure {
                         inputLossCount++;
                     } else if (b instanceof AkaishiWirelessOutputLossBlock) {
                         outputLossCount++;
+                    } else if (b instanceof AkaishiWirelessTransmitFrameBlock) {
+                        transmitFrameCount++;
                     } else {
                         return null; // 内腔存在无关方块
                     }
@@ -185,7 +193,8 @@ public final class WirelessTerminalStructure {
             return null;
         }
         return new Result(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ),
-                shells, core, crossDimCount, chunkLoaderCount, chunkRangeCount, inputLossCount, outputLossCount);
+                shells, core, crossDimCount, chunkLoaderCount, chunkRangeCount, inputLossCount, outputLossCount,
+                transmitFrameCount);
     }
 
     /** 是否为合法墙面块（构成封闭壳体的方块）：终端/安全/控制器/外壳/结构玻璃 */

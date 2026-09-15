@@ -8,8 +8,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * 无线能源便捷终端界面（手持物品，只读遥控面板，参考 AE2 无线终端）。
- * 两页互斥切换：运行情况（身份卡/认证终端/口统计）+ 能量储存情况（储能条）。
+ * 无线能源便捷终端界面（手持物品，遥控面板，参考 AE2 无线终端）。
+ * 两页互斥切换：运行情况（身份卡/认证终端/口统计/随身供能开关）+ 能量储存情况（储能条）。
  * 数据由服务端 broadcastChanges 每 tick 扫背包身份卡刷新。
  * 198 高布局：标题 y=6 与切页按钮 y=16 错开，内容区 y=36 起舒展排布。
  */
@@ -31,6 +31,12 @@ public class AkaishiWirelessPortableTerminalScreen extends AbstractContainerScre
     private static final int BAR_Y = 36;
     private static final int BAR_W = 136;
     private static final int BAR_H = 8;
+
+    // 随身供能开关按钮（运行情况页，四行状态文字之下）
+    private static final int SUPPLY_X = 8;
+    private static final int SUPPLY_Y = 88;
+    private static final int SUPPLY_W = 96;
+    private static final int SUPPLY_H = 16;
 
     /** 当前页面：0=运行情况，1=能量储存 */
     private int currentPage;
@@ -87,6 +93,12 @@ public class AkaishiWirelessPortableTerminalScreen extends AbstractContainerScre
         // 口统计
         gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.port_stats",
                 menu.getInputCount(), menu.getOutputCount()), x + 8, y + 72, TEXT_DIM, false);
+        // 随身供能开关：未放置便捷传输构架（终端未解锁）时置灰不可点
+        boolean unlocked = menu.isSupplyUnlocked();
+        String key = !unlocked ? "gui.akaishi.wireless.supply.locked"
+                : (menu.isSupplyEnabled() ? "gui.akaishi.wireless.supply.on" : "gui.akaishi.wireless.supply.off");
+        GuiWidgets.buttonText(gui, this.font, x + SUPPLY_X, y + SUPPLY_Y, SUPPLY_W, SUPPLY_H,
+                Component.translatable(key), unlocked);
     }
 
     /** 页2：能量储存情况（储能条 + 数值 + 容量） */
@@ -130,6 +142,13 @@ public class AkaishiWirelessPortableTerminalScreen extends AbstractContainerScre
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
         }
+        // 随身供能开关悬停提示（页1）
+        if (currentPage == 0 && isHovering(SUPPLY_X, SUPPLY_Y, SUPPLY_W, SUPPLY_H, mouseX, mouseY)) {
+            gui.renderTooltip(this.font,
+                    Component.translatable(menu.isSupplyUnlocked()
+                            ? "gui.akaishi.wireless.supply.tip" : "gui.akaishi.wireless.supply.tip_locked"),
+                    mouseX, mouseY);
+        }
     }
 
     @Override
@@ -142,6 +161,14 @@ public class AkaishiWirelessPortableTerminalScreen extends AbstractContainerScre
             }
             if (isIn(this.leftPos + 88, this.topPos + TAB_Y, TAB_W, TAB_H, mouseX, mouseY)) {
                 currentPage = 1;
+                return true;
+            }
+            // 随身供能开关（服务端翻转物品 NBT；未解锁时不发送）
+            if (isIn(this.leftPos + SUPPLY_X, this.topPos + SUPPLY_Y, SUPPLY_W, SUPPLY_H, mouseX, mouseY)) {
+                if (menu.isSupplyUnlocked()) {
+                    this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId,
+                            AkaishiWirelessPortableTerminalMenu.BTN_TOGGLE_SUPPLY);
+                }
                 return true;
             }
         }

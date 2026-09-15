@@ -29,6 +29,8 @@ public final class AkaishiLifeBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_ELITE = null;
     /** 生命能量管道（超级，64000/tick） */
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_ULTIMATE = null;
+    /** 生命能量管道（无限，无速率上限，终局） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_PIPE_INFINITE = null;
     /** 生命聚合转换器（消耗赤能源聚合生命能量，单方块 / 生命转换架构外壳） */
     public static RegistrySupplier<Block> CHISHI_LIFE_AGGREGATION_CONVERTER = null;
     /** 生命转换架构（3×3×3 多方块主方块） */
@@ -41,6 +43,8 @@ public final class AkaishiLifeBlocks {
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL_SUPER = null;
     /** 生命储存串联器（3×3×3 多方块主方块，聚合 26 台储存器容量） */
     public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_CELL_SERIALIZER = null;
+    /** 生命能量发射器（抽能蓄满后朝权杖绑定坐标发射能量弹） */
+    public static RegistrySupplier<Block> CHISHI_LIFE_ENERGY_EMITTER = null;
     /** 创造生命能量储存原件（无限输出测试方块） */
     public static RegistrySupplier<Block> CHISHI_CREATIVE_LIFE_CELL = null;
     /** 生命能量提纯器（赤能源驱动，1000 生命能量 + 10M 赤能源 → 1 生命能量固态物） */
@@ -104,7 +108,7 @@ public final class AkaishiLifeBlocks {
     /** 注册全部生命系统方块（由 AkaishiMod.init 调用） */
     public static void register() {
         Registrar<Block> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
-        // 生命能量管道（基础/中级/高级/超级），速率对齐物品管道分级
+        // 生命能量管道（基础/中级/高级/超级/无限），速率对齐物品管道分级
         CHISHI_LIFE_ENERGY_PIPE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe",
                 () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.BASIC));
         CHISHI_LIFE_ENERGY_PIPE_ADVANCED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_advanced",
@@ -113,6 +117,8 @@ public final class AkaishiLifeBlocks {
                 () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.ELITE));
         CHISHI_LIFE_ENERGY_PIPE_ULTIMATE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_ultimate",
                 () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.ULTIMATE));
+        CHISHI_LIFE_ENERGY_PIPE_INFINITE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_pipe_infinite",
+                () -> new AkaishiLifeEnergyPipeBlock(LifeEnergyPipeTier.INFINITE));
         CHISHI_LIFE_AGGREGATION_CONVERTER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_aggregation_converter",
                 AkaishiLifeAggregationConverterBlock::new);
         CHISHI_LIFE_CONVERSION_ARCHITECTURE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_conversion_architecture",
@@ -127,6 +133,9 @@ public final class AkaishiLifeBlocks {
         // 生命储存串联器（3×3×3 多方块主方块）
         CHISHI_LIFE_ENERGY_CELL_SERIALIZER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_cell_serializer",
                 AkaishiLifeEnergyCellSerializerBlock::new);
+        // 生命能量发射器（抽能蓄满后朝绑定坐标发射能量弹）
+        CHISHI_LIFE_ENERGY_EMITTER = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_life_energy_emitter",
+                AkaishiLifeEnergyEmitterBlock::new);
         // 创造模式能量源（测试用，无限输出）：生命能量版（赤能源版在 AkaishiEnergyBlocks）
         CHISHI_CREATIVE_LIFE_CELL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "creative_life_energy_cell",
                 () -> new CreativeEnergySourceBlock(LifeEnergyType.INSTANCE));

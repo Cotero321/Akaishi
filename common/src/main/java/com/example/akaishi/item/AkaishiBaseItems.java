@@ -13,6 +13,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.BannerPatternItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 
@@ -75,6 +76,7 @@ public final class AkaishiBaseItems {
     public static RegistrySupplier<Item> akaishiDiary;
     public static RegistrySupplier<Item> lifeBook;
     public static RegistrySupplier<Item> geneBook;
+    public static RegistrySupplier<Item> goatSkullBannerPattern;
 
     public static void register() {
         akaishiCrystal = item(ModItems.CHISHI_CRYSTAL_ID);
@@ -141,6 +143,9 @@ public final class AkaishiBaseItems {
         // 基因详解：独立手册，按基因组/基因型/词条/序列分区整理生命体系的全部数值
         geneBook = item(ModItems.GENE_BOOK_ID,
                 () -> new AkaishiBookItem(new ResourceLocation(AkaishiMod.MOD_ID, "gene_detail"), new Item.Properties()));
+        // 山羊头旗帜图案：放入织布机后可选「山羊头徽记」图案
+        goatSkullBannerPattern = item(ModItems.GOAT_SKULL_BANNER_PATTERN_ID,
+                () -> new BannerPatternItem(AkaishiBannerPatterns.GOAT_SKULL_TAG, new Item.Properties()));
     }
 
     /** 注册普通物品（generated 模型引用 textures/item/&lt;id&gt;.png） */

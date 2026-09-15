@@ -13,6 +13,8 @@ import net.minecraft.sounds.SoundEvent;
  * 由 sounds.json 关联事件名。注册时机与方块一致：注册事件期间延迟求值。
  * <p>
  * 机器运转音一律以 {@code *_hum} 结尾，并由 {@link MachineHum} 在各机器 tickServer 中播放。
+ * 祭坛氛围音（{@code VOID_*}）为整段无缝循环素材，同样经 {@link MachineHum} 播放，
+ * 只是重播间隔取音效时长以实现连续不断（见 {@code AkaishiMotherAltarBlockEntity}）。
  */
 public final class ModSounds {
 
@@ -124,10 +126,20 @@ public final class ModSounds {
     public static final RegistrySupplier<SoundEvent> TRAIT_REFORGER_HUM = reg("trait_reforger_hum");
     /** 药水台运转 */
     public static final RegistrySupplier<SoundEvent> POTION_TABLE_HUM = reg("potion_table_hum");
-    /** 母体祭坛运转 */
-    public static final RegistrySupplier<SoundEvent> MOTHER_ALTAR_HUM = reg("mother_altar_hum");
     /** 自动收集器运转 */
     public static final RegistrySupplier<SoundEvent> AUTO_COLLECTOR_HUM = reg("auto_collector_hum");
+
+    // ==================== 祭坛氛围音 ====================
+
+    /** 母神祭坛成型后未工作的氛围音：虚空的心跳声（5s 无缝循环） */
+    public static final RegistrySupplier<SoundEvent> VOID_HEARTBEAT = reg("void_heartbeat");
+    /** 母神祭坛仪式进行中的氛围音：虚空呓语声（8s 无缝循环） */
+    public static final RegistrySupplier<SoundEvent> VOID_WHISPER = reg("void_whisper");
+
+    // ==================== 不可名状 ====================
+
+    /** 「不可名状」减益的耳中呓语：以玩家自身为音源播放的一次性低语（8s） */
+    public static final RegistrySupplier<SoundEvent> UNNAMEABLE_WHISPER = reg("unnameable_whisper");
 
     /** 强制类加载：确保 SoundEvent 在注册事件前完成注册（游戏启动阶段由 AkaishiMod.init 调用） */
     public static void touch() {

@@ -159,6 +159,9 @@ public final class AkaishiConfigSync {
         ModConfig.decayZoneEnabled = AkaishiConfig.DECAY_ZONE_ENABLED.get();
         ModConfig.sunlightBurnEnabled = AkaishiConfig.SUNLIGHT_BURN_ENABLED.get();
         ModConfig.overloadEnabled = AkaishiConfig.OVERLOAD_ENABLED.get();
+        // 赤石饰品扩展槽
+        ModConfig.curioSlotUnlockRequired = AkaishiConfig.CURIO_SLOT_UNLOCK_REQUIRED.get();
+        ModConfig.curioSlotUnlockThresholds = toIntArray(AkaishiConfig.CURIO_SLOT_UNLOCK_THRESHOLDS.get());
 
         // 生命研究机器
         ModConfig.geneAnalyzerLifeCost = AkaishiConfig.GENE_ANALYZER_LIFE_COST.get();

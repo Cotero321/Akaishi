@@ -26,8 +26,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * 凋零藤茎：整株的第 2/3 格。
  * - 第 2 格（下方是根）：随机刻向上长第 3 格；
  * - 第 3 格（下方是茎）为成熟顶端，转入"结果"阶段：
- *   age 0 空藤 → 1 挂出幼果 → 2 果实成熟；成熟后右键采摘必定得 1 凋零凝聚体并回到空藤继续结果。
- * - 挖掘第 3 格（非创造）必定掉 1 凝聚体；挖掘第 2 格/茎坍塌无掉落。
+ *   age 0 空藤 → 1 挂出幼果 → 2 果实成熟；成熟后右键采摘必定得 1 凋零果并回到空藤继续结果。
+ * - 挖掘第 3 格（非创造）必定掉 1 凋零果；挖掘第 2 格/茎坍塌无掉落。
  * 无物品形式（无法手持放置，只能由根长出），杜绝绕过种子的繁殖。
  */
 public class AkaishiWitherStemBlock extends BushBlock {
@@ -97,7 +97,7 @@ public class AkaishiWitherStemBlock extends BushBlock {
         }
     }
 
-    /** 右键：仅成熟顶端（第 3 格）且果实成熟（age 2）时可采摘，必定得 1 凝聚体，藤回到空藤继续结果 */
+    /** 右键：仅成熟顶端（第 3 格）且果实成熟（age 2）时可采摘，必定得 1 凋零果，藤回到空藤继续结果 */
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                 InteractionHand hand, BlockHitResult hit) {
@@ -111,7 +111,7 @@ public class AkaishiWitherStemBlock extends BushBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    /** 挖掘成熟顶端（第 3 格，非创造）必定掉落 1 个凋零凝聚体；茎无 loot，其它节挖掘无掉落 */
+    /** 挖掘成熟顶端（第 3 格，非创造）必定掉落 1 个凋零果；茎无 loot，其它节挖掘无掉落 */
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide && !player.getAbilities().instabuild && isMatureTip(level, pos)) {

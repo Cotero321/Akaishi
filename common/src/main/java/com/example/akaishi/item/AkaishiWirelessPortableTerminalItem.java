@@ -19,10 +19,12 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * 无线能源便捷终端：手持右键打开只读遥控面板（参考 AE2 无线终端）。
+ * 无线能源便捷终端：手持右键打开遥控面板（参考 AE2 无线终端）。
  * <p>
  * 不再使用频道号：服务端每 tick 扫描玩家背包中的第一张身份卡，反查授权该卡的在线终端，
- * 把其状态（成型/储能/口统计/卡与终端短 ID）同步到界面。手持终端不传输能量，仅作状态面板。
+ * 把其状态（成型/储能/口统计/卡与终端短 ID）同步到界面。物品本身不存能量，
+ * 但在 GUI 开启「随身供能」后（需终端内腔含便捷传输构架解锁），会持续从绑定终端
+ * 抽能注入玩家背包单元与已装备饰品，见 {@link com.example.akaishi.wireless.PortableSupplyService}。
  */
 public class AkaishiWirelessPortableTerminalItem extends Item {
 

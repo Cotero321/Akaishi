@@ -47,12 +47,19 @@ public class AkaishiItemPipeBlock extends BaseEntityBlock {
         /** 精英：16 个/tick */
         ELITE(16),
         /** 终极：64 个/tick，海量物品瞬间输送 */
-        ULTIMATE(64);
+        ULTIMATE(64),
+        /** 无限：无速率上限，每 tick 一次搬空/填满（网络含任一段即不受速率限速） */
+        INFINITE(Integer.MAX_VALUE);
 
         public final int transferRate;
 
         ItemPipeTier(int transferRate) {
             this.transferRate = transferRate;
+        }
+
+        /** 是否无限速率等级 */
+        public boolean isInfinite() {
+            return this == INFINITE;
         }
     }
 
@@ -73,6 +80,11 @@ public class AkaishiItemPipeBlock extends BaseEntityBlock {
     /** 每 tick 可传输的物品个数 */
     public int getTransferRate() {
         return tier.transferRate;
+    }
+
+    /** 是否无限速率管道：传输时不再受网络速率上限约束，一次搬空/填满 */
+    public boolean isInfinite() {
+        return tier.isInfinite();
     }
 
     @Override

@@ -1,0 +1,127 @@
+{
+  "name": "Black Goat Altar (Three Tiers)",
+  "icon": "akaishi:akaishi_mother_altar",
+  "category": "akaishi:life_advanced",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_mother_altar",
+      "text": "$(bold)Purpose: $(0)the complete form of the Altar of the Black Mother — a 2×2 core of mother altars acts as the anchor, with three tiers stacked downward.$(br2)$(bold)Tiers: $(0)$(li)$(4)Tier 1$(0): top altar layer + the layer beneath it$(li)$(4)Tier 2$(0): tier 1 + the next layer down$(li)$(4)Tier 3$(0): tier 2 + the bottom layer (including the beacon structure)$(br2)Any core mother altar re-checks itself every 20 ticks and reports the $(4)highest contiguous tier$(0); the tier is stored on all four altars and synced to the client."
+    },
+    {
+      "type": "patchouli:multiblock",
+      "name": "Black Goat Altar (16×16×4)",
+      "multiblock": {
+        "pattern": [
+          [
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "      C  C      ",
+            "                ",
+            "    C      C    ",
+            "       0C       ",
+            "       CC       ",
+            "    C      C    ",
+            "                ",
+            "      C  C      ",
+            "                ",
+            "                ",
+            "                ",
+            "                "
+          ],
+          [
+            "                ",
+            "                ",
+            "  D          D  ",
+            "                ",
+            "     AEBBEA     ",
+            "    AABHHBAA    ",
+            "    EBBHHBBE    ",
+            "    BHHEEHHB    ",
+            "    BHHEEHHB    ",
+            "    EBBHHBBE    ",
+            "    AABHHBAA    ",
+            "     AEBBEA     ",
+            "                ",
+            "  D          D  ",
+            "                ",
+            "                "
+          ],
+          [
+            "                ",
+            " III        III ",
+            " III        III ",
+            " III AEBBEA III ",
+            "    A      A    ",
+            "   A        A   ",
+            "   E        E   ",
+            "   B        B   ",
+            "   B        B   ",
+            "   E        E   ",
+            "   A        A   ",
+            "    A      A    ",
+            " III AEBBEA III ",
+            " III        III ",
+            " III        III ",
+            "                "
+          ],
+          [
+            "HHHHH      HHHHH",
+            "HAAAH      HAAAH",
+            "HAAAHHHHHHHHAAAH",
+            "HAAAH      HAAAH",
+            "HHHH        HHHH",
+            "  H          H  ",
+            "  H          H  ",
+            "  H          H  ",
+            "  H          H  ",
+            "  H          H  ",
+            "  H          H  ",
+            "HHHH        HHHH",
+            "HAAAH      HAAAH",
+            "HAAAHHHHHHHHAAAH",
+            "HAAAH      HAAAH",
+            "HHHHH      HHHHH"
+          ]
+        ],
+        "mapping": {
+          "A": "akaishi:akaishi_altar_stone",
+          "B": "akaishi:akaishi_essence_block",
+          "C": "akaishi:akaishi_mother_altar",
+          "H": "minecraft:crying_obsidian",
+          "I": "minecraft:iron_block",
+          "E": "minecraft:bone_block",
+          "D": "minecraft:beacon",
+          "0": "akaishi:akaishi_mother_altar"
+        },
+        "symmetrical": true
+      },
+      "text": "$(bold)Layers (top to bottom, 4 total): $(0)$(li)y=-57 top: C=mother altar (red 0 is the anchor)$(li)y=-58 bedding: A=altar stone, B=essence block, E=bone block, H=crying obsidian, D=beacon$(li)y=-59 middle: I=beacon base squares + E/B/A ring steps$(li)y=-60 bottom: H=crying obsidian frame, A=altar stone$(br2)$(4)The beacon structure belongs to tier 3 only$(0): at tiers 1/2 the D (beacon) and I (base) cells are ignored, so anything may sit there. Tier 3 requires real beacons, and any base block that $(4)can power a beacon$(0) works - iron, gold, diamond, emerald or netherite blocks. The whole structure is 90°-rotation symmetric, so $(4)any facing works$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Tier Detection",
+      "text": "$(bold)Rule: $(0)validation starts at tier 1 and climbs layer by layer; the count of contiguous layers is the tier. One missing solid block falls back to the previous tier, down to 0 (incomplete). $(bold)Air cells: $(0)cells left blank in the diagram accept anything and never affect detection.$(br2)$(bold)Anchor: $(0)any of the four core mother altars $(4)can trigger the scan$(0); each reports the same tier independently.$(br2)$(bold)Current stage: $(0)structure detection, tier sync, formation (merging at tier 1+) and the $(4)Life Fusion Ritual$(0) are all live."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Life Fusion Ritual",
+      "text": "$(bold)Offerings: $(0)put $(4)1 Akaishi Ingot$(0) on the mother altar, then 1 item on each of the 8 outer sub-altars: $(4)2 Life Embryos, 2 Life Ashes, 2 Gene Sequences with purity >50, and 2 Chishi Essence Blocks$(0) - all 8 altars must be filled exactly; one extra or one wrong item fails the recipe.$(br2)$(bold)Charging: $(0)feed life energy into the mother altar with the $(4)Life Energy Emitter$(0) (bind the altar first with the wand); the progress bar settles at $(4)80K$(0), each projectile delivering 8K.$(br2)$(bold)Lightning: $(0)every $(4)10%$(0) of progress calls down a $(4)visual-only bolt$(0) (beam and thunder, but $(4)no fire and no damage$(0)): milestones 1-9 strike the 8 outer sub-altars in structure order, and milestone 10 (progress full) $(4)strikes the center of the great altar$(0).$(br2)$(bold)Outcome: $(0)with the recipe complete, $(4)every offering is consumed$(0) and $(4)1 Life Fusion Ingot$(0) forms in the mother altar slot (floating display; take it by right-click or via the screen). An incomplete recipe leaves progress pinned at full until the offerings are corrected.$(br2)$(bold)Energy source: $(0)the altar $(4)refuses any pipe-fed energy$(0) - only the emitter works; the emitter stops by itself once the target is full.$(br2)$(bold)No whitelist: $(0)there is no allow/deny list - $(4)any item can be offered$(0); a wrong item simply never joins the recipe."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "After Formation",
+      "text": "$(bold)Trigger: $(0)a tier of $(4)1 or higher$(0) forms the shrine; dropping to 0 (core block broken) dissolves it and $(4)reverts everything$(0).$(br2)$(bold)Merged altar: $(0)the four core altars each render a quarter of the great-altar model, $(4)seamlessly joined$(0), topped by a $(4)red blanket$(0).$(br2)$(bold)Right-click: $(0)once formed, right-click any of the four core altars to open the $(4)merged altar screen$(0) - it shows the $(4)current tier$(0) and one offering slot ($(4)single item$(0) only, any item accepted).$(br2)$(bold)Crimson veins: $(0)once formed, $(4)crying obsidian$(0) turns red by tier - the $(4)y=-58 bedding is always crimson$(0), while the $(4)y=-60 bottom layer is crimson at tier 3 only$(0); purple veins become flowing red ones. $(4)Obsidian added later$(0) converts automatically within seconds.$(br2)$(bold)Eight red glows: $(0)the 8 outer sub-altars shift from purple to a $(4)red glow$(0) (visual only; they still take offerings).$(br2)$(bold)Reverting: $(0)breaking a required block of layer 1 (y=-57 top / y=-58 bedding) drops the tier to 0 - crimson reverts to crying obsidian, red glows go out and the four altars split back to single form (offerings are $(4)ejected and returned$(0) altar by altar when merging).$(br2)$(bold)Downgrading: $(0)breaking only deeper layers (y=-59 / y=-60) does not dissolve the shrine; it downgrades to the remaining tier - crimson beyond that tier reverts to plain crying obsidian, and turns red again once restored."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:mother_altar"
+      ],
+      "text": "Prerequisite: read \"Altar of the Black Mother\" first for the single-altar offering interaction."
+    }
+  ]
+}

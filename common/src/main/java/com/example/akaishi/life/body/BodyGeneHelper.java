@@ -50,7 +50,8 @@ public final class BodyGeneHelper {
         }
         int compat = AkaishiOrganItem.getCompat(organ);
         String entityId = AkaishiOrganItem.getEntityId(organ);
-        if (!entityId.isEmpty()) {
+        boolean hasSource = entityId != null && !entityId.isEmpty();
+        if (hasSource) {
             compat += state.getGeneBonus(entityId);
             // 同源套装：专注同一生物来源（≥4 枚）额外适配 +5
             if (sameSourceCount(state, entityId) >= SYNERGY_TIER) {
@@ -61,7 +62,7 @@ public final class BodyGeneHelper {
         compat += extraCompat;
         int effective = Math.min(AkaishiOrganItem.MAX_COMPAT, compat);
         // 突破激活且来源匹配：叠加额外适配（突破 100 上限，激活结束后自动回落）
-        if (!entityId.isEmpty() && state.isBreakthroughActive(entityId)) {
+        if (hasSource && state.isBreakthroughActive(entityId)) {
             effective += state.getBreakthroughExtra();
         }
         return effective;

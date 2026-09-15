@@ -13,7 +13,9 @@ public enum LifeEnergyPipeTier {
     /** 高级：16000/tick */
     ELITE(16000, EnergyPipeTier.ELITE),
     /** 超级：64000/tick */
-    ULTIMATE(64000, EnergyPipeTier.ULTIMATE);
+    ULTIMATE(64000, EnergyPipeTier.ULTIMATE),
+    /** 无限：无速率上限，每 tick 一次搬空/填满 */
+    INFINITE(Integer.MAX_VALUE, EnergyPipeTier.INFINITE);
 
     /** 每 tick 生命能量传输速率 */
     public final int transferRate;
@@ -23,5 +25,10 @@ public enum LifeEnergyPipeTier {
     LifeEnergyPipeTier(int transferRate, EnergyPipeTier level) {
         this.transferRate = transferRate;
         this.level = level;
+    }
+
+    /** 是否无限速率等级 */
+    public boolean isInfinite() {
+        return this == INFINITE;
     }
 }

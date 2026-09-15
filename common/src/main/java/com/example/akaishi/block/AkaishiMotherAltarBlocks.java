@@ -22,6 +22,10 @@ public final class AkaishiMotherAltarBlocks {
     public static RegistrySupplier<Block> CHISHI_MOTHER_ALTAR = null;
     /** 母神祭坛石：祭坛结构件（5×5 底座 + 四角柱，铺设成型后母神驻留） */
     public static RegistrySupplier<Block> CHISHI_ALTAR_STONE = null;
+    /** 红纹哭泣黑曜石：祭坛成型时替换结构内哭泣黑曜石，紫色纹路转为红色流动纹路 */
+    public static RegistrySupplier<Block> CRYING_OBSIDIAN_RED = null;
+    /** 巨坛封印：成型时补入中心 2×2 正上方（y+1）的隐形选靶壳，转发主座界面（技术方块，无对应物品） */
+    public static RegistrySupplier<Block> CHISHI_ALTAR_SEAL = null;
 
     private AkaishiMotherAltarBlocks() {
     }
@@ -32,5 +36,11 @@ public final class AkaishiMotherAltarBlocks {
         CHISHI_MOTHER_ALTAR = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_mother_altar", AkaishiMotherAltarBlock::new);
         CHISHI_ALTAR_STONE = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_altar_stone",
                 () -> new Block(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN)));
+        // 沿用哭泣黑曜石属性（硬度/抗爆/发光），仅替换贴图与纹路动画
+        CRYING_OBSIDIAN_RED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_crying_obsidian_red",
+                () -> new Block(BlockBehaviour.Properties.copy(Blocks.CRYING_OBSIDIAN)));
+        // 封印无对应物品：随结构成型补入、还原移除，玩家无法自行获取
+        CHISHI_ALTAR_SEAL = AkaishiBlockRegistrar.registerBlockOnly(registrar, "akaishi_altar_seal",
+                AkaishiAltarSealBlock::new);
     }
 }

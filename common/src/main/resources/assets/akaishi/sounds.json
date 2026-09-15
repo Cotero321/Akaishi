@@ -187,12 +187,20 @@
     "subtitle": "subtitles.akaishi.potion_table_hum",
     "sounds": [ { "name": "akaishi:potion_table_hum", "stream": true } ]
   },
-  "mother_altar_hum": {
-    "subtitle": "subtitles.akaishi.mother_altar_hum",
-    "sounds": [ { "name": "akaishi:mother_altar_hum", "stream": true } ]
+  "void_heartbeat": {
+    "subtitle": "subtitles.akaishi.void_heartbeat",
+    "sounds": [ { "name": "akaishi:void_heartbeat", "stream": true } ]
+  },
+  "void_whisper": {
+    "subtitle": "subtitles.akaishi.void_whisper",
+    "sounds": [ { "name": "akaishi:void_whisper", "stream": true } ]
   },
   "auto_collector_hum": {
     "subtitle": "subtitles.akaishi.auto_collector_hum",
     "sounds": [ { "name": "akaishi:auto_collector_hum", "stream": true } ]
+  },
+  "unnameable_whisper": {
+    "subtitle": "subtitles.akaishi.unnameable_whisper",
+    "sounds": [ { "name": "akaishi:unnameable_whisper", "stream": true } ]
   }
 }

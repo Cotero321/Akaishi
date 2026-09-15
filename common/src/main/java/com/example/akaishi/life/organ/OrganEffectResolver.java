@@ -240,10 +240,15 @@ public final class OrganEffectResolver {
         return passives;
     }
 
-    /** 生物 id → 生态分组（以空世界实体分类，结果缓存；不可采样/null 亦缓存避免重复创建） */
+    /** 生物 id → 生态分组（以空世界实体分类，结果缓存；不可采样亦缓存避免重复创建） */
     private static final Map<String, Optional<ISampleGroup>> GROUP_CACHE = new ConcurrentHashMap<>();
 
     public static ISampleGroup groupOf(String entityId, Level level) {
+        // 未定型 / 无来源器官的 entityId 为 null：不得作为键（ConcurrentHashMap 禁用 null 键），
+        // 直接返回 null 且不写缓存，交由调用方按"无生态分组"处理
+        if (entityId == null || entityId.isEmpty()) {
+            return null;
+        }
         Optional<ISampleGroup> cached = GROUP_CACHE.get(entityId);
         if (cached != null) {
             return cached.orElse(null);

@@ -179,6 +179,8 @@ public final class ModCreativeTabs {
         accept(output, ModItems.quartzOreBase);
         accept(output, ModItems.netheriteOreBase);
         accept(output, ModItems.akaishiOreBase);
+        // 山羊头旗帜图案（织布机图案物）
+        accept(output, ModItems.goatSkullBannerPattern);
         // 手册
         accept(output, ModItems.akaishiDiary);
         accept(output, ModItems.lifeBook);
@@ -236,6 +238,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ADVANCED);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ELITE);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_ULTIMATE);
+        accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_PIPE_INFINITE);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_AGGREGATION_CONVERTER);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_CONVERSION_ARCHITECTURE);
         // 生命能量储存器（基础/高级/超级）+ 串联器
@@ -243,6 +246,9 @@ public final class ModCreativeTabs {
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_ADVANCED);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SUPER);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_CELL_SERIALIZER);
+        // 生命能量发射器 + 权杖（权杖两步式绑定发射目标）
+        accept(output, AkaishiLifeBlocks.CHISHI_LIFE_ENERGY_EMITTER);
+        accept(output, ModItems.lifeEnergyWand);
         // 生命能量无线终端族
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_SHELL);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CORE);
@@ -256,6 +262,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_RANGE);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_LOSS);
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_LOSS);
+        accept(output, ModItems.akaishiLifeWirelessPortableTerminal);
         // 生命能量提纯器 + 固态物
         accept(output, AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER);
         accept(output, ModItems.akaishiLifeEssenceSolid);
@@ -285,6 +292,7 @@ public final class ModCreativeTabs {
         // 母神祭坛体系
         accept(output, AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR);
         accept(output, AkaishiMotherAltarBlocks.CHISHI_ALTAR_STONE);
+        accept(output, AkaishiMotherAltarBlocks.CRYING_OBSIDIAN_RED);
         // 样本 / 基因 / 胚胎
         accept(output, ModItems.sampleCollector);
         accept(output, ModItems.lifeSample);
@@ -295,6 +303,8 @@ public final class ModCreativeTabs {
         accept(output, ModItems.akaishiWitherCondensate);
         accept(output, ModItems.akaishiBlazeSeed);
         accept(output, ModItems.akaishiBlazeCondensate);
+        accept(output, ModItems.akaishiCurseVineSeed);
+        accept(output, ModItems.akaishiCurseBlossom);
         // 离心结晶 + 活化成分
         accept(output, ModItems.exhaustedCrystal);
         accept(output, ModItems.activatedSculkCrystal);
@@ -339,6 +349,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ADVANCED);
         accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ELITE);
         accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_ULTIMATE);
+        accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_PIPE_INFINITE);
         // 赤能源发生机 + 小型组合结构 + 聚合器 + 串联器 + 超级发生器架构核心
         accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_GENERATOR);
         accept(output, AkaishiEnergyBlocks.CHISHI_ENERGY_ASSEMBLY);
@@ -350,6 +361,7 @@ public final class ModCreativeTabs {
         accept(output, ModBlocks.CHISHI_ITEM_PIPE_ADVANCED);
         accept(output, ModBlocks.CHISHI_ITEM_PIPE_ELITE);
         accept(output, ModBlocks.CHISHI_ITEM_PIPE_ULTIMATE);
+        accept(output, ModBlocks.CHISHI_ITEM_PIPE_INFINITE);
         // 液体管道 + 废料管道 + 多重废液管道 + 储罐 3 档
         accept(output, ModBlocks.CHISHI_FLUID_PIPE);
         accept(output, ModBlocks.CHISHI_EXHAUSTED_PIPE);
@@ -419,6 +431,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_RANGE);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_LOSS);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_LOSS);
+        accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_TRANSMIT_FRAME);
         accept(output, ModItems.akaishiWirelessComponent);
         accept(output, ModItems.akaishiWirelessPortableTerminal);
         accept(output, ModItems.akaishiWirelessIdentityCard);

@@ -13,11 +13,18 @@ public enum EnergyPipeTier {
     /** 精英：大规模电网的主干管道 */
     ELITE(5000000),
     /** 终极：海量能量瞬间输送 */
-    ULTIMATE(50000000);
+    ULTIMATE(50000000),
+    /** 无限：无速率上限，每 tick 一次搬空/填满（网络含任一段即不受速率限速） */
+    INFINITE(Integer.MAX_VALUE);
 
     public final int transferRate;
 
     EnergyPipeTier(int transferRate) {
         this.transferRate = transferRate;
+    }
+
+    /** 是否无限速率等级：网络只要含一段无限管道即视为无限 */
+    public boolean isInfinite() {
+        return this == INFINITE;
     }
 }

@@ -46,6 +46,7 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_ADVANCED;
     public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_ELITE;
     public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_ULTIMATE;
+    public static RegistrySupplier<Block> CHISHI_ITEM_PIPE_INFINITE;
     public static RegistrySupplier<Block> CHISHI_FLUID_PIPE;
     public static RegistrySupplier<Block> CHISHI_EXHAUSTED_PIPE;
     public static RegistrySupplier<Block> CHISHI_MULTI_FLUID_WASTE_PIPE;
@@ -55,11 +56,13 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_FLUID_TANK_SUPER;
     public static RegistrySupplier<Block> CHISHI_PLASMA_TANK;
 
-    // —— 转基因域（AkaishiTransgeneBlocks）：转基因植物（凋零藤 / 烈焰花）——
+    // —— 转基因域（AkaishiTransgeneBlocks）：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓）——
     public static RegistrySupplier<Block> CHISHI_WITHER_ROOT;
     public static RegistrySupplier<Block> CHISHI_WITHER_STEM;
     public static RegistrySupplier<Block> CHISHI_BLAZE_FLOWER_ROOT;
     public static RegistrySupplier<Block> CHISHI_BLAZE_BLOOM;
+    public static RegistrySupplier<Block> CHISHI_CURSE_VINE_ROOT;
+    public static RegistrySupplier<Block> CHISHI_CURSE_VINE_STEM;
 
     // —— 衰竭域（AkaishiDecayBlocks）：区域治理与终态方块 ——
     public static RegistrySupplier<Block> CHISHI_DECAY_PURIFIER;
@@ -107,6 +110,7 @@ public final class ModBlocks {
         CHISHI_ITEM_PIPE_ADVANCED = AkaishiLogisticsBlocks.CHISHI_ITEM_PIPE_ADVANCED;
         CHISHI_ITEM_PIPE_ELITE = AkaishiLogisticsBlocks.CHISHI_ITEM_PIPE_ELITE;
         CHISHI_ITEM_PIPE_ULTIMATE = AkaishiLogisticsBlocks.CHISHI_ITEM_PIPE_ULTIMATE;
+        CHISHI_ITEM_PIPE_INFINITE = AkaishiLogisticsBlocks.CHISHI_ITEM_PIPE_INFINITE;
         CHISHI_FLUID_PIPE = AkaishiLogisticsBlocks.CHISHI_FLUID_PIPE;
         CHISHI_EXHAUSTED_PIPE = AkaishiLogisticsBlocks.CHISHI_EXHAUSTED_PIPE;
         CHISHI_MULTI_FLUID_WASTE_PIPE = AkaishiLogisticsBlocks.CHISHI_MULTI_FLUID_WASTE_PIPE;
@@ -121,6 +125,8 @@ public final class ModBlocks {
         CHISHI_WITHER_STEM = AkaishiTransgeneBlocks.CHISHI_WITHER_STEM;
         CHISHI_BLAZE_FLOWER_ROOT = AkaishiTransgeneBlocks.CHISHI_BLAZE_FLOWER_ROOT;
         CHISHI_BLAZE_BLOOM = AkaishiTransgeneBlocks.CHISHI_BLAZE_BLOOM;
+        CHISHI_CURSE_VINE_ROOT = AkaishiTransgeneBlocks.CHISHI_CURSE_VINE_ROOT;
+        CHISHI_CURSE_VINE_STEM = AkaishiTransgeneBlocks.CHISHI_CURSE_VINE_STEM;
 
         // —— 衰竭域（注册在 init() 中先于本方法完成）——
         CHISHI_DECAY_PURIFIER = AkaishiDecayBlocks.CHISHI_DECAY_PURIFIER;

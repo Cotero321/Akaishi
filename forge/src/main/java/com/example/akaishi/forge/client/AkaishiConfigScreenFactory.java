@@ -136,6 +136,11 @@ public final class AkaishiConfigScreenFactory {
         booleanToggle(toggles, eb, "toggles.sunlightBurn", AkaishiConfig.SUNLIGHT_BURN_ENABLED);
         booleanToggle(toggles, eb, "toggles.overloadToggle", AkaishiConfig.OVERLOAD_ENABLED);
 
+        // ===== 赤石饰品扩展槽 =====
+        ConfigCategory curioSlots = category(builder, "curio_slots");
+        booleanToggle(curioSlots, eb, "curio_slots.unlockRequired", AkaishiConfig.CURIO_SLOT_UNLOCK_REQUIRED);
+        intList(curioSlots, eb, "curio_slots.unlockThresholds", AkaishiConfig.CURIO_SLOT_UNLOCK_THRESHOLDS);
+
         // ===== 生命研究机器 =====
         ConfigCategory lifeMachines = category(builder, "life_machines");
         longField(lifeMachines, eb, "life_machines.geneAnalyzerLifeCost", AkaishiConfig.GENE_ANALYZER_LIFE_COST);

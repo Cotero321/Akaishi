@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 烈焰花种：转基因工厂产物。右键灵魂沙顶面种下烈焰花株（第 1 格）；
- * 花株随机刻成株后于上方长出烈焰花冠，盛开花冠可收烈焰凝聚物。
+ * 花株随机刻成株后于上方长出烈焰花冠，盛开花冠可收烈焰花瓣。
  * 仅能种在灵魂沙上（花株 canSurvive 校验），不满足时不消耗种子。
  */
 public class AkaishiBlazeSeedItem extends Item {

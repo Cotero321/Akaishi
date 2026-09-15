@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "akaishi:block/akaishi_mother_altar_side",
+    "particle": "akaishi:block/akaishi_mother_altar_base",
     "top": "akaishi:block/akaishi_mother_altar_top",
     "side": "akaishi:block/akaishi_mother_altar_side",
     "base": "akaishi:block/akaishi_mother_altar_base",
@@ -38,10 +38,10 @@
       "faces": {
         "down": { "uv": [0, 0, 16, 16], "texture": "#bottom" },
         "up": { "uv": [0, 0, 16, 16], "texture": "#top" },
-        "north": { "uv": [0, 0, 16, 16], "texture": "#side" },
-        "south": { "uv": [0, 0, 16, 16], "texture": "#side" },
-        "west": { "uv": [0, 0, 16, 16], "texture": "#side" },
-        "east": { "uv": [0, 0, 16, 16], "texture": "#side" }
+        "north": { "uv": [0, 0, 16, 16], "texture": "#base" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#base" },
+        "west": { "uv": [0, 0, 16, 16], "texture": "#base" },
+        "east": { "uv": [0, 0, 16, 16], "texture": "#base" }
       }
     }
   ]
