@@ -12,18 +12,22 @@ logs/
 **/.tmp_arch_src/
 
 # ---- IDE ----
-.classpath
-.project
-.settings/
-.metadata/
-.factorypath
-*.launch
 .idea/
 *.iml
 *.iws
 *.ipr
 .vscode/
 *.code-workspace
+.classpath
+.project
+.settings/
+.metadata/
+.factorypath
+*.launch
+nbproject/
+.fleet/
+.zed/
+.history/
 
 # ---- 操作系统 ----
 .DS_Store
@@ -49,9 +53,16 @@ $RECYCLE.BIN/
 local.properties
 gradle-local.properties
 
-# ---- AI / 编辑器工具目录 ----
-/.claude/
-/.windsurf
-/.cursor/rules/mc.mdc
-/.kiro/
-/AGENTS.md
+# ---- AI 工具目录 / 配置 ----
+.claude/
+.cursor/
+.windsurf/
+.kiro/
+.trae/
+.codeium/
+.continue/
+.aider*
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.mcp.json
