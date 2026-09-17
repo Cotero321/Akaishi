@@ -1,0 +1,36 @@
+{
+  "name": "Forbidden Ritual",
+  "icon": "akaishi:akaishi_mother_altar",
+  "category": "akaishi:life_advanced",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_life_fusion_ingot",
+      "text": "$(bold)The forbidden ritual:$(0) the ultimate use of the Mother Altar — offer $(4)1x Life Fusion Ingot$(0) as the main item and 1 item on each of the 8 surrounding altars to condense four $(4)Forbidden Trinkets$(0). All four share one set of extension slots; once worn, their boons and their price both apply.$(br2)$(bold)Prerequisite:$(0) you must first build the $(l:akaishi:goat_altar)Tier 3 Altar of the Black Mother$(/l). A lower tier will not start the ritual even with a complete recipe."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "The Four Recipes",
+      "text": "$(bold)Shared template:$(0) main item = 1x Life Fusion Ingot; the 8 outer altars take $(4)2x theme organ + 2x base material + 2x gene sequence + 2x potion$(0).$(br2)$(li)$(bold)Touch of a Thousand Hands$(0): left arm + right arm, base material is Life Embryo$(li)$(bold)Quickening of the Cub$(0): 2x heart, base material is Life Embryo$(li)$(bold)The Mother's Gaze$(0): 2x eye, base material is Life Ash$(li)$(bold)Endless Gestation$(0): 2x viscera, base material is Life Ash$(br2)$(bold)Offering thresholds:$(0) organs must be $(4)tier III or above$(0) and neither polluted husks nor gibberish; gene sequences and potions must be at $(4)full purity 100$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Infusion and Drain",
+      "text": "$(bold)Threshold:$(0) all four recipes need a $(4)Tier 3 altar$(0) and a charge threshold of $(4)800,000 life energy$(0); the older Life Fusion Ingot recipe has no tier requirement and a 80,000 threshold.$(br2)$(bold)Automatic:$(0) once the altar is formed and the recipe complete it simply $(4)starts draining on its own$(0) — no redstone, no player action.$(br2)$(bold)Drain:$(0) every 2 seconds it scans all living beings (players included) within $(4)64 blocks$(0) and drains $(4)10%$(0) of their max health, up to 16 targets at a time, nearest first. Each health point yields $(4)1000 life energy$(0), capped at 5000 per target per strike. A target too low on health is drained dry and dies.$(br2)$(bold)Consequence:$(0) anything drained to death $(4)drops nothing, grants no experience and does not count as your kill$(0); the death message says its life was reclaimed by the Mother. Creative-mode players are exempt."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Erosion and Locked Slots",
+      "text": "$(bold)Erosion:$(0) wearing a forbidden trinket accumulates $(4)erosion$(0), shown right on the item tooltip; the higher it climbs, the more often the wearer suffers warped vision and unnameable whispers.$(br2)$(bold)When it maxes out:$(0) the organ slots are $(4)permanently locked$(0) — all four Akaishi extension slots turn to gibberish, blocking both implantation and removal, and the related modification machines and the rejection neutraliser stop working. The trinket itself has become a source of contamination.$(br2)$(bold)Removing it:$(0) before it maxes out, normal interaction removes the trinket as usual; once maxed out, deal with the consequences first."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:life_body",
+        "akaishi:life_organs"
+      ],
+      "text": "Slots and body modification live in $(l:akaishi:life_body)Body Modification$(/l); organ quality and affinity in $(l:akaishi:life_organs)Organ Research$(/l)."
+    }
+  ]
+}

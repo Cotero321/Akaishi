@@ -3,9 +3,13 @@ package com.example.akaishi.item;
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.item.curio.AkaishiAntidoteBracelet;
 import com.example.akaishi.item.curio.AkaishiBlastCharm;
+import com.example.akaishi.item.curio.AkaishiCubHeart;
+import com.example.akaishi.item.curio.AkaishiFertilityRing;
 import com.example.akaishi.item.curio.AkaishiFireNecklace;
 import com.example.akaishi.item.curio.AkaishiGatheringBracelet;
 import com.example.akaishi.item.curio.AkaishiHuntingRing;
+import com.example.akaishi.item.curio.AkaishiLifeTouch;
+import com.example.akaishi.item.curio.AkaishiMotherSeal;
 import com.example.akaishi.item.curio.AkaishiSatiationCharm;
 import com.example.akaishi.item.curio.AkaishiWitherCharm;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -15,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BannerPatternItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.Tiers;
 
 /**
@@ -48,6 +53,10 @@ public final class AkaishiBaseItems {
     public static RegistrySupplier<Item> blastCharm;
     public static RegistrySupplier<Item> antidoteBracelet;
     public static RegistrySupplier<Item> witherCharm;
+    public static RegistrySupplier<Item> lifeTouch;
+    public static RegistrySupplier<Item> cubHeart;
+    public static RegistrySupplier<Item> motherSeal;
+    public static RegistrySupplier<Item> fertilityRing;
     public static RegistrySupplier<Item> machineSpeedUpgrade;
     public static RegistrySupplier<Item> machineEnergyUpgrade;
     public static RegistrySupplier<Item> akaishiDust;
@@ -135,6 +144,12 @@ public final class AkaishiBaseItems {
         blastCharm = item(ModItems.BLAST_CHARM_ID, () -> new AkaishiBlastCharm(new Item.Properties()));
         antidoteBracelet = item(ModItems.ANTIDOTE_BRACELET_ID, () -> new AkaishiAntidoteBracelet(new Item.Properties()));
         witherCharm = item(ModItems.WITHER_CHARM_ID, () -> new AkaishiWitherCharm(new Item.Properties()));
+        // 禁忌四件（Curios 扩展槽 akaishi_socket_1..4）：纯被动零消耗，各占一槽，集齐触发套装
+        Item.Properties forbiddenProps = new Item.Properties().stacksTo(1).rarity(Rarity.EPIC);
+        lifeTouch = item(ModItems.LIFE_TOUCH_ID, () -> new AkaishiLifeTouch(forbiddenProps));
+        cubHeart = item(ModItems.CUB_HEART_ID, () -> new AkaishiCubHeart(forbiddenProps));
+        motherSeal = item(ModItems.MOTHER_SEAL_ID, () -> new AkaishiMotherSeal(forbiddenProps));
+        fertilityRing = item(ModItems.FERTILITY_RING_ID, () -> new AkaishiFertilityRing(forbiddenProps));
         // Patchouli 手册物品（右键打开对应书籍）
         akaishiDiary = item(ModItems.AKAISHI_DIARY_ID,
                 () -> new AkaishiBookItem(new ResourceLocation(AkaishiMod.MOD_ID, ModItems.AKAISHI_DIARY_ID), new Item.Properties()));

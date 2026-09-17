@@ -3,7 +3,6 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.fluid.IExternalFluidAccess;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.block.AkaishiFluidPipeBlock;
-import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import dev.architectury.fluid.FluidStack;
@@ -14,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -27,20 +27,14 @@ import java.util.Set;
  * 液体管道方块实体：液体网络传输核心。
  * 每 tick 由网络"代表节点"（网络中坐标最小的管道）执行 BFS 收集全部连通管道与
  * 相邻液体罐（模组设备 {@link IFluidPipeDevice} 或外部液体能力），把液体从源罐
- * 送到汇罐。每段管道内置缓冲罐：网络内没有设备源/汇时承接外部管道（MEK）注入。
- * 支持配置器方向模式与单侧断开。
+ * 直连送到汇罐：先以 simulate 探测汇可接收量，确认后才从源真实抽取并直接注入，
+ * 管道自身不存储任何液体。支持配置器方向模式与单侧断开。
  */
 public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiPipeControl {
 
-    /** 方向模式：正常 / 推（只作汇）/ 拉（只作源） */
-    public static final int MODE_NORMAL = 0;
-    public static final int MODE_PUSH = 1;
-    public static final int MODE_PULL = 2;
-
-    /** 本段管道缓冲罐容量（承接外部注入的落点），由 {@link ModConfig#fluidPipeBufferCapacity} 提供 */
-
-    private final FluidTank buffer;
-    private int mode = MODE_NORMAL;
+    /** 每面 2 bit 打包的方向模式（bit0-1=DOWN ... bit10-11=EAST），默认全 0 即全正常；
+     *  取值见 {@link AkaishiPipeControl#MODE_NORMAL} / {@code MODE_OUTPUT} / {@code MODE_INPUT} */
+    private int sideModes;
     /** 被配置器断开的连接面（bit 0-5 对应 Direction.ordinal()） */
     private int disconnectedMask;
 
@@ -58,30 +52,10 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
 
     public AkaishiFluidPipeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        this.buffer = createBuffer();
     }
 
     public AkaishiFluidPipeBlockEntity(BlockPos pos, BlockState state) {
         this(ModBlockEntities.CHISHI_FLUID_PIPE.get(), pos, state);
-    }
-
-    /** 缓冲罐工厂：子类（废料管道）可覆写为废料专用罐/多液体罐。
-     *  基类（普通管道）缓冲拒收衰竭燃料，防止外部罐混入废料时被普通管道缓存（绕过泄漏机制） */
-    protected FluidTank createBuffer() {
-        return new FluidTank(ModConfig.fluidPipeBufferCapacity) {
-            @Override
-            public long fill(FluidStack resource, boolean simulate) {
-                if (resource != null && ModFluids.isExhaustedFuel(resource.getFluid())) {
-                    return 0; // 废料仅限废料管道家族运输
-                }
-                return super.fill(resource, simulate);
-            }
-
-            @Override
-            protected void onChanged() {
-                setChanged();
-            }
-        };
     }
 
     /** 是否废料管道家族：废料管道仅与废料管道互连，仅对接废料专用设备 */
@@ -101,25 +75,24 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                 && p.isPlasmaFamily() == isPlasmaFamily();
     }
 
-    public FluidTank buffer() {
-        return buffer;
-    }
-
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiFluidPipeBlockEntity be) {
         be.tickServer();
     }
 
     @Override
-    public int getMode() {
-        return mode;
+    public int getSideMode(Direction dir) {
+        return (sideModes >> (dir.ordinal() * 2)) & 3;
     }
 
+    /** 设置某面的方向模式（正常/输出/输入），越界回退为正常 */
     @Override
-    public void setMode(int mode) {
-        if (mode >= MODE_NORMAL && mode <= MODE_PULL) {
-            this.mode = mode;
-            setChanged();
+    public void setSideMode(Direction dir, int mode) {
+        if (mode < MODE_NORMAL || mode > MODE_INPUT) {
+            mode = MODE_NORMAL;
         }
+        int shift = dir.ordinal() * 2;
+        sideModes = (sideModes & ~(3 << shift)) | (mode << shift);
+        setChanged();
     }
 
     @Override
@@ -241,7 +214,9 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
         this.networkDirty = false;
     }
 
-    /** 基于缓存的网络成员执行一次液体传输（代表每 tick 调用，正常 tick 零 BFS） */
+    /** 基于缓存的网络成员执行一次液体直连传输（代表每 tick 调用，正常 tick 零 BFS）。
+     *  直连语义：先以 simulate 探测各汇合计可接收量，确认能接收后才从源真实抽取，再直接注入汇；
+     *  全程不经管道自身存储，汇全满/拒收时不动源，液体不会凭空产生或消失 */
     private void transferNetwork() {
         List<BlockPos> pipes = cachedPipes;
 
@@ -251,11 +226,12 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
         deviceObs.clear();
         for (BlockPos pipe : pipes) {
             AkaishiFluidPipeBlockEntity pb = pipeAt(pipe);
-            int pipeMode = pb != null ? pb.getMode() : MODE_NORMAL;
             for (Direction dir : Direction.values()) {
                 if (pb != null && pb.isDisconnected(dir)) {
                     continue;
                 }
+                // 方向类型取自「离开本段朝设备」那一面，逐面独立
+                int sideMode = pb != null ? pb.getSideMode(dir) : MODE_NORMAL;
                 BlockPos nb = pipe.relative(dir);
                 if (!hasFluidTank(level.getBlockEntity(nb), dir)) {
                     continue;
@@ -263,8 +239,8 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                 DeviceObs obs = deviceObs.computeIfAbsent(nb, k -> new DeviceObs(nb));
                 obs.dirs.add(dir);
                 obs.sides++;
-                obs.allPush &= pipeMode == MODE_PUSH;
-                obs.allPull &= pipeMode == MODE_PULL;
+                obs.allOutput &= sideMode == MODE_OUTPUT;
+                obs.allInput &= sideMode == MODE_INPUT;
             }
         }
 
@@ -280,8 +256,8 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                     if (!seenTanks.add(tank.identity())) {
                         continue;
                     }
-                    boolean asSource = obs.allPush ? false : (obs.allPull ? true : tank.canExtract());
-                    boolean asSink = obs.allPull ? false : (obs.allPush ? true : tank.canInsert());
+                    boolean asSource = obs.allOutput ? false : (obs.allInput ? true : tank.canExtract());
+                    boolean asSink = obs.allInput ? false : (obs.allOutput ? true : tank.canInsert());
                     if (asSource && tank.getAmount() > 0) {
                         sources.add(tank);
                     }
@@ -291,80 +267,83 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                 }
             }
         }
-        // 网络内无设备源/汇时，全网各段管道缓冲作为兜底源/汇（外部注入后参与网络分发）
-        boolean noDeviceSource = sources.isEmpty();
-        boolean noDeviceSink = sinks.isEmpty();
-        if (noDeviceSource || noDeviceSink) {
-            for (BlockPos pipe : pipes) {
-                AkaishiFluidPipeBlockEntity pb = pipeAt(pipe);
-                if (pb == null) {
-                    continue;
-                }
-                FluidTank b = pb.buffer();
-                if (noDeviceSource && !b.isEmpty()) {
-                    sources.add(TankHandle.of(b));
-                }
-                if (noDeviceSink && !b.isFull()) {
-                    sinks.add(TankHandle.of(b));
-                }
-            }
-        }
         if (sources.isEmpty() || sinks.isEmpty()) {
             return;
         }
 
         // 网络每 tick 总传输上限 = 管道段数 × 单段速率
-        long networkRate = pipes.size() * AkaishiFluidPipeBlock.getTransferRate();
-        long movedTotal = 0;
-        // 需求驱动：总注入量不超过所有汇的空缺
-        long demand = 0;
-        for (TankHandle sink : sinks) {
-            demand += Math.max(0, sink.getCapacity() - sink.getAmount());
-        }
-        if (demand <= 0) {
+        long budget = (long) pipes.size() * AkaishiFluidPipeBlock.getTransferRate();
+        if (budget <= 0) {
             return;
         }
-        long quota = Math.min(networkRate, demand);
         for (TankHandle source : sources) {
-            if (quota <= 0) {
+            if (budget <= 0) {
                 break;
             }
-            long take = Math.min(Math.min(quota, source.getAmount()), AkaishiFluidPipeBlock.getTransferRate());
-            if (take <= 0) {
+            long want = Math.min(Math.min(budget, source.getAmount()), AkaishiFluidPipeBlock.getTransferRate());
+            if (want <= 0) {
                 continue;
             }
-            FluidStack taken = source.drain(take);
-            // 家族液体过滤：普通管道不传输废料（外部罐若混入废料，立即放回，防止绕过本 mod 泄漏机制）；
-            // 等离子体管道不传输非等离子体，普通/废料管道也不承接等离子体（三族彻底隔离）
-            if ((!isWasteFamily() && ModFluids.isExhaustedFuel(taken.getFluid()))
-                    || (!isPlasmaFamily() && ModFluids.isPlasma(taken.getFluid()))
-                    || (isPlasmaFamily() && !ModFluids.isPlasma(taken.getFluid()))) {
-                source.fill(taken);
+            // 模拟抽取：仅探明液体种类与可抽量，不改变源状态
+            FluidStack probe = source.drain(want, true);
+            if (probe.isEmpty() || !familyAllowed(probe.getFluid())) {
                 continue;
             }
+            // 模拟探测：按与真实注入一致的顺序试灌，得出各汇合计可接收量
+            FluidStack trial = probe.copyWithAmount(probe.getAmount());
+            for (TankHandle sink : sinks) {
+                if (trial.isEmpty()) {
+                    break;
+                }
+                if (sink.identity() == source.identity()) {
+                    continue; // 自循环：跳过与源同底层罐的汇
+                }
+                long moved = sink.fill(trial, true);
+                if (moved > 0) {
+                    trial.shrink(moved);
+                }
+            }
+            long accepted = probe.getAmount() - trial.getAmount();
+            if (accepted <= 0) {
+                continue; // 无汇可接收：跳过，不动源
+            }
+            // 模拟成功 → 从源真实抽取，再对目标真实注入
+            FluidStack taken = source.drain(accepted, false);
+            if (taken.isEmpty()) {
+                continue;
+            }
+            long movedTotal = 0;
             for (TankHandle sink : sinks) {
                 if (taken.isEmpty()) {
                     break;
                 }
-                // 跳过与源同底层罐的汇：自循环只消耗配额，且无效标记方块
                 if (sink.identity() == source.identity()) {
                     continue;
                 }
-                long moved = sink.fill(taken);
+                long moved = sink.fill(taken, false);
                 if (moved > 0) {
                     taken.shrink(moved);
-                    quota -= moved;
                     movedTotal += moved;
                 }
             }
             // 未全部注入的部分放回源罐，避免液体凭空消失
             if (!taken.isEmpty()) {
-                source.fill(taken);
+                source.fill(taken, false);
             }
+            budget -= movedTotal;
         }
-        if (movedTotal > 0) {
-            setChanged();
+    }
+
+    /** 家族液体过滤：普通管道不传输废料（外部罐若混入废料则不抽，防止绕过本 mod 泄漏机制）；
+     *  等离子体管道仅传输等离子体，普通/废料管道不承接等离子体（三族彻底隔离） */
+    private boolean familyAllowed(Fluid fluid) {
+        if (!isWasteFamily() && ModFluids.isExhaustedFuel(fluid)) {
+            return false;
         }
+        if (isPlasmaFamily()) {
+            return ModFluids.isPlasma(fluid);
+        }
+        return !ModFluids.isPlasma(fluid);
     }
 
     /** 收集邻居方块暴露的全部液体罐（模组设备或外部能力），并标记其输入/输出权限。
@@ -425,14 +404,14 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
         return level.getBlockEntity(pos) instanceof AkaishiFluidPipeBlockEntity p ? p : null;
     }
 
-    /** 设备观察聚合：观察方向 + 相邻管道模式统计。
-     *  角色判定：全部相邻管道为推 → 设备只作汇；全部为拉 → 设备只作源；其余（含混合）→ 双向 */
+    /** 设备观察聚合：观察方向 + 各观察面上相邻管道的方向类型统计。
+     *  角色判定：全部为输出 → 设备只作汇；全部为输入 → 设备只作源；其余（含混合）→ 双向 */
     private static final class DeviceObs {
         final BlockPos pos;
         final List<Direction> dirs = new ArrayList<>(2);
         int sides;
-        boolean allPush = true;
-        boolean allPull = true;
+        boolean allOutput = true;
+        boolean allInput = true;
 
         DeviceObs(BlockPos pos) {
             this.pos = pos;
@@ -449,11 +428,11 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
 
         boolean canInsert();
 
-        /** 抽取指定量，返回实际抽出的液体 */
-        FluidStack drain(long amount);
+        /** 抽取指定量（simulate=true 时不修改状态），返回实际抽出的液体 */
+        FluidStack drain(long amount, boolean simulate);
 
-        /** 注入液体，返回实际注入量 */
-        long fill(FluidStack stack);
+        /** 注入液体（simulate=true 时不修改状态），返回实际注入量 */
+        long fill(FluidStack stack, boolean simulate);
 
         /** 底层罐身份：同一罐同时被标记为源与汇时跳过，防止自循环挤占配额饿死真实传输 */
         Object identity();
@@ -485,13 +464,13 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                 }
 
                 @Override
-                public FluidStack drain(long amount) {
-                    return tank.drain(amount, false);
+                public FluidStack drain(long amount, boolean simulate) {
+                    return tank.drain(amount, simulate);
                 }
 
                 @Override
-                public long fill(FluidStack stack) {
-                    return tank.fill(stack, false);
+                public long fill(FluidStack stack, boolean simulate) {
+                    return tank.fill(stack, simulate);
                 }
 
                 @Override
@@ -524,13 +503,13 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
                 }
 
                 @Override
-                public FluidStack drain(long amount) {
-                    return tank.drain(amount, false);
+                public FluidStack drain(long amount, boolean simulate) {
+                    return tank.drain(amount, simulate);
                 }
 
                 @Override
-                public long fill(FluidStack stack) {
-                    return tank.fill(stack, false);
+                public long fill(FluidStack stack, boolean simulate) {
+                    return tank.fill(stack, simulate);
                 }
 
                 @Override
@@ -541,22 +520,31 @@ public class AkaishiFluidPipeBlockEntity extends BlockEntity implements AkaishiP
         }
     }
 
+    /**
+     * 方向类型/断开位只存于方块实体，服务端切换后必须随方块更新下发；
+     * 默认实现返回 null / 空 tag，会导致客户端 getSideMode 恒为「正常」、标识渲染不触发。
+     */
+    @Override
+    public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return this.saveWithoutMetadata();
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.put("Buffer", buffer.writeToNbt());
-        tag.putInt("Mode", mode);
+        tag.putInt("SideModes", sideModes);
         tag.putInt("Disconnected", disconnectedMask);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        buffer.readFromNbt(tag.getCompound("Buffer"));
-        mode = tag.getInt("Mode");
-        if (mode < MODE_NORMAL || mode > MODE_PULL) {
-            mode = MODE_NORMAL;
-        }
+        sideModes = tag.getInt("SideModes");
         disconnectedMask = tag.getInt("Disconnected");
     }
 }

@@ -68,6 +68,8 @@ import com.example.akaishi.block.entity.AkaishiUpgradeStationBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
+import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
+import com.example.akaishi.block.entity.AkaishiItemStorageUnitBlockEntity;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import dev.architectury.registry.menu.MenuRegistry;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -225,6 +227,10 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiLifeEnergyEmitterMenu>> CHISHI_LIFE_ENERGY_EMITTER;
     /** 合并母神祭坛菜单类型（结构等级展示 + 单物品供奉槽） */
     public static RegistrySupplier<MenuType<AkaishiMotherAltarMenu>> CHISHI_MOTHER_ALTAR;
+    /** 物品终端菜单类型（库页为可滚动聚合列表：4×9 可视区 + 客户端只读虚拟槽） */
+    public static RegistrySupplier<MenuType<AkaishiItemTerminalMenu>> CHISHI_ITEM_TERMINAL;
+    /** 物品储存单元菜单类型（D18 只读视图：54 槽展示 + 占用/剩余 IP） */
+    public static RegistrySupplier<MenuType<AkaishiItemStorageUnitMenu>> CHISHI_ITEM_STORAGE_UNIT;
 
     private ModMenus() {
     }
@@ -1375,5 +1381,39 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mother_altar"), () -> motherAltarType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(motherAltarType, AkaishiMotherAltarScreen::new));
+
+        // 物品终端：库页 4×9 可视区（客户端只读虚拟槽）+ IP/单笔上限展示，服务端仅玩家背包槽
+        MenuType<AkaishiItemTerminalMenu> itemTerminalType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiItemTerminalBlockEntity terminal) {
+                return new AkaishiItemTerminalMenu(syncId, inv, terminal);
+            }
+            // 方块实体缺失（跨维度/距离过远）时用空数据兜底：槽位与数据槽数量不变，避免索引错位
+            return new AkaishiItemTerminalMenu(syncId, inv, null);
+        });
+        CHISHI_ITEM_TERMINAL = (RegistrySupplier<MenuType<AkaishiItemTerminalMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_item_terminal"), () -> itemTerminalType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(itemTerminalType, AkaishiItemTerminalScreen::new));
+
+        // 物品储存单元：D18 只读视图（54 槽 + 占用/剩余 IP），无任何写入路径
+        MenuType<AkaishiItemStorageUnitMenu> itemStorageUnitType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiItemStorageUnitBlockEntity unit) {
+                return new AkaishiItemStorageUnitMenu(syncId, inv, unit);
+            }
+            return new AkaishiItemStorageUnitMenu(syncId, inv, null);
+        });
+        CHISHI_ITEM_STORAGE_UNIT = (RegistrySupplier<MenuType<AkaishiItemStorageUnitMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_item_storage_unit"),
+                        () -> itemStorageUnitType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(itemStorageUnitType, AkaishiItemStorageUnitScreen::new));
     }
 }

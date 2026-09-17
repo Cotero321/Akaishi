@@ -216,7 +216,10 @@ public class AkaishiCultivatorBlockEntity extends BlockEntity implements
         // 升级模式：品质 <IV 的器官（按品质等级分档）
         else if (input.getItem() instanceof AkaishiOrganItem) {
             QualityTier tier = AkaishiOrganItem.getTier(input);
-            if (tier != null && tier.next() != null) {
+            // 原生部件无需升级，乱码器官拒绝改造（D28/D56）；二者都与其它改造入口口径一致
+            boolean upgradable = tier != null && tier.next() != null
+                    && !AkaishiOrganItem.isNative(input) && !AkaishiOrganItem.isCorrupted(input);
+            if (upgradable) {
                 // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
                 long cost = (long) (upgradeCost(tier) * getEnergyCostMultiplier());
                 int solid = upgradeSolid(tier);

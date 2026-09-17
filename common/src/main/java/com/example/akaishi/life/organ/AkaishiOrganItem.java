@@ -55,6 +55,8 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
     public static final String TAG_MUTATIONS = "mutations";
     /** 本次移植期间排异中和剂的清洗次数（移植时清零） */
     public static final String TAG_WASH_USED = "wash_used";
+    /** 乱码标记（D27）：侵蚀跑满时写入，跟物品 NBT 走、可随物品转手传染（D190） */
+    public static final String TAG_CORRUPTED = "corrupted";
     /** 适配度上限 */
     public static final int MAX_COMPAT = 100;
     /** 原生器官固定适配度 */
@@ -113,6 +115,17 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
     /** 是否未定型（无基因来源/品质且非原生）：不可移植，需先在部件培养舱定型 */
     public static boolean isUnformed(ItemStack stack) {
         return !isNative(stack) && (getSource(stack) == null || getTier(stack) == null);
+    }
+
+    /** 是否已乱码（D27/D190）：标记随物品 NBT 走，摘下、转手、换人佩戴均保留并照常传染 */
+    public static boolean isCorrupted(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.getBoolean(TAG_CORRUPTED);
+    }
+
+    /** 写入乱码标记（D189：一次定稿，重登/重新装备/躯体同步都不再重抽） */
+    public static void setCorrupted(ItemStack stack) {
+        stack.getOrCreateTag().putBoolean(TAG_CORRUPTED, true);
     }
 
     /** 槽位 → 物品实例（与 ModItems 注册对应） */
@@ -305,11 +318,23 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
 
     // ===== 显示 =====
 
+    /** 乱码器官名（D27/D48）：用 ▓ 包裹原名，物品栏 / 躯体总览 GUI / tooltip 三处同源 */
+    @Override
+    public Component getName(ItemStack stack) {
+        Component base = super.getName(stack);
+        return isCorrupted(stack)
+                ? Component.translatable("gui.akaishi.organ.corrupted_name", base)
+                : base;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         // 原生部件：与身体完全契合
         if (isNative(stack)) {
             tooltip.add(Component.translatable("gui.akaishi.organ.native"));
+            if (isCorrupted(stack)) {
+                tooltip.add(Component.translatable("gui.akaishi.organ.corrupted"));
+            }
             return;
         }
         ISampleGroup source = getSource(stack);
@@ -319,21 +344,30 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
             tooltip.add(Component.translatable("gui.akaishi.organ.unformed"));
             return;
         }
-        // 品质 + 来源基因
-        tooltip.add(Component.translatable("gui.akaishi.organ.tier",
-                Component.translatable("life.akaishi.organ_tier." + tier.name().toLowerCase())));
-        tooltip.add(Component.translatable("gui.akaishi.organ.source",
-                Component.translatable(source.getNameKey())));
-        // 具体生物（如 minecraft:cow → 牛）；未注册类型回退原始 id
-        String entityId = getEntityId(stack);
-        if (entityId != null) {
-            ResourceLocation entityLoc = ResourceLocation.tryParse(entityId);
-            EntityType<?> type = entityLoc != null
-                    ? BuiltInRegistries.ENTITY_TYPE.getOptional(entityLoc).orElse(null) : null;
-            tooltip.add(Component.translatable("gui.akaishi.organ.entity",
-                    type != null ? Component.translatable(type.getDescriptionId())
-                            : Component.literal(entityId)));
+        // 乱码后（D22/D26/D48）：品质档、来源、生物三行统一打成方框，其余数值行照常显示
+        if (isCorrupted(stack)) {
+            tooltip.add(Component.translatable("gui.akaishi.organ.tier_corrupted"));
+            tooltip.add(Component.translatable("gui.akaishi.organ.source_corrupted"));
+            tooltip.add(Component.translatable("gui.akaishi.organ.entity_corrupted"));
+            tooltip.add(Component.translatable("gui.akaishi.organ.corrupted"));
+        } else {
+            // 品质 + 来源基因
+            tooltip.add(Component.translatable("gui.akaishi.organ.tier",
+                    Component.translatable("life.akaishi.organ_tier." + tier.name().toLowerCase())));
+            tooltip.add(Component.translatable("gui.akaishi.organ.source",
+                    Component.translatable(source.getNameKey())));
+            // 具体生物（如 minecraft:cow → 牛）；未注册类型回退原始 id
+            String entityId = getEntityId(stack);
+            if (entityId != null) {
+                ResourceLocation entityLoc = ResourceLocation.tryParse(entityId);
+                EntityType<?> type = entityLoc != null
+                        ? BuiltInRegistries.ENTITY_TYPE.getOptional(entityLoc).orElse(null) : null;
+                tooltip.add(Component.translatable("gui.akaishi.organ.entity",
+                        type != null ? Component.translatable(type.getDescriptionId())
+                                : Component.literal(entityId)));
+            }
         }
+
         // 适配度（按等级着色：≥80 绿 / 60-79 黄 / <60 红）
         int compat = getCompat(stack);
         String compatKey = compat >= 80 ? "gui.akaishi.organ.compat_high"
@@ -351,7 +385,8 @@ public class AkaishiOrganItem extends Item implements IInstallableOrgan {
         // 突破倍率 / 融合套装强度为运行时动态量，不在此静态预估）
         double scale = tier.getMultiplier() * compatFactor;
         // 生物特色效果（未注册时回退槽位模板属性，槽位无模板返回空列表）
-        OrganEffect effect = OrganEffectRegistry.get(getEntityId(stack), slot);
+        String entityId = getEntityId(stack);
+        OrganEffect effect = OrganEffectRegistry.get(entityId, slot);
         List<MutantTrait> mutations = getMutations(stack);
         // —— 属性栏：器官本体 + 全部词条，按属性归并求和（同属性只留一行净值，消除加减重复）——
         OrganTemplate slotTemplate = OrganRegistry.get(slot);

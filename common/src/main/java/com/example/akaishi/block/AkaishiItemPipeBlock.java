@@ -117,12 +117,12 @@ public class AkaishiItemPipeBlock extends BaseEntityBlock {
     private BlockState computeConnections(BlockState state, Level level, BlockPos pos) {
         AkaishiItemPipeBlockEntity pipe = level.getBlockEntity(pos) instanceof AkaishiItemPipeBlockEntity p ? p : null;
         return state
-                .setValue(NORTH, !isDisconnected(pipe, Direction.NORTH) && connectsTo(level, pos.relative(Direction.NORTH)))
-                .setValue(EAST, !isDisconnected(pipe, Direction.EAST) && connectsTo(level, pos.relative(Direction.EAST)))
-                .setValue(SOUTH, !isDisconnected(pipe, Direction.SOUTH) && connectsTo(level, pos.relative(Direction.SOUTH)))
-                .setValue(WEST, !isDisconnected(pipe, Direction.WEST) && connectsTo(level, pos.relative(Direction.WEST)))
-                .setValue(UP, !isDisconnected(pipe, Direction.UP) && connectsTo(level, pos.relative(Direction.UP)))
-                .setValue(DOWN, !isDisconnected(pipe, Direction.DOWN) && connectsTo(level, pos.relative(Direction.DOWN)));
+                .setValue(NORTH, !isDisconnected(pipe, Direction.NORTH) && connectsTo(level, pos, Direction.NORTH))
+                .setValue(EAST, !isDisconnected(pipe, Direction.EAST) && connectsTo(level, pos, Direction.EAST))
+                .setValue(SOUTH, !isDisconnected(pipe, Direction.SOUTH) && connectsTo(level, pos, Direction.SOUTH))
+                .setValue(WEST, !isDisconnected(pipe, Direction.WEST) && connectsTo(level, pos, Direction.WEST))
+                .setValue(UP, !isDisconnected(pipe, Direction.UP) && connectsTo(level, pos, Direction.UP))
+                .setValue(DOWN, !isDisconnected(pipe, Direction.DOWN) && connectsTo(level, pos, Direction.DOWN));
     }
 
     /** 配置器断开/恢复连接后，重算并返回最新连接状态（由调用方决定是否落盘） */
@@ -134,10 +134,13 @@ public class AkaishiItemPipeBlock extends BaseEntityBlock {
         return pipe != null && pipe.isDisconnected(dir);
     }
 
-    /** 判断某邻居是否可连接：同物品管道，或可访问的容器设备 */
-    private boolean connectsTo(Level level, BlockPos neighborPos) {
+    /** 判断某方向邻居是否可连接：同物品管道（且对方在该侧未断开），或可访问的容器设备 */
+    private boolean connectsTo(Level level, BlockPos pos, Direction dir) {
+        BlockPos neighborPos = pos.relative(dir);
         if (level.getBlockState(neighborPos).getBlock() instanceof AkaishiItemPipeBlock) {
-            return true;
+            // 双向断开：邻居在该侧断开时本侧也不连，否则对方管臂会悬在断口上，看起来"断开没生效"
+            return !(level.getBlockEntity(neighborPos) instanceof AkaishiItemPipeBlockEntity np)
+                    || !np.isDisconnected(dir.getOpposite());
         }
         return isPipeAccessible(level.getBlockEntity(neighborPos));
     }

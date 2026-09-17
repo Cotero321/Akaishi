@@ -46,6 +46,10 @@ public final class UnnameableClientAmbience {
         if (player == null) {
             return 0f;
         }
+        // 套装集齐者屏蔽视觉扭曲表现（D43）：只取消表现，效果本身照常生效
+        if (ForbiddenSetHooks.isDistortionSuppressed(player)) {
+            return 0f;
+        }
         MobEffectInstance instance = player.getEffect(ModEffects.UNNAMEABLE.get());
         if (instance == null) {
             return 0f;

@@ -43,10 +43,12 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
-    /** 能源产生升级组件装配槽起始（燃料槽之后连续 10 格，最多装 10 个） */
+    /** 能源产生升级组件装配槽起始（燃料槽之后 1 格，槽内堆叠数即装配数） */
     public static final int UPGRADE_SLOT_START = SLOT_COUNT;
-    /** 升级装配槽数量 */
-    public static final int UPGRADE_SLOTS = 10;
+    /** 升级装配槽数量（单格位，堆叠即等级） */
+    public static final int UPGRADE_SLOTS = 1;
+    /** 单槽可堆叠的升级组件上限（= 倍率公式的 n 上限） */
+    public static final int MAX_UPGRADES = 10;
     /** 容器总槽数 = 燃料 + 升级 */
     public static final int TOTAL_SLOTS = SLOT_COUNT + UPGRADE_SLOTS;
 
@@ -88,7 +90,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
 
     /** 加速倍率：n 个组件 → 1.75^n 倍速度 × (1 - 1%×n) 产出，满配 10 个 ≈ 242 倍 */
     public static double getBoostMultiplier(int upgradeCount) {
-        int n = Math.max(0, Math.min(upgradeCount, AkaishiEnergyGeneratorBlockEntity.UPGRADE_SLOTS));
+        int n = Math.max(0, Math.min(upgradeCount, MAX_UPGRADES));
         return Math.pow(1.75, n) * (1.0 - 0.01 * n);
     }
 
@@ -137,15 +139,13 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
         return inventory;
     }
 
-    /** 统计装配的能源产生升级组件数量（0-10，最多 10 个） */
+    /** 统计装配的能源产生升级组件数量（单槽堆叠数，0-10） */
     public int getUpgradeCount() {
-        int n = 0;
-        for (int i = UPGRADE_SLOT_START; i < TOTAL_SLOTS; i++) {
-            if (inventory.getItem(i).is(ModItems.akaishiSpeedUpgrade.get())) {
-                n++;
-            }
+        ItemStack stack = inventory.getItem(UPGRADE_SLOT_START);
+        if (!stack.is(ModItems.akaishiSpeedUpgrade.get())) {
+            return 0;
         }
-        return n;
+        return Math.min(stack.getCount(), MAX_UPGRADES);
     }
 
     /** 成型后作为多方块外壳：容器访问动态代理到中心主方块，使 AE2 存储总线 / Mekanism 物流管道能经外壳给结构喂燃料 */

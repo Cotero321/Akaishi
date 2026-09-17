@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "SCS",
+    "S S"
+  ],
+  "key": {
+    "C": { "item": "minecraft:crafting_table" },
+    "S": { "item": "akaishi:akaishi_item_terminal_shell" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal", "count": 1 }
+}

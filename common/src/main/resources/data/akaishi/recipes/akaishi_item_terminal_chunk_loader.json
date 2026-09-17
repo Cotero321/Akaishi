@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SDS",
+    "DCD",
+    "SDS"
+  ],
+  "key": {
+    "S": { "item": "akaishi:akaishi_item_terminal_shell" },
+    "D": { "item": "akaishi:diamond_dust" },
+    "C": { "item": "minecraft:lodestone" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_chunk_loader", "count": 1 }
+}

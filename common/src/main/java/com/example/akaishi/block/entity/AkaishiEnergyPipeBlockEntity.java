@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,18 +30,14 @@ import java.util.Set;
  */
 public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements AkaishiPipeControl {
 
-    /** 方向模式：正常（默认，按设备能力双向判定） */
-    public static final int MODE_NORMAL = 0;
-    /** 方向模式：推（相连设备只作能量汇，管道主动向设备推能） */
-    public static final int MODE_PUSH = 1;
-    /** 方向模式：拉（相连设备只作能量源，管道主动从设备拉能） */
-    public static final int MODE_PULL = 2;
+    /** 每面 2 bit 打包的方向模式（bit0-1=DOWN ... bit10-11=EAST），默认全 0 即全正常；
+     *  取值见 {@link AkaishiPipeControl#MODE_NORMAL} / {@code MODE_OUTPUT} / {@code MODE_INPUT} */
+    private int sideModes;
 
     /** 网络规模上限：防止超大网络 BFS 遍历过多节点拖慢主线程（超出则截断，远端设备可能无法接入） */
     private static final int MAX_NETWORK = 1024;
 
-    /** 本段管道方向模式，默认正常 */
-    private int mode = MODE_NORMAL;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** 被配置器断开的连接面（bit 0-5 对应 Direction.ordinal()），断开后不参与连接与传输 */
     private int disconnectedMask;
@@ -69,19 +67,24 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
         be.tickServer();
     }
 
-    public int getMode() {
-        return mode;
+    @Override
+    public int getSideMode(Direction dir) {
+        return (sideModes >> (dir.ordinal() * 2)) & 3;
     }
 
-    /** 切换方向模式（正常→推→拉循环）并标记保存 */
-    public void setMode(int mode) {
-        if (mode >= MODE_NORMAL && mode <= MODE_PULL) {
-            this.mode = mode;
-            setChanged();
+    /** 设置某面的方向模式（正常/输出/输入），越界回退为正常 */
+    @Override
+    public void setSideMode(Direction dir, int mode) {
+        if (mode < MODE_NORMAL || mode > MODE_INPUT) {
+            mode = MODE_NORMAL;
         }
+        int shift = dir.ordinal() * 2;
+        sideModes = (sideModes & ~(3 << shift)) | (mode << shift);
+        setChanged();
     }
 
     /** 该方向是否被配置器断开连接 */
+    @Override
     public boolean isDisconnected(Direction dir) {
         return (disconnectedMask & (1 << dir.ordinal())) != 0;
     }
@@ -92,6 +95,7 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
     }
 
     /** 切换某方向的连接（断开↔恢复），返回切换后是否处于断开状态 */
+    @Override
     public boolean toggleDisconnected(Direction dir) {
         disconnectedMask ^= (1 << dir.ordinal());
         networkDirty = true; // 连接拓扑变化 → 缓存失效
@@ -226,11 +230,12 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
         Set<BlockPos> visitedDevices = new HashSet<>();
         for (BlockPos pipe : pipes) {
             AkaishiEnergyPipeBlockEntity pb = level.getBlockEntity(pipe) instanceof AkaishiEnergyPipeBlockEntity p ? p : null;
-            int pipeMode = pb != null ? pb.getMode() : MODE_NORMAL;
             for (Direction dir : Direction.values()) {
                 if (pb != null && pb.isDisconnected(dir)) {
                     continue;
                 }
+                // 方向类型取自「离开本段朝设备」那一面，逐面独立
+                int sideMode = pb != null ? pb.getSideMode(dir) : MODE_NORMAL;
                 BlockPos nb = pipe.relative(dir);
                 if (!visitedDevices.add(nb)) {
                     continue;
@@ -244,14 +249,14 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
                 if (storage == null) {
                     continue;
                 }
-                boolean asSource = switch (pipeMode) {
-                    case MODE_PUSH -> false;   // 推：只作汇，不作源
-                    case MODE_PULL -> true;    // 拉：强制作源
+                boolean asSource = switch (sideMode) {
+                    case MODE_OUTPUT -> false;   // 输出：设备只作汇，不作源
+                    case MODE_INPUT -> true;     // 输入：设备强制作源
                     default -> provider.canOutputEnergy(pipeType);
                 };
-                boolean asSink = switch (pipeMode) {
-                    case MODE_PUSH -> true;    // 推：强制作汇
-                    case MODE_PULL -> false;   // 拉：只作源，不作汇
+                boolean asSink = switch (sideMode) {
+                    case MODE_OUTPUT -> true;    // 输出：设备强制作汇
+                    case MODE_INPUT -> false;    // 输入：设备只作源，不作汇
                     default -> provider.canInputEnergy(pipeType);
                 };
                 if (asSource && storage.getEnergyStored() > 0) {
@@ -272,71 +277,141 @@ public class AkaishiEnergyPipeBlockEntity extends BlockEntity implements Akaishi
         }
 
         // 网络每 tick 总传输上限 = 缓存的全网络管道传输速率之和（等级越高、管道越多，输送越快）
-        long networkRate = cachedNetworkRate;
-        if (networkRate <= 0) {
+        long budget = cachedNetworkRate;
+        if (budget <= 0) {
             return;
         }
 
-        // 需求驱动：抽取量不超过所有汇的总空缺，避免网络需求小于管道速率时过量抽取缓冲
-        long totalDemand = 0;
+        // 直连传输：逐汇探测空缺 → 从源真实抽取 → 直接插入汇，全程不经管道自身存储。
+        // sinks 已按 BlockPos 去重，故同一目标每 tick 只模拟/处理一次，不存在重复计算。
+        // 目标满或拒收一律 continue（不动任何源），保证能量不丢失、不销毁。
+        List<Draw> draws = new ArrayList<>();
         for (IEnergyStorage sink : sinks) {
-            totalDemand += Math.max(0, sink.getMaxEnergy() - sink.getEnergyStored());
-        }
-        if (totalDemand <= 0) {
-            return;
-        }
-
-        // Mekanism 式缓冲中转：先把能量从源抽入网络缓冲，再统一推给汇。
-        // 避免"源→汇"直连时双向缓冲（储存单元）既被抽又被灌造成的回流与能量搬运。
-        long buffer = 0;
-        // 无限网络（networkRate = Long.MAX_VALUE）时 min 直接取 totalDemand，即一次填满所有空缺
-        long toExtract = Math.min(networkRate, totalDemand);
-        for (IEnergyStorage source : pureSources) {
-            if (toExtract <= 0) {
-                break;
-            }
-            long got = source.extractEnergy(toExtract, false);
-            buffer += got;
-            toExtract -= got;
-        }
-        for (IEnergyStorage source : bufferSources) {
-            if (toExtract <= 0) {
-                break;
-            }
-            long got = source.extractEnergy(toExtract, false);
-            buffer += got;
-            toExtract -= got;
-        }
-        if (buffer <= 0) {
-            return;
-        }
-        long remaining = buffer;
-        for (IEnergyStorage sink : sinks) {
-            if (remaining <= 0) {
+            if (budget <= 0) {
                 break;
             }
             long need = sink.getMaxEnergy() - sink.getEnergyStored();
             if (need <= 0) {
-                continue;
+                continue; // 目标已满：跳过
             }
-            remaining -= sink.addEnergy(Math.min(remaining, need), false);
+            long canAccept = sink.addEnergy(Math.min(budget, need), true); // simulate 探测，不改状态
+            if (canAccept <= 0) {
+                continue; // 目标拒收：跳过
+            }
+            draws.clear();
+            long got = extractFrom(sink, pureSources, bufferSources, canAccept, draws);
+            if (got <= 0) {
+                continue; // 所有源都无能量：跳过
+            }
+            long accepted = sink.addEnergy(got, false); // 真实插入
+            long leftover = got - accepted;
+            if (leftover > 0) {
+                giveBack(draws, leftover); // 目标少收的那部分按明细退回源，杜绝凭空损失
+            }
+            budget -= accepted;
         }
+    }
+
+    /**
+     * 依次从纯源、缓冲源真实抽取能量（每次抽取前先 simulate 探测可抽量），总量不超过 want。
+     * 抽取明细记入 draws，供目标插入不足时等量退回。
+     * 注意：每 tick 都对邻居重新探测，未接入能量的方向不会被缓存，邻居更新后下一 tick 即可重新识别。
+     */
+    private long extractFrom(IEnergyStorage sink, List<IEnergyStorage> pureSources,
+                             List<IEnergyStorage> bufferSources, long want, List<Draw> draws) {
+        long remaining = want;
+        for (IEnergyStorage source : pureSources) {
+            remaining -= draw(sink, source, remaining, draws);
+            if (remaining <= 0) {
+                return want;
+            }
+        }
+        for (IEnergyStorage source : bufferSources) {
+            remaining -= draw(sink, source, remaining, draws);
+            if (remaining <= 0) {
+                return want;
+            }
+        }
+        return want - remaining;
+    }
+
+    /** 从单个源抽取：跳过汇自身（避免自抽自灌的空转搬运），先 simulate 探测再真实抽取 */
+    private static long draw(IEnergyStorage sink, IEnergyStorage source, long want, List<Draw> draws) {
+        if (want <= 0 || source == sink) {
+            return 0;
+        }
+        long available = source.extractEnergy(want, true);
+        if (available <= 0) {
+            return 0;
+        }
+        long got = Math.min(available, source.extractEnergy(available, false));
+        if (got <= 0) {
+            return 0;
+        }
+        draws.add(new Draw(source, got));
+        return got;
+    }
+
+    /** 按抽取明细逆序退回差额：源刚被抽走能量，通常必有空间；退不完说明设备实现异常，需告警 */
+    private static void giveBack(List<Draw> draws, long leftover) {
+        for (int i = draws.size() - 1; i >= 0 && leftover > 0; i--) {
+            leftover -= draws.get(i).giveBack(leftover);
+        }
+        if (leftover > 0) {
+            LOGGER.warn("Pipe energy return failed: {} FE lost at {}", leftover, draws);
+        }
+    }
+
+    /** 单次抽取明细（源 + 数量），用于目标插入不足时等量退回 */
+    private static final class Draw {
+        private final IEnergyStorage storage;
+        private long amount;
+
+        Draw(IEnergyStorage storage, long amount) {
+            this.storage = storage;
+            this.amount = amount;
+        }
+
+        /** 退回最多 want 点能量，返回实际退回量并从明细中扣减 */
+        long giveBack(long want) {
+            long done = storage.addEnergy(Math.min(want, amount), false);
+            if (done > 0) {
+                amount -= done;
+            }
+            return done;
+        }
+
+        @Override
+        public String toString() {
+            return amount + "FE@" + storage;
+        }
+    }
+
+    /**
+     * 方向类型/断开位只存于方块实体，服务端切换后必须随方块更新下发；
+     * 默认实现返回 null / 空 tag，会导致客户端 getSideMode 恒为「正常」、标识渲染不触发。
+     */
+    @Override
+    public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
+        return this.saveWithoutMetadata();
     }
 
     @Override
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("Mode", mode);
+        tag.putInt("SideModes", sideModes);
         tag.putInt("Disconnected", disconnectedMask);
     }
 
     @Override
     public void load(net.minecraft.nbt.CompoundTag tag) {
         super.load(tag);
-        mode = tag.getInt("Mode");
-        if (mode < MODE_NORMAL || mode > MODE_PULL) {
-            mode = MODE_NORMAL;
-        }
+        sideModes = tag.getInt("SideModes");
         disconnectedMask = tag.getInt("Disconnected");
     }
 }

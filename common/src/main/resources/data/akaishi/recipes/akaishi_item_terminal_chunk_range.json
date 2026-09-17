@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GRG",
+    "RWR",
+    "GRG"
+  ],
+  "key": {
+    "G": { "item": "akaishi:gold_dust" },
+    "R": { "item": "akaishi:akaishi_dust" },
+    "W": { "item": "akaishi:akaishi_item_terminal_chunk_loader" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_chunk_range", "count": 1 }
+}

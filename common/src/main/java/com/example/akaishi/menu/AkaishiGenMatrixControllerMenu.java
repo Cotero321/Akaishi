@@ -33,28 +33,20 @@ public class AkaishiGenMatrixControllerMenu extends AbstractContainerMenu {
         this.tier = tier;
 
         // 燃料槽
-        addSlot(new Slot(container, AkaishiGenMatrixControllerBlockEntity.FUEL_SLOT, 25, 42));
+        addSlot(new Slot(container, AkaishiGenMatrixControllerBlockEntity.FUEL_SLOT, 26, 40));
 
-        // 能源产生升级组件装配槽 5×2（最多 10 个）：固定面板右上角 y=8，5 列整齐（规则 3）
-        int[] cols = {80, 98, 116, 134, 152};
-        int[] rows = {8, 26};
-        for (int r = 0; r < rows.length; r++) {
-            for (int c = 0; c < cols.length; c++) {
-                addSlot(new SpeedUpgradeSlot(container,
-                        AkaishiGenMatrixControllerBlockEntity.UPGRADE_SLOT_START + r * cols.length + c,
-                        cols[c], rows[r]));
-            }
-        }
+        // 能源产生升级组件装配槽：单格位（右上角），槽内堆叠数即等级
+        addSlot(new SpeedUpgradeSlot(container, AkaishiGenMatrixControllerBlockEntity.UPGRADE_SLOT_START, 152, 8));
 
-        // 玩家背包 3×9（升级槽扩为两行 18 间距后整体下移）
+        // 玩家背包 3×9
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 96 + row * 18));
+                addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 124 + row * 18));
             }
         }
         // 快捷栏 1×9
         for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(inv, col, 8 + col * 18, 152));
+            addSlot(new Slot(inv, col, 8 + col * 18, 180));
         }
 
         addDataSlots(data);

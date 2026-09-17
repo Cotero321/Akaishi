@@ -4,6 +4,7 @@ import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMechanicalBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
@@ -40,6 +41,8 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 new ForgingRecipeCategory(helper),
                 // 生命融合锻台：赤石装备 + 生命融合锭 → 生命融合装备（获得途径展示）
                 new LifeFusionAnvilRecipeCategory(helper),
+                // 母神祭坛仪式：巨坛主祭品 + 外圈 8 座子祭坛供奉 → 生命融合锭 / 四件禁断饰品
+                new AkaishiAltarRecipeCategory(helper),
                 new UpgradeRecipeCategory(helper),
                 // 燃料生产链：液化 → 加工 → 调和（燃料产生展示）
                 new LiquefactionRecipeCategory(helper),
@@ -62,6 +65,8 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(AggregationRecipeCategory.TYPE, AggregationRecipeCategory.AggregationRecipe.getAll());
         registration.addRecipes(ForgingRecipeCategory.TYPE, ForgingRecipeCategory.ForgingRecipe.getAll());
         registration.addRecipes(LifeFusionAnvilRecipeCategory.TYPE, LifeFusionAnvilRecipeCategory.LifeFusionRecipe.getAll());
+        // 母神祭坛仪式配方（旧 1 条 + 新 4 条）
+        registration.addRecipes(AkaishiAltarRecipeCategory.TYPE, AkaishiAltarRecipeCategory.AltarRecipe.getAll());
         registration.addRecipes(UpgradeRecipeCategory.TYPE, UpgradeRecipeCategory.UpgradeRecipe.getAll());
         // 燃料生产链配方
         registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll());
@@ -102,6 +107,18 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         // 生命能量提纯器与固态物：双能量输入的固化设备，用物品信息说明数值
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_PURIFIER.get(), "jei.akaishi.life_purifier");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.akaishiLifeEssenceSolid.get(), "jei.akaishi.life_essence_solid");
+
+        // 物品终端体系（IP 物品库）：终端本体 + 三阶储存单元（同一机制，共用一条说明）+ 赤能源接入口
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL.get(), "jei.akaishi.item_terminal");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_BASIC.get(), "jei.akaishi.item_storage_unit");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_ADVANCED.get(), "jei.akaishi.item_storage_unit");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_SUPER.get(), "jei.akaishi.item_storage_unit");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_ENERGY_INPUT.get(), "jei.akaishi.item_terminal_energy_input");
+        // 内腔功能件（放进物品终端内腔才有作用，墙面不生效）
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_BUFFER_MODULE.get(), "jei.akaishi.item_terminal_buffer_module");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_FEE_MODULE.get(), "jei.akaishi.item_terminal_fee_module");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_CHUNK_LOADER.get(), "jei.akaishi.item_terminal_chunk_loader");
+        addIngredientInfo(registration, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_CHUNK_RANGE.get(), "jei.akaishi.item_terminal_chunk_range");
 
         // ===== 生命系统：样本 → 基因 → 器官 → 移植 全链路（物品信息说明机制） =====
         // 工具与原料

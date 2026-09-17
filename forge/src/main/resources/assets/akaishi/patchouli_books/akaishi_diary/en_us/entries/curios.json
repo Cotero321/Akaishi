@@ -17,6 +17,10 @@
       "text": "$(bold)Akaishi extension slots:$(0) as your Akaishi progress advances, four extra slots grow on your body. All four names are masked by gibberish (they flicker in-game and cannot be read), so tell them apart by the icon colour at the bottom of the slot: red / gold / green / aqua map to slots one through four.$(br2)Thresholds are counted in completed nodes on the Akaishi Path advancement tree: slot one needs 1 node, slot two needs 2, slot three needs 3, slot four needs 4.$(br2)Tune each threshold under the \"Akaishi curio extension slots\" config category; turn off \"Extension slots require progress\" to open all four at once."
     },
     {
+      "type": "patchouli:text",
+      "text": "$(bold)What these four slots are really for:$(0) they exist for the $(4)Forbidden$(0) trinkets. Each forbidden trinket maps to one slot colour —$(li)$(4)red$(0) -> Touch of a Thousand Hands$(li)$(4)gold$(0) -> Quickening of the Cub$(li)$(4)green$(0) -> The Mother's Gaze$(li)$(4)aqua$(0) -> Endless Gestation$(br2)None of the four comes from a crafting table. They can only be condensed by the $(4)Mother Altar ritual$(0), which needs a Tier 3 altar, 8 outer offerings and a large amount of life energy. For the full ritual, the offering list and the price of wearing them, see the \"Forbidden Ritual\" entry in Life's Secrets.$(br2)Think it over before you wear one — the boons are strong, and so is the cost."
+    },
+    {
       "type": "patchouli:relations",
       "entries": [
         "akaishi:curios_income",

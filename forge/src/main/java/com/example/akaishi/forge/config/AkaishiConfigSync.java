@@ -2,6 +2,7 @@ package com.example.akaishi.forge.config;
 
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.value.ValueReloadHooks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -42,7 +43,6 @@ public final class AkaishiConfigSync {
         ModConfig.reactorExplosionDelayTicks = AkaishiConfig.REACTOR_EXPLOSION_DELAY_TICKS.get();
         // 液体管道
         ModConfig.fluidPipeRate = AkaishiConfig.FLUID_PIPE_RATE.get();
-        ModConfig.fluidPipeBufferCapacity = AkaishiConfig.FLUID_PIPE_BUFFER_CAPACITY.get();
         // 废品口
         ModConfig.wastePortBufferCapacity = AkaishiConfig.WASTE_PORT_BUFFER_CAPACITY.get();
         // 保存桶
@@ -162,6 +162,87 @@ public final class AkaishiConfigSync {
         // 赤石饰品扩展槽
         ModConfig.curioSlotUnlockRequired = AkaishiConfig.CURIO_SLOT_UNLOCK_REQUIRED.get();
         ModConfig.curioSlotUnlockThresholds = toIntArray(AkaishiConfig.CURIO_SLOT_UNLOCK_THRESHOLDS.get());
+
+        // 禁断四件 · 1 生命之触
+        ModConfig.lifeTouchEnabled = AkaishiConfig.LIFE_TOUCH_ENABLED.get();
+        ModConfig.lifeTouchReachBonus = AkaishiConfig.LIFE_TOUCH_REACH_BONUS.get();
+        ModConfig.lifeTouchDoubleStrikeChance = AkaishiConfig.LIFE_TOUCH_DOUBLE_STRIKE_CHANCE.get();
+        ModConfig.lifeTouchSelfHurtChance = AkaishiConfig.LIFE_TOUCH_SELF_HURT_CHANCE.get();
+        ModConfig.lifeTouchSelfHurtDamage = AkaishiConfig.LIFE_TOUCH_SELF_HURT_DAMAGE.get();
+        ModConfig.lifeTouchHungerCostChance = AkaishiConfig.LIFE_TOUCH_HUNGER_COST_CHANCE.get();
+        ModConfig.lifeTouchHungerCostAmount = AkaishiConfig.LIFE_TOUCH_HUNGER_COST_AMOUNT.get();
+        ModConfig.lifeTouchHungerRestoreChance = AkaishiConfig.LIFE_TOUCH_HUNGER_RESTORE_CHANCE.get();
+        ModConfig.lifeTouchHungerRestoreAmount = AkaishiConfig.LIFE_TOUCH_HUNGER_RESTORE_AMOUNT.get();
+        ModConfig.lifeTouchHitCacheTicks = AkaishiConfig.LIFE_TOUCH_HIT_CACHE_TICKS.get();
+        // 禁断四件 · 2 幼崽之心
+        ModConfig.cubHeartEnabled = AkaishiConfig.CUB_HEART_ENABLED.get();
+        ModConfig.cubHeartAbsorptionRatio = AkaishiConfig.CUB_HEART_ABSORPTION_RATIO.get();
+        ModConfig.cubHeartEffectInterval = AkaishiConfig.CUB_HEART_EFFECT_INTERVAL.get();
+        ModConfig.cubHeartSlowHasteChance = AkaishiConfig.CUB_HEART_SLOW_HASTE_CHANCE.get();
+        ModConfig.cubHeartSlowHasteAmplitude = AkaishiConfig.CUB_HEART_SLOW_HASTE_AMPLITUDE.get();
+        ModConfig.cubHeartSlowHasteTicks = AkaishiConfig.CUB_HEART_SLOW_HASTE_TICKS.get();
+        ModConfig.cubHeartDamageShiftChance = AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_CHANCE.get();
+        ModConfig.cubHeartDamageShiftAmount = AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_AMOUNT.get();
+        ModConfig.cubHeartDamageShiftTicks = AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_TICKS.get();
+        ModConfig.cubHeartUnnameableChance = AkaishiConfig.CUB_HEART_UNNAMEABLE_CHANCE.get();
+        ModConfig.cubHeartUnnameableAmplifier = AkaishiConfig.CUB_HEART_UNNAMEABLE_AMPLIFIER.get();
+        ModConfig.cubHeartUnnameableTicks = AkaishiConfig.CUB_HEART_UNNAMEABLE_TICKS.get();
+        ModConfig.cubHeartExcitementAttackSpeed = AkaishiConfig.CUB_HEART_EXCITEMENT_ATTACK_SPEED.get();
+        ModConfig.cubHeartExcitementTicks = AkaishiConfig.CUB_HEART_EXCITEMENT_TICKS.get();
+        // 禁断四件 · 3 母神之印
+        ModConfig.motherSealEnabled = AkaishiConfig.MOTHER_SEAL_ENABLED.get();
+        ModConfig.motherSealDamageBonus = AkaishiConfig.MOTHER_SEAL_DAMAGE_BONUS.get();
+        ModConfig.motherSealHealthBonus = AkaishiConfig.MOTHER_SEAL_HEALTH_BONUS.get();
+        ModConfig.motherSealSpeedBonus = AkaishiConfig.MOTHER_SEAL_SPEED_BONUS.get();
+        ModConfig.motherSealAttackSpeedBonus = AkaishiConfig.MOTHER_SEAL_ATTACK_SPEED_BONUS.get();
+        ModConfig.motherSealSelfUnnameablePeriod = AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_PERIOD.get();
+        ModConfig.motherSealSelfUnnameableTicks = AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_TICKS.get();
+        ModConfig.motherSealSelfUnnameableAmplifier = AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_AMPLIFIER.get();
+        ModConfig.motherSealVegetarianHungerCost = AkaishiConfig.MOTHER_SEAL_VEGETARIAN_HUNGER_COST.get();
+        ModConfig.motherSealVegetarianNauseaTicks = AkaishiConfig.MOTHER_SEAL_VEGETARIAN_NAUSEA_TICKS.get();
+        ModConfig.motherSealResistFactor = AkaishiConfig.MOTHER_SEAL_RESIST_FACTOR.get();
+        // 禁断四件 · 4 孕育之环
+        ModConfig.fertilityRingEnabled = AkaishiConfig.FERTILITY_RING_ENABLED.get();
+        ModConfig.fertilityRingHealChance = AkaishiConfig.FERTILITY_RING_HEAL_CHANCE.get();
+        ModConfig.fertilityRingHealAmount = AkaishiConfig.FERTILITY_RING_HEAL_AMOUNT.get();
+        ModConfig.fertilityRingHealHungerCost = AkaishiConfig.FERTILITY_RING_HEAL_HUNGER_COST.get();
+        ModConfig.fertilityRingAttackSpeedBonus = AkaishiConfig.FERTILITY_RING_ATTACK_SPEED_BONUS.get();
+        ModConfig.fertilityRingAttackSpeedTicks = AkaishiConfig.FERTILITY_RING_ATTACK_SPEED_TICKS.get();
+        ModConfig.fertilityRingMeatHealAmount = AkaishiConfig.FERTILITY_RING_MEAT_HEAL_AMOUNT.get();
+        ModConfig.fertilityRingSatiatedMeatOnly = AkaishiConfig.FERTILITY_RING_SATIATED_MEAT_ONLY.get();
+        ModConfig.fertilityRingStarveMultiplier = AkaishiConfig.FERTILITY_RING_STARVE_MULTIPLIER.get();
+        ModConfig.fertilityRingStarveLethal = AkaishiConfig.FERTILITY_RING_STARVE_LETHAL.get();
+        // 禁断四件 · 5 套装
+        ModConfig.setAttackCountRequired = AkaishiConfig.SET_ATTACK_COUNT_REQUIRED.get();
+        ModConfig.setAttackCountHungerRestore = AkaishiConfig.SET_ATTACK_COUNT_HUNGER_RESTORE.get();
+        ModConfig.setUnnameableLevelBonus = AkaishiConfig.SET_UNNAMEABLE_LEVEL_BONUS.get();
+        ModConfig.setSuppressDistortion = AkaishiConfig.SET_SUPPRESS_DISTORTION.get();
+        ModConfig.setDamageReduction = AkaishiConfig.SET_DAMAGE_REDUCTION.get();
+        ModConfig.setUnnameableCritChance = AkaishiConfig.SET_UNNAMEABLE_CRIT_CHANCE.get();
+        ModConfig.setUnnameableCritDamage = AkaishiConfig.SET_UNNAMEABLE_CRIT_DAMAGE.get();
+        ModConfig.setNearDeathHealPercent = AkaishiConfig.SET_NEAR_DEATH_HEAL_PERCENT.get();
+        ModConfig.setNearDeathUnnameableTicks = AkaishiConfig.SET_NEAR_DEATH_UNNAMEABLE_TICKS.get();
+        ModConfig.setNearDeathCooldownTicks = AkaishiConfig.SET_NEAR_DEATH_COOLDOWN_TICKS.get();
+        // 禁断四件 · 6 侵蚀
+        ModConfig.erosionEnabled = AkaishiConfig.EROSION_ENABLED.get();
+        ModConfig.erosionDurationMinutes = AkaishiConfig.EROSION_DURATION_MINUTES.get();
+        ModConfig.erosionNoticeThresholds = toIntArray(AkaishiConfig.EROSION_NOTICE_THRESHOLDS.get());
+        ModConfig.erosionNoticeIntervalMinutes = AkaishiConfig.EROSION_NOTICE_INTERVAL_MINUTES.get();
+        ModConfig.erosionStatRerollPercent = AkaishiConfig.EROSION_STAT_REROLL_PERCENT.get();
+        ModConfig.erosionNbtFlushTicks = AkaishiConfig.EROSION_NBT_FLUSH_TICKS.get();
+        ModConfig.erosionScreenFlashEnabled = AkaishiConfig.EROSION_SCREEN_FLASH_ENABLED.get();
+        // 禁断四件 · 7 仪式与吸取
+        ModConfig.altarDrainEnabled = AkaishiConfig.ALTAR_DRAIN_ENABLED.get();
+        ModConfig.altarDrainRadius = AkaishiConfig.ALTAR_DRAIN_RADIUS.get();
+        ModConfig.altarDrainIntervalTicks = AkaishiConfig.ALTAR_DRAIN_INTERVAL_TICKS.get();
+        ModConfig.altarDrainHealthPercent = AkaishiConfig.ALTAR_DRAIN_HEALTH_PERCENT.get();
+        ModConfig.altarDrainEnergyPerHp = AkaishiConfig.ALTAR_DRAIN_ENERGY_PER_HP.get();
+        ModConfig.altarDrainMaxTargets = AkaishiConfig.ALTAR_DRAIN_MAX_TARGETS.get();
+        ModConfig.altarDrainMaxEnergyPerTarget = AkaishiConfig.ALTAR_DRAIN_MAX_ENERGY_PER_TARGET.get();
+        ModConfig.altarDrainExemptCreative = AkaishiConfig.ALTAR_DRAIN_EXEMPT_CREATIVE.get();
+        ModConfig.altarNewRecipeTierRequired = AkaishiConfig.ALTAR_NEW_RECIPE_TIER_REQUIRED.get();
+        ModConfig.altarNewRecipeProgressMax = AkaishiConfig.ALTAR_NEW_RECIPE_PROGRESS_MAX.get();
+        ModConfig.altarLegacyProgressMax = AkaishiConfig.ALTAR_LEGACY_PROGRESS_MAX.get();
 
         // 生命研究机器
         ModConfig.geneAnalyzerLifeCost = AkaishiConfig.GENE_ANALYZER_LIFE_COST.get();
@@ -288,6 +369,8 @@ public final class AkaishiConfigSync {
         ModConfig.reactorEnergyOutputBufferCapacity = AkaishiConfig.REACTOR_ENERGY_OUTPUT_BUFFER.get();
         ModConfig.lifeEnergyCellSerializerBaseCapacity = AkaishiConfig.LIFE_ENERGY_CELL_SERIALIZER_CAPACITY.get();
         ModConfig.plasmaTankCapacity = AkaishiConfig.PLASMA_TANK_CAPACITY.get();
+        ModConfig.itemTerminalEnergyBuffer = AkaishiConfig.ITEM_TERMINAL_ENERGY_BUFFER.get();
+        ModConfig.itemTerminalEnergyPortBufferCapacity = AkaishiConfig.ITEM_TERMINAL_ENERGY_PORT_BUFFER.get();
 
         // 培养机提纯与分馏机
         ModConfig.cultivatorLifeCapacity = AkaishiConfig.CULTIVATOR_LIFE_CAPACITY.get();
@@ -299,6 +382,28 @@ public final class AkaishiConfigSync {
         ModConfig.fractionatorEnergyCapacity = AkaishiConfig.FRACTIONATOR_ENERGY_CAPACITY.get();
         ModConfig.fractionatorCostPerCraft = AkaishiConfig.FRACTIONATOR_COST_PER_CRAFT.get();
         ModConfig.fractionatorProcessTicks = AkaishiConfig.FRACTIONATOR_PROCESS_TICKS.get();
+
+        // 价值分（统一存储库定价内核）
+        ModConfig.valueCostMultiplier = AkaishiConfig.VALUE_COST_MULTIPLIER.get();
+        ModConfig.valueIngredientWeight = AkaishiConfig.VALUE_INGREDIENT_WEIGHT.get();
+        ModConfig.valueMagicBonus = AkaishiConfig.VALUE_MAGIC_BONUS.get();
+        ModConfig.valueIngredientCap = AkaishiConfig.VALUE_INGREDIENT_CAP.get();
+        ModConfig.valueIterations = AkaishiConfig.VALUE_ITERATIONS.get();
+        ModConfig.valueLootEnabled = AkaishiConfig.VALUE_LOOT_ENABLED.get();
+        ModConfig.valueLootAutoApply = AkaishiConfig.VALUE_LOOT_AUTO_APPLY.get();
+        ModConfig.valueLootCap = AkaishiConfig.VALUE_LOOT_CAP.get();
+        ModConfig.valueFluidEnabled = AkaishiConfig.VALUE_FLUID_ENABLED.get();
+        ModConfig.valueFluidPerMbCap = AkaishiConfig.VALUE_FLUID_PER_MB_CAP.get();
+        ModConfig.valueOverrides = toStringArray(AkaishiConfig.VALUE_OVERRIDES.get());
+        ModConfig.valueFluidValues = toStringArray(AkaishiConfig.VALUE_FLUID_VALUES.get());
+        ModConfig.valueTagValues = toStringArray(AkaishiConfig.VALUE_TAG_VALUES.get());
+        ModConfig.valueTierBonus = toStringArray(AkaishiConfig.VALUE_TIER_BONUS.get());
+        ModConfig.valueKeywordExclusions = toStringArray(AkaishiConfig.VALUE_KEYWORD_EXCLUSIONS.get());
+        ModConfig.valueLootBlacklist = toStringArray(AkaishiConfig.VALUE_LOOT_BLACKLIST.get());
+        ModConfig.unifiedVaultRows = AkaishiConfig.UNIFIED_VAULT_ROWS.get();
+
+        // 估值参数可能已变：作废快照 + 重建掉落来源索引，保证保存即生效
+        ValueReloadHooks.onReload();
 
         // 配置热重载后把服务端权威值推送给所有在线玩家（登录推送见 AkaishiModForge）
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -332,6 +437,16 @@ public final class AkaishiConfigSync {
         long[] arr = new long[list.size()];
         for (int i = 0; i < list.size(); i++) {
             arr[i] = ((Number) list.get(i)).longValue();
+        }
+        return arr;
+    }
+
+    /** 配置 String 列表 → String[]（空条目由读取端忽略） */
+    private static String[] toStringArray(List<?> list) {
+        String[] arr = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            Object v = list.get(i);
+            arr[i] = v == null ? "" : v.toString();
         }
         return arr;
     }

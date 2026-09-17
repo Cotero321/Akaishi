@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.item.MechanicalOrganItem;
 import com.example.akaishi.life.body.BodyOverviewEntry;
 import com.example.akaishi.life.body.BodyPassiveEntry;
@@ -9,7 +10,9 @@ import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
@@ -31,9 +34,9 @@ import java.util.Map;
  */
 public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBodyScannerMenu> {
 
-    /** 界面尺寸（无背包，纯信息面板；加宽以容纳部位名 + 排斥条 + 数值三栏，加高容纳基因区） */
+    /** 界面尺寸（无背包，纯信息面板；加宽以容纳部位名 + 排斥条 + 数值三栏，加高容纳基因区与饰品区） */
     private static final int PANEL_W = 200;
-    private static final int PANEL_H = 200;
+    private static final int PANEL_H = 242;
 
     /** 内容区布局 */
     private static final int ROW_X = 10;
@@ -55,6 +58,27 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
     private static final int BREAKTHROUGH_Y = 178;
     private static final int SYNERGY_Y = 187;
 
+    /** 饰品区（禁忌四件 · 侵蚀进度，D96/D207）：图标行 / 进度条行 / 百分比行，四条并列 */
+    private static final int CURIO_X = 6;
+    private static final int CURIO_COL_W = 47;
+    private static final int CURIO_ICON_Y = 198;
+    private static final int CURIO_BAR_Y = 216;
+    private static final int CURIO_TEXT_Y = 223;
+    private static final int CURIO_BAR_W = 43;
+    private static final int CURIO_BAR_H = 5;
+
+    /** 槽位边框色：乱码（§5 紫）/ 锁槽（红） */
+    private static final int CORRUPT_COLOR = 0xFFAA00AA;
+    private static final int LOCK_COLOR = 0xFFD64545;
+
+    /** 饰品区槽图标（socket_1..4，与槽位扫描页同源，16×16 直绘） */
+    private static final ResourceLocation[] SOCKET_ICONS = new ResourceLocation[4];
+    static {
+        for (int i = 0; i < SOCKET_ICONS.length; i++) {
+            SOCKET_ICONS[i] = new ResourceLocation("akaishi", "textures/slot/socket_" + (i + 1) + ".png");
+        }
+    }
+
     /** 顶部页签（互斥双页：槽位扫描 / 躯体总览），右对齐于面板内容区右上角 */
     private static final int TAB_Y = 4;
 
@@ -71,6 +95,9 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
     private boolean overviewMode = false;
     /** 躯体总览页滚动偏移（行单位，超出可视行数时滚轮调节） */
     private int overviewScroll = 0;
+    /** 饰品区快照（每游戏刻刷新一次，见 renderCurioSection） */
+    private List<ForbiddenSetHooks.CurioState> curioCache = List.of();
+    private long curioCacheTick = -1L;
 
     public AkaishiBodyScannerScreen(AkaishiBodyScannerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -83,7 +110,7 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         // 自绘面板背景
         gui.fill(this.leftPos, this.topPos, this.leftPos + PANEL_W, this.topPos + PANEL_H, BG_COLOR);
         // 面板内容区
-        gui.fill(this.leftPos + 6, this.topPos + 18, this.leftPos + PANEL_W - 6, this.topPos + 192, PANEL_COLOR);
+        gui.fill(this.leftPos + 6, this.topPos + 18, this.leftPos + PANEL_W - 6, this.topPos + PANEL_H - 8, PANEL_COLOR);
         // 躯体总览页不复用槽位排斥条背景（互斥页各自内容，避免残留扫描页元素）
         if (overviewMode) {
             return;
@@ -124,6 +151,8 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         }
 
         // 9 行槽位：部位名 + 器官图标/名称 + 排斥数值
+        LocalPlayer player = this.minecraft.player;
+        boolean locked = player != null && ForbiddenSetHooks.socketsLocked(player);
         BodySlot[] slots = BodySlot.values();
         for (int i = 0; i < slots.length; i++) {
             BodySlot slot = slots[i];
@@ -145,6 +174,13 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             int rej = ClientBodyData.getRejection(slot);
             gui.drawString(this.font, String.valueOf(rej), this.leftPos + REJECT_NUM_X - this.font.width(String.valueOf(rej)),
                     rowY - 4, rejectionColor(rej), false);
+            // 乱码槽位 / 锁槽：纯代码画边（D90/D206，随状态实时变色，零新贴图）
+            int frameColor = locked ? LOCK_COLOR
+                    : (!organ.isEmpty() && AkaishiOrganItem.isCorrupted(organ) ? CORRUPT_COLOR : 0);
+            if (frameColor != 0) {
+                drawSlotFrame(gui, this.leftPos + ROW_X - 2, rowY - 6,
+                        this.leftPos + PANEL_W - 7, rowY + 8, frameColor);
+            }
         }
 
         // 底部汇总行：总排斥 + 状况评级
@@ -167,6 +203,11 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             statusColor = 0xFF2E7D32;
         }
         int sumY = this.topPos + SUMMARY_Y;
+        if (locked) {
+            // 锁槽优先于常规状况评级：佩戴禁忌饰品即拒绝一切改造（D13/D115）
+            statusKey = "gui.akaishi.body.curio.locked";
+            statusColor = LOCK_COLOR;
+        }
         Component summary = Component.translatable("gui.akaishi.body_scanner.summary", occupied, slots.length, total);
         gui.drawString(this.font, summary, this.leftPos + SLOT_NAME_X, sumY, 0xE0E0E0, false);
         Component status = Component.translatable(statusKey);
@@ -189,6 +230,9 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         if (!synergyText.isEmpty()) {
             gui.drawString(this.font, synergyText, this.leftPos + ROW_X, this.topPos + SYNERGY_Y, 0x8B6F1E, false);
         }
+
+        // 饰品区：禁忌四件 · 侵蚀进度（D96/D207）
+        renderCurioSection(gui, locked);
 
         // ===== 悬停详情 =====
         // 槽位行：移植器官完整属性 / 原装说明
@@ -218,6 +262,80 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             gui.renderComponentTooltip(this.font, tip, mouseX, mouseY);
             return;
         }
+    }
+
+    /** 槽位边框：1px 纯代码描边（上/下/左/右），零新贴图（D206） */
+    private void drawSlotFrame(GuiGraphics gui, int x1, int y1, int x2, int y2, int color) {
+        gui.fill(x1, y1, x2, y1 + 1, color);
+        gui.fill(x1, y2 - 1, x2, y2, color);
+        gui.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
+        gui.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
+    }
+
+    /** 饰品区：禁忌四件（生命之触/幼崽之心/母神之印/孕育之环）侵蚀进度条（D96/D207）。
+     *  数据取自 ForbiddenSetHooks.curioStates（forge 注入，common 侧零 Curios 依赖）；
+     *  forge 未注入时整节隐藏；未佩戴以灰化空槽占位。锁槽时整节加红框提示（D115）。 */
+    private void renderCurioSection(GuiGraphics gui, boolean locked) {
+        LocalPlayer player = this.minecraft.player;
+        if (player == null) {
+            return;
+        }
+        // 每游戏刻取一次（Curios 查询较贵，避免每帧重复 resolve）
+        long now = player.level().getGameTime();
+        if (now != curioCacheTick) {
+            curioCache = ForbiddenSetHooks.curioStates(player);
+            curioCacheTick = now;
+        }
+        List<ForbiddenSetHooks.CurioState> states = curioCache;
+        if (states.isEmpty()) {
+            return;
+        }
+        int count = Math.min(states.size(), SOCKET_ICONS.length);
+        for (int i = 0; i < count; i++) {
+            ForbiddenSetHooks.CurioState state = states.get(i);
+            int x = this.leftPos + CURIO_X + i * CURIO_COL_W;
+            int iconY = this.topPos + CURIO_ICON_Y;
+            // 槽图标直绘：socket_1..4（16×16），与槽位扫描页图标同源，避免新增资源
+            gui.blit(SOCKET_ICONS[i], x, iconY, 0, 0, 16, 16, 16, 16);
+
+            int pct = state.worn() ? Math.max(0, Math.min(100, (int) Math.round(state.erosion()))) : 0;
+            int barX = x + 1;
+            int barY = this.topPos + CURIO_BAR_Y;
+            gui.fill(barX, barY, barX + CURIO_BAR_W, barY + CURIO_BAR_H, 0xFF2B2B2B);
+            int fillW = CURIO_BAR_W * pct / 100;
+            if (fillW > 0) {
+                gui.fill(barX, barY, barX + fillW, barY + CURIO_BAR_H, erosionColor(pct, true));
+            }
+
+            Component text = state.worn()
+                    ? Component.translatable("gui.akaishi.body.curio.erosion", pct)
+                    : Component.translatable("gui.akaishi.body.curio.empty");
+            String shown = this.font.plainSubstrByWidth(text.getString(), CURIO_BAR_W);
+            gui.drawString(this.font, shown, barX, this.topPos + CURIO_TEXT_Y,
+                    state.worn() ? 0xFFC8C8C8 : 0xFF6E6E6E, false);
+        }
+        if (locked) {
+            int top = this.topPos + CURIO_ICON_Y - 2;
+            drawSlotFrame(gui, this.leftPos + CURIO_X - 2, top,
+                    this.leftPos + CURIO_X + count * CURIO_COL_W, top + CURIO_TEXT_Y - CURIO_ICON_Y + 12, LOCK_COLOR);
+        }
+    }
+
+    /** 侵蚀配色：0 绿 → 50 黄 → 100 红（低于阈值无警示色） */
+    private static int erosionColor(int pct, boolean worn) {
+        if (!worn) {
+            return 0xFF4A4A4A;
+        }
+        int r;
+        int g;
+        if (pct < 50) {
+            r = 0x4C + (0xC8 - 0x4C) * pct / 50;
+            g = 0xC0 - (0xC0 - 0x9A) * pct / 50;
+        } else {
+            r = 0xC8 + (0xD6 - 0xC8) * (pct - 50) / 50;
+            g = 0x9A - (0x9A - 0x45) * (pct - 50) / 50;
+        }
+        return 0xFF000000 | (r << 16) | (g << 8) | 0x4C;
     }
 
     /** 顶部页签：槽位扫描 / 躯体总览（右对齐，激活项提亮） */

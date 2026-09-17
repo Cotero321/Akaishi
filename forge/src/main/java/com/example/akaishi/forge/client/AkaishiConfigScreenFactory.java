@@ -141,6 +141,100 @@ public final class AkaishiConfigScreenFactory {
         booleanToggle(curioSlots, eb, "curio_slots.unlockRequired", AkaishiConfig.CURIO_SLOT_UNLOCK_REQUIRED);
         intList(curioSlots, eb, "curio_slots.unlockThresholds", AkaishiConfig.CURIO_SLOT_UNLOCK_THRESHOLDS);
 
+        // ===== 禁断四件 · 1 生命之触 =====
+        ConfigCategory curioLifeTouch = category(builder, "curio_life_touch");
+        booleanToggle(curioLifeTouch, eb, "curio.lifeTouch.enabled", AkaishiConfig.LIFE_TOUCH_ENABLED);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.reachBonus", AkaishiConfig.LIFE_TOUCH_REACH_BONUS);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.doubleStrikeChance", AkaishiConfig.LIFE_TOUCH_DOUBLE_STRIKE_CHANCE);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.selfHurtChance", AkaishiConfig.LIFE_TOUCH_SELF_HURT_CHANCE);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.selfHurtDamage", AkaishiConfig.LIFE_TOUCH_SELF_HURT_DAMAGE);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.hungerCostChance", AkaishiConfig.LIFE_TOUCH_HUNGER_COST_CHANCE);
+        intField(curioLifeTouch, eb, "curio.lifeTouch.hungerCostAmount", AkaishiConfig.LIFE_TOUCH_HUNGER_COST_AMOUNT);
+        doubleField(curioLifeTouch, eb, "curio.lifeTouch.hungerRestoreChance", AkaishiConfig.LIFE_TOUCH_HUNGER_RESTORE_CHANCE);
+        intField(curioLifeTouch, eb, "curio.lifeTouch.hungerRestoreAmount", AkaishiConfig.LIFE_TOUCH_HUNGER_RESTORE_AMOUNT);
+        intField(curioLifeTouch, eb, "curio.lifeTouch.hitCacheTicks", AkaishiConfig.LIFE_TOUCH_HIT_CACHE_TICKS);
+
+        // ===== 禁断四件 · 2 幼崽之心 =====
+        ConfigCategory curioCubHeart = category(builder, "curio_cub_heart");
+        booleanToggle(curioCubHeart, eb, "curio.cubHeart.enabled", AkaishiConfig.CUB_HEART_ENABLED);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.absorptionRatio", AkaishiConfig.CUB_HEART_ABSORPTION_RATIO);
+        intField(curioCubHeart, eb, "curio.cubHeart.effectInterval", AkaishiConfig.CUB_HEART_EFFECT_INTERVAL);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.slowHasteChance", AkaishiConfig.CUB_HEART_SLOW_HASTE_CHANCE);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.slowHasteAmplitude", AkaishiConfig.CUB_HEART_SLOW_HASTE_AMPLITUDE);
+        intField(curioCubHeart, eb, "curio.cubHeart.slowHasteTicks", AkaishiConfig.CUB_HEART_SLOW_HASTE_TICKS);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.damageShiftChance", AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_CHANCE);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.damageShiftAmount", AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_AMOUNT);
+        intField(curioCubHeart, eb, "curio.cubHeart.damageShiftTicks", AkaishiConfig.CUB_HEART_DAMAGE_SHIFT_TICKS);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.unnameableChance", AkaishiConfig.CUB_HEART_UNNAMEABLE_CHANCE);
+        intField(curioCubHeart, eb, "curio.cubHeart.unnameableAmplifier", AkaishiConfig.CUB_HEART_UNNAMEABLE_AMPLIFIER);
+        intField(curioCubHeart, eb, "curio.cubHeart.unnameableTicks", AkaishiConfig.CUB_HEART_UNNAMEABLE_TICKS);
+        doubleField(curioCubHeart, eb, "curio.cubHeart.excitementAttackSpeed", AkaishiConfig.CUB_HEART_EXCITEMENT_ATTACK_SPEED);
+        intField(curioCubHeart, eb, "curio.cubHeart.excitementTicks", AkaishiConfig.CUB_HEART_EXCITEMENT_TICKS);
+
+        // ===== 禁断四件 · 3 母神之印 =====
+        ConfigCategory curioMotherSeal = category(builder, "curio_mother_seal");
+        booleanToggle(curioMotherSeal, eb, "curio.motherSeal.enabled", AkaishiConfig.MOTHER_SEAL_ENABLED);
+        doubleField(curioMotherSeal, eb, "curio.motherSeal.damageBonus", AkaishiConfig.MOTHER_SEAL_DAMAGE_BONUS);
+        doubleField(curioMotherSeal, eb, "curio.motherSeal.healthBonus", AkaishiConfig.MOTHER_SEAL_HEALTH_BONUS);
+        doubleField(curioMotherSeal, eb, "curio.motherSeal.speedBonus", AkaishiConfig.MOTHER_SEAL_SPEED_BONUS);
+        doubleField(curioMotherSeal, eb, "curio.motherSeal.attackSpeedBonus", AkaishiConfig.MOTHER_SEAL_ATTACK_SPEED_BONUS);
+        intField(curioMotherSeal, eb, "curio.motherSeal.selfUnnameablePeriod", AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_PERIOD);
+        intField(curioMotherSeal, eb, "curio.motherSeal.selfUnnameableTicks", AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_TICKS);
+        intField(curioMotherSeal, eb, "curio.motherSeal.selfUnnameableAmplifier", AkaishiConfig.MOTHER_SEAL_SELF_UNNAMEABLE_AMPLIFIER);
+        intField(curioMotherSeal, eb, "curio.motherSeal.vegetarianHungerCost", AkaishiConfig.MOTHER_SEAL_VEGETARIAN_HUNGER_COST);
+        intField(curioMotherSeal, eb, "curio.motherSeal.vegetarianNauseaTicks", AkaishiConfig.MOTHER_SEAL_VEGETARIAN_NAUSEA_TICKS);
+        doubleField(curioMotherSeal, eb, "curio.motherSeal.resistFactor", AkaishiConfig.MOTHER_SEAL_RESIST_FACTOR);
+
+        // ===== 禁断四件 · 4 孕育之环 =====
+        ConfigCategory curioFertilityRing = category(builder, "curio_fertility_ring");
+        booleanToggle(curioFertilityRing, eb, "curio.fertilityRing.enabled", AkaishiConfig.FERTILITY_RING_ENABLED);
+        doubleField(curioFertilityRing, eb, "curio.fertilityRing.healChance", AkaishiConfig.FERTILITY_RING_HEAL_CHANCE);
+        doubleField(curioFertilityRing, eb, "curio.fertilityRing.healAmount", AkaishiConfig.FERTILITY_RING_HEAL_AMOUNT);
+        intField(curioFertilityRing, eb, "curio.fertilityRing.healHungerCost", AkaishiConfig.FERTILITY_RING_HEAL_HUNGER_COST);
+        doubleField(curioFertilityRing, eb, "curio.fertilityRing.attackSpeedBonus", AkaishiConfig.FERTILITY_RING_ATTACK_SPEED_BONUS);
+        intField(curioFertilityRing, eb, "curio.fertilityRing.attackSpeedTicks", AkaishiConfig.FERTILITY_RING_ATTACK_SPEED_TICKS);
+        doubleField(curioFertilityRing, eb, "curio.fertilityRing.meatHealAmount", AkaishiConfig.FERTILITY_RING_MEAT_HEAL_AMOUNT);
+        booleanToggle(curioFertilityRing, eb, "curio.fertilityRing.satiatedMeatOnly", AkaishiConfig.FERTILITY_RING_SATIATED_MEAT_ONLY);
+        doubleField(curioFertilityRing, eb, "curio.fertilityRing.starveMultiplier", AkaishiConfig.FERTILITY_RING_STARVE_MULTIPLIER);
+        booleanToggle(curioFertilityRing, eb, "curio.fertilityRing.starveLethal", AkaishiConfig.FERTILITY_RING_STARVE_LETHAL);
+
+        // ===== 禁断四件 · 5 套装 =====
+        ConfigCategory curioSet = category(builder, "curio_set");
+        intField(curioSet, eb, "curio.set.attackCountRequired", AkaishiConfig.SET_ATTACK_COUNT_REQUIRED);
+        intField(curioSet, eb, "curio.set.attackCountHungerRestore", AkaishiConfig.SET_ATTACK_COUNT_HUNGER_RESTORE);
+        intField(curioSet, eb, "curio.set.unnameableLevelBonus", AkaishiConfig.SET_UNNAMEABLE_LEVEL_BONUS);
+        booleanToggle(curioSet, eb, "curio.set.suppressDistortion", AkaishiConfig.SET_SUPPRESS_DISTORTION);
+        doubleField(curioSet, eb, "curio.set.damageReduction", AkaishiConfig.SET_DAMAGE_REDUCTION);
+        doubleField(curioSet, eb, "curio.set.unnameableCritChance", AkaishiConfig.SET_UNNAMEABLE_CRIT_CHANCE);
+        doubleField(curioSet, eb, "curio.set.unnameableCritDamage", AkaishiConfig.SET_UNNAMEABLE_CRIT_DAMAGE);
+        doubleField(curioSet, eb, "curio.set.nearDeathHealPercent", AkaishiConfig.SET_NEAR_DEATH_HEAL_PERCENT);
+        intField(curioSet, eb, "curio.set.nearDeathUnnameableTicks", AkaishiConfig.SET_NEAR_DEATH_UNNAMEABLE_TICKS);
+        intField(curioSet, eb, "curio.set.nearDeathCooldownTicks", AkaishiConfig.SET_NEAR_DEATH_COOLDOWN_TICKS);
+
+        // ===== 禁断四件 · 6 侵蚀 =====
+        ConfigCategory curioErosion = category(builder, "curio_erosion");
+        booleanToggle(curioErosion, eb, "curio.erosion.enabled", AkaishiConfig.EROSION_ENABLED);
+        intField(curioErosion, eb, "curio.erosion.durationMinutes", AkaishiConfig.EROSION_DURATION_MINUTES);
+        intList(curioErosion, eb, "curio.erosion.noticeThresholds", AkaishiConfig.EROSION_NOTICE_THRESHOLDS);
+        intField(curioErosion, eb, "curio.erosion.noticeIntervalMinutes", AkaishiConfig.EROSION_NOTICE_INTERVAL_MINUTES);
+        doubleField(curioErosion, eb, "curio.erosion.statRerollPercent", AkaishiConfig.EROSION_STAT_REROLL_PERCENT);
+        intField(curioErosion, eb, "curio.erosion.nbtFlushTicks", AkaishiConfig.EROSION_NBT_FLUSH_TICKS);
+        booleanToggle(curioErosion, eb, "curio.erosion.screenFlashEnabled", AkaishiConfig.EROSION_SCREEN_FLASH_ENABLED);
+
+        // ===== 禁断四件 · 7 仪式与吸取 =====
+        ConfigCategory curioAltar = category(builder, "curio_altar");
+        booleanToggle(curioAltar, eb, "curio.altar.drainEnabled", AkaishiConfig.ALTAR_DRAIN_ENABLED);
+        intField(curioAltar, eb, "curio.altar.drainRadius", AkaishiConfig.ALTAR_DRAIN_RADIUS);
+        intField(curioAltar, eb, "curio.altar.drainIntervalTicks", AkaishiConfig.ALTAR_DRAIN_INTERVAL_TICKS);
+        doubleField(curioAltar, eb, "curio.altar.drainHealthPercent", AkaishiConfig.ALTAR_DRAIN_HEALTH_PERCENT);
+        longField(curioAltar, eb, "curio.altar.drainEnergyPerHp", AkaishiConfig.ALTAR_DRAIN_ENERGY_PER_HP);
+        intField(curioAltar, eb, "curio.altar.drainMaxTargets", AkaishiConfig.ALTAR_DRAIN_MAX_TARGETS);
+        longField(curioAltar, eb, "curio.altar.drainMaxEnergyPerTarget", AkaishiConfig.ALTAR_DRAIN_MAX_ENERGY_PER_TARGET);
+        booleanToggle(curioAltar, eb, "curio.altar.drainExemptCreative", AkaishiConfig.ALTAR_DRAIN_EXEMPT_CREATIVE);
+        intField(curioAltar, eb, "curio.altar.newRecipeTierRequired", AkaishiConfig.ALTAR_NEW_RECIPE_TIER_REQUIRED);
+        longField(curioAltar, eb, "curio.altar.newRecipeProgressMax", AkaishiConfig.ALTAR_NEW_RECIPE_PROGRESS_MAX);
+        longField(curioAltar, eb, "curio.altar.legacyProgressMax", AkaishiConfig.ALTAR_LEGACY_PROGRESS_MAX);
+
         // ===== 生命研究机器 =====
         ConfigCategory lifeMachines = category(builder, "life_machines");
         longField(lifeMachines, eb, "life_machines.geneAnalyzerLifeCost", AkaishiConfig.GENE_ANALYZER_LIFE_COST);
@@ -241,6 +335,8 @@ public final class AkaishiConfigScreenFactory {
         longField(buffers, eb, "buffers.reactorEnergyOutputBufferCapacity", AkaishiConfig.REACTOR_ENERGY_OUTPUT_BUFFER);
         longField(buffers, eb, "buffers.lifeEnergyCellSerializerBaseCapacity", AkaishiConfig.LIFE_ENERGY_CELL_SERIALIZER_CAPACITY);
         longField(buffers, eb, "buffers.plasmaTankCapacity", AkaishiConfig.PLASMA_TANK_CAPACITY);
+        longField(buffers, eb, "buffers.itemTerminalEnergyBuffer", AkaishiConfig.ITEM_TERMINAL_ENERGY_BUFFER);
+        longField(buffers, eb, "buffers.itemTerminalEnergyPortBufferCapacity", AkaishiConfig.ITEM_TERMINAL_ENERGY_PORT_BUFFER);
 
         // ===== 培养机提纯与分馏机 =====
         ConfigCategory cultivatorFractionator = category(builder, "cultivator_fractionator");
@@ -253,6 +349,26 @@ public final class AkaishiConfigScreenFactory {
         longField(cultivatorFractionator, eb, "cultivator_fractionator.fractionatorEnergyCapacity", AkaishiConfig.FRACTIONATOR_ENERGY_CAPACITY);
         longField(cultivatorFractionator, eb, "cultivator_fractionator.fractionatorCostPerCraft", AkaishiConfig.FRACTIONATOR_COST_PER_CRAFT);
         intField(cultivatorFractionator, eb, "cultivator_fractionator.fractionatorProcessTicks", AkaishiConfig.FRACTIONATOR_PROCESS_TICKS);
+
+        // ===== 价值分（统一存储库定价内核） =====
+        ConfigCategory value = category(builder, "value");
+        doubleField(value, eb, "value.costMultiplier", AkaishiConfig.VALUE_COST_MULTIPLIER);
+        doubleField(value, eb, "value.ingredientWeight", AkaishiConfig.VALUE_INGREDIENT_WEIGHT);
+        doubleField(value, eb, "value.magicBonus", AkaishiConfig.VALUE_MAGIC_BONUS);
+        doubleField(value, eb, "value.ingredientCap", AkaishiConfig.VALUE_INGREDIENT_CAP);
+        intField(value, eb, "value.iterations", AkaishiConfig.VALUE_ITERATIONS);
+        booleanToggle(value, eb, "value.lootEnabled", AkaishiConfig.VALUE_LOOT_ENABLED);
+        booleanToggle(value, eb, "value.lootAutoApply", AkaishiConfig.VALUE_LOOT_AUTO_APPLY);
+        doubleField(value, eb, "value.lootCap", AkaishiConfig.VALUE_LOOT_CAP);
+        booleanToggle(value, eb, "value.fluidEnabled", AkaishiConfig.VALUE_FLUID_ENABLED);
+        doubleField(value, eb, "value.fluidPerMbCap", AkaishiConfig.VALUE_FLUID_PER_MB_CAP);
+        stringList(value, eb, "value.fluidValues", AkaishiConfig.VALUE_FLUID_VALUES);
+        stringList(value, eb, "value.overrides", AkaishiConfig.VALUE_OVERRIDES);
+        stringList(value, eb, "value.tagValues", AkaishiConfig.VALUE_TAG_VALUES);
+        stringList(value, eb, "value.tierBonus", AkaishiConfig.VALUE_TIER_BONUS);
+        stringList(value, eb, "value.keywordExclusions", AkaishiConfig.VALUE_KEYWORD_EXCLUSIONS);
+        stringList(value, eb, "value.lootBlacklist", AkaishiConfig.VALUE_LOOT_BLACKLIST);
+        intField(value, eb, "value.unifiedVaultRows", AkaishiConfig.UNIFIED_VAULT_ROWS);
 
         return builder.build();
     }
@@ -327,6 +443,19 @@ public final class AkaishiConfigScreenFactory {
             }
         }
         cat.addEntry(eb.startDoubleList(Component.translatable("config.akaishi." + key), current)
+                .setSaveConsumer(v -> spec.set(new ArrayList<>(v)))
+                .build());
+    }
+
+    private static void stringList(ConfigCategory cat, ConfigEntryBuilder eb, String key,
+                                   ForgeConfigSpec.ConfigValue<List<? extends String>> spec) {
+        List<String> current = new ArrayList<>();
+        for (Object v : spec.get()) {
+            if (v != null) {
+                current.add(v.toString());
+            }
+        }
+        cat.addEntry(eb.startStrList(Component.translatable("config.akaishi." + key), current)
                 .setSaveConsumer(v -> spec.set(new ArrayList<>(v)))
                 .build());
     }

@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "akaishi:item/blank"
+    }
+  ]
+}

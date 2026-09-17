@@ -35,11 +35,13 @@ public final class ModCommands {
     private ModCommands() {
     }
 
-    /** 注册 /akaishi_geode 指令（由 Forge RegisterCommandsEvent 调用） */
+    /** 注册 /akaishi_geode 与 /akaishi_value 指令（由 Forge RegisterCommandsEvent 调用） */
     public static void build(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("akaishi_geode")
                 .requires(src -> src.hasPermission(2))
                 .executes(ctx -> teleportToNearestGeode(ctx, 128)));
+        // 估值内核诊断指令（手持取值 / 强制重建 / 全库排名）
+        AkaishiValueCommand.register(dispatcher);
     }
 
     private static int teleportToNearestGeode(CommandContext<CommandSourceStack> ctx, int radius)

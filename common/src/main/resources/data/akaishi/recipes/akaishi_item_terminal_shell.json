@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IGI",
+    "C C",
+    "IGI"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "C": { "item": "minecraft:chest" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_shell", "count": 4 }
+}

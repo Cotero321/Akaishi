@@ -7,6 +7,7 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.ModItems;
@@ -165,6 +166,11 @@ public class AkaishiSurgeryBlockEntity extends BlockEntity implements
         BodySlot target = BodySlot.values()[index];
         IPlayerBodyState state = PlayerBodyHelper.of(player);
         if (state == null) {
+            return;
+        }
+        // 佩戴禁忌饰品时 9 槽锁死：植入与摘除一并拒绝（D13/D28/D196），摘下饰品即解锁
+        if (ForbiddenSetHooks.socketsLocked(player)) {
+            ForbiddenSetHooks.denyLocked(player);
             return;
         }
         if (type == OP_IMPLANT) {

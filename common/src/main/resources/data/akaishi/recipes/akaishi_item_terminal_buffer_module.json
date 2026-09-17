@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "SRS",
+    "ISI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "S": { "item": "akaishi:akaishi_item_terminal_shell" },
+    "R": { "item": "akaishi:akaishi_dust" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_buffer_module", "count": 1 }
+}

@@ -39,8 +39,6 @@ public final class ModConfig {
     // ==================== 液体管道 ====================
     /** 单段管道每 tick 最大传输量（mb） */
     public static volatile int fluidPipeRate = 4000;
-    /** 单段管道缓冲罐容量（mb） */
-    public static volatile int fluidPipeBufferCapacity = 8000;
 
     // ==================== 废品口 ====================
     /** 废品口废料缓冲罐容量（mb） */
@@ -292,7 +290,167 @@ public final class ModConfig {
     /** 扩展槽是否需要赤石进度解锁（false = 四槽始终开启） */
     public static volatile boolean curioSlotUnlockRequired = true;
     /** 四槽各自所需进度节点数（0 = 无条件开启） */
-    public static volatile int[] curioSlotUnlockThresholds = {1, 2, 3, 4};
+    public static volatile int[] curioSlotUnlockThresholds = {0, 0, 0, 0};
+
+    // ==================== 禁断四件 · 1 生命之触 ====================
+    /** 生命之触：是否生效 */
+    public static volatile boolean lifeTouchEnabled = true;
+    /** 生命之触：实体与方块交互距离加成（格） */
+    public static volatile double lifeTouchReachBonus = 2.0;
+    /** 生命之触：连打（复刻上一击）概率 */
+    public static volatile double lifeTouchDoubleStrikeChance = 0.25;
+    /** 生命之触：命中后自身真实伤害概率 */
+    public static volatile double lifeTouchSelfHurtChance = 0.1;
+    /** 生命之触：自身真实伤害点数（可致死） */
+    public static volatile double lifeTouchSelfHurtDamage = 1.0;
+    /** 生命之触：命中后扣饱食概率 */
+    public static volatile double lifeTouchHungerCostChance = 0.2;
+    /** 生命之触：扣饱食格数 */
+    public static volatile int lifeTouchHungerCostAmount = 1;
+    /** 生命之触：命中后回饱食概率 */
+    public static volatile double lifeTouchHungerRestoreChance = 0.3333;
+    /** 生命之触：回饱食格数 */
+    public static volatile int lifeTouchHungerRestoreAmount = 1;
+    /** 生命之触：「上一击伤害」缓存时效（tick） */
+    public static volatile int lifeTouchHitCacheTicks = 100;
+
+    // ==================== 禁断四件 · 2 幼崽之心 ====================
+    /** 幼崽之心：是否生效 */
+    public static volatile boolean cubHeartEnabled = true;
+    /** 幼崽之心：造成伤害转吸收（黄心）比例，累加不封顶 */
+    public static volatile double cubHeartAbsorptionRatio = 0.1;
+    /** 幼崽之心：效果刷新节流（tick） */
+    public static volatile int cubHeartEffectInterval = 20;
+    /** 幼崽之心：减速对方 / 加速自身概率 */
+    public static volatile double cubHeartSlowHasteChance = 0.1;
+    /** 幼崽之心：移速变动幅度 */
+    public static volatile double cubHeartSlowHasteAmplitude = 0.10;
+    /** 幼崽之心：移速变动持续（tick，上限 30s） */
+    public static volatile int cubHeartSlowHasteTicks = 600;
+    /** 幼崽之心：自身加伤 / 对方减伤概率 */
+    public static volatile double cubHeartDamageShiftChance = 0.05;
+    /** 幼崽之心：伤害变动点数 */
+    public static volatile double cubHeartDamageShiftAmount = 1.0;
+    /** 幼崽之心：伤害变动持续（tick，上限 30s） */
+    public static volatile int cubHeartDamageShiftTicks = 600;
+    /** 幼崽之心：触发效果时自施不可名状概率 */
+    public static volatile double cubHeartUnnameableChance = 0.1;
+    /** 幼崽之心：自施不可名状等级 */
+    public static volatile int cubHeartUnnameableAmplifier = 1;
+    /** 幼崽之心：自施不可名状持续（tick） */
+    public static volatile int cubHeartUnnameableTicks = 400;
+    /** 幼崽之心：「亢奋」攻速加成 */
+    public static volatile double cubHeartExcitementAttackSpeed = 0.20;
+    /** 幼崽之心：「亢奋」持续（tick，每次命中刷新） */
+    public static volatile int cubHeartExcitementTicks = 100;
+
+    // ==================== 禁断四件 · 3 母神之印 ====================
+    /** 母神之印：是否生效 */
+    public static volatile boolean motherSealEnabled = true;
+    /** 母神之印：不可名状 I 级的伤害加成（等级越高按倍率放大） */
+    public static volatile double motherSealDamageBonus = 2.0;
+    /** 母神之印：不可名状 I 级的最大生命加成 */
+    public static volatile double motherSealHealthBonus = 4.0;
+    /** 母神之印：不可名状 I 级的移速加成 */
+    public static volatile double motherSealSpeedBonus = 0.10;
+    /** 母神之印：不可名状 I 级的攻速加成 */
+    public static volatile double motherSealAttackSpeedBonus = 0.10;
+    /** 母神之印：自施不可名状周期（tick） */
+    public static volatile int motherSealSelfUnnameablePeriod = 1200;
+    /** 母神之印：自施不可名状持续（tick） */
+    public static volatile int motherSealSelfUnnameableTicks = 200;
+    /** 母神之印：自施不可名状等级 */
+    public static volatile int motherSealSelfUnnameableAmplifier = 1;
+    /** 母神之印：吃素食倒扣饱食格数 */
+    public static volatile int motherSealVegetarianHungerCost = 1;
+    /** 母神之印：吃素食恶心时长（tick） */
+    public static volatile int motherSealVegetarianNauseaTicks = 100;
+    /** 母神之印：毒 / 火 / 凋零 / 爆炸伤害倍率 */
+    public static volatile double motherSealResistFactor = 0.5;
+
+    // ==================== 禁断四件 · 4 孕育之环 ====================
+    /** 孕育之环：是否生效 */
+    public static volatile boolean fertilityRingEnabled = true;
+    /** 孕育之环：受伤回血概率 */
+    public static volatile double fertilityRingHealChance = 0.2;
+    /** 孕育之环：受伤回血点数 */
+    public static volatile double fertilityRingHealAmount = 2.0;
+    /** 孕育之环：回血同时扣饱食格数 */
+    public static volatile int fertilityRingHealHungerCost = 1;
+    /** 孕育之环：触发后攻速加成 */
+    public static volatile double fertilityRingAttackSpeedBonus = 0.20;
+    /** 孕育之环：攻速加成持续（tick） */
+    public static volatile int fertilityRingAttackSpeedTicks = 100;
+    /** 孕育之环：吃肉回血点数 */
+    public static volatile double fertilityRingMeatHealAmount = 3.0;
+    /** 孕育之环：满饱食仅肉类可食 */
+    public static volatile boolean fertilityRingSatiatedMeatOnly = true;
+    /** 孕育之环：饥饿伤害倍率（最终伤害 = 原值 × 倍率） */
+    public static volatile double fertilityRingStarveMultiplier = 3.0;
+    /** 孕育之环：饥饿伤害可致死 */
+    public static volatile boolean fertilityRingStarveLethal = true;
+
+    // ==================== 禁断四件 · 5 套装 ====================
+    /** 套装：触发回饱食所需有效攻击次数 */
+    public static volatile int setAttackCountRequired = 10;
+    /** 套装：达标回饱食格数 */
+    public static volatile int setAttackCountHungerRestore = 1;
+    /** 套装：不可名状等级加成 */
+    public static volatile int setUnnameableLevelBonus = 1;
+    /** 套装：屏蔽不可名状视野扭曲 */
+    public static volatile boolean setSuppressDistortion = true;
+    /** 套装：受到的伤害减免（与四类减半叠乘） */
+    public static volatile double setDamageReduction = 0.30;
+    /** 套装：持不可名状时的暴击率加成 */
+    public static volatile double setUnnameableCritChance = 0.20;
+    /** 套装：持不可名状时的暴击伤害加成（追加倍率，0.3 = 暴击倍率 +0.3） */
+    public static volatile double setUnnameableCritDamage = 0.30;
+    /** 套装：濒死免死时恢复的最大生命占比 */
+    public static volatile double setNearDeathHealPercent = 0.60;
+    /** 套装：濒死免死时获得的不可名状时长（tick） */
+    public static volatile int setNearDeathUnnameableTicks = 600;
+    /** 套装：濒死免死的冷却（tick） */
+    public static volatile int setNearDeathCooldownTicks = 9600;
+
+    // ==================== 禁断四件 · 6 侵蚀 ====================
+    /** 侵蚀：是否启用 */
+    public static volatile boolean erosionEnabled = true;
+    /** 侵蚀：佩戴累计跑满所需分钟数（0 = 使用内置默认 480） */
+    public static volatile int erosionDurationMinutes = 480;
+    /** 侵蚀：必报节点百分比 */
+    public static volatile int[] erosionNoticeThresholds = {25, 50, 75, 100};
+    /** 侵蚀：兜底提示间隔（分钟） */
+    public static volatile int erosionNoticeIntervalMinutes = 30;
+    /** 侵蚀：乱码时数值重抽幅度（±%） */
+    public static volatile double erosionStatRerollPercent = 0.25;
+    /** 侵蚀：进度落盘间隔（tick） */
+    public static volatile int erosionNbtFlushTicks = 100;
+    /** 侵蚀：跑满时屏幕边缘泛红 */
+    public static volatile boolean erosionScreenFlashEnabled = true;
+
+    // ==================== 禁断四件 · 7 仪式与吸取 ====================
+    /** 仪式吸取：是否启用 */
+    public static volatile boolean altarDrainEnabled = true;
+    /** 仪式吸取：半径（格） */
+    public static volatile int altarDrainRadius = 64;
+    /** 仪式吸取：间隔（tick） */
+    public static volatile int altarDrainIntervalTicks = 20;
+    /** 仪式吸取：单次抽取最大生命比例 */
+    public static volatile double altarDrainHealthPercent = 0.10;
+    /** 仪式吸取：每 1 点血折算生命能量 */
+    public static volatile long altarDrainEnergyPerHp = 1000L;
+    /** 仪式吸取：单次最多目标数 */
+    public static volatile int altarDrainMaxTargets = 16;
+    /** 仪式吸取：单只单次贡献上限 */
+    public static volatile long altarDrainMaxEnergyPerTarget = 5000L;
+    /** 仪式吸取：豁免创造模式玩家 */
+    public static volatile boolean altarDrainExemptCreative = true;
+    /** 四件饰品新仪式：所需祭坛等级 */
+    public static volatile int altarNewRecipeTierRequired = 3;
+    /** 四件饰品新仪式：蓄能阈值 */
+    public static volatile long altarNewRecipeProgressMax = 800_000L;
+    /** 旧生命融合锭仪式：蓄能阈值 */
+    public static volatile long altarLegacyProgressMax = 80_000L;
 
     // ==================== 生命研究机器 ====================
     /** 基因分析仪：解构一次消耗的生命能量 */
@@ -534,6 +692,10 @@ public final class ModConfig {
     public static volatile long wirelessInputPortBufferCapacity = 100_000_000L;
     /** 无线能量输出口缓冲容量 */
     public static volatile long wirelessOutputPortBufferCapacity = 100_000_000L;
+    /** 物品终端赤能源缓冲容量（一次性费用池，须 ≥ 单笔最大存取费用） */
+    public static volatile long itemTerminalEnergyBuffer = 1_000_000L;
+    /** 物品终端赤能源接入口（单口）自身缓冲容量：多口并联时各口独立蓄能，供终端结算时汇聚抽取 */
+    public static volatile long itemTerminalEnergyPortBufferCapacity = 1_000_000L;
     /** 生命矩阵结构【外接】能量输出口缓冲容量 */
     public static volatile long genEnergyOutputPortBufferCapacity = 100_000_000L;
     /** 聚变能量输出口缓冲容量 */
@@ -558,4 +720,40 @@ public final class ModConfig {
     public static volatile int[] cultivatorPurifyTicks = {0, 0, 0, 0};
     /** 培养机：单次提纯增加的纯度 */
     public static volatile int cultivatorPurifyGain = 10;
+
+    // ==================== 价值分（统一存储库定价内核） ====================
+    /** 最终造价倍率；0 = 用内置默认 10 */
+    public static volatile double valueCostMultiplier = 10.0;
+    /** 原料价值项权重；0 = 用内置默认 0.75 */
+    public static volatile double valueIngredientWeight = 0.75;
+    /** 魔法/功能类物品加成；0 = 用内置默认 40 */
+    public static volatile double valueMagicBonus = 40.0;
+    /** 单项原料价值封顶；0 = 用内置默认 80 */
+    public static volatile double valueIngredientCap = 80.0;
+    /** 不动点迭代遍数；0 = 用内置默认 4 */
+    public static volatile int valueIterations = 4;
+    /** 掉落来源项开关 */
+    public static volatile boolean valueLootEnabled = true;
+    /** 掉落来源项是否自动生效（true 时无配方物品按掉落难度加价） */
+    public static volatile boolean valueLootAutoApply = false;
+    /** 掉落来源项封顶；0 = 用内置默认 60 */
+    public static volatile double valueLootCap = 60.0;
+    /** 流体估值开关 */
+    public static volatile boolean valueFluidEnabled = true;
+    /** 流体每 mB 价值上限；0 = 用内置默认 0.5（即单桶 500） */
+    public static volatile double valueFluidPerMbCap = 0.5;
+    /** 手动指定价值表：id=分值 / 通配符 / #tag=分值（三级优先级） */
+    public static volatile String[] valueOverrides = new String[0];
+    /** 流体价值表：fluidId=每桶分值（支持 * 通配，优先于内置无桶推导与桶装折算） */
+    public static volatile String[] valueFluidValues = new String[0];
+    /** 标签价值表：#tag=分值 */
+    public static volatile String[] valueTagValues = new String[0];
+    /** 品质词加成表：词=分值（对物品 id 词边界匹配，命中多个取最高） */
+    public static volatile String[] valueTierBonus = new String[0];
+    /** 关键词豁免表：id / 通配符（命中则跳过品质词与魔法关键词加成） */
+    public static volatile String[] valueKeywordExclusions = new String[0];
+    /** 掉落来源项黑名单：id / 命名空间 / 通配符 */
+    public static volatile String[] valueLootBlacklist = new String[0];
+    /** 统一存储库：每页行数（1 行 = 9 格）；0 = 用内置默认 6 */
+    public static volatile int unifiedVaultRows = 6;
 }

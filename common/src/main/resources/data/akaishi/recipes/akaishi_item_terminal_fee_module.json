@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "SGS",
+    "ISI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "S": { "item": "akaishi:akaishi_item_terminal_shell" },
+    "G": { "item": "akaishi:gold_dust" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_fee_module", "count": 1 }
+}

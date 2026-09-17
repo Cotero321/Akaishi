@@ -7,9 +7,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -29,18 +32,12 @@ import java.util.Set;
  */
 public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPipeControl {
 
-    /** 方向模式：正常（默认，按设备能力双向判定） */
-    public static final int MODE_NORMAL = 0;
-    /** 方向模式：推（相连设备只作物品汇，管道主动向设备推物品） */
-    public static final int MODE_PUSH = 1;
-    /** 方向模式：拉（相连设备只作物品源，管道主动从设备拉物品） */
-    public static final int MODE_PULL = 2;
+    /** 每面 2 bit 打包的方向模式（bit0-1=DOWN ... bit10-11=EAST），默认全 0 即全正常；
+     *  取值见 {@link AkaishiPipeControl#MODE_NORMAL} / {@code MODE_OUTPUT} / {@code MODE_INPUT} */
+    private int sideModes;
 
     /** 网络规模上限：防止超大网络 BFS 遍历过多节点拖慢主线程（超出则截断，远端设备可能无法接入） */
     private static final int MAX_NETWORK = 1024;
-
-    /** 本段管道方向模式，默认正常 */
-    private int mode = MODE_NORMAL;
 
     /** 被配置器断开的连接面（bit 0-5 对应 Direction.ordinal()），断开后不参与连接与传输 */
     private int disconnectedMask;
@@ -65,24 +62,30 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
         be.tickServer();
     }
 
-    public int getMode() {
-        return mode;
+    @Override
+    public int getSideMode(Direction dir) {
+        return (sideModes >> (dir.ordinal() * 2)) & 3;
     }
 
-    /** 切换方向模式（正常→推→拉循环）并标记保存 */
-    public void setMode(int mode) {
-        if (mode >= MODE_NORMAL && mode <= MODE_PULL) {
-            this.mode = mode;
-            setChanged();
+    /** 设置某面的方向模式（正常/输出/输入），越界回退为正常 */
+    @Override
+    public void setSideMode(Direction dir, int mode) {
+        if (mode < MODE_NORMAL || mode > MODE_INPUT) {
+            mode = MODE_NORMAL;
         }
+        int shift = dir.ordinal() * 2;
+        sideModes = (sideModes & ~(3 << shift)) | (mode << shift);
+        setChanged();
     }
 
     /** 该方向是否被配置器断开连接 */
+    @Override
     public boolean isDisconnected(Direction dir) {
         return (disconnectedMask & (1 << dir.ordinal())) != 0;
     }
 
     /** 切换某方向的连接（断开↔恢复），返回切换后是否处于断开状态 */
+    @Override
     public boolean toggleDisconnected(Direction dir) {
         disconnectedMask ^= (1 << dir.ordinal());
         networkDirty = true; // 连接拓扑变化 → 缓存失效
@@ -221,11 +224,12 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
         Set<BlockPos> visitedDevices = new HashSet<>();
         for (BlockPos pipe : pipes) {
             AkaishiItemPipeBlockEntity pb = level.getBlockEntity(pipe) instanceof AkaishiItemPipeBlockEntity p ? p : null;
-            int pipeMode = pb != null ? pb.getMode() : MODE_NORMAL;
             for (Direction dir : Direction.values()) {
                 if (pb != null && pb.isDisconnected(dir)) {
                     continue;
                 }
+                // 方向类型取自「离开本段朝设备」那一面，逐面独立
+                int sideMode = pb != null ? pb.getSideMode(dir) : MODE_NORMAL;
                 BlockPos nb = pipe.relative(dir);
                 if (!visitedDevices.add(nb)) {
                     continue;
@@ -234,17 +238,20 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
                 if (!AkaishiItemPipeBlock.isPipeAccessible(be)) {
                     continue;
                 }
-                Container device = (Container) be;
+                Container device = resolveContainer(nb, be);
+                if (device == null) {
+                    continue;
+                }
                 int[] inputSlots = inputSlotsOf(device);
                 int[] outputSlots = outputSlotsOf(device);
-                boolean asSource = switch (pipeMode) {
-                    case MODE_PUSH -> false;   // 推：只作汇，不作源
-                    case MODE_PULL -> true;    // 拉：强制作源
+                boolean asSource = switch (sideMode) {
+                    case MODE_OUTPUT -> false;   // 输出：设备只作汇，不作源
+                    case MODE_INPUT -> true;     // 输入：设备强制作源
                     default -> outputSlots.length > 0;
                 };
-                boolean asSink = switch (pipeMode) {
-                    case MODE_PUSH -> true;    // 推：强制作汇
-                    case MODE_PULL -> false;   // 拉：只作源，不作汇
+                boolean asSink = switch (sideMode) {
+                    case MODE_OUTPUT -> true;    // 输出：设备强制作汇
+                    case MODE_INPUT -> false;    // 输入：设备只作源，不作汇
                     default -> inputSlots.length > 0;
                 };
                 DeviceEntry entry = new DeviceEntry(device, inputSlots, outputSlots);
@@ -293,20 +300,45 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
         }
     }
 
-    /** 从单个源设备抽取并配送物品，返回剩余传输额度 */
+    /**
+     * 从单个源设备抽取并配送物品，返回剩余传输额度。
+     * 直连语义：先以 simulate 探测各汇合计可接收量，确认能接收后才真实抽取，再直接插入汇；
+     * 全程不经管道自身存储，汇全满时不动源，物品不会丢失或销毁。
+     */
     private long transferFromSource(DeviceEntry source, List<DeviceEntry> sinks, long remainingRate) {
         for (int slot : source.outputSlots) {
             if (remainingRate <= 0) {
                 break;
             }
-            int amount = (int) Math.min(remainingRate, 64);
-            ItemStack stack = extractFromSlots(source.device, new int[]{slot}, amount, false);
+            ItemStack peek = source.device.getItem(slot);
+            if (peek.isEmpty()) {
+                continue;
+            }
+            int amount = (int) Math.min(remainingRate, Math.min(64, peek.getCount()));
+            // 模拟探测：按与真实插入一致的顺序试放，得出各汇合计可接收量
+            ItemStack probe = peek.copy();
+            probe.setCount(amount);
+            for (DeviceEntry sink : sinks) {
+                if (probe.isEmpty()) {
+                    break;
+                }
+                if (sink.device() == source.device()) {
+                    continue;
+                }
+                probe = insertIntoSlots(sink.device(), sink.inputSlots(), probe, true);
+            }
+            int accepted = amount - probe.getCount();
+            if (accepted <= 0) {
+                continue; // 无汇可接收：跳过，不动源
+            }
+            // 模拟成功 → 从源真实抽取，再对目标真实插入（期间汇状态未变，落点与模拟一致）
+            ItemStack stack = extractFromSlots(source.device, new int[]{slot}, accepted, false);
             if (stack.isEmpty()) {
                 continue;
             }
             ItemStack left = insertToSinks(source, stack, sinks);
             if (!left.isEmpty()) {
-                // 汇都放不下时退回源（放回输出槽，保持物品不丢失）
+                // 极端情况下汇少收（设备实现异常）：退回源输出槽，保持物品不丢失
                 insertIntoSlots(source.device, source.outputSlots, left, false);
             }
             remainingRate -= (stack.getCount() - left.getCount());
@@ -343,6 +375,24 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
     }
 
     // ===== 设备槽位适配与物品搬运工具 =====
+
+    /**
+     * 取邻居设备的可物流容器视图。
+     * 箱子（含陷阱箱）改由原版合并接口获取：大箱子是两个方块共用一个 54 格组合容器，
+     * 而单个箱子的方块实体只有 27 格，直接取方块实体必然漏掉另一半（大箱子只识别一半的根因）。
+     * allowBlocked=true 与漏斗一致，忽略"上方遮挡/猫坐"对自动化的限制。
+     */
+    @Nullable
+    private Container resolveContainer(BlockPos pos, BlockEntity be) {
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof ChestBlock chest) {
+            Container combined = ChestBlock.getContainer(chest, state, level, pos, true);
+            if (combined != null) {
+                return combined;
+            }
+        }
+        return be instanceof Container container ? container : null;
+    }
 
     /** 设备的输入槽：IItemPipeDevice 按声明，普通容器全槽 */
     private static int[] inputSlotsOf(Container device) {
@@ -422,20 +472,31 @@ public class AkaishiItemPipeBlockEntity extends BlockEntity implements AkaishiPi
         return remaining;
     }
 
+    /**
+     * 方向类型/断开位只存于方块实体，服务端切换后必须随方块更新下发；
+     * 默认实现返回 null / 空 tag，会导致客户端 getSideMode 恒为「正常」、标识渲染不触发。
+     */
+    @Override
+    public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
+        return this.saveWithoutMetadata();
+    }
+
     @Override
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("Mode", mode);
+        tag.putInt("SideModes", sideModes);
         tag.putInt("Disconnected", disconnectedMask);
     }
 
     @Override
     public void load(net.minecraft.nbt.CompoundTag tag) {
         super.load(tag);
-        mode = tag.getInt("Mode");
-        if (mode < MODE_NORMAL || mode > MODE_PULL) {
-            mode = MODE_NORMAL;
-        }
+        sideModes = tag.getInt("SideModes");
         disconnectedMask = tag.getInt("Disconnected");
     }
 }

@@ -6,6 +6,7 @@ import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiEnergyBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
@@ -17,6 +18,7 @@ import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.decay.DecayZoneManager;
 import com.example.akaishi.decay.DecayZoneSync;
 import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.ScreenFlashS2C;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.entity.ModEntities;
 import com.example.akaishi.item.AkaishiBannerPatterns;
@@ -30,10 +32,12 @@ import com.example.akaishi.menu.AkaishiPotionSync;
 import com.example.akaishi.menu.AkaishiTraitReforgerSync;
 import com.example.akaishi.menu.AkaishiGeneManagerSync;
 import com.example.akaishi.menu.AkaishiOrganVaultSync;
+import com.example.akaishi.menu.AkaishiItemTerminalSync;
 import com.example.akaishi.menu.ModMenus;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.value.AkaishiValueService;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
@@ -66,6 +70,8 @@ public final class AkaishiMod {
         AkaishiReactorBlocks.register();
         AkaishiLifeBlocks.register();
         AkaishiMatrixBlocks.register();
+        // 物品终端域：须先于 ModBlockEntities.register() 注册（BE 类型绑定其方块引用）
+        AkaishiItemTerminalBlocks.register();
         ModBlockEntities.register();
         // 实体类型：能量弹等（不依赖方块，随注册表事件求值）
         ModEntities.register();
@@ -86,6 +92,10 @@ public final class AkaishiMod {
             DecayZoneSync.registerClient();
             // 服务端权威配置值同步（登录/热重载时由 forge 层推送）
             ConfigSyncS2C.registerClient();
+            // 屏幕泛红表现（侵蚀跑满 / 吸取被吸，D100/D180）
+            ScreenFlashS2C.registerClient();
+            // 物品终端库页条目快照（S2C 接收器，仅客户端注册）
+            AkaishiItemTerminalSync.registerClient();
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();
@@ -103,6 +113,10 @@ public final class AkaishiMod {
         com.example.akaishi.menu.MechanicalSelectSync.register();
         // 机械三机单次制作请求包（C2S 接收器）
         com.example.akaishi.menu.MechanicalCraftSync.register();
+        // 物品终端库页交互包（C2S 接收器：AE2 网格双向的点击动作）
+        AkaishiItemTerminalSync.register();
+        // 价值分服务：统一存储库排序/统计/筛选与查询指令共用的底层（纯计算，不参与经济兑换）
+        AkaishiValueService.install();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
         ModSounds.touch();
     }

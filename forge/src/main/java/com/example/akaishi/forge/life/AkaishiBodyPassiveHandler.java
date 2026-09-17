@@ -677,8 +677,9 @@ public final class AkaishiBodyPassiveHandler {
                 factor *= AkaishiLifeFusionSet.REJECTION_SLOW_FACTOR;
             }
             // 增长间隔 ≥300t：即使极端低适配也不低于 15s/点，保留梯度同时封住爆炸增速
+            // 乱码器官（禁忌饰品侵蚀产物）排异冻结：既不涨也不降，保留既有读数（D8/D128）
             int interval = (int) Math.max(ModConfig.growthIntervalMinTicks, tier.getGrowthIntervalSeconds() * 20.0 / factor);
-            if (player.tickCount % interval == 0) {
+            if (player.tickCount % interval == 0 && !AkaishiOrganItem.isCorrupted(organ)) {
                 state.addRejection(slot, 1);
             }
         }

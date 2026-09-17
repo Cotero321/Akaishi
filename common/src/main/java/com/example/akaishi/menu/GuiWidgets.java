@@ -1,8 +1,17 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.AkaishiMod;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.datafixers.util.Pair;
+import org.joml.Matrix4f;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 
 /**
  * 界面自绘控件工具：统一槽位框/按钮的绘制样式，供各 Screen 复用。
@@ -10,14 +19,79 @@ import net.minecraft.network.chat.Component;
  */
 public final class GuiWidgets {
 
+    /** 原版容器贴图：其 (7,83) 处即标准 18×18 槽位图案（暗边 373737 / 体色 8B8B8B / 亮边 FFFFFF，全不透明） */
+    private static final ResourceLocation VANILLA_SLOT_TEXTURE =
+            new ResourceLocation("minecraft", "textures/gui/container/inventory.png");
+    private static final int VANILLA_SLOT_U = 7;
+    private static final int VANILLA_SLOT_V = 83;
+
     private static final int COLOR_SLOT = 0xFF8B8B8B;
     private static final int COLOR_SLOT_DARK = 0xFF373737;
     private static final int COLOR_SLOT_LIGHT = 0xFFFFFFFF;
     private static final int COLOR_PANEL = 0xFFC6C6C6;
+    /** 输入框底槽：中深灰（与滚动条把柄同调），白字落上去对比足；不是纯黑，不会在浅色面板上跳出来 */
+    private static final int COLOR_INPUT = 0xFF6E6E6E;
     private static final int COLOR_PROGRESS = 0xFFFFD030;
+    /**
+     * 「空图标」：槽位在原版渲染那一趟被伪装成空槽后（见各 Menu 的 {@code vanillaRenderPass}），
+     * 原版会走 {@code getNoItemIcon} 分支画这张图 —— 全透明 ⇒ 屏幕上什么都不画。
+     * <p>
+     * 所以物品图标与数量全部由界面自绘（见各 Screen 的 {@code drawGrid}）。
+     * <b>注意</b>：1.20.1 的 {@code AbstractContainerScreen#renderSlot} 只在槽里没有物品时才走该分支，
+     * 槽有物品时原版一定会 {@code renderItem}，光靠它是挡不住的。
+     */
+    public static final Pair<ResourceLocation, ResourceLocation> BLANK_SLOT_ICON =
+            Pair.of(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(AkaishiMod.MOD_ID, "item/blank"));
+
+    /**
+     * 槽位数量标签：显示按类聚合后的<b>真实总量</b>（可远超单堆上限 64，按 K/M 缩写）。
+     * <p>
+     * 取自 AE2 1.20.1 {@code StackSizeRenderer} 的<b>默认档</b>：{@code scaleFactor = 0.5f}、
+     * {@code offset = -1}，z 抬 200 后用 {@code MultiBufferSource.immediate} + {@code endBatch} 立即出图。
+     * 调用前调用方必须已 {@code gui.flush()}：原版 GUI 与即时缓冲共用 {@code Tesselator} 的同一个
+     * {@code BufferBuilder}，不先刷会丢掉界面待画几何。
+     * <p>
+     * 与 AE2 的两点差异都是实测踩出来的：
+     * <ul>
+     *   <li><b>必须关深度测试</b>：AE2 的 z=200 能压住物品，是因为它的数量文字与物品在同一 pose/深度
+     *       上下文里画；本项目这趟在槽位渲染之外，z 不在同一空间，开着深度测试会被物品整片剔掉；</li>
+     *   <li><b>四向薄描边</b>代替原版阴影：0.5 档字形只有 3~4 逻辑像素高，原版阴影只偏半个逻辑像素，
+     *       压在浅色贴图（铁块 / 创造元件）与槽位白描边上白字会直接"消失"。
+     *       描边偏移 ±1（缩放空间单位 = 0.5 逻辑像素 = 半个笔画宽）：只吃半个笔画、留出白芯，
+     *       不会像早期 ±2（整条笔画宽）那样把字糊成黑点。</li>
+     * </ul>
+     */
+    public static void amountLabel(GuiGraphics gui, Font font, int slotX, int slotY, String text) {
+        final float scale = 0.5f;
+        final float inverse = 1.0f / scale;
+        final int offset = -1;
+        int x = (int) ((slotX + offset + 16.0f - font.width(text) * scale) * inverse);
+        int y = (int) ((slotY + offset + 16.0f - 7.0f * scale) * inverse);
+        gui.pose().pushPose();
+        gui.pose().translate(0.0f, 0.0f, 200.0f);
+        gui.pose().scale(scale, scale, scale);
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+        MultiBufferSource.BufferSource buffer =
+                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        Matrix4f matrix = gui.pose().last().pose();
+        for (int[] d : LABEL_OUTLINE) {
+            font.drawInBatch(text, x + d[0], y + d[1], 0xFF000000, false, matrix, buffer,
+                    Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        }
+        font.drawInBatch(text, x, y, 0xFFFFFF, false, matrix, buffer,
+                Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        buffer.endBatch();
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        gui.pose().popPose();
+    }
 
     private GuiWidgets() {
     }
+
+    /** 数量标签薄描边偏移（缩放空间单位，1 单位 ≈ 一个笔画宽）：上、下、左、右 */
+    private static final int[][] LABEL_OUTLINE = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
     /** 绘制不透明原版风格背景面板（灰底 + 四周内凹边框），解决无贴图界面的透明背景问题 */
     public static void panel(GuiGraphics gui, int x, int y, int w, int h) {
@@ -51,13 +125,21 @@ public final class GuiWidgets {
         }
     }
 
-    /** 绘制 18×18 原版风格槽位框（灰体内凹：上左暗边、下右亮边） */
+    /**
+     * 绘制 18×18 原版槽位框。传入坐标为 Menu 槽位的 {@code (slot.x, slot.y)}（即 16×16 物品区左上角），
+     * 原版槽框固定在 {@code (slot.x-1, slot.y-1)} —— 直接引用原版贴图图案，保证像素级与原版一致。
+     */
     public static void slotBox(GuiGraphics gui, int x, int y) {
-        gui.fill(x, y, x + 18, y + 18, COLOR_SLOT);
-        gui.fill(x, y, x + 18, y + 1, COLOR_SLOT_DARK);
-        gui.fill(x, y, x + 1, y + 18, COLOR_SLOT_DARK);
-        gui.fill(x, y + 17, x + 18, y + 18, COLOR_SLOT_LIGHT);
-        gui.fill(x + 17, y, x + 18, y + 18, COLOR_SLOT_LIGHT);
+        gui.blit(VANILLA_SLOT_TEXTURE, x - 1, y - 1, VANILLA_SLOT_U, VANILLA_SLOT_V, 18, 18);
+    }
+
+    /** 绘制输入框底槽（浅色内凹）：与面板同族配色，供文字为深色的输入框使用 */
+    public static void inputWell(GuiGraphics gui, int x, int y, int w, int h) {
+        gui.fill(x, y, x + w, y + h, COLOR_INPUT);
+        gui.fill(x, y, x + w, y + 1, COLOR_SLOT_DARK);
+        gui.fill(x, y, x + 1, y + h, COLOR_SLOT_DARK);
+        gui.fill(x, y + h - 1, x + w, y + h, COLOR_SLOT_LIGHT);
+        gui.fill(x + w - 1, y, x + w, y + h, COLOR_SLOT_LIGHT);
     }
 
     /** 绘制原版风格轨道框（能量/液体/进度条底槽，内凹样式） */

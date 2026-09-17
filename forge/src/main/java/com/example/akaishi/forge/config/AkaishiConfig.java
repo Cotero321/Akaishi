@@ -29,7 +29,6 @@ public final class AkaishiConfig {
 
     // ==================== 液体管道 ====================
     public static final ForgeConfigSpec.IntValue FLUID_PIPE_RATE;
-    public static final ForgeConfigSpec.IntValue FLUID_PIPE_BUFFER_CAPACITY;
 
     // ==================== 废品口 ====================
     public static final ForgeConfigSpec.IntValue WASTE_PORT_BUFFER_CAPACITY;
@@ -248,6 +247,93 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.BooleanValue CURIO_SLOT_UNLOCK_REQUIRED;
     public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> CURIO_SLOT_UNLOCK_THRESHOLDS;
 
+    // ---- 禁断四件 · 1 生命之触 ----
+    public static final ForgeConfigSpec.BooleanValue LIFE_TOUCH_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_REACH_BONUS;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_DOUBLE_STRIKE_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_SELF_HURT_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_SELF_HURT_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_HUNGER_COST_CHANCE;
+    public static final ForgeConfigSpec.IntValue LIFE_TOUCH_HUNGER_COST_AMOUNT;
+    public static final ForgeConfigSpec.DoubleValue LIFE_TOUCH_HUNGER_RESTORE_CHANCE;
+    public static final ForgeConfigSpec.IntValue LIFE_TOUCH_HUNGER_RESTORE_AMOUNT;
+    public static final ForgeConfigSpec.IntValue LIFE_TOUCH_HIT_CACHE_TICKS;
+
+    // ---- 禁断四件 · 2 幼崽之心 ----
+    public static final ForgeConfigSpec.BooleanValue CUB_HEART_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_ABSORPTION_RATIO;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_EFFECT_INTERVAL;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_SLOW_HASTE_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_SLOW_HASTE_AMPLITUDE;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_SLOW_HASTE_TICKS;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_DAMAGE_SHIFT_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_DAMAGE_SHIFT_AMOUNT;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_DAMAGE_SHIFT_TICKS;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_UNNAMEABLE_CHANCE;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_UNNAMEABLE_AMPLIFIER;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_UNNAMEABLE_TICKS;
+    public static final ForgeConfigSpec.DoubleValue CUB_HEART_EXCITEMENT_ATTACK_SPEED;
+    public static final ForgeConfigSpec.IntValue CUB_HEART_EXCITEMENT_TICKS;
+
+    // ---- 禁断四件 · 3 母神之印 ----
+    public static final ForgeConfigSpec.BooleanValue MOTHER_SEAL_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue MOTHER_SEAL_DAMAGE_BONUS;
+    public static final ForgeConfigSpec.DoubleValue MOTHER_SEAL_HEALTH_BONUS;
+    public static final ForgeConfigSpec.DoubleValue MOTHER_SEAL_SPEED_BONUS;
+    public static final ForgeConfigSpec.DoubleValue MOTHER_SEAL_ATTACK_SPEED_BONUS;
+    public static final ForgeConfigSpec.IntValue MOTHER_SEAL_SELF_UNNAMEABLE_PERIOD;
+    public static final ForgeConfigSpec.IntValue MOTHER_SEAL_SELF_UNNAMEABLE_TICKS;
+    public static final ForgeConfigSpec.IntValue MOTHER_SEAL_SELF_UNNAMEABLE_AMPLIFIER;
+    public static final ForgeConfigSpec.IntValue MOTHER_SEAL_VEGETARIAN_HUNGER_COST;
+    public static final ForgeConfigSpec.IntValue MOTHER_SEAL_VEGETARIAN_NAUSEA_TICKS;
+    public static final ForgeConfigSpec.DoubleValue MOTHER_SEAL_RESIST_FACTOR;
+
+    // ---- 禁断四件 · 4 孕育之环 ----
+    public static final ForgeConfigSpec.BooleanValue FERTILITY_RING_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue FERTILITY_RING_HEAL_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue FERTILITY_RING_HEAL_AMOUNT;
+    public static final ForgeConfigSpec.IntValue FERTILITY_RING_HEAL_HUNGER_COST;
+    public static final ForgeConfigSpec.DoubleValue FERTILITY_RING_ATTACK_SPEED_BONUS;
+    public static final ForgeConfigSpec.IntValue FERTILITY_RING_ATTACK_SPEED_TICKS;
+    public static final ForgeConfigSpec.DoubleValue FERTILITY_RING_MEAT_HEAL_AMOUNT;
+    public static final ForgeConfigSpec.BooleanValue FERTILITY_RING_SATIATED_MEAT_ONLY;
+    public static final ForgeConfigSpec.DoubleValue FERTILITY_RING_STARVE_MULTIPLIER;
+    public static final ForgeConfigSpec.BooleanValue FERTILITY_RING_STARVE_LETHAL;
+
+    // ---- 禁断四件 · 5 套装 ----
+    public static final ForgeConfigSpec.IntValue SET_ATTACK_COUNT_REQUIRED;
+    public static final ForgeConfigSpec.IntValue SET_ATTACK_COUNT_HUNGER_RESTORE;
+    public static final ForgeConfigSpec.IntValue SET_UNNAMEABLE_LEVEL_BONUS;
+    public static final ForgeConfigSpec.BooleanValue SET_SUPPRESS_DISTORTION;
+    public static final ForgeConfigSpec.DoubleValue SET_DAMAGE_REDUCTION;
+    public static final ForgeConfigSpec.DoubleValue SET_UNNAMEABLE_CRIT_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue SET_UNNAMEABLE_CRIT_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue SET_NEAR_DEATH_HEAL_PERCENT;
+    public static final ForgeConfigSpec.IntValue SET_NEAR_DEATH_UNNAMEABLE_TICKS;
+    public static final ForgeConfigSpec.IntValue SET_NEAR_DEATH_COOLDOWN_TICKS;
+
+    // ---- 禁断四件 · 6 侵蚀 ----
+    public static final ForgeConfigSpec.BooleanValue EROSION_ENABLED;
+    public static final ForgeConfigSpec.IntValue EROSION_DURATION_MINUTES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> EROSION_NOTICE_THRESHOLDS;
+    public static final ForgeConfigSpec.IntValue EROSION_NOTICE_INTERVAL_MINUTES;
+    public static final ForgeConfigSpec.DoubleValue EROSION_STAT_REROLL_PERCENT;
+    public static final ForgeConfigSpec.IntValue EROSION_NBT_FLUSH_TICKS;
+    public static final ForgeConfigSpec.BooleanValue EROSION_SCREEN_FLASH_ENABLED;
+
+    // ---- 禁断四件 · 7 仪式与吸取 ----
+    public static final ForgeConfigSpec.BooleanValue ALTAR_DRAIN_ENABLED;
+    public static final ForgeConfigSpec.IntValue ALTAR_DRAIN_RADIUS;
+    public static final ForgeConfigSpec.IntValue ALTAR_DRAIN_INTERVAL_TICKS;
+    public static final ForgeConfigSpec.DoubleValue ALTAR_DRAIN_HEALTH_PERCENT;
+    public static final ForgeConfigSpec.LongValue ALTAR_DRAIN_ENERGY_PER_HP;
+    public static final ForgeConfigSpec.IntValue ALTAR_DRAIN_MAX_TARGETS;
+    public static final ForgeConfigSpec.LongValue ALTAR_DRAIN_MAX_ENERGY_PER_TARGET;
+    public static final ForgeConfigSpec.BooleanValue ALTAR_DRAIN_EXEMPT_CREATIVE;
+    public static final ForgeConfigSpec.IntValue ALTAR_NEW_RECIPE_TIER_REQUIRED;
+    public static final ForgeConfigSpec.LongValue ALTAR_NEW_RECIPE_PROGRESS_MAX;
+    public static final ForgeConfigSpec.LongValue ALTAR_LEGACY_PROGRESS_MAX;
+
     // ---- 生命研究机器 ----
     public static final ForgeConfigSpec.LongValue GENE_ANALYZER_LIFE_COST;
     public static final ForgeConfigSpec.LongValue GENE_ANALYZER_LIFE_CAPACITY;
@@ -344,6 +430,8 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.LongValue REACTOR_ENERGY_OUTPUT_BUFFER;
     public static final ForgeConfigSpec.LongValue LIFE_ENERGY_CELL_SERIALIZER_CAPACITY;
     public static final ForgeConfigSpec.LongValue PLASMA_TANK_CAPACITY;
+    public static final ForgeConfigSpec.LongValue ITEM_TERMINAL_ENERGY_BUFFER;
+    public static final ForgeConfigSpec.LongValue ITEM_TERMINAL_ENERGY_PORT_BUFFER;
 
     // ---- 培养机提纯与分馏机 ----
     public static final ForgeConfigSpec.LongValue CULTIVATOR_LIFE_CAPACITY;
@@ -355,6 +443,25 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.LongValue FRACTIONATOR_ENERGY_CAPACITY;
     public static final ForgeConfigSpec.LongValue FRACTIONATOR_COST_PER_CRAFT;
     public static final ForgeConfigSpec.IntValue FRACTIONATOR_PROCESS_TICKS;
+
+    // ---- 价值分（统一存储库定价内核） ----
+    public static final ForgeConfigSpec.DoubleValue VALUE_COST_MULTIPLIER;
+    public static final ForgeConfigSpec.DoubleValue VALUE_INGREDIENT_WEIGHT;
+    public static final ForgeConfigSpec.DoubleValue VALUE_MAGIC_BONUS;
+    public static final ForgeConfigSpec.DoubleValue VALUE_INGREDIENT_CAP;
+    public static final ForgeConfigSpec.IntValue VALUE_ITERATIONS;
+    public static final ForgeConfigSpec.BooleanValue VALUE_LOOT_ENABLED;
+    public static final ForgeConfigSpec.BooleanValue VALUE_LOOT_AUTO_APPLY;
+    public static final ForgeConfigSpec.DoubleValue VALUE_LOOT_CAP;
+    public static final ForgeConfigSpec.BooleanValue VALUE_FLUID_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue VALUE_FLUID_PER_MB_CAP;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_OVERRIDES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_FLUID_VALUES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_TAG_VALUES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_TIER_BONUS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_KEYWORD_EXCLUSIONS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VALUE_LOOT_BLACKLIST;
+    public static final ForgeConfigSpec.IntValue UNIFIED_VAULT_ROWS;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -389,8 +496,6 @@ public final class AkaishiConfig {
         b.push("fluid_pipe");
         FLUID_PIPE_RATE = b.comment("Max transfer per pipe segment per tick (mb)")
                 .defineInRange("rate", 4000, 1, Integer.MAX_VALUE);
-        FLUID_PIPE_BUFFER_CAPACITY = b.comment("Pipe segment buffer capacity (mb)")
-                .defineInRange("bufferCapacity", 8000, 1, Integer.MAX_VALUE);
         b.pop();
 
         b.push("waste_port");
@@ -762,9 +867,189 @@ public final class AkaishiConfig {
         b.push("curio_slots");
         CURIO_SLOT_UNLOCK_REQUIRED = b.comment("赤石饰品扩展槽是否需要进度解锁（false = 四个扩展槽始终开启）")
                 .define("unlockRequired", true);
-        CURIO_SLOT_UNLOCK_THRESHOLDS = b.comment("四个扩展槽各自所需的赤石进度节点数 [槽1, 槽2, 槽3, 槽4]；0 = 该槽无条件开启")
-                .defineList("unlockThresholds", List.of(1, 2, 3, 4),
+        CURIO_SLOT_UNLOCK_THRESHOLDS = b.comment("四个扩展槽各自所需的赤石进度节点数 [槽1, 槽2, 槽3, 槽4]；0 = 该槽无条件开启（默认全 0，四个槽登录即全开）")
+                .defineList("unlockThresholds", List.of(0, 0, 0, 0),
                         (Object o) -> o instanceof Number n && n.intValue() >= 0);
+        b.pop();
+
+        // ==================== 禁断四件 ====================
+        b.push("curio");
+
+        // ---- 1 生命之触 ----
+        b.push("lifeTouch");
+        LIFE_TOUCH_ENABLED = b.comment("生命之触：是否生效")
+                .define("enabled", true);
+        LIFE_TOUCH_REACH_BONUS = b.comment("生命之触：实体与方块交互距离加成（格）")
+                .defineInRange("reachBonus", 2.0, 0.0, 8.0);
+        LIFE_TOUCH_DOUBLE_STRIKE_CHANCE = b.comment("生命之触：连打（复刻上一击伤害）概率")
+                .defineInRange("doubleStrikeChance", 0.25, 0.0, 1.0);
+        LIFE_TOUCH_SELF_HURT_CHANCE = b.comment("生命之触：命中后自身受真实伤害概率")
+                .defineInRange("selfHurtChance", 0.1, 0.0, 1.0);
+        LIFE_TOUCH_SELF_HURT_DAMAGE = b.comment("生命之触：自身真实伤害点数（无视护甲，可致死）")
+                .defineInRange("selfHurtDamage", 1.0, 0.0, 20.0);
+        LIFE_TOUCH_HUNGER_COST_CHANCE = b.comment("生命之触：命中后扣饱食概率")
+                .defineInRange("hungerCostChance", 0.2, 0.0, 1.0);
+        LIFE_TOUCH_HUNGER_COST_AMOUNT = b.comment("生命之触：命中后扣饱食格数")
+                .defineInRange("hungerCostAmount", 1, 0, 20);
+        LIFE_TOUCH_HUNGER_RESTORE_CHANCE = b.comment("生命之触：命中后回饱食概率")
+                .defineInRange("hungerRestoreChance", 0.3333, 0.0, 1.0);
+        LIFE_TOUCH_HUNGER_RESTORE_AMOUNT = b.comment("生命之触：命中后回饱食格数")
+                .defineInRange("hungerRestoreAmount", 1, 0, 20);
+        LIFE_TOUCH_HIT_CACHE_TICKS = b.comment("生命之触：「上一击伤害」缓存时效 (tick)，超时后连打不再复刻")
+                .defineInRange("hitCacheTicks", 100, 0, 1200);
+        b.pop();
+
+        // ---- 2 幼崽之心 ----
+        b.push("cubHeart");
+        CUB_HEART_ENABLED = b.comment("幼崽之心：是否生效")
+                .define("enabled", true);
+        CUB_HEART_ABSORPTION_RATIO = b.comment("幼崽之心：造成伤害转吸收（黄心）比例，累加不封顶")
+                .defineInRange("absorptionRatio", 0.1, 0.0, 1.0);
+        CUB_HEART_EFFECT_INTERVAL = b.comment("幼崽之心：效果刷新节流 (tick)，期间重复命中不重复结算")
+                .defineInRange("effectInterval", 20, 1, 200);
+        CUB_HEART_SLOW_HASTE_CHANCE = b.comment("幼崽之心：减速对方 / 加速自身 概率")
+                .defineInRange("slowHasteChance", 0.1, 0.0, 1.0);
+        CUB_HEART_SLOW_HASTE_AMPLITUDE = b.comment("幼崽之心：移速变动幅度（0.10 = 10%）")
+                .defineInRange("slowHasteAmplitude", 0.10, 0.0, 1.0);
+        CUB_HEART_SLOW_HASTE_TICKS = b.comment("幼崽之心：移速变动持续 (tick)，命中时只刷新时长")
+                .defineInRange("slowHasteTicks", 600, 0, 600);
+        CUB_HEART_DAMAGE_SHIFT_CHANCE = b.comment("幼崽之心：自身加伤 / 对方减伤 概率")
+                .defineInRange("damageShiftChance", 0.05, 0.0, 1.0);
+        CUB_HEART_DAMAGE_SHIFT_AMOUNT = b.comment("幼崽之心：伤害变动点数")
+                .defineInRange("damageShiftAmount", 1.0, 0.0, 20.0);
+        CUB_HEART_DAMAGE_SHIFT_TICKS = b.comment("幼崽之心：伤害变动持续 (tick)")
+                .defineInRange("damageShiftTicks", 600, 0, 600);
+        CUB_HEART_UNNAMEABLE_CHANCE = b.comment("幼崽之心：触发效果时自施不可名状概率")
+                .defineInRange("unnameableChance", 0.1, 0.0, 1.0);
+        CUB_HEART_UNNAMEABLE_AMPLIFIER = b.comment("幼崽之心：自施不可名状等级（1 = II 级）")
+                .defineInRange("unnameableAmplifier", 1, 0, 4);
+        CUB_HEART_UNNAMEABLE_TICKS = b.comment("幼崽之心：自施不可名状持续 (tick)")
+                .defineInRange("unnameableTicks", 400, 0, 6000);
+        CUB_HEART_EXCITEMENT_ATTACK_SPEED = b.comment("幼崽之心：「亢奋」攻速加成（0.20 = 20%）")
+                .defineInRange("excitementAttackSpeed", 0.20, 0.0, 1.0);
+        CUB_HEART_EXCITEMENT_TICKS = b.comment("幼崽之心：「亢奋」持续 (tick)，每次有效命中刷新")
+                .defineInRange("excitementTicks", 100, 0, 600);
+        b.pop();
+
+        // ---- 3 母神之印 ----
+        b.push("motherSeal");
+        MOTHER_SEAL_ENABLED = b.comment("母神之印：是否生效")
+                .define("enabled", true);
+        MOTHER_SEAL_DAMAGE_BONUS = b.comment("母神之印：不可名状 I 级的伤害加成（II 级 ×1.5，III 级及以上 ×2.0）")
+                .defineInRange("damageBonus", 2.0, 0.0, 20.0);
+        MOTHER_SEAL_HEALTH_BONUS = b.comment("母神之印：不可名状 I 级的最大生命加成")
+                .defineInRange("healthBonus", 4.0, 0.0, 40.0);
+        MOTHER_SEAL_SPEED_BONUS = b.comment("母神之印：不可名状 I 级的移速加成（0.10 = 10%）")
+                .defineInRange("speedBonus", 0.10, 0.0, 1.0);
+        MOTHER_SEAL_ATTACK_SPEED_BONUS = b.comment("母神之印：不可名状 I 级的攻速加成（0.10 = 10%）")
+                .defineInRange("attackSpeedBonus", 0.10, 0.0, 1.0);
+        MOTHER_SEAL_SELF_UNNAMEABLE_PERIOD = b.comment("母神之印：自施不可名状周期 (tick)，0 = 关闭自施")
+                .defineInRange("selfUnnameablePeriod", 1200, 0, 24000);
+        MOTHER_SEAL_SELF_UNNAMEABLE_TICKS = b.comment("母神之印：自施不可名状持续 (tick)")
+                .defineInRange("selfUnnameableTicks", 200, 0, 6000);
+        MOTHER_SEAL_SELF_UNNAMEABLE_AMPLIFIER = b.comment("母神之印：自施不可名状等级（1 = II 级）")
+                .defineInRange("selfUnnameableAmplifier", 1, 0, 4);
+        MOTHER_SEAL_VEGETARIAN_HUNGER_COST = b.comment("母神之印：吃素食倒扣饱食格数")
+                .defineInRange("vegetarianHungerCost", 1, 0, 20);
+        MOTHER_SEAL_VEGETARIAN_NAUSEA_TICKS = b.comment("母神之印：吃素食恶心时长 (tick)")
+                .defineInRange("vegetarianNauseaTicks", 100, 0, 1200);
+        MOTHER_SEAL_RESIST_FACTOR = b.comment("母神之印：毒 / 火 / 凋零 / 爆炸伤害倍率（0.5 = 减半）")
+                .defineInRange("resistFactor", 0.5, 0.0, 1.0);
+        b.pop();
+
+        // ---- 4 孕育之环 ----
+        b.push("fertilityRing");
+        FERTILITY_RING_ENABLED = b.comment("孕育之环：是否生效")
+                .define("enabled", true);
+        FERTILITY_RING_HEAL_CHANCE = b.comment("孕育之环：受伤回血概率")
+                .defineInRange("healChance", 0.2, 0.0, 1.0);
+        FERTILITY_RING_HEAL_AMOUNT = b.comment("孕育之环：受伤回血点数")
+                .defineInRange("healAmount", 2.0, 0.0, 20.0);
+        FERTILITY_RING_HEAL_HUNGER_COST = b.comment("孕育之环：回血同时扣饱食格数")
+                .defineInRange("healHungerCost", 1, 0, 20);
+        FERTILITY_RING_ATTACK_SPEED_BONUS = b.comment("孕育之环：触发后攻速加成（0.20 = 20%）")
+                .defineInRange("attackSpeedBonus", 0.20, 0.0, 1.0);
+        FERTILITY_RING_ATTACK_SPEED_TICKS = b.comment("孕育之环：攻速加成持续 (tick)")
+                .defineInRange("attackSpeedTicks", 100, 0, 600);
+        FERTILITY_RING_MEAT_HEAL_AMOUNT = b.comment("孕育之环：吃肉回血点数")
+                .defineInRange("meatHealAmount", 3.0, 0.0, 20.0);
+        FERTILITY_RING_SATIATED_MEAT_ONLY = b.comment("孕育之环：满饱食时仅允许进食肉类")
+                .define("satiatedMeatOnly", true);
+        FERTILITY_RING_STARVE_MULTIPLIER = b.comment("孕育之环：饥饿伤害倍率（最终伤害 = 原值 × 倍率）")
+                .defineInRange("starveMultiplier", 3.0, 1.0, 20.0);
+        FERTILITY_RING_STARVE_LETHAL = b.comment("孕育之环：饥饿伤害可致死（false = 最低留 1 点血）")
+                .define("starveLethal", true);
+        b.pop();
+
+        // ---- 5 套装 ----
+        b.push("set");
+        SET_ATTACK_COUNT_REQUIRED = b.comment("套装：触发回饱食所需的有效攻击次数（持久化，不掉线衰减）")
+                .defineInRange("attackCountRequired", 10, 1, 100);
+        SET_ATTACK_COUNT_HUNGER_RESTORE = b.comment("套装：达标后回饱食格数")
+                .defineInRange("attackCountHungerRestore", 1, 0, 20);
+        SET_UNNAMEABLE_LEVEL_BONUS = b.comment("套装：不可名状等级加成（对所有施加来源统一生效）")
+                .defineInRange("unnameableLevelBonus", 1, 0, 4);
+        SET_SUPPRESS_DISTORTION = b.comment("套装：屏蔽不可名状的视野扭曲表现")
+                .define("suppressDistortion", true);
+        SET_DAMAGE_REDUCTION = b.comment("套装：受到的伤害减免（0.30 = 30%，与四类减半叠乘）")
+                .defineInRange("damageReduction", 0.30, 0.0, 1.0);
+        SET_UNNAMEABLE_CRIT_CHANCE = b.comment("套装：持不可名状时的暴击率加成（0.20 = +20%）")
+                .defineInRange("unnameableCritChance", 0.20, 0.0, 1.0);
+        SET_UNNAMEABLE_CRIT_DAMAGE = b.comment("套装：持不可名状时的暴击伤害加成（0.30 = 暴击倍率 +0.3）")
+                .defineInRange("unnameableCritDamage", 0.30, 0.0, 100.0);
+        SET_NEAR_DEATH_HEAL_PERCENT = b.comment("套装：濒死免死时恢复的最大生命占比（0.60 = 60%）")
+                .defineInRange("nearDeathHealPercent", 0.60, 0.0, 1.0);
+        SET_NEAR_DEATH_UNNAMEABLE_TICKS = b.comment("套装：濒死免死时获得的不可名状时长（tick，600 = 30 秒）")
+                .defineInRange("nearDeathUnnameableTicks", 600, 0, 72000);
+        SET_NEAR_DEATH_COOLDOWN_TICKS = b.comment("套装：濒死免死的冷却（tick，9600 = 480 秒）")
+                .defineInRange("nearDeathCooldownTicks", 9600, 0, 72000);
+        b.pop();
+
+        // ---- 6 侵蚀 ----
+        b.push("erosion");
+        EROSION_ENABLED = b.comment("侵蚀：佩戴期间进度是否累加（总开关）")
+                .define("enabled", true);
+        EROSION_DURATION_MINUTES = b.comment("侵蚀：佩戴累计跑满所需分钟数（0 = 使用内置默认 480）")
+                .defineInRange("durationMinutes", 480, 0, 10080);
+        EROSION_NOTICE_THRESHOLDS = b.comment("侵蚀：必报节点百分比 [25, 50, 75, 100]（1~100）")
+                .defineList("noticeThresholds", List.of(25, 50, 75, 100),
+                        (Object o) -> o instanceof Number n && n.intValue() >= 1 && n.intValue() <= 100);
+        EROSION_NOTICE_INTERVAL_MINUTES = b.comment("侵蚀：兜底提示间隔（分钟），非节点也按此周期播报")
+                .defineInRange("noticeIntervalMinutes", 30, 1, 480);
+        EROSION_STAT_REROLL_PERCENT = b.comment("侵蚀：乱码时数值重抽幅度（±%，0.25 = ±25%，保底不低于 1）")
+                .defineInRange("statRerollPercent", 0.25, 0.0, 1.0);
+        EROSION_NBT_FLUSH_TICKS = b.comment("侵蚀：进度落盘间隔 (tick)，摘下 / 死亡 / 下线时强制落盘")
+                .defineInRange("nbtFlushTicks", 100, 20, 1200);
+        EROSION_SCREEN_FLASH_ENABLED = b.comment("侵蚀：跑满时屏幕边缘泛红提示")
+                .define("screenFlashEnabled", true);
+        b.pop();
+
+        // ---- 7 仪式与吸取 ----
+        b.push("altar");
+        ALTAR_DRAIN_ENABLED = b.comment("仪式吸取：配方齐备时是否自动吸取周边生物")
+                .define("drainEnabled", true);
+        ALTAR_DRAIN_RADIUS = b.comment("仪式吸取：吸取半径（格）")
+                .defineInRange("drainRadius", 64, 4, 128);
+        ALTAR_DRAIN_INTERVAL_TICKS = b.comment("仪式吸取：吸取间隔 (tick)")
+                .defineInRange("drainIntervalTicks", 20, 1, 200);
+        ALTAR_DRAIN_HEALTH_PERCENT = b.comment("仪式吸取：单次抽取的最大生命比例（0.10 = 10%）")
+                .defineInRange("drainHealthPercent", 0.10, 0.0, 1.0);
+        ALTAR_DRAIN_ENERGY_PER_HP = b.comment("仪式吸取：每 1 点血折算的生命能量")
+                .defineInRange("drainEnergyPerHp", 1000L, 1L, 100_000L);
+        ALTAR_DRAIN_MAX_TARGETS = b.comment("仪式吸取：单次最多吸取目标数（超出按距离优先）")
+                .defineInRange("drainMaxTargets", 16, 1, 128);
+        ALTAR_DRAIN_MAX_ENERGY_PER_TARGET = b.comment("仪式吸取：单只单次贡献上限（0 = 不限制）")
+                .defineInRange("drainMaxEnergyPerTarget", 5000L, 0L, 1_000_000L);
+        ALTAR_DRAIN_EXEMPT_CREATIVE = b.comment("仪式吸取：豁免创造模式玩家")
+                .define("drainExemptCreative", true);
+        ALTAR_NEW_RECIPE_TIER_REQUIRED = b.comment("四件饰品新仪式：所需的祭坛等级（生命结构台扫描等级）")
+                .defineInRange("newRecipeTierRequired", 3, 1, 3);
+        ALTAR_NEW_RECIPE_PROGRESS_MAX = b.comment("四件饰品新仪式：蓄能阈值（祭品不齐时进度冻结不归零）")
+                .defineInRange("newRecipeProgressMax", 800_000L, 1L, Long.MAX_VALUE);
+        ALTAR_LEGACY_PROGRESS_MAX = b.comment("旧生命融合锭仪式：蓄能阈值")
+                .defineInRange("legacyProgressMax", 80_000L, 1L, Long.MAX_VALUE);
+        b.pop();
+
         b.pop();
 
         // ==================== 生命研究机器 ====================
@@ -959,6 +1244,14 @@ public final class AkaishiConfig {
                 .defineInRange("lifeEnergyCellSerializerBaseCapacity", 2_000_000L, 0L, Long.MAX_VALUE);
         PLASMA_TANK_CAPACITY = b.comment("等离子储罐：容量 (mb)")
                 .defineInRange("plasmaTankCapacity", 16_000L, 0L, Long.MAX_VALUE);
+        ITEM_TERMINAL_ENERGY_BUFFER = b.comment("物品终端：赤能源缓冲容量（一次性存取费用的费用池）",
+                        "须 ≥ 允许的最大单笔费用；单笔 IP 上限 = floor(该值 × 4 / 费率系数)，费率系数为存入 1.005 / 取出 1.0025",
+                        "默认 1000000 赤能源 ⇒ 单笔最多约 398 万 IP（约 5.6 箱钻石），可一次存一箱")
+                .defineInRange("itemTerminalEnergyBuffer", 1_000_000L, 1L, Long.MAX_VALUE);
+        ITEM_TERMINAL_ENERGY_PORT_BUFFER = b.comment("物品终端赤能源接入口：单口自身缓冲容量",
+                        "接入口由赤能源管道注入并暂存，终端在存取结算时主动汇聚抽取（多口并联，各口独立蓄能）",
+                        "该值只影响单口可暂存量，不影响单笔费用上限（后者由 itemTerminalEnergyBuffer 决定）")
+                .defineInRange("itemTerminalEnergyPortBufferCapacity", 1_000_000L, 1L, Long.MAX_VALUE);
         b.pop();
 
         // ==================== 培养机提纯与分馏机 ====================
@@ -986,6 +1279,53 @@ public final class AkaishiConfig {
                 .defineInRange("fractionatorCostPerCraft", 2_000L, 0L, Long.MAX_VALUE);
         FRACTIONATOR_PROCESS_TICKS = b.comment("活化分馏机：每次分馏耗时 (tick)")
                 .defineInRange("fractionatorProcessTicks", 100, 1, Integer.MAX_VALUE);
+        b.pop();
+
+        // ==================== 价值分（统一存储库定价内核） ====================
+        // 说明：所有"分"都是相对价值单位，仅用于统一存储库的排序/统计/筛选，不做经济兑换。
+        b.push("value");
+        VALUE_COST_MULTIPLIER = b.comment("最终造价倍率；0 = 用内置默认 10")
+                .defineInRange("costMultiplier", 10.0, 0.0, 10_000.0);
+        VALUE_INGREDIENT_WEIGHT = b.comment("原料价值项权重；0 = 用内置默认 0.75")
+                .defineInRange("ingredientWeight", 0.75, 0.0, 100.0);
+        VALUE_MAGIC_BONUS = b.comment("魔法/功能类物品加成（卷轴/符文/法术书等）；0 = 用内置默认 40")
+                .defineInRange("magicBonus", 40.0, 0.0, 10_000.0);
+        VALUE_INGREDIENT_CAP = b.comment("单项原料价值封顶（防止一组配方把价炸飞）；0 = 用内置默认 80")
+                .defineInRange("ingredientCap", 80.0, 0.0, 100_000.0);
+        VALUE_ITERATIONS = b.comment("不动点迭代遍数（合成链传播层数）；0 = 用内置默认 4")
+                .defineInRange("iterations", 4, 0, 32);
+        VALUE_LOOT_ENABLED = b.comment("掉落来源估值开关（离线扫描战利品表）")
+                .define("lootEnabled", true);
+        VALUE_LOOT_AUTO_APPLY = b.comment("掉落来源项是否自动生效；false 时仅在索引中给出建议值，不加价")
+                .define("lootAutoApply", false);
+        VALUE_LOOT_CAP = b.comment("掉落来源项封顶；0 = 用内置默认 60")
+                .defineInRange("lootCap", 60.0, 0.0, 100_000.0);
+        VALUE_FLUID_ENABLED = b.comment("流体估值开关（桶代理 + 流标签表）")
+                .define("fluidEnabled", true);
+        VALUE_FLUID_PER_MB_CAP = b.comment("流体每 mB 价值上限；0 = 用内置默认 0.5（即单桶 500 分）")
+                .defineInRange("fluidPerMbCap", 0.5, 0.0, 10_000.0);
+        VALUE_OVERRIDES = b.comment("手动指定价值表，三级优先级：精确 id → 通配符 → #tag；格式 id=分值")
+                .defineList("overrides", List.of(),
+                        (Object o) -> o instanceof String s && s.contains("="));
+        VALUE_FLUID_VALUES = b.comment("流体价值表，格式 流体id=每桶分值（支持 * 通配）；"
+                + "优先于内置无桶推导与桶装折算，用于给不注册桶的流体单独定价")
+                .defineList("fluidValues", List.of(),
+                        (Object o) -> o instanceof String s && s.contains("="));
+        VALUE_TAG_VALUES = b.comment("标签价值表，格式 #tag=分值（叠加计算，有总分上限）")
+                .defineList("tagValues", List.of(),
+                        (Object o) -> o instanceof String s && s.startsWith("#") && s.contains("="));
+        VALUE_TIER_BONUS = b.comment("品质词加成表，格式 词=分值（对物品 id 词边界匹配，命中多个取最高）")
+                .defineList("tierBonus", List.of(),
+                        (Object o) -> o instanceof String s && s.contains("="));
+        VALUE_KEYWORD_EXCLUSIONS = b.comment("关键词豁免表：id / 通配符（*）；命中则跳过品质词与魔法关键词加成，"
+                + "空列表 = 用内置默认（豁免本 mod 的等级后缀 ultimate 与 Curios 槽位名 charm）")
+                .defineList("keywordExclusions", List.of(),
+                        (Object o) -> o instanceof String s && !s.isBlank());
+        VALUE_LOOT_BLACKLIST = b.comment("掉落来源项黑名单：命名空间 / id / 通配符（*）")
+                .defineList("lootBlacklist", List.of(),
+                        (Object o) -> o instanceof String s && !s.isBlank());
+        UNIFIED_VAULT_ROWS = b.comment("统一存储库每页行数（1 行 = 9 格）；0 = 用内置默认 6")
+                .defineInRange("unifiedVaultRows", 6, 0, 26);
         b.pop();
 
         SPEC = b.build();

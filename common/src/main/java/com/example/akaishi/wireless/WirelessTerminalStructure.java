@@ -197,7 +197,7 @@ public final class WirelessTerminalStructure {
                 transmitFrameCount);
     }
 
-    /** 是否为合法墙面块（构成封闭壳体的方块）：终端/安全/控制器/外壳/结构玻璃 */
+    /** 是否为合法墙面块（构成封闭壳体的方块）：终端/安全/控制器/外壳/结构玻璃（本族专属，不含物品终端） */
     public static boolean isWallBlock(Block b) {
         return b instanceof AkaishiWirelessTerminalBlock
                 || b instanceof AkaishiWirelessSecurityBlock

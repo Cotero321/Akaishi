@@ -3,7 +3,10 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.ILifeEnergyReceiver;
 import com.example.akaishi.block.AkaishiMotherAltarBlock;
+import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.life.altar.AkaishiAltarDrain;
 import com.example.akaishi.life.altar.AkaishiAltarRitual;
 import com.example.akaishi.menu.AkaishiMotherAltarMenu;
 import com.example.akaishi.multiblock.AkaishiAltarFormation;
@@ -53,17 +56,16 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
     private static final String TAG_TIER = "StructureTier";
     private static final String TAG_PROGRESS = "RitualProgress";
 
-    /** 仪式所需总能量（进度上限）：80K，即发射器满蓄 10 发 */
-    public static final long PROGRESS_MAX = 80_000L;
-
     /** 合并祭坛界面的结构等级数据槽下标 */
     public static final int DATA_TIER = 0;
     /** 仪式进度：连续 4 槽承载完整 64 位（低位在前） */
     public static final int DATA_PROGRESS = 1;
     /** 祭品配方是否齐备：1=齐备（真正在合成，界面才显示所需能量），0=未齐备 */
     public static final int DATA_READY = 5;
-    /** 数据槽总数：等级 1 + 进度 4 + 齐备标志 1（上限为编译期常量，无需占槽） */
-    public static final int DATA_SLOTS = 6;
+    /** 当前配方的蓄能阈值：旧配方 80K / 新配方 800K，占 1 槽（int 足够承载），供界面显示进度上限 */
+    public static final int DATA_PROGRESS_MAX = 6;
+    /** 数据槽总数：等级 1 + 进度 4 + 齐备标志 1 + 蓄能阈值 1 */
+    public static final int DATA_SLOTS = 7;
 
     /** 结构检测节流计数（每 20 tick 检测一次，结构变化不频繁） */
     private int tick;
@@ -74,8 +76,10 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
     /** 主座坐标缓存：随结构扫描（每 20 tick）刷新，避免发射器逐 tick 查询时反复全量扫描 */
     @Nullable
     private BlockPos primaryPos;
-    /** 仪式进度（0 ~ {@link #PROGRESS_MAX}），满值后等待配方齐备结算，期间不再接收注入 */
+    /** 仪式进度（0 ~ {@link #progressMax}），满值后等待配方齐备结算，期间不再接收注入 */
     private long progress;
+    /** 当前配方的蓄能阈值（旧 80K / 新 800K）：随 {@link #refreshRecipeReady()} 每 20 tick 重算 */
+    private long progressMax = ModConfig.altarLegacyProgressMax;
     /** 祭品配方是否齐备（= 真正在合成）：每 20 tick 重算一次，驱动界面显示与氛围音档位 */
     private boolean recipeReady;
 
@@ -107,6 +111,9 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
 
     /** 减益/呓语节流计数 */
     private int afflictTick;
+
+    /** 仪式吸取节流计数（间隔取配置 {@code altarDrainIntervalTicks}） */
+    private int drainTick;
 
     /**
      * 合并祭坛供奉槽视图：读写直接落回 {@link #offering}，使界面槽位与悬浮渲染共用同一份数据。
@@ -240,6 +247,8 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
         tickAmbience();
         // 仪式进行中向附近玩家施加「不可名状」（含耳中呓语），同样逐 tick 参与节流
         tickAffliction();
+        // 仪式吸取：配方齐备期间持续抽取周边生物的生命折算为进度（D146）
+        tickDrain();
         // 先取模后自增：首 tick 即执行一次完整检测，避免重启后等级与齐备标志空等 20 tick 才恢复
         if (tick++ % 20 != 0) {
             return;
@@ -256,32 +265,36 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
                 : null;
         AkaishiAltarFormation.refresh(level, worldPosition, tier);
         refreshRecipeReady();
-        // 祭品撤下（recipeReady 转 false，含结构被破坏）即中止本轮：进度只允许在"祭品齐备"期间积累。
-        // 否则进度会滞留（含旧存档遗留的满值），玩家下次摆齐祭品时被下一轮注入/结算瞬间吞掉，
-        // 既看不到注能过程，界面也来不及显示"所需能量"。
-        if (!recipeReady && progress > 0) {
-            progress = 0;
-            LongDataSlots.write(data, DATA_PROGRESS, DATA_PROGRESS + 1, DATA_PROGRESS + 2, DATA_PROGRESS + 3, 0L);
-            sync();
-        }
     }
 
     /**
      * 重算"祭品配方是否齐备"。齐备 = 真正在合成，是界面显示所需能量与播放呓语声的唯一条件；
      * 结果变化时写入数据槽并同步客户端（每 20 tick 一次，避免逐 tick 扫描 8 座子祭坛的开销）。
+     * <p>同时刷新当前配方的蓄能阈值 {@link #progressMax}（旧 80K / 新 800K）并写入数据槽，
+     * 供界面进度条按正确上限显示。
      */
     private void refreshRecipeReady() {
         // 统一以主座为准：供品、界面与氛围音都由主座承载，非主座自身供品恒空，直接判定会误报"不齐备"
         AkaishiMotherAltarBlockEntity host = primaryHost();
         boolean ready;
+        long max;
         if (host == null || host.structureTier < AkaishiGoatAltarTiersStructure.FORMED_TIER) {
             ready = false;
+            max = ModConfig.altarLegacyProgressMax;
         } else if (host == this) {
-            ready = level instanceof ServerLevel serverLevel
-                    && AkaishiAltarRitual.isRecipeReady(serverLevel, worldPosition, this);
+            AkaishiAltarRitual.Match match = level instanceof ServerLevel serverLevel
+                    ? AkaishiAltarRitual.match(serverLevel, worldPosition, this) : null;
+            ready = match != null;
+            max = match != null ? match.recipe().progressMax() : ModConfig.altarLegacyProgressMax;
         } else {
             // 非主座直接复用主座本轮的判定结果，省去"四座各扫一遍外圈 8 座"的重复开销
             ready = host.recipeReady;
+            max = host.progressMax;
+        }
+        if (max != progressMax) {
+            progressMax = max;
+            data.set(DATA_PROGRESS_MAX, (int) Math.min(Integer.MAX_VALUE, max));
+            sync();
         }
         if (ready != recipeReady) {
             recipeReady = ready;
@@ -352,14 +365,36 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
                 continue;
             }
             // ambient=true 降低粒子密度、visible=false 不冒粒子、showIcon=true 保留 HUD 图标
+            // 套装集齐者在所有施加入口统一 +1 级（D73/D191）
             player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
-                    AFFLICT_DURATION, 0, true, false, true));
+                    AFFLICT_DURATION, ForbiddenSetHooks.unnameableBonus(player), true, false, true));
             if (whisper) {
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
                         ModSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS,
                         0.7F, 0.9F + serverLevel.random.nextFloat() * 0.2F);
             }
         }
+    }
+
+    /**
+     * 仪式吸取：配方齐备期间由主座持续抽取周边生物的生命，折算成生命能量灌入本坛（D146~D182）。
+     * <p>仅主座、仅成型且祭品齐备时生效，间隔取配置 {@code altarDrainIntervalTicks}；
+     * 等级复查由 {@link #refreshRecipeReady()} 每 20 tick 承担——等级跌破配方门槛即 {@code recipeReady}
+     * 转 false，吸取与减益一并冻结，回升后自动恢复（D182）。
+     */
+    private void tickDrain() {
+        int interval = Math.max(1, ModConfig.altarDrainIntervalTicks);
+        if (drainTick++ % interval != 0) {
+            return;
+        }
+        BlockState state = getBlockState();
+        if (!state.getValue(AkaishiMotherAltarBlock.FORMED)
+                || state.getValue(AkaishiMotherAltarBlock.CORNER) != 0
+                || !recipeReady
+                || !(level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        AkaishiAltarDrain.drain(serverLevel, worldPosition, this);
     }
 
     /** 数据变更 → 落盘 + 向在线玩家广播方块实体数据包（悬浮渲染 / 界面依赖客户端持有最新数据） */
@@ -383,7 +418,7 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
         return Component.translatable("block.akaishi.akaishi_mother_altar");
     }
 
-    /** 当前仪式进度（0 ~ {@link #PROGRESS_MAX}） */
+    /** 当前仪式进度（0 ~ {@link #progressMax}）；祭品不齐时仅冻结（不涨不跌），不归零 */
     public long getProgress() {
         return progress;
     }
@@ -402,7 +437,8 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
         // 祭品未齐备（recipeReady=false）一律拒收：进度与祭品齐备同源，否则发射器会在玩家摆齐祭品前把进度灌满，
         // 导致"放上最后一件祭品的下个检测周期直接结算"——玩家看不到蓄能阶段、界面进度条也来不及出现。
         // 齐备后才开闸注能，进度从 0 起涨，界面按 recipeReady 同步显示"所需能量"。
-        return host.recipeReady && host.progress < PROGRESS_MAX;
+        // 撤下祭品期间进度只冻结（D161 全局统一语义），重新摆齐后从冻结值继续蓄能。
+        return host.recipeReady && host.progress < host.progressMax;
     }
 
     @Override
@@ -419,15 +455,17 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
     }
 
     /** 主座累计进度并结清本轮：跨 10% 档位落雷，满值尝试结算（仅主座自身调用，故无需再次定位主座） */
-    private long absorbLifeEnergy(long amount) {
+    public long absorbLifeEnergy(long amount) {
+        // 阈值按当前匹配配方取（旧 80K / 新 800K）；Math.min 同时承担"满值溢出丢弃"语义（D173）
+        long max = Math.max(1L, progressMax);
         long before = progress;
-        progress = Math.min(PROGRESS_MAX, progress + amount);
+        progress = Math.min(max, progress + amount);
         long absorbed = progress - before;
         // 每跨过 10% 档位落一道雷（子祭坛轮流，进度满落巨坛中央）
         if (absorbed > 0 && level instanceof ServerLevel serverLevel) {
-            AkaishiAltarRitual.strikeProgressBolts(serverLevel, worldPosition, before, progress);
+            AkaishiAltarRitual.strikeProgressBolts(serverLevel, worldPosition, before, progress, max);
         }
-        if (progress >= PROGRESS_MAX) {
+        if (progress >= max) {
             trySettle();
         }
         sync();
@@ -489,8 +527,10 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
         // 满值进度不予恢复：满值必在达成当 tick 结算并清零，残留满值只可能来自旧存档/异常中断，
         // 照搬会跳过注能阶段被瞬间结算，故一律清零，由玩家重新摆放祭品注能
         long storedProgress = tag.getLong(TAG_PROGRESS);
-        progress = storedProgress >= PROGRESS_MAX ? 0L : Math.max(0L, storedProgress);
+        long upper = Math.max(ModConfig.altarLegacyProgressMax, ModConfig.altarNewRecipeProgressMax);
+        progress = (storedProgress <= 0L || storedProgress >= upper) ? 0L : storedProgress;
         // load 由 notifyBlockUpdate 触发时数据槽未必已写入，补一次保证界面初值正确
         LongDataSlots.write(data, DATA_PROGRESS, DATA_PROGRESS + 1, DATA_PROGRESS + 2, DATA_PROGRESS + 3, progress);
+        data.set(DATA_PROGRESS_MAX, (int) Math.min(Integer.MAX_VALUE, progressMax));
     }
 }

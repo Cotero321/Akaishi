@@ -50,7 +50,7 @@ public class AkaishiMotherAltarMenu extends AbstractContainerMenu {
         return data.get(AkaishiMotherAltarBlockEntity.DATA_TIER);
     }
 
-    /** 当前仪式进度：跨 4 槽重组 64 位（上限 80K 在 int 范围内，仍按 long 读取以留扩展余地） */
+    /** 当前仪式进度：跨 4 槽重组 64 位（旧配方上限 80K、新配方 800K，仍按 long 读取以留扩展余地） */
     public long getProgress() {
         return LongDataSlots.read(data,
                 AkaishiMotherAltarBlockEntity.DATA_PROGRESS,
@@ -59,9 +59,9 @@ public class AkaishiMotherAltarMenu extends AbstractContainerMenu {
                 AkaishiMotherAltarBlockEntity.DATA_PROGRESS + 3);
     }
 
-    /** 仪式进度上限（与方块实体一致） */
+    /** 仪式进度上限：由方块实体按当前匹配配方同步（旧 80K / 新 800K） */
     public long getProgressMax() {
-        return AkaishiMotherAltarBlockEntity.PROGRESS_MAX;
+        return Integer.toUnsignedLong(data.get(AkaishiMotherAltarBlockEntity.DATA_PROGRESS_MAX));
     }
 
     /**

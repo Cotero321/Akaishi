@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SIS",
+    "ICI",
+    "SIS"
+  ],
+  "key": {
+    "S": { "item": "akaishi:akaishi_item_terminal_shell" },
+    "I": { "item": "akaishi:akaishi_ingot" },
+    "C": { "item": "minecraft:chest" }
+  },
+  "result": { "item": "akaishi:akaishi_item_storage_unit_basic", "count": 1 }
+}

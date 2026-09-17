@@ -144,7 +144,9 @@ public class AkaishiLifeBreederBlockEntity extends BlockEntity implements
     /** 培养条件：可突变器官 + 同组序列 + 足够结晶/能量 + 产物槽可容纳 */
     private boolean canProcess() {
         ItemStack organ = inventory.getItem(ORGAN_SLOT);
-        if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem) || !AkaishiOrganItem.canMutate(organ)) {
+        // 乱码器官拒绝一切改造（D28/D56），canMutate 已覆盖原生与上限判定
+        if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem) || !AkaishiOrganItem.canMutate(organ)
+                || AkaishiOrganItem.isCorrupted(organ)) {
             return false;
         }
         ItemStack sequence = inventory.getItem(SEQUENCE_SLOT);

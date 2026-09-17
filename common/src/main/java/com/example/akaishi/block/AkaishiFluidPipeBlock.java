@@ -79,12 +79,12 @@ public class AkaishiFluidPipeBlock extends BaseEntityBlock {
     private BlockState computeConnections(BlockState state, Level level, BlockPos pos) {
         AkaishiFluidPipeBlockEntity pipe = level.getBlockEntity(pos) instanceof AkaishiFluidPipeBlockEntity p ? p : null;
         return state
-                .setValue(NORTH, !isDisconnected(pipe, Direction.NORTH) && connectsTo(level, pos.relative(Direction.NORTH), pipe))
-                .setValue(EAST, !isDisconnected(pipe, Direction.EAST) && connectsTo(level, pos.relative(Direction.EAST), pipe))
-                .setValue(SOUTH, !isDisconnected(pipe, Direction.SOUTH) && connectsTo(level, pos.relative(Direction.SOUTH), pipe))
-                .setValue(WEST, !isDisconnected(pipe, Direction.WEST) && connectsTo(level, pos.relative(Direction.WEST), pipe))
-                .setValue(UP, !isDisconnected(pipe, Direction.UP) && connectsTo(level, pos.relative(Direction.UP), pipe))
-                .setValue(DOWN, !isDisconnected(pipe, Direction.DOWN) && connectsTo(level, pos.relative(Direction.DOWN), pipe));
+                .setValue(NORTH, !isDisconnected(pipe, Direction.NORTH) && connectsTo(level, pos, Direction.NORTH, pipe))
+                .setValue(EAST, !isDisconnected(pipe, Direction.EAST) && connectsTo(level, pos, Direction.EAST, pipe))
+                .setValue(SOUTH, !isDisconnected(pipe, Direction.SOUTH) && connectsTo(level, pos, Direction.SOUTH, pipe))
+                .setValue(WEST, !isDisconnected(pipe, Direction.WEST) && connectsTo(level, pos, Direction.WEST, pipe))
+                .setValue(UP, !isDisconnected(pipe, Direction.UP) && connectsTo(level, pos, Direction.UP, pipe))
+                .setValue(DOWN, !isDisconnected(pipe, Direction.DOWN) && connectsTo(level, pos, Direction.DOWN, pipe));
     }
 
     /** 配置器断开/恢复连接后重算连接状态（由调用方决定是否落盘） */
@@ -126,12 +126,15 @@ public class AkaishiFluidPipeBlock extends BaseEntityBlock {
      * 废料专用设备（废品口/保存桶）仅废料管道可接；等离子体罐设备仅等离子体管道可接；
      * 普通设备仅普通管道可接；外部液体能力仅普通管道可接。
      */
-    private boolean connectsTo(Level level, BlockPos neighborPos, AkaishiFluidPipeBlockEntity pipe) {
+    private boolean connectsTo(Level level, BlockPos pos, Direction dir, AkaishiFluidPipeBlockEntity pipe) {
+        BlockPos neighborPos = pos.relative(dir);
         boolean wasteFamily = pipe != null ? pipe.isWasteFamily() : isWastePipeBlock();
         boolean plasmaFamily = pipe != null ? pipe.isPlasmaFamily() : isPlasmaPipeBlock();
         BlockEntity neighbor = level.getBlockEntity(neighborPos);
         if (neighbor instanceof AkaishiFluidPipeBlockEntity np) {
-            return np.isWasteFamily() == wasteFamily && np.isPlasmaFamily() == plasmaFamily;
+            // 双向断开：邻居在该侧断开时本侧也不连，否则对方管臂会悬在断口上，看起来"断开没生效"
+            return np.isWasteFamily() == wasteFamily && np.isPlasmaFamily() == plasmaFamily
+                    && !np.isDisconnected(dir.getOpposite());
         }
         if (neighbor instanceof IFluidPipeDevice device) {
             // 混合接入设备（如生命活化器）普通/废料两族均可连接；仅当设备暴露等离子体罐时才允许等离子体管道

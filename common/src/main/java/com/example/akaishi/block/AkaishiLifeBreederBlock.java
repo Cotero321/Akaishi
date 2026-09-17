@@ -2,6 +2,7 @@ package com.example.akaishi.block;
 
 import com.example.akaishi.block.entity.AkaishiLifeBreederBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,6 +55,11 @@ public class AkaishiLifeBreederBlock extends AkaishiMachineBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        // 佩戴禁忌饰品时 9 槽锁死：改造入口整体拒绝（D28/D196）
+        if (!level.isClientSide && ForbiddenSetHooks.socketsLocked(player)) {
+            ForbiddenSetHooks.denyLocked(player);
+            return InteractionResult.FAIL;
+        }
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             if (level.getBlockEntity(pos) instanceof AkaishiLifeBreederBlockEntity breeder) {
                 MenuRegistry.openExtendedMenu(serverPlayer, breeder);

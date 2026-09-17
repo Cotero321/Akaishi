@@ -155,8 +155,9 @@ public class AkaishiTraitReforgerBlockEntity extends BlockEntity implements
     /** 重铸条件：可重铸器官（≥1 词条且目标档有候选）+ 足够结晶/能量 + 产物槽可容纳 */
     private boolean canProcess() {
         ItemStack organ = inventory.getItem(ORGAN_SLOT);
+        // 原生器官与乱码器官均不可改造（乱码为禁忌饰品侵蚀产物，只允许摘除，D28/D56）
         if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem)
-                || AkaishiOrganItem.isNative(organ)) {
+                || AkaishiOrganItem.isNative(organ) || AkaishiOrganItem.isCorrupted(organ)) {
             return false;
         }
         MutantTrait old = targetTrait();

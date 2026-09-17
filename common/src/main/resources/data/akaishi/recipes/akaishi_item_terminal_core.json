@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WQW",
+    "QEQ",
+    "WQW"
+  ],
+  "key": {
+    "W": { "item": "akaishi:akaishi_item_terminal_shell" },
+    "Q": { "item": "akaishi:akaishi_ingot" },
+    "E": { "item": "minecraft:ender_pearl" }
+  },
+  "result": { "item": "akaishi:akaishi_item_terminal_core", "count": 1 }
+}

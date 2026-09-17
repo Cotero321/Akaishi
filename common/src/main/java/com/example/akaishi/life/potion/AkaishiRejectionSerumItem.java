@@ -1,6 +1,7 @@
 package com.example.akaishi.life.potion;
 
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
@@ -42,6 +43,11 @@ public class AkaishiRejectionSerumItem extends Item {
             player.displayClientMessage(Component.translatable("message.akaishi.serum.cooldown"), true);
             return InteractionResultHolder.fail(stack);
         }
+        // 佩戴禁忌饰品时 9 槽锁死：清洗属改造通道，锁死期间拒绝（D28/D196）
+        if (ForbiddenSetHooks.socketsLocked(player)) {
+            ForbiddenSetHooks.denyLocked(player);
+            return InteractionResultHolder.fail(stack);
+        }
         IPlayerBodyState state = PlayerBodyHelper.of(player);
         if (state == null) {
             return InteractionResultHolder.fail(stack);
@@ -57,8 +63,9 @@ public class AkaishiRejectionSerumItem extends Item {
                 continue;
             }
             ItemStack organ = state.getOrgan(slot);
-            // 只对已移植的非原生器官生效（原生器官无排斥可言）
-            if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)) {
+            // 只对已移植的非原生器官生效（原生器官无排斥可言）；乱码器官排异冻结，清洗无效（D56/D128）
+            if (organ.isEmpty() || !(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)
+                    || AkaishiOrganItem.isCorrupted(organ)) {
                 continue;
             }
             if (state.getRejection(slot) <= 0) {

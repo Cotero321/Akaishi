@@ -7,13 +7,13 @@ import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiFoundationBlocks;
 import com.example.akaishi.block.AkaishiFusionBlocks;
+import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiTransgeneBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
-import com.example.akaishi.block.entity.AkaishiFluidPipeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
@@ -29,7 +29,9 @@ import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.LifeEnergyEmitterRenderer;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
+import com.example.akaishi.forge.client.PipeSideOverlayRenderer;
 import com.example.akaishi.forge.client.AkaishiUnnameableHandler;
+import com.example.akaishi.forge.client.AkaishiErosionFlashOverlay;
 import com.example.akaishi.forge.client.AkaishiUnnameableOverlay;
 import com.example.akaishi.forge.client.AkaishiUnnameablePostHandler;
 import com.example.akaishi.forge.client.mechanical.MechanicalPartRenderer;
@@ -37,17 +39,21 @@ import com.example.akaishi.forge.client.model.MechanicalPartGeometryLoader;
 import com.example.akaishi.forge.config.AkaishiConfig;
 import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.fluid.ForgeFluidBridge;
-import com.example.akaishi.forge.fluid.ForgeFluidHandler;
 import com.example.akaishi.forge.fluid.ModFluidsImpl;
 import com.example.akaishi.forge.io.MachineCapabilityProvider;
 import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
+import com.example.akaishi.forge.life.AkaishiForbiddenErosionHandler;
+import com.example.akaishi.forge.life.AkaishiForbiddenTooltipHandler;
 import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
 import com.example.akaishi.forge.life.AkaishiLifeInteraction;
 import com.example.akaishi.forge.life.AkaishiMechanicalEffectHandler;
+import com.example.akaishi.forge.life.AkaishiSocketEffectHandler;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
 import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
+import com.example.akaishi.forge.value.AkaishiValueForgeEvents;
+import com.example.akaishi.forge.value.ValuePlatformImpl;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
 import com.example.akaishi.gametest.AkaishiLifeSystemTests;
 import com.example.akaishi.item.AkaishiLifeFusionSet;
@@ -61,8 +67,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -83,10 +87,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -170,30 +170,12 @@ public final class AkaishiModForge {
         // 第三方物流能力（能量除外）：任何实现 IItemPipeDevice / IFluidPipeDevice 的机器方块自动
         // 暴露 Forge ITEM_HANDLER / FLUID_HANDLER，原版漏斗、MEK 管道、AE2/RS 等可直接对接；
         // 方向（仅输出/仅输入）与废料/等离子家族过滤由 forge.io 适配器逐槽/逐罐遵守。
-        // 液体管道自身缓冲另暴露 FLUID_HANDLER（家族过滤由缓冲罐 fill 覆写继承）。
+        // 液体管道为直连模式，自身无缓冲，故不额外暴露 FLUID_HANDLER。
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, (AttachCapabilitiesEvent<BlockEntity> event) -> {
             BlockEntity be = event.getObject();
             if (be instanceof IItemPipeDevice || be instanceof IFluidPipeDevice) {
                 event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "external_logistics"),
                         new MachineCapabilityProvider(be));
-            } else if (be instanceof AkaishiFluidPipeBlockEntity pipe) {
-                event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "fluid_pipe_buffer"),
-                        new ICapabilitySerializable<CompoundTag>() {
-                            @Override
-                            public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-                                return ForgeCapabilities.FLUID_HANDLER.orEmpty(cap,
-                                        LazyOptional.of(() -> new ForgeFluidHandler(pipe)));
-                            }
-
-                            @Override
-                            public CompoundTag serializeNBT() {
-                                return new CompoundTag(); // 缓冲数据由 BE 自身 NBT 保存，能力无独立持久化
-                            }
-
-                            @Override
-                            public void deserializeNBT(CompoundTag nbt) {
-                            }
-                        });
             }
         });
 
@@ -241,6 +223,14 @@ public final class AkaishiModForge {
         // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
         MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
 
+        // 禁忌四件饰品统一生效层（生命之触/幼崽之心/母神之印/孕育之环 + 套装）
+        // 构造器内完成 common↔forge 接口注入（套装等级加成 / 扭曲屏蔽），注册即生效
+        MinecraftForge.EVENT_BUS.register(AkaishiSocketEffectHandler.INSTANCE);
+        // 禁忌套装实时状态 tooltip（已集齐件数，仅客户端渲染触发）
+        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenTooltipHandler.INSTANCE);
+        // 禁忌侵蚀推进层：阈值低语提示 + 跑满结算（9 槽乱码 + 数值重抽，幂等一次）
+        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenErosionHandler.INSTANCE);
+
         // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
 
@@ -249,6 +239,15 @@ public final class AkaishiModForge {
 
         // 祭坛成型静音：屏蔽四个结构信标的环境音/激活音（取消位置音事件，无需 Mixin）
         MinecraftForge.EVENT_BUS.register(AkaishiAltarSoundMuter.INSTANCE);
+
+        // 仪式吸取掉落豁免：被吸死无掉落/无经验（common 定钩子，此处注入实现并消费事件，D158/D257）
+        AkaishiAltarDrainHandler.install();
+        MinecraftForge.EVENT_BUS.register(AkaishiAltarDrainHandler.INSTANCE);
+
+        // 估值内核平台桥接：注入「当前服务端」获取方式（common 层通过 ValuePlatform 读取）
+        ValuePlatformImpl.install();
+        // 掉落来源索引：数据包重载标脏 + tick 分帧扫表 + 服务端停止清索引
+        MinecraftForge.EVENT_BUS.register(AkaishiValueForgeEvents.INSTANCE);
 
         // 调用通用初始化逻辑
         AkaishiMod.init();
@@ -267,8 +266,10 @@ public final class AkaishiModForge {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegisterOverlays);
     }
 
-    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字 */
+    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字；侵蚀泛红的血色边缘 */
     private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
+        // 泛红先注册（位于下层），避免盖住低语文字
+        event.registerAboveAll("erosion_flash_overlay", new AkaishiErosionFlashOverlay());
         event.registerAboveAll("unnameable_overlay", new AkaishiUnnameableOverlay());
     }
 
@@ -300,7 +301,8 @@ public final class AkaishiModForge {
                 AkaishiMatrixBlocks.CHISHI_PURIFIER_MATRIX_STRUCTURE_GLASS.get(),
                 AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_STRUCTURE_GLASS.get(),
                 AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get(),
-                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS.get());
+                AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS.get(),
+                AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_STRUCTURE_GLASS.get());
         // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
         // 钻机钻头：结构成型时从钻头底面打出向下的信标光束（客户端渲染器）
@@ -309,6 +311,14 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_LIFE_ENERGY_EMITTER.get(), LifeEnergyEmitterRenderer::new);
         // 生命能量弹：相机朝向的发光公告板
         EntityRenderers.register(ModEntities.LIFE_ENERGY_PROJECTILE.get(), AkaishiLifeEnergyProjectileRenderer::new);
+        // 管道方向标识：输出=臂端收窄尖口，输入=臂端外扩喇叭口（物品/赤能源/生命能量/液体/废料/等离子全族）
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ITEM_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ENERGY_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_LIFE_ENERGY_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_FLUID_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_EXHAUSTED_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_MULTI_FLUID_WASTE_PIPE.get(), PipeSideOverlayRenderer::new);
+        BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_PLASMA_PIPE.get(), PipeSideOverlayRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
         // 「不可名状」视野扭曲：相机滚转/抖动与 FOV 脉动

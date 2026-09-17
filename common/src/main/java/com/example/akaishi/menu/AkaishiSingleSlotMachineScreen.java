@@ -43,8 +43,8 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         GuiWidgets.slotBox(gui, x + OUTPUT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
-        // 玩家背包 + 快捷栏槽框（解决物品栏背景看不到槽位的问题）
-        GuiWidgets.playerInventory(gui, x, y);
+        // 玩家背包 + 快捷栏槽框（坐标须与 Menu 的 addSlot 一致：背包 124、快捷栏 180）
+        GuiWidgets.playerInventory(gui, x, y, 124, 180);
         // 赤能源条（红）
         drawBar(gui, x + ENERGY_X, y + ENERGY_Y, ENERGY_W, BAR_H,
                 (float) menu.getEnergy() / Math.max(1, menu.getEnergyCapacity()), 0xFFE03030);

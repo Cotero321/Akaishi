@@ -1,14 +1,13 @@
 package com.example.akaishi.life.altar;
 
-import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
+import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.effect.ModEffects;
-import com.example.akaishi.item.ModItems;
-import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
 import com.example.akaishi.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -16,38 +15,32 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
- * 母神祭坛"生命融合仪式"：进度蓄满后校验祭品配方，齐备即消耗全部祭品、凝出生命融合锭。
- * <p>配方（共 9 件，须恰好占满 1 巨坛 + 8 外圈子祭坛）：
- * <ul>
- *   <li>巨坛供奉槽：赤石锭 ×1</li>
- *   <li>外圈 8 座各 1 件：生命胚胎 ×2、生命灰烬 ×2、纯度 &gt; {@link #MIN_GENE_PURITY} 的基因序列 ×2、
- *       浓缩赤石精华块 ×2</li>
- * </ul>
+ * 母神祭坛「生命融合仪式」：进度蓄满后按 {@link AkaishiAltarRecipe} 校验祭品，齐备即消耗祭品凝出产物。
+ * <p>共 5 条配方（1 旧 + 4 新），靠巨坛供奉槽祭品区分；详见 {@link AkaishiAltarRecipe}。
  * <p>产物放回巨坛供奉槽（沿用悬浮旋转展示），玩家经界面或空手右键取回。
  * <p>注能期间每推进 10% 落一道纯视觉雷（子祭坛轮流，进度满时落巨坛中央），见 {@link #strikeProgressBolts}。
  */
 public final class AkaishiAltarRitual {
 
-    /** 基因纯度门槛（不含）：低于或等于该值的序列不被仪式接受 */
+    /** 旧配方基因纯度门槛（不含）：低于或等于该值的序列不被旧仪式接受 */
     public static final int MIN_GENE_PURITY = 50;
-    /** 外圈子祭坛座数（配方恰好占满，多一件即不成立） */
-    private static final int OUTER_SLOTS = 8;
-    /** 每种祭品的要求数量 */
-    private static final int PER_KIND = 2;
     /** 完成反馈的广播半径（格） */
     private static final double ANNOUNCE_RANGE = 64.0D;
     /** 仪式落雷档数：进度每推进 1/10 落一道，共 10 档（第 10 档即进度满） */
     private static final long BOLT_MILESTONES = 10L;
-    /** 单档进度步长（8K = 10%），跨过其整数倍即落雷 */
-    private static final long BOLT_STEP = AkaishiMotherAltarBlockEntity.PROGRESS_MAX / BOLT_MILESTONES;
     /** 完成爆发时「不可名状」的时长（tick）：15s，足够玩家看完一轮强化表现 */
     private static final int BURST_DURATION = 300;
     /** 完成爆发时「不可名状」的等级：II 级（放大器 1），画面扭曲与呓语随之加剧 */
     private static final int BURST_AMPLIFIER = 1;
+
+    /** 配方命中结果：命中的配方 + 参与消耗的外圈 8 座坐标 */
+    public record Match(AkaishiAltarRecipe recipe, List<BlockPos> outer) {
+    }
 
     private AkaishiAltarRitual() {
     }
@@ -58,12 +51,13 @@ public final class AkaishiAltarRitual {
      * 第 10 档（进度满）击中巨坛正中央，呼应"能量注入的节拍"。
      * <p>档位直接由进度推导，进度单调递增、结算成功后清零，故无需额外落雷状态，也不会重复触发。
      *
-     * @param before 本次注入前的进度
-     * @param after  本次注入后的进度
+     * @param maxProgress 当前配方的蓄能阈值（新/旧配方不同，故不能取编译期常量）
      */
-    public static void strikeProgressBolts(ServerLevel level, BlockPos hostPos, long before, long after) {
-        long first = before / BOLT_STEP + 1;
-        long last = after / BOLT_STEP;
+    public static void strikeProgressBolts(ServerLevel level, BlockPos hostPos,
+                                           long before, long after, long maxProgress) {
+        long step = Math.max(1L, maxProgress / BOLT_MILESTONES);
+        long first = before / step + 1;
+        long last = after / step;
         if (first > last) {
             return;
         }
@@ -95,12 +89,16 @@ public final class AkaishiAltarRitual {
     }
 
     /**
-     * 只读校验祭品配方（无任何消耗/产出副作用），供界面与氛围音判定"是否正在合成"。
+     * 只读匹配当前祭品配方（无任何消耗/产出副作用），供界面、氛围音与结算共用。
+     * <p>遍历配方表，跳过等级不达标的配方（新四套需三级祭坛，D133），
+     * 以主祭品谓词区分后逐座消耗外圈配额；全部配额恰好清空才算命中。
      *
-     * @return 配方齐备时返回外圈 8 座坐标（供结算时消耗），否则返回 {@code null}
+     * @return 命中时返回配方 + 外圈坐标，否则返回 {@code null}
      */
-    private static List<BlockPos> findReadyOuter(ServerLevel level, BlockPos hostPos, AkaishiMotherAltarBlockEntity host) {
-        if (!host.getOffering().is(ModItems.akaishiIngot.get())) {
+    @Nullable
+    public static Match match(ServerLevel level, BlockPos hostPos, AkaishiMotherAltarBlockEntity host) {
+        ItemStack hostStack = host.getOffering();
+        if (hostStack.isEmpty()) {
             return null;
         }
         BlockPos origin = AkaishiGoatAltarTiersStructure.findOrigin(level, hostPos);
@@ -108,82 +106,107 @@ public final class AkaishiAltarRitual {
             return null;
         }
         List<BlockPos> outer = AkaishiGoatAltarTiersStructure.collectOuterAltars(origin);
-        if (outer.size() != OUTER_SLOTS) {
+        if (outer.size() != AkaishiAltarRecipe.OUTER_SLOTS) {
             return null;
         }
-        int embryo = 0;
-        int ash = 0;
-        int gene = 0;
-        int essence = 0;
+        int tier = host.getStructureTier();
+        for (AkaishiAltarRecipe recipe : AkaishiAltarRecipe.all()) {
+            if (tier < recipe.requiredTier() || !recipe.hostOffering().test(hostStack)) {
+                continue;
+            }
+            if (matchesOuter(level, outer, recipe)) {
+                return new Match(recipe, outer);
+            }
+        }
+        return null;
+    }
+
+    /** 逐座消耗外圈配额：每座子祭坛只能命中一类尚有余量的要求，全部要求恰好清空即通过 */
+    private static boolean matchesOuter(ServerLevel level, List<BlockPos> outer, AkaishiAltarRecipe recipe) {
+        List<AkaishiAltarRecipe.Requirement> requirements = recipe.outer();
+        int[] remaining = new int[requirements.size()];
+        for (int i = 0; i < remaining.length; i++) {
+            remaining[i] = requirements.get(i).count();
+        }
         for (BlockPos pos : outer) {
             if (!(level.getBlockEntity(pos) instanceof AkaishiMotherAltarBlockEntity altar) || !altar.hasOffering()) {
-                return null;
+                return false;
             }
             ItemStack stack = altar.getOffering();
-            if (stack.is(ModItems.lifeEmbryo.get())) {
-                embryo++;
-            } else if (stack.is(ModItems.lifeAsh.get())) {
-                ash++;
-            } else if (stack.is(ModItems.geneSequence.get())
-                    && AkaishiGeneSequenceItem.getPurity(stack) > MIN_GENE_PURITY) {
-                gene++;
-            } else if (stack.is(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem())) {
-                essence++;
-            } else {
-                return null;
+            boolean consumed = false;
+            for (int i = 0; i < remaining.length; i++) {
+                if (remaining[i] > 0 && requirements.get(i).test().test(stack)) {
+                    remaining[i]--;
+                    consumed = true;
+                    break;
+                }
+            }
+            if (!consumed) {
+                return false;
             }
         }
-        if (embryo != PER_KIND || ash != PER_KIND || gene != PER_KIND || essence != PER_KIND) {
-            return null;
+        for (int left : remaining) {
+            if (left > 0) {
+                return false;
+            }
         }
-        return outer;
+        return true;
     }
 
     /**
-     * 只读预检：祭品配方是否齐备（含巨坛供奉槽的赤石锭与外圈 8 件）。
+     * 只读预检：祭品配方是否齐备（含巨坛供奉槽与外圈 8 座）。
      * 仅做判定，不消耗也不产出，供界面进度条显示与氛围音"工作中"档位使用。
      */
     public static boolean isRecipeReady(ServerLevel level, BlockPos hostPos, AkaishiMotherAltarBlockEntity host) {
-        return findReadyOuter(level, hostPos, host) != null;
+        return match(level, hostPos, host) != null;
     }
 
     /**
      * 尝试结算仪式（仅服务端调用）。
      *
      * @param hostPos 巨坛主座坐标（结构原点 offset(7,0,7)）
-     * @return true = 配方齐备并已完成消耗与产出；false = 配方不齐，进度保持满值等待补齐
+     * @return true = 配方齐备并已完成消耗与产出；false = 配方不齐，进度保持当前值冻结等待补齐
      */
     public static boolean tryComplete(ServerLevel level, BlockPos hostPos, AkaishiMotherAltarBlockEntity host) {
-        List<BlockPos> outer = findReadyOuter(level, hostPos, host);
-        if (outer == null) {
+        Match match = match(level, hostPos, host);
+        if (match == null) {
             return false;
         }
         // 消耗外圈 8 件，巨坛供奉槽换为产物
-        for (BlockPos pos : outer) {
+        for (BlockPos pos : match.outer()) {
             if (level.getBlockEntity(pos) instanceof AkaishiMotherAltarBlockEntity altar) {
                 altar.takeOffering();
             }
         }
-        host.setOffering(new ItemStack(ModItems.lifeFusionIngot.get()));
-        announce(level, hostPos);
+        host.setOffering(new ItemStack(match.recipe().output().get()));
+        announce(level, hostPos, match.recipe());
         return true;
     }
 
-    /** 仪式完成反馈：向巨坛附近的玩家施加强化「不可名状」爆发并散出粒子（无聊天文本） */
-    private static void announce(ServerLevel level, BlockPos hostPos) {
+    /**
+     * 仪式完成反馈：向巨坛附近的玩家施加强化「不可名状」爆发并散出粒子。
+     * <p>四套新配方各播报专属仪式名（D176）；旧配方维持原「纯表现无文本」口径，不新增广播。
+     */
+    private static void announce(ServerLevel level, BlockPos hostPos, AkaishiAltarRecipe recipe) {
         double cx = hostPos.getX() + 0.5D;
         double cy = hostPos.getY() + 0.5D;
         double cz = hostPos.getZ() + 0.5D;
         double rangeSqr = ANNOUNCE_RANGE * ANNOUNCE_RANGE;
+        String ritualKey = recipe.ritualName();
         for (ServerPlayer player : level.players()) {
             if (player.distanceToSqr(cx, cy, cz) > rangeSqr) {
                 continue;
             }
             // 完成爆发：叠加 II 级「不可名状」，客户端画面扭曲/噪点/低语文字随之加剧
+            // 套装集齐者在所有施加入口统一 +1 级（D73/D191）
             player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
-                    BURST_DURATION, BURST_AMPLIFIER, true, false, true));
+                    BURST_DURATION, BURST_AMPLIFIER + ForbiddenSetHooks.unnameableBonus(player), true, false, true));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     ModSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS, 1.0F, 0.85F);
+            if (ritualKey != null) {
+                player.sendSystemMessage(Component.translatable("message.akaishi.altar.ritual.done",
+                        Component.translatable(ritualKey)));
+            }
         }
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                 hostPos.getX() + 0.5D, hostPos.getY() + 1.5D, hostPos.getZ() + 0.5D,
