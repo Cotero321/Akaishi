@@ -1,6 +1,6 @@
 package com.example.akaishi.wireless;
 
-import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
 import com.example.akaishi.item.AkaishiWirelessPortableTerminalItem;
@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * 便携终端「随身供能」服务：由平台玩家 tick 驱动，把绑定终端的储能持续注入玩家随身承接物。
  * <p>
- * 解锁前提：终端内腔含 ≥1 便捷传输构架（{@link AkaishiWirelessTerminalBlockEntity#hasTransmitFrame()}），
+ * 解锁前提：终端内腔含 ≥1 便捷传输构架（{@link IWirelessTerminal#hasTransmitFrame()}），
  * 且便携终端物品 NBT 已开启供能开关（{@link #setEnabled(ItemStack, boolean)}）。
  * 承接物分两层：
  * 1) 背包/快捷栏的便捷赤能源单元（本地处理）；
@@ -79,7 +79,7 @@ public final class PortableSupplyService {
 
     /**
      * 服务端每 tick 调用：取玩家第一台开启供能的便携终端，从其绑定终端抽能注入承接物。
-     * 未开启开关 / 未持有身份卡 / 终端离线 / 未解锁（无便捷传输构架）时静默跳过。
+     * 未开启开关 / 无可用终端（无 CRAFT 权限或离线）/ 未解锁（无便捷传输构架）时静默跳过。
      */
     public static void tick(Player player) {
         if (player.level().isClientSide || player.isDeadOrDying()) {
@@ -89,7 +89,7 @@ public final class PortableSupplyService {
         if (portable.isEmpty() || !isEnabled(portable)) {
             return;
         }
-        AkaishiWirelessTerminalBlockEntity terminal = resolveTerminal(player);
+        IWirelessTerminal terminal = resolveTerminal(player);
         if (terminal == null || !terminal.hasTransmitFrame()) {
             return;
         }
@@ -119,21 +119,29 @@ public final class PortableSupplyService {
         return ItemStack.EMPTY;
     }
 
-    /** 反查便携终端绑定终端的方块实体：扫背包身份卡 → 网络注册表 → 所在维度/区块；离线或跨维未加载返回 null */
-    private static AkaishiWirelessTerminalBlockEntity resolveTerminal(Player player) {
-        UUID cardUuid = null;
+    /**
+     * 反查便携终端可用终端的方块实体：身份取「背包身份卡绑定的玩家」，卡未绑定身份或未持卡则取玩家自己；
+     * 终端按安全表与身份反查（需具备 {@link AkaishiSecurityPermission#CRAFT} 权限）。
+     * 离线或跨维未加载返回 null。
+     * <p>
+     * 依赖面收敛到 {@link IWirelessTerminal}：完整终端与<b>微缩后的终端</b>（同一个终端 ID 继续注册）
+     * 对便携终端完全同构，坍缩不会让随身供能失效。
+     */
+    private static IWirelessTerminal resolveTerminal(Player player) {
+        UUID identity = null;
         Inventory inv = player.getInventory();
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack s = inv.getItem(i);
             if (s.getItem() instanceof AkaishiWirelessIdentityCardItem) {
-                cardUuid = AkaishiWirelessIdentityCardItem.ensureUuid(s);
+                identity = AkaishiWirelessIdentityCardItem.playerOf(s);
                 break;
             }
         }
-        if (cardUuid == null) {
-            return null;
+        if (identity == null) {
+            identity = player.getUUID(); // 卡未绑定身份 / 未持卡：以本人身份请求
         }
-        UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid);
+        UUID terminalId = WirelessNetworkManager.findTerminalForIdentity(identity, WirelessFamily.CHISHI,
+                AkaishiSecurityPermission.CRAFT);
         if (terminalId == null) {
             return null;
         }
@@ -145,7 +153,7 @@ public final class PortableSupplyService {
         if (target == null) {
             return null;
         }
-        return target.getBlockEntity(ref.pos()) instanceof AkaishiWirelessTerminalBlockEntity t ? t : null;
+        return target.getBlockEntity(ref.pos()) instanceof IWirelessTerminal t && t.isFormed() ? t : null;
     }
 
     /** 背包便携单元总缺口（容量 - 当前储能之和） */

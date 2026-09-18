@@ -12,12 +12,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 机械改造三机菜单基类：升级槽（速度/能量，右上角 y=8）+ 机器槽 + 双能源/进度数据 + 通用快捷移动。
+ * 机械改造三机菜单基类：升级槽（速度/能量/无线接收，右上角 y=8）+ 机器槽 + 双能源/进度数据 + 通用快捷移动。
  * 机器槽由子类 addSlot 配置；升级槽与玩家背包布局三机完全一致。
  */
 public abstract class AbstractMechanicalMachineMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级 2 + 子类机器槽） */
+    /** 升级槽数（速度/能量/无线接收三层，机器区槽 = 本值 + 子类机器槽） */
     public static final int UPGRADE_SLOT_COUNT = MachineUpgradeSlots.SLOT_COUNT;
 
     protected final Container container;
@@ -37,6 +37,7 @@ public abstract class AbstractMechanicalMachineMenu extends AbstractContainerMen
         // 升级槽（右上角固定并排 y=8，与全模组一致）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         addMachineSlots();
 
@@ -57,6 +58,11 @@ public abstract class AbstractMechanicalMachineMenu extends AbstractContainerMen
 
     protected Container container() {
         return container;
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     // ===== 双能源 + 进度数据（能量为 long，各占低/高 32 位两槽） =====

@@ -13,15 +13,15 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 能量加工器菜单：1 个输入槽（生命固态物）+ 机器升级槽（速度/能量各一格）+ 赤能源/双输入罐/双输出罐/进度数据。
- * 槽位：0/1=升级槽 2=输入槽 3-38=玩家背包与快捷栏。
+ * 能量加工器菜单：1 个输入槽（生命固态物）+ 机器升级槽（速度/能量/无线接收各一格）+ 赤能源/双输入罐/双输出罐/进度数据。
+ * 槽位：0/1/2=升级槽 3=输入槽 4-39=玩家背包与快捷栏。
  * 数据槽：long 值各占高低两槽（SimpleContainerData 仅支持 int）
  * 0/1=赤能量 2/3=赤容量 4/5=至纯能量入量 6/7=至纯能量入容量 8/9=复合能量入量 10/11=复合能量入容量
  * 12/13=至纯燃料出量 14/15=至纯燃料出容量 16/17=复合燃料出量 18/19=复合燃料出容量 20=加工进度百分比。
  */
 public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输入槽 1），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 输入槽 1），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + AkaishiEnergyProcessorBlockEntity.SLOT_COUNT;
 
     private final Container container;
@@ -38,9 +38,10 @@ public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量/无线接收各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 输入槽：只收生命固态物
         addSlot(new Slot(container, AkaishiEnergyProcessorBlockEntity.INPUT_SLOT, 116, 30) {
@@ -124,6 +125,11 @@ public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

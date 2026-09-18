@@ -72,8 +72,6 @@ public class AkaishiFuelMixerScreen extends AbstractContainerScreen<AkaishiFuelM
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
         }
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
 
         // 输入区
         drawBar(gui, x, y + IN1_Y, "gui.akaishi.mixer.in1",
@@ -136,6 +134,11 @@ public class AkaishiFuelMixerScreen extends AbstractContainerScreen<AkaishiFuelM
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        } else if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

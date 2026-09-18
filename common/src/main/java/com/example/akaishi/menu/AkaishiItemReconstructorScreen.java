@@ -49,11 +49,10 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
         GuiWidgets.slotBox(gui, x + 26, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 62, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 98, y + SLOT_Y);
-        // 升级槽（速度/能量，固定面板右上角，纹理无图案需自绘框；标签置于槽位左侧）
+        // 升级槽（速度/能量/无线，固定面板右上角，纹理无图案需自绘框；标签置于槽位左侧）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + UPGRADE_Y + 4, 0xFF707070, false);
+        GuiWidgets.slotBox(gui, x + 116, y + UPGRADE_Y);
 
         // 能量条
         GuiWidgets.track(gui, x + 20, y + ENERGY_Y, 136, BAR_H);
@@ -101,13 +100,13 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
         }
         // 机器槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
         else if (isHovering(26, SLOT_Y, 16, 16, mouseX, mouseY)
-                && menu.slots.get(2).getItem().isEmpty()) {
+                && menu.slots.get(3).getItem().isEmpty()) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.input_tip"), mouseX, mouseY);
         } else if (isHovering(62, SLOT_Y, 16, 16, mouseX, mouseY)
-                && menu.slots.get(3).getItem().isEmpty()) {
+                && menu.slots.get(4).getItem().isEmpty()) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.crystal_tip"), mouseX, mouseY);
         } else if (isHovering(98, SLOT_Y, 16, 16, mouseX, mouseY)
-                && menu.slots.get(4).getItem().isEmpty()) {
+                && menu.slots.get(5).getItem().isEmpty()) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.reconstructor.output_tip"), mouseX, mouseY);
         }
         // 升级槽悬停提示
@@ -121,6 +120,12 @@ public class AkaishiItemReconstructorScreen extends AbstractContainerScreen<Akai
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

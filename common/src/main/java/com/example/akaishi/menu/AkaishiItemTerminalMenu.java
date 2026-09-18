@@ -1,12 +1,15 @@
 package com.example.akaishi.menu;
 
 import java.util.List;
+import java.util.UUID;
 
-import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
+import com.example.akaishi.api.storage.IItemTerminalHost;
+import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemTerminalFee;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -25,7 +28,8 @@ import net.minecraft.world.item.ItemStack;
  * <b>滚动纯客户端</b>：滚动行只是本机状态（AE2 滚动条同理），点击时把「选中条目 + 动作」发到服务端，
  * 服务端按物品重新定位条目，故不存在"两侧对不齐页"的问题。
  */
-public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
+public class AkaishiItemTerminalMenu extends AbstractContainerMenu
+        implements SecurityPage.Source, AkaishiTerminalSecuritySync.Target {
 
     // ===== 库页 / 面板几何（Menu 与 Screen 共用，避免两侧坐标错位） =====
 
@@ -62,9 +66,22 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
     /** 视距校验：超过 8 格自动关闭菜单，防远程操作 */
     private static final double MAX_DISTANCE_SQR = 64.0D;
 
-    private final AkaishiItemTerminalBlockEntity terminal;
+    private final IItemTerminalHost terminal;
     private final ContainerData data;
     private final Player player;
+    /** 安全页授权槽（瞬时容器：关闭界面时未登记的卡返还玩家，防物品丢失） */
+    private final SimpleContainer cardInv = new SimpleContainer(1);
+    /** 授权槽是否激活（仅安全页激活；客户端 Screen 每帧同步） */
+    private boolean securitySlotActive;
+
+    // ===== 安全页：权限表快照（客户端渲染只读；S2C 包填充） =====
+
+    private String securityOwnerName = "";
+    private boolean securityHasDefault;
+    private int securityDefaultPerms;
+    private List<AkaishiTerminalSecuritySync.Entry> securityEntries = List.of();
+    /** 服务端：已推送的权限表版本（仅变化时重推，免每 tick 空包） */
+    private int securitySentRevision = -1;
 
     /** 服务端：已下发的库内容版本 / 成型状态（仅变化时重推，免每 tick 空包） */
     private int sentRevision = -1;
@@ -90,7 +107,7 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
      */
     private boolean vanillaRenderPass;
 
-    public AkaishiItemTerminalMenu(int id, Inventory inv, AkaishiItemTerminalBlockEntity terminal) {
+    public AkaishiItemTerminalMenu(int id, Inventory inv, IItemTerminalHost terminal) {
         super(ModMenus.CHISHI_ITEM_TERMINAL.get(), id);
         this.terminal = terminal;
         this.player = inv.player;
@@ -98,7 +115,7 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
         // 否则客户端索引会错位
         this.data = terminal != null
                 ? terminal.data()
-                : new SimpleContainerData(AkaishiItemTerminalBlockEntity.DATA_SLOTS);
+                : new SimpleContainerData(IItemTerminalHost.DATA_SLOTS);
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < COLUMNS; col++) {
@@ -108,7 +125,92 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
         for (int col = 0; col < COLUMNS; col++) {
             addSlot(new Slot(inv, col, SLOT_X + col * SLOT_STEP, HOTBAR_Y));
         }
+        // 安全页授权槽挂在玩家槽之后（下标 36）：玩家槽下标保持 0..35，quickMoveStack 不受影响；
+        // 库页虚拟槽由 Screen#init 追加在其后
+        addCardSlot();
         addDataSlots(this.data);
+    }
+
+    /** 安全页授权槽：仅允许放入身份卡；isActive 由 Screen 按页面切换（非安全页隐藏槽） */
+    private void addCardSlot() {
+        this.addSlot(new Slot(cardInv, 0, SecurityPage.CARD_SLOT_X, SecurityPage.CARD_SLOT_Y + SEC_PAGE_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.getItem() instanceof AkaishiWirelessIdentityCardItem;
+            }
+
+            @Override
+            public boolean isActive() {
+                return securitySlotActive;
+            }
+        });
+    }
+
+    /** 安全页整体下移量：物品终端面板更高（背包在 y=147），且 y=17..35 是 IP 条与 IP 文本行 */
+    public static final int SEC_PAGE_Y = 10;
+
+    /** 授权槽是否激活（仅安全页激活） */
+    public void setSecuritySlotActive(boolean active) {
+        this.securitySlotActive = active;
+    }
+
+    // ===== 安全页：服务端动作 + 客户端快照（SecurityPage.Source 实现） =====
+
+    /**
+     * 服务端执行一次安全页动作。安全校验走<b>本地权威权限表</b>：
+     * 物品终端不参与无线网络注册表，没有可查的镜像。
+     */
+    public void applySecurityAction(Player actor, byte action, UUID target, int permOrdinal) {
+        if (terminal == null) {
+            return;
+        }
+        SecurityPage.applyAction(terminal.security(),
+                (checkPlayer, perm) -> SecurityPage.checkLocal(terminal.security(), checkPlayer, perm),
+                actor, cardInv.getItem(0), action, target, permOrdinal);
+    }
+
+    /** 客户端：接收权限表快照（渲染只读） */
+    public void acceptSecurity(String ownerName, boolean hasDefault, int defaultPerms,
+            List<AkaishiTerminalSecuritySync.Entry> entries) {
+        this.securityOwnerName = ownerName == null ? "" : ownerName;
+        this.securityHasDefault = hasDefault;
+        this.securityDefaultPerms = defaultPerms;
+        this.securityEntries = List.copyOf(entries);
+    }
+
+    @Override
+    public String securityOwnerName() {
+        return securityOwnerName;
+    }
+
+    @Override
+    public List<AkaishiTerminalSecuritySync.Entry> securityEntries() {
+        return securityEntries;
+    }
+
+    @Override
+    public boolean securityHasDefault() {
+        return securityHasDefault;
+    }
+
+    @Override
+    public int securityDefaultPerms() {
+        return securityDefaultPerms;
+    }
+
+    @Override
+    public boolean securityEnabled() {
+        return !securityEntries.isEmpty() || securityHasDefault;
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        // 授权槽是 Menu 内瞬时容器（非方块实体物品栏）：关闭界面时未登记的卡必须返还玩家，防物品丢失
+        ItemStack card = cardInv.removeItemNoUpdate(0);
+        if (!card.isEmpty() && player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.getInventory().placeItemBackInInventory(card);
+        }
     }
 
     // ===== 库页条目仓库（客户端） =====
@@ -198,49 +300,49 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
         return this.clientFormed;
     }
 
-    public AkaishiItemTerminalBlockEntity terminal() {
+    public IItemTerminalHost terminal() {
         return this.terminal;
     }
 
     // ===== 数据槽读数（服务端权威值，经数据槽同步到客户端） =====
 
     public boolean formed() {
-        return this.data.get(AkaishiItemTerminalBlockEntity.DATA_FORMED) != 0;
+        return this.data.get(IItemTerminalHost.DATA_FORMED) != 0;
     }
 
     public long usedIp() {
-        return LongDataSlots.read(this.data, AkaishiItemTerminalBlockEntity.DATA_USED_LOW,
-                AkaishiItemTerminalBlockEntity.DATA_USED_HIGH, AkaishiItemTerminalBlockEntity.DATA_USED_HIGH2,
-                AkaishiItemTerminalBlockEntity.DATA_USED_HIGH3);
+        return LongDataSlots.read(this.data, IItemTerminalHost.DATA_USED_LOW,
+                IItemTerminalHost.DATA_USED_HIGH, IItemTerminalHost.DATA_USED_HIGH2,
+                IItemTerminalHost.DATA_USED_HIGH3);
     }
 
     public long capacityIp() {
-        return LongDataSlots.read(this.data, AkaishiItemTerminalBlockEntity.DATA_CAPACITY_LOW,
-                AkaishiItemTerminalBlockEntity.DATA_CAPACITY_HIGH, AkaishiItemTerminalBlockEntity.DATA_CAPACITY_HIGH2,
-                AkaishiItemTerminalBlockEntity.DATA_CAPACITY_HIGH3);
+        return LongDataSlots.read(this.data, IItemTerminalHost.DATA_CAPACITY_LOW,
+                IItemTerminalHost.DATA_CAPACITY_HIGH, IItemTerminalHost.DATA_CAPACITY_HIGH2,
+                IItemTerminalHost.DATA_CAPACITY_HIGH3);
     }
 
     public long bufferedEnergy() {
-        return LongDataSlots.read(this.data, AkaishiItemTerminalBlockEntity.DATA_BUFFER_LOW,
-                AkaishiItemTerminalBlockEntity.DATA_BUFFER_HIGH, AkaishiItemTerminalBlockEntity.DATA_BUFFER_HIGH2,
-                AkaishiItemTerminalBlockEntity.DATA_BUFFER_HIGH3);
+        return LongDataSlots.read(this.data, IItemTerminalHost.DATA_BUFFER_LOW,
+                IItemTerminalHost.DATA_BUFFER_HIGH, IItemTerminalHost.DATA_BUFFER_HIGH2,
+                IItemTerminalHost.DATA_BUFFER_HIGH3);
     }
 
     public int unitCount() {
-        return this.data.get(AkaishiItemTerminalBlockEntity.DATA_UNIT_COUNT);
+        return this.data.get(IItemTerminalHost.DATA_UNIT_COUNT);
     }
 
     /** 有效赤能源缓冲容量（服务端权威值：配置基准 + 缓冲扩展组件加成） */
     public long effectiveBufferCapacity() {
-        return LongDataSlots.read(this.data, AkaishiItemTerminalBlockEntity.DATA_EFFECTIVE_BUFFER_LOW,
-                AkaishiItemTerminalBlockEntity.DATA_EFFECTIVE_BUFFER_HIGH,
-                AkaishiItemTerminalBlockEntity.DATA_EFFECTIVE_BUFFER_HIGH2,
-                AkaishiItemTerminalBlockEntity.DATA_EFFECTIVE_BUFFER_HIGH3);
+        return LongDataSlots.read(this.data, IItemTerminalHost.DATA_EFFECTIVE_BUFFER_LOW,
+                IItemTerminalHost.DATA_EFFECTIVE_BUFFER_HIGH,
+                IItemTerminalHost.DATA_EFFECTIVE_BUFFER_HIGH2,
+                IItemTerminalHost.DATA_EFFECTIVE_BUFFER_HIGH3);
     }
 
     /** 生效的费率减免份数（0 ~ FEE_MODULE_MAX） */
     public int effectiveFeeModules() {
-        return this.data.get(AkaishiItemTerminalBlockEntity.DATA_FEE_MODULES);
+        return this.data.get(IItemTerminalHost.DATA_FEE_MODULES);
     }
 
     /**
@@ -260,6 +362,12 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu {
         super.broadcastChanges();
         if (!(this.player instanceof ServerPlayer serverPlayer) || this.terminal == null) {
             return;
+        }
+        // 安全页权限表：与库内容版本相互独立，变化才推快照（免每 tick 空包）
+        var security = this.terminal.security();
+        if (security.revision() != this.securitySentRevision) {
+            this.securitySentRevision = security.revision();
+            AkaishiTerminalSecuritySync.sendSnapshot(serverPlayer, this.containerId, security);
         }
         int revision = this.terminal.contentRevision();
         boolean formed = this.terminal.isFormed();

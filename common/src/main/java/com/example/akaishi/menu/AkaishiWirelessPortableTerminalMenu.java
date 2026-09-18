@@ -1,10 +1,12 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
 import com.example.akaishi.item.AkaishiWirelessPortableTerminalItem;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.PortableSupplyService;
+import com.example.akaishi.wireless.WirelessFamily;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -19,8 +21,8 @@ import java.util.UUID;
 
 /**
  * 无线能源便捷终端菜单（手持物品，遥控面板，参考 AE2 无线终端）：
- * 无方块实体；服务端每 tick broadcastChanges 扫描玩家背包中的身份卡（取第一张），
- * 反查授权该卡的在线终端并把其状态（成型/储能/口统计/卡与终端短 ID）写入数据槽，
+ * 无方块实体；服务端每 tick broadcastChanges 取背包第一张身份卡绑定的身份（未绑定/未持卡则用玩家自己），
+ * 按终端安全表（CRAFT 权限）反查在线终端并把其状态（成型/储能/口统计/卡与终端短 ID）写入数据槽，
  * 随原版数据槽同步推送给客户端。终端本身不参与物品搬运，但可经「随身供能」开关
  * 把绑定终端储能持续注入玩家随身承接物（背包单元/已装备饰品），详见 {@link PortableSupplyService}。
  */
@@ -79,15 +81,18 @@ public class AkaishiWirelessPortableTerminalMenu extends AbstractContainerMenu {
         }
     }
 
-    /** 服务端刷新数据槽：取背包第一张身份卡，反查其授权终端的在线状态（无全图扫描） */
+    /** 服务端刷新数据槽：身份取背包第一张身份卡绑定的玩家（未绑定/未持卡则用玩家自己），按安全表反查终端 */
     private void refreshData(Level level) {
         ItemStack card = findCard(player);
-        // 服务端逻辑：为背包新卡生成唯一卡号，保证能反查授权终端
+        // 服务端逻辑：为背包新卡生成唯一卡号，供 GUI 显示卡短 ID
         UUID cardUuid = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.ensureUuid(card);
         LongDataSlots.writeInt(data, DATA_CARD_HASH, DATA_CARD_HASH_HIGH,
                 cardUuid == null ? 0 : (int) (cardUuid.getMostSignificantBits() >>> 32));
 
-        UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid);
+        UUID identity = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.playerOf(card);
+        UUID terminalId = WirelessNetworkManager.findTerminalForIdentity(
+                identity == null ? player.getUUID() : identity, WirelessFamily.CHISHI,
+                AkaishiSecurityPermission.CRAFT);
         boolean formed = false;
         boolean supplyUnlocked = false;
         long stored = 0;

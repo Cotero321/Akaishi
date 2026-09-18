@@ -79,6 +79,8 @@ public final class ModItems {
     /** 机器升级组件：装入用电器升级槽，单格堆叠 8 封顶（速度/能量各一格、互斥） */
     public static final String MACHINE_SPEED_UPGRADE_ID = "akaishi_machine_speed_upgrade";
     public static final String MACHINE_ENERGY_UPGRADE_ID = "akaishi_machine_energy_upgrade";
+    /** 无线接收升级：装 1 个即让机器加入无线场域（被微缩矩阵终端调度） */
+    public static final String MACHINE_WIRELESS_RECEIVER_UPGRADE_ID = "akaishi_machine_wireless_receiver_upgrade";
     // ===== 粉末（打粉机产物 / 压缩机原料）=====
     public static final String CHISHI_DUST_ID = "akaishi_dust";
     public static final String COAL_DUST_ID = "coal_dust";
@@ -191,6 +193,7 @@ public final class ModItems {
     public static RegistrySupplier<Item> fertilityRing;
     public static RegistrySupplier<Item> machineSpeedUpgrade;
     public static RegistrySupplier<Item> machineEnergyUpgrade;
+    public static RegistrySupplier<Item> machineWirelessReceiverUpgrade;
     public static RegistrySupplier<Item> akaishiDust;
     public static RegistrySupplier<Item> coalDust;
     public static RegistrySupplier<Item> ironDust;
@@ -371,6 +374,7 @@ public final class ModItems {
         fertilityRing = AkaishiBaseItems.fertilityRing;
         machineSpeedUpgrade = AkaishiBaseItems.machineSpeedUpgrade;
         machineEnergyUpgrade = AkaishiBaseItems.machineEnergyUpgrade;
+        machineWirelessReceiverUpgrade = AkaishiBaseItems.machineWirelessReceiverUpgrade;
         akaishiDust = AkaishiBaseItems.akaishiDust;
         coalDust = AkaishiBaseItems.coalDust;
         ironDust = AkaishiBaseItems.ironDust;

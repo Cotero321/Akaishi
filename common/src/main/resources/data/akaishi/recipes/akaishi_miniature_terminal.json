@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "C C",
+    "ICI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_mini_matrix_casing" },
+    "C": { "item": "akaishi:akaishi_wireless_component" }
+  },
+  "result": { "item": "akaishi:akaishi_miniature_terminal", "count": 1 }
+}

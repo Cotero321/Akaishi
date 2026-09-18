@@ -58,12 +58,10 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
         GuiWidgets.slotBox(gui, x + 44, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 80, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + 116, y + SLOT_Y);
-        // 升级槽（速度/能量，输入槽行右侧）
+        // 升级槽（速度/能量/无线接收，输入槽行右侧）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        // 升级槽标签（槽位左侧小字提示）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
+        GuiWidgets.slotBox(gui, x + 116, y + 8);
 
         drawBar(gui, x, y + ENERGY_Y, "gui.akaishi.energy.short",
                 menu.getEnergy(), menu.getEnergyCapacity(), 0xFFE03030);
@@ -109,6 +107,12 @@ public class AkaishiActivatedFractionatorScreen extends AbstractContainerScreen<
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 业务槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）

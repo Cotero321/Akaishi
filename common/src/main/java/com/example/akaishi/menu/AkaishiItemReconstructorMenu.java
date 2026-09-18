@@ -16,12 +16,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 物品重构仪菜单：升级槽（速度/能量）+ 3 机器槽（2=原料，3=衰竭结晶代价，4=产物）+ 玩家背包 + 5 数据槽。
+ * 物品重构仪菜单：升级槽（速度/能量/无线）+ 3 机器槽（3=原料，4=衰竭结晶代价，5=产物）+ 玩家背包 + 5 数据槽。
  * 结晶槽仅接纳衰竭结晶（mayPlace 限制）；原料槽排除升级组件（保证 shift 点击时升级组件只进升级槽）。
  */
 public class AkaishiItemReconstructorMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 机器物品槽 3），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 机器物品槽 3），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 3;
 
     private final ContainerData data;
@@ -42,9 +42,10 @@ public class AkaishiItemReconstructorMenu extends AbstractContainerMenu {
         this.inventory = inventory;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
+        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         addSlot(new Slot(inventory, 0, 26, 40) {
             @Override
@@ -110,6 +111,11 @@ public class AkaishiItemReconstructorMenu extends AbstractContainerMenu {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
     }
 
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack stack = ItemStack.EMPTY;
@@ -126,14 +132,16 @@ public class AkaishiItemReconstructorMenu extends AbstractContainerMenu {
             } else {
                 // 玩家背包/快捷栏：结晶 → 结晶槽，升级组件 → 升级槽，其余 → 原料槽，再背包内移动
                 if (current.is(ModItems.exhaustedCrystal.get())) {
-                    if (!this.moveItemStackTo(current, 3, 4, false)) {
+                    if (!this.moveItemStackTo(current, MachineUpgradeSlots.SLOT_COUNT + 1,
+                            MachineUpgradeSlots.SLOT_COUNT + 2, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
-                    if (!this.moveItemStackTo(current, 0, 2, false)) {
+                    if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (!this.moveItemStackTo(current, 2, 3, false)) {
+                } else if (!this.moveItemStackTo(current, MachineUpgradeSlots.SLOT_COUNT,
+                        MachineUpgradeSlots.SLOT_COUNT + 1, false)) {
                     return ItemStack.EMPTY;
                 }
                 if (!this.moveItemStackTo(current, MACHINE_SLOT_END + 27,

@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.fluid.ModFluids;
+import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -24,8 +25,8 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
     private static final int FLUID_BAR_Y = 38;
     /** 液化进度条区域 */
     private static final int PROGRESS_Y = 50;
-    /** 机器槽位数量（升级槽 2 + 输入/固态物槽 2，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = 4;
+    /** 机器槽位数量（升级槽 3 + 输入/固态物槽 2，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = MachineUpgradeSlots.SLOT_COUNT + 2;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角并排 y=8 起，规则3） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
@@ -64,14 +65,11 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 机器槽位框（贴图无图形，自绘补齐；0/1=升级槽 2/3=输入/固态物槽）
+        // 机器槽位框（贴图无图形，自绘补齐；0/1/2=升级槽 3/4=输入/固态物槽）
         for (int i = 0; i < MACHINE_SLOTS; i++) {
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
         }
-        // 升级槽标签（输入槽行左侧小字提示）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
 
         // 赤能源条（红）
         drawBar(gui, x + CHISHI_BAR_X, y + CHISHI_BAR_Y, "gui.akaishi.energy.short",
@@ -120,6 +118,12 @@ public class AkaishiEnergyLiquefierScreen extends AbstractContainerScreen<Akaish
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 材料输入槽/生命固态物槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）

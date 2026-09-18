@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "akaishi:block/akaishi_mini_matrix_terminal"
+    },
+    "formed=true": {
+      "model": "akaishi:block/akaishi_mini_matrix_terminal_formed"
+    }
+  }
+}

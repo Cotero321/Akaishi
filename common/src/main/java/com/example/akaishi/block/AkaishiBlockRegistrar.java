@@ -27,10 +27,22 @@ public final class AkaishiBlockRegistrar {
     /** 注册方块及其同名 BlockItem，返回方块的延迟引用 */
     public static RegistrySupplier<Block> registerMachineBlock(Registrar<Block> registrar, String id,
                                                                Supplier<Block> factory) {
+        return registerMachineBlock(registrar, id, factory, BlockItem::new);
+    }
+
+    /**
+     * 注册方块及其同名 BlockItem，<b>自定义物品类型</b>（如需要悬浮文本的物品）。
+     * <p>
+     * 与上面同 id 同语义，只是把 BlockItem 的构造交给调用方；默认重载仍走原版 {@link BlockItem}，
+     * 因此既有域类无需改动。
+     */
+    public static RegistrySupplier<Block> registerMachineBlock(Registrar<Block> registrar, String id,
+                                                               Supplier<Block> factory,
+                                                               java.util.function.BiFunction<Block, Item.Properties, Item> itemFactory) {
         RegistrySupplier<Block> block = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, id), factory);
         RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.ITEM)
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, id),
-                        () -> new BlockItem(block.get(), new Item.Properties()));
+                        () -> itemFactory.apply(block.get(), new Item.Properties()));
         return block;
     }
 

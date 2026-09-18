@@ -41,10 +41,11 @@ public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）。
-        // 右缘(152)避让右侧垂直能量条(153 起)，与输出槽(116,35)垂直错开不堆叠
+        // 升级槽（速度/能量/无线接收各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）。
+        // 无线接收槽右移至 152 避开既有两格；右缘(168)让开右侧垂直能量条(153 起，条体已整体下移)
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 116, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 134, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 152, 8));
 
         // 输入槽：仅接受提纯原料（粗制赤石块 / 赤石水晶块）
         addSlot(new Slot(container, AkaishiPurifierMatrixControllerBlockEntity.INPUT_SLOT, 56, 17) {
@@ -98,6 +99,11 @@ public class AkaishiPurifierMatrixControllerMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

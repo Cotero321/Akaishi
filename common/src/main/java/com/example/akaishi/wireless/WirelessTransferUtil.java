@@ -1,6 +1,6 @@
 package com.example.akaishi.wireless;
 
-import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.config.ModConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -13,9 +13,10 @@ import java.util.UUID;
  * <p>
  * 损耗规则：同维度按欧氏距离线性增长（基础 + 每格额外），封顶 {@link ModConfig#wirelessMaxLoss}；
  * 跨维度无距离概念，使用固定跨维损耗 {@link ModConfig#wirelessCrossDimLoss}（需终端已解锁跨维度）。
- * {@link #resolveTerminal} 按身份卡认证反查授权终端：同维度直查，异维度需终端解锁跨维度，
- * 并经服务器在目标维度查询（终端所在区块由区块加载构架弱加载保证在线）。
- * 族感知：卡反查与终端实体校验均限定 {@link WirelessFamily}，跨族终端不可命中。
+ * {@link #resolveTerminal} 按端口记录的终端 ID 直达目标终端，并校验绑定身份在终端安全表里的方向权限：
+ * 同维度直查，异维度需终端解锁跨维度，并经服务器在目标维度查询
+ * （终端所在区块由区块加载构架弱加载保证在线）。
+ * 族感知：终端实体校验限定 {@link WirelessFamily}，跨族终端不可命中。
  */
 public final class WirelessTransferUtil {
 
@@ -46,29 +47,19 @@ public final class WirelessTransferUtil {
     }
 
     /**
-     * 解析绑定卡可用的成型赤能源终端（旧签名保留：委派 {@link WirelessFamily#CHISHI} 族解析后强转回
-     * 具体类型，赤能源输入口/输出口与便携终端的编译与行为均不变）。
+     * <b>远程绑定解析</b>（新路径）：按端口记录的终端 ID 直达终端，并校验「绑定身份」在目标终端安全表里的
+     * 方向权限（输入口 {@code INJECT}、输出口 {@code EXTRACT}）——不再依赖身份卡白名单。
+     * <p>
+     * 归属者在安全表里恒为全权限；未登记任何条目的终端默认全放行，因此不配置安全的单机场景行为不变。
      *
-     * @return 成型赤能源终端方块实体，或 null（卡未授权 / 无在线终端 / 未解锁跨维度 / 终端区块未加载）
+     * @return 成型终端，或 null（未绑定 / 权限不足 / 未解锁跨维度 / 终端区块未加载）
      */
-    public static AkaishiWirelessTerminalBlockEntity resolveTerminal(Level level, UUID boundCard) {
-        IWirelessTerminal t = resolveTerminal(level, boundCard, WirelessFamily.CHISHI);
-        return t instanceof AkaishiWirelessTerminalBlockEntity be ? be : null;
-    }
-
-    /**
-     * 族感知解析绑定卡可用的成型终端：按卡 UUID + 网络族反查网络注册表（参考 MEK 同卡配对）；
-     * 同维度直查；异维度需终端已解锁跨维度，并经服务器在目标维度查询
-     * （终端所在区块由区块加载构架弱加载保证在线）。跨族终端经 family 校验不可命中。
-     *
-     * @return 成型终端（族已匹配），或 null（卡未授权 / 无在线终端 / 未解锁跨维度 / 终端区块未加载）
-     */
-    public static IWirelessTerminal resolveTerminal(Level level, UUID boundCard, WirelessFamily family) {
-        WirelessFamily f = family == null ? WirelessFamily.CHISHI : family;
-        UUID terminalId = WirelessNetworkManager.findTerminalForCard(boundCard, f);
-        if (terminalId == null) {
+    public static IWirelessTerminal resolveTerminal(Level level, UUID terminalId, WirelessFamily family,
+            UUID identity, AkaishiSecurityPermission required) {
+        if (terminalId == null || !WirelessNetworkManager.hasPermission(terminalId, identity, required)) {
             return null;
         }
+        WirelessFamily f = family == null ? WirelessFamily.CHISHI : family;
         WirelessNetworkManager.TerminalRef tr = WirelessNetworkManager.terminalOf(terminalId);
         if (tr == null) {
             return null;
@@ -81,10 +72,7 @@ public final class WirelessTransferUtil {
             return null;
         }
         ServerLevel target = level.getServer().getLevel(tr.dimension());
-        if (target == null) {
-            return null;
-        }
-        return terminalAt(target, tr.pos(), f);
+        return target == null ? null : terminalAt(target, tr.pos(), f);
     }
 
     /** 读取位置处成型且属指定族的终端（额外实体级校验，防注册表与实体状态不一致） */

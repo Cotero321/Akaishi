@@ -50,11 +50,15 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
         // 固定面板右上角 y=8 顶部留白（规则 3）；浮层打开时失活让位）
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
                 () -> linkState != null && linkState.open));
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
+                () -> linkState != null && linkState.open));
+        // 无线接收格放 (152,26)：本界面中上带已有「存储」按钮 (90,6)-(122,16) 会压住 (116,8)，
+        // 且其 mouseClicked 优先命中该按钮 → 放左上角会导致「点槽位却切浮层」，故改放能量格正下方
+        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 152, 26,
                 () -> linkState != null && linkState.open));
 
         // 输入槽：仅接受纯度 ≥25 的生命样本（未达解构门槛只能用于药剂）
@@ -121,6 +125,11 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

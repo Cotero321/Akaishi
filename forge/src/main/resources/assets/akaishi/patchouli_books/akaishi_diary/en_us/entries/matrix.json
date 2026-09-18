@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Akaishi's \"sealed-cavity matrices\" in one line: $(4)wall off scattered machines into a hollow box and merge them into one big machine$(0).$(br2)$(bold)Universal rules:$(0)$(li)Casing is a $(bold)hollow sealed box with an odd edge length$(0) (3 or 5)$(li)Casings make the walls; ports and the controller sit on them, and the $(4)cavity must be empty$(0)$(li)Once formed it works as one unit — break any casing block and it instantly fails$(br2)Only two matrices have ever been built under these rules: one generates power, the other refines essence. Open their entries below for the exact layouts and stats."
+      "text": "Akaishi's \"sealed-cavity matrices\" in one line: $(4)wall off scattered machines into a hollow box and merge them into one big machine$(0).$(br2)$(bold)Universal rules:$(0)$(li)Casing is a $(bold)hollow sealed box with an odd edge length$(0) (3 or 5)$(li)Casings make the walls; ports and the controller sit on them, and the $(4)cavity must be empty$(0)$(li)Once formed it works as one unit — break any casing block and it instantly fails$(br2)Alongside the generator and purifier matrices there is a third: the Miniature Matrix Terminal. Same sealed cavity, but its $(4)cavity takes upgrade components and its walls take Miniature Terminal chips$(0), letting it schedule machines in the field across the air. Open their entries below for the exact layouts and stats."
     },
     {
       "type": "patchouli:text",
@@ -17,10 +17,11 @@
       "entries": [
         "akaishi:gen_matrix",
         "akaishi:purifier_matrix",
+        "akaishi:mini_matrix",
         "akaishi:generator",
         "akaishi:purifier"
       ],
-      "text": "Single-block machines are where matrices start: the $(l:akaishi:generator)Energy Generator$(/l) and the $(l:akaishi:purifier)Akaishi Purifier$(/l) each have their own entry, and the two matrices grow out of them."
+      "text": "Single-block machines are where matrices start: the $(l:akaishi:generator)Energy Generator$(/l) and the $(l:akaishi:purifier)Akaishi Purifier$(/l) each have their own entry, and the two matrices grow out of them. The third form is the $(l:akaishi:mini_matrix)Miniature Matrix Terminal$(/l): chips on the walls of a 5x5x5 cavity network it, scheduling machines in the field across the air."
     }
   ]
 }

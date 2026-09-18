@@ -2,6 +2,7 @@ package com.example.akaishi.block;
 
 import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import com.example.akaishi.miniature.MiniatureCollapse;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
@@ -46,6 +47,22 @@ public class AkaishiLifeWirelessTerminalBlock extends AkaishiMachineBlock {
         builder.add(FORMED);
     }
 
+    /**
+     * 记录归属者：终端「归属者恒全权限」是安全系统的根（AE2 口径：谁放安全终端谁是主人）。
+     * 结构主方块被放置时写入，之后不随拆装结构改变。
+     */
+    @Override
+    public void setPlacedBy(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+            BlockState state, net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (level.isClientSide || !(placer instanceof net.minecraft.world.entity.player.Player player)) {
+            return;
+        }
+        if (level.getBlockEntity(pos) instanceof com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity be) {
+            be.setOwner(player.getUUID(), player.getGameProfile().getName());
+        }
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -67,6 +84,10 @@ public class AkaishiLifeWirelessTerminalBlock extends AkaishiMachineBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        // 潜行 + 可微缩终端 ⇒ 坍缩为单方块（命中即拦截，不再开界面）
+        if (MiniatureCollapse.handleSneakUse(level, pos, player)) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof AkaishiLifeWirelessTerminalBlockEntity terminal
                 && player instanceof ServerPlayer serverPlayer) {
             MenuRegistry.openExtendedMenu(serverPlayer, terminal);

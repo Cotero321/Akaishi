@@ -12,13 +12,13 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 燃料混合器菜单：机器升级槽（速度/能量各一格，顶部并排）+ 玩家背包 + 17 个数据槽同步。
- * 槽位：0/1=升级槽 2-37=玩家背包与快捷栏。
+ * 燃料混合器菜单：机器升级槽（速度/能量/无线接收各一格，顶部并排）+ 玩家背包 + 17 个数据槽同步。
+ * 槽位：0/1/2=升级槽 3-38=玩家背包与快捷栏。
  * 数据槽：0/1=赤能量/容量 2/3=输入1 4/5=输入2 6/7=输出 8=混合进度。
  */
 public class AkaishiFuelMixerMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2，无物品输入输出槽），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3，无物品输入输出槽），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT;
 
     private final ContainerData data;
@@ -33,9 +33,10 @@ public class AkaishiFuelMixerMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
+        // 升级槽（速度/能量/无线接收各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -101,6 +102,11 @@ public class AkaishiFuelMixerMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

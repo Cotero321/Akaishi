@@ -32,6 +32,25 @@ public class TerminalDisplaySlot extends Slot {
         this.viewIndex = viewIndex;
     }
 
+    /**
+     * 是否参与原版 hover 高亮 / 悬浮文本 / 快速搬运。
+     * <p>
+     * 安全页等「覆盖式页面」在库区之上绘制时置 false：否则这些看不见的格子仍会被
+     * {@code AbstractContainerScreen.getHoveredSlot} 命中，导致上一页的槽位高亮与悬浮文本
+     * 穿透到当前页（"隐藏的上一页格子"）。
+     */
+    private boolean active = true;
+
+    /** 由界面按页面切换 */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    @Override
+    public boolean isActive() {
+        return this.active;
+    }
+
     /** 当前应显示的条目（滚动行参与换算），越界为 null */
     public AkaishiItemTerminalSync.Entry entry() {
         return this.menu.entryAt(this.viewIndex);

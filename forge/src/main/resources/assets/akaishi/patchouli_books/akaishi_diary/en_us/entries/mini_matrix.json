@@ -1,0 +1,30 @@
+{
+  "name": "Miniature Matrix Terminal",
+  "icon": "akaishi:akaishi_mini_matrix_terminal",
+  "category": "akaishi:tech",
+  "sortnum": 18,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The Miniature Matrix Terminal $(4)collects scattered machines into one 5x5x5 hollow box$(0): chips mounted on the walls act as the library and the power source, feeding machines across the air — no more pipelines running half a world away.$(br2)$(bold)Formation:$(0)$(li)Wall a $(4)sealed 5x5x5 cavity$(0) with Miniature Matrix Casings (structure glass can replace casings as a window)$(li)Mount the Miniature Matrix Terminal itself on the wall; the controller must sit on a wall$(li)Place the five Mini Matrix upgrade components in the cavity and $(4)leave everything else empty$(0)$(br2)An unsealed box does nothing; break any wall block and it instantly fails, aborting any running craft and returning the locked materials."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "akaishi:akaishi_miniature_terminal",
+      "text": "$(bold)Mounting chips on the walls:$(0) place a $(4)Miniature Terminal$(0) that already holds data on the wall and the matrix will recognize it, reading its $(bold)item library and red energy readouts$(0) — that chip's library becomes the matrix's library, its energy becomes the matrix's energy pool.$(br2)$(li)Need more capacity or more energy? Mount more chips$(li)With no chip at all, crafting reports \"no usable item terminal chip on the walls\"$(li)Security settings are registered once on the matrix and then pushed to every bound chip; sneak-right-click the terminal to push manually$(br2)A chip is a Miniature Terminal holding data — the better the terminal, the more library and energy the matrix can command."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)The five cavity upgrade components (only effective inside the cavity, not on walls):$(0)$(li)$(4)Wireless Control Component$(0) x1: controls machines inside the field network; the target machine needs the Wireless Receiver Upgrade$(li)$(4)Wireless Field Upgrade$(0) up to 3: projects and powers the translucent blue field barrier, +1 chunk radius each$(li)$(4)Wireless Expansion Upgrade$(0) up to 3: each adds one \"Wireless Network Node\" claim slot — place nodes inside the field and each claimed node projects its own 1-chunk sub-field (needs chunk-loading support)$(li)$(4)Wireless Crafting Upgrade$(0) x1: the terminal's Craft page lists craftable items and schedules crafting by recipe (time + red energy + IP)$(li)$(4)Wireless Field Link Upgrade$(0) x1: feeds red energy / life energy / IP directly to machines inside the field (IP only for crafting)$(br2)More of the same component means a higher level, up to the caps above; the Chips page shows the current counts, and a broken structure disables them at once."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "akaishi:matrix",
+        "akaishi:wireless",
+        "akaishi:item_pipe"
+      ],
+      "text": "Suggested reading order: the universal layout rules in $(l:akaishi:matrix)Matrix Structures$(/l) first, then set up cards and security with $(l:akaishi:wireless)Wireless Red Energy$(/l); feed bulk materials through $(l:akaishi:item_pipe)Item Pipes$(/l) and let the matrix take over across the air."
+    }
+  ]
+}

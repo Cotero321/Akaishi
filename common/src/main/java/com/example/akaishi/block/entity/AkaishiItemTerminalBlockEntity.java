@@ -3,22 +3,33 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.miniature.IMiniaturizableTerminal;
 import com.example.akaishi.api.storage.IItemStorageUnit;
 import com.example.akaishi.api.storage.IItemTerminalEnergyPort;
+import com.example.akaishi.api.storage.IItemTerminalHost;
+import com.example.akaishi.block.AkaishiItemStorageUnitBlock;
 import com.example.akaishi.block.AkaishiItemTerminalBlock;
 import com.example.akaishi.block.AkaishiItemTerminalBufferModuleBlock;
+import com.example.akaishi.block.ItemStorageUnitTier;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.AkaishiItemTerminalMenu;
+import com.example.akaishi.miniature.ItemTerminalMiniatureAdapter;
+import com.example.akaishi.miniature.ItemTerminalMiniatureState;
 import com.example.akaishi.multiblock.ItemTerminalStructure;
+import com.example.akaishi.storage.ItemStorageUnitData;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemTerminalFee;
+import com.example.akaishi.wireless.ItemTerminalRegistry;
+import com.example.akaishi.wireless.TerminalSecurity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.player.Inventory;
@@ -37,6 +48,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * 物品终端方块实体：5×5×5 同族壳体多方块的 IP 物品库中枢。
@@ -49,32 +61,9 @@ import java.util.Set;
  * 并一次性扣费（D7 无维持费 ⇒ 无每 tick 抽能）。
  */
 public class AkaishiItemTerminalBlockEntity extends BlockEntity
-        implements IDataCarrier, IEnergyProvider, ExtendedMenuProvider {
+        implements IDataCarrier, IEnergyProvider, ExtendedMenuProvider, IItemTerminalHost, IMiniaturizableTerminal {
 
-    // ===== 数据槽（long 一律拆 4 槽，防 2^31 截断） =====
-    public static final int DATA_FORMED = 0;
-    public static final int DATA_USED_LOW = 1;
-    public static final int DATA_USED_HIGH = 2;
-    public static final int DATA_USED_HIGH2 = 3;
-    public static final int DATA_USED_HIGH3 = 4;
-    public static final int DATA_CAPACITY_LOW = 5;
-    public static final int DATA_CAPACITY_HIGH = 6;
-    public static final int DATA_CAPACITY_HIGH2 = 7;
-    public static final int DATA_CAPACITY_HIGH3 = 8;
-    public static final int DATA_BUFFER_LOW = 9;
-    public static final int DATA_BUFFER_HIGH = 10;
-    public static final int DATA_BUFFER_HIGH2 = 11;
-    public static final int DATA_BUFFER_HIGH3 = 12;
-    /** 已贴装并联的储存单元数量 */
-    public static final int DATA_UNIT_COUNT = 13;
-    /** 有效赤能源缓冲容量（配置基准 + 缓冲扩展组件加成）：客户端据此显示正确的单笔上限 */
-    public static final int DATA_EFFECTIVE_BUFFER_LOW = 14;
-    public static final int DATA_EFFECTIVE_BUFFER_HIGH = 15;
-    public static final int DATA_EFFECTIVE_BUFFER_HIGH2 = 16;
-    public static final int DATA_EFFECTIVE_BUFFER_HIGH3 = 17;
-    /** 生效的费率减免份数（0 ~ ItemTerminalFee.FEE_MODULE_MAX） */
-    public static final int DATA_FEE_MODULES = 18;
-    public static final int DATA_SLOTS = 19;
+    // 数据槽下标（DATA_*）随 IItemTerminalHost 一并下沉：菜单只依赖接口，不依赖本类
 
     /** 储存单元搜索范围：墙面 + 结构外围 1 格（单元可贴外侧 1 格，也可镶嵌进墙面） */
     private static final int BIND_RANGE = 1;
@@ -90,6 +79,19 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     /** 结构扫描缓存失效标记 */
     private boolean structureDirty = true;
     private int scanCooldown;
+    /**
+     * 安全状态（归属者 + 权限表 + 默认权限条目）：权威数据。
+     * 物品终端不参与无线网络注册表（没有端口/便携终端来查它），判定走本地
+     * （{@code SecurityPage#checkLocal}），因此变化回调只需落盘。
+     */
+    private final TerminalSecurity security = new TerminalSecurity(this::setChanged);
+    /**
+     * 终端唯一 ID（首次生成随机，NBT 持久化）。
+     * <p>
+     * 与无线族同口径：对外寻址一律用本 ID，<b>不用坐标</b> —— 坐标会随方块搬动 / 终端微缩而变，
+     * ID 不会。储存无线输入/输出口即按本 ID 绑定（见 {@link com.example.akaishi.wireless.ItemTerminalRegistry}）。
+     */
+    private UUID terminalId = UUID.randomUUID();
     private int unitCooldown;
     private ItemTerminalStructure.Result structure;
 
@@ -112,7 +114,14 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiItemTerminalBlockEntity be) {
+        // 心跳：储存无线输入/输出口靠它按终端 ID 定位本终端（超时自动摘除）
+        ItemTerminalRegistry.heartbeat(level, be.terminalId, pos, be.security.ownerName());
         be.tickServer();
+    }
+
+    /** 终端唯一 ID（对外寻址 key；NBT 持久化，微缩时随数据搬迁） */
+    public UUID terminalId() {
+        return terminalId;
     }
 
     private void tickServer() {
@@ -178,6 +187,25 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     }
 
     // ===== 储存单元聚合（D5：外侧 1 格贴装） =====
+
+    /**
+     * 立即重扫结构与贴装件（不缓存）。
+     * <p>
+     * <b>坍缩取数前必须调用</b>：结构与单元平时是每 {@link #RESCAN_INTERVAL} tick 重扫一次的缓存，
+     * 若拿最多 20 tick 前的旧列表去销毁世界，刚放下的储存单元既不会被写进 payload、又会被连方块一起清掉
+     * —— 那就是真的丢东西。
+     */
+    public void refreshUnitsNow() {
+        if (!(level instanceof ServerLevel)) {
+            return;
+        }
+        ItemTerminalStructure.Result scanned = ItemTerminalStructure.scan(level, worldPosition);
+        structureDirty = false;
+        scanCooldown = RESCAN_INTERVAL;
+        unitCooldown = RESCAN_INTERVAL;
+        this.structure = scanned;
+        this.unitEntities = scanned == null ? List.of() : scanUnits();
+    }
 
     /**
      * 扫描墙面 + 结构外围 {@link #BIND_RANGE} 格内的物品储存单元（内腔除外，那是功能件的地盘）。
@@ -463,8 +491,7 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
             return true;
         }
         absorbEnergyFromPorts();
-        long fee = deposit ? ItemTerminalFee.depositCost(ip, effectiveFeeModules())
-                : ItemTerminalFee.withdrawCost(ip, effectiveFeeModules());
+        long fee = feeCost(ip, deposit);
         if (fee <= 0L) {
             return true;
         }
@@ -476,6 +503,38 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
         return true;
     }
 
+    /**
+     * 非破坏性费用预检：这笔费用现在付得起吗？
+     * <p>
+     * 口径与 {@link #tryChargeFee} 完全一致（先汇聚各口，再判缓冲 ≥ 费用），但<b>不扣费</b>：
+     * 供外部物流能力在 {@code simulate} / {@code canPlaceItem} 阶段先给出承诺，避免"承诺了却付不起"。
+     */
+    public boolean canAffordFee(long ip, boolean deposit) {
+        if (ip <= 0L) {
+            return true;
+        }
+        absorbEnergyFromPorts();
+        return energy.getEnergyStored() >= feeCost(ip, deposit);
+    }
+
+    /** 单笔费用换算（IP → 赤能源，0 = 免费）；费率口径唯一来源见 {@link ItemTerminalFee} */
+    private long feeCost(long ip, boolean deposit) {
+        return deposit ? ItemTerminalFee.depositCost(ip, effectiveFeeModules())
+                : ItemTerminalFee.withdrawCost(ip, effectiveFeeModules());
+    }
+
+    // ===== 安全状态（归属者 + 权限表；权限载体为身份卡，规则见 TerminalSecurity） =====
+
+    /** 安全状态（安全页 / 判定入口） */
+    public TerminalSecurity security() {
+        return security;
+    }
+
+    /** 记录归属者（结构主方块放置时由方块调用）；归属者恒全权限，不占权限表条目 */
+    public void setOwner(UUID owner, String name) {
+        security.setOwner(owner, name);
+    }
+
     // ===== NBT 持久化 =====
 
     @Override
@@ -483,12 +542,116 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
         super.saveAdditional(tag);
         // 缓冲随物品走（拆除后重新放置不丢能量，同矿机能量输入口取舍）
         tag.putLong("Energy", energy.getEnergyStored());
+        tag.putUUID("TerminalId", terminalId);
+        security.save(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         energy.setEnergy(tag.getLong("Energy"));
+        // 旧档无 ID 时保留构造期生成的随机 ID（模组未发布，不做跨版本兼容）
+        if (tag.hasUUID("TerminalId")) {
+            terminalId = tag.getUUID("TerminalId");
+        }
+        security.load(tag);
+    }
+
+    // ===== 微缩（坍缩为单方块）：见 IMiniaturizableTerminal 与 MiniatureCollapse =====
+
+    @Override
+    public ResourceLocation miniatureTypeId() {
+        return ItemTerminalMiniatureAdapter.ID;
+    }
+
+    @Override
+    public BlockPos structureMin() {
+        return structure == null ? null : structure.min;
+    }
+
+    @Override
+    public BlockPos structureMax() {
+        return structure == null ? null : structure.max;
+    }
+
+    /**
+     * 导出微缩数据：把「各储存单元的等阶 / 内容 / 账本 + 安全表 + 缓冲余额 + 生效的扩展与减免份数」
+     * 一次写全，键名与 {@link ItemTerminalMiniatureState} 的读回口径严格对应（单向漂移就会变成脏数据）。
+     * <p>
+     * 储存单元此刻还是方块实体，故经 {@link ItemStorageUnitData#writeEntry} 从接口面导出。
+     */
+    @Override
+    public CompoundTag captureMiniature() {
+        // 结构与贴装件是 20 tick 缓存：取数前必须重扫，否则刚放下的单元会被"连方块一起清掉但数据没进 payload"
+        refreshUnitsNow();
+        // 接入口的能量要一并带走：先把各口汇聚进本机缓冲，再导出缓冲余额
+        // （口本身会随后被消耗，不汇聚就等于把这些赤能源凭空销毁）
+        absorbEnergyFromPorts();
+        CompoundTag payload = new CompoundTag();
+        CompoundTag sec = new CompoundTag();
+        security.save(sec);
+        payload.put(ItemTerminalMiniatureState.TAG_SECURITY, sec);
+        payload.putLong(ItemTerminalMiniatureState.TAG_ENERGY, energy.getEnergyStored());
+        payload.putInt(ItemTerminalMiniatureState.TAG_BUFFER_MODULES, structure == null ? 0
+                : Math.min(structure.bufferModuleCount, AkaishiItemTerminalBufferModuleBlock.MAX_EFFECTIVE));
+        payload.putInt(ItemTerminalMiniatureState.TAG_FEE_MODULES, structure == null ? 0 : structure.feeModuleCount);
+        ListTag units = new ListTag();
+        for (BlockEntity be : unitEntities) {
+            if (be.isRemoved() || !(be instanceof IItemStorageUnit unit)) {
+                continue;
+            }
+            units.add(ItemStorageUnitData.writeEntry(unit, tierOf(be)));
+        }
+        payload.put(ItemTerminalMiniatureState.TAG_UNITS, units);
+        return payload;
+    }
+
+    /** 储存单元方块的等阶（异常方块退回基础档，防脏数据把整个微缩流程带崩） */
+    private static ItemStorageUnitTier tierOf(BlockEntity be) {
+        return be.getBlockState().getBlock() instanceof AkaishiItemStorageUnitBlock block
+                ? block.getTier() : ItemStorageUnitTier.BASIC;
+    }
+
+    /**
+     * 箱体之外、必须随坍缩一并消耗的贴装件：储存单元 + 赤能源接入口。
+     * <p>
+     * 两类方块都允许装在外侧 1 格（在箱体之外）：
+     * <ul>
+     *   <li>储存单元：内容已进 payload，留下就是同一批物品的第二份；</li>
+     *   <li>接入口：能量已汇聚进 payload（{@link #captureMiniature}），留下就是一个带电、却再也没有主机可服务的孤儿口。</li>
+     * </ul>
+     * 墙内镶嵌的那些本来就在箱体里，会被箱体遍历消耗掉；这里重复返回它们是幂等的。
+     */
+    @Override
+    public List<BlockPos> extraConsumedBlocks() {
+        List<BlockPos> positions = new ArrayList<>(unitEntities.size());
+        for (BlockEntity be : unitEntities) {
+            if (!be.isRemoved() && be instanceof IItemStorageUnit) {
+                positions.add(be.getBlockPos());
+            }
+        }
+        positions.addAll(energyPortPositions());
+        return positions;
+    }
+
+    /** 结构范围内（含外圈 1 格、不含内腔）的赤能源接入口位置 */
+    private List<BlockPos> energyPortPositions() {
+        if (structure == null) {
+            return List.of();
+        }
+        List<BlockPos> positions = new ArrayList<>();
+        Set<BlockPos> visited = new LinkedHashSet<>();
+        BlockPos min = structure.min.offset(-BIND_RANGE, -BIND_RANGE, -BIND_RANGE);
+        BlockPos max = structure.max.offset(BIND_RANGE, BIND_RANGE, BIND_RANGE);
+        for (BlockPos cursor : BlockPos.betweenClosed(min, max)) {
+            BlockPos p = cursor.immutable();
+            if (insideCavity(p) || !visited.add(p)
+                    || !(level.getBlockEntity(p) instanceof IItemTerminalEnergyPort)) {
+                continue;
+            }
+            positions.add(p);
+        }
+        return positions;
     }
 
     // ===== 菜单入口（ExtendedMenuProvider：坐标经 saveExtraData 传给客户端工厂） =====

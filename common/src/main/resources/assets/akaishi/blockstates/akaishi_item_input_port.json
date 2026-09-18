@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "akaishi:block/akaishi_item_input_port" },
+    "facing=up": { "model": "akaishi:block/akaishi_item_input_port" },
+    "facing=north": { "model": "akaishi:block/akaishi_item_input_port" },
+    "facing=south": { "model": "akaishi:block/akaishi_item_input_port" },
+    "facing=west": { "model": "akaishi:block/akaishi_item_input_port" },
+    "facing=east": { "model": "akaishi:block/akaishi_item_input_port" }
+  }
+}

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
+import com.example.akaishi.api.storage.IItemTerminalHost;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -122,25 +122,28 @@ public final class AkaishiItemTerminalSync {
      * {@code shouldOverrideMultiplayerNbt} 的物品写 NBT，其余物品的<b>自定义 NBT 会被静默丢弃</b>。
      * 对物品库而言这是硬伤：客户端拿到的展示堆会缺 NBT（悬浮文本无法确认 NBT 功能），
      * 服务端也拿不到客户端点中的条目 NBT ⇒ 同物品但 NBT 不同的条目无法定位。
+     * <p>
+     * 公开供同包其它同步包复用（如输入/输出口的过滤网快照），口径必须唯一，避免各自写一份再漂移。
      */
-    private static void writeFullStack(FriendlyByteBuf buf, ItemStack stack) {
+    public static void writeFullStack(FriendlyByteBuf buf, ItemStack stack) {
         if (stack.isEmpty()) {
             buf.writeBoolean(false);
             return;
         }
         buf.writeBoolean(true);
         buf.writeId(BuiltInRegistries.ITEM, stack.getItem());
-        buf.writeByte(stack.getCount());
+        // 数量用 varint：虚拟加工单的件数上限是订单级的（可达 9999），单字节会在 128 处溢出成负数
+        buf.writeVarInt(stack.getCount());
         buf.writeNbt(stack.getTag());
     }
 
-    /** 与 {@link #writeFullStack} 对称的读取 */
-    private static ItemStack readFullStack(FriendlyByteBuf buf) {
+    /** 与 {@link #writeFullStack} 对称的读取（同样供过滤网快照复用） */
+    public static ItemStack readFullStack(FriendlyByteBuf buf) {
         if (!buf.readBoolean()) {
             return ItemStack.EMPTY;
         }
         Item item = buf.readById(BuiltInRegistries.ITEM);
-        int count = buf.readByte();
+        int count = buf.readVarInt();
         CompoundTag tag = buf.readNbt();
         if (item == null) {
             return ItemStack.EMPTY;
@@ -151,7 +154,7 @@ public final class AkaishiItemTerminalSync {
     }
 
     /** 供菜单按版本号判断是否需要重推（避免每 tick 空包） */
-    public static List<TerminalEntry> snapshot(AkaishiItemTerminalBlockEntity terminal) {
+    public static List<TerminalEntry> snapshot(IItemTerminalHost terminal) {
         return TerminalInventory.snapshot(terminal.storageUnits());
     }
 }

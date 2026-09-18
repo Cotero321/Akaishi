@@ -8,6 +8,8 @@ import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
+import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
+import com.example.akaishi.block.AkaishiMiniatureBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
@@ -119,6 +121,7 @@ public final class ModCreativeTabs {
         accept(output, ModItems.akaishiSpeedUpgrade);
         accept(output, ModItems.machineSpeedUpgrade);
         accept(output, ModItems.machineEnergyUpgrade);
+        accept(output, ModItems.machineWirelessReceiverUpgrade);
         // 调试工具
         accept(output, ModItems.akaishiDebugTool);
         // 赤石装备（头盔/胸甲/护腿/靴子/剑/镐/铲/斧）
@@ -429,6 +432,17 @@ public final class ModCreativeTabs {
         accept(output, AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_CONTROLLER);
         accept(output, AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_INPUT);
         accept(output, AkaishiMatrixBlocks.CHISHI_LIFE_MATRIX_ENERGY_OUTPUT);
+        // 微缩矩阵（P1a：外壳 / 结构玻璃 / 控制器）
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_CASING);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_STRUCTURE_GLASS);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_TERMINAL);
+        // 微缩矩阵内腔升级组件（5 类方块，装在箱体内腔生效）
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_CONTROL);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_FIELD);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_EXTEND);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_CRAFT);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_LINK);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_NETWORK_NODE);
         // 无线赤能源体系（方块族 + 便捷件）
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_SHELL);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS);
@@ -438,6 +452,9 @@ public final class ModCreativeTabs {
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_CONTROLLER);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_INPUT_PORT);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_OUTPUT_PORT);
+        // 储存无线输入/输出口（物品终端 IP 库的远程物品口，与能量口同排）
+        accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_INPUT_PORT);
+        accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_OUTPUT_PORT);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_DIM_BRIDGE);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_LOADER);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_CHUNK_RANGE);
@@ -449,6 +466,8 @@ public final class ModCreativeTabs {
         accept(output, ModItems.akaishiWirelessIdentityCard);
         // 物品终端体系（IP 物品库：终端本体 + 三阶储存单元 + 赤能源接入口）
         accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL);
+        // 微缩终端：完整终端坍缩成的单方块（无合成配方，仅由坍缩动作产出）
+        accept(output, AkaishiMiniatureBlocks.CHISHI_MINIATURE_TERMINAL);
         accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_BASIC);
         accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_ADVANCED);
         accept(output, AkaishiItemTerminalBlocks.CHISHI_ITEM_STORAGE_UNIT_SUPER);

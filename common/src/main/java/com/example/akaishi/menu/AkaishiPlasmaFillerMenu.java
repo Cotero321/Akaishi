@@ -15,11 +15,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 离子体填装器菜单：升级槽（速度/能量）+ 1 反应棒槽 + 3 只读燃料棒输出槽 + 玩家背包 + 7 数据槽（3 等离子体罐量/进度）。
+ * 离子体填装器菜单：升级槽（速度/能量/无线）+ 1 反应棒槽 + 3 只读燃料棒输出槽 + 玩家背包 + 7 数据槽（3 等离子体罐量/进度）。
  */
 public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 反应棒 1 + 输出槽 3），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 反应棒 1 + 输出槽 3），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 4;
     /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
     public static final int SLOT_ROD = MachineUpgradeSlots.SLOT_COUNT;
@@ -47,9 +47,10 @@ public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
         this.output = output;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 反应棒槽：仅聚变反应棒可放入
         addSlot(new Slot(rods, 0, 44, 66) {
@@ -113,6 +114,11 @@ public class AkaishiPlasmaFillerMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

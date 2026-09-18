@@ -13,13 +13,13 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 能量液化装置菜单：1 个输入槽（下界之星/凋零玫瑰/各混合物）+ 1 固态物槽 + 机器升级槽（速度/能量各一格）+ 数据。
- * 槽位：0/1=升级槽 2/3=输入/固态物槽 4-39=玩家背包与快捷栏。
+ * 能量液化装置菜单：1 个输入槽（下界之星/凋零玫瑰/各混合物）+ 1 固态物槽 + 机器升级槽（速度/能量/无线接收各一格）+ 数据。
+ * 槽位：0/1/2=升级槽 3/4=输入/固态物槽 5-40=玩家背包与快捷栏。
  * 数据槽：0/1=赤能量/赤容量 2/3=输出液体量/容量 4=液化进度百分比。
  */
 public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输入/固态物槽 2），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 输入/固态物槽 2），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + AkaishiEnergyLiquefierBlockEntity.SLOT_COUNT;
 
     private final Container container;
@@ -36,9 +36,10 @@ public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量/无线接收各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 材料输入槽：只接受液化配方输入物（下界之星/凋零玫瑰/各混合物），防误塞无关物品
         addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 58) {
@@ -99,6 +100,11 @@ public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

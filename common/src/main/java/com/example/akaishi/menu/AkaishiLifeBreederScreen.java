@@ -32,15 +32,15 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
     private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 18, BAR_W = 108, BAR_H = 8;
     /** 培养进度条区域（机器槽行下方空档；避开槽名行，下方留给状态行） */
     private static final int PROGRESS_X = 60, PROGRESS_Y = 60, PROGRESS_W = 56, PROGRESS_H = 8;
-    /** 机器区槽数（升级槽 2 + 器官/序列/结晶/产物槽 4） */
-    private static final int MACHINE_SLOTS = 6;
+    /** 机器区槽数（升级槽 3 + 器官/序列/结晶/产物槽 4） */
+    private static final int MACHINE_SLOTS = 7;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
     /** 存储开关按钮（移置左上带，避开右上角升级槽、升级标签与标题；仅在相邻存储库时显示） */
     private static final int STORE_X = 58, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
-    /** 菜单槽位索引（Menu 先加 2 升级槽，再按器官/序列/结晶/产物顺序加业务槽） */
-    private static final int IDX_ORGAN = 2, IDX_SEQUENCE = 3, IDX_CRYSTAL = 4, IDX_OUTPUT = 5;
+    /** 菜单槽位索引（Menu 先加 3 升级槽，再按器官/序列/结晶/产物顺序加业务槽） */
+    private static final int IDX_ORGAN = 3, IDX_SEQUENCE = 4, IDX_CRYSTAL = 5, IDX_OUTPUT = 6;
     /** 机器槽行下方布局：槽位底 y48 → 槽名 y49、进度条 y60、状态行 y70（与背包区 y84 不重叠） */
     private static final int CAPTION_Y = 49;
     private static final int STATUS_Y = 70;
@@ -123,7 +123,7 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
             return;
         }
 
-        // 机器槽位框（贴图无图形，自绘补齐；0/1=升级槽 2~5=器官/序列/结晶/产物槽）
+        // 机器槽位框（贴图无图形，自绘补齐；0~2=升级槽 3~6=器官/序列/结晶/产物槽）
         for (int i = 0; i < MACHINE_SLOTS; i++) {
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
@@ -133,9 +133,6 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
         drawCaption(gui, x + menu.slots.get(IDX_SEQUENCE).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_seq");
         drawCaption(gui, x + menu.slots.get(IDX_CRYSTAL).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_crystal");
         drawCaption(gui, x + menu.slots.get(IDX_OUTPUT).x, y + CAPTION_Y, "gui.akaishi.life_breeder.slot_out");
-        // 升级槽标签（槽位下方，避开上方能量条）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
         // 生命能量条（绿）
         GuiWidgets.track(gui, x + LIFE_BAR_X, y + LIFE_BAR_Y, BAR_W, BAR_H);
         long life = menu.getLifeEnergy();
@@ -262,6 +259,12 @@ public class AkaishiLifeBreederScreen extends AbstractContainerScreen<AkaishiLif
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 业务槽空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）

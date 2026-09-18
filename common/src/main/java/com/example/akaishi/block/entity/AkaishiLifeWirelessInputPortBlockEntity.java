@@ -10,6 +10,7 @@ import com.example.akaishi.menu.AkaishiLifeWirelessPortMenu;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import com.example.akaishi.wireless.IWirelessTerminal;
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.wireless.WirelessFamily;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import com.example.akaishi.wireless.WirelessTransferUtil;
@@ -61,8 +62,10 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
 
     private final AkaishiEnergyStorage buffer;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
-    /** 绑定身份卡 UUID（NBT 持久化）；null=未绑定 */
+    /** 绑定身份 UUID（NBT 持久化）：<b>远程认证</b>下即「绑定该口的玩家」，安全表按此身份判定；null=未绑定 */
     private UUID boundCard;
+    /** 远程绑定的终端 UUID（NBT 持久化）：端口直接认终端，不再依赖身份卡白名单；null=未选终端 */
+    private UUID boundTerminalId;
     /** 当前认证成功的终端 ID（内存态，每 tick 重校验） */
     private UUID authenticatedTerminal;
 
@@ -79,8 +82,9 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
         if (boundCard == null) {
             unregisterSelf();
         } else {
-            // 族感知解析：仅匹配授权该卡的生命族（LIFE）成型终端，跨族卡不可命中
-            IWirelessTerminal terminal = WirelessTransferUtil.resolveTerminal(level, boundCard, WirelessFamily.LIFE);
+            // 远程认证：按记录的终端 ID 直达生命族终端，并校验绑定身份在安全表里的「存入」权限
+            IWirelessTerminal terminal = WirelessTransferUtil.resolveTerminal(level, boundTerminalId,
+                    WirelessFamily.LIFE, boundCard, AkaishiSecurityPermission.INJECT);
             if (terminal != null) {
                 UUID termId = terminal.terminalId();
                 if (!termId.equals(authenticatedTerminal)) {
@@ -123,22 +127,40 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
         data.set(DATA_IS_OUTPUT, 0);
     }
 
-    // ===== 身份卡绑定 =====
+    // ===== 绑定（远程认证） =====
 
-    /** 绑定身份卡（手持卡右键口；覆盖旧绑定） */
-    public void bind(UUID card) {
-        if (card != null && !card.equals(boundCard)) {
+    /**
+     * 远程绑定：GUI 选定终端 + 记录调用者身份（安全表按身份判 BUILD/INJECT）。
+     * 覆盖旧绑定并先注销旧注册，避免残留在旧终端的端口列表里。
+     */
+    public void bindTerminal(UUID terminalId, UUID identity) {
+        if (terminalId == null || identity == null) {
+            return;
+        }
+        if (!terminalId.equals(boundTerminalId) || !identity.equals(boundCard)) {
             unregisterSelf();
-            boundCard = card;
+            boundTerminalId = terminalId;
+            boundCard = identity;
             setChanged();
         }
     }
 
+    /**
+     * 兼容路径：手持身份卡右键。身份取卡上绑定的玩家（旧卡无该字段则退回卡号），
+     * 终端按安全表反查（该身份具备「布局」权限的第一个在线终端）。
+     */
+    public void bind(UUID card) {
+        UUID terminalId = WirelessNetworkManager.findTerminalForIdentity(card, WirelessFamily.LIFE,
+                AkaishiSecurityPermission.BUILD);
+        bindTerminal(terminalId, card);
+    }
+
     /** 解绑（GUI 按钮），断开与终端的所有连接 */
     public void unbind() {
-        if (boundCard != null) {
+        if (boundCard != null || boundTerminalId != null) {
             unregisterSelf();
             boundCard = null;
+            boundTerminalId = null;
             setChanged();
         }
     }
@@ -150,6 +172,21 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
     /** 当前绑定卡短 ID 文本（GUI 显示） */
     public String cardShortId() {
         return boundCard == null ? "" : boundCard.toString().substring(0, 8).toUpperCase();
+    }
+
+    /** 当前远程绑定的终端短 ID（GUI 显示；未选终端返回空串） */
+    public String boundTerminalShortId() {
+        return boundTerminalId == null ? "" : WirelessNetworkManager.shortId(boundTerminalId);
+    }
+
+    @Override
+    public UUID bindingIdentity() {
+        return boundCard;
+    }
+
+    @Override
+    public UUID boundTerminalId() {
+        return boundTerminalId;
     }
 
     /** UUID 前 4 字节（高位 32 bit）：GUI 短 ID 显示的 8 位 hex，与卡片 ID 一致 */
@@ -220,6 +257,9 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
         if (boundCard != null) {
             tag.putUUID("BoundCard", boundCard);
         }
+        if (boundTerminalId != null) {
+            tag.putUUID("TerminalId", boundTerminalId);
+        }
         tag.putLong("Energy", buffer.getEnergyStored());
     }
 
@@ -227,6 +267,7 @@ public class AkaishiLifeWirelessInputPortBlockEntity extends BlockEntity
     public void load(CompoundTag tag) {
         super.load(tag);
         boundCard = tag.hasUUID("BoundCard") ? tag.getUUID("BoundCard") : null;
+        boundTerminalId = tag.hasUUID("TerminalId") ? tag.getUUID("TerminalId") : null;
         buffer.setEnergy(tag.getLong("Energy"));
     }
 

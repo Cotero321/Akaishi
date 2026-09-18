@@ -20,6 +20,7 @@ public class AkaishiMechanicalProcessingFactoryScreen extends AbstractContainerS
     private static final int AKASHI_BAR_Y = 24, LIFE_BAR_Y = 32;
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    private static final int WIRELESS_SLOT_X = 116, WIRELESS_SLOT_Y = 8;
     private static final int INPUT_TEMPLATE_X = 26, INPUT_MATERIAL_X = 44, INPUT_SOLID_X = 62, INPUT_Y = 56;
     private static final int OUTPUT_X = 116, OUTPUT_Y = 56;
     // 箭头即进度（指向输出槽）
@@ -59,6 +60,7 @@ public class AkaishiMechanicalProcessingFactoryScreen extends AbstractContainerS
 
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
+        GuiWidgets.slotBox(gui, x + WIRELESS_SLOT_X, y + WIRELESS_SLOT_Y);
 
         // 输入三槽 → 输出
         GuiWidgets.slotBox(gui, x + INPUT_TEMPLATE_X, y + INPUT_Y);
@@ -127,6 +129,14 @@ public class AkaishiMechanicalProcessingFactoryScreen extends AbstractContainerS
             return;
         }
         if (slotTip(gui, MachineUpgradeSlots.SLOT_ENERGY, "gui.akaishi.upgrade.energy.hint", mouseX, mouseY)) {
+            return;
+        }
+        // 无线接收槽：按已装/未装给出状态提示
+        if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                            Component.translatable(menu.hasWirelessReceiver()
+                                    ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
+                    mouseX, mouseY);
             return;
         }
         // 机器槽（模板 / 材料 / 固态物 / 输出）

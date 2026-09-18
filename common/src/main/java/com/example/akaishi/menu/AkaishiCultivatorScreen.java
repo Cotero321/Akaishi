@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.entity.AkaishiCultivatorBlockEntity;
+import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -20,17 +21,19 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
 
     private static final int PANEL_W = 176;
 
-    /** 生命能量条区域（收窄右缘至 x128 避开右上角升级槽，下移 2px 避开存储按钮，规则 3/4） */
-    private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 18, BAR_W = 108, BAR_H = 8;
+    /** 生命能量条区域（右缘至 x114 避开右上角三格升级槽，下移 2px 避开存储按钮，规则 3/4） */
+    private static final int LIFE_BAR_X = 20, LIFE_BAR_Y = 18, BAR_W = 94, BAR_H = 8;
     private static final int PROGRESS_X = 56, PROGRESS_Y = 74, PROGRESS_W = 56, PROGRESS_H = 8;
-    /** 机器槽位数量（升级槽 2 + 输入/材料槽 2，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = 4;
-    /** 输入/材料槽的 Menu 槽位索引（升级槽 2 后的样本或器官/固态物，空槽 tooltip 用） */
-    private static final int INPUT_SLOT_INDEX = 2;
+    /** 机器槽位数量（升级槽 3 + 输入/材料槽 2，贴图无槽位图形需自绘框） */
+    private static final int MACHINE_SLOTS = MachineUpgradeSlots.SLOT_COUNT
+            + AkaishiCultivatorBlockEntity.SLOT_COUNT;
+    /** 输入/材料槽的 Menu 槽位索引（升级槽之后的样本或器官/固态物，空槽 tooltip 用） */
+    private static final int INPUT_SLOT_INDEX = MachineUpgradeSlots.SLOT_COUNT;
     private static final int SOLID_SLOT_INDEX = INPUT_SLOT_INDEX + 1;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    private static final int WIRELESS_SLOT_X = 116, WIRELESS_SLOT_Y = 8;
     /** 存储开关按钮（移置左上带，避开右上角升级槽、升级标签与标题；仅在相邻存储库时显示） */
     private static final int STORE_X = 58, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
 
@@ -78,9 +81,6 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
         if (progressWidth > 0) {
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, color);
         }
-        // 升级槽标签（槽位下方，避开上方能量条）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
     }
 
     /** 左上带"存储"开关按钮 */
@@ -207,6 +207,12 @@ public class AkaishiCultivatorScreen extends AbstractContainerScreen<AkaishiCult
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 输入/材料空槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）

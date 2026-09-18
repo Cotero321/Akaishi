@@ -13,12 +13,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 自动收集器菜单：升级槽（速度/能量）+ 27 槽存储（9×3）+ 玩家背包。
+ * 自动收集器菜单：升级槽（速度/能量/无线接收）+ 27 槽存储（9×3）+ 玩家背包。
  * 通过 ContainerData 将能量与收集进度同步给客户端 GUI。
  */
 public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 存储槽 27），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 存储槽 27），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + AkaishiAutoCollectorBlockEntity.STORAGE_SIZE;
 
     private final Container container;
@@ -39,9 +39,10 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；顶部右侧避开状态行/能量条）
+        // 升级槽（速度/能量/无线接收各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；顶部右侧避开状态行/能量条）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 存储槽 9×3
         for (int row = 0; row < 3; row++) {
@@ -95,6 +96,11 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
     }
 
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
@@ -111,10 +117,10 @@ public class AkaishiAutoCollectorMenu extends AbstractContainerMenu {
             } else {
                 // 玩家背包：升级组件 → 升级槽，其余 → 存储槽
                 if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
-                    if (!this.moveItemStackTo(current, 0, 2, false)) {
+                    if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (!this.moveItemStackTo(current, 2, MACHINE_SLOT_END, false)) {
+                } else if (!this.moveItemStackTo(current, MachineUpgradeSlots.SLOT_COUNT, MACHINE_SLOT_END, false)) {
                     return ItemStack.EMPTY;
                 }
                 if (!this.moveItemStackTo(current, MACHINE_SLOT_END + 27,

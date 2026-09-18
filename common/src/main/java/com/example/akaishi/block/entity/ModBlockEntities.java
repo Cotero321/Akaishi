@@ -7,6 +7,8 @@ import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
+import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
+import com.example.akaishi.block.AkaishiMiniatureBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiMechanicalBlocks;
@@ -226,6 +228,16 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiItemStorageUnitBlockEntity>> CHISHI_ITEM_STORAGE_UNIT;
     /** 物品终端赤能源接入口方块实体类型（纯汇口，无 ticker） */
     public static RegistrySupplier<BlockEntityType<AkaishiItemTerminalEnergyInputPortBlockEntity>> CHISHI_ITEM_TERMINAL_ENERGY_INPUT;
+    /** 储存无线输入口方块实体类型（面朝方向容器 → 绑定物品终端，output=false） */
+    public static RegistrySupplier<BlockEntityType<AkaishiItemPortBlockEntity>> CHISHI_ITEM_INPUT_PORT;
+    /** 储存无线输出口方块实体类型（绑定物品终端 → 面朝方向容器，output=true） */
+    public static RegistrySupplier<BlockEntityType<AkaishiItemPortBlockEntity>> CHISHI_ITEM_OUTPUT_PORT;
+    /** 微缩终端方块实体类型（通用壳：承载被浓缩终端的数据与能力转发） */
+    public static RegistrySupplier<BlockEntityType<MiniatureTerminalBlockEntity>> CHISHI_MINIATURE_TERMINAL;
+    /** 微缩矩阵终端方块实体类型（5×5×5 空腔箱体成型判定 + 墙面芯片识别） */
+    public static RegistrySupplier<BlockEntityType<AkaishiMiniMatrixTerminalBlockEntity>> CHISHI_MINI_MATRIX_TERMINAL;
+    /** 无线网络节点方块实体类型（无 tick/无界面：仅让节点登记随区块加载/卸载重建） */
+    public static RegistrySupplier<BlockEntityType<AkaishiMiniMatrixNetworkNodeBlockEntity>> CHISHI_MINI_MATRIX_NETWORK_NODE;
 
     private ModBlockEntities() {
     }
@@ -556,5 +568,22 @@ public final class ModBlockEntities {
         CHISHI_ITEM_TERMINAL_ENERGY_INPUT = be("akaishi_item_terminal_energy_input",
                 AkaishiItemTerminalEnergyInputPortBlockEntity::new,
                 AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_ENERGY_INPUT);
+        // 储存无线输入口（面朝方向容器的物品 → 绑定物品终端；共用端口 BE，output=false）
+        CHISHI_ITEM_INPUT_PORT = be("akaishi_item_input_port",
+                (pos, state) -> new AkaishiItemPortBlockEntity(CHISHI_ITEM_INPUT_PORT.get(), pos, state, false),
+                AkaishiItemTerminalBlocks.CHISHI_ITEM_INPUT_PORT);
+        // 储存无线输出口（绑定物品终端 → 面朝方向容器；共用端口 BE，output=true）
+        CHISHI_ITEM_OUTPUT_PORT = be("akaishi_item_output_port",
+                (pos, state) -> new AkaishiItemPortBlockEntity(CHISHI_ITEM_OUTPUT_PORT.get(), pos, state, true),
+                AkaishiItemTerminalBlocks.CHISHI_ITEM_OUTPUT_PORT);
+        // ===== 微缩终端（通用单方块壳，被浓缩终端的族数据由适配器还原） =====
+        CHISHI_MINIATURE_TERMINAL = be("akaishi_miniature_terminal", MiniatureTerminalBlockEntity::new,
+                AkaishiMiniatureBlocks.CHISHI_MINIATURE_TERMINAL);
+        // ===== 微缩矩阵（P1a：多方块成型 + 墙面芯片识别；外壳/玻璃无 BE） =====
+        CHISHI_MINI_MATRIX_TERMINAL = be("akaishi_mini_matrix_terminal", AkaishiMiniMatrixTerminalBlockEntity::new,
+                AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_TERMINAL);
+        // 无线网络节点（无 tick/无界面：BE 只为让节点登记随区块加载重建，见该 BE 注释）
+        CHISHI_MINI_MATRIX_NETWORK_NODE = be("akaishi_mini_matrix_network_node",
+                AkaishiMiniMatrixNetworkNodeBlockEntity::new, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_NETWORK_NODE);
     }
 }

@@ -36,6 +36,15 @@ public interface IWirelessTerminal {
     /** 所属网络族（赤能源 / 生命能量） */
     WirelessFamily family();
 
+    /**
+     * 是否解锁便携终端「随身供能」（内腔含便捷传输构架；赤能源族口径）。
+     * <p>
+     * 默认 false：生命族与微缩后的非赤能源终端天然不具备该构架。
+     */
+    default boolean hasTransmitFrame() {
+        return false;
+    }
+
     /** 终端所在维度（未加载/已移除时可能为 null） */
     Level getLevel();
 

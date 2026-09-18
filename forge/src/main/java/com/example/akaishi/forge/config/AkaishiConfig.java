@@ -118,6 +118,8 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.DoubleValue WIRELESS_MAX_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_CROSS_DIM_LOSS;
     public static final ForgeConfigSpec.DoubleValue WIRELESS_LOSS_REDUCTION_PER_MODULE;
+    /** 场域屏障可见性：false = 所有人可见（默认），true = 仅归属者与同队可见 */
+    public static final ForgeConfigSpec.BooleanValue WIRELESS_FIELD_OWNER_ONLY;
 
     // ==================== 器官·品质曲线 ====================
     /** 品质 I~IV 属性加成倍率（下标 = 品质序数，下同） */
@@ -671,6 +673,9 @@ public final class AkaishiConfig {
                 .defineInRange("crossDimLoss", 0.25, 0.0, 0.99);
         WIRELESS_LOSS_REDUCTION_PER_MODULE = b.comment("Loss reduction per input/output loss suppressor module (0.05 = -5%, stackable, capped at 90%)")
                 .defineInRange("lossReductionPerModule", 0.05, 0.0, 0.9);
+        WIRELESS_FIELD_OWNER_ONLY = b.comment("场域屏障可见性：false = 所有人可见（默认，起环境提示作用），"
+                        + "true = 仅终端归属者与同队玩家可见")
+                .define("fieldBarrierOwnerOnly", false);
         b.pop();
 
         // ==================== 器官·品质曲线 ====================

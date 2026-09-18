@@ -9,6 +9,8 @@ import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
+import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
+import com.example.akaishi.block.AkaishiMiniatureBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
@@ -34,6 +36,7 @@ import com.example.akaishi.menu.AkaishiGeneManagerSync;
 import com.example.akaishi.menu.AkaishiOrganVaultSync;
 import com.example.akaishi.menu.AkaishiItemTerminalSync;
 import com.example.akaishi.menu.ModMenus;
+import com.example.akaishi.miniature.AkaishiMiniatureAdapters;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.sound.ModSounds;
@@ -70,9 +73,15 @@ public final class AkaishiMod {
         AkaishiReactorBlocks.register();
         AkaishiLifeBlocks.register();
         AkaishiMatrixBlocks.register();
+        // 微缩矩阵域：同样须先于 ModBlockEntities.register() 注册（BE 类型绑定其控制器方块引用）
+        AkaishiMiniMatrixBlocks.register();
         // 物品终端域：须先于 ModBlockEntities.register() 注册（BE 类型绑定其方块引用）
         AkaishiItemTerminalBlocks.register();
+        // 微缩终端域：同样须先于 ModBlockEntities.register() 注册（BE 类型绑定其方块引用）
+        AkaishiMiniatureBlocks.register();
         ModBlockEntities.register();
+        // 终端微缩适配器：通用微缩层按 NBT 里的族 id 取适配器还原状态（无顺序约束）
+        AkaishiMiniatureAdapters.register();
         // 实体类型：能量弹等（不依赖方块，随注册表事件求值）
         ModEntities.register();
         ModCreativeTabs.register();
@@ -96,6 +105,16 @@ public final class AkaishiMod {
             ScreenFlashS2C.registerClient();
             // 物品终端库页条目快照（S2C 接收器，仅客户端注册）
             AkaishiItemTerminalSync.registerClient();
+            // 无线终端安全页权限表快照（S2C 接收器，仅客户端注册）
+            com.example.akaishi.menu.AkaishiTerminalSecuritySync.registerClient();
+            // 端口远程绑定清单快照（S2C 接收器，仅客户端注册）
+            com.example.akaishi.menu.AkaishiPortBindingSync.registerClient();
+            // 储存口远程绑定清单快照（S2C 接收器，仅客户端注册）
+            com.example.akaishi.menu.AkaishiItemPortBindingSync.registerClient();
+            // 微缩矩阵终端视图快照（S2C 接收器，仅客户端注册）
+            com.example.akaishi.menu.AkaishiMiniMatrixSync.registerClient();
+            // 微缩矩阵终端加工页视图（S2C 接收器，仅客户端注册）
+            com.example.akaishi.menu.AkaishiMatrixCraftSync.registerClient();
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();
@@ -115,6 +134,14 @@ public final class AkaishiMod {
         com.example.akaishi.menu.MechanicalCraftSync.register();
         // 物品终端库页交互包（C2S 接收器：AE2 网格双向的点击动作）
         AkaishiItemTerminalSync.register();
+        // 无线终端安全页动作包（C2S 接收器：登记 / 移除 / 勾选权限）
+        com.example.akaishi.menu.AkaishiTerminalSecuritySync.register();
+        // 端口远程绑定动作包（C2S 接收器：绑定 / 解绑）
+        com.example.akaishi.menu.AkaishiPortBindingSync.register();
+        // 储存口远程绑定动作包（C2S 接收器：绑定 / 解绑）
+        com.example.akaishi.menu.AkaishiItemPortBindingSync.register();
+        // 微缩矩阵终端加工页动作包（C2S 接收器：搜索 / 选中 / 开始加工）
+        com.example.akaishi.menu.AkaishiMatrixCraftSync.register();
         // 价值分服务：统一存储库排序/统计/筛选与查询指令共用的底层（纯计算，不参与经济兑换）
         AkaishiValueService.install();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成

@@ -1,5 +1,6 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
 import com.example.akaishi.util.LongDataSlots;
@@ -18,8 +19,8 @@ import java.util.UUID;
 
 /**
  * 无线生命便捷终端菜单（手持物品，只读遥控面板，赤版便捷终端的生命镜像）：
- * 无方块实体；服务端每 tick broadcastChanges 扫描玩家背包中的第一张身份卡（取第一张），
- * 按 {@link WirelessFamily#LIFE} 族反查授权该卡的在线生命终端并把其状态
+ * 无方块实体；服务端每 tick broadcastChanges 取背包第一张身份卡绑定的身份（未绑定/未持卡则用玩家自己），
+ * 按 {@link WirelessFamily#LIFE} 族与终端安全表（CRAFT 权限）反查在线生命终端并把其状态
  * （成型/储能/口统计/卡与终端短 ID）写入数据槽，随原版数据槽同步推送给客户端。
  * 手持终端不传输能量，仅作状态面板；与赤版便携终端共用身份卡，族隔离保证互不误命中。
  */
@@ -71,15 +72,18 @@ public class AkaishiLifeWirelessPortableTerminalMenu extends AbstractContainerMe
         }
     }
 
-    /** 服务端刷新数据槽：取背包第一张身份卡，按生命族反查其授权终端的在线状态（无全图扫描） */
+    /** 服务端刷新数据槽：身份取背包第一张身份卡绑定的玩家（未绑定/未持卡则用玩家自己），按生命族安全表反查终端 */
     private void refreshData(Level level) {
         ItemStack card = findCard(player);
-        // 服务端逻辑：为背包新卡生成唯一卡号，保证能反查授权终端
+        // 服务端逻辑：为背包新卡生成唯一卡号，供 GUI 显示卡短 ID
         UUID cardUuid = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.ensureUuid(card);
         LongDataSlots.writeInt(data, DATA_CARD_HASH, DATA_CARD_HASH_HIGH,
                 cardUuid == null ? 0 : (int) (cardUuid.getMostSignificantBits() >>> 32));
 
-        UUID terminalId = WirelessNetworkManager.findTerminalForCard(cardUuid, WirelessFamily.LIFE);
+        UUID identity = card.isEmpty() ? null : AkaishiWirelessIdentityCardItem.playerOf(card);
+        UUID terminalId = WirelessNetworkManager.findTerminalForIdentity(
+                identity == null ? player.getUUID() : identity, WirelessFamily.LIFE,
+                AkaishiSecurityPermission.CRAFT);
         boolean formed = false;
         long stored = 0;
         long max = 0;

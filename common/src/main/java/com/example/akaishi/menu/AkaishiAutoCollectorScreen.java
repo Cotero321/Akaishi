@@ -50,11 +50,10 @@ public class AkaishiAutoCollectorScreen extends AbstractContainerScreen<AkaishiA
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 升级槽（速度/能量，顶部右侧，纹理无图案需自绘框 + 标签）
+        // 升级槽（速度/能量/无线接收，顶部右侧，纹理无图案需自绘框 + 标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
+        GuiWidgets.slotBox(gui, x + 116, y + 8);
 
         // 赤石能量条
         GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
@@ -116,7 +115,7 @@ public class AkaishiAutoCollectorScreen extends AbstractContainerScreen<AkaishiA
                     mouseX, mouseY);
             return;
         }
-        // 存储槽 27 格（索引 2..MACHINE_SLOT_END）：空槽提示用途
+        // 存储槽 27 格（索引 3..MACHINE_SLOT_END）：空槽提示用途
         for (int i = MachineUpgradeSlots.SLOT_COUNT; i < AkaishiAutoCollectorMenu.MACHINE_SLOT_END; i++) {
             var slot = menu.slots.get(i);
             if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.getItem().isEmpty()) {
@@ -139,6 +138,13 @@ public class AkaishiAutoCollectorScreen extends AbstractContainerScreen<AkaishiA
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        // 升级槽悬停提示（无线接收，直接报已装/空）
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

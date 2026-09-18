@@ -43,12 +43,6 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
     // 组件状态文本最大宽度（面板 176，留出右缘边距防出框/重叠）
     private static final int COMPONENTS_MAX_W = 148;
 
-    // 安全页：授权/移除按钮（与授权槽同排）
-    private static final int BTN_X = 88;
-    private static final int BTN_Y = 46;
-    private static final int BTN_W = 40;
-    private static final int BTN_H = 12;
-
     /** 当前页面（0=运行，1=储能，2=安全认证，3=传输） */
     private int currentPage;
 
@@ -68,11 +62,9 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
         for (int i = 0; i < 4; i++) {
             GuiWidgets.button(gui, x + TAB_X[i], y + TAB_Y, TAB_W, TAB_H);
         }
-        // 安全页：授权槽背景框
+        // 安全页：授权槽 + 登记/移除 + 权限表（共用实现 SecurityPage）
         if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY) {
-            GuiWidgets.slotBox(gui, x + AkaishiLifeWirelessTerminalMenu.CARD_SLOT_X, y + AkaishiLifeWirelessTerminalMenu.CARD_SLOT_Y);
-            GuiWidgets.button(gui, x + BTN_X, y + BTN_Y, BTN_W, BTN_H);
-            GuiWidgets.button(gui, x + BTN_X + 42, y + BTN_Y, BTN_W, BTN_H);
+            SecurityPage.renderBg(gui, x, y, this.menu, mouseY);
         }
     }
 
@@ -88,7 +80,8 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
         switch (currentPage) {
             case AkaishiLifeWirelessTerminalMenu.PAGE_RUN -> renderRunPage(gui);
             case AkaishiLifeWirelessTerminalMenu.PAGE_ENERGY -> renderEnergyPage(gui);
-            case AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY -> renderSecurityPage(gui);
+            case AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY ->
+                    SecurityPage.renderLabels(gui, this.font, 0, 0, this.menu, TEXT, TEXT_DIM, TEXT_GREEN);
             case AkaishiLifeWirelessTerminalMenu.PAGE_TRANSFER -> renderTransferPage(gui);
             default -> {
             }
@@ -145,25 +138,6 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
                 menu.getBoundSerializers()), x + 8, y + 72, TEXT_DIM, false);
     }
 
-    /** 页3：安全卡认证（授权卡数 + 授权槽 + 授权/移除按钮） */
-    private void renderSecurityPage(GuiGraphics gui) {
-        // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
-        int x = 0;
-        int y = 0;
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.authorized",
-                menu.getAuthorizedCount(), menu.maxAuthorized()), x + 8, y + 36, TEXT, false);
-        // 授权槽（y=46）上方的说明文字
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.auth_hint"),
-                x + 8, y + 68, TEXT_DIM, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.auth_hint2"),
-                x + 8, y + 78, TEXT_DIM, false);
-        // 按钮标签（授权槽上方）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.authorize"),
-                x + BTN_X + 8, y + BTN_Y + 2, TEXT, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.terminal.revoke"),
-                x + BTN_X + 42 + 8, y + BTN_Y + 2, TEXT, false);
-    }
-
     /** 页4：能量传输（口统计/速率/损耗规则/抑制/区块加载） */
     private void renderTransferPage(GuiGraphics gui) {
         // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
@@ -196,6 +170,8 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
         this.renderBackground(gui);
         syncCardSlot();
         super.render(gui, mouseX, mouseY, partialTick);
+        // 从矩阵左列跳来时给出的回头路（贴在面板左侧外，不与任何既有控件重叠）
+        MiniMatrixReturn.render(gui, this.font, this.leftPos, this.topPos);
         this.renderTooltip(gui, mouseX, mouseY);
         // 储能条悬停提示（页2）
         if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_ENERGY
@@ -205,17 +181,19 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
         }
-        // 安全页：授权卡上限提示
-        if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY
-                && menu.getAuthorizedCount() >= WirelessNetworkManager.MAX_AUTHORIZED_CARDS) {
-            gui.renderTooltip(this.font,
-                    Component.translatable("gui.akaishi.wireless.terminal.auth_full"), mouseX, mouseY);
+        // 安全页：勾选框 → 权限名 + 说明；按钮 / 归属者 → 操作说明（共用实现）
+        if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY) {
+            SecurityPage.renderTooltip(gui, this.font, this.leftPos, this.topPos, mouseX, mouseY, this.menu);
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
+            if (MiniMatrixReturn.mouseClicked(mouseX, mouseY, button, this.leftPos, this.topPos,
+                    this.menu.containerId)) {
+                return true;
+            }
             // 切页按钮（本地互斥切换）
             for (int i = 0; i < 4; i++) {
                 if (isIn(this.leftPos + TAB_X[i], this.topPos + TAB_Y, TAB_W, TAB_H, mouseX, mouseY)) {
@@ -223,18 +201,11 @@ public class AkaishiLifeWirelessTerminalScreen extends AbstractContainerScreen<A
                     return true;
                 }
             }
-            // 授权/移除按钮（仅安全页，服务端执行）
-            if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY) {
-                if (isIn(this.leftPos + BTN_X, this.topPos + BTN_Y, BTN_W, BTN_H, mouseX, mouseY)) {
-                    this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId,
-                            AkaishiLifeWirelessTerminalMenu.BTN_AUTHORIZE);
-                    return true;
-                }
-                if (isIn(this.leftPos + BTN_X + 42, this.topPos + BTN_Y, BTN_W, BTN_H, mouseX, mouseY)) {
-                    this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId,
-                            AkaishiLifeWirelessTerminalMenu.BTN_REVOKE);
-                    return true;
-                }
+            // 安全页：登记 / 移除 / 勾选权限（共用实现，走 C2S 动作包 + 服务端 SECURITY 校验）
+            if (currentPage == AkaishiLifeWirelessTerminalMenu.PAGE_SECURITY
+                    && SecurityPage.mouseClicked(mouseX, mouseY, this.leftPos, this.topPos, this.menu,
+                            this.menu.containerId)) {
+                return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);

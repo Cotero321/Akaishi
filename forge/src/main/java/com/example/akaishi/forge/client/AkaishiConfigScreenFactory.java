@@ -135,6 +135,8 @@ public final class AkaishiConfigScreenFactory {
         booleanToggle(toggles, eb, "toggles.decayZone", AkaishiConfig.DECAY_ZONE_ENABLED);
         booleanToggle(toggles, eb, "toggles.sunlightBurn", AkaishiConfig.SUNLIGHT_BURN_ENABLED);
         booleanToggle(toggles, eb, "toggles.overloadToggle", AkaishiConfig.OVERLOAD_ENABLED);
+        // 场域屏障可见性：默认所有人可见（环境提示），可改为仅归属者与同队可见
+        booleanToggle(toggles, eb, "toggles.wirelessFieldOwnerOnly", AkaishiConfig.WIRELESS_FIELD_OWNER_ONLY);
 
         // ===== 赤石饰品扩展槽 =====
         ConfigCategory curioSlots = category(builder, "curio_slots");

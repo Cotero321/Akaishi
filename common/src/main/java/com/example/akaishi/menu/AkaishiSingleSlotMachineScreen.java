@@ -25,11 +25,23 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
     protected static final int INPUT_X = 26, OUTPUT_X = 98, SLOT_Y = 40;
     protected static final int UPGRADE_Y = 8;
     protected static final int SPEED_SLOT_X = 134, ENERGY_SLOT_X = 152;
+    protected static final int WIRELESS_SLOT_X = 116;
 
     protected AkaishiSingleSlotMachineScreen(T menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.imageWidth = 176;
         this.imageHeight = 198;
+    }
+
+    /**
+     * 暗色背景层：1.20.1 的 {@link AbstractContainerScreen} 自身不画它，
+     * 本族界面原先漏了这一步 —— 面板之外的区域直接透出世界，且 JEI 会报警
+     * 「GUI did not draw the dark background layer behind itself」。与本项目其它界面同范式，只补这一处。
+     */
+    @Override
+    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(gui);
+        super.render(gui, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -43,6 +55,7 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         GuiWidgets.slotBox(gui, x + OUTPUT_X, y + SLOT_Y);
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
+        GuiWidgets.slotBox(gui, x + WIRELESS_SLOT_X, y + UPGRADE_Y);
         // 玩家背包 + 快捷栏槽框（坐标须与 Menu 的 addSlot 一致：背包 124、快捷栏 180）
         GuiWidgets.playerInventory(gui, x, y, 124, 180);
         // 赤能源条（红）
@@ -68,8 +81,6 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
         gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.single_slot.input"), INPUT_X, 30, TEXT, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.single_slot.output"), OUTPUT_X, 30, TEXT, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                SPEED_SLOT_X - 36, UPGRADE_Y + 4, 0xFF707070, false);
         // 玩家背包标题（背包槽起点 y=124，标签置于其上方 8px）
         gui.drawString(this.font, Component.translatable("container.inventory"), 8, 116, TEXT, false);
     }
@@ -103,6 +114,13 @@ public abstract class AkaishiSingleSlotMachineScreen<T extends AkaishiSingleSlot
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        // 无线接收槽：按已装/未装给出状态提示
+        if (isHovering(WIRELESS_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                            Component.translatable(menu.hasWirelessReceiver()
+                                    ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

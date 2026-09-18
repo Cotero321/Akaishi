@@ -2,8 +2,9 @@ package com.example.akaishi.menu;
 
 import java.util.List;
 
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.api.storage.IItemStorageUnit;
-import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
+import com.example.akaishi.api.storage.IItemTerminalHost;
 import com.example.akaishi.value.ItemPoints;
 
 import net.minecraft.network.chat.Component;
@@ -55,7 +56,9 @@ public final class TerminalActions {
         /** 库里没有这件物品 */
         NO_ITEM("gui.akaishi.item_terminal.fail.no_item"),
         /** 背包放不下 */
-        NO_INV_ROOM("gui.akaishi.item_terminal.fail.no_room");
+        NO_INV_ROOM("gui.akaishi.item_terminal.fail.no_room"),
+        /** 安全表未授予本方向权限（存入需「存」、取出需「取」） */
+        DENIED("gui.akaishi.item_terminal.fail.denied");
 
         private final String langKey;
 
@@ -85,13 +88,13 @@ public final class TerminalActions {
     /**
      * 执行一次库页交互。
      *
-     * @param terminal 终端方块实体（提供单元视图 + 一次性费用结算）
+     * @param terminal 终端宿主（提供单元视图 + 一次性费用结算）
      * @param menu     玩家的当前菜单（光标持有物的读 / 写入口）
      * @param player   操作玩家
      * @param action   {@link #PICKUP_OR_SET_DOWN} 等动作字节
      * @param key      点击的条目（空堆 = 点击空白格，仅允许放入）
      */
-    public static void perform(AkaishiItemTerminalBlockEntity terminal, AbstractContainerMenu menu,
+    public static void perform(IItemTerminalHost terminal, AbstractContainerMenu menu,
             Player player, byte action, ItemStack key) {
         if (terminal == null || !terminal.isFormed()) {
             notify(player, Outcome.UNFORMED);
@@ -103,6 +106,15 @@ public final class TerminalActions {
             return;
         }
         ItemStack carried = menu.getCarried();
+        // 方向权限：本笔是"存入"还是"取出"，据此查安全表（与端口同一套口径：输入口=存、输出口=取）。
+        // 权限表为空时全放行（项目"使用"口径），因此单人/未配置的终端不受影响。
+        boolean depositIntent = key.isEmpty() || (!carried.isEmpty() && ItemStack.isSameItemSameTags(carried, key));
+        AkaishiSecurityPermission needed = depositIntent
+                ? AkaishiSecurityPermission.INJECT : AkaishiSecurityPermission.EXTRACT;
+        if (!player.hasPermissions(4) && !terminal.security().check(player.getUUID(), needed)) {
+            notify(player, Outcome.DENIED);
+            return;
+        }
         Result result;
         if (key.isEmpty()) {
             result = deposit(terminal, units, carried, single(action));
@@ -148,7 +160,7 @@ public final class TerminalActions {
      * <p>
      * 顺序固定为「预检 → 扣费 → 入库」，因此扣费失败或无可存空间时，物品与账本零改动（D13 约束 3）。
      */
-    private static Result deposit(AkaishiItemTerminalBlockEntity terminal, List<IItemStorageUnit> units,
+    private static Result deposit(IItemTerminalHost terminal, List<IItemStorageUnit> units,
             ItemStack carried, boolean single) {
         if (carried.isEmpty()) {
             return Result.okNoCursor(); // 空手点空白格：无事发生
@@ -203,7 +215,7 @@ public final class TerminalActions {
      * 账本 IP 用 {@code slotIp * take / count} 复刻单元 {@code extract} 的扣减公式，
      * 全程不重算价值表 ⇒ 价值表热重载后费用不漂移（D10）。
      */
-    private static Result withdrawToCursor(AkaishiItemTerminalBlockEntity terminal,
+    private static Result withdrawToCursor(IItemTerminalHost terminal,
             List<IItemStorageUnit> units, ItemStack key, int requested) {
         TerminalEntry entry = find(units, key);
         if (entry == null) {
@@ -221,7 +233,7 @@ public final class TerminalActions {
     }
 
     /** 整条取出进背包（AE2 SHIFT_CLICK）：按背包剩余空位夹量，不经光标 */
-    private static Result withdrawToInventory(AkaishiItemTerminalBlockEntity terminal,
+    private static Result withdrawToInventory(IItemTerminalHost terminal,
             List<IItemStorageUnit> units, Player player, ItemStack key) {
         TerminalEntry entry = find(units, key);
         if (entry == null) {
@@ -247,7 +259,7 @@ public final class TerminalActions {
     }
 
     /** 模拟取出 amount 件的账本 IP 并扣费（不改动任何物品） */
-    private static boolean chargeFor(AkaishiItemTerminalBlockEntity terminal, TerminalEntry entry, int amount) {
+    private static boolean chargeFor(IItemTerminalHost terminal, TerminalEntry entry, int amount) {
         long ip = 0L;
         int need = amount;
         for (TerminalEntry.Slice slice : entry.slices()) {
@@ -255,11 +267,26 @@ public final class TerminalActions {
                 break;
             }
             int take = Math.min(need, slice.count());
-            long slotIp = slice.unit().getSlotIp(slice.slot());
-            ip += take >= slice.count() ? slotIp : slotIp * take / slice.count();
+            ip += withdrawIp(slice.unit(), slice.slot(), slice.count(), take);
             need -= take;
         }
         return ip <= 0L || terminal.tryChargeFee(ip, false);
+    }
+
+    /**
+     * 单槽取出 amount 件对应的账本 IP（唯一算法源）。
+     * <p>
+     * 复刻单元 {@code extract} 的扣减公式：整槽取空 = 全部账本值，部分取出按比例向下取整，
+     * 全程不重算价值表 ⇒ 价值表热重载后费用不漂移（D10）。库页取出与无线输出口共用本方法。
+     *
+     * @param storedCount 取出前该槽件数
+     */
+    public static long withdrawIp(IItemStorageUnit unit, int slot, int storedCount, int amount) {
+        if (unit == null || amount <= 0 || storedCount <= 0) {
+            return 0L;
+        }
+        long slotIp = unit.getSlotIp(slot);
+        return amount >= storedCount ? slotIp : slotIp * amount / storedCount;
     }
 
     /** 按分片顺序真实取出；分片取自本笔开头即时聚合的结果，单线程下不会中途变化 */

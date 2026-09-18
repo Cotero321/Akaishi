@@ -201,6 +201,8 @@ public final class ModConfig {
     public static volatile double wirelessCrossDimLoss = 0.25;
     /** 每个损耗抑制组件削减的损耗比例（0.05 = 削减 5%，可叠加，最高削减 90%） */
     public static volatile double wirelessLossReductionPerModule = 0.05;
+    /** 场域屏障可见性：false = 所有人可见（默认），true = 仅归属者与同队可见 */
+    public static volatile boolean wirelessFieldOwnerOnly = false;
 
     // ==================== 器官·品质曲线（override：0 = 不覆盖，用 QualityTier 内置默认） ====================
     /** 品质 I~IV 属性加成倍率 override（索引 = 品质序号） */

@@ -84,6 +84,9 @@ public final class ConfigSyncS2C {
             double combatCritChanceCap = buf.readDouble();
             double combatCritDamageCap = buf.readDouble();
             double combatDodgeChanceCap = buf.readDouble();
+            // 场域屏障可见性：消费端是纯客户端渲染（WirelessFieldRenderer），
+            // COMMON 配置不会自动下发，必须随包同步服务端权威值
+            boolean wirelessFieldOwnerOnly = buf.readBoolean();
             Minecraft.getInstance().execute(() -> {
                 ModConfig.maxRejection = maxRejection;
                 ModConfig.reactorTempMax = reactorTempMax;
@@ -142,6 +145,7 @@ public final class ConfigSyncS2C {
                 ModConfig.combatCritChanceCap = combatCritChanceCap;
                 ModConfig.combatCritDamageCap = combatCritDamageCap;
                 ModConfig.combatDodgeChanceCap = combatDodgeChanceCap;
+                ModConfig.wirelessFieldOwnerOnly = wirelessFieldOwnerOnly;
             });
         });
     }
@@ -206,6 +210,8 @@ public final class ConfigSyncS2C {
         buf.writeDouble(ModConfig.combatCritChanceCap);
         buf.writeDouble(ModConfig.combatCritDamageCap);
         buf.writeDouble(ModConfig.combatDodgeChanceCap);
+        // 与读端最后一个字段严格对称
+        buf.writeBoolean(ModConfig.wirelessFieldOwnerOnly);
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }
 

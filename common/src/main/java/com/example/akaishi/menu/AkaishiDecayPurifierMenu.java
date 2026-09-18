@@ -12,12 +12,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 衰变净化塔菜单：仅升级槽（速度/能量）+ 玩家背包 + 数据槽（能量/容量/净化中/区域数）。
+ * 衰变净化塔菜单：仅升级槽（速度/能量/无线接收）+ 玩家背包 + 数据槽（能量/容量/净化中/区域数）。
  * 无机器物品槽位；198 高 GUI（与催化剂一致，玩家背包 y=124、快捷栏 y=180）。
  */
 public class AkaishiDecayPurifierMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（仅升级槽 2 格），玩家背包紧随其后 */
+    /** 机器区槽数（仅升级槽 3 格），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT;
 
     private final ContainerData data;
@@ -37,9 +37,10 @@ public class AkaishiDecayPurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
+        // 升级槽（速度/能量/无线接收各一格，固定面板右上角 Y=8，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 玩家背包 3 行 y=124 起，快捷栏 y=180（198 高 GUI，与 akaishi_wireless_terminal.png 槽位图案对齐）
         for (int row = 0; row < 3; row++) {
@@ -81,6 +82,11 @@ public class AkaishiDecayPurifierMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

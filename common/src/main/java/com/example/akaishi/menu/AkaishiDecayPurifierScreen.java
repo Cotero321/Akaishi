@@ -48,11 +48,10 @@ public class AkaishiDecayPurifierScreen extends AbstractContainerScreen<AkaishiD
             gui.fill(x + BAR_X, y + BAR_Y, x + BAR_X + width, y + BAR_Y + BAR_H, 0xFFE03030);
         }
 
-        // 升级槽（速度/能量，贴图无图案需自绘框 + 槽位左侧标签）
+        // 升级槽（速度/能量/无线接收，贴图无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X - 36, y + SPEED_SLOT_Y + 4, 0xFF707070, false);
+        GuiWidgets.slotBox(gui, x + 116, y + 8);
     }
 
     @Override
@@ -113,6 +112,12 @@ public class AkaishiDecayPurifierScreen extends AbstractContainerScreen<AkaishiD
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+        }
+        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                    Component.translatable(menu.hasWirelessReceiver()
+                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

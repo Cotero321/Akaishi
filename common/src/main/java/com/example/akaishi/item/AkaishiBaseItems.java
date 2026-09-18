@@ -59,6 +59,7 @@ public final class AkaishiBaseItems {
     public static RegistrySupplier<Item> fertilityRing;
     public static RegistrySupplier<Item> machineSpeedUpgrade;
     public static RegistrySupplier<Item> machineEnergyUpgrade;
+    public static RegistrySupplier<Item> machineWirelessReceiverUpgrade;
     public static RegistrySupplier<Item> akaishiDust;
     public static RegistrySupplier<Item> coalDust;
     public static RegistrySupplier<Item> ironDust;
@@ -111,6 +112,9 @@ public final class AkaishiBaseItems {
                 () -> new AkaishiMachineUpgradeItem(MachineUpgradeType.SPEED));
         machineEnergyUpgrade = item(ModItems.MACHINE_ENERGY_UPGRADE_ID,
                 () -> new AkaishiMachineUpgradeItem(MachineUpgradeType.ENERGY));
+        // 无线接收升级：装 1 个即让机器加入无线场域（微缩矩阵终端的调度对象）
+        machineWirelessReceiverUpgrade = item(ModItems.MACHINE_WIRELESS_RECEIVER_UPGRADE_ID,
+                () -> new AkaishiMachineUpgradeItem(MachineUpgradeType.WIRELESS));
         // 粉末（打粉机产物 / 压缩机原料）
         akaishiDust = item(ModItems.CHISHI_DUST_ID);
         coalDust = item(ModItems.COAL_DUST_ID);

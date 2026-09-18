@@ -11,6 +11,7 @@ import com.ibm.icu.text.Transliterator;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,22 +44,61 @@ public final class ItemTerminalSearch {
     /** 过滤条目表：查询为空时直接返回原表（省一次复制） */
     public static List<AkaishiItemTerminalSync.Entry> filter(
             List<AkaishiItemTerminalSync.Entry> entries, String query) {
-        String trimmed = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+        String trimmed = normalizeQuery(query);
         if (trimmed.isEmpty()) {
             return entries;
         }
         String[] orGroups = trimmed.split("\\|");
         List<AkaishiItemTerminalSync.Entry> out = new ArrayList<>(entries.size());
         for (AkaishiItemTerminalSync.Entry entry : entries) {
-            if (matchesAnyGroup(entry, orGroups)) {
+            if (matchesAnyGroup(haystack(entry), orGroups)) {
                 out.add(entry);
             }
         }
         return out;
     }
 
-    private static boolean matchesAnyGroup(AkaishiItemTerminalSync.Entry entry, String[] orGroups) {
-        String haystack = haystack(entry);
+    /**
+     * 通用匹配：查询串 vs 单件物品（本地化名 + 拼音 + 注册名）。
+     * <p>
+     * 语法与库页<b>完全一致</b>（{@code |} 分组、组内空格分词 AND）；空查询视为全部命中。
+     * 公开给"可合成物品"等其它搜索复用，杜绝两套搜索口径漂移。
+     */
+    public static boolean matches(ItemStack stack, String query) {
+        String trimmed = normalizeQuery(query);
+        if (trimmed.isEmpty()) {
+            return true;
+        }
+        String haystack = haystack(stack.getItem(), stack.getHoverName().getString());
+        return matchesAnyGroup(haystack, trimmed.split("\\|"));
+    }
+
+    /**
+     * 过滤物品栈表（加工页「可合成物目录」用）：与库页同一套语法与口径。
+     * <p>
+     * 不能重载成 {@code filter(List&lt;ItemStack&gt;, String)} —— 与
+     * {@link #filter(List, String)} 擦除后签名相同（都是 {@code filter(List, String)}），Java 直接报名称冲突。
+     */
+    public static List<ItemStack> filterStacks(List<ItemStack> stacks, String query) {
+        String trimmed = normalizeQuery(query);
+        if (trimmed.isEmpty()) {
+            return stacks;
+        }
+        String[] orGroups = trimmed.split("\\|");
+        List<ItemStack> out = new ArrayList<>(stacks.size());
+        for (ItemStack stack : stacks) {
+            if (matchesAnyGroup(haystack(stack.getItem(), stack.getHoverName().getString()), orGroups)) {
+                out.add(stack);
+            }
+        }
+        return out;
+    }
+
+    private static String normalizeQuery(String query) {
+        return query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static boolean matchesAnyGroup(String haystack, String[] orGroups) {
         for (String group : orGroups) {
             boolean allTermsHit = true;
             for (String term : group.trim().split("\\s+")) {
@@ -75,12 +115,10 @@ public final class ItemTerminalSearch {
     }
 
     /**
-     * 条目的可搜索串：名称 + 拼音首字母 + 注册名，三者用分隔符拼成一条，之后每个搜索词只需一次
-     * {@code contains}，避免逐词重复做名称解析与转写。
+     * 物品的可搜索串：名称 + 拼音首字母 + 注册名，三者用分隔符拼成一条，之后每个搜索词只需一次
+     * {@code contains}，避免逐词重复做名称解析与转写。公开供其它搜索入口复用同一口径。
      */
-    private static String haystack(AkaishiItemTerminalSync.Entry entry) {
-        Item item = entry.display().getItem();
-        String name = entry.display().getHoverName().getString();
+    public static String haystack(Item item, String name) {
         String cacheKey = BuiltInRegistries.ITEM.getKey(item) + "\u0000" + name;
         String cached = HAYSTACK_CACHE.get(cacheKey);
         if (cached != null) {
@@ -93,6 +131,11 @@ public final class ItemTerminalSearch {
         }
         HAYSTACK_CACHE.put(cacheKey, built);
         return built;
+    }
+
+    /** 条目版的可搜索串（委托 {@link #haystack(Item, String)}，两条搜索路径口径唯一） */
+    private static String haystack(AkaishiItemTerminalSync.Entry entry) {
+        return haystack(entry.display().getItem(), entry.display().getHoverName().getString());
     }
 
     /**

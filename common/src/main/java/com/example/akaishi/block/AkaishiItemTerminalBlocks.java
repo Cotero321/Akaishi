@@ -40,6 +40,10 @@ public final class AkaishiItemTerminalBlocks {
     public static RegistrySupplier<Block> CHISHI_ITEM_TERMINAL_CHUNK_LOADER = null;
     /** 区块加载扩展组件：内腔功能件，把弱加载范围扩为 3×3（只认 1 个，需先有构架） */
     public static RegistrySupplier<Block> CHISHI_ITEM_TERMINAL_CHUNK_RANGE = null;
+    /** 储存无线输入口：把面朝方向容器的物品抓进绑定的物品终端 */
+    public static RegistrySupplier<Block> CHISHI_ITEM_INPUT_PORT = null;
+    /** 储存无线输出口：把绑定的物品终端储存推给面朝方向的容器 */
+    public static RegistrySupplier<Block> CHISHI_ITEM_OUTPUT_PORT = null;
 
     private AkaishiItemTerminalBlocks() {
     }
@@ -75,5 +79,10 @@ public final class AkaishiItemTerminalBlocks {
                 "akaishi_item_terminal_chunk_loader", AkaishiItemTerminalChunkLoaderBlock::new);
         CHISHI_ITEM_TERMINAL_CHUNK_RANGE = AkaishiBlockRegistrar.registerMachineBlock(registrar,
                 "akaishi_item_terminal_chunk_range", AkaishiItemTerminalChunkRangeBlock::new);
+        // 储存无线输入/输出口：口朝点击面，把面朝方向容器的物品与终端库互搬（搬运在 AkaishiItemPortBlockEntity）
+        CHISHI_ITEM_INPUT_PORT = AkaishiBlockRegistrar.registerMachineBlock(registrar,
+                "akaishi_item_input_port", AkaishiItemInputPortBlock::new);
+        CHISHI_ITEM_OUTPUT_PORT = AkaishiBlockRegistrar.registerMachineBlock(registrar,
+                "akaishi_item_output_port", AkaishiItemOutputPortBlock::new);
     }
 }

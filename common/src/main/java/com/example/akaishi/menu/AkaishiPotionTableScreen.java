@@ -1,8 +1,8 @@
 package com.example.akaishi.menu;
 
-import com.example.akaishi.block.entity.AkaishiPotionTableBlockEntity;
 import com.example.akaishi.life.potion.PotionRegistry;
 import com.example.akaishi.life.potion.PotionTemplate;
+import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -27,10 +27,11 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3；标签置于槽位下方） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    private static final int WIRELESS_SLOT_X = 116, WIRELESS_SLOT_Y = 8;
     /** 存储开关按钮（移置左上方，避免与右上角升级槽重叠；仅在相邻存储库时显示，规则 3） */
     private static final int STORE_X = 8, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
-    /** 机器业务槽的 Menu 槽位索引（升级槽 2 后的样本/固态/输出，空槽 tooltip 用） */
-    private static final int SAMPLE_SLOT_INDEX = 2;
+    /** 机器业务槽的 Menu 槽位索引（升级槽之后的样本/固态/输出，空槽 tooltip 用） */
+    private static final int SAMPLE_SLOT_INDEX = MachineUpgradeSlots.SLOT_COUNT;
     private static final int SOLID_SLOT_INDEX = SAMPLE_SLOT_INDEX + 1;
     private static final int OUTPUT_SLOT_INDEX = SAMPLE_SLOT_INDEX + 2;
 
@@ -57,7 +58,8 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
         if (menu.linkState != null && menu.linkState.open) {
             drawStorageButton(gui, x, y);
             drawStorageOverlay(gui, x, y);
-            for (int i = AkaishiPotionTableBlockEntity.SLOT_COUNT; i < this.menu.slots.size(); i++) {
+            // 起始下标 = 升级槽数（跳过升级槽）；不能用业务容器 SLOT_COUNT，二者含义不同
+            for (int i = MachineUpgradeSlots.SLOT_COUNT; i < this.menu.slots.size(); i++) {
                 var slot = this.menu.slots.get(i);
                 if (!slot.isActive()) {
                     continue;
@@ -91,9 +93,6 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
             }
             drawSlotBox(gui, x + slot.x, y + slot.y);
         }
-        // 升级槽标签（槽位框已由上方循环自绘；置于槽位下方，避开顶部留白）
-        gui.drawString(this.font, Component.translatable("gui.akaishi.upgrade.tag"),
-                x + SPEED_SLOT_X, y + SPEED_SLOT_Y + 18, 0xFF707070, false);
 
         // 存储联动：按钮 + 浮层
         if (menu.linkState != null) {
@@ -200,6 +199,13 @@ public class AkaishiPotionTableScreen extends AbstractContainerScreen<AkaishiPot
                 gui.renderTooltip(this.font,
                         Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                                 "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                        mouseX, mouseY);
+            }
+            // 无线接收槽：按已装/未装给出状态提示
+            if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)) {
+                gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                                Component.translatable(menu.hasWirelessReceiver()
+                                        ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                         mouseX, mouseY);
             }
         }

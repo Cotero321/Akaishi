@@ -14,6 +14,8 @@ import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiTransgeneBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
+import com.example.akaishi.block.entity.AkaishiItemPortBlockEntity;
+import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
@@ -30,17 +32,23 @@ import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.LifeEnergyEmitterRenderer;
 import com.example.akaishi.forge.client.MotherAltarRenderer;
 import com.example.akaishi.forge.client.PipeSideOverlayRenderer;
+import com.example.akaishi.forge.client.WirelessFieldRenderer;
+import com.example.akaishi.forge.client.WirelessNodeFieldRenderer;
 import com.example.akaishi.forge.client.AkaishiUnnameableHandler;
 import com.example.akaishi.forge.client.AkaishiErosionFlashOverlay;
 import com.example.akaishi.forge.client.AkaishiUnnameableOverlay;
 import com.example.akaishi.forge.client.AkaishiUnnameablePostHandler;
+import com.example.akaishi.api.miniature.IMiniaturizableTerminal;
+import com.example.akaishi.miniature.MiniatureCollapse;
 import com.example.akaishi.forge.client.mechanical.MechanicalPartRenderer;
 import com.example.akaishi.forge.client.model.MechanicalPartGeometryLoader;
 import com.example.akaishi.forge.config.AkaishiConfig;
 import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.fluid.ForgeFluidBridge;
 import com.example.akaishi.forge.fluid.ModFluidsImpl;
+import com.example.akaishi.forge.io.ItemPortExternalItemHandler;
 import com.example.akaishi.forge.io.MachineCapabilityProvider;
+import com.example.akaishi.forge.io.MiniatureTerminalItemHandler;
 import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
 import com.example.akaishi.forge.life.AkaishiForbiddenErosionHandler;
@@ -61,6 +69,8 @@ import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.wireless.PortableSupplyService;
+import com.example.akaishi.wireless.WirelessFieldManager;
+import com.example.akaishi.wireless.WirelessNodeRegistry;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
@@ -68,6 +78,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -97,11 +108,14 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -171,9 +185,24 @@ public final class AkaishiModForge {
         // 暴露 Forge ITEM_HANDLER / FLUID_HANDLER，原版漏斗、MEK 管道、AE2/RS 等可直接对接；
         // 方向（仅输出/仅输入）与废料/等离子家族过滤由 forge.io 适配器逐槽/逐罐遵守。
         // 液体管道为直连模式，自身无缓冲，故不额外暴露 FLUID_HANDLER。
+        // 例外：储存无线输入/输出口是"无内部容器、纯转发"的终端远程接口面，通用适配层按真实槽位
+        // 记账（插入乐观扣减、抽取乐观回报），会对它丢物/复制，故改挂专用转发实现（见该类注释）。
+        // 同理，微缩终端也是虚拟槽纯转发（且费用不足整笔拒绝），须排在通用分支之前单独处理；
+        // 仅在其确实声明了物品槽（getContainerSize > 0）时才挂能力，无物品能力的族不暴露槽位。
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, (AttachCapabilitiesEvent<BlockEntity> event) -> {
             BlockEntity be = event.getObject();
-            if (be instanceof IItemPipeDevice || be instanceof IFluidPipeDevice) {
+            if (be instanceof AkaishiItemPortBlockEntity port) {
+                event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "item_port_external"),
+                        new ItemPortExternalItemHandler(port));
+            } else if (be instanceof MiniatureTerminalBlockEntity miniature) {
+                // 微缩终端一律由本分支处理，**绝不落到下面的通用分支**：通用适配层按"真实槽位"记账，
+                // 对虚拟槽纯转发件会丢物/复制。无物品能力的族（containerSize == 0，纯能量族）直接不挂物品能力；
+                // 能量亦不外转第三方（赤能源/生命能量自研，见项目铁律）。
+                if (miniature.getContainerSize() > 0) {
+                    event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "miniature_terminal_external"),
+                            new MiniatureTerminalItemHandler(miniature));
+                }
+            } else if (be instanceof IItemPipeDevice || be instanceof IFluidPipeDevice) {
                 event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "external_logistics"),
                         new MachineCapabilityProvider(be));
             }
@@ -249,12 +278,24 @@ public final class AkaishiModForge {
         // 掉落来源索引：数据包重载标脏 + tick 分帧扫表 + 服务端停止清索引
         MinecraftForge.EVENT_BUS.register(AkaishiValueForgeEvents.INSTANCE);
 
+        // 无线场域 / 节点登记表按 server 实例分表，需在服务器停止时显式整组丢弃：
+        // 否则静态表会长期钉住已结束的 ServerLevel（旧清理点只在下一次终端 refresh 时才触发）
+        MinecraftForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> {
+            WirelessFieldManager.clearServer(event.getServer());
+            WirelessNodeRegistry.clearServer(event.getServer());
+        });
+
         // 调用通用初始化逻辑
         AkaishiMod.init();
+        // 相邻容器物品访问：装上 forge 物品能力实现（common 侧默认只有原版容器兜底）
+        com.example.akaishi.api.transfer.ItemAccessHolder.install(new com.example.akaishi.forge.transfer.ForgeItemAccess());
 
         // 游戏事件总线：动态属性修饰符事件 + 特殊能力战斗事件 + 测试指令
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> ModCommands.build(event.getDispatcher()));
+        // 终端微缩（潜行右键）：必须走 RightClickBlock —— 原版在"潜行且手上有物品"时会跳过
+        // 方块自身的 use()，直接用物品放置，方块侧钩子根本收不到；本事件不受该门控影响
+        MinecraftForge.EVENT_BUS.addListener(this::onRightClickBlock);
 
         // Mods 菜单在模组构造阶段收集配置扩展点，必须此时注册才能显示配置按钮。
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AkaishiConfigScreenFactory::register);
@@ -264,6 +305,39 @@ public final class AkaishiModForge {
 
         // 「不可名状」HUD 叠加层：RegisterGuiOverlaysEvent 属于 IModBusEvent，必须走 mod 事件总线
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegisterOverlays);
+    }
+
+    /**
+     * 终端微缩：潜行右键已成型终端 ⇒ 坍缩为单方块。
+     * <p>
+     * <b>为什么走事件而不是方块 {@code use()}</b>：原版在「潜行且手上拿着物品」时，
+     * 客户端会跳过 {@code BlockState#use}，直接用物品去放置方块 —— 于是方块侧的钩子<b>永远收不到</b>
+     * 这次交互（表现就是"潜行右键照样放方块、毫无反应"）。{@code RightClickBlock} 不受该门控影响，
+     * 是扳手类交互的标准落点。
+     * <p>
+     * 只在<b>已成型终端</b>上才拦截：其它方块（含本族外壳）保持原版行为，不影响建造。
+     */
+    private void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) {
+            return;
+        }
+        Player player = event.getEntity();
+        BlockPos pos = event.getPos();
+        if (!(level.getBlockEntity(pos) instanceof IMiniaturizableTerminal)) {
+            return;
+        }
+        if (!player.isShiftKeyDown()) {
+            return; // 不潜行：交给方块自身逻辑（开界面）
+        }
+        if (MiniatureCollapse.collapse(level, pos, player)) {
+            event.setCanceled(true);
+            event.setUseBlock(Event.Result.DENY);
+            event.setUseItem(Event.Result.DENY);
+        } else {
+            // 未成型 / 无权限：同样拦下，避免"想微缩却把方块放出去"
+            event.setCanceled(true);
+            event.setUseItem(Event.Result.DENY);
+        }
     }
 
     /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字；侵蚀泛红的血色边缘 */
@@ -319,6 +393,10 @@ public final class AkaishiModForge {
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_EXHAUSTED_PIPE.get(), PipeSideOverlayRenderer::new);
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_MULTI_FLUID_WASTE_PIPE.get(), PipeSideOverlayRenderer::new);
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_PLASMA_PIPE.get(), PipeSideOverlayRenderer::new);
+        // 无线场域屏障：微缩矩阵终端的场域范围画成四面透明蓝光墙（客户端只读重扫取半径，无需同步包）
+        BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINI_MATRIX_TERMINAL.get(), WirelessFieldRenderer::new);
+        // 网络节点子场域：节点被申领时画它自己的 1 区块场域（不限距离 ⇒ 必须由节点所在区块渲染）
+        BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINI_MATRIX_NETWORK_NODE.get(), WirelessNodeFieldRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
         // 「不可名状」视野扭曲：相机滚转/抖动与 FOV 脉动

@@ -69,6 +69,9 @@ import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
+import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMiniMatrixTerminalBlockEntity;
+import com.example.akaishi.block.entity.AkaishiItemPortBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemStorageUnitBlockEntity;
 import com.example.akaishi.wireless.IWirelessPortHost;
 import dev.architectury.registry.menu.MenuRegistry;
@@ -231,6 +234,10 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiItemTerminalMenu>> CHISHI_ITEM_TERMINAL;
     /** 物品储存单元菜单类型（D18 只读视图：54 槽展示 + 占用/剩余 IP） */
     public static RegistrySupplier<MenuType<AkaishiItemStorageUnitMenu>> CHISHI_ITEM_STORAGE_UNIT;
+    /** 储存无线输入口/输出口菜单类型（共用，两页：运行 / 远程绑定） */
+    public static RegistrySupplier<MenuType<AkaishiItemPortMenu>> CHISHI_ITEM_PORT;
+    /** 微缩矩阵终端菜单类型（三页：芯片列表 / 升级装配 / 安全认证） */
+    public static RegistrySupplier<MenuType<AkaishiMiniMatrixTerminalMenu>> CHISHI_MINI_MATRIX_TERMINAL;
 
     private ModMenus() {
     }
@@ -1181,11 +1188,15 @@ public final class ModMenus {
         // 1 授权槽（仅安全页显示）；网络缓冲 = 方块坐标 + 初始页（安全方块直达安全卡认证页）
         MenuType<AkaishiWirelessTerminalMenu> terminalType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
-            int page = buf.readInt();
+            // 微缩终端的扩展数据只写坐标（无页号）⇒ 缺页号时回退运行页，避免缓冲读越界
+            int page = buf.isReadable() ? buf.readInt() : 0;
             Level level = inv.player.level();
-            AkaishiWirelessTerminalMenu menu = level.getBlockEntity(pos) instanceof AkaishiWirelessTerminalBlockEntity t
+            BlockEntity be = level.getBlockEntity(pos);
+            AkaishiWirelessTerminalMenu menu = be instanceof AkaishiWirelessTerminalBlockEntity t
                     ? new AkaishiWirelessTerminalMenu(syncId, inv, t)
-                    : AkaishiWirelessTerminalMenu.emptyMenu(syncId, inv);
+                    : be instanceof MiniatureTerminalBlockEntity miniature && miniature.wirelessHost() != null
+                            ? new AkaishiWirelessTerminalMenu(syncId, inv, miniature.wirelessHost())
+                            : AkaishiWirelessTerminalMenu.emptyMenu(syncId, inv);
             menu.setInitialPage(page);
             return menu;
         });
@@ -1216,11 +1227,15 @@ public final class ModMenus {
         // 终端（外墙主方块）：数据槽布局与赤版无线终端相同；网络缓冲 = 方块坐标 + 初始页
         MenuType<AkaishiLifeWirelessTerminalMenu> lifeTerminalType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();
-            int page = buf.readInt();
+            // 微缩终端的扩展数据只写坐标（无页号）⇒ 缺页号时回退运行页，避免缓冲读越界
+            int page = buf.isReadable() ? buf.readInt() : 0;
             Level level = inv.player.level();
-            AkaishiLifeWirelessTerminalMenu menu = level.getBlockEntity(pos) instanceof AkaishiLifeWirelessTerminalBlockEntity t
+            BlockEntity lifeBe = level.getBlockEntity(pos);
+            AkaishiLifeWirelessTerminalMenu menu = lifeBe instanceof AkaishiLifeWirelessTerminalBlockEntity t
                     ? new AkaishiLifeWirelessTerminalMenu(syncId, inv, t)
-                    : AkaishiLifeWirelessTerminalMenu.emptyMenu(syncId, inv);
+                    : lifeBe instanceof MiniatureTerminalBlockEntity miniature && miniature.wirelessHost() != null
+                            ? new AkaishiLifeWirelessTerminalMenu(syncId, inv, miniature.wirelessHost())
+                            : AkaishiLifeWirelessTerminalMenu.emptyMenu(syncId, inv);
             menu.setInitialPage(page);
             return menu;
         });
@@ -1390,6 +1405,10 @@ public final class ModMenus {
             if (be instanceof AkaishiItemTerminalBlockEntity terminal) {
                 return new AkaishiItemTerminalMenu(syncId, inv, terminal);
             }
+            // 微缩件：同一套库页（宿主是微缩状态，不是终端方块实体）
+            if (be instanceof MiniatureTerminalBlockEntity miniature && miniature.itemHost() != null) {
+                return new AkaishiItemTerminalMenu(syncId, inv, miniature.itemHost());
+            }
             // 方块实体缺失（跨维度/距离过远）时用空数据兜底：槽位与数据槽数量不变，避免索引错位
             return new AkaishiItemTerminalMenu(syncId, inv, null);
         });
@@ -1398,6 +1417,23 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_item_terminal"), () -> itemTerminalType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(itemTerminalType, AkaishiItemTerminalScreen::new));
+
+        // 微缩矩阵终端：芯片列表 / 升级装配 / 安全认证三页（芯片读数经 AkaishiMiniMatrixSync 快照）
+        MenuType<AkaishiMiniMatrixTerminalMenu> miniMatrixType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiMiniMatrixTerminalBlockEntity matrix) {
+                return new AkaishiMiniMatrixTerminalMenu(syncId, inv, matrix);
+            }
+            // 方块实体缺失（跨维度/距离过远）时用空数据兜底：槽位数量不变，避免索引错位
+            return new AkaishiMiniMatrixTerminalMenu(syncId, inv, null);
+        });
+        CHISHI_MINI_MATRIX_TERMINAL = (RegistrySupplier<MenuType<AkaishiMiniMatrixTerminalMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mini_matrix_terminal"), () -> miniMatrixType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(miniMatrixType, AkaishiMiniMatrixTerminalScreen::new));
 
         // 物品储存单元：D18 只读视图（54 槽 + 占用/剩余 IP），无任何写入路径
         MenuType<AkaishiItemStorageUnitMenu> itemStorageUnitType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
@@ -1415,5 +1451,24 @@ public final class ModMenus {
                         () -> itemStorageUnitType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(itemStorageUnitType, AkaishiItemStorageUnitScreen::new));
+
+        // 储存无线输入口/输出口（共用菜单类型）：5 数据槽（方向/绑定态/上次搬运/绑定身份短号拆 2 槽），无机器槽；
+        // 远程绑定走 AkaishiItemPortBindingSync（S2C 清单快照 + C2S 动作包）
+        MenuType<AkaishiItemPortMenu> itemPortType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiItemPortBlockEntity port) {
+                return new AkaishiItemPortMenu(syncId, inv, port);
+            }
+            // 方块实体缺失（如跨维度/距离过远）时用同尺寸空数据兜底，避免索引错位
+            return new AkaishiItemPortMenu(syncId, inv,
+                    new SimpleContainerData(AkaishiItemPortBlockEntity.DATA_SLOTS));
+        });
+        CHISHI_ITEM_PORT = (RegistrySupplier<MenuType<AkaishiItemPortMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_item_port"), () -> itemPortType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(itemPortType, AkaishiItemPortScreen::new));
     }
 }

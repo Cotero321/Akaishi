@@ -23,7 +23,7 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
     private static final int TEXT_GREEN = 0xFF2E7D32;
 
     // 页面切换按钮（80×12，两个并排，y=16 避开标题）
-    private static final int TAB_W = 80;
+    private static final int TAB_W = 53;
     private static final int TAB_H = 12;
     private static final int TAB_Y = 16;
 
@@ -39,8 +39,16 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
     private static final int UNBIND_W = 44;
     private static final int UNBIND_H = 12;
 
-    /** 当前页面：0=运行情况，1=传输情况 */
+    /** 当前页面：0=运行情况，1=传输情况，2=远程绑定 */
     private int currentPage;
+
+    // 绑定页布局：状态两行 + 最多 6 行候选终端（行高 11，止于 y≈122，背包自 124）
+    private static final int TAB_STEP = 55;
+    private static final int BIND_STATUS_Y = 36;
+    private static final int BIND_LIST_Y = 58;
+    private static final int BIND_ROW_H = 11;
+    private static final int BIND_LIST_W = 160;
+    private static final int BIND_ROWS = 6;
 
     public AkaishiLifeWirelessPortScreen(AkaishiLifeWirelessPortMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -53,9 +61,18 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
         int x = this.leftPos;
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
-        // 顶部切页按钮
-        GuiWidgets.button(gui, x + 8, y + TAB_Y, TAB_W, TAB_H);
-        GuiWidgets.button(gui, x + 88, y + TAB_Y, TAB_W, TAB_H);
+        // 顶部切页按钮（3 页：运行 / 传输 / 绑定）
+        for (int i = 0; i < 3; i++) {
+            GuiWidgets.button(gui, x + 8 + i * TAB_STEP, y + TAB_Y, TAB_W, TAB_H);
+        }
+        // 绑定页：候选行悬停高亮（行高仅 11，靠底色区分行）
+        if (currentPage == 2) {
+            int row = bindRowAt(mouseX, mouseY);
+            if (row >= 0 && row < this.menu.bindingEntries().size()) {
+                gui.fill(x + 8, y + BIND_LIST_Y + row * BIND_ROW_H - 1, x + 168,
+                        y + BIND_LIST_Y + row * BIND_ROW_H + BIND_ROW_H - 1, 0x30FFFFFF);
+            }
+        }
     }
 
     @Override
@@ -63,13 +80,67 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
         gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT, false);
         // 切页标签
         drawTabLabel(gui, 8, "gui.akaishi.wireless.tab.run", currentPage == 0);
-        drawTabLabel(gui, 88, "gui.akaishi.wireless.tab.transfer", currentPage == 1);
+        drawTabLabel(gui, 8 + TAB_STEP, "gui.akaishi.wireless.tab.transfer", currentPage == 1);
+        drawTabLabel(gui, 8 + TAB_STEP * 2, "gui.akaishi.wireless.tab.bind", currentPage == 2);
 
         if (currentPage == 0) {
             renderRunPage(gui);
-        } else {
+        } else if (currentPage == 1) {
             renderTransferPage(gui);
+        } else {
+            renderBindPage(gui);
         }
+    }
+
+    /**
+     * 页3：远程绑定（列出对你有「布局」权限的在线终端，点一行即绑定，无需身份卡）。
+     * 绑定身份 = 你本人，端口每 tick 会按该身份校验方向权限（输入口=存入 / 输出口=取出）。
+     */
+    private void renderBindPage(GuiGraphics gui) {
+        // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
+        int x = 0;
+        int y = 0;
+        String bound = menu.boundShortId();
+        gui.drawString(this.font, Component.translatable("gui.akaishi.wireless.port.bound_to",
+                bound.isEmpty() ? "----" : bound), x + 8, y + BIND_STATUS_Y, TEXT, false);
+        gui.drawString(this.font, Component.translatable(menu.isAuthenticated()
+                        ? "gui.akaishi.wireless.port.authenticated"
+                        : "gui.akaishi.wireless.port.not_authenticated"),
+                x + 8, y + BIND_STATUS_Y + 10, menu.isAuthenticated() ? TEXT_GREEN : TEXT_RED, false);
+        java.util.List<AkaishiPortBindingSync.Entry> entries = menu.bindingEntries();
+        if (entries.isEmpty()) {
+            gui.drawString(this.font, this.font.plainSubstrByWidth(
+                            Component.translatable("gui.akaishi.wireless.port.no_terminal").getString(),
+                            BIND_LIST_W),
+                    x + 8, y + BIND_LIST_Y, TEXT_DIM, false);
+            return;
+        }
+        for (int i = 0; i < entries.size() && i < BIND_ROWS; i++) {
+            AkaishiPortBindingSync.Entry entry = entries.get(i);
+            boolean selected = entry.shortId().equals(bound);
+            Component label = Component.translatable("gui.akaishi.wireless.port.entry",
+                    entry.shortId(), entry.ownerName().isEmpty() ? "----" : entry.ownerName());
+            int rowY = y + BIND_LIST_Y + i * BIND_ROW_H;
+            // 选中行：标记在**行首**，终端信息接在其后 —— 避免长文字与行尾标记挤在一起
+            int labelX = x + 10;
+            if (selected) {
+                Component marker = Component.translatable("gui.akaishi.wireless.port.selected");
+                gui.drawString(this.font, marker, labelX, rowY, TEXT_GREEN, false);
+                labelX += this.font.width(marker) + 4;
+            }
+            gui.drawString(this.font, this.font.plainSubstrByWidth(label.getString(), 158 - (labelX - x - 10)),
+                    labelX, rowY, selected ? TEXT_GREEN : TEXT, false);
+        }
+    }
+
+    /** 鼠标所在候选行（不在列表内返回 -1） */
+    private int bindRowAt(double mouseX, double mouseY) {
+        int relY = (int) mouseY - this.topPos - BIND_LIST_Y;
+        if (relY < 0 || mouseX < this.leftPos + 8 || mouseX >= this.leftPos + 168) {
+            return -1;
+        }
+        int row = relY / BIND_ROW_H;
+        return row < BIND_ROWS ? row : -1;
     }
 
     /** 页1：运行情况（绑定卡/认证状态/区块加载提示/解绑） */
@@ -152,6 +223,12 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
                             EnergyFormat.format(menu.getEnergy()), EnergyFormat.format(menu.getMaxEnergy())),
                     mouseX, mouseY);
         }
+        // 绑定页：候选行悬停提示（操作说明 + 权限口径）
+        if (currentPage == 2 && bindRowAt(mouseX, mouseY) >= 0) {
+            gui.renderComponentTooltip(this.font, java.util.List.of(
+                    Component.translatable("gui.akaishi.wireless.port.bind_row.tip"),
+                    Component.translatable("gui.akaishi.wireless.port.bind_row.dir")), mouseX, mouseY);
+        }
     }
 
     @Override
@@ -162,9 +239,23 @@ public class AkaishiLifeWirelessPortScreen extends AbstractContainerScreen<Akais
                 currentPage = 0;
                 return true;
             }
-            if (isIn(this.leftPos + 88, this.topPos + TAB_Y, TAB_W, TAB_H, mouseX, mouseY)) {
+            if (isIn(this.leftPos + 8 + TAB_STEP, this.topPos + TAB_Y, TAB_W, TAB_H, mouseX, mouseY)) {
                 currentPage = 1;
                 return true;
+            }
+            if (isIn(this.leftPos + 8 + TAB_STEP * 2, this.topPos + TAB_Y, TAB_W, TAB_H, mouseX, mouseY)) {
+                currentPage = 2;
+                return true;
+            }
+            // 绑定页：点候选行 = 远程绑定到该终端（解绑仍在页1按钮）
+            if (currentPage == 2) {
+                int row = bindRowAt(mouseX, mouseY);
+                java.util.List<AkaishiPortBindingSync.Entry> entries = menu.bindingEntries();
+                if (row >= 0 && row < entries.size()) {
+                    AkaishiPortBindingSync.sendAction(this.menu.containerId, AkaishiPortBindingSync.ACTION_BIND,
+                            entries.get(row).terminalId());
+                    return true;
+                }
             }
             // 解绑按钮（页1，服务端执行）
             if (currentPage == 0 && menu.getCardHash() != 0

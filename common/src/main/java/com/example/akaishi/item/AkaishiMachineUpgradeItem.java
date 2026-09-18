@@ -9,9 +9,9 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * 机器升级组件（MEK 式单格堆叠）：装入用电器升级槽，提供速度/容量加成。
- * 每台用电器 2 个升级槽（速度/能量各一格），槽位 mayPlace 互斥，
- * 单格最多堆叠 8 个，堆叠数即等级：速度每级 +12.5%（封顶 +100%），能量每级 +50% 容量（封顶 +400%）。
+ * 机器升级组件（MEK 式单格堆叠）：装入用电器升级槽，提供速度/容量加成或无线接收能力。
+ * 每台用电器 3 个升级槽（速度 / 能量 / 无线接收各一格，槽位 mayPlace 互斥）；
+ * 速度与能量单格最多堆叠 8 个，堆叠数即等级；无线接收升级单格 1 个即生效。
  */
 public class AkaishiMachineUpgradeItem extends Item {
 
@@ -20,7 +20,8 @@ public class AkaishiMachineUpgradeItem extends Item {
     private final MachineUpgradeType type;
 
     public AkaishiMachineUpgradeItem(MachineUpgradeType type) {
-        super(new Item.Properties().stacksTo(MAX_STACK));
+        // 无线接收是"装/没装"的开关语义，不设等级，故封顶 1
+        super(new Item.Properties().stacksTo(type == MachineUpgradeType.WIRELESS ? 1 : MAX_STACK));
         this.type = type;
     }
 
@@ -30,11 +31,13 @@ public class AkaishiMachineUpgradeItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        if (type == MachineUpgradeType.SPEED) {
-            tooltip.add(Component.translatable("gui.akaishi.upgrade.speed.hint"));
-        } else {
-            tooltip.add(Component.translatable("gui.akaishi.upgrade.energy.hint"));
+        tooltip.add(Component.translatable(switch (type) {
+            case SPEED -> "gui.akaishi.upgrade.speed.hint";
+            case ENERGY -> "gui.akaishi.upgrade.energy.hint";
+            case WIRELESS -> "gui.akaishi.upgrade.wireless.hint";
+        }));
+        if (type != MachineUpgradeType.WIRELESS) {
+            tooltip.add(Component.translatable("gui.akaishi.upgrade.stack_hint"));
         }
-        tooltip.add(Component.translatable("gui.akaishi.upgrade.stack_hint"));
     }
 }

@@ -1,25 +1,34 @@
 package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
+import com.example.akaishi.api.energy.IEnergyProvider;
+import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.miniature.IMiniaturizableTerminal;
+import com.example.akaishi.api.storage.IWirelessTerminalHost;
 import com.example.akaishi.block.AkaishiLifeEnergyCellBlock;
 import com.example.akaishi.block.AkaishiLifeWirelessTerminalBlock;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyCellArrayStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeWirelessTerminalMenu;
+import com.example.akaishi.miniature.WirelessTerminalMiniatureAdapter;
+import com.example.akaishi.miniature.WirelessTerminalMiniatureState;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.IWirelessTerminal;
 import com.example.akaishi.wireless.LifeWirelessStructure;
+import com.example.akaishi.wireless.TerminalSecurity;
 import com.example.akaishi.wireless.WirelessFamily;
 import com.example.akaishi.wireless.WirelessNetworkManager;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,6 +44,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -51,44 +61,21 @@ import java.util.UUID;
  *    聚合为本网络储能池（总容量 = 各单元容量之和，动态收集）；
  * 3) 惰性清理网络内失效的输入口/输出口。
  * <p>
- * 认证：身份卡 UUID 集合经「安全卡认证」页维护（最多 {@link WirelessNetworkManager#MAX_AUTHORIZED_CARDS} 张），
- * 与注册表同步持久化；输入口/输出口凭同 UUID 卡片接入本终端。
+ * 认证：一律走终端安全表（归属者 + 权限表 + 默认权限条目，{@link TerminalSecurity}）——输入口凭
+ * {@code INJECT}、输出口凭 {@code EXTRACT}、远程绑定凭 {@code BUILD}、便携终端凭 {@code CRAFT} 权限接入本终端。
  * 生命无线组件可解锁跨维连接、终端及端口区块加载、3×3 加载范围，并按输入/输出方向独立抑制无线损耗。
- * 终端 ID 与授权卡集合经 NBT 持久化；数据槽同步储能/容量（long 拆 4 槽）+ 状态 + 终端 ID 摘要
+ * 终端 ID 与安全状态经 NBT 持久化；数据槽同步储能/容量（long 拆 4 槽）+ 状态 + 终端 ID 摘要
  * （数量与下标和赤版完全一致，菜单读取兼容）。
  */
 public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
-        implements ExtendedMenuProvider, IDataCarrier, IWirelessTerminal {
+        implements ExtendedMenuProvider, IDataCarrier, IWirelessTerminal, IMiniaturizableTerminal,
+        IWirelessTerminalHost {
 
-    // ===== 数据槽（数量与下标与赤版 AkaishiWirelessTerminalBlockEntity 完全一致） =====
-    public static final int DATA_FORMED = 0;
-    public static final int DATA_STORED_LOW = 1;
-    public static final int DATA_STORED_HIGH = 2;
-    public static final int DATA_CAPACITY_LOW = 3;
-    public static final int DATA_CAPACITY_HIGH = 4;
-    public static final int DATA_INPUT_COUNT = 5;
-    public static final int DATA_OUTPUT_COUNT = 6;
-    public static final int DATA_BOUND_SERIALIZERS = 7;
+    // 数据槽下标（DATA_*）随 IWirelessTerminalHost 一并下沉：菜单只依赖接口，不依赖本类
+    /** 旧授权卡计数（白名单已废弃，槽位与下标保持不变以免索引错位） */
     public static final int DATA_AUTHORIZED = 8;
-    public static final int DATA_CROSS_DIM = 9;
-    public static final int DATA_CHUNK_LOAD = 10;
-    public static final int DATA_CHUNK_RANGE = 11;
-    public static final int DATA_INPUT_LOSS = 12;
-    public static final int DATA_OUTPUT_LOSS = 13;
-    /** 终端 ID 摘要（UUID.hashCode，GUI 显示短 ID） */
-    public static final int DATA_TERMINAL_ID = 14;
-    /** 当前弱加载区块数 */
-    public static final int DATA_CHUNK_LOADED = 15;
     /** 区块加载能量税停用标志（生命族恒 0，槽位保留以免索引错位） */
     public static final int DATA_TAX_DISABLED = 16;
-    /** 储能 64 位高段：储能/容量超过 2^31（生命串联器聚合 10.42 亿/台）时，低 32 位槽 1..4 无法承载，追加高 32 位槽 */
-    public static final int DATA_STORED_HIGH2 = 17;
-    public static final int DATA_STORED_HIGH3 = 18;
-    public static final int DATA_CAPACITY_HIGH2 = 19;
-    public static final int DATA_CAPACITY_HIGH3 = 20;
-    /** 终端 ID 高 16 位（低 16 位见 {@link #DATA_TERMINAL_ID}）：数据槽仅 16 位有效，8 位 hex 短 ID 需拆 2 槽 */
-    public static final int DATA_TERMINAL_ID_HIGH = 21;
-    public static final int DATA_SLOTS = 22;
 
     /** 绑定储能单元的搜索半径：结构外围 1 格（单元单方块直接贴身布置即可，范围小不误扫无关方块） */
     private static final int BIND_RANGE = 1;
@@ -104,8 +91,18 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
 
     /** 终端唯一 ID（首次放置生成，NBT 持久化；网络注册表 key） */
     private UUID terminalId = UUID.randomUUID();
-    /** 授权身份卡集合（安全卡认证页管理，NBT 持久化） */
+    /** 旧授权卡白名单条数上限（对齐旧版实现，仅用于裁剪旧存档 NBT，防伪造数据撑爆内存） */
+    private static final int LEGACY_AUTHORIZED_CARD_CAP = 8;
+    /**
+     * 旧授权卡白名单：权限判定已由安全表接管，本集合仅在加载旧存档时读入（不再写回、不推注册表），
+     * 保留读取以避免老存档报错并让计数槽延续旧值。
+     */
     private final Set<UUID> authorizedCards = new HashSet<>();
+    /**
+     * 安全状态（归属者 + 权限表 + 默认权限条目）：权威数据，变化即落盘并推镜像到网络注册表。
+     * 回调走方法引用而非 lambda：lambda 里直接写 {@code security} 会构成字段自引用。
+     */
+    private final TerminalSecurity security = new TerminalSecurity(this::onSecurityChanged);
     private final AkaishiEnergyCellArrayStorage boundStorage;
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
     /** 最近一次聚合储能读数缓存（供便携终端等高频读取，避免每 tick 全量求和） */
@@ -144,6 +141,10 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
         boolean wasFormed = getBlockState().getValue(AkaishiLifeWirelessTerminalBlock.FORMED);
         if (wasFormed != formed) {
             level.setBlock(worldPosition, getBlockState().setValue(AkaishiLifeWirelessTerminalBlock.FORMED, formed), 3);
+        }
+        if (formed && !wasFormed) {
+            // 成型瞬间把权限表镜像推回注册表：重载/换结构后端口与便携终端立即恢复判定
+            security.pushTo(terminalId);
         }
         this.structure = scanned;
 
@@ -189,7 +190,7 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
         data.set(DATA_INPUT_COUNT, WirelessNetworkManager.inputCount(terminalId));
         data.set(DATA_OUTPUT_COUNT, WirelessNetworkManager.outputCount(terminalId));
         data.set(DATA_BOUND_SERIALIZERS, cachedMembers.size());
-        data.set(DATA_AUTHORIZED, WirelessNetworkManager.authorizedCount(terminalId));
+        data.set(DATA_AUTHORIZED, authorizedCards.size()); // 旧授权卡计数（白名单已废弃，槽位与下标保持不变）
         data.set(DATA_CROSS_DIM, structure != null && structure.crossDimCount > 0 ? 1 : 0);
         data.set(DATA_CHUNK_LOAD, structure != null && structure.chunkLoaderCount > 0 ? 1 : 0);
         data.set(DATA_CHUNK_RANGE, structure != null && structure.chunkRangeCount > 0 ? 1 : 0);
@@ -337,39 +338,23 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
         return boundStorage.extractEnergy(amount, false);
     }
 
-    // ===== 安全卡认证 =====
-
-    /** 授权一张身份卡（上限 {@link WirelessNetworkManager#MAX_AUTHORIZED_CARDS}，重复返回 false） */
-    public boolean authorizeCard(UUID card) {
-        if (authorizedCards.size() >= WirelessNetworkManager.MAX_AUTHORIZED_CARDS) {
-            return false;
-        }
-        if (authorizedCards.add(card)) {
-            WirelessNetworkManager.addAuthorizedCard(terminalId, card);
-            setChanged();
-            return true;
-        }
-        return false;
-    }
-
-    /** 撤销一张身份卡的授权 */
-    public void revokeCard(UUID card) {
-        if (authorizedCards.remove(card)) {
-            WirelessNetworkManager.removeAuthorizedCard(terminalId, card);
-            setChanged();
-        }
-    }
-
-    /** 该卡是否已被本终端授权 */
-    public boolean isCardAuthorized(UUID card) {
-        return card != null && authorizedCards.contains(card);
-    }
-
-    public int authorizedCount() {
-        return authorizedCards.size();
-    }
-
     // ===== 访问器 =====
+
+    /** 安全状态（安全页 / GUI / 判定入口） */
+    public TerminalSecurity security() {
+        return security;
+    }
+
+    /** 记录归属者（结构主方块放置时由方块调用）；归属者恒全权限，不占权限表条目 */
+    public void setOwner(UUID owner, String name) {
+        security.setOwner(owner, name);
+    }
+
+    /** 安全状态变化：落盘 + 推镜像（端口/便携终端/客户端 UI 依赖注册表镜像） */
+    private void onSecurityChanged() {
+        setChanged();
+        security.pushTo(terminalId);
+    }
 
     /** 终端唯一 ID（网络注册表 key） */
     @Override
@@ -444,13 +429,7 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putUUID("TerminalId", terminalId);
-        ListTag cards = new ListTag();
-        for (UUID c : authorizedCards) {
-            CompoundTag ct = new CompoundTag();
-            ct.putUUID("Card", c);
-            cards.add(ct);
-        }
-        tag.put("AuthorizedCards", cards);
+        security.save(tag);
     }
 
     @Override
@@ -459,21 +438,131 @@ public class AkaishiLifeWirelessTerminalBlockEntity extends BlockEntity
         if (tag.hasUUID("TerminalId")) {
             terminalId = tag.getUUID("TerminalId");
         }
+        // 旧存档兼容：旧授权卡白名单仅读入本地（按上限裁剪，防伪造 NBT 撑爆内存），不再推注册表
         authorizedCards.clear();
         ListTag cards = tag.getList("AuthorizedCards", Tag.TAG_COMPOUND);
-        // 按授权上限裁剪，防伪造 NBT 导致本地集合与网络注册表（同样受限）不一致
-        for (int i = 0; i < cards.size() && authorizedCards.size() < WirelessNetworkManager.MAX_AUTHORIZED_CARDS; i++) {
+        for (int i = 0; i < cards.size() && authorizedCards.size() < LEGACY_AUTHORIZED_CARD_CAP; i++) {
             authorizedCards.add(cards.getCompound(i).getUUID("Card"));
         }
-        // 加载后同步授权卡到网络注册表（重启恢复在线认证）
-        for (UUID c : authorizedCards) {
-            WirelessNetworkManager.addAuthorizedCard(terminalId, c);
-        }
+        // 安全状态（归属者 + 权限表）读入后立刻推镜像：端口/便携终端/客户端 UI 都依赖它
+        security.load(tag);
+        security.pushTo(terminalId);
     }
 
     /** 结构失效标记：结构方块被破坏时由事件驱动重扫 */
     public void invalidateStructure() {
         structureDirty = true;
+    }
+
+    // ===== 微缩（坍缩为单方块）：见 IMiniaturizableTerminal 与 MiniatureCollapse =====
+
+    @Override
+    public ResourceLocation miniatureTypeId() {
+        return WirelessTerminalMiniatureAdapter.LIFE_ID;
+    }
+
+    @Override
+    public BlockPos structureMin() {
+        return structure == null ? null : structure.min;
+    }
+
+    @Override
+    public BlockPos structureMax() {
+        return structure == null ? null : structure.max;
+    }
+
+    /**
+     * 导出微缩数据（生命族版）：安全表 + <b>储能池快照（容量 + 储量）</b> + 跨维/损耗抑制读数
+     * （生命结构不含便捷传输构架，故该位恒 false），键名与 {@link WirelessTerminalMiniatureState} 一致。
+     * <p>
+     * 池子口径与赤能源族完全一致：坍缩连贴身储能单元一起吃掉，容量/储量并入芯片；代价是
+     * 那些单元必须出现在 {@link #extraConsumedBlocks()} 里（见该方法的硬不变量）。
+     * {@code PoolCells} 仅作诊断/结构留档。
+     */
+    @Override
+    public CompoundTag captureMiniature() {
+        CompoundTag payload = new CompoundTag();
+        CompoundTag sec = new CompoundTag();
+        security.save(sec);
+        payload.put(WirelessTerminalMiniatureState.TAG_SECURITY, sec);
+        payload.putBoolean(WirelessTerminalMiniatureState.TAG_CROSS_DIM, isCrossDim());
+        payload.putInt(WirelessTerminalMiniatureState.TAG_INPUT_LOSS, structure == null ? 0 : structure.inputLossCount);
+        payload.putInt(WirelessTerminalMiniatureState.TAG_OUTPUT_LOSS, structure == null ? 0 : structure.outputLossCount);
+        payload.putBoolean(WirelessTerminalMiniatureState.TAG_TRANSMIT_FRAME, false);
+        long capacity = 0L;
+        long stored = 0L;
+        for (IEnergyStorage storage : collectSerializers()) {
+            capacity += storage.getMaxEnergy();
+            stored += storage.getEnergyStored();
+        }
+        payload.putLong(WirelessTerminalMiniatureState.TAG_POOL_CAPACITY, capacity);
+        payload.putLong(WirelessTerminalMiniatureState.TAG_POOL_STORED, stored);
+        payload.put(WirelessTerminalMiniatureState.TAG_POOL_CELLS, capturePoolCells());
+        return payload;
+    }
+
+    /**
+     * 除 5×5×5 箱体外必须一并消耗的方块：<b>所有把能量算进了池子快照的方块</b>
+     * （硬不变量：能量进了快照 ⇒ 方块必须在这里出现，否则即第二份电）。
+     * <p>
+     * 普通单元消耗自身；生命储存串联器只要任一外壳落进绑定范围就整台接入，
+     * 故<b>中心 + 全部 26 个外壳</b>都要消耗（只取真实能量单元，不越界误伤无关方块）。
+     */
+    @Override
+    public List<BlockPos> extraConsumedBlocks() {
+        if (level == null) {
+            return List.of();
+        }
+        Set<BlockPos> consumed = new LinkedHashSet<>();
+        for (BlockEntity be : serializerEntities()) {
+            if (!(be instanceof AkaishiLifeEnergyCellBlockEntity cell)) {
+                continue;
+            }
+            AkaishiLifeEnergyCellSerializerBlockEntity center = cell.findSerializerCenter();
+            if (center == null) {
+                consumed.add(cell.getBlockPos());
+            } else {
+                collectSerializerBlocks(consumed, center.getBlockPos());
+            }
+        }
+        return List.copyOf(consumed);
+    }
+
+    /** 串联器整台的组成方块：中心串联器 + 3×3×3 内的 26 个外壳单元（非单元不取，避免误伤） */
+    private void collectSerializerBlocks(Set<BlockPos> out, BlockPos center) {
+        out.add(center);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
+                    BlockPos p = center.offset(dx, dy, dz);
+                    if (level.getBlockState(p).getBlock() instanceof AkaishiLifeEnergyCellBlock) {
+                        out.add(p);
+                    }
+                }
+            }
+        }
+    }
+
+    /** 记录绑定储能单元的相对坐标（仅诊断/结构留档，不再驱动能量读数） */
+    private ListTag capturePoolCells() {
+        ListTag cells = new ListTag();
+        List<IEnergyStorage> seen = new ArrayList<>();
+        for (BlockEntity be : serializerEntities()) {
+            if (!(be instanceof IEnergyProvider provider)) {
+                continue;
+            }
+            IEnergyStorage storage = provider.getEnergyStorage(LifeEnergyType.INSTANCE);
+            if (storage == null || seen.contains(storage)) {
+                continue;
+            }
+            seen.add(storage);
+            BlockPos offset = be.getBlockPos().subtract(worldPosition);
+            cells.add(new IntArrayTag(new int[] {offset.getX(), offset.getY(), offset.getZ()}));
+        }
+        return cells;
     }
 
     /** 供结构内方块被破坏/放置事件调用（反应堆同款兜底，此处直接标记重扫） */

@@ -22,6 +22,8 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 /**
  * 无线赤能源输入口：能量管道 → 无线网络的发送端方块（远程设备，无需在外墙上）。
  * 手持身份卡右键即绑定（覆盖旧绑定）；空手/其他物品右键打开口界面（运行/传输 两页）。
@@ -60,9 +62,11 @@ public class AkaishiWirelessInputPortBlock extends AkaishiMachineBlock {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof AkaishiWirelessInputPortBlockEntity port
                 && player instanceof ServerPlayer serverPlayer) {
             ItemStack held = player.getItemInHand(hand);
-            // 手持身份卡右键 → 绑定到本口（覆盖旧绑定）；服务端逻辑为卡生成唯一卡号
+            // 手持身份卡右键 → 绑定到本口（覆盖旧绑定）：身份取卡上绑定的玩家，卡未绑定则用右键玩家自己
             if (held.getItem() instanceof AkaishiWirelessIdentityCardItem) {
-                port.bind(AkaishiWirelessIdentityCardItem.ensureUuid(held));
+                AkaishiWirelessIdentityCardItem.ensureUuid(held); // 服务端为卡生成唯一卡号（保证短 ID 可显示）
+                UUID identity = AkaishiWirelessIdentityCardItem.playerOf(held);
+                port.bind(identity == null ? player.getUUID() : identity);
                 serverPlayer.displayClientMessage(Component.translatable(
                         "message.akaishi.port.bound", AkaishiWirelessIdentityCardItem.shortId(held)), false);
                 return InteractionResult.sidedSuccess(false);

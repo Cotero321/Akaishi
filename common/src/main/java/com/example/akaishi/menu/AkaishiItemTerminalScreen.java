@@ -47,6 +47,17 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
     /** 搜索框（原版 EditBox：自带背景/光标/选中，行为与其它模组终端一致） */
     private EditBox searchBox;
 
+    // 标题栏的「安全 / 返回」切页按钮（安全页复用库区 + 原搜索框位置）
+    private static final int SEC_TAB_X = 74;
+    private static final int SEC_TAB_Y = 4;
+    private static final int SEC_TAB_W = 52;
+    private static final int SEC_TAB_H = 12;
+
+    /** 是否处于安全页（本机状态：切页不占网络，同无线终端的四页切换） */
+    private boolean securityPage;
+    /** 安全页副作用是否已应用到槽位/搜索框（null = 尚未应用） */
+    private Boolean securityTabApplied;
+
     public AkaishiItemTerminalScreen(AkaishiItemTerminalMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.imageWidth = AkaishiItemTerminalMenu.PANEL_W;
@@ -114,14 +125,45 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
     @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
+        syncSecurityTab();
         this.menu.setVanillaRenderPass(true);
         try {
             super.render(gui, mouseX, mouseY, partialTick);
         } finally {
             this.menu.setVanillaRenderPass(false);
         }
-        drawGrid(gui);
+        if (securityPage) {
+            // 安全页：库页格子与数量都不画，改画共享安全页（框体在 renderBg、文字在 renderLabels）
+            SecurityPage.renderTooltip(gui, this.font, this.leftPos,
+                    this.topPos + AkaishiItemTerminalMenu.SEC_PAGE_Y, mouseX, mouseY, this.menu);
+        } else {
+            drawGrid(gui);
+        }
+        // 背包 / 快捷栏 / 授权槽 / 手上物品的悬浮文本：两页都必须走这一趟
+        // （1.20.1 原版 render 不画 tooltip，且安全页也要能看背包物品，故不能只在库页调用）
+        MiniMatrixReturn.render(gui, this.font, this.leftPos, this.topPos);
         this.renderTooltip(gui, mouseX, mouseY);
+    }
+
+    /** 安全页切换的副作用：搜索框与库页虚拟槽只在库页生效、授权槽只在安全页激活（仅在状态变化时执行） */
+    private void syncSecurityTab() {
+        if (this.securityTabApplied != null && this.securityTabApplied == this.securityPage) {
+            return;
+        }
+        this.securityTabApplied = this.securityPage;
+        if (this.searchBox != null) {
+            this.searchBox.setVisible(!securityPage);
+            if (securityPage) {
+                this.searchBox.setFocused(false);
+            }
+        }
+        this.menu.setSecuritySlotActive(securityPage);
+        // 库页虚拟槽整体失活：否则 getHoveredSlot 仍会命中它们，槽位高亮与悬浮文本会穿透到安全页
+        for (Slot slot : this.menu.slots) {
+            if (slot instanceof TerminalDisplaySlot displaySlot) {
+                displaySlot.setActive(!securityPage);
+            }
+        }
     }
 
     /**
@@ -156,16 +198,23 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
         int x = this.leftPos;
         int y = this.topPos;
         GuiWidgets.panel(gui, x, y, this.imageWidth, this.imageHeight);
+        // 切页按钮（标题栏内，与标题、右侧「单元 N」错开）
+        GuiWidgets.button(gui, x + SEC_TAB_X, y + SEC_TAB_Y, SEC_TAB_W, SEC_TAB_H);
 
         // IP 容量条（内缩 1px 填充，避免覆盖轨道边框）
         GuiWidgets.track(gui, x + IP_BAR_X, y + IP_BAR_Y, IP_BAR_W, IP_BAR_H);
         GuiWidgets.bar(gui, x + IP_BAR_X + 1, y + IP_BAR_Y + 1, IP_BAR_W - 2, IP_BAR_H - 2,
                 this.menu.usedIp(), Math.max(1L, this.menu.capacityIp()), COLOR_IP_BAR);
+        GuiWidgets.playerInventory(gui, x, y, AkaishiItemTerminalMenu.INV_TOP, AkaishiItemTerminalMenu.HOTBAR_Y);
+
+        if (securityPage) {
+            // 安全页占用原搜索框 + 库区：库页的槽框与滚动条都不画（否则与勾选框叠在一起）
+            SecurityPage.renderBg(gui, x, y + AkaishiItemTerminalMenu.SEC_PAGE_Y, this.menu, mouseY);
+            return;
+        }
         // 搜索框凹槽：输入框自身已关掉边框（否则自带深色底与浅色面板冲突），底与外框由这里统一画
         GuiWidgets.inputWell(gui, x + AkaishiItemTerminalMenu.SEARCH_X, y + AkaishiItemTerminalMenu.SEARCH_Y,
                 AkaishiItemTerminalMenu.SEARCH_W, AkaishiItemTerminalMenu.SEARCH_H);
-
-        GuiWidgets.playerInventory(gui, x, y, AkaishiItemTerminalMenu.INV_TOP, AkaishiItemTerminalMenu.HOTBAR_Y);
         for (Slot slot : this.menu.slots) {
             if (slot instanceof TerminalDisplaySlot) {
                 GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
@@ -208,6 +257,17 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
         gui.drawString(this.font, Component.translatable("gui.akaishi.item_terminal.ip",
                         EnergyFormat.format(this.menu.usedIp()), EnergyFormat.format(this.menu.capacityIp())),
                 8, IP_TEXT_Y, TEXT, false);
+        // 切页按钮标签（安全 ↔ 返回）
+        Component tabLabel = Component.translatable(securityPage
+                ? "gui.akaishi.security.back" : "gui.akaishi.security.tab");
+        gui.drawString(this.font, tabLabel,
+                SEC_TAB_X + (SEC_TAB_W - this.font.width(tabLabel)) / 2, SEC_TAB_Y + 2, TEXT, false);
+        if (securityPage) {
+            // 安全页：权限表文字交给共享实现（renderLabels 已 translate(leftPos,topPos)）
+            SecurityPage.renderLabels(gui, this.font, 0, AkaishiItemTerminalMenu.SEC_PAGE_Y, this.menu,
+                    TEXT, TEXT_DIM, 0xFF2E7D32);
+            return;
+        }
         gui.drawString(this.font, Component.translatable("gui.akaishi.item_terminal.hint"),
                 8, HINT_Y, TEXT_DIM, false);
         // 库区状态提示：未成型 / 未贴装单元 / 库空 三种原因必须分开显示 ——
@@ -234,7 +294,37 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // 从矩阵左列跳来时给出的回头路（贴面板左侧外，与既有控件零重叠）
+        if (MiniMatrixReturn.mouseClicked(mouseX, mouseY, button, this.leftPos, this.topPos,
+                this.menu.containerId)) {
+            return true;
+        }
+        // 标题栏切页按钮：库页 ↔ 安全页（本机状态）
+        if (button == 0 && isIn(this.leftPos + SEC_TAB_X, this.topPos + SEC_TAB_Y, SEC_TAB_W, SEC_TAB_H,
+                mouseX, mouseY)) {
+            securityPage = !securityPage;
+            return true;
+        }
+        if (securityPage) {
+            // 安全页：先给共享安全页处理；未命中则继续走原版（授权槽要能放卡——库页虚拟槽此时已失活，不会误触）
+            if (SecurityPage.mouseClicked(mouseX, mouseY, this.leftPos,
+                    this.topPos + AkaishiItemTerminalMenu.SEC_PAGE_Y, this.menu, this.menu.containerId)) {
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private static boolean isIn(int x, int y, int w, int h, double mx, double my) {
+        return mx >= x && mx < x + w && my >= y && my < y + h;
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (securityPage) {
+            return false; // 安全页没有可滚内容
+        }
         // 每档滚动 1 行：AE2 Scrollbar 的 pageSize = max(1, 可视行数/6)，4 行时即 1 行
         int max = this.menu.maxScrollRow();
         if (max <= 0) {
@@ -251,6 +341,9 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
     @Override
     public void slotClicked(Slot slot, int slotId, int mouseButton, ClickType clickType) {
         if (slot instanceof TerminalDisplaySlot displaySlot) {
+            if (securityPage) {
+                return; // 安全页：库页虚拟槽被安全页盖住，不响应点击
+            }
             // 虚拟槽不进原版点击管线（否则原版会尝试本地改写内容）：
             // 只把「点中的条目 + 动作」发给服务端，由服务端扣费并落账
             AkaishiItemTerminalSync.sendAction(this.menu.containerId,

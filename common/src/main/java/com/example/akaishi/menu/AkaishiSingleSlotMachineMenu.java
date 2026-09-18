@@ -15,13 +15,13 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 单输入单输出处理机器菜单抽象基类（升级槽 2 + 输入 + 输出 + 玩家背包 + 数据槽）。
- * 槽位布局四台机器统一：输入(26,40)、输出(98,40)、速度升级(134,8)、能量升级(152,8)
+ * 单输入单输出处理机器菜单抽象基类（升级槽 3 + 输入 + 输出 + 玩家背包 + 数据槽）。
+ * 槽位布局四台机器统一：输入(26,40)、输出(98,40)、无线接收升级(116,8)、速度升级(134,8)、能量升级(152,8)
  * （升级槽固定面板右上角 Y=8），背包 (8,124) 起（窗口高 198）。
  */
 public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输入 1 + 输出 1），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 输入 1 + 输出 1），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 2;
 
     private final ContainerData data;
@@ -35,9 +35,10 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
         this.inventory = inventory;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，固定面板右上角 Y=8，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
+        // 升级槽（速度/能量/无线接收各一格，固定面板右上角 Y=8，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
         // 输入槽：排除升级组件（保证 shift 点击时升级组件只进升级槽）
         addSlot(new Slot(inventory, 0, 26, 40) {
             @Override
@@ -93,6 +94,11 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
     }
 
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack stack = ItemStack.EMPTY;
@@ -108,10 +114,11 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
             } else {
                 // 玩家背包/快捷栏：升级组件 → 升级槽，其余 → 输入槽，再背包内移动
                 if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
-                    if (!this.moveItemStackTo(current, 0, 2, false)) {
+                    if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (!this.moveItemStackTo(current, 2, 3, false)) {
+                } else if (!this.moveItemStackTo(current,
+                        MachineUpgradeSlots.SLOT_COUNT, MachineUpgradeSlots.SLOT_COUNT + 1, false)) {
                     return ItemStack.EMPTY;
                 }
                 if (!this.moveItemStackTo(current, MACHINE_SLOT_END + 27, MACHINE_SLOT_END + 36, false)

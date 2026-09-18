@@ -93,7 +93,16 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
         }
     }
 
-    /** 接收控制器推送的产物（支持部分合并：尽量并入同种槽/空槽，返回未放入的剩余部分） */
+    /**
+     * 灌注顺序（兜底）：产物优先灌立柱上的专属输出口，转口排在最后（见 {@link IMinerOutputSink#fillOrder()}）
+     */
+    public static final int FILL_ORDER_FALLBACK = 100;
+
+    /**
+     * 接收控制器推送的产物（支持部分合并：尽量并入同种槽/空槽，返回未放入的剩余部分）。
+     * <p>
+     * 转口是<b>兜底/暂存</b>口：专属物品输出口都满了才轮到它；已积压的存量会被控制器再平衡回填出去。
+     */
     @Override
     public ItemStack receivePartial(ItemStack incoming) {
         if (incoming.isEmpty()) {
@@ -120,6 +129,12 @@ public class AkaishiMinerPortBlockEntity extends BlockEntity
             setChanged();
         }
         return remaining;
+    }
+
+    /** 灌注顺序取兜底值：转口排在专属物品输出口之后（产物优先给专属口，这里只接溢出） */
+    @Override
+    public int fillOrder() {
+        return FILL_ORDER_FALLBACK;
     }
 
     public SimpleContainer buffer() {

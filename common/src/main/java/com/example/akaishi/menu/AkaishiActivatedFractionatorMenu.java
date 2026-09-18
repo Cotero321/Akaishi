@@ -15,11 +15,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 活化分馏器菜单：升级槽（速度/能量）+ 1 输入槽（仅活化结晶）+ 2 只读输出槽 + 玩家背包 + 3 数据槽。
+ * 活化分馏器菜单：升级槽（速度/能量/无线接收）+ 1 输入槽（仅活化结晶）+ 2 只读输出槽 + 玩家背包 + 3 数据槽。
  */
 public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输入/输出槽 3），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 输入/输出槽 3），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 3;
     /** 业务槽位索引（供 Screen tooltip 定位，槽位顺序与 addSlot 一致） */
     public static final int SLOT_INPUT = MachineUpgradeSlots.SLOT_COUNT;
@@ -46,9 +46,10 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         this.output = output;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量/无线接收各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；固定面板右上角并排 y=8，规则3）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 输入槽：仅 7 种活化结晶可放入
         addSlot(new Slot(input, 0, 44, 52) {
@@ -107,6 +108,11 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
     }
 
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack stack = ItemStack.EMPTY;
@@ -123,11 +129,11 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
             } else {
                 // 玩家背包/快捷栏：活化结晶 → 输入槽，升级组件 → 升级槽，其余仅在玩家栏内移动
                 if (AkaishiActivatedFractionatorBlockEntity.isActivatedCrystal(current)) {
-                    if (!this.moveItemStackTo(current, 2, 3, false)) {
+                    if (!this.moveItemStackTo(current, SLOT_INPUT, SLOT_INPUT + 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
-                    if (!this.moveItemStackTo(current, 0, 2, false)) {
+                    if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
                 }

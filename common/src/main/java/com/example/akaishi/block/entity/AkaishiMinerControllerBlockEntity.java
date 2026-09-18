@@ -389,9 +389,17 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
         }
     }
 
-    /** 把暂存槽产物推送给转口（部分合并：同种槽塞满为止，剩余留待下 tick） */
+    /**
+     * 把暂存槽产物推送给端口：顺序 = <b>专属产物输出口优先、转口兜底</b>（按 {@link IMinerOutputSink#fillOrder()}）。
+     * <p>
+     * <b>不能沿用结构扫描顺序</b>：扫描顺序由坐标决定，顶层中心的转口可能排在立柱输出口之前，
+     * 于是产物全被转口吃掉、物品输出口一直空着（现象：转口有货、输出口没货）。
+     * <p>
+     * 推送后再做一次<b>存量再平衡</b>：兜底口里已积压的产物挪给仍有空位的优先口（单向搬迁，物料守恒）。
+     */
     private void pushToPorts() {
-        if (ports.isEmpty()) {
+        List<IMinerOutputSink> sinks = orderedSinks();
+        if (sinks.isEmpty()) {
             return;
         }
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
@@ -399,16 +407,54 @@ public class AkaishiMinerControllerBlockEntity extends BlockEntity
             if (stack.isEmpty()) {
                 continue;
             }
-            for (BlockPos pp : ports) {
+            for (IMinerOutputSink sink : sinks) {
                 if (stack.isEmpty()) {
                     break;
                 }
-                BlockEntity be = level.getBlockEntity(pp);
-                if (be instanceof IMinerOutputSink sink) {
-                    stack = sink.receivePartial(stack);
-                }
+                stack = sink.receivePartial(stack);
             }
             inventory.setItem(i, stack);
+        }
+        rebalanceSinks(sinks);
+    }
+
+    /** 结构端口里能收产物的接收端，按灌注顺序排列（同序保持扫描顺序，排序稳定） */
+    private List<IMinerOutputSink> orderedSinks() {
+        List<IMinerOutputSink> sinks = new ArrayList<>(ports.size());
+        for (BlockPos pp : ports) {
+            if (level.getBlockEntity(pp) instanceof IMinerOutputSink sink) {
+                sinks.add(sink);
+            }
+        }
+        sinks.sort(java.util.Comparator.comparingInt(IMinerOutputSink::fillOrder));
+        return sinks;
+    }
+
+    /**
+     * 存量再平衡：把排在后面的兜底口（转口）里已积压的产物，挪给前面仍有空位的优先口（物品输出口）。
+     * <p>
+     * 只往下标小的一侧搬（单向），故不会来回倒腾；搬不动的部分原样留在原口，
+     * 全程 {@code 取出多少 = 送达多少}，不产生也不吞掉任何物品。
+     */
+    private void rebalanceSinks(List<IMinerOutputSink> sinks) {
+        for (int giver = sinks.size() - 1; giver >= 1; giver--) {
+            if (!(sinks.get(giver) instanceof Container container)) {
+                continue; // 拿不出存量的接收端（纯逻辑型）不参与回流
+            }
+            for (int slot = 0; slot < container.getContainerSize(); slot++) {
+                ItemStack stored = container.getItem(slot);
+                if (stored.isEmpty()) {
+                    continue;
+                }
+                ItemStack moving = stored.copy();
+                for (int taker = 0; taker < giver && !moving.isEmpty(); taker++) {
+                    moving = sinks.get(taker).receivePartial(moving);
+                }
+                int moved = stored.getCount() - moving.getCount();
+                if (moved > 0) {
+                    container.removeItem(slot, moved);
+                }
+            }
         }
     }
 

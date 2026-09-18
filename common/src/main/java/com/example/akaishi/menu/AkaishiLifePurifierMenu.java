@@ -12,12 +12,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 生命能量提纯器菜单：升级槽（速度/能量）+ 1 个输出槽（生命能量固态物，只出不进）+ 双能量/进度数据。
+ * 生命能量提纯器菜单：升级槽（速度/能量/无线）+ 1 个输出槽（生命能量固态物，只出不进）+ 双能量/进度数据。
  * 数据槽：0/1=赤能量低/高 2/3=赤容量低/高 4/5=生命能量低/高 6/7=生命容量低/高 8=固化进度百分比。
  */
 public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输出槽 1），玩家背包紧随其后 */
+    /** 机器区槽数（升级槽 3 + 输出槽 1），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT
             + AkaishiLifePurifierBlockEntity.SLOT_COUNT;
 
@@ -39,9 +39,10 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧，固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧，固定面板右上角并排 y=8，规则3）
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 输出槽：只出不进
         addSlot(new Slot(container, AkaishiLifePurifierBlockEntity.OUTPUT_SLOT, 116, 30) {
@@ -99,6 +100,11 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
     /** 能量升级组件数量（0~8） */
     public int getEnergyUpgradeCount() {
         return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
+    }
+
+    /** 无线接收升级是否已装（界面提示用） */
+    public boolean hasWirelessReceiver() {
+        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
     }
 
     @Override

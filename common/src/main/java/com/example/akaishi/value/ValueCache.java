@@ -32,6 +32,22 @@ public final class ValueCache {
     private static final Map<RecipeManager, Snapshot> SNAPSHOTS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
+    /**
+     * 指纹复用窗口（ms）。
+     * <p>
+     * {@link #fingerprint} 是 O(配方数) 的全表扫描，而 {@link #get} 在<b>每次取价</b>时都要拿它判缓存是否有效 ——
+     * 热路径（虚拟加工规划器逐候选物取单价）因此把整表哈希扫了成千上万遍，实测导致建索引 14.8 秒。
+     * 这里按毫秒级窗口复用：既不再每次调用都扫全表，也不会长期看不见配方重载
+     * （数据包重载另有 {@link #invalidate()} 主动清空，窗口只是兜底）。
+     */
+    private static final long FINGERPRINT_TTL_MS = 1000L;
+
+    private record CachedFingerprint(Fingerprint value, long expiresAt) {
+    }
+
+    private static final Map<RecipeManager, CachedFingerprint> FINGERPRINTS =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
     /** 估值代次：快照重建或主动失效时自增，供外部判断「价格是否需要刷新」 */
     private static final AtomicInteger GENERATION = new AtomicInteger();
 
@@ -95,6 +111,7 @@ public final class ValueCache {
     public static void invalidate() {
         synchronized (LOCK) {
             SNAPSHOTS.clear();
+            FINGERPRINTS.clear(); // 指纹一并作废：否则窗口内还会拿旧指纹判"快照有效"
             GENERATION.incrementAndGet();
         }
     }
@@ -104,8 +121,13 @@ public final class ValueCache {
         return GENERATION.get();
     }
 
-    /** 计算内容指纹：配方 id 哈希 + 配方实例哈希，加法聚合保证顺序无关 */
+    /** 计算内容指纹：配方 id 哈希 + 配方实例哈希，加法聚合保证顺序无关（按 {@link #FINGERPRINT_TTL_MS} 复用） */
     public static Fingerprint fingerprint(RecipeManager manager) {
+        long now = System.currentTimeMillis();
+        CachedFingerprint cached = FINGERPRINTS.get(manager);
+        if (cached != null && now < cached.expiresAt()) {
+            return cached.value();
+        }
         int count = 0;
         long hash = 0L;
         for (Recipe<?> recipe : manager.getRecipes()) {
@@ -113,6 +135,8 @@ public final class ValueCache {
             long entry = ((long) recipe.getId().hashCode() << 32) ^ recipe.hashCode();
             hash += entry;
         }
-        return new Fingerprint(count, hash * 31L + count);
+        Fingerprint result = new Fingerprint(count, hash * 31L + count);
+        FINGERPRINTS.put(manager, new CachedFingerprint(result, now + FINGERPRINT_TTL_MS));
+        return result;
     }
 }

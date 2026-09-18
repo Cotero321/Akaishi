@@ -2,6 +2,8 @@ package com.example.akaishi.block;
 
 import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import com.example.akaishi.miniature.MiniatureCollapse;
+import com.example.akaishi.wireless.ItemTerminalRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +49,22 @@ public class AkaishiItemTerminalBlock extends AkaishiMachineBlock {
         builder.add(FORMED);
     }
 
+    /**
+     * 记录归属者：终端「归属者恒全权限」是安全系统的根（AE2 口径：谁放终端谁是主人）。
+     * 结构主方块被放置时写入，之后不随拆装结构改变。
+     */
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state,
+            net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (level.isClientSide || !(placer instanceof Player player)) {
+            return;
+        }
+        if (level.getBlockEntity(pos) instanceof AkaishiItemTerminalBlockEntity terminal) {
+            terminal.setOwner(player.getUUID(), player.getGameProfile().getName());
+        }
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -68,10 +86,14 @@ public class AkaishiItemTerminalBlock extends AkaishiMachineBlock {
         return RenderShape.MODEL;
     }
 
-    /** 右键打开物品终端界面（与其它机器同范式：仅服务端开菜单，客户端看结果） */
+    /** 右键打开物品终端界面（与其它机器同范式：仅服务端开菜单，客户端看结果）；潜行右键 = 微缩 */
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
             InteractionHand hand, BlockHitResult hit) {
+        // 潜行 + 可微缩终端 ⇒ 坍缩为单方块（命中即拦截，不再开界面）
+        if (MiniatureCollapse.handleSneakUse(level, pos, player)) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             if (level.getBlockEntity(pos) instanceof AkaishiItemTerminalBlockEntity terminal) {
                 MenuRegistry.openExtendedMenu(serverPlayer, terminal);
@@ -91,6 +113,8 @@ public class AkaishiItemTerminalBlock extends AkaishiMachineBlock {
         if (!state.is(newState.getBlock())
                 && level.getBlockEntity(pos) instanceof AkaishiItemTerminalBlockEntity terminal) {
             terminal.releaseChunkLoad();
+            // 注册表注销：不等心跳超时（否则拆机后 40 tick 内仍会被储存口列为可绑定终端）
+            ItemTerminalRegistry.unregister(terminal.terminalId());
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }

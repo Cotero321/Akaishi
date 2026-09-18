@@ -116,6 +116,7 @@ public final class AkaishiConfigSync {
         ModConfig.wirelessMaxLoss = AkaishiConfig.WIRELESS_MAX_LOSS.get();
         ModConfig.wirelessCrossDimLoss = AkaishiConfig.WIRELESS_CROSS_DIM_LOSS.get();
         ModConfig.wirelessLossReductionPerModule = AkaishiConfig.WIRELESS_LOSS_REDUCTION_PER_MODULE.get();
+        ModConfig.wirelessFieldOwnerOnly = AkaishiConfig.WIRELESS_FIELD_OWNER_ONLY.get();
 
         // 器官·品质曲线（列表 → 数组整体发布，volatile 引用保证读取端原子可见）
         ModConfig.organTierMultiplier = toDoubleArray(AkaishiConfig.ORGAN_TIER_MULTIPLIER.get());

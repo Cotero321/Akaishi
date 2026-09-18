@@ -7,6 +7,7 @@ import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMechanicalBlocks;
+import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiWirelessBlocks;
 import com.example.akaishi.block.ModBlocks;
@@ -203,6 +204,20 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_CHUNK_RANGE.get(), "jei.akaishi.life_wireless");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_INPUT_LOSS.get(), "jei.akaishi.life_wireless");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_OUTPUT_LOSS.get(), "jei.akaishi.life_wireless");
+
+        // ===== 微缩矩阵体系：5×5×5 空腔终端（墙面贴微缩终端芯片）+ 内腔升级件 + 无线接收升级 =====
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_CASING.get(), "jei.akaishi.mini_matrix_casing");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_STRUCTURE_GLASS.get(), "jei.akaishi.mini_matrix_structure_glass");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_TERMINAL.get(), "jei.akaishi.mini_matrix_terminal");
+        // 内腔升级件（5 类，装进箱体内腔才有作用，墙面放置无效）
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_CONTROL.get(), "jei.akaishi.mini_matrix_upgrade_control");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_FIELD.get(), "jei.akaishi.mini_matrix_upgrade_field");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_EXTEND.get(), "jei.akaishi.mini_matrix_upgrade_extend");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_CRAFT.get(), "jei.akaishi.mini_matrix_upgrade_craft");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_LINK.get(), "jei.akaishi.mini_matrix_upgrade_link");
+        addIngredientInfo(registration, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_NETWORK_NODE.get(), "jei.akaishi.mini_matrix_network_node");
+        // 无线接收升级：装进机器的无线接收槽，机器才加入场域、可被矩阵调度
+        addIngredientInfo(registration, com.example.akaishi.item.ModItems.machineWirelessReceiverUpgrade.get(), "jei.akaishi.machine_wireless_receiver_upgrade");
 
         // ===== 活化产物系列获取说明：活化结晶（7）/ 活化成分（7）/ 衰竭结晶 / 生命灰烬 =====
         // 活化结晶：7 种同机制（生命离心机分离活化衰竭液体，共用说明）
