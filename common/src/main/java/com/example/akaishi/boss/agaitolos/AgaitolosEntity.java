@@ -70,6 +70,15 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     private static final EntityDataAccessor<Boolean> DATA_CHARGING =
             SynchedEntityData.defineId(AgaitolosEntity.class, EntityDataSerializers.BOOLEAN);
 
+    /**
+     * 同步数据：是否正在播出场演出。
+     * <p>与架势 / 蓄力同属<b>状态轮询式</b>，故走同步数据而不是一次性触发同步：出场是一个持续 4s 的状态，
+     * 两端各自读它来驱动动画控制器（见 {@code AgaitolosAnimations#CONTROLLER_INTRO}），
+     * 服务端结算（位移/闸门）也读同一份真源，不需要额外的触发包。
+     */
+    private static final EntityDataAccessor<Boolean> DATA_INTRO =
+            SynchedEntityData.defineId(AgaitolosEntity.class, EntityDataSerializers.BOOLEAN);
+
     /** 复活阶段时长：4s = 80 tick（用户拍板；期间回满生命，结束时击飞周围玩家） */
     public static final int RESPAWN_DURATION_TICKS = 80;
 
@@ -124,6 +133,38 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 只压这一次（见 {@link #aiStep}）：50% / 25% 处的常规阶段推进不压血，保持原有口径。
      */
     public static final float INTRO_HEALTH_RATIO = 0.25F;
+
+    // ---------------------------------------------------------------- 出场演出编排（首次召唤，0~80t）
+
+    /**
+     * 出场演出总时长（tick）：<b>严格等于复活阶段</b>（{@link #RESPAWN_DURATION_TICKS} = 80 = 4.0s）。
+     * <p>为什么直接引用而不是再写一个 80：两者必须同窗——首次召唤那一 tick 同时进复活阶段与出场演出，
+     * 演出结束时血量刚回满、复活的无敌与击飞也刚好收尾，玩家看到的是"BOSS 从空中降临并回满血"这一件事。
+     * 各写一份常量迟早会漂移成"降临完了还在回血"或"血回满了还在空中"。
+     * <p>同时也是 {@code animation.agaitolos.intro} clip 的长度（4.0s）：改 clip 长度要同步改这里。待调手感值 / P8 转配置项
+     */
+    public static final int INTRO_DURATION_TICKS = RESPAWN_DURATION_TICKS;
+
+    /** 出场 ① 段（粒子柱）的结束 tick：0~20t。待调手感值 / P8 转配置项 */
+    public static final int INTRO_PILLAR_END_TICKS = 20;
+
+    /**
+     * 出场 ② 段（降临位移）的时长（tick）：0~40t 从"悬停高度上方 {@link #INTRO_DESCENT_HEIGHT} 格"降到悬停高度。
+     * <p>这个常量同时是 ③ 段的起点（落地冲击环在降临完成那一 tick 起爆）——刻意只留一份分界，
+     * 两处各写 40 迟早会漂移成"还没落地就起环"。待调手感值 / P8 转配置项
+     */
+    public static final int INTRO_DESCENT_TICKS = 40;
+
+    /** 出场 ③ 段（落地冲击环）的结束 tick：40~60t（起点复用 {@link #INTRO_DESCENT_TICKS}）。待调手感值 / P8 转配置项 */
+    public static final int INTRO_SHOCK_END_TICKS = 60;
+
+    /**
+     * 降临起点相对悬停高度的抬升量（格）：3.5。
+     * <p>起点 = 本 tick 的<b>真实悬停高度</b> + 该值（不是"当前坐标 + 该值"）：悬停高度由
+     * {@link AgaitolosMoveControl#hoverY} 唯一计算，这样 40t 内落到的终点就是 BOSS 之后该待的位置，
+     * 演出结束时 MoveControl 接手不会再有"落地又弹一下"的二次修正。待调手感值 / P8 转配置项
+     */
+    public static final double INTRO_DESCENT_HEIGHT = 3.5D;
 
     /**
      * 死亡演出时长（tick）：50 = 2.5s，<b>与 death clip 时长对齐 —— 改 clip 长度要同步改这里</b>。
@@ -233,6 +274,15 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /** 高速踢击（二阶段）冷却剩余 tick（服务端权威，不参与同步；已落盘，同上） */
     private int kickCooldownTicks;
 
+    /** 出场演出剩余 tick（服务端权威；客户端只需要"是否在出场"，同 respawning 的分工）。<b>不落盘</b>，理由见 {@link #readAdditionalSaveData} */
+    private int introTicks;
+
+    /**
+     * 出场降临的目标 Y（服务端权威；开演时按 {@link AgaitolosMoveControl#hoverY} 定一次，之后不再重算）。
+     * <p>整个过程不落盘、也不参与同步：它只是本段插值的临时基准，重进存档时演出已按"不重放"处理。
+     */
+    private double introDescentTargetY;
+
     public AgaitolosEntity(EntityType<? extends AgaitolosEntity> type, Level level) {
         super(type, level);
         // 低空飞行移动控制器。原版 Mob 没有 createMoveControl() 钩子（凋灵/幻翼也都是构造器里直接赋值），故在此替换
@@ -260,6 +310,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.entityData.define(DATA_RESPAWNING, Boolean.FALSE);
         this.entityData.define(DATA_GUARDING, Boolean.FALSE);
         this.entityData.define(DATA_CHARGING, Boolean.FALSE);
+        // 出场默认 false：读档重建的实体不从存档恢复演出（见 readAdditionalSaveData），
+        // 只有"首次召唤分支"会把它立起来
+        this.entityData.define(DATA_INTRO, Boolean.FALSE);
     }
 
     /** 当前阶段（服务端读权威值，客户端读同步值） */
@@ -312,6 +365,16 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /** 蓄力只由本类的 {@link #tickCharge()} / {@link #finishCharge()} 开合，技能不自持计时（同架势） */
     private void setCharging(boolean charging) {
         this.entityData.set(DATA_CHARGING, charging);
+    }
+
+    /** 是否正在播出场演出（服务端读权威值，客户端读同步值）：动画与"一律不起手"的闸门两端共用 */
+    public boolean isIntroPlaying() {
+        return this.entityData.get(DATA_INTRO);
+    }
+
+    /** 出场只由本类的 {@link #startIntro()} / {@link #tickIntro()} 开合，技能不自持计时（同架势/蓄力） */
+    private void setIntroPlaying(boolean intro) {
+        this.entityData.set(DATA_INTRO, intro);
     }
 
     // ---------------------------------------------------------------- 冲锋 / 禁飞 / 封印状态
@@ -451,6 +514,13 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.blinkCooldownTicks = Math.max(0, tag.getInt(NBT_BLINK_COOLDOWN));
         this.kickCooldownTicks = Math.max(0, tag.getInt(NBT_KICK_COOLDOWN));
         this.setCharging(tag.getBoolean(NBT_CHARGING) && this.chargeTicks > 0);
+        // 出场演出<b>刻意不落盘</b>（没有对应的 NBT 键），读回时一律复位成"没在出场"：
+        // ① 它是首次召唤的一次性演出（initialRespawnDone 已落盘保证不重演），续播没有意义；
+        // ② 续播还会错位 —— 降临的基准是"开演那一 tick 的悬停高度"，服务器存盘/区块卸载后这个基准已经丢了，
+        //    若接着从半空插值，BOSS 会擦着地面或悬在半空落地（比直接复位更糟）。
+        // 复位后由 AgaitolosMoveControl ③ 的悬停修正把 BOSS 收回常态高度，无需额外处理。
+        this.introTicks = 0;
+        this.setIntroPlaying(false);
     }
 
     // ---------------------------------------------------------------- 阶段机 / 复活阶段
@@ -472,6 +542,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             this.enterRespawn();
             // 纯表现：出场瞬间的一次性青蓝爆发（识别色同族），不参与任何结算
             AgaitolosFx.introBurst(this);
+            // 出场演出（三段编排）与复活阶段同刻开演、同窗结束：开演那一刻就把 BOSS 抬到悬停高度上方，
+            // 之后 40t 降临、40~60t 落地冲击。只在此分支起手 ⇒ 阶段推进触发的复活不会重放（见 tickIntro）
+            this.startIntro();
         }
         // 复活阶段内不再判阶段阈值，否则刚进 PHASE_2 就会被残留的低血量直接推到 PHASE_3
         if (this.isRespawning()) {
@@ -490,6 +563,78 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         //（顺序若反过来，本 tick 起手的冲锋/架势/蓄力会被这两招绕过，状态互斥就失效了）
         this.tickBlink();
         this.tickKick();
+        // 出场演出排在<b>最末</b>：它要独占位移（写竖直分量），必须等所有可能改速度的状态都跑完；
+        // 放在这里也保证"起手闸拦住的动作"先被判一遍，本 tick 不会既起手又降临
+        this.tickIntro();
+    }
+
+    // ---------------------------------------------------------------- 出场演出编排（首次召唤，0~80t）
+
+    /**
+     * 出场演出的<b>服务端编排</b>（唯一入口，见 {@link #aiStep} 的首次召唤分支），三段：
+     * <ol>
+     *   <li><b>0~{@link #INTRO_PILLAR_END_TICKS}t 粒子柱</b>：BOSS 周身青蓝光焰（{@link AgaitolosFx#introPillar}）；</li>
+     *   <li><b>0~{@link #INTRO_DESCENT_TICKS}t 降临位移</b>：从"悬停高度 + {@link #INTRO_DESCENT_HEIGHT}"逐 tick 插值降到悬停高度；</li>
+     *   <li><b>{@link #INTRO_DESCENT_TICKS}~{@link #INTRO_SHOCK_END_TICKS}t 落地冲击环</b>：向外扩散的粒子环 + 地面尘
+     *       （{@link AgaitolosFx#introShockRing}）。</li>
+     * </ol>
+     * 全段由 {@link #isIntroPlaying()}（同步数据 DATA_INTRO）对外表达，客户端动画控制器轮询同一个状态。
+     * 数值一律为待调手感值 / P8 转配置项。
+     * <p>
+     * <b>为什么是"逐 tick 插值速度"而不是直接 {@code setPos}</b>：与 {@code tickDiveCharge} 同一手法 ——
+     * 写 {@code deltaMovement} 后由 {@code travel} 走 {@code move(MoverType.SELF, …)}，位移会<b>经过碰撞</b>
+     * （撞到地形就停下），而 {@code setPos} 是无碰撞的瞬移，降临途中可能把 BOSS 塞进方块里。
+     * 代价只是"本 tick 写的速度由下一 tick 的 travel 消费"这半拍延迟，与冲锋完全一致、肉眼不可见。
+     * <p>
+     * <b>与 {@link AgaitolosMoveControl} 的共存</b>：MoveControl 在出场期间<b>整体让位</b>
+     * （见其 {@code tick()} ⓪'），故本方法写的竖直速度不会被悬停修正改写、水平也不会被导航加速。
+     * 纯按"剩余距离 / 剩余 tick"递推 ⇒ 每 tick 步长恒等于 {@code INTRO_DESCENT_HEIGHT / INTRO_DESCENT_TICKS}
+     * （3.5/40 = 0.0875 格/tick，匀速、无抖），且 40 tick 内<b>精确</b>落在目标高度上（最后一步剩余距离恰好一步走完）。
+     */
+    private void tickIntro() {
+        if (!this.isIntroPlaying()) {
+            return;
+        }
+        // 已演出 tick 数（0 起）：起手那一 tick 为 0，与两段常量的时间窗口径一致
+        int introAge = INTRO_DURATION_TICKS - this.introTicks;
+        AgaitolosFx.introPillar(this, introAge);
+        // ② 降临：40t 内线性收敛；40t 之后必须继续写竖直 0（见下）
+        double motionY = 0.0D;
+        if (introAge < INTRO_DESCENT_TICKS) {
+            int remaining = INTRO_DESCENT_TICKS - introAge;
+            motionY = (this.introDescentTargetY - this.getY()) / remaining;
+        }
+        // 水平恒 0：演出要原地降临（MoveControl 已让位，这里把残余水平速度也一并清掉，避免被击退/惯性带偏）。
+        // 竖直在 ② 段之后仍写 0 是<b>必须</b>的：travel 会把上一 tick 的速度乘 0.91 留到下一 tick，
+        // 若 40t 后撒手不管，末段那 0.0875 的残余速度会继续下沉（几何级数合计约 0.8 格），
+        // 观感是"落地后又沉一下，随后被悬停修正拉回"。待调手感值 / P8 转配置项
+        this.setDeltaMovement(0.0D, motionY, 0.0D);
+        AgaitolosFx.introShockRing(this, introAge);
+        if (--this.introTicks <= 0) {
+            // 只出场一次：计时期满即撤状态，之后（含阶段推进触发的复活）不会再回到这里
+            this.setIntroPlaying(false);
+        }
+    }
+
+    /**
+     * 开演：把 BOSS 抬到"悬停高度 + {@link #INTRO_DESCENT_HEIGHT}"作为降临起点，并立起状态与计时。
+     * <p>
+     * 目标高度取 {@link AgaitolosMoveControl#hoverY}（唯一的悬停高度算法，MoveControl 每 tick 用的是同一份），
+     * 不用"当前坐标 + 3.5"：召唤坐标未必正好在悬停位（例如被指令放到地面、或第一 tick 只被修正了 0.2 格），
+     * 用真实悬停高度才能保证 40t 后落点就是它之后该待的位置，演出结束不出现二次升降。
+     * <p>
+     * 抬升用 {@code setPos} 直接落位（同"落点"语义，不需要 {@code teleportTo} 的乘客/朝向处理）：
+     * 一次性瞬抬 3.5 格由原版位置包下发给客户端，客户端会插值过去，读作"闪现在空中"。
+     */
+    private void startIntro() {
+        double hoverY = AgaitolosMoveControl.hoverY(this.level(), this.getX(), this.getY(), this.getZ());
+        // 虚空/深井里扫不到地面（NaN）时不强行算高度，退化为"原地不动"，演出其余两段照常
+        this.introDescentTargetY = Double.isNaN(hoverY) ? this.getY() : hoverY;
+        this.setPos(this.getX(), this.introDescentTargetY + INTRO_DESCENT_HEIGHT, this.getZ());
+        // 清掉召唤瞬间可能残留的速度：起点必须是干净的，否则 ② 的匀速插值会被叠加上一段漂移
+        this.setDeltaMovement(Vec3.ZERO);
+        this.introTicks = INTRO_DURATION_TICKS;
+        this.setIntroPlaying(true);
     }
 
     /** 阶段阈值判定：生命比例跌破本阶段的下一阶段门槛即推进 */
@@ -573,15 +718,15 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             --this.guardCooldownTicks;
         }
         if (this.isGuarding()) {
-            // 复活阶段/死亡必须立刻撤架势：无敌演出期间还举着格挡会与死亡/复活姿势打架，也白吃一次免伤
-            if (this.isRespawning() || this.isDeadOrDying() || --this.guardTicks <= 0) {
+            // 复活阶段/死亡/出场演出必须立刻撤架势：无敌演出期间还举着格挡会与死亡/复活/降临姿势打架，也白吃一次免伤
+            if (this.isRespawning() || this.isIntroPlaying() || this.isDeadOrDying() || --this.guardTicks <= 0) {
                 this.endGuard();
             }
             return;
         }
         // 冲锋期间不做其它事：正在俯冲就不起手架势（否则"一边冲一边举盾"，语义与动画都会打架）
-        if (this.guardCooldownTicks <= 0 && !this.isRespawning() && !this.isDiving() && !this.isCharging()
-                && this.shouldEnterGuard()) {
+        if (this.guardCooldownTicks <= 0 && !this.isRespawning() && !this.isIntroPlaying() && !this.isDiving()
+                && !this.isCharging() && this.shouldEnterGuard()) {
             this.setGuarding(true);
             this.guardTicks = AgaitolosGuardSkill.GUARD_DURATION_TICKS;
             // 架势要站定：先停掉寻路，否则 Goal 会继续下发目标点。
@@ -630,8 +775,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             // 纯表现：蓄力每 tick 上报一次，节流在 AgaitolosFx 内部（每 2 tick 一帧）。
             // 放在收尾判断之前：本 tick 只要 isCharging() 仍成立就发一帧，末帧多发一次无副作用。
             AgaitolosFx.chargedOrb(this);
-            // ① 死亡/复活演出必须立刻收势（与 tickGuard 同一口径）：打断，不结算吸血
-            if (this.isDeadOrDying() || this.isRespawning()) {
+            // ① 死亡/复活/出场演出必须立刻收势（与 tickGuard 同一口径）：打断，不结算吸血
+            if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
                 this.endChargeInterrupted();
                 return;
             }
@@ -658,7 +803,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             return;
         }
         if (this.minionCooldownTicks > 0 || this.isGuarding() || this.isDiving()
-                || this.isRespawning() || this.isDeadOrDying()) {
+                || this.isRespawning() || this.isIntroPlaying() || this.isDeadOrDying()) {
             return;
         }
         LivingEntity target = this.getTarget();
@@ -736,8 +881,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         if (this.diveSweepCooldownTicks > 0) {
             --this.diveSweepCooldownTicks;
         }
-        // 死亡/复活演出期间中断冲锋：不结算横扫（演出期间不该出手），也不让计时残留到下一条命
-        if (this.isDeadOrDying() || this.isRespawning()) {
+        // 死亡/复活/出场演出期间中断冲锋：不结算横扫（演出期间不该出手），也不让计时残留到下一条命
+        if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
             this.diveTicks = 0;
             return;
         }
@@ -745,10 +890,11 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             this.tickDiveCharge();
             return;
         }
-        // 起手闸：冷却中 / 正举着架势 / 被玩家格挡后封印期内 —— 三种"这一轮不放"的情况。
+        // 起手闸：冷却中 / 正举着架势 / 被玩家格挡后封印期内 / 出场演出中 —— "这一轮不放"的几种情况。
         // 与格挡架势互斥：架势是"这一轮放弃进攻"的取舍，不能一边举盾一边俯冲；
         // 封印期只封这一招，普攻与凋零头照常。横扫本身是当帧一次性结算，没有持续时间状态，故不存在反向重叠。
-        if (this.diveSweepCooldownTicks > 0 || this.isGuarding() || this.isCharging() || this.isScytheSealed()) {
+        if (this.diveSweepCooldownTicks > 0 || this.isGuarding() || this.isCharging() || this.isScytheSealed()
+                || this.isIntroPlaying()) {
             return;
         }
         LivingEntity target = this.getTarget();
@@ -834,9 +980,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * <ul>
      *   <li><b>阶段门</b>：两招都是规格里的二阶段招式（设计文档 §0 阶段二 / §5 的 P5），
      *       阶段一起手会破坏"二阶段才解锁"的契约；</li>
-     *   <li><b>状态互斥</b>：死亡 / 复活演出 / 架势 / 蓄力 / 冲锋任一成立都不起手 ——
+     *   <li><b>状态互斥</b>：死亡 / 复活演出 / 出场演出 / 架势 / 蓄力 / 冲锋任一成立都不起手 ——
      *       与 {@code tickCharge}、{@code tickGuard}、{@code tickDiveSweep} 的起手闸同款判据，
-     *       五者共用同一批骨骼动画，同时成立会互相拉扯；</li>
+     *       共用同一批骨骼动画，同时成立会互相拉扯；</li>
      *   <li><b>技能封印</b>（{@link #isScytheSealed()}）：封印<b>只封"大招"</b>（俯冲镰扫，
      *       以及后续接入的三重投掷 / 天魔灾 / 投技），<b>不封瞬击与高速踢击</b>，
      *       故本方法<b>不含</b>封印判定；作用范围与理由见 {@link #isScytheSealed()} 的 javadoc。</li>
@@ -844,7 +990,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      */
     private boolean canStartPhaseTwoSkill() {
         return this.isPhaseTwoOrLater() && !this.isDeadOrDying() && !this.isRespawning()
-                && !this.isGuarding() && !this.isCharging() && !this.isDiving();
+                && !this.isIntroPlaying() && !this.isGuarding() && !this.isCharging() && !this.isDiving();
     }
 
     /** 是否已进入二阶段（含三阶段）：二阶段招式的阶段门 */
@@ -1033,7 +1179,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 架势期间不出手：一手格挡一手打人观感很怪，也会让"格挡 = 这一轮放弃进攻"的取舍失效。
         // 蓄力（恶怨倒转）同理：规格要求"手握紫色球往天上举"，这一轮整体让位给召唤与蓄力，
         // 出手既与 charge 姿势打架，也会让"蓄力是一个可被打断的窗口"这一代价语义失效。
-        if (this.isGuarding() || this.isCharging()) {
+        // 出场演出同理：这 4s 是"降临"，一律不起手（与所有技能起手闸同一口径，见各 tick* 的闸门）。
+        if (this.isGuarding() || this.isCharging() || this.isIntroPlaying()) {
             return false;
         }
         // 普攻必须整套走 skill（物理 + 凋零 + 真实伤害），不能只留原版 Mob#doHurtTarget
@@ -1061,6 +1208,11 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      */
     @Override
     public void performRangedAttack(LivingEntity target, float velocity) {
+        // 出场演出期间一律不起手（与 doHurtTarget 同一口径）：RangedAttackGoal 的间隔到点也会被这里挡下，
+        // 不发射弹体、不播施法动作，避免"一边降临一边吐凋零头"
+        if (this.isIntroPlaying()) {
+            return;
+        }
         AgaitolosSkullSkill.fire(this, target);
         // 纯表现：发射动作与弹体生成同刻触发
         AgaitolosAnimations.playCast(this);

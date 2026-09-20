@@ -5,12 +5,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * 阿盖托洛丝的表现层：出场爆发、死亡爆发、蓄力光球三处纯粒子演出。
+ * 阿盖托洛丝的表现层：出场爆发 + 出场三段演出（粒子柱 / 落地冲击环）、死亡爆发、蓄力光球等纯粒子演出。
  * <p>
  * <b>为什么单独成类</b>：粒子只跟"什么时候放、放成什么样"有关，与状态机、伤害口径、
  * 阶段推进毫无耦合。塞进 {@code AgaitolosEntity} 会让本就承担编排的实体继续变胖，
- * 也让以后调手感（换个粒子/改个数量）必须去改实体。这里只暴露三个语义入口，
- * 实体侧各调一行，两侧互不牵制。
+ * 也让以后调手感（换个粒子/改个数量）必须去改实体。这里只暴露语义入口，
+ * 实体侧各调一行，两侧互不牵制。演出<b>时节</b>（哪一段、演到第几 tick）由实体掌握，
+ * 本类只按传入的年龄做窗口判定与节流（时间窗常量仍是实体那一份，本类只读）。
  * <p>
  * <b>为什么全部只在服务端做</b>：
  * <ol>
@@ -74,6 +75,60 @@ public final class AgaitolosFx {
     /** 爆发粒子的高度 = 身高 × 该比例：0.6（躯干中部，而不是脚底或头顶）。待调手感值 / P8 转配置项 */
     public static final double BURST_HEIGHT_RATIO = 0.6D;
 
+    /** 出场粒子柱（① 段）的发射节流间隔（tick）：2 —— 与 {@link #CHARGE_ORB_INTERVAL_TICKS} 同款口径。待调手感值 / P8 转配置项 */
+    public static final int INTRO_PILLAR_INTERVAL_TICKS = 2;
+
+    /** 出场粒子柱的层数：3（脚 / 腰 / 头，围成一段"柱"而不是一圈盘）。待调手感值 / P8 转配置项 */
+    public static final int INTRO_PILLAR_LAYERS = 3;
+
+    /** 出场粒子柱的层间距（格）：0.9（三层合起来约 1.8 格，覆盖身高 2.9 的中段）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_LAYER_HEIGHT = 0.9D;
+
+    /** 出场粒子柱在 ① 段内整体上抬的高度（格）：1.2 —— 上升感只能靠逐帧抬高发射高度（见 {@link #introPillar}）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_RISE = 1.2D;
+
+    /** 出场粒子柱每层每簇的粒子数：6。待调手感值 / P8 转配置项 */
+    public static final int INTRO_PILLAR_COUNT = 6;
+
+    /** 出场粒子柱的环绕半径（格）：1.1（略大于碰撞箱半宽 0.8，贴着周身而不穿进模型）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_RADIUS = 1.1D;
+
+    /** 出场粒子柱的竖直扩散（格）：0.25（层内压成盘，层与层之间才连得成柱）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_SPREAD_Y = 0.25D;
+
+    /** 出场粒子柱的初速度：0.02（近乎原地，上升交给发射高度）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_SPEED = 0.02D;
+
+    /** 落地冲击环（③ 段）的发射节流间隔（tick）：2。待调手感值 / P8 转配置项 */
+    public static final int INTRO_SHOCK_INTERVAL_TICKS = 2;
+
+    /** 落地冲击环的采样点数（"一圈"由这些点连成）：8。待调手感值 / P8 转配置项 */
+    public static final int INTRO_SHOCK_POINTS = 8;
+
+    /** 落地冲击环的最大半径（格）：6（到 ③ 段末尾达到）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_MAX_RADIUS = 6.0D;
+
+    /** 冲击环每个采样点的粒子数：2。待调手感值 / P8 转配置项 */
+    public static final int INTRO_SHOCK_RING_COUNT = 2;
+
+    /** 冲击环采样点的扩散（格）：0.2（保持"点"，连成环而不是糊成圆盘）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_RING_SPREAD = 0.2D;
+
+    /** 冲击环粒子的初速度：0.05（略外扩，读作"冲击波推出去"）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_RING_SPEED = 0.05D;
+
+    /** 冲击环的离地抬升（格）：0.1 —— 环贴在方块顶面之上，不埋进地里。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_GROUND_LIFT = 0.1D;
+
+    /** 落地地面尘的粒子数：6（与环同帧、按当前半径铺开，读作"尘随环起"）。待调手感值 / P8 转配置项 */
+    public static final int INTRO_SHOCK_DUST_COUNT = 6;
+
+    /** 地面尘的竖直扩散（格）：0.3。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_DUST_SPREAD_Y = 0.3D;
+
+    /** 地面尘的初速度：0.01（几乎只就地散开，避免被吹成一团飘云）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_SHOCK_DUST_SPEED = 0.01D;
+
     private AgaitolosFx() {
     }
 
@@ -112,6 +167,83 @@ public final class AgaitolosFx {
      */
     public static void introBurst(AgaitolosEntity boss) {
         burst(boss, INTRO_BURST_COUNT, INTRO_BURST_SPREAD, INTRO_BURST_SPEED);
+    }
+
+    /**
+     * 出场 ① 段（0~20t）的粒子柱：BOSS 周身的青蓝光焰，由 {@code AgaitolosEntity#tickIntro} 每 tick 调用。
+     * <p>
+     * <b>为什么还是 SOUL_FIRE_FLAME</b>：与 {@link #introBurst} / {@link #deathBurst} 同一选型
+     * （青蓝焰点 = BOSS 识别色），不另开一套粒子把识别色割裂成两种。
+     * <p>
+     * <b>"升起"从哪来（已核对 1.20.1 源码，不是推测）</b>：{@code SOUL_FIRE_FLAME} 的粒子类是
+     * {@code FlameParticle}（继承 {@code RisingParticle}），而 {@code RisingParticle} 的构造只设
+     * {@code friction = 0.96} 与初速，<b>没有任何 gravity 赋值</b>（{@code Particle#gravity} 默认 0）
+     * ⇒ 它自身既不下沉也不上升，只会随机飘移。故"升起"不能指望粒子物理，只能靠
+     * <b>逐帧抬高发射高度</b>（{@code progress * }{@link #INTRO_PILLAR_RISE}）加多层位置差造出柱体；
+     * 把 {@link #INTRO_PILLAR_RISE} 调成 0 会退化成"原地一团闪烁"。
+     * <p>
+     * 与 {@link #chargedOrb} 一样按 {@code 年龄 % 间隔} 节流，本类因此仍是无状态工具类。
+     *
+     * @param introAgeTicks 出场已演出的 tick 数（0 起，由实体传入）；不在 ① 段内直接空转
+     */
+    public static void introPillar(AgaitolosEntity boss, int introAgeTicks) {
+        if (!(boss.level() instanceof ServerLevel level)) {
+            return;
+        }
+        if (introAgeTicks < 0 || introAgeTicks >= AgaitolosEntity.INTRO_PILLAR_END_TICKS
+                || introAgeTicks % INTRO_PILLAR_INTERVAL_TICKS != 0) {
+            return;
+        }
+        double progress = introAgeTicks / (double) AgaitolosEntity.INTRO_PILLAR_END_TICKS;
+        double rise = progress * INTRO_PILLAR_RISE;
+        for (int layer = 0; layer < INTRO_PILLAR_LAYERS; ++layer) {
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, boss.getX(),
+                    boss.getY() + layer * INTRO_PILLAR_LAYER_HEIGHT + rise, boss.getZ(),
+                    INTRO_PILLAR_COUNT, INTRO_PILLAR_RADIUS, INTRO_PILLAR_SPREAD_Y, INTRO_PILLAR_RADIUS,
+                    INTRO_PILLAR_SPEED);
+        }
+    }
+
+    /**
+     * 出场 ③ 段（40~60t）的落地冲击：一圈向外扩散的青蓝粒子环 + 地面尘，由 {@code AgaitolosEntity#tickIntro} 每 tick 调用。
+     * <p>
+     * <b>为什么要手写 8 个采样点</b>：{@code ServerLevel#sendParticles} 的偏移量是<b>高斯</b>偏移，
+     * 无论怎么给参都只会得到一个中心最密的球/盘，造不出中空的"环"⇒ 只能沿圆周取点、逐点发射
+     * （{@link #INTRO_SHOCK_POINTS} 个点 × 1 帧）。点数与节流因此是<b>性能参数</b>，不纯是观感参数：
+     * 每点一次 {@code sendParticles} 就是一轮"给追踪到该位置的每个玩家发一个粒子包"。
+     * <p>
+     * <b>环的高度</b>取"BOSS 脚部 - {@link AgaitolosMoveControl#HOVER_HEIGHT}"：降临结束时 BOSS 恰好落在
+     * 悬停高度上（见 {@code AgaitolosEntity#tickIntro}），故此式即脚下方块顶面 + {@link #INTRO_SHOCK_GROUND_LIFT}，
+     * 复用悬停高度常量而不是再扫一遍地面。
+     * <p>
+     * 地面尘选 {@code CLOUD}：它是原版唯一的"白灰软雾"粒子（低速度时读作扬尘），青蓝与白灰一冷一暖，
+     * 环是能量、尘是被震起的地面。
+     *
+     * @param introAgeTicks 出场已演出的 tick 数（0 起，由实体传入）；不在 ③ 段内直接空转
+     */
+    public static void introShockRing(AgaitolosEntity boss, int introAgeTicks) {
+        if (!(boss.level() instanceof ServerLevel level)) {
+            return;
+        }
+        if (introAgeTicks < AgaitolosEntity.INTRO_DESCENT_TICKS
+                || introAgeTicks >= AgaitolosEntity.INTRO_SHOCK_END_TICKS
+                || introAgeTicks % INTRO_SHOCK_INTERVAL_TICKS != 0) {
+            return;
+        }
+        // 环半径随 ③ 段进度线性外扩；分母为段长常量，恒 > 0
+        double progress = (introAgeTicks - AgaitolosEntity.INTRO_DESCENT_TICKS)
+                / (double) (AgaitolosEntity.INTRO_SHOCK_END_TICKS - AgaitolosEntity.INTRO_DESCENT_TICKS);
+        double radius = INTRO_SHOCK_MAX_RADIUS * progress;
+        double groundY = boss.getY() - AgaitolosMoveControl.HOVER_HEIGHT + INTRO_SHOCK_GROUND_LIFT;
+        for (int i = 0; i < INTRO_SHOCK_POINTS; ++i) {
+            double angle = (Math.PI * 2.0D) * i / INTRO_SHOCK_POINTS;
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                    boss.getX() + Math.cos(angle) * radius, groundY, boss.getZ() + Math.sin(angle) * radius,
+                    INTRO_SHOCK_RING_COUNT, INTRO_SHOCK_RING_SPREAD, INTRO_SHOCK_RING_SPREAD,
+                    INTRO_SHOCK_RING_SPREAD, INTRO_SHOCK_RING_SPEED);
+        }
+        level.sendParticles(ParticleTypes.CLOUD, boss.getX(), groundY, boss.getZ(),
+                INTRO_SHOCK_DUST_COUNT, radius, INTRO_SHOCK_DUST_SPREAD_Y, radius, INTRO_SHOCK_DUST_SPEED);
     }
 
     /**

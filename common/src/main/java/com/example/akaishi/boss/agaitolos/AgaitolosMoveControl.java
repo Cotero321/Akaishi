@@ -21,9 +21,10 @@ import net.minecraft.world.phys.Vec3;
  * </ol>
  * 刻意不消费 {@code wantedY}：常态低空悬停、不俯冲，高度完全由脚下地形决定
  * （俯冲镰扫的冲锋位移不在这里，见下）。
- * <p><b>三类例外</b>：
+ * <p><b>四类例外</b>：
  * <ul>
  *   <li>冲锋中（{@code boss.isDiving()}）：整体让位，水平与垂直都不写，位移由 {@code AgaitolosEntity#tickDiveCharge} 驱动；</li>
+ *   <li>出场演出中（{@code boss.isIntroPlaying()}）：整体让位，水平与垂直都不写，位移由 {@code AgaitolosEntity#tickIntro} 驱动；</li>
  *   <li>禁飞中（{@code boss.isGrounded()}）：只做水平，垂直分量原样保留（交给 {@code LivingEntity#travel} 的重力把 BOSS 拉下地面）；</li>
  *   <li>格挡架势（{@code boss.isGuarding()}）：水平归零站定，垂直悬停照常；</li>
  *   <li>蓄力（{@code boss.isCharging()}，恶怨倒转）：同样水平归零站定、垂直悬停照常
@@ -68,6 +69,16 @@ public class AgaitolosMoveControl extends MoveControl {
         //    结果是俯冲永远贴近不了地面目标、抵达判定次次超时。
         //    与既有"架势掐断水平"同理，必须在控制器层让位 —— 本 tick 的 travel 在随后执行，实体侧改写来不及。
         if (isDiving()) {
+            return;
+        }
+
+        // ⓪' 出场演出（首次召唤的 0~80t）：同样<b>整体让位</b>。
+        //    出场期间位移由 AgaitolosEntity#tickIntro 逐 tick 直接写竖直分量（从悬停高度上方 3.5 格拉降下来）。
+        //    这里若继续跑：③ 的悬停修正每 tick 都会把竖直速度改写成"朝悬停高度收敛"（offset 3.5 ⇒ 恒 -0.2），
+        //    与降临插值互相抵消，BOSS 会以 MoveControl 的速度（约 17.5 tick 到底）落下来，40t 的编排被抹平；
+        //    水平同样要站定（演出不接受导航加速）。
+        //    与 ⓪ 的差别只在"谁接手"：⓪ 由 tickDiveCharge 写 3D 速度去追人，本处由 tickIntro 只写竖直分量原地降临。
+        if (isIntroPlaying()) {
             return;
         }
 
@@ -143,6 +154,14 @@ public class AgaitolosMoveControl extends MoveControl {
     }
 
     /**
+     * 所属生物是否正在表演出场（首次召唤的 0~80t）。为 true 时本控制器整体让位（见 {@link #tick()} ⓪'）。
+     * <p>{@code instanceof} 仅作类型兜底（防将来被复用到别的生物上），与本类其它判定同款。
+     */
+    private boolean isIntroPlaying() {
+        return this.mob instanceof AgaitolosEntity boss && boss.isIntroPlaying();
+    }
+
+    /**
      * 所属生物是否正在摆格挡架势。
      * <p>本控制器只装配给 {@link AgaitolosEntity}，{@code instanceof} 仅作类型兜底（防将来被复用到别的生物上）。
      */
@@ -181,19 +200,34 @@ public class AgaitolosMoveControl extends MoveControl {
      * @return 悬停目标 Y；{@link #GROUND_SCAN_RANGE} 格内无地面（虚空/深井）时返回 {@link Double#NaN}，表示本 tick 不修正高度
      */
     private double hoverY() {
-        Level level = this.mob.level();
-        int x = Mth.floor(this.mob.getX());
-        int z = Mth.floor(this.mob.getZ());
-        int lowestY = Math.max(level.getMinBuildHeight(), Mth.floor(this.mob.getY()) - GROUND_SCAN_RANGE);
+        return hoverY(this.mob.level(), this.mob.getX(), this.mob.getY(), this.mob.getZ());
+    }
+
+    /**
+     * 悬停高度算法的<b>唯一实现</b>（{@link #hoverY()} 只是把自身状态喂进来）。
+     * <p>
+     * <b>为什么放开成静态公开方法</b>：出场演出的降临目标高度必须是"这一 tick 真正的悬停高度"——
+     * 若实体另扫一遍地面，两处算法一旦漂移，出场结束时 BOSS 会偏离悬停位、再被 ③ 的修正拉回去
+     * （观感是"落地后又弹一下"）。故让实体直接复用本方法，而不是复制一份扫描逻辑
+     * （{@code AgaitolosEntity#startIntro} 的唯一调用点），与本项目"悬停高度只有一个真源"的口径一致。
+     *
+     * @param x 实体脚部 X（取整后作为扫描列）
+     * @param y 实体脚部 Y（扫描起点）
+     * @param z 实体脚部 Z
+     */
+    public static double hoverY(Level level, double x, double y, double z) {
+        int blockX = Mth.floor(x);
+        int blockZ = Mth.floor(z);
+        int lowestY = Math.max(level.getMinBuildHeight(), Mth.floor(y) - GROUND_SCAN_RANGE);
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-        for (int y = Mth.floor(this.mob.getY()); y >= lowestY; --y) {
-            cursor.set(x, y, z);
+        for (int scanY = Mth.floor(y); scanY >= lowestY; --scanY) {
+            cursor.set(blockX, scanY, blockZ);
             BlockState state = level.getBlockState(cursor);
             // 无碰撞（空气、草、火把…）且不含流体 ⇒ 不是地面，继续往下找
             if (state.getCollisionShape(level, cursor).isEmpty() && state.getFluidState().isEmpty()) {
                 continue;
             }
-            return (y + 1) + HOVER_HEIGHT; // 该方块顶面 = y + 1
+            return (scanY + 1) + HOVER_HEIGHT; // 该方块顶面 = y + 1
         }
         return Double.NaN;
     }
