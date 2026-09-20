@@ -1426,6 +1426,8 @@
   "death.attack.akaishi.true_damage.player": "%1$s was erased by %2$s",
   "death.attack.akaishi.scythe_sweep": "%1$s was cut in half by a diving scythe sweep",
   "death.attack.akaishi.scythe_sweep.player": "%1$s was cut in half by %2$s's diving scythe sweep",
+  "death.attack.akaishi.heavy_strike": "%1$s was shattered by a high-speed kick",
+  "death.attack.akaishi.heavy_strike.player": "%1$s was shattered by %2$s's high-speed kick",
   "life.akaishi.organ_passive.jump_boost": "Jump Boost (constant)",
   "life.akaishi.organ_passive.night_vision": "Night Vision (constant)",
   "life.akaishi.organ_passive.fall_immune": "Fall Damage Immunity",

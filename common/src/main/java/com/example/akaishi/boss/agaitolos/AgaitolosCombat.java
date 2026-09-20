@@ -7,9 +7,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 
 /**
@@ -55,6 +58,23 @@ public final class AgaitolosCombat {
      */
     public static final ResourceKey<DamageType> SCYTHE_SWEEP = ResourceKey.create(
             Registries.DAMAGE_TYPE, new ResourceLocation(AkaishiMod.MOD_ID, "scythe_sweep"));
+
+    /**
+     * 自定义伤害类型键：重击（高速踢击等贴身技；数据层见 {@code data/akaishi/damage_type/heavy_strike.json}）。
+     * <p>
+     * 标签口径（{@code data/minecraft/tags/damage_type/}）与 {@link #SCYTHE_SWEEP} 完全一致：
+     * <ul>
+     *   <li>{@code bypasses_armor} —— <b>必须</b>。护甲已在调用方按「护甲 × 生效比例」预折算过一次
+     *       （见 {@link #damageAfterPartialArmorBypass}），不进该标签会被原版护甲步骤二次减免。</li>
+     *   <li>刻意<b>不</b>加入 {@code bypasses_resistance} / {@code bypasses_enchantments} ——
+     *       规格只要求"无视 40% 护甲"，抗性提升与保护类附魔须照常生效。</li>
+     * </ul>
+     * 同一条连带效应（见 {@link #heavyStrike} 的说明）：{@code #minecraft:bypasses_shield} 直接引用了
+     * {@code #minecraft:bypasses_armor}，故本类型会传递性地也被视为「无视盾牌」，
+     * 格挡判定因此必须换成等价探针源。
+     */
+    public static final ResourceKey<DamageType> HEAVY_STRIKE = ResourceKey.create(
+            Registries.DAMAGE_TYPE, new ResourceLocation(AkaishiMod.MOD_ID, "heavy_strike"));
 
     private AgaitolosCombat() {
     }
@@ -125,5 +145,55 @@ public final class AgaitolosCombat {
             return new DamageSource(holder, directEntity, causingEntity);
         }
         return level.damageSources().generic();
+    }
+
+    /**
+     * 构造重击的伤害源（二阶段技能「高速踢击」的伤害面）。
+     * <p>
+     * 与 {@link #scytheSweep} 逐行同构，只有伤害类型换成 {@link #HEAVY_STRIKE}：
+     * 踢击同样<b>没有独立弹体</b>（directEntity 传 null），若走三参构造器则
+     * {@code getSourcePosition()} 为 null，玩家侧盾牌朝向判定会整条失效；
+     * 故在 directEntity 为 null 时改用两参重载 {@code DamageSource(Holder, Entity)}
+     * （内部即 {@code this(type, entity, entity)}），把 BOSS 同时当作直接实体与归属实体，
+     * 换来源位置的同时保住击杀归属与 {@code death.attack.akaishi.heavy_strike.player} 消息键。
+     */
+    public static DamageSource heavyStrike(Level level, Entity directEntity, Entity causingEntity) {
+        if (level instanceof ServerLevel serverLevel) {
+            Registry<DamageType> registry = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+            Holder<DamageType> holder = registry.getHolderOrThrow(HEAVY_STRIKE);
+            if (directEntity == null && causingEntity != null) {
+                return new DamageSource(holder, causingEntity);
+            }
+            return new DamageSource(holder, directEntity, causingEntity);
+        }
+        return level.damageSources().generic();
+    }
+
+    /**
+     * 「按比例削甲」的<b>唯一</b>结算口径 —— 俯冲镰扫（无视 30% ⇒ 生效 0.7）与高速踢击（无视 40% ⇒ 生效 0.6）共用。
+     * <p>
+     * <b>为什么必须抽成一段公用代码</b>：两招的差异只有一个比例参数，算法完全同源；历史上本项目反复出现
+     * "同一套口径写两份、改一份忘一份"的事故（设计文档 §3.1）。抽成方法后，例外的只有比例常量，
+     * 想改算法（例如原版护甲公式变化）只需改这里一处。
+     * <p>
+     * <b>算法（不是"把伤害乘 0.7"，而是"把护甲收益打七折"）</b>：
+     * 用「护甲 × 生效比例、韧性 × 生效比例」自己跑一遍原版 {@link CombatRules#getDamageAfterAbsorb}
+     * （参数顺序实测为 <b>(伤害, 护甲, 韧性)</b>），算出应受伤害，再由调用方用带 {@code bypasses_armor}
+     * 标签的伤害源施加 —— 原版 {@code LivingEntity#getDamageAfterArmorAbsorb} 会因该标签整段跳过护甲步骤
+     * （不会二次减免），而 {@code getDamageAfterMagicAbsorb}（抗性提升 + 保护附魔）照常执行。
+     * <p>
+     * 护甲取 {@link LivingEntity#getArmorValue()}（= {@code floor(getAttributeValue(Attributes.ARMOR))}，
+     * 与原版管线 {@code LivingEntity#getDamageAfterArmorAbsorb} 里的取法逐字一致），
+     * 韧性取 {@code getAttributeValue(Attributes.ARMOR_TOUGHNESS)}（double，需显式窄化）。
+     *
+     * @param target         挨打方（护甲/韧性从这里读）
+     * @param baseDamage     折算前的伤害（通常是"目标最大生命 × 比例"）
+     * @param armorKeptRatio 生效护甲比例：0.7 = 无视 30%、0.6 = 无视 40%
+     * @return 折算后的伤害值（未落地，仍需调用方经破甲伤害源施加）
+     */
+    public static float damageAfterPartialArmorBypass(LivingEntity target, float baseDamage, float armorKeptRatio) {
+        return CombatRules.getDamageAfterAbsorb(baseDamage,
+                target.getArmorValue() * armorKeptRatio,
+                (float) (target.getAttributeValue(Attributes.ARMOR_TOUGHNESS) * armorKeptRatio));
     }
 }

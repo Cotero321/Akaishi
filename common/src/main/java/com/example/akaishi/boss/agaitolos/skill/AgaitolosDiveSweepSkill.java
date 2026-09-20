@@ -5,12 +5,10 @@ import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -25,8 +23,9 @@ import net.minecraft.world.phys.Vec3;
  * {@link AgaitolosEntity#onSweepBlocked()} 持有，本类只在判定到格挡时<b>上报</b>，不碰位移与状态计时。
  * <p>
  * <b>破甲折算口径（用户拍板，不可擅改）</b>：不是去改玩家属性，而是"精确折算"——
- * 先按「护甲 × {@link #ARMOR_KEPT_RATIO}、韧性 × {@link #ARMOR_KEPT_RATIO}」用
- * {@link CombatRules#getDamageAfterAbsorb(float, float, float)} 算出应受伤害，
+ * 先按「护甲 × {@link #ARMOR_KEPT_RATIO}、韧性 × {@link #ARMOR_KEPT_RATIO}」跑一遍原版护甲公式
+ * （算法在 {@link AgaitolosCombat#damageAfterPartialArmorBypass}，
+ * 与二阶段「高速踢击」的 40% <b>共用同一段代码</b>）算出应受伤害，
  * 再以带 {@code bypasses_armor} 标签的 {@code akaishi:scythe_sweep} 施加。
  * 这样原版 {@code LivingEntity#getDamageAfterArmorAbsorb} 会因该标签整段跳过护甲步骤
  * （不会二次减免），而 {@code getDamageAfterMagicAbsorb}（抗性提升 + 保护附魔）照常执行 ——
@@ -94,14 +93,12 @@ public final class AgaitolosDiveSweepSkill {
             // b. 伤害量：基础 = 目标最大生命 × 30%
             float damage = player.getMaxHealth() * BASE_DAMAGE_MAX_HEALTH_RATIO;
             if (!withered) {
-                // 精确折算「无视 30% 护甲与韧性」：把生效护甲/韧性各乘 0.7 后自己跑一遍原版护甲公式。
-                // 参数顺序实测为 (伤害, 护甲, 韧性)：CombatRules.getDamageAfterAbsorb(float damage, float totalArmor, float toughnessAttribute)。
-                // 护甲取 LivingEntity#getArmorValue()（= floor(getAttributeValue(Attributes.ARMOR))，原版管线同款取法），
-                // 韧性取 getAttributeValue(Attributes.ARMOR_TOUGHNESS)（double，需显式窄化）。
-                // 折算依据：护甲项 g = clamp(a - d/f, 0.2a, 20) 中 a 线性出现，故 0.7×护甲/0.7×韧性 正是"护甲收益打七折"（不是把伤害乘 0.7）。
-                damage = CombatRules.getDamageAfterAbsorb(damage,
-                        player.getArmorValue() * ARMOR_KEPT_RATIO,
-                        (float) (player.getAttributeValue(Attributes.ARMOR_TOUGHNESS) * ARMOR_KEPT_RATIO));
+                // 精确折算「无视 30% 护甲与韧性」：算法与常量口径<b>整体收在</b>
+                // AgaitolosCombat#damageAfterPartialArmorBypass（二阶段「高速踢击」的 40% 与本处 30%
+                // 共用同一段代码，只有比例参数不同 —— 详见该方法 javadoc 里的公式依据）。
+                // 本处传 ARMOR_KEPT_RATIO = 0.7F，与抽取前逐项相同（护甲取 getArmorValue()、
+                // 韧性取 getAttributeValue(ARMOR_TOUGHNESS) 后显式窄化），行为不变。
+                damage = AgaitolosCombat.damageAfterPartialArmorBypass(player, damage, ARMOR_KEPT_RATIO);
             }
             // 魔法分支不折算：原版 magic 本就不吃护甲点数，直接用基础值（再折算等于凭空多减一次）。
 

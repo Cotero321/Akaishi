@@ -35,10 +35,10 @@ public class AgaitolosMoveControl extends MoveControl {
     /** 悬停高度（格）：以「脚下地面顶面」为基准的抬升量。手感值，待实机调 / P8 转配置项 */
     public static final double HOVER_HEIGHT = 2.0D;
 
-    /** 水平加速度（格/tick，再乘 speedModifier 后作用于水平速度）——待调手感值 */
+    /** 水平加速度（格/tick，再乘 speedModifier 与阶段倍率后作用于水平速度）——待调手感值 */
     private static final double HORIZONTAL_ACCELERATION = 0.05D;
 
-    /** 水平速度上限（格/tick）：空气阻力只有 0.91，不夹住会越飞越快——待调手感值 */
+    /** 水平速度上限（格/tick）：空气阻力只有 0.91，不夹住会越飞越快；同样乘阶段倍率——待调手感值 */
     private static final double MAX_HORIZONTAL_SPEED = 0.25D;
 
     /** 到导航目标点的水平死区（格）：进入后不再加速，避免在目标点上方来回抖 */
@@ -47,7 +47,7 @@ public class AgaitolosMoveControl extends MoveControl {
     /** 高度差 → 垂直速度的比例系数（再经 {@link #MAX_VERTICAL_SPEED} 限速） */
     private static final double VERTICAL_GAIN = 0.25D;
 
-    /** 垂直速度上限（格/tick）：限制上升/下降速率，避免瞬移感 */
+    /** 垂直速度上限（格/tick）：限制上升/下降速率，避免瞬移感；乘阶段倍率后阶段二三升降更快——待调手感值 */
     private static final double MAX_VERTICAL_SPEED = 0.2D;
 
     /** 高度差死区（格）：差量小于此值即视为已在悬停位，垂直速度归零以抑制抖动 */
@@ -88,16 +88,17 @@ public class AgaitolosMoveControl extends MoveControl {
             double deltaZ = this.wantedZ - this.mob.getZ();
             double horizontal = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
             if (horizontal > HORIZONTAL_DEAD_ZONE) {
-                double acceleration = HORIZONTAL_ACCELERATION * this.speedModifier;
+                double acceleration = HORIZONTAL_ACCELERATION * this.speedModifier * pace();
                 motionX += deltaX / horizontal * acceleration;
                 motionZ += deltaZ / horizontal * acceleration;
             }
         }
 
-        // ② 水平限速（加速度 + 空气阻力的平衡速度会超过上限，这里夹住）
+        // ② 水平限速（加速度 + 空气阻力的平衡速度会超过上限，这里夹住）；上限同样乘阶段倍率
+        double maxHorizontalSpeed = MAX_HORIZONTAL_SPEED * pace();
         double horizontalSpeed = Math.sqrt(motionX * motionX + motionZ * motionZ);
-        if (horizontalSpeed > MAX_HORIZONTAL_SPEED) {
-            double scale = MAX_HORIZONTAL_SPEED / horizontalSpeed;
+        if (horizontalSpeed > maxHorizontalSpeed) {
+            double scale = maxHorizontalSpeed / horizontalSpeed;
             motionX *= scale;
             motionZ *= scale;
         }
@@ -115,7 +116,8 @@ public class AgaitolosMoveControl extends MoveControl {
             if (!Double.isNaN(hoverY)) {
                 double offset = hoverY - this.mob.getY();
                 if (Math.abs(offset) > VERTICAL_DEAD_ZONE) {
-                    motionY = Mth.clamp(offset * VERTICAL_GAIN, -MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED);
+                    double maxVerticalSpeed = MAX_VERTICAL_SPEED * pace();
+                    motionY = Mth.clamp(offset * VERTICAL_GAIN, -maxVerticalSpeed, maxVerticalSpeed);
                 }
             }
         }
@@ -155,6 +157,16 @@ public class AgaitolosMoveControl extends MoveControl {
      */
     private boolean isCharging() {
         return this.mob instanceof AgaitolosEntity boss && boss.isCharging();
+    }
+
+    /**
+     * 当前阶段的移动速度倍率（{@link AgaitolosPace#moveSpeed(AgaitolosEntity)}）：
+     * 规格"二阶段比一阶段更加快速"的<b>唯一</b>落点之一（另一处是冲锋速度，见 {@code AgaitolosEntity#tickDiveCharge}）。
+     * <p>阶段一与复活阶段恒为 1.0 ⇒ 乘算后与原值逐位相同，一阶段手感不受影响。
+     * <p>{@code instanceof} 兜底：非本 BOSS 生物回退 1.0（将来若复用本控制器不会莫名提速）。
+     */
+    private double pace() {
+        return this.mob instanceof AgaitolosEntity boss ? AgaitolosPace.moveSpeed(boss) : 1.0D;
     }
 
     /**

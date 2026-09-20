@@ -1,8 +1,10 @@
 package com.example.akaishi.boss.agaitolos;
 
 import com.example.akaishi.boss.agaitolos.entity.AgaitolosWitherSkull;
+import com.example.akaishi.boss.agaitolos.skill.AgaitolosBlinkSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosDiveSweepSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosGuardSkill;
+import com.example.akaishi.boss.agaitolos.skill.AgaitolosKickSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosMeleeSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosMinionSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosReversalSkill;
@@ -40,7 +42,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * 阿盖托洛丝【下界本源】实体主体。
  * <p>
  * P1 交付骨架（属性 + 受击管线 + GeckoLib 可见渲染），P3 在本类上补<b>编排</b>：
- * 阶段机（阈值判定 → 推进）、复活阶段（无敌 + 回血 + 结束击飞）。
+ * 阶段机（阈值判定 → 推进）、复活阶段（无敌 + 回血 + 结束击飞）；
+ * P5 再补<b>二阶段两招</b>（瞬击 / 高速踢击）与「二阶段比一阶段更快速」的阶段节奏倍率
+ * （倍率表收在 {@link AgaitolosPace}，本类只接线）。
  * 阶段独立成类（{@link AgaitolosPhase}），本类只做编排，不把逻辑堆成巨型类。
  * <p>
  * <b>血条不由本类持有</b>：显示职责整体移交客户端自定义 overlay（forge 侧
@@ -174,6 +178,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     private static final String NBT_CHARGE_TICKS = "AgaitolosChargeTicks";
     private static final String NBT_MINION_COOLDOWN = "AgaitolosMinionCooldown";
     private static final String NBT_CHARGE_DAMAGE = "AgaitolosChargeDamage";
+    private static final String NBT_BLINK_COOLDOWN = "AgaitolosBlinkCooldown";
+    private static final String NBT_KICK_COOLDOWN = "AgaitolosKickCooldown";
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -220,6 +226,12 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 被格挡 / 被免伤（非玩家来源、复活无敌）/ 被 0.2s 冷却挡下的部分一律不计入。
      */
     private float chargeDamageTaken;
+
+    /** 瞬击（二阶段）冷却剩余 tick（服务端权威，不参与同步；已落盘，同俯冲镰扫） */
+    private int blinkCooldownTicks;
+
+    /** 高速踢击（二阶段）冷却剩余 tick（服务端权威，不参与同步；已落盘，同上） */
+    private int kickCooldownTicks;
 
     public AgaitolosEntity(EntityType<? extends AgaitolosEntity> type, Level level) {
         super(type, level);
@@ -287,7 +299,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      */
     public void endGuard() {
         this.guardTicks = 0;
-        this.guardCooldownTicks = AgaitolosGuardSkill.GUARD_COOLDOWN_TICKS;
+        // 冷却按阶段折算（二阶段起更短，即"更频繁地摆架势"）：倍率表见 AgaitolosPace
+        this.guardCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosGuardSkill.GUARD_COOLDOWN_TICKS);
         this.setGuarding(false);
     }
 
@@ -386,6 +399,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 打断阈值的累计承伤也要落盘：不落盘则"玩家已经打进一半阈值的蓄力"被读档洗成从零开始，
         // 等于用读档白嫖一次续命（区块卸载/重启都会重走 readAdditionalSaveData）
         tag.putFloat(NBT_CHARGE_DAMAGE, this.chargeDamageTaken);
+        // 二阶段两招的冷却同理落盘：不落盘则读档会白送一次瞬击/踢击（且与"冷却已过"无法区分）
+        tag.putInt(NBT_BLINK_COOLDOWN, this.blinkCooldownTicks);
+        tag.putInt(NBT_KICK_COOLDOWN, this.kickCooldownTicks);
     }
 
     @Override
@@ -416,6 +432,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 下界保护：缺键 ⇒ 0（安全默认，等同"这一轮蓄力还没被打进任何伤害"）；
         // 异常存档里的负值也只当 0，否则负累计会让阈值判定永远差一截才算数
         this.chargeDamageTaken = Math.max(0.0F, tag.getFloat(NBT_CHARGE_DAMAGE));
+        // 二阶段两招的冷却同做下界保护（缺键 ⇒ 0 = 可立刻起手，安全默认；异常负值也只当 0）
+        this.blinkCooldownTicks = Math.max(0, tag.getInt(NBT_BLINK_COOLDOWN));
+        this.kickCooldownTicks = Math.max(0, tag.getInt(NBT_KICK_COOLDOWN));
         this.setCharging(tag.getBoolean(NBT_CHARGING) && this.chargeTicks > 0);
     }
 
@@ -451,6 +470,11 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.tickCharge();
         this.tickGuard();
         this.tickDiveSweep();
+        // 二阶段两招排在最后：它们的起手闸含 !isDiving()/!isGuarding()/!isCharging()，
+        // 必须等上面三者在本 tick 先把状态立起来，才能保证"同一 tick 不会一边冲锋一边瞬移"
+        //（顺序若反过来，本 tick 起手的冲锋/架势/蓄力会被这两招绕过，状态互斥就失效了）
+        this.tickBlink();
+        this.tickKick();
     }
 
     /** 阶段阈值判定：生命比例跌破本阶段的下一阶段门槛即推进 */
@@ -672,7 +696,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.chargeTicks = 0;
         // 承伤累计随收尾一起清：两个出口都清，下一轮起手（tickCharge 起手处也清一次）不会残留
         this.chargeDamageTaken = 0.0F;
-        this.minionCooldownTicks = MINION_COOLDOWN_TICKS;
+        // 冷却按阶段折算（二阶段起更短）：倍率表见 AgaitolosPace
+        this.minionCooldownTicks = AgaitolosPace.scaledCooldown(this, MINION_COOLDOWN_TICKS);
         this.setCharging(false);
         // 自发光随状态一起摘：否则会出现"球已经收了，人还亮着"的错位
         this.removeEffect(MobEffects.GLOWING);
@@ -748,10 +773,11 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             this.finishDive();
             return;
         }
-        // 按 3D 方向归一化后乘速度：竖直分量也在内，故水平速度会随俯仰角自然减小
+        // 按 3D 方向归一化后乘速度：竖直分量也在内，故水平速度会随俯仰角自然减小。
+        // 速度再乘阶段倍率（AgaitolosPace）：规格"二阶段比一阶段更加快速"，阶段一恒为 1.0 不受影响
         double length = Math.sqrt(horizontalSqr + deltaY * deltaY);
         // length > DIVE_ARRIVE_DISTANCE > 0，不会除零
-        double scale = DIVE_SPEED / length;
+        double scale = DIVE_SPEED * AgaitolosPace.moveSpeed(this) / length;
         this.setDeltaMovement(deltaX * scale, deltaY * scale, deltaZ * scale);
     }
 
@@ -759,7 +785,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     private void finishDive() {
         this.diveTicks = 0;
         if (AgaitolosDiveSweepSkill.perform(this)) {
-            this.diveSweepCooldownTicks = AgaitolosDiveSweepSkill.SWEEP_COOLDOWN_TICKS;
+            // 冷却按阶段折算（二阶段起更短）：倍率表见 AgaitolosPace，阶段一恒为原值
+            this.diveSweepCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosDiveSweepSkill.SWEEP_COOLDOWN_TICKS);
         }
     }
 
@@ -778,6 +805,106 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         double deltaZ = target.getZ() - this.getZ();
         double distanceSqr = deltaX * deltaX + deltaZ * deltaZ;
         return distanceSqr >= DIVE_MIN_RANGE * DIVE_MIN_RANGE && distanceSqr <= DIVE_TRIGGER_RANGE * DIVE_TRIGGER_RANGE;
+    }
+
+    // ---------------------------------------------------------------- 二阶段两招（瞬击 / 高速踢击）
+
+    /**
+     * 二阶段两招共用的起手闸（服务端权威）。
+     * <p>
+     * <b>为什么两招共用一条判断</b>：它们的互斥条件完全相同，分开写就会出现"改一招忘一招"；
+     * 与 {@link AgaitolosDamageRules} / {@link AgaitolosGuardSkill} 的收口思路一致。
+     * <p>
+     * 三段判据：
+     * <ul>
+     *   <li><b>阶段门</b>：两招都是规格里的二阶段招式（设计文档 §0 阶段二 / §5 的 P5），
+     *       阶段一起手会破坏"二阶段才解锁"的契约；</li>
+     *   <li><b>状态互斥</b>：死亡 / 复活演出 / 架势 / 蓄力 / 冲锋任一成立都不起手 ——
+     *       与 {@code tickCharge}、{@code tickGuard}、{@code tickDiveSweep} 的起手闸同款判据，
+     *       五者共用同一批骨骼动画，同时成立会互相拉扯；</li>
+     *   <li><b>技能封印</b>（{@link #isScytheSealed()}）：被玩家格挡俯冲镰扫后的 30s 惩罚窗口内，
+     *       新招同样被封 —— 否则"封印"会被绕过去，玩家的格挡收益缩水。</li>
+     * </ul>
+     */
+    private boolean canStartPhaseTwoSkill() {
+        return this.isPhaseTwoOrLater() && !this.isDeadOrDying() && !this.isRespawning()
+                && !this.isGuarding() && !this.isCharging() && !this.isDiving() && !this.isScytheSealed();
+    }
+
+    /** 是否已进入二阶段（含三阶段）：二阶段招式的阶段门 */
+    private boolean isPhaseTwoOrLater() {
+        return getPhase().combatOrdinal() >= AgaitolosPhase.PHASE_2.combatOrdinal();
+    }
+
+    /**
+     * 「瞬击」的状态推进（服务端权威，每 tick 一次），两段式与俯冲镰扫同构：
+     * <ol>
+     *   <li>冷却递减；</li>
+     *   <li>起手闸通过后，仅在<b>不处于飞行状态</b>（{@link #isGrounded()}）时尝试起手，
+     *       再交给 {@link AgaitolosBlinkSkill} 做距离判定、落点校验与瞬移。</li>
+     * </ol>
+     * <b>"不飞行"为什么只能是禁飞窗口</b>：本 BOSS 常态低空悬停（{@code AgaitolosMoveControl} 恒定维持高度），
+     * 唯一的落地状态就是被玩家格挡俯冲镰扫后授予的 30s 禁飞（{@link #onSweepBlocked()}）。
+     * 于是瞬击天然是一招"<b>惩罚期的补偿手段</b>"：禁飞期间够不到目标，靠绕后瞬移把距离拉回近战范围
+     * （详见 {@link AgaitolosBlinkSkill} 的类注释）。
+     * <p>
+     * <b>⚠ 与技能封印的重叠（需用户拍板）</b>：禁飞与封印由 {@code onSweepBlocked} <b>同时</b>授予、
+     * 时长也相同（各 600 tick），而 {@link #canStartPhaseTwoSkill()} 又要求"未被封印"
+     * ⇒ 当前口径下<b>瞬击的唯一起手窗口正好被封印覆盖，实际打不出来</b>。
+     * 本轮按任务书"新技能也必须被封"的要求原样接线（不擅自豁免），此处保留冲突记录；
+     * 若要让瞬击可用，最小改动是二选一：① 封印不覆盖瞬击；② 让禁飞窗口长于封印窗口。
+     * <p>
+     * 冷却落点两分支：<b>成功进完整冷却</b>（{@link AgaitolosBlinkSkill#BLINK_COOLDOWN_TICKS}，
+     * 按阶段折算）；<b>落点校验失败只给短重试窗口</b>（{@link AgaitolosBlinkSkill#BLINK_FAILED_RETRY_TICKS}）
+     * —— 失败不传送、不改朝向、不扣完整冷却，只是别每 tick 重扫方块。
+     */
+    private void tickBlink() {
+        if (this.blinkCooldownTicks > 0) {
+            --this.blinkCooldownTicks;
+        }
+        if (!this.canStartPhaseTwoSkill()) {
+            return;
+        }
+        // 非飞行状态（= 禁飞窗口）是这一招的启用前提，规格原文即如此
+        if (!this.isGrounded()) {
+            return;
+        }
+        LivingEntity target = this.getTarget();
+        if (target == null || !target.isAlive() || !AgaitolosBlinkSkill.canBlink(this, target)) {
+            return;
+        }
+        if (AgaitolosBlinkSkill.perform(this, target)) {
+            this.blinkCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosBlinkSkill.BLINK_COOLDOWN_TICKS);
+        } else {
+            this.blinkCooldownTicks = AgaitolosBlinkSkill.BLINK_FAILED_RETRY_TICKS;
+        }
+    }
+
+    /**
+     * 「高速踢击」的状态推进（服务端权威，每 tick 一次）：冷却递减 → 起手闸 → 目标与距离 → 交给技能结算。
+     * <p>
+     * <b>与瞬击恰相反，本招不限定飞行/地面</b>（规格："任何状态下可用"）：悬停、禁飞、任何高度都能起手；
+     * 但仍受 {@link #canStartPhaseTwoSkill()} 的六项互斥约束（死亡/复活/架势/蓄力/冲锋/封印）
+     * —— "任何状态"指的是空间状态，不是"可以一边蓄力一边踢"。
+     * <p>
+     * 目标与距离一律复用既有口径：目标取 {@code getTarget()}（唯一由 {@code NearestAttackableTargetGoal<Player>}
+     * 选定），距离取 {@link #getMeleeAttackRangeSqr}（含悬停高度折算，与普攻/格挡同一把尺子）。
+     * 出手即进冷却（被盾牌挡下也算"这一脚踢出去了"，与俯冲镰扫同一取舍），避免格挡成功时每 tick 空踢。
+     */
+    private void tickKick() {
+        if (this.kickCooldownTicks > 0) {
+            --this.kickCooldownTicks;
+        }
+        if (!this.canStartPhaseTwoSkill()) {
+            return;
+        }
+        LivingEntity target = this.getTarget();
+        if (target == null || !target.isAlive() || !AgaitolosKickSkill.isWithinKickRange(this, target)) {
+            return;
+        }
+        if (AgaitolosKickSkill.perform(this, target)) {
+            this.kickCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosKickSkill.KICK_COOLDOWN_TICKS);
+        }
     }
 
     // ---------------------------------------------------------------- 受击 / 生命周期
