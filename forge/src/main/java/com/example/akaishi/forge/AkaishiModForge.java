@@ -25,6 +25,7 @@ import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.entity.ModEntities;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosBossBarOverlay;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosMusicHandler;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosRenderer;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
 import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
@@ -422,6 +423,8 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameableHandler.INSTANCE);
         // 「不可名状」后处理：整帧对比度提升 + 电视机花白
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameablePostHandler.INSTANCE);
+        // 阿盖托洛丝战斗音乐：附近有存活 BOSS 时挂一条跟随它的循环位置音效（客户端 TickableSoundInstance）
+        MinecraftForge.EVENT_BUS.register(AgaitolosMusicHandler.INSTANCE);
 
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();

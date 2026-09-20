@@ -202,5 +202,8 @@
   "unnameable_whisper": {
     "subtitle": "subtitles.akaishi.unnameable_whisper",
     "sounds": [ { "name": "akaishi:unnameable_whisper", "stream": true } ]
+  },
+  "agaitolos_theme": {
+    "sounds": [ { "name": "akaishi:agaitolos_theme", "stream": true, "attenuation_distance": 64 } ]
   }
 }
