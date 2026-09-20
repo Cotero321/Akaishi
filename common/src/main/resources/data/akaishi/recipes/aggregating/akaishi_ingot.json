@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:aggregating",
+  "ingredient": { "item": "minecraft:netherite_ingot" },
+  "result": { "item": "akaishi:akaishi_ingot", "count": 1 }
+}

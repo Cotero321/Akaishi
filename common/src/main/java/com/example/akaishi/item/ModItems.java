@@ -91,7 +91,6 @@ public final class ModItems {
     public static final String DIAMOND_DUST_ID = "diamond_dust";
     public static final String EMERALD_DUST_ID = "emerald_dust";
     public static final String QUARTZ_DUST_ID = "quartz_dust";
-    public static final String NETHERITE_DUST_ID = "netherite_dust";
     public static final String OBSIDIAN_DUST_ID = "obsidian_dust";
     // ===== 基底（变化器产物）=====
     public static final String COOLING_BASE_ID = "cooling_base";
@@ -203,7 +202,6 @@ public final class ModItems {
     public static RegistrySupplier<Item> diamondDust;
     public static RegistrySupplier<Item> emeraldDust;
     public static RegistrySupplier<Item> quartzDust;
-    public static RegistrySupplier<Item> netheriteDust;
     public static RegistrySupplier<Item> obsidianDust;
     public static RegistrySupplier<Item> coolingBase;
     public static RegistrySupplier<Item> coalOreBase;
@@ -384,7 +382,6 @@ public final class ModItems {
         diamondDust = AkaishiBaseItems.diamondDust;
         emeraldDust = AkaishiBaseItems.emeraldDust;
         quartzDust = AkaishiBaseItems.quartzDust;
-        netheriteDust = AkaishiBaseItems.netheriteDust;
         obsidianDust = AkaishiBaseItems.obsidianDust;
         coolingBase = AkaishiBaseItems.coolingBase;
         coalOreBase = AkaishiBaseItems.coalOreBase;

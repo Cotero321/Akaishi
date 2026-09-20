@@ -19,10 +19,12 @@ import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosRenderer;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
 import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
 import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
@@ -70,12 +72,14 @@ import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.wireless.PortableSupplyService;
 import com.example.akaishi.wireless.WirelessFieldManager;
+import com.example.akaishi.wireless.WirelessNetworkManager;
 import com.example.akaishi.wireless.WirelessNodeRegistry;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.WitherSkullRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -103,6 +107,7 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -220,6 +225,9 @@ public final class AkaishiModForge {
         // 玩家属性供应商，否则会丢失全部原版属性并触发 "Registry Object not present" 崩溃。
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onEntityAttributeModification);
 
+        // 阿盖托洛丝 BOSS 属性：自定义生物必须在此注册属性供应商，否则实体生成即崩
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onEntityAttributes);
+
         // 原生动力护甲层：分件几何绑定到人形骨骼，不依赖 Geo/GeckoLib。
         FMLJavaModLoadingContext.get().getModEventBus().addListener(
                 (EntityRenderersEvent.RegisterLayerDefinitions event) -> event.registerLayerDefinition(
@@ -278,11 +286,12 @@ public final class AkaishiModForge {
         // 掉落来源索引：数据包重载标脏 + tick 分帧扫表 + 服务端停止清索引
         MinecraftForge.EVENT_BUS.register(AkaishiValueForgeEvents.INSTANCE);
 
-        // 无线场域 / 节点登记表按 server 实例分表，需在服务器停止时显式整组丢弃：
-        // 否则静态表会长期钉住已结束的 ServerLevel（旧清理点只在下一次终端 refresh 时才触发）
+        // 无线场域 / 节点登记表 / 终端注册表按 server 实例分表，需在服务器停止时显式整组丢弃：
+        // 否则静态表会长期钉住已结束的 ServerLevel，且条目随"建过多少终端"单调增长永不回收
         MinecraftForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> {
             WirelessFieldManager.clearServer(event.getServer());
             WirelessNodeRegistry.clearServer(event.getServer());
+            WirelessNetworkManager.clear();
         });
 
         // 调用通用初始化逻辑
@@ -385,6 +394,10 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_LIFE_ENERGY_EMITTER.get(), LifeEnergyEmitterRenderer::new);
         // 生命能量弹：相机朝向的发光公告板
         EntityRenderers.register(ModEntities.LIFE_ENERGY_PROJECTILE.get(), AkaishiLifeEnergyProjectileRenderer::new);
+        // 阿盖托洛丝：GeckoLib 几何动画渲染（阶段一模型/动画，P7 再接三阶段换模）
+        EntityRenderers.register(ModEntities.AGAITOLOS.get(), AgaitolosRenderer::new);
+        // 阿盖托洛丝的远程弹体：复用原版凋零头渲染器（子类可被 EntityRenderer<WitherSkull> 直接渲染）
+        EntityRenderers.register(ModEntities.AGAITOLOS_WITHER_SKULL.get(), WitherSkullRenderer::new);
         // 管道方向标识：输出=臂端收窄尖口，输入=臂端外扩喇叭口（物品/赤能源/生命能量/液体/废料/等离子全族）
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ITEM_PIPE.get(), PipeSideOverlayRenderer::new);
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ENERGY_PIPE.get(), PipeSideOverlayRenderer::new);
@@ -416,6 +429,11 @@ public final class AkaishiModForge {
         event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_CHANCE.get());
         event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_DAMAGE.get());
         event.add(EntityType.PLAYER, ModCombatAttributes.DODGE_CHANCE.get());
+    }
+
+    /** 自定义生物的属性供应商（每个自定义 LivingEntity 类型必须注册一次） */
+    private void onEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.AGAITOLOS.get(), AgaitolosEntity.createAttributes().build());
     }
 
     /**

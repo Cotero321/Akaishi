@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Ore Bases are the Akaishi Transformer's $(4)signature output$(0): they squeeze any lump of ore into a single standardized base, so machines can recognize materials at a glance.$(br2)$(bold)The whole family:$(0)$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)Akaishi ore → Akaishi Ore Base$(li)Lapis Dust → Cooling Base (it serves the cooling line, not the ores)$(br2)One machine makes them all: the Transformer, one in, one out."
+      "text": "Ore Bases are the Akaishi Transformer's $(4)signature output$(0): they squeeze any lump of ore into a single standardized base, so machines can recognize materials at a glance.$(br2)$(bold)The whole family:$(0)$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)$(4)Compressed Akaishi Essence → Akaishi Ore Base$(0) (Akaishi Ore no longer converts directly: pulverize it into the concentrate first)$(li)Lapis Dust → Cooling Base (it serves the cooling line, not the ores)$(br2)One machine makes them all: the Transformer, one in, one out."
     },
     {
       "type": "patchouli:text",

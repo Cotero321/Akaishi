@@ -1,7 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEnergyLiquefierBlockEntity;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
@@ -41,18 +41,20 @@ public class AkaishiEnergyLiquefierMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
-        // 材料输入槽：只接受液化配方输入物（下界之星/凋零玫瑰/各混合物），防误塞无关物品
+        // 材料输入槽与辅料槽：只排除升级组件（保证 shift 点击时升级组件只进升级槽）；
+        // 具体什么能液化、需要哪种辅料都由数据包配方决定，机器在 tick 内按配方核对，
+        // 且只在成功结算时消耗（放错不会损失物品），故菜单不做预判
         addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.INPUT_SLOT, 116, 58) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return AkaishiEnergyLiquefierBlockEntity.recipeFor(stack) != null;
+                return !(stack.getItem() instanceof AkaishiMachineUpgradeItem);
             }
         });
-        // 生命能量固态物输入槽：仅接纳生命能量固态物，防止误放燃料罐等被配方吞掉
+        // 生命能量固态物输入槽（配方 catalyst 缺省即它）
         addSlot(new Slot(container, AkaishiEnergyLiquefierBlockEntity.SOLID_SLOT, 62, 58) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.is(ModItems.akaishiLifeEssenceSolid.get());
+                return !(stack.getItem() instanceof AkaishiMachineUpgradeItem);
             }
         });
 

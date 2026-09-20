@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "akaishi:lapis_dust" },
+  "result": { "item": "akaishi:cooling_base", "count": 1 }
+}

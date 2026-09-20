@@ -1,5 +1,6 @@
 package com.example.akaishi.block;
 
+import com.example.akaishi.block.entity.AkaishiMiniMatrixNetworkNodeBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.wireless.WirelessFieldManager;
 import com.example.akaishi.wireless.WirelessNodeRegistry;
@@ -7,6 +8,10 @@ import com.example.akaishi.wireless.WirelessNodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
@@ -15,10 +20,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.BlockHitResult;
+
+import dev.architectury.registry.menu.MenuRegistry;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,11 +40,13 @@ import java.util.List;
  * 每块节点自带 <b>1 区块半径</b>的子场域（同样走弱加载票据），由场域内的微缩矩阵终端按
  * 拓展升级数量申领（最多 3 个、就近优先）——即需求里的「让专用网络节点附加无线场域」。
  * <p>
- * 纯结构件：<b>无界面、无 tick</b>，只做两件事：放置/被拆时在
+ * 纯结构件 + 一个极简界面：放置/被拆时在
  * {@link WirelessNodeRegistry} 登记/注销；被申领后由场域服务挂票。
- * 携带一个<b>极简方块实体</b>（{@code AkaishiMiniMatrixNetworkNodeBlockEntity}），
+ * 携带一个方块实体（{@code AkaishiMiniMatrixNetworkNodeBlockEntity}），
  * 目的是把登记绑到区块生命周期上，使服务器重启后节点能随区块加载自动重新登记。
  * 未安装拓展升级（或不在任何场域内）时，节点只是普通装饰方块，不产生加载开销。
+ * <p>
+ * 右键打开节点界面：只读展示「绑定终端 / 归属者 / 子场域」，并可开关<b>本节点</b>的场域屏障。
  */
 public class AkaishiMiniMatrixNetworkNodeBlock extends AkaishiMachineBlock {
 
@@ -62,11 +74,27 @@ public class AkaishiMiniMatrixNetworkNodeBlock extends AkaishiMachineBlock {
         builder.add(ACTIVE);
     }
 
-    /** 只承载登记表的生命周期钩子，无 tick（基类默认 ticker 为 null） */
+    /** 只承载登记表的生命周期钩子 + 幽灵自愈自检；无随机 tick，但服务端需要一个逐 tick 的自检 */
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return ModBlockEntities.CHISHI_MINI_MATRIX_NETWORK_NODE.get().create(pos, state);
+    }
+
+    /**
+     * 服务端逐 tick 自检（幽灵自愈 + 自持弱加载票，见 BE 的 {@code tick}）。
+     * <p>
+     * <b>只在服务端注册</b>：客户端既不改方块状态、也不持票据，注册了纯属白烧每 tick 的开销。
+     */
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
+        if (level.isClientSide) {
+            return null;
+        }
+        return createTickerHelper(type, ModBlockEntities.CHISHI_MINI_MATRIX_NETWORK_NODE.get(),
+                AkaishiMiniMatrixNetworkNodeBlockEntity::tick);
     }
 
     @Override
@@ -93,10 +121,22 @@ public class AkaishiMiniMatrixNetworkNodeBlock extends AkaishiMachineBlock {
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
+    /** 右键打开节点界面（只读绑定信息 + 本节点独立的屏障开关） */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
+                && level.getBlockEntity(pos) instanceof AkaishiMiniMatrixNetworkNodeBlockEntity node) {
+            MenuRegistry.openExtendedMenu(serverPlayer, node);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip,
             TooltipFlag flag) {
         tooltip.add(Component.translatable("gui.akaishi.matrix.node.hint"));
         tooltip.add(Component.translatable("gui.akaishi.matrix.node.max_hint"));
+        tooltip.add(Component.translatable("gui.akaishi.matrix.node.open_hint"));
     }
 }

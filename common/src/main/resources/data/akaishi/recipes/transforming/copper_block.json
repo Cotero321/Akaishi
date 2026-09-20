@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:copper_block" },
+  "result": { "item": "akaishi:copper_ore_base", "count": 9 }
+}

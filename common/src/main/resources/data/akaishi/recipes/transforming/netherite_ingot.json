@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:netherite_ingot" },
+  "result": { "item": "akaishi:netherite_ore_base", "count": 1 }
+}

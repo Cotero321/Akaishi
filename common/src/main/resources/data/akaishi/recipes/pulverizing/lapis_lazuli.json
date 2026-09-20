@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:lapis_lazuli" },
+  "result": { "item": "akaishi:lapis_dust", "count": 1 }
+}

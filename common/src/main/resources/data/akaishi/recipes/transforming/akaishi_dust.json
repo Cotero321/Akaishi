@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "akaishi:akaishi_dust" },
+  "input_count": 9,
+  "result": { "item": "akaishi:akaishi_essence_compressed", "count": 1 }
+}

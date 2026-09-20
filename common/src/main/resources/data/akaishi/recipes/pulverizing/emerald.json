@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:emerald" },
+  "result": { "item": "akaishi:emerald_dust", "count": 1 }
+}

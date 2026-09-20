@@ -48,6 +48,11 @@ public class WirelessNodeFieldRenderer implements BlockEntityRenderer<AkaishiMin
                 || !state.getValue(AkaishiMiniMatrixNetworkNodeBlock.ACTIVE)) {
             return;
         }
+        // 每个节点各自带一个屏障开关（默认开）：关掉只影响这一个节点，也顺带解决
+        // "释放时区块未加载导致 ACTIVE 残留"的观感问题 —— 玩家可以把这个节点的屏障关掉
+        if (!be.barrierEnabled()) {
+            return;
+        }
         if (!WirelessFieldRenderer.visibleToLocalPlayer(be.claimantId(), be.claimantName())) {
             return;
         }

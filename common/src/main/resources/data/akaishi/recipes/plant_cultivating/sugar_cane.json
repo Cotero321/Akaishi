@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:sugar_cane" },
+  "consume_input": false,
+  "result": { "item": "minecraft:sugar_cane", "count": 1 }
+}

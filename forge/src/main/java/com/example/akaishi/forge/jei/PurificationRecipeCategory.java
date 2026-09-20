@@ -1,8 +1,8 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.entity.AkaishiPurifierBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
@@ -17,10 +17,12 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JEI 展示的"赤石提纯"配方类别：粗制赤石块 + 燃料 → 赤石精华。
@@ -82,20 +84,25 @@ public class PurificationRecipeCategory implements IRecipeCategory<PurificationR
     /** 提纯配方展示数据 */
     public record PurificationRecipe(ItemStack input, ItemStack fuel, ItemStack output) {
 
-        /** 生成全部展示配方：不同燃料对应不同配方 */
+        /**
+         * 全部展示配方：<b>由机器侧的 {@link AkaishiPurifierBlockEntity#INPUT_OUTPUTS}
+         * × {@link AkaishiPurifierBlockEntity#FUEL_ENERGIES} 组合生成</b>。
+         * <p>
+         * 原先是 JEI 手抄 3 条，与机器规则不等价：机器允许「2 种输入 × 2 种燃料」共 4 种组合，
+         * 而 JEI 漏了「赤石水晶块 + 粗制赤石块」这条；抄写既不全也会过期，故改为按表生成。
+         */
         public static List<PurificationRecipe> getAll() {
-            ItemStack raw = new ItemStack(ModBlocks.RAW_CHISHI_BLOCK.get());
-            ItemStack crystalBlock = new ItemStack(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get());
-            ItemStack essence = new ItemStack(ModItems.akaishiEssence.get());
-            ItemStack essence4 = new ItemStack(ModItems.akaishiEssence.get(), 4);
-            List<PurificationRecipe> recipes = new ArrayList<>();
-            // 粗制赤石块 + 赤石晶 → 1 精华
-            recipes.add(new PurificationRecipe(raw.copy(), new ItemStack(ModItems.akaishiCrystal.get()), essence.copy()));
-            // 粗制赤石块 + 粗制赤石块 → 1 精华
-            recipes.add(new PurificationRecipe(raw.copy(), raw.copy(), essence.copy()));
-            // 赤石水晶块 + 赤石晶 → 4 精华
-            recipes.add(new PurificationRecipe(crystalBlock.copy(), new ItemStack(ModItems.akaishiCrystal.get()), essence4.copy()));
-            return recipes;
+            List<PurificationRecipe> list = new ArrayList<>(
+                    AkaishiPurifierBlockEntity.INPUT_OUTPUTS.size()
+                            * AkaishiPurifierBlockEntity.FUEL_ENERGIES.size());
+            for (Map.Entry<Item, Integer> input : AkaishiPurifierBlockEntity.INPUT_OUTPUTS.entrySet()) {
+                ItemStack inputStack = new ItemStack(input.getKey());
+                ItemStack output = new ItemStack(ModItems.akaishiEssence.get(), input.getValue());
+                for (Item fuel : AkaishiPurifierBlockEntity.FUEL_ENERGIES.keySet()) {
+                    list.add(new PurificationRecipe(inputStack.copy(), new ItemStack(fuel), output.copy()));
+                }
+            }
+            return List.copyOf(list);
         }
     }
 }

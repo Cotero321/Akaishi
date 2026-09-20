@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:obsidian_dust" },
+  "input_count": 1,
+  "result": { "item": "minecraft:obsidian", "count": 1 }
+}

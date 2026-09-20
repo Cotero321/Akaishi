@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:nether_wart" },
+  "consume_input": false,
+  "result": { "item": "minecraft:nether_wart", "count": 1 }
+}

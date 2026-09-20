@@ -6,6 +6,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * 液体常量：注册表 ID 与 GUI 渲染颜色。
  * 液体本体在 Forge 平台模块注册（需 FluidType），common 通过原版注册表按 ID 取用。
@@ -160,28 +164,39 @@ public final class ModFluids {
         return fluid == get(MIXED_PLASMA_ID) || fluid == get(NETHER_PLASMA_ID) || fluid == get(END_PLASMA_ID);
     }
 
+    /**
+     * 衰竭燃料 → 活化衰竭液体（<b>插入顺序即"取值"顺序</b>）。
+     * <p><b>注意：这张表不再是"生命活化器"的真源</b> —— 机器的转化关系已由数据包配方
+     * （{@code data/akaishi/recipes/activating/*.json}，类型 {@code akaishi:activating}）描述。
+     * 本表只服务于<b>不依赖配方表</b>的场合：{@link #activatedFuelFor} 供
+     * {@code FluidValues} 在算燃料价值时把"活化形态"也挂上价值。
+     * <p>若整合包改了配方，机器行为跟着配方走、本表不会变 —— 这是刻意的取舍：
+     * 价值计算发生在无 {@code RecipeManager} 上下文的缓存构建期，读不到数据包。
+     * <p>存<b>流体 id 字符串</b>：类初始化可能早于流体注册，取值时再 {@link #get} 解析。
+     */
+    public static final Map<String, String> EXHAUSTED_TO_ACTIVATED = buildExhaustedToActivated();
+
+    private static Map<String, String> buildExhaustedToActivated() {
+        Map<String, String> map = new LinkedHashMap<>(7);
+        map.put(EXHAUSTED_SCULK_FUEL_ID, ACTIVATED_EXHAUSTED_SCULK_FUEL_ID);
+        map.put(EXHAUSTED_NETHER_COMPOUND_FUEL_ID, ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID);
+        map.put(EXHAUSTED_END_MIXTURE_FUEL_ID, ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID);
+        map.put(EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID, ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID);
+        map.put(EXHAUSTED_PURE_FUEL_ID, ACTIVATED_EXHAUSTED_PURE_FUEL_ID);
+        map.put(EXHAUSTED_DRAGON_FUEL_ID, ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID);
+        map.put(EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID, ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+        return Collections.unmodifiableMap(map);
+    }
+
     /** 衰竭燃料 → 对应活化衰竭液体；非衰竭燃料返回空液体 */
     public static Fluid activatedFuelFor(Fluid exhausted) {
-        if (exhausted == get(EXHAUSTED_SCULK_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_SCULK_FUEL_ID);
+        if (exhausted == null || exhausted == Fluids.EMPTY) {
+            return Fluids.EMPTY;
         }
-        if (exhausted == get(EXHAUSTED_NETHER_COMPOUND_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID);
-        }
-        if (exhausted == get(EXHAUSTED_END_MIXTURE_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID);
-        }
-        if (exhausted == get(EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID);
-        }
-        if (exhausted == get(EXHAUSTED_PURE_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_PURE_FUEL_ID);
-        }
-        if (exhausted == get(EXHAUSTED_DRAGON_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID);
-        }
-        if (exhausted == get(EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID)) {
-            return get(ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID);
+        for (Map.Entry<String, String> entry : EXHAUSTED_TO_ACTIVATED.entrySet()) {
+            if (exhausted == get(entry.getKey())) {
+                return get(entry.getValue());
+            }
         }
         return Fluids.EMPTY;
     }

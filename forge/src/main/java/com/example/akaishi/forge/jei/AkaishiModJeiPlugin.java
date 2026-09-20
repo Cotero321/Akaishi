@@ -21,6 +21,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
  * JEI 集成入口：注册提纯配方类别、展示配方，并为催化器/收集器提供物品信息说明。
@@ -49,37 +51,59 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 new LiquefactionRecipeCategory(helper),
                 new FuelProcessingRecipeCategory(helper),
                 new FuelMixingRecipeCategory(helper),
+                // 聚变燃料链：活化成分 → 等离子体 → 燃料棒
+                new FusionFuelAggregatorRecipeCategory(helper),
+                new PlasmaFillingRecipeCategory(helper),
                 // 物品重构：衰竭结晶为代价的嬗变配方
                 new ReconstructRecipeCategory(helper),
+                // 活化链：活化结晶 → 活化成分（副产衰竭结晶）；活化燃料 → 活化结晶（副产衰竭结晶）
+                new ActivatedFractionatingRecipeCategory(helper),
+                new LifeCentrifugingRecipeCategory(helper),
+                // 生命活化：衰竭燃料 → 活化燃料（1:1，耗生命能量）
+                new LifeActivatingRecipeCategory(helper),
                 // 单输入单输出处理机器：压缩机 / 打粉机 / 变化器 / 植物培养机
                 new CompressorRecipeCategory(helper),
                 new PulverizerRecipeCategory(helper),
                 new TransformerRecipeCategory(helper),
                 new PlantCultivatorRecipeCategory(helper),
+                // 生命能量固化：生命提纯器（无物品输入，双能量 → 生命固态物）
+                new LifePurifyingRecipeCategory(helper),
                 // 转基因合成：凋零 / 烈焰基因序列 + 对应催化素材
                 new TransgeneRecipeCategory(helper));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        // 数据包配方的统一读取入口（本回调在服务端就绪后才触发，故当前服务端必定存在）
+        RecipeManager recipeManager = ServerLifecycleHooks.getCurrentServer().getRecipeManager();
         registration.addRecipes(PurificationRecipeCategory.TYPE, PurificationRecipeCategory.PurificationRecipe.getAll());
-        registration.addRecipes(AggregationRecipeCategory.TYPE, AggregationRecipeCategory.AggregationRecipe.getAll());
         registration.addRecipes(ForgingRecipeCategory.TYPE, ForgingRecipeCategory.ForgingRecipe.getAll());
         registration.addRecipes(LifeFusionAnvilRecipeCategory.TYPE, LifeFusionAnvilRecipeCategory.LifeFusionRecipe.getAll());
         // 母神祭坛仪式配方（旧 1 条 + 新 4 条）
         registration.addRecipes(AkaishiAltarRecipeCategory.TYPE, AkaishiAltarRecipeCategory.AltarRecipe.getAll());
         registration.addRecipes(UpgradeRecipeCategory.TYPE, UpgradeRecipeCategory.UpgradeRecipe.getAll());
-        // 燃料生产链配方
-        registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll());
-        registration.addRecipes(FuelProcessingRecipeCategory.TYPE, FuelProcessingRecipeCategory.FuelProcessingRecipe.getAll());
-        registration.addRecipes(FuelMixingRecipeCategory.TYPE, FuelMixingRecipeCategory.FuelMixingRecipe.getAll());
+        // 燃料生产链配方（数据包）
+        registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll(recipeManager));
+        registration.addRecipes(FuelProcessingRecipeCategory.TYPE, FuelProcessingRecipeCategory.FuelProcessingRecipe.getAll(recipeManager));
+        registration.addRecipes(FuelMixingRecipeCategory.TYPE, FuelMixingRecipeCategory.FuelMixingRecipe.getAll(recipeManager));
+        // 聚变燃料链：活化成分 → 等离子体 → 燃料棒（数据包）
+        registration.addRecipes(FusionFuelAggregatorRecipeCategory.TYPE, FusionFuelAggregatorRecipeCategory.PlasmaRecipe.getAll(recipeManager));
+        registration.addRecipes(PlasmaFillingRecipeCategory.TYPE, PlasmaFillingRecipeCategory.FillingRecipe.getAll());
         // 物品重构配方（衰竭结晶嬗变）
         registration.addRecipes(ReconstructRecipeCategory.TYPE, ReconstructRecipeCategory.ReconstructRecipe.getAll());
-        // 单输入单输出处理机器配方
-        registration.addRecipes(CompressorRecipeCategory.TYPE, CompressorRecipeCategory.getAll());
-        registration.addRecipes(PulverizerRecipeCategory.TYPE, PulverizerRecipeCategory.getAll());
-        registration.addRecipes(TransformerRecipeCategory.TYPE, TransformerRecipeCategory.getAll());
-        registration.addRecipes(PlantCultivatorRecipeCategory.TYPE, PlantCultivatorRecipeCategory.getAll());
+        // 活化分馏（数据包配方，读服务端配方管理器）
+        registration.addRecipes(ActivatedFractionatingRecipeCategory.TYPE, ActivatedFractionatingRecipeCategory.FractionatingRecipe.getAll(recipeManager));
+        // 活化链（数据包配方）
+        registration.addRecipes(LifeCentrifugingRecipeCategory.TYPE, LifeCentrifugingRecipeCategory.CentrifugingRecipe.getAll(recipeManager));
+        registration.addRecipes(LifeActivatingRecipeCategory.TYPE, LifeActivatingRecipeCategory.ActivatingRecipe.getAll(recipeManager));
+        // 单输入单输出处理机器配方 + 聚合器配方：数据包配方（data/akaishi/recipes/<机器>/）
+        registration.addRecipes(AggregationRecipeCategory.TYPE, AggregationRecipeCategory.getAll(recipeManager));
+        registration.addRecipes(CompressorRecipeCategory.TYPE, CompressorRecipeCategory.getAll(recipeManager));
+        registration.addRecipes(PulverizerRecipeCategory.TYPE, PulverizerRecipeCategory.getAll(recipeManager));
+        registration.addRecipes(TransformerRecipeCategory.TYPE, TransformerRecipeCategory.getAll(recipeManager));
+        registration.addRecipes(PlantCultivatorRecipeCategory.TYPE, PlantCultivatorRecipeCategory.getAll(recipeManager));
+        // 生命能量固化（生命提纯器）：同样是数据包配方，纯能量配方无物品输入
+        registration.addRecipes(LifePurifyingRecipeCategory.TYPE, LifePurifyingRecipeCategory.getAll(recipeManager));
         // 转基因合成配方（凋零藤 / 烈焰花种子）
         registration.addRecipes(TransgeneRecipeCategory.TYPE, TransgeneRecipeCategory.TransgeneRecipe.getAll());
 
@@ -135,6 +159,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_LIFE_STRUCT.get(), "jei.akaishi.life_struct");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_SURGERY.get(), "jei.akaishi.surgery");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_POTION_TABLE.get(), "jei.akaishi.potion_table");
+        addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_TRAIT_REFORGER.get(), "jei.akaishi.trait_reforger");
         // 存储库
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT.get(), "jei.akaishi.sample_vault");
         addIngredientInfo(registration, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT.get(), "jei.akaishi.organ_vault");

@@ -238,6 +238,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiMiniMatrixTerminalBlockEntity>> CHISHI_MINI_MATRIX_TERMINAL;
     /** 无线网络节点方块实体类型（无 tick/无界面：仅让节点登记随区块加载/卸载重建） */
     public static RegistrySupplier<BlockEntityType<AkaishiMiniMatrixNetworkNodeBlockEntity>> CHISHI_MINI_MATRIX_NETWORK_NODE;
+    /** 无线接入器（第三方认可架构）：BE 只做"相邻机器识别"，无 tick */
+    public static RegistrySupplier<BlockEntityType<AkaishiWirelessAccessAdapterBlockEntity>> CHISHI_WIRELESS_ACCESS_ADAPTER;
 
     private ModBlockEntities() {
     }
@@ -585,5 +587,7 @@ public final class ModBlockEntities {
         // 无线网络节点（无 tick/无界面：BE 只为让节点登记随区块加载重建，见该 BE 注释）
         CHISHI_MINI_MATRIX_NETWORK_NODE = be("akaishi_mini_matrix_network_node",
                 AkaishiMiniMatrixNetworkNodeBlockEntity::new, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_NETWORK_NODE);
+        CHISHI_WIRELESS_ACCESS_ADAPTER = be("akaishi_wireless_access_adapter",
+                AkaishiWirelessAccessAdapterBlockEntity::new, AkaishiMiniMatrixBlocks.CHISHI_WIRELESS_ACCESS_ADAPTER);
     }
 }

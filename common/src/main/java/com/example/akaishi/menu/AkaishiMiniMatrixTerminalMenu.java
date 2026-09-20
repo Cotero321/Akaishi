@@ -1,13 +1,18 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.api.storage.IItemTerminalHost;
 import com.example.akaishi.block.AkaishiMiniMatrixUpgradeType;
 import com.example.akaishi.block.entity.AkaishiMiniMatrixTerminalBlockEntity;
 import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.craft.CraftLibrary;
 import com.example.akaishi.craft.CraftReadiness;
+import com.example.akaishi.craft.MachineProcessEnergy;
+import com.example.akaishi.craft.ProcessCoverage;
 import com.example.akaishi.craft.VirtualCraftPlanner;
 import com.example.akaishi.craft.VirtualCraftTask;
+import com.example.akaishi.energy.AkaishiEnergyType;
+import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
 import com.example.akaishi.wireless.TerminalSecurity;
 
@@ -22,13 +27,17 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import dev.architectury.registry.menu.MenuRegistry;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,6 +129,9 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
     private AkaishiMatrixCraftSync.PlanView craftPlan;
     @Nullable
     private AkaishiMatrixCraftSync.TaskView craftTaskView;
+    /** 上一次加工的失败原因（内部代号；界面翻成当前语言）。服务端已把任务对象丢弃，故必须单独带下来 */
+    @Nullable
+    private String craftTaskFail;
     /** 服务端：任务进度推送节流 */
     private int taskCooldown;
 
@@ -128,6 +140,12 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
         super(ModMenus.CHISHI_MINI_MATRIX_TERMINAL.get(), id);
         this.be = be;
         this.player = inv.player;
+        // 安全表下发基线：<b>不能留 -1</b>。留 -1 会让"打开界面"这一帧被当成"安全表已变更"，
+        // 于是任何人开一次界面、什么都不改，也会把矩阵表强推覆盖全部绑定芯片
+        //（矩阵表为空 ⇒ 芯片被改成"无条目 = 全放行"，等于静默放宽权限）。
+        // 现在的两条下发路径：① 安全页编辑成功 ⇒ 本菜单 broadcastChanges 比对 revision 后下发；
+        // ② 新芯片被申领 ⇒ 终端侧 inheritSecurityToNewChips() 继承。
+        this.securitySentRevision = be == null ? 0 : be.security().revision();
         this.cardInv = new SimpleContainer(1);
         addCardSlot();
         addPlayerSlots(inv);
@@ -201,8 +219,12 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
             AkaishiMatrixCraftSync.TaskView view = task == null ? null
                     : new AkaishiMatrixCraftSync.TaskView(AkaishiMatrixCraftSync.TASK_CRAFT,
                             task.plan().target(), task.remainingTicks(),
-                            (int) Math.min(task.plan().totalTicks(), Integer.MAX_VALUE), 0, 0);
-            AkaishiMatrixCraftSync.sendTask(serverPlayer, this.containerId, view);
+                            (int) Math.min(task.plan().totalTicks(), Integer.MAX_VALUE),
+                            // 节点进度才是真机加工的真实进度（机台耗时不由我们决定，总时长只是预估）
+                            task.completedSteps(), task.totalSteps());
+            // 失败原因随同一包下发：任务对象已被丢弃，不带着它就只剩"加工莫名停了"
+            AkaishiMatrixCraftSync.sendTask(serverPlayer, this.containerId, view,
+                    task == null ? be.lastCraftFail() : null);
         }
     }
 
@@ -252,7 +274,14 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
             // 只回目录，不回"搜索结果"：过滤在客户端做（专用服务器没有客户端语言，中文/模组名搜不到）
             case AkaishiMatrixCraftSync.ACTION_SEARCH -> sendCraftCatalog(serverPlayer, serverLevel);
             case AkaishiMatrixCraftSync.ACTION_SELECT -> sendCraftPlan(serverPlayer, serverLevel, target);
+            // 开工是真扣库里的材料 + 场域里的能量 ⇒ 必须过安全表（归属者恒有，op 4 放行）
             case AkaishiMatrixCraftSync.ACTION_START -> {
+                if (!serverPlayer.hasPermissions(4)
+                        && !be.security().check(actor.getUUID(), AkaishiSecurityPermission.CRAFT)) {
+                    serverPlayer.displayClientMessage(
+                            Component.translatable("message.akaishi.matrix.craft.fail.denied"), true);
+                    return;
+                }
                 String failure = be.startCraft(serverLevel, target);
                 serverPlayer.displayClientMessage(Component.translatable(failure == null
                         ? "message.akaishi.matrix.craft.started"
@@ -261,11 +290,22 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
             // 界面左列：把玩家送到"那枚芯片自己的界面"。
             // 坐标来自客户端，故必须走 chipAt 白名单（只认矩阵已识别的芯片），
             // 否则改包的客户端能让服务端打开世界里任意方块的界面。
+            // 另需「取出」权限：芯片界面能直接动库里的物品，不能靠矩阵界面白送一个入口。
             case AkaishiMatrixCraftSync.ACTION_OPEN_CHIP -> {
                 MiniatureTerminalBlockEntity chip = be.chipAt(pos);
-                if (chip != null) {
-                    MenuRegistry.openExtendedMenu(serverPlayer, chip);
+                if (chip == null) {
+                    // 静默无反应会让玩家以为按键坏了：芯片已不在（区块卸载 / 刚被拆）必须回执
+                    serverPlayer.displayClientMessage(
+                            Component.translatable("message.akaishi.matrix.chip.gone"), true);
+                    return;
                 }
+                if (!serverPlayer.hasPermissions(4)
+                        && !be.security().check(actor.getUUID(), AkaishiSecurityPermission.EXTRACT)) {
+                    serverPlayer.displayClientMessage(
+                            Component.translatable("message.akaishi.matrix.chip.denied"), true);
+                    return;
+                }
+                MenuRegistry.openExtendedMenu(serverPlayer, chip);
             }
             default -> {
             }
@@ -300,7 +340,7 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
         // 判定复用开工时的同一条路径（配方树 → 叶子 → 库存核对），不会出现"说能做却开不了工"
         IItemTerminalHost host = be.findLedgerHost();
         Set<Item> ready = host == null ? Set.of()
-                : CraftReadiness.ready(manager, level.registryAccess(), items, host.storageUnits());
+                : CraftReadiness.ready(manager, level.registryAccess(), items, host.storageUnits(), be, be);
         List<Item> ordered = new ArrayList<>(items.size());
         int readyCount = 0;
         for (Item item : items) {
@@ -325,16 +365,31 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
         // 库存先取好再规划：规划要"逐级先扣库存"（下级材料够就不现做），扣料与判定必须同一份账
         IItemTerminalHost host = be.findLedgerHost();
         Map<Item, Long> stock = host == null ? Map.of() : CraftLibrary.stock(host.storageUnits());
+        // 场域工序供给快照：扫一次，规划（按机台升级/台数算成本）与准入判定共用同一份
+        ProcessCoverage coverage = be.processCoverage();
         VirtualCraftPlanner.Plan plan = target.isEmpty() ? null
-                : VirtualCraftPlanner.plan(level.getRecipeManager(), level.registryAccess(), target, stock);
+                : VirtualCraftPlanner.plan(level.getRecipeManager(), level.registryAccess(), target, stock,
+                        coverage);
         if (plan == null) {
             // 空 target + 件数 = "这个物品/这个件数确实规划不出来"（区别于没有回包）
             AkaishiMatrixCraftSync.sendPlan(player, containerId, new AkaishiMatrixCraftSync.PlanView(
-                    ItemStack.EMPTY, requested, 0L, 0L, 0L, 0L, 0, false, List.of()));
+                    ItemStack.EMPTY, requested, 0L, 0L, 0L, 0L, 0L, false, false, 0, false, List.of(), List.of()));
             return;
         }
-        // 齐备判定用 consumables（现采材料 + 直接吃掉的库存）：只看 leaves 会漏掉"库存里直接拿"那部分
-        boolean affordable = host != null && CraftLibrary.hasAll(stock, plan.consumables());
+        // 齐备判定用 consumables（现采材料 + 直接吃掉的库存）：只看 leaves 会漏掉"库存里直接拿"那部分。
+        // 手续费（物品终端）、机器能量（场域能量芯片）、机械工序机台（场域机台）也要一起判，
+        // 逐条对齐 {@code AkaishiMiniMatrixTerminalBlockEntity#startCraft} 的预检，
+        // 否则会出现"按钮亮着、点下去却开不了工"
+        MachineProcessEnergy.Cost machine = plan.machineCost();
+        boolean machineMissing = !coverage.covers(plan.machineKinds());
+        // 机台光在场不够：真机加工里它得拿得到能量（终端缺「操控」/「联动」升级时就拿不到）。
+        // 免机台工序（纯原版配方）不受影响，故只在"本单真要跑机械工序"时才判
+        boolean powerMissing = !plan.machineKinds().isEmpty() && !be.canPowerMachines();
+        boolean affordable = host != null && !machineMissing && !powerMissing
+                && CraftLibrary.hasAll(stock, plan.consumables())
+                && host.canAffordFee(plan.materialIp() + plan.resultIp(), true)
+                && be.availableEnergy(AkaishiEnergyType.INSTANCE) >= machine.chishi()
+                && be.availableEnergy(LifeEnergyType.INSTANCE) >= machine.life();
         List<AkaishiMatrixCraftSync.LeafView> materials = new ArrayList<>();
         // 明细只给"最上面那一层"的直接材料（玩家看得懂"要 3 木板 + 2 木棍"）；
         // 总账仍按 consumables 扣料与判定，两者互不影响
@@ -348,7 +403,30 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
         // 详情必须带上"这是哪个物品、按几件算的"：界面靠它比对当前请求，杜绝异步错包串台
         AkaishiMatrixCraftSync.sendPlan(player, containerId, new AkaishiMatrixCraftSync.PlanView(
                 plan.target(), requested, plan.materialIp(), plan.resultIp(), plan.totalTicks(),
-                plan.totalEnergy(), plan.steps(), affordable, materials));
+                plan.totalEnergy(), machine.life(), machineMissing, powerMissing, plan.steps(), affordable,
+                materials, describeProcesses(plan)));
+    }
+
+    /**
+     * 这一单要跑的工序整理成界面可显示的来源清单（自研在前、按 id 稳定排序）。
+     * <p>
+     * <b>为什么由服务端算</b>：来源分档依赖认可表与注册表，两者都在服务端权威侧；
+     * 客户端只负责把 id 翻成当前语言的名字（服务端不知道客户端语言）。
+     * <p>排序固定，否则同一单两次打开界面的顺序会跳（哈希序不稳定）。
+     */
+    private static List<AkaishiMatrixCraftSync.ProcessView> describeProcesses(VirtualCraftPlanner.Plan plan) {
+        List<AkaishiMatrixCraftSync.ProcessView> sources = new ArrayList<>(plan.machineKinds().size());
+        for (RecipeType<?> kind : plan.machineKinds()) {
+            ResourceLocation id = BuiltInRegistries.RECIPE_TYPE.getKey(kind);
+            if (id == null) {
+                continue;
+            }
+            sources.add(new AkaishiMatrixCraftSync.ProcessView(id.toString(),
+                    MachineProcessEnergy.sourceTier(kind), MachineProcessEnergy.declaredOwners(kind)));
+        }
+        sources.sort(Comparator.comparingInt(AkaishiMatrixCraftSync.ProcessView::tier)
+                .thenComparing(AkaishiMatrixCraftSync.ProcessView::processId));
+        return sources;
     }
 
     // ===== 加工页：客户端只读访问器 =====
@@ -389,8 +467,9 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
     }
 
     @Override
-    public void acceptCraftTask(@Nullable AkaishiMatrixCraftSync.TaskView task) {
+    public void acceptCraftTask(@Nullable AkaishiMatrixCraftSync.TaskView task, @Nullable String failure) {
         this.craftTaskView = task;
+        this.craftTaskFail = task == null ? failure : null; // 有任务在跑时不展示旧失败，避免自相矛盾
     }
 
     /** 可合成物目录（客户端本地过滤的原料表，界面不做服务端往返） */
@@ -411,6 +490,12 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
     @Nullable
     public AkaishiMatrixCraftSync.TaskView craftTaskView() {
         return craftTaskView;
+    }
+
+    /** 上一次加工的失败原因（内部代号；无则 null）：界面据此解释"为什么停了" */
+    @Nullable
+    public String craftTaskFail() {
+        return craftTaskFail;
     }
 
     // ===== 安全页：只读访问器（SecurityPage.Source） =====
@@ -481,8 +566,12 @@ public class AkaishiMiniMatrixTerminalMenu extends AbstractContainerMenu
 
     @Override
     public boolean stillValid(Player player) {
-        // 8 格内才有效：安全页能改权限，不允许远距离操作
-        return be == null || player.distanceToSqr(be.getBlockPos().getCenter()) <= 64.0D;
+        // 8 格内才有效：安全页能改权限，不允许远距离操作。
+        // 还必须确认"那个坐标上仍是同一台终端"：拆掉方块后方块实体只被 setRemoved，
+        // 若只比距离，界面会一直开着、服务端也继续对一个已移除的方块实体接受动作。
+        return be != null && !be.isRemoved()
+                && player.level().getBlockEntity(be.getBlockPos()) == be
+                && player.distanceToSqr(be.getBlockPos().getCenter()) <= 64.0D;
     }
 
     @Override

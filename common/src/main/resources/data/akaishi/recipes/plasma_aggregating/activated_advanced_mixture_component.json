@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:plasma_aggregating",
+  "ingredient": { "item": "akaishi:akaishi_activated_advanced_mixture_component" },
+  "fluid_output": { "fluid": "akaishi:mixed_plasma" }
+}

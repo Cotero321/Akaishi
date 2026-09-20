@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import com.example.akaishi.api.recipe.IFluidProcessRecipe;
+import com.example.akaishi.api.recipe.IProcessInputCount;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -34,8 +36,15 @@ public final class RecipeIngredients {
     public record FluidAmount(Fluid fluid, long mb) {
     }
 
-    /** 一张配方的估价视图：产物 + 每格候选物品 + 流体原料 */
-    public record RecipeCost(Item resultItem, int outputCount, List<Item[]> ingredients, List<FluidAmount> fluidsIn) {
+    /**
+     * 一张配方的估价视图：产物 + 每格候选物品 + 流体原料 + 单格消耗数量 + 原配方。
+     * <p>
+     * <b>为什么要带原配方</b>：机器能耗随配置项变动（且配置支持热重载），若把能耗值烘进本记录，
+     * 配方表指纹未变就会一直用旧值。留一个引用，规划时再实时求值即可（见
+     * {@code MachineProcessEnergy}）。
+     */
+    public record RecipeCost(Item resultItem, int outputCount, List<Item[]> ingredients, List<FluidAmount> fluidsIn,
+            int inputCount, Recipe<?> recipe) {
     }
 
     /** 单张配方的 Ingredient 字段缓存，避免重复扫描继承链 */
@@ -70,6 +79,12 @@ public final class RecipeIngredients {
         if (result == null || result.isEmpty()) {
             return null;
         }
+        // 需要流体输入的配方一律不进虚拟加工索引：虚拟加工只按物品库存扣料（不认流体库存），
+        // 而这类配方往往"有物品产物、物品原料格却是空的"⇒ 会被当成不用材料白拿产物（凭空造物）。
+        // 见 api/recipe/IFluidProcessRecipe。
+        if (recipe instanceof IFluidProcessRecipe fluid && fluid.requiresFluidInput()) {
+            return null;
+        }
         List<Ingredient> ingredients = new ArrayList<>();
         NonNullList<Ingredient> declared = recipe.getIngredients();
         if (declared != null) {
@@ -90,7 +105,10 @@ public final class RecipeIngredients {
             }
         }
         List<FluidAmount> fluids = reflectFluids(recipe);
-        return new RecipeCost(result.getItem(), Math.max(1, result.getCount()), List.copyOf(slots), fluids);
+        // 单格消耗数量：原版 Ingredient 不表达数量，机器配方经 IProcessInputCount 自行声明
+        int inputCount = recipe instanceof IProcessInputCount process ? Math.max(1, process.inputCount()) : 1;
+        return new RecipeCost(result.getItem(), Math.max(1, result.getCount()), List.copyOf(slots), fluids, inputCount,
+                recipe);
     }
 
     /** 取一格的候选物品；空标签会被原版填成屏障，需剔除 */

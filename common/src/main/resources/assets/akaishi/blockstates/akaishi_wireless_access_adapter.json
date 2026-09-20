@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "linked=false": {
+      "model": "akaishi:block/akaishi_wireless_access_adapter"
+    },
+    "linked=true": {
+      "model": "akaishi:block/akaishi_wireless_access_adapter_linked"
+    }
+  }
+}

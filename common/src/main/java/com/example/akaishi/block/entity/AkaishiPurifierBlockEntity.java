@@ -31,10 +31,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 赤石提纯器方块实体（仅服务端驱动逻辑，客户端通过 Menu 数据展示）。
@@ -66,6 +71,33 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
     public static final int FUEL_CRYSTAL = 200;
     /** 燃料能量：粗制赤石块 */
     public static final int FUEL_RAW_BLOCK = 2000;
+
+    /**
+     * 有效输入 → 单次产出精华数（<b>顺序即 JEI 展示顺序</b>）。
+     * <p>这是输入的<b>唯一真源</b>：{@link #isValidInput} 与 {@link #outputPerInput} 都由本表派生，
+     * JEI（{@code PurificationRecipeCategory}）也遍历本表，不再各写一份。
+     */
+    public static final Map<Item, Integer> INPUT_OUTPUTS = buildInputOutputs();
+
+    private static Map<Item, Integer> buildInputOutputs() {
+        Map<Item, Integer> map = new LinkedHashMap<>(2);
+        map.put(ModBlocks.RAW_CHISHI_BLOCK.get().asItem(), 1);
+        map.put(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem(), 4);
+        return Collections.unmodifiableMap(map);
+    }
+
+    /**
+     * 有效燃料 → 燃料能量（<b>顺序即 JEI 展示顺序</b>）。同样是燃料判定的唯一真源，
+     * {@link #getFuelEnergy} 与 JEI 都读它。
+     */
+    public static final Map<Item, Integer> FUEL_ENERGIES = buildFuelEnergies();
+
+    private static Map<Item, Integer> buildFuelEnergies() {
+        Map<Item, Integer> map = new LinkedHashMap<>(2);
+        map.put(ModItems.akaishiCrystal.get(), FUEL_CRYSTAL);
+        map.put(ModBlocks.RAW_CHISHI_BLOCK.get().asItem(), FUEL_RAW_BLOCK);
+        return Collections.unmodifiableMap(map);
+    }
 
     private final SimpleContainer inventory;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
@@ -247,26 +279,19 @@ public class AkaishiPurifierBlockEntity extends BlockEntity implements ExtendedM
         return out.is(ModItems.akaishiEssence.get()) && out.getCount() + outputPerInput() <= out.getMaxStackSize();
     }
 
-    /** 有效输入：粗制赤石块 或 赤石水晶块 */
+    /** 有效输入：粗制赤石块 或 赤石水晶块（判据来自 {@link #INPUT_OUTPUTS}） */
     private boolean isValidInput(ItemStack stack) {
-        return stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())
-                || stack.is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem());
+        return INPUT_OUTPUTS.containsKey(stack.getItem());
     }
 
-    /** 单次提纯产出的精华数：赤石水晶块 4 个，粗制赤石块 1 个 */
+    /** 单次提纯产出的精华数：赤石水晶块 4 个，粗制赤石块 1 个（同上表） */
     private int outputPerInput() {
-        return inventory.getItem(INPUT_SLOT).is(AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get().asItem()) ? 4 : 1;
+        return INPUT_OUTPUTS.getOrDefault(inventory.getItem(INPUT_SLOT).getItem(), 1);
     }
 
     /** 燃料能量值，非燃料返回 0（public 供 Menu 燃料槽放入校验） */
     public static int getFuelEnergy(ItemStack stack) {
-        if (stack.is(ModItems.akaishiCrystal.get())) {
-            return FUEL_CRYSTAL;
-        }
-        if (stack.is(ModBlocks.RAW_CHISHI_BLOCK.get().asItem())) {
-            return FUEL_RAW_BLOCK;
-        }
-        return 0;
+        return FUEL_ENERGIES.getOrDefault(stack.getItem(), 0);
     }
 
     public Container inventory() {

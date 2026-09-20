@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:wheat_seeds" },
+  "consume_input": false,
+  "result": { "item": "minecraft:wheat", "count": 1 }
+}

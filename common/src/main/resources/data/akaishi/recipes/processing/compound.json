@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:processing",
+  "ingredient": { "item": "akaishi:akaishi_life_essence_solid" },
+  "fluid_inputs": [ { "fluid": "akaishi:nether_compound_energy", "amount": 1000 } ],
+  "fluid_output": { "fluid": "akaishi:nether_compound_fuel", "amount": 1000 }
+}

@@ -51,11 +51,12 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
-        // 输入槽：仅 7 种活化结晶可放入
+        // 输入槽：只排除升级组件（保证 shift 点击时升级组件只进升级槽）；
+        // 具体哪种输入有效由数据包配方决定，机器在 tick 内核对
         addSlot(new Slot(input, 0, 44, 52) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return AkaishiActivatedFractionatorBlockEntity.isActivatedCrystal(stack);
+                return !(stack.getItem() instanceof AkaishiMachineUpgradeItem);
             }
         });
         // 输出槽只读：防止放入杂物卡死机器
@@ -127,15 +128,14 @@ public class AkaishiActivatedFractionatorMenu extends AbstractContainerMenu {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // 玩家背包/快捷栏：活化结晶 → 输入槽，升级组件 → 升级槽，其余仅在玩家栏内移动
-                if (AkaishiActivatedFractionatorBlockEntity.isActivatedCrystal(current)) {
-                    if (!this.moveItemStackTo(current, SLOT_INPUT, SLOT_INPUT + 1, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
+                // 玩家背包/快捷栏：升级组件 → 升级槽，其余 → 输入槽，再背包内移动
+                // （"哪种结晶能分馏"由数据包配方决定，机器在 tick 内按配方核对，菜单不预判）
+                if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
                     if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
+                } else if (!this.moveItemStackTo(current, SLOT_INPUT, SLOT_INPUT + 1, false)) {
+                    return ItemStack.EMPTY;
                 }
                 if (!this.moveItemStackTo(current, MACHINE_SLOT_END + 27,
                         MACHINE_SLOT_END + 36, false)

@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:raw_iron" },
+  "result": { "item": "akaishi:iron_ore_base", "count": 1 }
+}

@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:activating",
+  "fluid_inputs": [ { "fluid": "akaishi:exhausted_nether_compound_fuel", "amount": 1000 } ],
+  "fluid_output": { "fluid": "akaishi:activated_exhausted_nether_compound_fuel", "amount": 1000 }
+}

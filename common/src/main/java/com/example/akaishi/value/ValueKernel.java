@@ -2,8 +2,10 @@ package com.example.akaishi.value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.ToDoubleFunction;
 
 import com.example.akaishi.config.ModConfig;
@@ -64,6 +66,23 @@ public final class ValueKernel {
     private static final EquipmentSlot[] SCORED_SLOTS = {
             EquipmentSlot.MAINHAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
     };
+
+    /**
+     * 环钉住表：处在「<b>有损配方环</b>」里的物品，直接给权威值，迭代不得抬高。
+     *
+     * <p><b>为什么必须有</b>：迭代是"只抬不降"的，环内若存在乘数积 &gt; 1 的边
+     * （例如 赤石粉 ⇄ 浓缩赤石精华：打粉 1→2、变化器 9→1，乘积 4.5），双方会把彼此一路顶到
+     * {@link IngredientValues#cap() 单项封顶}，与真实造价彻底脱节，并污染所有拿它当原料的配方。
+     * 无损环（如 赤石晶 ⇄ 水晶块 的 9→1 / 1→9，乘积 = 1）不会被抬，故无需登记。
+     *
+     * <p>当前仅 <b>赤石粉</b>：钉住值 8.0 即它的自身分
+     * （COMMON 1 + 非方块 1 + {@code #forge:dusts} 6），也正是改环之前的实际取值。
+     * 钉住后：赤石精华（9 × 8 = 72）与 浓缩赤石精华（封顶 80）与改环前完全一致；
+     * 赤石粉自身价值同为 8，但其<b>原料项被抑制</b>（见 {@link IngredientValues#terms}），
+     * IP 由改环前的 ≈107 变为 ≈96。
+     */
+    private static final Map<String, Double> CYCLE_PINNED = Map.of(
+            "akaishi:akaishi_dust", 8.0);
 
     private ValueKernel() {
     }
@@ -221,21 +240,39 @@ public final class ValueKernel {
         }
 
         // 1) 全物品自身分打底（含无配方物品，保证存储库中任意物品都有基础分）
+        //    同时收集「钉住集合」：手动覆盖命中的物品 + 环钉住表成员；后者在此直接写权威值
         Map<Item, Double> values = new HashMap<>();
+        Set<Item> pinned = new HashSet<>();
         for (Item item : BuiltInRegistries.ITEM) {
-            if (item != Items.AIR) {
-                values.put(item, intrinsicScore(item, tables));
+            if (item == Items.AIR) {
+                continue;
             }
+            String id = itemId(item);
+            // 优先级：玩家配置的手动覆盖 > 内置环钉住 > 自身分
+            // （顺序不能反：反了会让玩家配了 akaishi:akaishi_dust 却被内置钉住值短路，等于配了不生效）
+            double override = id == null ? -1.0 : tables.overrideValue(id, item);
+            if (override >= 0) {
+                values.put(item, override);
+                pinned.add(item);
+                continue;
+            }
+            Double pin = id == null ? null : CYCLE_PINNED.get(id);
+            if (pin != null) {
+                values.put(item, pin);
+                pinned.add(item);
+                continue;
+            }
+            values.put(item, intrinsicScore(item, tables));
         }
 
         // 2) 流体每 mB 价值：桶装物品价值折算
         Map<Fluid, Double> fluidPerMb = FluidValues.build(values);
 
-        // 3) 物品价值不动点迭代（单调不减，单项原料封顶保证收敛）
-        IngredientValues.iterate(values, byResult, fluidPerMb);
+        // 3) 物品价值不动点迭代（单调不减，单项原料封顶保证收敛；钉住者不被抬高）
+        IngredientValues.iterate(values, byResult, fluidPerMb, pinned);
 
         // 4) 原料项（展示用，与迭代同口径）与功能项
-        Map<Item, Double> ingredientTerms = IngredientValues.terms(byResult, values, fluidPerMb);
+        Map<Item, Double> ingredientTerms = IngredientValues.terms(byResult, values, fluidPerMb, pinned);
         Map<Item, Double> functionTerms = new HashMap<>();
         double magic = magicBonus();
         for (Item item : BuiltInRegistries.ITEM) {

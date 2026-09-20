@@ -71,6 +71,7 @@ import com.example.akaishi.block.entity.AkaishiWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemTerminalBlockEntity;
 import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMiniMatrixTerminalBlockEntity;
+import com.example.akaishi.block.entity.AkaishiMiniMatrixNetworkNodeBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemPortBlockEntity;
 import com.example.akaishi.block.entity.AkaishiItemStorageUnitBlockEntity;
 import com.example.akaishi.wireless.IWirelessPortHost;
@@ -238,6 +239,8 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiItemPortMenu>> CHISHI_ITEM_PORT;
     /** 微缩矩阵终端菜单类型（三页：芯片列表 / 升级装配 / 安全认证） */
     public static RegistrySupplier<MenuType<AkaishiMiniMatrixTerminalMenu>> CHISHI_MINI_MATRIX_TERMINAL;
+    /** 网络节点菜单类型（只读绑定信息 + 本节点屏障开关；176×112，无背包区） */
+    public static RegistrySupplier<MenuType<AkaishiMiniMatrixNodeMenu>> CHISHI_MINI_MATRIX_NODE;
 
     private ModMenus() {
     }
@@ -1434,6 +1437,23 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mini_matrix_terminal"), () -> miniMatrixType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(miniMatrixType, AkaishiMiniMatrixTerminalScreen::new));
+
+        // 网络节点：只读展示绑定终端 / 归属者 / 子场域，外加本节点独立的「节点屏障」开关
+        MenuType<AkaishiMiniMatrixNodeMenu> miniMatrixNodeType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
+            BlockPos pos = buf.readBlockPos();
+            Level level = inv.player.level();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AkaishiMiniMatrixNetworkNodeBlockEntity node) {
+                return new AkaishiMiniMatrixNodeMenu(syncId, inv, node);
+            }
+            // 方块实体缺失（跨维度/距离过远）时用空数据兜底：本界面没有槽位，不存在索引错位
+            return AkaishiMiniMatrixNodeMenu.empty(syncId, inv);
+        });
+        CHISHI_MINI_MATRIX_NODE = (RegistrySupplier<MenuType<AkaishiMiniMatrixNodeMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mini_matrix_node"), () -> miniMatrixNodeType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(miniMatrixNodeType, AkaishiMiniMatrixNodeScreen::new));
 
         // 物品储存单元：D18 只读视图（54 槽 + 占用/剩余 IP），无任何写入路径
         MenuType<AkaishiItemStorageUnitMenu> itemStorageUnitType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

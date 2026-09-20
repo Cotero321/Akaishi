@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:red_mushroom" },
+  "consume_input": false,
+  "result": { "item": "minecraft:red_mushroom", "count": 1 }
+}

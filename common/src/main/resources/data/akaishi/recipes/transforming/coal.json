@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:coal" },
+  "result": { "item": "akaishi:coal_ore_base", "count": 1 }
+}

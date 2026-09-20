@@ -43,6 +43,9 @@ public final class AkaishiMiniMatrixBlocks {
     /** 无线网络节点：配合「无线拓展升级」，每块自带 1 区块子场域（最多 3 块生效） */
     public static RegistrySupplier<Block> CHISHI_MINI_MATRIX_NETWORK_NODE = null;
 
+    /** 无线接入器：贴相邻的第三方机器，把它接入无线场域（第三方认可架构的载体） */
+    public static RegistrySupplier<Block> CHISHI_WIRELESS_ACCESS_ADAPTER = null;
+
     private AkaishiMiniMatrixBlocks() {
     }
 
@@ -65,6 +68,9 @@ public final class AkaishiMiniMatrixBlocks {
         // 网络节点：独立放置的世界方块（不是内腔组件），由场域内的矩阵按拓展升级数量申领
         CHISHI_MINI_MATRIX_NETWORK_NODE = AkaishiBlockRegistrar.registerMachineBlock(registrar,
                 "akaishi_mini_matrix_network_node", AkaishiMiniMatrixNetworkNodeBlock::new);
+        // 接入器：独立放置的世界方块，贴相邻第三方机器即把它接入无线场域
+        CHISHI_WIRELESS_ACCESS_ADAPTER = AkaishiBlockRegistrar.registerMachineBlock(registrar,
+                "akaishi_wireless_access_adapter", AkaishiWirelessAccessAdapterBlock::new);
     }
 
     private static RegistrySupplier<Block> registerUpgrade(Registrar<Block> registrar,

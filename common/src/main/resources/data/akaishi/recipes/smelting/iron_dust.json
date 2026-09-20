@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": { "item": "akaishi:iron_dust" },
+  "result": "minecraft:iron_ingot",
+  "experience": 0.7,
+  "cookingtime": 200
+}

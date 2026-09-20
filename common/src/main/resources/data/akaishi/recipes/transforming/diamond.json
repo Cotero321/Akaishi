@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:diamond" },
+  "result": { "item": "akaishi:diamond_ore_base", "count": 1 }
+}

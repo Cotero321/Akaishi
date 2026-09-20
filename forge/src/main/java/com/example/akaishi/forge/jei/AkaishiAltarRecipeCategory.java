@@ -2,8 +2,7 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
-import com.example.akaishi.block.ModBlocks;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.life.altar.AkaishiAltarRecipe;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -21,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -156,56 +156,33 @@ public class AkaishiAltarRecipeCategory implements IRecipeCategory<AkaishiAltarR
     public record AltarRecipe(ItemStack host, List<ItemStack> outer, ItemStack output,
                               int tierRequired, long progressRequired) {
 
-        /** 全部 5 条仪式配方：旧配方 1 条 + 四件禁断饰品 4 条（顺序与实机配方表一致） */
+        /**
+         * 全部 5 条仪式配方：<b>直接遍历 common 侧的 {@link AkaishiAltarRecipe#all()}</b>。
+         * <p>
+         * 原先是 JEI 自带一份抄写，两处必然脱节 —— 实测旧配方的能量阈值 JEI 写死 {@code 80_000}，
+         * 而机器读的是配置项 {@code ModConfig.altarLegacyProgressMax}，改配置后 JEI 仍显示旧值。
+         * 现在等级与阈值一律取 {@link AkaishiAltarRecipe#requiredTier()} / {@link AkaishiAltarRecipe#progressMax()}。
+         */
         public static List<AltarRecipe> getAll() {
-            return List.of(
-                    // 旧配方：赤石锭 + 外圈 8 件 → 生命融合锭（不限等级，仅需结构成型）
-                    new AltarRecipe(
-                            new ItemStack(ModItems.akaishiIngot.get()),
-                            List.of(
-                                    stack(ModItems.lifeEmbryo.get()), stack(ModItems.lifeEmbryo.get()),
-                                    stack(ModItems.lifeAsh.get()), stack(ModItems.lifeAsh.get()),
-                                    stack(ModItems.geneSequence.get()), stack(ModItems.geneSequence.get()),
-                                    stack(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem()),
-                                    stack(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem())),
-                            new ItemStack(ModItems.lifeFusionIngot.get()),
-                            1, 80_000L),
-                    // 四套新配方：生命融合锭 + 主题器官×2 + 基础素材×2 + 基因序列×2 + 药剂×2
-                    advanced(
-                            List.of(stack(ModItems.akaishiOrganLeftArm.get()), stack(ModItems.akaishiOrganRightArm.get()),
-                                    stack(ModItems.lifeEmbryo.get()), stack(ModItems.lifeEmbryo.get())),
-                            ModItems.lifeTouch.get()),
-                    advanced(
-                            List.of(stack(ModItems.akaishiOrganHeart.get()), stack(ModItems.akaishiOrganHeart.get()),
-                                    stack(ModItems.lifeEmbryo.get()), stack(ModItems.lifeEmbryo.get())),
-                            ModItems.cubHeart.get()),
-                    advanced(
-                            List.of(stack(ModItems.akaishiOrganEye.get()), stack(ModItems.akaishiOrganEye.get()),
-                                    stack(ModItems.lifeAsh.get()), stack(ModItems.lifeAsh.get())),
-                            ModItems.motherSeal.get()),
-                    advanced(
-                            List.of(stack(ModItems.akaishiOrganViscera.get()), stack(ModItems.akaishiOrganViscera.get()),
-                                    stack(ModItems.lifeAsh.get()), stack(ModItems.lifeAsh.get())),
-                            ModItems.fertilityRing.get()));
-        }
-
-        /** 新配方：补足基因序列×2 与药剂×2，等级/能量取 common 侧同一配置口径 */
-        private static AltarRecipe advanced(List<ItemStack> head, net.minecraft.world.item.Item output) {
-            java.util.ArrayList<ItemStack> outer = new java.util.ArrayList<>(head);
-            outer.add(stack(ModItems.geneSequence.get()));
-            outer.add(stack(ModItems.geneSequence.get()));
-            outer.add(stack(ModItems.akaishiPotion.get()));
-            outer.add(stack(ModItems.akaishiPotion.get()));
-            return new AltarRecipe(
-                    new ItemStack(ModItems.lifeFusionIngot.get()),
-                    List.copyOf(outer),
-                    new ItemStack(output),
-                    com.example.akaishi.config.ModConfig.altarNewRecipeTierRequired,
-                    com.example.akaishi.config.ModConfig.altarNewRecipeProgressMax);
-        }
-
-        private static ItemStack stack(net.minecraft.world.item.Item item) {
-            return new ItemStack(item);
+            List<AkaishiAltarRecipe> sources = AkaishiAltarRecipe.all();
+            List<AltarRecipe> list = new ArrayList<>(sources.size());
+            for (AkaishiAltarRecipe source : sources) {
+                // 外圈 8 槽：每类祭品按 declared 件数铺满（代表物品由配方自己声明）
+                List<ItemStack> outer = new ArrayList<>(AkaishiAltarRecipe.OUTER_SLOTS);
+                for (AkaishiAltarRecipe.Requirement requirement : source.outer()) {
+                    ItemStack display = new ItemStack(requirement.item().get());
+                    for (int i = 0; i < requirement.count(); i++) {
+                        outer.add(display.copy());
+                    }
+                }
+                list.add(new AltarRecipe(
+                        new ItemStack(source.hostItem().get()),
+                        List.copyOf(outer),
+                        new ItemStack(source.output().get()),
+                        source.requiredTier(),
+                        source.progressMax()));
+            }
+            return List.copyOf(list);
         }
     }
 }

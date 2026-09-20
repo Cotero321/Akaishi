@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "CAC",
+    "ICI"
+  ],
+  "key": {
+    "I": { "item": "akaishi:akaishi_wireless_component" },
+    "C": { "item": "akaishi:akaishi_ingot" },
+    "A": { "item": "akaishi:akaishi_advanced_component" }
+  },
+  "result": { "item": "akaishi:akaishi_wireless_access_adapter", "count": 1 }
+}

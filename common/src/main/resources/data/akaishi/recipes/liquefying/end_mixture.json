@@ -1,0 +1,7 @@
+{
+  "type": "akaishi:liquefying",
+  "ingredient": { "item": "akaishi:end_mixture" },
+  "catalyst": { "item": "akaishi:akaishi_life_essence_solid" },
+  "energy": 10000000,
+  "fluid_output": { "fluid": "akaishi:end_mixture_fuel", "amount": 500 }
+}

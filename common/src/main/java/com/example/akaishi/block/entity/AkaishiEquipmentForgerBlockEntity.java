@@ -33,7 +33,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -70,16 +73,39 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
     public static final int DATA_BASE_START = 6;
     public static final int DATA_SIZE = 12;
 
-    /** 重铸配方：下界合金装备 → (赤石装备, 消耗锭数) */
-    private static final Map<Item, ForgeRecipe> FORGE_RECIPES = Map.of(
-            Items.NETHERITE_HELMET, new ForgeRecipe(() -> ModItems.akaishiHelmet.get(), 5),
-            Items.NETHERITE_CHESTPLATE, new ForgeRecipe(() -> ModItems.akaishiChestplate.get(), 8),
-            Items.NETHERITE_LEGGINGS, new ForgeRecipe(() -> ModItems.akaishiLeggings.get(), 7),
-            Items.NETHERITE_BOOTS, new ForgeRecipe(() -> ModItems.akaishiBoots.get(), 4),
-            Items.NETHERITE_SWORD, new ForgeRecipe(() -> ModItems.akaishiSword.get(), 2),
-            Items.NETHERITE_PICKAXE, new ForgeRecipe(() -> ModItems.akaishiPickaxe.get(), 3),
-            Items.NETHERITE_SHOVEL, new ForgeRecipe(() -> ModItems.akaishiShovel.get(), 1),
-            Items.NETHERITE_AXE, new ForgeRecipe(() -> ModItems.akaishiAxe.get(), 3));
+    /**
+     * 重铸配方：下界合金装备 → (赤石装备, 消耗锭数)。
+     * <p>
+     * <b>用 List 而不是 Map 作真源</b>：{@code Map.of} 的迭代顺序不保证稳定（同一份数据每次启动顺序可能不同），
+     * JEI 展示顺序会跟着跳。列表顺序即展示顺序，查询走 {@link #recipeFor} 的索引，仍是 O(1)。
+     * <p>JEI（{@code ForgingRecipeCategory}）直接遍历本表，不再自带一份抄写 —— 一份数据一个真源。
+     */
+    public static final List<ForgeRecipe> FORGE_RECIPES = List.of(
+            new ForgeRecipe(Items.NETHERITE_HELMET, () -> ModItems.akaishiHelmet.get(), 5),
+            new ForgeRecipe(Items.NETHERITE_CHESTPLATE, () -> ModItems.akaishiChestplate.get(), 8),
+            new ForgeRecipe(Items.NETHERITE_LEGGINGS, () -> ModItems.akaishiLeggings.get(), 7),
+            new ForgeRecipe(Items.NETHERITE_BOOTS, () -> ModItems.akaishiBoots.get(), 4),
+            new ForgeRecipe(Items.NETHERITE_SWORD, () -> ModItems.akaishiSword.get(), 2),
+            new ForgeRecipe(Items.NETHERITE_PICKAXE, () -> ModItems.akaishiPickaxe.get(), 3),
+            new ForgeRecipe(Items.NETHERITE_SHOVEL, () -> ModItems.akaishiShovel.get(), 1),
+            new ForgeRecipe(Items.NETHERITE_AXE, () -> ModItems.akaishiAxe.get(), 3));
+
+    /** 输入装备 → 配方 的查询索引（由 {@link #FORGE_RECIPES} 派生，不另立真源） */
+    private static final Map<Item, ForgeRecipe> FORGE_BY_INPUT = buildForgeIndex();
+
+    private static Map<Item, ForgeRecipe> buildForgeIndex() {
+        Map<Item, ForgeRecipe> index = new HashMap<>();
+        for (ForgeRecipe recipe : FORGE_RECIPES) {
+            index.put(recipe.input(), recipe);
+        }
+        return Map.copyOf(index);
+    }
+
+    /** 该装备能否重铸；不能则 null（JEI 展示与机器判定同源） */
+    @Nullable
+    public static ForgeRecipe recipeFor(Item input) {
+        return FORGE_BY_INPUT.get(input);
+    }
 
     private final AkaishiEnergyStorage energy;
     private final SimpleContainer inventory;
@@ -175,7 +201,7 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
 
     /** 查找下界合金装备对应的重铸配方，无则 null */
     private ForgeRecipe findRecipe(ItemStack stack) {
-        return FORGE_RECIPES.get(stack.getItem());
+        return recipeFor(stack.getItem());
     }
 
     /** 下界合金装备 → 重铸消耗锭数（非配方装备返回 0）。供 Menu/Screen 判断锻造是否就绪。 */
@@ -365,7 +391,7 @@ public class AkaishiEquipmentForgerBlockEntity extends BlockEntity implements Ex
         inventory.fromTag(tag.getList("Inventory", net.minecraft.nbt.Tag.TAG_COMPOUND));
     }
 
-    /** 重铸配方：目标赤石装备 + 消耗锭数 */
-    private record ForgeRecipe(Supplier<Item> result, int ingotCost) {
+    /** 重铸配方：输入装备 + 目标赤石装备 + 消耗锭数（public：JEI 展示直接读这一份） */
+    public record ForgeRecipe(Item input, Supplier<Item> result, int ingotCost) {
     }
 }

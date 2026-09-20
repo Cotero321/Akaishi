@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:aggregating",
+  "ingredient": { "item": "akaishi:akaishi_geode_flawed" },
+  "energy_config": "geode_upgrade",
+  "result": { "item": "akaishi:akaishi_geode_normal", "count": 1 }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:pumpkin_seeds" },
+  "consume_input": false,
+  "result": { "item": "minecraft:pumpkin", "count": 1 }
+}

@@ -47,11 +47,11 @@ public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
-        // 输入槽：仅 7 种活化成分可放入
+        // 输入槽：只排除升级组件；"哪种活化成分有效"由数据包配方决定，机器在 tick 内核对（放错不损失）
         addSlot(new Slot(input, 0, 44, 20) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return AkaishiFusionFuelAggregatorBlockEntity.isActivatedComponent(stack);
+                return !(stack.getItem() instanceof AkaishiMachineUpgradeItem);
             }
         });
 
@@ -125,15 +125,14 @@ public class AkaishiFusionFuelAggregatorMenu extends AbstractContainerMenu {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // 玩家背包/快捷栏：活化成分 → 输入槽，升级组件 → 升级槽，其余仅在玩家栏内移动
-                if (AkaishiFusionFuelAggregatorBlockEntity.isActivatedComponent(current)) {
-                    if (!this.moveItemStackTo(current, SLOT_INPUT, SLOT_INPUT + 1, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
+                // 玩家背包/快捷栏：升级组件 → 升级槽，其余 → 输入槽，再背包内移动
+                // （哪种活化成分能聚合由数据包配方决定，机器在 tick 内核对）
+                if (current.getItem() instanceof AkaishiMachineUpgradeItem) {
                     if (!this.moveItemStackTo(current, 0, MachineUpgradeSlots.SLOT_COUNT, false)) {
                         return ItemStack.EMPTY;
                     }
+                } else if (!this.moveItemStackTo(current, SLOT_INPUT, SLOT_INPUT + 1, false)) {
+                    return ItemStack.EMPTY;
                 }
                 if (!this.moveItemStackTo(current, MACHINE_SLOT_END + 27,
                         MACHINE_SLOT_END + 36, false)

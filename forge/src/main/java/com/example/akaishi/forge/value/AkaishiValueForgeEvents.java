@@ -1,5 +1,6 @@
 package com.example.akaishi.forge.value;
 
+import com.example.akaishi.craft.thirdparty.ThirdPartyProcessReloadListener;
 import com.example.akaishi.value.ValueReloadHooks;
 
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -20,10 +21,12 @@ public final class AkaishiValueForgeEvents {
     private AkaishiValueForgeEvents() {
     }
 
-    /** 数据包重载（含战利品表）：快照作废 + 掉落索引标脏，交后续 tick 分帧重建 */
+    /** 数据包重载（含战利品表）：快照作废 + 掉落索引标脏，交后续 tick 分帧重建；并重载第三方认可表 */
     @SubscribeEvent
     public void onAddReloadListener(AddReloadListenerEvent event) {
         ValueReloadHooks.onReload();
+        // 第三方认可表的挂载点必须在平台侧（common 拿不到 AddReloadListenerEvent）
+        event.addListener(new ThirdPartyProcessReloadListener());
     }
 
     /** 服务端每 tick 推进掉落表扫描（分帧，不阻塞主线程） */

@@ -1,0 +1,7 @@
+{
+  "type": "akaishi:liquefying",
+  "ingredient": { "item": "akaishi:sculk_lifeform" },
+  "catalyst": { "item": "akaishi:akaishi_life_essence_solid" },
+  "energy": 10000000,
+  "fluid_output": { "fluid": "akaishi:sculk_life_fuel", "amount": 100 }
+}

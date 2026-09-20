@@ -34,8 +34,8 @@ public final class AkaishiMiniMatrixSync {
     public static final ResourceLocation SNAPSHOT_CHANNEL =
             new ResourceLocation(AkaishiMod.MOD_ID, "mini_matrix");
 
-    /** 单次快照最多携带的芯片行数（5×5×5 表面最多约 98 格，留足余量的硬上限） */
-    public static final int MAX_ROWS = 64;
+    /** 单次快照最多携带的芯片行数（5×5×5 表面最多约 98 格 ⇒ 必须 ≥ 98，否则超出部分会被静默丢掉） */
+    public static final int MAX_ROWS = 128;
 
     /** 单行文本长度上限（服务端与解码端同口径，防超长串） */
     private static final int MAX_NAME = 64;

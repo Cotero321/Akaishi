@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:raw_iron" },
+  "result": { "item": "akaishi:iron_dust", "count": 1 }
+}

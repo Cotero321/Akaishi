@@ -6,13 +6,16 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.fluid.MultiFluidTank;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeCentrifugeMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -34,6 +37,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,17 +49,21 @@ import java.util.List;
 /**
  * 生命离心机方块实体（仅服务端驱动逻辑）。
  * 将活化衰竭液体分离为两类结晶：1 个对应活化结晶（主产物）+ 1 个衰竭结晶（通用副产物）。
- * 每 100mb 活化燃料产出各 1 个；每 tick 至多分离 8mb，每 1mb 消耗 50 赤能源。
+ * 每批（配方声明的 mB）产出各 1 个；每 tick 至多分离
+ * {@link ModConfig#lifeCentrifugeConvertRate} mB，每 1mb 消耗 {@link ModConfig#lifeCentrifugeCostPerMb} 赤能源。
  * 输入罐仅接纳活化燃料（普通液体管道注入），输出结晶由第三方物流/玩家从产物槽取出。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/centrifuging/*.json}，类型 {@code akaishi:centrifuging}）：
+ * 输入是哪一种活化燃料、一批多少 mB、产出哪种结晶与副产，全部由配方描述。
+ * <p><b>批量为 0 的配方视为非法</b>（机器不加工）：批量既是结算阈值也是成本基数，缺了它无意义。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有离心机"。
  */
 public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
-
-    /** 每批产出所需的活化燃料量（mb） */
-    public static final long BATCH_MB = 1000L;
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     // ===== 数据槽（long 拆低/高 32 位双槽同步，避免 int 溢出）=====
-    public static final int DATA_SLOTS = 9;
+    public static final int DATA_SLOTS = 11;
     public static final int DATA_ENERGY = 0;
     public static final int DATA_ENERGY_HIGH = 1;
     public static final int DATA_ENERGY_CAPACITY = 2;
@@ -64,8 +72,14 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
     public static final int DATA_IN_AMOUNT_HIGH = 5;
     public static final int DATA_IN_CAPACITY = 6;
     public static final int DATA_IN_CAPACITY_HIGH = 7;
-    /** 当前批次累计分离量（mb，满 BATCH_MB 结算一次；受常量上限约束，int 安全） */
+    /** 当前批次累计分离量（mb，满"配方声明的批量"结算一次） */
     public static final int DATA_PROGRESS = 8;
+    /**
+     * 当前配方声明的批量（mb，0 = 当前无配方）。
+     * <p>必须同步给客户端：进度条的<b>分母</b>就是它，而批量现在由数据包决定，客户端算不出来。
+     */
+    public static final int DATA_BATCH_MB = 9;
+    public static final int DATA_BATCH_MB_HIGH = 10;
 
     private final SimpleContainerData data;
     private final AkaishiEnergyStorage energy;
@@ -117,10 +131,15 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         if (fluid == null || !ModFluids.isActivatedFuel(fluid)) {
             return; // 无活化燃料，静默等待
         }
-        Item main = crystalFor(fluid);
-        if (main == null || !canFit(0, main) || !canFit(1, ModItems.exhaustedCrystal.get())) {
-            return; // 输出槽不可容纳完整一批，暂停分离
+        AkaishiFluidProcessRecipe recipe = selectRecipe(fluid);
+        if (recipe == null) {
+            return; // 无可用配方（或输出槽装不下完整一批）→ 暂停分离
         }
+        long batchMb = recipe.fluidInputs().get(0).amount();
+        // 批量同步给客户端（进度条分母；数据包化后客户端算不出来）
+        LongDataSlots.write(data, DATA_BATCH_MB, DATA_BATCH_MB_HIGH, batchMb);
+        Item main = recipe.result().getItem();
+        Item byproduct = recipe.byproduct().isEmpty() ? null : recipe.byproduct().getItem();
         // 单位成本 = costPerMb × 配置 [machine] costMultiplier × 速度升级耗能倍率（封顶 4×）（afford 按此口径限流，防超扣）
         long unitCost = (long) (ModConfig.lifeCentrifugeCostPerMb * ModConfig.machineCostMultiplier
                 * getEnergyCostMultiplier());
@@ -136,38 +155,46 @@ public class AkaishiLifeCentrifugeBlockEntity extends BlockEntity implements
         hum.tick(level, worldPosition);
         progress += rate;
         // 每满一批结算一次（速率低于阈值，单 tick 至多结算 1 批）
-        while (progress >= BATCH_MB) {
-            progress -= BATCH_MB;
+        while (progress >= batchMb) {
+            progress -= batchMb;
             addOutput(0, main);
-            addOutput(1, ModItems.exhaustedCrystal.get());
+            if (byproduct != null) {
+                addOutput(1, byproduct);
+            }
         }
         setChanged();
     }
 
-    /** 活化燃料 → 对应活化结晶；非七种活化燃料返回 null */
-    private static Item crystalFor(Fluid fluid) {
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_SCULK_FUEL_ID)) {
-            return ModItems.activatedSculkCrystal.get();
+    /**
+     * 取当前输入流体对应的配方；无匹配、批量为 0 或产出槽不够则 null。
+     * <p>数据包配方按"输入流体 + 一批用量 + 主产物 + 副产"描述，机器不再硬编码对照表。
+     */
+    @Nullable
+    private AkaishiFluidProcessRecipe selectRecipe(Fluid fluid) {
+        if (fluid == null) {
+            return null;
         }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_NETHER_COMPOUND_FUEL_ID)) {
-            return ModItems.activatedNetherCompoundCrystal.get();
-        }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_END_MIXTURE_FUEL_ID)) {
-            return ModItems.activatedEndMixtureCrystal.get();
-        }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_ADVANCED_MIXTURE_FUEL_ID)) {
-            return ModItems.activatedAdvancedMixtureCrystal.get();
-        }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_PURE_FUEL_ID)) {
-            return ModItems.activatedPureCrystal.get();
-        }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_DRAGON_FUEL_ID)) {
-            return ModItems.activatedDragonCrystal.get();
-        }
-        if (fluid == ModFluids.get(ModFluids.ACTIVATED_EXHAUSTED_ULTIMATE_MIXTURE_FUEL_ID)) {
-            return ModItems.activatedUltimateMixtureCrystal.get();
+        for (AkaishiFluidProcessRecipe candidate
+                : AkaishiMachineRecipeIndex.all(level.getRecipeManager(), AkaishiRecipeTypes.CENTRIFUGING.get())) {
+            List<AkaishiFluidProcessRecipe.FluidSpec> ins = candidate.fluidInputs();
+            // 本机固定"一路进液 + 一个主产物"；批量必须 > 0（它既是结算阈值也是成本基数）
+            if (ins.size() != 1 || ins.get(0).fluid() != fluid || ins.get(0).amount() <= 0L
+                    || candidate.result().isEmpty()) {
+                continue;
+            }
+            Item main = candidate.result().getItem();
+            Item byproduct = candidate.byproduct().isEmpty() ? null : candidate.byproduct().getItem();
+            if (canFit(0, main) && (byproduct == null || canFit(1, byproduct))) {
+                return candidate;
+            }
         }
         return null;
+    }
+
+    /** 本机自述工序族：虚拟加工据此要求场域内确有离心机（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.CENTRIFUGING.get();
     }
 
     private boolean canFit(int slot, Item item) {

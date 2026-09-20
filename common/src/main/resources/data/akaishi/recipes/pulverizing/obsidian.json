@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:obsidian" },
+  "result": { "item": "akaishi:obsidian_dust", "count": 1 }
+}

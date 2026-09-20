@@ -2,8 +2,10 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.AkaishiEnergyBlocks;
-import com.example.akaishi.block.entity.AkaishiEnergyProcessorBlockEntity;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
@@ -20,9 +22,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -71,7 +75,7 @@ public class FuelProcessingRecipeCategory implements IRecipeCategory<FuelProcess
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, FuelProcessingRecipe recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 44, 30)
-                .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.akaishiLifeEssenceSolid.get()));
+                .addIngredients(VanillaTypes.ITEM_STACK, recipe.catalysts());
         builder.addSlot(RecipeIngredientRole.INPUT, 62, 30)
                 .addIngredient(ForgeTypes.FLUID_STACK, new FluidStack(recipe.inputFluid(), (int) recipe.inputAmount()));
         builder.addSlot(RecipeIngredientRole.OUTPUT, 116, 30)
@@ -85,22 +89,48 @@ public class FuelProcessingRecipeCategory implements IRecipeCategory<FuelProcess
         GuiWidgets.slotBox(guiGraphics, 116, 30);
         // 深色信息条 + 白字：描边融入深底，文字清晰锐利
         guiGraphics.fill(8, 50, 168, 59, 0xC0282828);
+        // 成本读实时配置（本机成本来自 ModConfig.energyProcessorChishiCost，不写在配方里）
         guiGraphics.drawString(Minecraft.getInstance().font,
-                Component.translatable("jei.akaishi.cost_process"), 10, 51, 0xFFFFFFFF);
+                Component.translatable("jei.akaishi.cost_process", fmt(ModConfig.energyProcessorChishiCost)),
+                10, 51, 0xFFFFFFFF);
     }
 
-    /** 加工配方展示数据（源自加工器机器配方） */
-    public record FuelProcessingRecipe(Fluid inputFluid, Fluid outputFluid, long inputAmount, long outputAmount) {
-
-        /** 全部加工配方：复合（1000mb）与至纯（100→50mb 浓缩） */
-        public static List<FuelProcessingRecipe> getAll() {
-            return List.of(
-                    from(AkaishiEnergyProcessorBlockEntity.compoundRecipe()),
-                    from(AkaishiEnergyProcessorBlockEntity.pureRecipe()));
+    /** 赤能源缩写：50M / 10M / 5K */
+    private static String fmt(long v) {
+        if (v >= 1_000_000L) {
+            return (v / 1_000_000L) + "M";
         }
+        if (v >= 1_000L) {
+            return (v / 1_000L) + "K";
+        }
+        return String.valueOf(v);
+    }
 
-        private static FuelProcessingRecipe from(AkaishiEnergyProcessorBlockEntity.Recipe r) {
-            return new FuelProcessingRecipe(r.inputFluid(), r.outputFluid(), r.inputAmount(), r.outputAmount());
+    /** 加工配方展示数据（源自数据包配方） */
+    public record FuelProcessingRecipe(List<ItemStack> catalysts, Fluid inputFluid, Fluid outputFluid,
+                                      long inputAmount, long outputAmount) {
+
+        /** 全部加工配方：取数据包里"一路进液 + 一路出液"的那些（顺序即配方表顺序） */
+        public static List<FuelProcessingRecipe> getAll(RecipeManager manager) {
+            List<AkaishiFluidProcessRecipe> sources =
+                    AkaishiMachineRecipeIndex.all(manager, AkaishiRecipeTypes.PROCESSING.get());
+            List<FuelProcessingRecipe> list = new ArrayList<>(sources.size());
+            for (AkaishiFluidProcessRecipe source : sources) {
+                List<AkaishiFluidProcessRecipe.FluidSpec> ins = source.fluidInputs();
+                AkaishiFluidProcessRecipe.FluidSpec out = source.fluidOutput();
+                if (ins.size() != 1 || out == null) {
+                    continue; // 本机固定"一路进液 + 一路出液"
+                }
+                List<ItemStack> catalysts = new ArrayList<>();
+                if (source.ingredient() != null) {
+                    for (ItemStack candidate : source.ingredient().getItems()) {
+                        catalysts.add(new ItemStack(candidate.getItem(), source.inputCount()));
+                    }
+                }
+                list.add(new FuelProcessingRecipe(List.copyOf(catalysts), ins.get(0).fluid(), out.fluid(),
+                        ins.get(0).amount(), out.amount()));
+            }
+            return List.copyOf(list);
         }
     }
 }

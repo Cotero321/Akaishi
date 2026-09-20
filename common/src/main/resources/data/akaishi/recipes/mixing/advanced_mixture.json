@@ -1,0 +1,8 @@
+{
+  "type": "akaishi:mixing",
+  "fluid_inputs": [
+    { "fluid": "akaishi:end_mixture_fuel", "amount": 1000 },
+    { "fluid": "akaishi:nether_compound_fuel", "amount": 1000 }
+  ],
+  "fluid_output": { "fluid": "akaishi:advanced_mixture_fuel", "amount": 1500 }
+}

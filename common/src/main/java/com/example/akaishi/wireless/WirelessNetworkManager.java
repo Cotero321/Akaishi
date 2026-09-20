@@ -288,4 +288,16 @@ public final class WirelessNetworkManager {
     public static int terminalCount() {
         return (int) TERMINALS.values().stream().filter(e -> e.ref != null).count();
     }
+
+    /**
+     * 服务端停止时整表丢弃（由平台层 {@code ServerStoppedEvent} 调用，与
+     * {@link WirelessFieldManager#clearServer} / {@link WirelessNodeRegistry#clearServer} 同一释放点）。
+     * <p>
+     * 条目只在终端注册时创建、拆除时仅把 {@code ref} 置空，条目本身<b>永不回收</b> ⇒
+     * 这张静态表会随"历史上建过多少个终端"单调增长，且跨存档带着上一个世界的数据。
+     * 终端生命周期不可能跨服务端实例，故停机整表清空是最干净的释放点。
+     */
+    public static void clear() {
+        TERMINALS.clear();
+    }
 }

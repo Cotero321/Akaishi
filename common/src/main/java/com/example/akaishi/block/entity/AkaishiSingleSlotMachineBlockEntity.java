@@ -5,7 +5,11 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiItemProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.IAkaishiMachineRecipe;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.sound.MachineHum;
@@ -28,13 +32,12 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
  * 单输入单输出处理机器抽象基类（赤石植物培养机/压缩机/打粉机/变化器共用）。
@@ -43,11 +46,8 @@ import java.util.Map;
  * 子类仅需提供配方表、能量容量/耗时/能耗与菜单构造。
  */
 public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
-
-    /** 加工配方：输入物品 → 输出物品（inputCount 消耗量、outputCount 产量） */
-    public record MachineRecipe(Item input, int inputCount, Item output, int outputCount) {
-    }
+        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -89,8 +89,14 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
-    /** 配方表：输入物品 → 配方（子类硬编码） */
-    protected abstract Map<Item, MachineRecipe> recipes();
+    /** 本机配方类型（数据包配方，见 {@code data/akaishi/recipes/<机器>/}） */
+    protected abstract RecipeType<AkaishiItemProcessRecipe> recipeType();
+
+    /** 机台自述工序族（供场域调度判断"这道机械工序有没有机台能跑"） */
+    @Override
+    public RecipeType<?> processKind() {
+        return recipeType();
+    }
 
     /** 能量缓冲基础容量（能量升级按倍率扩容） */
     protected abstract long baseCapacity();
@@ -112,11 +118,6 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         return hum;
     }
 
-    /** 加工是否消耗输入物品（植物培养机种子保留 → 覆写 false） */
-    protected boolean consumesInput() {
-        return true;
-    }
-
     /** 子类创建具体菜单（供 createMenu 委托） */
     protected abstract AbstractContainerMenu createMenuInstance(int id, Inventory inv);
 
@@ -129,7 +130,7 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
 
         ItemStack inputStack = inventory.getItem(SLOT_INPUT);
         Item input = inputStack.getItem();
-        MachineRecipe recipe = recipes().get(input);
+        IAkaishiMachineRecipe recipe = AkaishiMachineRecipeIndex.find(level, recipeType(), inputStack);
         // 更换原料 → 重置进度（防止跨配方错配）
         if (currentInput == null) {
             currentInput = input;
@@ -144,9 +145,10 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         // 无配方 / 输入不足 / 输出不可容纳 / 能量不足 → 待机
         // （运行能耗 = energyPerTick × 配置 [machine] costMultiplier × 速度升级耗能倍率，判定与扣费口径一致）
         long perTick = (long) (energyPerTick() * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
-        int have = consumesInput() ? inputStack.getCount() : 1;
+        // 输入保留型配方（培养机）只看"有没有料"，不看数量
+        int have = recipe != null && !recipe.consumeInput() ? 1 : inputStack.getCount();
         if (recipe == null || inputStack.isEmpty() || have < recipe.inputCount()
-                || !canFitOutput(recipe.output()) || energy.getEnergyStored() < perTick) {
+                || !canFitOutput(recipe.result().getItem()) || energy.getEnergyStored() < perTick) {
             return;
         }
         // 推进：每 tick 扣能量，进度按速度倍率累加（小数余量防截断）
@@ -161,10 +163,10 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         if (progress >= ticks()) {
             progress = 0;
             speedAccum = 0;
-            if (consumesInput()) {
+            if (recipe.consumeInput()) {
                 inputStack.shrink(recipe.inputCount());
             }
-            addOutput(recipe.output(), recipe.outputCount());
+            addOutput(recipe.result().getItem(), recipe.result().getCount());
         }
         setChanged();
     }
@@ -307,12 +309,11 @@ public abstract class AkaishiSingleSlotMachineBlockEntity extends BlockEntity im
         if (tag.contains("Upgrades")) {
             upgradeSlots.load(tag.getCompound("Upgrades"));
         }
-        // 重载校验：无配方或进度超上限（跨配方错配）→ 清零
-        MachineRecipe recipe = recipes().get(inventory.getItem(SLOT_INPUT).getItem());
-        if (recipe == null || progress >= ticks()) {
+        // 进度超上限（跨配方错配）→ 清零；配方是否存在由下一个 tick 查数据包配方判定
+        if (progress >= ticks()) {
             progress = 0;
-            speedAccum = 0;
         }
+        speedAccum = 0;
         currentInput = null;
     }
 

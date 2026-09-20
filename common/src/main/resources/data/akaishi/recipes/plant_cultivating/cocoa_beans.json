@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:cocoa_beans" },
+  "consume_input": false,
+  "result": { "item": "minecraft:cocoa_beans", "count": 1 }
+}

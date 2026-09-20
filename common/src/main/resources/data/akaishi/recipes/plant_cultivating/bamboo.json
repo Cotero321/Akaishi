@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:bamboo" },
+  "consume_input": false,
+  "result": { "item": "minecraft:bamboo", "count": 1 }
+}

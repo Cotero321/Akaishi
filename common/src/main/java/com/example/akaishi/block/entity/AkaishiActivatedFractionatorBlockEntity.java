@@ -5,10 +5,13 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiItemProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiActivatedFractionatorMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -28,6 +31,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,11 +41,17 @@ import org.jetbrains.annotations.Nullable;
  * 活化分馏器方块实体（仅服务端驱动逻辑）。
  * 将活化结晶深度拆分：1 个活化结晶 → 1 个对应活化成分（主）+ 1 个衰竭结晶（副）。
  * 每次加工耗时 {@link ModConfig#fractionatorProcessTicks} tick、消耗赤能源一次结清；
- * 输入仅接纳 7 种活化结晶，输出槽只读（防止杂物卡死机器）。
+ * 输出槽只读（防止杂物卡死机器）。
  * 换料/取空输入槽会清零进度，防止跨配方错配白嫖半程进度。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/fractionating/*.json}，类型
+ * {@code akaishi:fractionating}）：输入匹配、主产物与副产全部由配方描述，
+ * 机器侧不再硬编码"结晶 ↔ 成分"对照表 —— 那条表以前是机器与 JEI 各维护一份。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有分馏器"。
  */
 public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     // ===== 数据槽 =====
     public static final int DATA_ENERGY = 0;
@@ -69,8 +79,9 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
     private int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
     private float speedAccum;
-    /** 当前输入的活化结晶种类（跨配方错配防御：换料清零进度） */
-    private Item currentInput;
+    /** 当前生效的配方（数据包提供；换配方即清零进度，防跨配方白嫖半程） */
+    @Nullable
+    private AkaishiItemProcessRecipe currentRecipe;
     /** 运转音播放器（本机音色） */
     private final MachineHum hum = new MachineHum(ModSounds.ACTIVATED_FRACTIONATOR_HUM, 0.4F, 1.0F);
 
@@ -100,19 +111,23 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
         data.set(DATA_PROGRESS, progress);
 
         ItemStack inputStack = input.getItem(0);
-        Item component = componentFor(inputStack);
-        if (component == null) {
+        // 配方来自数据包：按输入栈匹配（组内线性匹配，故标签原料也能命中）
+        AkaishiItemProcessRecipe recipe = AkaishiMachineRecipeIndex.find(level,
+                AkaishiRecipeTypes.FRACTIONATING.get(), inputStack);
+        if (recipe == null) {
             // 无有效输入 → 清零进度（换料/取空均在此兜底）
             progress = 0;
             speedAccum = 0;
-            currentInput = null;
+            currentRecipe = null;
             return;
         }
-        // 换料防御：成分种类变化 → 清零进度，防止跨配方白嫖半程
-        if (component != currentInput) {
+        Item main = recipe.result().getItem();
+        Item byproduct = recipe.byproduct().isEmpty() ? null : recipe.byproduct().getItem();
+        // 换配方防御：配方种类变化 → 清零进度，防止跨配方白嫖半程
+        if (recipe != currentRecipe) {
             progress = 0;
             speedAccum = 0;
-            currentInput = component;
+            currentRecipe = recipe;
         }
         // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
         long craftCost = (long) (ModConfig.fractionatorCostPerCraft * getEnergyCostMultiplier());
@@ -121,7 +136,7 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
             return;
         }
         // 产物槽不可容纳（加工中满仓）→ 暂停等待腾出
-        if (progress < ModConfig.fractionatorProcessTicks && !canFit(component)) {
+        if (progress < ModConfig.fractionatorProcessTicks && !canFit(main, byproduct)) {
             return;
         }
         // 机器升级：速度升级提升每 tick 加工进度（每级 +100%，8 级 8 倍速；小数余量累积避免截断）
@@ -133,48 +148,24 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
             hum.tick(level, worldPosition);
         }
         if (progress >= ModConfig.fractionatorProcessTicks) {
-            if (canFit(component)) {
+            if (canFit(main, byproduct)) {
                 progress = 0;
-                inputStack.shrink(1);
+                inputStack.shrink(recipe.inputCount());
                 energy.extractEnergy(craftCost, false);
-                addOutput(0, component);
-                addOutput(1, ModItems.exhaustedCrystal.get());
+                addOutput(0, main);
+                if (byproduct != null) {
+                    addOutput(1, byproduct);
+                }
             }
             // 满进度但产物槽满 → 保持满值，等待腾出后下 tick 结算
         }
         setChanged();
     }
 
-    /** 活化结晶 → 对应活化成分；非七种活化结晶返回 null */
-    private static Item componentFor(ItemStack stack) {
-        Item item = stack.getItem();
-        if (item == ModItems.activatedSculkCrystal.get()) {
-            return ModItems.activatedSculkComponent.get();
-        }
-        if (item == ModItems.activatedNetherCompoundCrystal.get()) {
-            return ModItems.activatedNetherCompoundComponent.get();
-        }
-        if (item == ModItems.activatedEndMixtureCrystal.get()) {
-            return ModItems.activatedEndMixtureComponent.get();
-        }
-        if (item == ModItems.activatedAdvancedMixtureCrystal.get()) {
-            return ModItems.activatedAdvancedMixtureComponent.get();
-        }
-        if (item == ModItems.activatedPureCrystal.get()) {
-            return ModItems.activatedPureComponent.get();
-        }
-        if (item == ModItems.activatedDragonCrystal.get()) {
-            return ModItems.activatedDragonComponent.get();
-        }
-        if (item == ModItems.activatedUltimateMixtureCrystal.get()) {
-            return ModItems.activatedUltimateMixtureComponent.get();
-        }
-        return null;
-    }
-
-    /** 是否可放入输入槽（仅 7 种活化结晶） */
-    public static boolean isActivatedCrystal(ItemStack stack) {
-        return !stack.isEmpty() && componentFor(stack) != null;
+    /** 本机自述工序族：虚拟加工据此要求场域内确有分馏器（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.FRACTIONATING.get();
     }
 
     private boolean canFit(int slot, Item item) {
@@ -182,8 +173,9 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
         return cur.isEmpty() || (cur.is(item) && cur.getCount() < cur.getMaxStackSize());
     }
 
-    private boolean canFit(Item component) {
-        return canFit(0, component) && canFit(1, ModItems.exhaustedCrystal.get());
+    /** 主产物与副产的槽位是否都容得下（副产为 null 表示本配方无副产） */
+    private boolean canFit(Item main, @Nullable Item byproduct) {
+        return canFit(0, main) && (byproduct == null || canFit(1, byproduct));
     }
 
     private void addOutput(int slot, Item item) {

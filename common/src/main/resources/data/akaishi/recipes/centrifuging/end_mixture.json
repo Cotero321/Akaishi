@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:centrifuging",
+  "fluid_inputs": [ { "fluid": "akaishi:activated_exhausted_end_mixture_fuel", "amount": 1000 } ],
+  "result": { "item": "akaishi:akaishi_activated_end_mixture_crystal" },
+  "byproduct": { "item": "akaishi:akaishi_exhausted_crystal" }
+}

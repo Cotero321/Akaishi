@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.api.storage.IItemTerminalHost;
+import com.example.akaishi.craft.VirtualCraftPlanner;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -40,6 +41,14 @@ public final class AkaishiItemTerminalSync {
     /** 客户端只读条目：只含渲染所需字段，不含任何服务端分片信息 */
     public record Entry(ItemStack display, long amount) {
     }
+
+    /**
+     * 条目快照条数上限（解码端防畸形包）。
+     * <p>
+     * 取 ≥ 结构扫描包络的理论上限：7³ 贴装区 − 3³ 内腔 = 316 个贴装位 × 54 槽 = 17,064 条。
+     * 正常快照远小于此值，该上限只为拦住"对端报个天文数字 ⇒ 客户端预分配爆内存"。
+     */
+    private static final int MAX_SNAPSHOT_ENTRIES = 18_000;
 
     private AkaishiItemTerminalSync() {
     }
@@ -84,8 +93,10 @@ public final class AkaishiItemTerminalSync {
             boolean formed = buf.readBoolean();
             int revision = buf.readVarInt();
             int size = buf.readVarInt();
-            List<Entry> entries = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
+            // 条数钳到上限：解码端不信任对端给的 size（畸形包会让客户端预分配爆内存）
+            int count = Math.min(Math.max(size, 0), MAX_SNAPSHOT_ENTRIES);
+            List<Entry> entries = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
                 entries.add(new Entry(readFullStack(buf), buf.readVarLong()));
             }
             // 网络线程只做解码，落地回客户端主线程，避免与渲染线程并发读写
@@ -143,7 +154,9 @@ public final class AkaishiItemTerminalSync {
             return ItemStack.EMPTY;
         }
         Item item = buf.readById(BuiltInRegistries.ITEM);
-        int count = buf.readVarInt();
+        // 数量钳制：本通道承载的最大合法件数是虚拟加工单的订单件数（可达 MAX_TARGET_COUNT），
+        // 解码端不信任对端给的 varint（原版 readItem 用单字节天然受限，这里没有）
+        int count = Math.min(Math.max(buf.readVarInt(), 0), VirtualCraftPlanner.MAX_TARGET_COUNT);
         CompoundTag tag = buf.readNbt();
         if (item == null) {
             return ItemStack.EMPTY;

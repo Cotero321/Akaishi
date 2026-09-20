@@ -22,8 +22,12 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 赤石能量聚合器：消耗赤能源（10M/次）与下界合金锭聚合出赤石锭。
+ * <p>
+ * 继承 {@link AkaishiMachineBlock}（而非裸 {@code BaseEntityBlock}）：内腔升级件（速度/能量/无线接收）
+ * 存在 BE 的 {@code Upgrades} 键里，破坏方块时必须随掉落物保留 —— 否则装上的无线接收升级会凭空消失，
+ * 而它正是虚拟加工准入的凭据。
  */
-public class AkaishiEnergyAggregatorBlock extends BaseEntityBlock {
+public class AkaishiEnergyAggregatorBlock extends AkaishiMachineBlock {
 
     public AkaishiEnergyAggregatorBlock() {
         super(Properties.of().mapColor(MapColor.COLOR_RED).strength(5.0F, 6.0F).sound(SoundType.METAL));

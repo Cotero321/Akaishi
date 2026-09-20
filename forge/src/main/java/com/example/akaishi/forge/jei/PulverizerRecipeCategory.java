@@ -2,7 +2,9 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
-import com.example.akaishi.block.entity.AkaishiPulverizerBlockEntity;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
+import net.minecraft.world.item.crafting.RecipeManager;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +21,7 @@ public class PulverizerRecipeCategory extends SingleSlotRecipeCategory {
         super(helper, TYPE, new ItemStack(ModBlocks.CHISHI_PULVERIZER.get()), "jei.akaishi.pulverizer");
     }
 
-    public static List<Recipe> getAll() {
-        return fromRecipes(AkaishiPulverizerBlockEntity.RECIPES);
+    public static List<Recipe> getAll(RecipeManager manager) {
+        return fromProcessRecipes(AkaishiMachineRecipeIndex.all(manager, AkaishiRecipeTypes.PULVERIZING.get()));
     }
 }

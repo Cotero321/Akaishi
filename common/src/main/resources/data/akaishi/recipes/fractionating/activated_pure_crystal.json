@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:fractionating",
+  "ingredient": { "item": "akaishi:akaishi_activated_pure_crystal" },
+  "result": { "item": "akaishi:akaishi_activated_pure_component" },
+  "byproduct": { "item": "akaishi:akaishi_exhausted_crystal" }
+}

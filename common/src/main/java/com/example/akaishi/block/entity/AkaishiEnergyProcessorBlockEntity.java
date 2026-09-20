@@ -7,12 +7,15 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyProcessorMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -34,29 +37,31 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
  * 能量加工器方块实体（仅服务端驱动逻辑）。
  * 消耗赤能源（输入率 1M/t）驱动：生命固态物 + 下界能量液体 → 反应堆燃料。
- * - 1 固态物 + 1000mb 下界复合能量 → 1000mb 下界复合燃料
- * - 1 固态物 + 100mb 下界至纯能量 → 50mb 至纯燃料（至纯燃料更浓缩，产量减半）
  * 四个液体罐：至纯/复合能量输入罐（管道注入）+ 至纯/复合燃料输出罐（管道抽取）。
- * 槽位：0 = 输入槽（生命固态物，只进不出）。
+ * 槽位：0 = 输入槽（辅料，只进不出）。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/processing/*.json}，类型 {@code akaishi:processing}）：
+ * 输入液体与用量、输出液体与用量都由配方描述，机器侧不再硬编码对照表。
+ * <p><b>"复合配方优先"的旧语义由判据承载</b>：两路配方都可行时，取<b>输入量更大</b>的那条
+ * （旧代码写死先试复合配方，理由是"1 个固态物换 1000mb 比换 75mb 划算"）——
+ * 若靠配方表顺序决定，数据包的文件遍历顺序不保证稳定，行为会随加载顺序变化。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有加工机"。
  */
 public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
-
-    /** 复合加工：1 固态物 + 1000mb 复合能量 → 1000mb 复合燃料 */
-    public static final long COMPOUND_AMOUNT = 1000L;
-    /** 至纯加工：1 固态物 + 100mb 至纯能量 → 75mb 至纯燃料（轻度浓缩，减轻固态物负担） */
-    public static final long PURE_INPUT_AMOUNT = 100L;
-    public static final long PURE_OUTPUT_AMOUNT = 75L;
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     public static final int INPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -86,19 +91,48 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
     public static final int DATA_PROGRESS = 20;
     public static final int DATA_SLOTS = 21;
 
-    /** 加工配方：输入液体+固态物 → 输出液体（输入/输出量分离，可支持浓缩产出） */
-    public record Recipe(Fluid inputFluid, Fluid outputFluid, long inputAmount, long outputAmount) {
+    /**
+     * 选一条当前可跑的配方：输入物品匹配辅料 + 对应输入罐液体够 + 对应输出罐装得下。
+     * <p>多条同时可行时取<b>输入量更大</b>的那条（详见类注释：旧"复合优先"语义在此承载）。
+     */
+    @Nullable
+    private AkaishiFluidProcessRecipe selectRecipe(ItemStack input) {
+        if (input.isEmpty()) {
+            return null;
+        }
+        AkaishiFluidProcessRecipe best = null;
+        long bestInputAmount = 0L;
+        for (AkaishiFluidProcessRecipe candidate
+                : AkaishiMachineRecipeIndex.all(level.getRecipeManager(), AkaishiRecipeTypes.PROCESSING.get())) {
+            List<AkaishiFluidProcessRecipe.FluidSpec> ins = candidate.fluidInputs();
+            AkaishiFluidProcessRecipe.FluidSpec out = candidate.fluidOutput();
+            if (ins.size() != 1 || out == null || !candidate.matchesInput(input)) {
+                continue; // 本机固定"一路进液 + 一路出液"
+            }
+            long inputAmount = ins.get(0).amount();
+            if (inputAmount <= bestInputAmount) {
+                continue;
+            }
+            if (canProcess(inputTankFor(ins.get(0).fluid()), outputTankFor(out.fluid()), candidate)) {
+                best = candidate;
+                bestInputAmount = inputAmount;
+            }
+        }
+        return best;
     }
 
-    /** 复合配方优先：量大、成本低，避免与至纯配方抢占进度 */
-    public static Recipe compoundRecipe() {
-        return new Recipe(ModFluids.get(ModFluids.NETHER_COMPOUND_ENERGY_ID),
-                ModFluids.get(ModFluids.NETHER_COMPOUND_FUEL_ID), COMPOUND_AMOUNT, COMPOUND_AMOUNT);
+    /**
+     * 配方输入的液体 → 本机对应的输入罐。
+     * <p>罐是<b>物理</b>的：本机只有至纯/复合这一对输入罐，故数据包目前只能在这两种流体之间选；
+     * 要支持第三种需先扩罐（这是硬件限制，不该由配方决定）。
+     */
+    private FluidTank inputTankFor(Fluid fluid) {
+        return fluid == ModFluids.get(ModFluids.NETHER_PURE_ENERGY_ID) ? pureInTank : compoundInTank;
     }
 
-    public static Recipe pureRecipe() {
-        return new Recipe(ModFluids.get(ModFluids.NETHER_PURE_ENERGY_ID),
-                ModFluids.get(ModFluids.PURE_FUEL_ID), PURE_INPUT_AMOUNT, PURE_OUTPUT_AMOUNT);
+    /** 配方输出的液体 → 本机对应的输出罐（同上，成对固定） */
+    private FluidTank outputTankFor(Fluid fluid) {
+        return fluid == ModFluids.get(ModFluids.PURE_FUEL_ID) ? pureOutTank : compoundOutTank;
     }
 
     private final SimpleContainer inventory;
@@ -164,39 +198,29 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         LongDataSlots.write(data, DATA_COMPOUND_OUT_CAPACITY, DATA_COMPOUND_OUT_CAPACITY_HIGH, compoundOutTank.getCapacity());
 
         ItemStack input = inventory.getItem(INPUT_SLOT);
-        Recipe recipe = null;
-        String key = "";
-        if (!input.isEmpty() && input.is(ModItems.akaishiLifeEssenceSolid.get())) {
-            // 复合配方优先（量大成本低）
-            Recipe compound = compoundRecipe();
-            Recipe pure = pureRecipe();
-            if (canProcess(compoundInTank, compoundOutTank, compound)) {
-                recipe = compound;
-                key = "compound";
-            } else if (canProcess(pureInTank, pureOutTank, pure)) {
-                recipe = pure;
-                key = "pure";
-            }
-        }
+        AkaishiFluidProcessRecipe recipe = selectRecipe(input);
         if (recipe == null) {
             progressEnergy = 0;
             lastRecipeKey = "";
             data.set(DATA_PROGRESS, 0);
             return;
         }
+        AkaishiFluidProcessRecipe.FluidSpec inSpec = recipe.fluidInputs().get(0);
+        AkaishiFluidProcessRecipe.FluidSpec outSpec = recipe.fluidOutput();
+        String key = recipe.getId().toString();
         // 配方切换时丢弃旧进度，避免跨配方挪用能量池
         if (!key.equals(lastRecipeKey)) {
             progressEnergy = 0;
             lastRecipeKey = key;
         }
-        FluidTank inputTank = recipe.inputFluid == ModFluids.get(ModFluids.NETHER_PURE_ENERGY_ID) ? pureInTank : compoundInTank;
-        FluidTank outputTank = recipe.outputFluid == ModFluids.get(ModFluids.PURE_FUEL_ID) ? pureOutTank : compoundOutTank;
+        FluidTank inputTank = inputTankFor(inSpec.fluid());
+        FluidTank outputTank = outputTankFor(outSpec.fluid());
+        // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
+        // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
+        long costTotal = (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier
+                * getEnergyCostMultiplier());
         boolean changed = false;
         if (canProcess(inputTank, outputTank, recipe)) {
-            // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
-            // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
-            long costTotal = (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier
-                    * getEnergyCostMultiplier());
             long extract = Math.min((long) (ModConfig.energyProcessorChishiRate * getSpeedMultiplier()
                             * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
                     akaishi.getEnergyStored());
@@ -204,12 +228,12 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
                 akaishi.extractEnergy(extract, false);
                 hum.tick(level, worldPosition);
                 progressEnergy += extract;
-                if (progressEnergy >= costTotal) {
+                if (costTotal > 0L && progressEnergy >= costTotal) {
                     progressEnergy -= costTotal;
                     // 原子完成：消耗固态物 + 输入液体，产出燃料液体
-                    inputTank.drain(recipe.inputAmount, false);
-                    outputTank.fill(FluidStack.create(recipe.outputFluid, recipe.outputAmount), false);
-                    input.shrink(1);
+                    inputTank.drain(inSpec.amount(), false);
+                    outputTank.fill(FluidStack.create(outSpec.fluid(), outSpec.amount()), false);
+                    input.shrink(recipe.inputCount());
                     if (input.isEmpty()) {
                         inventory.setItem(INPUT_SLOT, ItemStack.EMPTY);
                     }
@@ -219,23 +243,31 @@ public class AkaishiEnergyProcessorBlockEntity extends BlockEntity implements
         } else {
             progressEnergy = 0;
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100
-                / (long) (ModConfig.energyProcessorChishiCost * ModConfig.machineCostMultiplier * getEnergyCostMultiplier())));
+        // 成本为 0（如 [machine] costMultiplier 被配成 0）时不能做除法，直接显示满载
+        data.set(DATA_PROGRESS, costTotal <= 0L ? 100 : (int) (progressEnergy * 100 / costTotal));
         if (changed) {
             setChanged();
         }
     }
 
+    /** 本机自述工序族：虚拟加工据此要求场域内确有加工机（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.PROCESSING.get();
+    }
+
     /** 输入罐液体充足且输出罐能装下时，配方可执行 */
-    private boolean canProcess(FluidTank inputTank, FluidTank outputTank, Recipe recipe) {
-        if (inputTank.getFluid() != recipe.inputFluid || inputTank.getAmount() < recipe.inputAmount) {
+    private boolean canProcess(FluidTank inputTank, FluidTank outputTank, AkaishiFluidProcessRecipe recipe) {
+        AkaishiFluidProcessRecipe.FluidSpec inSpec = recipe.fluidInputs().get(0);
+        AkaishiFluidProcessRecipe.FluidSpec outSpec = recipe.fluidOutput();
+        if (inputTank.getFluid() != inSpec.fluid() || inputTank.getAmount() < inSpec.amount()) {
             return false;
         }
         if (outputTank.isEmpty()) {
-            return recipe.outputAmount <= outputTank.getCapacity();
+            return outSpec.amount() <= outputTank.getCapacity();
         }
-        return outputTank.getFluid() == recipe.outputFluid
-                && outputTank.getAmount() + recipe.outputAmount <= outputTank.getCapacity();
+        return outputTank.getFluid() == outSpec.fluid()
+                && outputTank.getAmount() + outSpec.amount() <= outputTank.getCapacity();
     }
 
     public Container inventory() {

@@ -46,4 +46,12 @@ public interface IItemAccess {
      * @return 可接收件数（0 = 完全塞不进；不会超过 {@code stack} 的件数）
      */
     int acceptable(Level level, BlockPos pos, Direction side, ItemStack stack);
+
+    /**
+     * <b>零副作用</b>能力判定：这个位置有没有可读写的物品容器。
+     * <p>与 {@link #acceptable} 的分工：那个回答"能塞进多少"（<b>满仓时为 0</b>），
+     * 本方法回答"有没有容器"—— 用于<b>识别</b>第三方机器（装满的机器同样是机器，
+     * 用 {@code acceptable} 当识别判据会把满仓机器判成"不存在"）。
+     */
+    boolean hasItemCapability(Level level, BlockPos pos, Direction side);
 }

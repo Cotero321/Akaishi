@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:quartz" },
+  "result": { "item": "akaishi:quartz_ore_base", "count": 1 }
+}

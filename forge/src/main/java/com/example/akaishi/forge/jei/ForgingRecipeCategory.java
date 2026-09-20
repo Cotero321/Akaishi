@@ -2,7 +2,11 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.entity.AkaishiEquipmentForgerBlockEntity;
+import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.menu.EnergyFormat;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -18,8 +22,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,24 +81,32 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipeCateg
         GuiWidgets.slotBox(guiGraphics, 38, 30);
         GuiWidgets.slotBox(guiGraphics, 62, 30);
         GuiWidgets.slotBox(guiGraphics, 116, 30);
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.akaishi.cost_forge"), 8, 52, 0xFF404040);
+        // 成本读实时配置：与机器侧 getCurrentCost() 同算式（基础价 + 投点数 × 单点价，单点为常量）
+        guiGraphics.drawString(Minecraft.getInstance().font,
+                Component.translatable("jei.akaishi.cost_forge",
+                        EnergyFormat.formatFloor(ModConfig.equipmentForgerEnergyPerForge),
+                        EnergyFormat.formatFloor(AkaishiUpgradeHelper.ENERGY_PER_BASE_UPGRADE)),
+                8, 52, 0xFF404040);
     }
 
     /** 打造配方展示数据 */
     public record ForgingRecipe(ItemStack base, ItemStack ingot, ItemStack output) {
 
-        /** 全部打造配方：下界合金五件套 → 赤石装备 */
+        /**
+         * 全部打造配方：<b>直接遍历机器侧的 {@link AkaishiEquipmentForgerBlockEntity#FORGE_RECIPES}</b>。
+         * <p>
+         * 原先是 JEI 自带一份抄写，结果机器有 8 条（含镐/锹/斧）而 JEI 只列了 5 条 ——
+         * 抄写的部分必然与真源脱节，故此处不再保留第二份数据。
+         */
         public static List<ForgingRecipe> getAll() {
-            return List.of(
-                    new ForgingRecipe(new ItemStack(Items.NETHERITE_HELMET), ingots(5), new ItemStack(ModItems.akaishiHelmet.get())),
-                    new ForgingRecipe(new ItemStack(Items.NETHERITE_CHESTPLATE), ingots(8), new ItemStack(ModItems.akaishiChestplate.get())),
-                    new ForgingRecipe(new ItemStack(Items.NETHERITE_LEGGINGS), ingots(7), new ItemStack(ModItems.akaishiLeggings.get())),
-                    new ForgingRecipe(new ItemStack(Items.NETHERITE_BOOTS), ingots(4), new ItemStack(ModItems.akaishiBoots.get())),
-                    new ForgingRecipe(new ItemStack(Items.NETHERITE_SWORD), ingots(2), new ItemStack(ModItems.akaishiSword.get())));
-        }
-
-        private static ItemStack ingots(int count) {
-            return new ItemStack(ModItems.akaishiIngot.get(), count);
+            List<ForgingRecipe> list = new ArrayList<>(AkaishiEquipmentForgerBlockEntity.FORGE_RECIPES.size());
+            for (AkaishiEquipmentForgerBlockEntity.ForgeRecipe recipe
+                    : AkaishiEquipmentForgerBlockEntity.FORGE_RECIPES) {
+                list.add(new ForgingRecipe(new ItemStack(recipe.input()),
+                        new ItemStack(ModItems.akaishiIngot.get(), recipe.ingotCost()),
+                        new ItemStack(recipe.result().get())));
+            }
+            return List.copyOf(list);
         }
     }
 }

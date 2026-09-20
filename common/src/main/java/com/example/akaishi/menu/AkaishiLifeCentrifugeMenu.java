@@ -92,9 +92,15 @@ public class AkaishiLifeCentrifugeMenu extends AbstractContainerMenu {
                 AkaishiLifeCentrifugeBlockEntity.DATA_IN_CAPACITY_HIGH);
     }
 
-    /** 当前批次进度（mb，满 {@link AkaishiLifeCentrifugeBlockEntity#BATCH_MB} 结算；受常量上限约束） */
+    /** 当前批次进度（mb，满一批（配方声明的批量）结算一次） */
     public long getProgress() {
         return data.get(AkaishiLifeCentrifugeBlockEntity.DATA_PROGRESS);
+    }
+
+    /** 当前配方声明的批量（mb，0 = 当前无配方）；进度条分母由服务端权威值同步而来 */
+    public long getBatchMb() {
+        return LongDataSlots.read(data, AkaishiLifeCentrifugeBlockEntity.DATA_BATCH_MB,
+                AkaishiLifeCentrifugeBlockEntity.DATA_BATCH_MB_HIGH);
     }
 
     /** 速度升级组件数量（0~8） */

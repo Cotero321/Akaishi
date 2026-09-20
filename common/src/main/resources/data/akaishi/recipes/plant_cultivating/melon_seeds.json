@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:melon_seeds" },
+  "consume_input": false,
+  "result": { "item": "minecraft:melon", "count": 1 }
+}

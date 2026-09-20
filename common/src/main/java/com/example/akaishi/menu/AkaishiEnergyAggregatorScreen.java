@@ -2,6 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.entity.AkaishiEnergyAggregatorBlockEntity;
+import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -16,10 +17,19 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_energy_cell.png");
 
-    private static final int BAR_X = 20, BAR_Y = 16, BAR_W = 136, BAR_H = 8;
+    /**
+     * 顶部能量条。<b>宽度刻意收窄到 88</b>：右上角要留给三格升级槽（x=116 起），
+     * 条子铺到 136 宽会压住无线接收格。
+     */
+    private static final int BAR_X = 20, BAR_Y = 16, BAR_W = 88, BAR_H = 8;
     private static final int PROGRESS_X = 80, PROGRESS_Y = 34, PROGRESS_W = 28, PROGRESS_H = 16;
-    /** 机器槽位数量（输入槽 + 输出槽，贴图无槽位图形需自绘框） */
+    /** 机器槽位数量（输入槽 + 输出槽，贴图无槽位图形需自绘框；升级槽在它们之后，单独画） */
     private static final int MACHINE_SLOTS = 2;
+
+    /** 升级槽（固定面板右上角 Y=8；无线接收格坐标与其余机器统一，见 MachineUpgradeSlots） */
+    private static final int UPGRADE_Y = 8;
+    private static final int SPEED_SLOT_X = 134;
+    private static final int ENERGY_SLOT_X = 152;
 
     public AkaishiEnergyAggregatorScreen(AkaishiEnergyAggregatorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -38,6 +48,10 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
             var slot = menu.slots.get(i);
             GuiWidgets.slotBox(gui, x + slot.x, y + slot.y);
         }
+        // 升级槽框（速度 / 能量 / 无线接收，固定面板右上角 Y=8）
+        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + UPGRADE_Y);
+        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + UPGRADE_Y);
+        GuiWidgets.slotBox(gui, x + MachineUpgradeSlots.WIRELESS_SLOT_X, y + UPGRADE_Y);
 
         // 赤能源条（红色）
         GuiWidgets.track(gui, x + BAR_X, y + BAR_Y, BAR_W, BAR_H);
@@ -100,6 +114,28 @@ public class AkaishiEnergyAggregatorScreen extends AbstractContainerScreen<Akais
         var outputSlot = menu.slots.get(AkaishiEnergyAggregatorBlockEntity.OUTPUT_SLOT);
         if (isHovering(outputSlot.x, outputSlot.y, 16, 16, mouseX, mouseY) && outputSlot.getItem().isEmpty()) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.aggregator.output_slot"), mouseX, mouseY);
+            return;
+        }
+        // 升级槽（与单槽族机器同一套提示键）
+        if (isHovering(SPEED_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
+                            "x" + (1 + menu.getSpeedUpgradeCount())),
+                    mouseX, mouseY);
+            return;
+        }
+        if (isHovering(ENERGY_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font,
+                    Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
+                            "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
+                    mouseX, mouseY);
+            return;
+        }
+        if (isHovering(MachineUpgradeSlots.WIRELESS_SLOT_X, UPGRADE_Y, 16, 16, mouseX, mouseY)) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                            Component.translatable(menu.hasWirelessReceiver()
+                                    ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
+                    mouseX, mouseY);
         }
     }
 }

@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:diamond_dust" },
+  "input_count": 9,
+  "result": { "item": "minecraft:diamond_block", "count": 1 }
+}

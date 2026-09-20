@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:aggregating",
+  "ingredient": { "item": "akaishi:akaishi_geode_pristine" },
+  "energy_config": "geode_upgrade",
+  "result": { "item": "akaishi:akaishi_geode_perfect", "count": 1 }
+}

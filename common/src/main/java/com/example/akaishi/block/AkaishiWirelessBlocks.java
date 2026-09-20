@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 /**
  * 无线赤能源方块族注册表（无线终端多方块体系）。
  * <p>
- * 从 ModBlocks 拆分出的域注册类：15 个无线终端/端口/组件方块。字段由
+ * 从 ModBlocks 拆分出的域注册类：14 个无线终端/端口/组件方块。字段由
  * {@link #register()} 在 {@link com.example.akaishi.AkaishiMod#init()} 阶段填充，
  * 消费方须在 register() 之后访问。
  */

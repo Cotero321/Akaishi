@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:quartz_block" },
+  "result": { "item": "akaishi:quartz_dust", "count": 4 }
+}

@@ -2,8 +2,10 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
-import com.example.akaishi.block.entity.AkaishiFuelMixerBlockEntity;
-import com.example.akaishi.fluid.ModFluids;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
@@ -20,9 +22,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -85,26 +89,41 @@ public class FuelMixingRecipeCategory implements IRecipeCategory<FuelMixingRecip
         GuiWidgets.slotBox(guiGraphics, 116, 30);
         // 深色信息条 + 白字：描边融入深底，文字清晰锐利
         guiGraphics.fill(8, 50, 168, 59, 0xC0282828);
+        // 成本读实时配置（本机成本来自 ModConfig.fuelMixerChishiCost，不写在配方里）
         guiGraphics.drawString(Minecraft.getInstance().font,
-                Component.translatable("jei.akaishi.cost_mix"), 10, 51, 0xFFFFFFFF);
+                Component.translatable("jei.akaishi.cost_mix", fmt(ModConfig.fuelMixerChishiCost)),
+                10, 51, 0xFFFFFFFF);
     }
 
-    /** 调和配方展示数据（源自混合机机器配方） */
+    /** 赤能源缩写：50M / 10M / 5K */
+    private static String fmt(long v) {
+        if (v >= 1_000_000L) {
+            return (v / 1_000_000L) + "M";
+        }
+        if (v >= 1_000L) {
+            return (v / 1_000L) + "K";
+        }
+        return String.valueOf(v);
+    }
+
+    /** 调和配方展示数据（源自数据包配方） */
     public record FuelMixingRecipe(Fluid in1, long in1Amount, Fluid in2, long in2Amount, Fluid out, long outAmount) {
 
-        /** 全部调和配方：高级（末地+下界复合）与终极（巨龙+至纯） */
-        public static List<FuelMixingRecipe> getAll() {
-            Fluid end = ModFluids.get(ModFluids.END_MIXTURE_FUEL_ID);
-            Fluid compound = ModFluids.get(ModFluids.NETHER_COMPOUND_FUEL_ID);
-            Fluid dragon = ModFluids.get(ModFluids.DRAGON_FUEL_ID);
-            Fluid pure = ModFluids.get(ModFluids.PURE_FUEL_ID);
-            return List.of(
-                    from(AkaishiFuelMixerBlockEntity.recipeFor(end, compound)),
-                    from(AkaishiFuelMixerBlockEntity.recipeFor(dragon, pure)));
-        }
-
-        private static FuelMixingRecipe from(AkaishiFuelMixerBlockEntity.Recipe r) {
-            return new FuelMixingRecipe(r.in1(), r.in1Amount(), r.in2(), r.in2Amount(), r.out(), r.outAmount());
+        /** 全部调和配方：取数据包里"两进一出"的那些（顺序即配方表顺序） */
+        public static List<FuelMixingRecipe> getAll(RecipeManager manager) {
+            List<AkaishiFluidProcessRecipe> sources =
+                    AkaishiMachineRecipeIndex.all(manager, AkaishiRecipeTypes.MIXING.get());
+            List<FuelMixingRecipe> list = new ArrayList<>(sources.size());
+            for (AkaishiFluidProcessRecipe source : sources) {
+                List<AkaishiFluidProcessRecipe.FluidSpec> ins = source.fluidInputs();
+                AkaishiFluidProcessRecipe.FluidSpec out = source.fluidOutput();
+                if (ins.size() != 2 || out == null) {
+                    continue; // 本机固定"两进一出"
+                }
+                list.add(new FuelMixingRecipe(ins.get(0).fluid(), ins.get(0).amount(),
+                        ins.get(1).fluid(), ins.get(1).amount(), out.fluid(), out.amount()));
+            }
+            return List.copyOf(list);
         }
     }
 }

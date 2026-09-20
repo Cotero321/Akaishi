@@ -1,0 +1,7 @@
+{
+  "type": "akaishi:liquefying",
+  "ingredient": { "item": "akaishi:dragon_mixture" },
+  "catalyst": { "item": "akaishi:akaishi_life_essence_solid" },
+  "energy": 50000000,
+  "fluid_output": { "fluid": "akaishi:dragon_fuel", "amount": 500 }
+}

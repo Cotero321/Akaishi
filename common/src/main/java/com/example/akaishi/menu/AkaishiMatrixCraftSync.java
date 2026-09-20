@@ -114,10 +114,33 @@ public final class AkaishiMatrixCraftSync {
      * {@code target} = 这份详情对应的物品，{@code amount} = 对应的<b>请求件数回显</b>：
      * 详情是异步回包，界面必须同时比对"物品 + 件数"，否则玩家改数量时旧的包后到，
      * 会把显示永久卡在旧账上（现象就是"有时显示不正确"）。
+     * <p>
+     * {@code machineMissing} = 本单要跑的机械工序在场域内找不到对应机台（界面据此说明为何不能开工）。
+     * <p>
+     * {@code powerMissing} = 机台在场但<b>拿不到能量</b>（终端缺「操控」/「联动」升级）：真机加工里机台要自己转，
+     * 没电就是干等到超时。与 {@code machineMissing} <b>分开报</b>，因为补救办法完全不同（装机器 vs 装升级）。
      */
     public record PlanView(ItemStack target, int amount, long materialIp, long resultIp, long ticks, long energy,
-                           int steps, boolean affordable, List<LeafView> leaves) {
+                           long lifeEnergy, boolean machineMissing, boolean powerMissing, int steps,
+                           boolean affordable, List<LeafView> leaves, List<ProcessView> processes) {
     }
+
+    /**
+     * 一单所需的单条工序来源（界面「这条工序由谁提供」用）。
+     * <p>
+     * {@code tier} 与 {@code MachineProcessEnergy#sourceTier} 同源：0 自研机台族 / 1 第三方已声明 /
+     * 2 第三方未声明（粗粒度）。{@code owners} 只放<b>方块 id</b>，由客户端翻成当前语言的名字。
+     */
+    public record ProcessView(String processId, byte tier, List<String> owners) {
+    }
+
+    /** 单包最多携带的工序条数 / id 与提供方块的上限（本模组最多 13 族，留足余量） */
+    private static final int MAX_PROCESSES = 24;
+    private static final int MAX_PROCESS_ID = 128;
+    private static final int MAX_PROCESS_OWNERS = 8;
+
+    /** 失败原因代号的长度上限：都是 {@code no_machine} 这类短代号，收发两端同口径 */
+    private static final int MAX_FAIL_REASON = 32;
 
     /** 任务视图类型：虚拟加工（有总时长承诺） */
     public static final byte TASK_CRAFT = 0;
@@ -125,7 +148,9 @@ public final class AkaishiMatrixCraftSync {
     /**
      * 在跑任务的进度（无任务时传 null）。
      * <p>
-     * {@code type = TASK_CRAFT} 用 {@code remainingTicks/totalTicks}。
+     * {@code type = TASK_CRAFT} 用 {@code remainingTicks/totalTicks}（<b>预估</b>：真机加工的实际耗时由机台决定）；
+     * {@code collected/elapsed} = 真机加工的<b>节点进度</b>（已完成节点 / 总节点）——机台不归我们计时，
+     * 节点数才是真实进度。
      */
     public record TaskView(byte type, ItemStack target, int remainingTicks, int totalTicks,
                            int collected, int elapsed) {
@@ -151,8 +176,8 @@ public final class AkaishiMatrixCraftSync {
         /** S2C：选中项详情；null = 无可规划方案 */
         void acceptCraftPlan(@Nullable PlanView plan);
 
-        /** S2C：任务进度；null = 当前无任务 */
-        void acceptCraftTask(@Nullable TaskView task);
+        /** S2C：任务进度；task = null 且 failure = null = 当前无任务也无失败记录 */
+        void acceptCraftTask(@Nullable TaskView task, @Nullable String failure);
     }
 
     private AkaishiMatrixCraftSync() {
@@ -236,6 +261,7 @@ public final class AkaishiMatrixCraftSync {
             List<ItemStack> results = List.of();
             PlanView plan = null;
             TaskView task = null;
+            String taskFail = null;
             boolean building = false;
             int readyCount = 0;
             switch (type) {
@@ -261,7 +287,15 @@ public final class AkaishiMatrixCraftSync {
                     results = read;
                 }
                 case VIEW_PLAN -> plan = buf.readBoolean() ? readPlan(buf) : null;
-                case VIEW_TASK -> task = buf.readBoolean() ? readTask(buf) : null;
+                case VIEW_TASK -> {
+                    if (buf.readBoolean()) {
+                        task = readTask(buf);
+                    } else {
+                        // 无任务时才带失败原因（失败的任务对象已被服务端丢弃）：空串 = 没有失败
+                        String reason = buf.readUtf(MAX_FAIL_REASON);
+                        taskFail = reason.isEmpty() ? null : reason;
+                    }
+                }
                 default -> {
                     return; // 未知类型：直接丢弃，不做任何落地
                 }
@@ -269,6 +303,7 @@ public final class AkaishiMatrixCraftSync {
             final List<ItemStack> accepted = results;
             final PlanView acceptedPlan = plan;
             final TaskView acceptedTask = task;
+            final String acceptedFail = taskFail;
             final boolean acceptedBuilding = building;
             final int acceptedReady = readyCount;
             // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
@@ -281,7 +316,7 @@ public final class AkaishiMatrixCraftSync {
                     } else if (type == VIEW_PLAN) {
                         target.acceptCraftPlan(acceptedPlan);
                     } else {
-                        target.acceptCraftTask(acceptedTask);
+                        target.acceptCraftTask(acceptedTask, acceptedFail);
                     }
                 }
             });
@@ -324,6 +359,9 @@ public final class AkaishiMatrixCraftSync {
             buf.writeVarLong(plan.resultIp());
             buf.writeVarLong(plan.ticks());
             buf.writeVarLong(plan.energy());
+            buf.writeVarLong(plan.lifeEnergy());
+            buf.writeBoolean(plan.machineMissing());
+            buf.writeBoolean(plan.powerMissing());
             buf.writeVarInt(plan.steps());
             buf.writeBoolean(plan.affordable());
             int leaves = Math.min(plan.leaves().size(), MAX_LEAVES);
@@ -334,12 +372,32 @@ public final class AkaishiMatrixCraftSync {
                 buf.writeVarLong(leaf.count());
                 buf.writeBoolean(leaf.enough());
             }
+            // 工序来源紧随材料之后（写读顺序必须一致，见 §17.2 断线教训）
+            int processes = Math.min(plan.processes().size(), MAX_PROCESSES);
+            buf.writeVarInt(processes);
+            for (int i = 0; i < processes; i++) {
+                ProcessView process = plan.processes().get(i);
+                buf.writeUtf(process.processId(), MAX_PROCESS_ID);
+                buf.writeByte(process.tier());
+                int owners = Math.min(process.owners().size(), MAX_PROCESS_OWNERS);
+                buf.writeVarInt(owners);
+                for (int k = 0; k < owners; k++) {
+                    buf.writeUtf(process.owners().get(k), MAX_PROCESS_ID);
+                }
+            }
         }
         NetworkManager.sendToPlayer(player, VIEW_CHANNEL, buf);
     }
 
-    /** 服务端：下发任务进度（null = 无任务） */
-    public static void sendTask(ServerPlayer player, int containerId, @Nullable TaskView task) {
+    /**
+     * 服务端：下发任务进度（null = 无任务）。
+     *
+     * @param failure 上一次加工的失败原因（内部代号，如 {@code no_machine}）；无则 null。
+     *                失败时任务对象本身已被丢弃（{@code task == null}），原因必须随同一包带下去，
+     *                否则玩家只看到"加工莫名停了"（界面无从解释）
+     */
+    public static void sendTask(ServerPlayer player, int containerId, @Nullable TaskView task,
+            @Nullable String failure) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeInt(containerId);
         buf.writeByte(VIEW_TASK);
@@ -351,6 +409,8 @@ public final class AkaishiMatrixCraftSync {
             buf.writeVarInt(task.totalTicks());
             buf.writeVarInt(task.collected());
             buf.writeVarInt(task.elapsed());
+        } else {
+            buf.writeUtf(failure == null ? "" : failure, MAX_FAIL_REASON);
         }
         NetworkManager.sendToPlayer(player, VIEW_CHANNEL, buf);
     }
@@ -362,6 +422,9 @@ public final class AkaishiMatrixCraftSync {
         long resultIp = buf.readVarLong();
         long ticks = buf.readVarLong();
         long energy = buf.readVarLong();
+        long lifeEnergy = buf.readVarLong();
+        boolean machineMissing = buf.readBoolean();
+        boolean powerMissing = buf.readBoolean();
         int steps = buf.readVarInt();
         boolean affordable = buf.readBoolean();
         int declared = buf.readVarInt();
@@ -371,8 +434,23 @@ public final class AkaishiMatrixCraftSync {
             leaves.add(new LeafView(AkaishiItemTerminalSync.readFullStack(buf), buf.readVarLong(),
                     buf.readBoolean()));
         }
-        return new PlanView(target, Math.max(1, amount), materialIp, resultIp, ticks, energy, steps, affordable,
-                leaves);
+        // 工序来源：条数与 id 长度都对端给的值，一律钳制（解码端不信任对端）
+        int declaredProcesses = buf.readVarInt();
+        int processes = Math.min(Math.max(declaredProcesses, 0), MAX_PROCESSES);
+        List<ProcessView> processViews = new ArrayList<>(processes);
+        for (int i = 0; i < processes; i++) {
+            String processId = buf.readUtf(MAX_PROCESS_ID);
+            byte tier = buf.readByte();
+            int declaredOwners = buf.readVarInt();
+            int owners = Math.min(Math.max(declaredOwners, 0), MAX_PROCESS_OWNERS);
+            List<String> ownerIds = new ArrayList<>(owners);
+            for (int k = 0; k < owners; k++) {
+                ownerIds.add(buf.readUtf(MAX_PROCESS_ID));
+            }
+            processViews.add(new ProcessView(processId, tier, List.copyOf(ownerIds)));
+        }
+        return new PlanView(target, Math.max(1, amount), materialIp, resultIp, ticks, energy, lifeEnergy,
+                machineMissing, powerMissing, steps, affordable, leaves, processViews);
     }
 
     private static TaskView readTask(FriendlyByteBuf buf) {

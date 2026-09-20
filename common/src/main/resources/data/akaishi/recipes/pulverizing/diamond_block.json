@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "minecraft:diamond_block" },
+  "result": { "item": "akaishi:diamond_dust", "count": 9 }
+}

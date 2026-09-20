@@ -7,8 +7,11 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -367,7 +370,9 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
     protected void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
         gui.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, TEXT, false);
         for (int i = 0; i < TAB_X.length; i++) {
-            Component label = Component.translatable(TAB_KEY[i]);
+            // 标签一律截到页签宽度内：步进 34px / 宽 32px，英文 "Overview"/"Security" 宽 ≥40px，不截就与邻页签互压
+            String label = this.font.plainSubstrByWidth(
+                    Component.translatable(TAB_KEY[i]).getString(), TAB_W - 2);
             int w = this.font.width(label);
             gui.drawString(this.font, label,
                     TAB_X[i] + (TAB_W - w) / 2, TAB_Y + 2, currentPage == i ? TEXT : TEXT_DIM, false);
@@ -391,13 +396,17 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
 
     /** 页1：成型状态 + 芯片逐行读数（行号 / 名称 / 短 ID / 类型 / IP / 能量） */
     private void renderChipPage(GuiGraphics gui) {
-        gui.drawString(this.font, Component.translatable(menu.isFormed()
-                        ? "gui.akaishi.matrix.formed" : "gui.akaishi.matrix.unformed"),
+        Component status = Component.translatable(menu.isFormed()
+                ? "gui.akaishi.matrix.formed" : "gui.akaishi.matrix.unformed");
+        Component countText = Component.translatable("gui.akaishi.matrix.chip_count", menu.chipRows().size());
+        int countWidth = this.font.width(countText);
+        // 两串文字同处 y=30：左侧状态必须让出右侧计数的宽度。
+        // 英文 "Structure incomplete (5x5x5 closed box)" 约 210px，不截会与计数重叠并压出面板
+        gui.drawString(this.font,
+                this.font.plainSubstrByWidth(status.getString(), Math.max(24, CONTENT_W - countWidth - 6)),
                 8, 30, menu.isFormed() ? TEXT_GREEN : TEXT_RED, false);
+        gui.drawString(this.font, countText, CONTENT_W + 8 - countWidth, 30, TEXT_DIM, false);
         int count = menu.chipRows().size();
-        gui.drawString(this.font, Component.translatable("gui.akaishi.matrix.chip_count", count),
-                CONTENT_W + 8 - this.font.width(Component.translatable("gui.akaishi.matrix.chip_count", count)),
-                30, TEXT_DIM, false);
         if (count == 0) {
             gui.drawString(this.font, Component.translatable("gui.akaishi.matrix.chip_none"),
                     8, ROW_Y + 2, TEXT_DIM, false);
@@ -560,7 +569,10 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
                     8, CRAFT_TITLE_Y, TEXT_RED, false);
             return;
         }
-        gui.drawString(this.font, Component.translatable("gui.akaishi.matrix.craft.title"),
+        // 标题与搜索框同处 y=33：必须让出搜索框起点。英文 "Craftable now" 约 70px，不截会压到搜索框与其中文字上
+        gui.drawString(this.font,
+                this.font.plainSubstrByWidth(Component.translatable("gui.akaishi.matrix.craft.title").getString(),
+                        CRAFT_SEARCH_X - 8 - 4),
                 8, CRAFT_TITLE_Y + 3, TEXT, false);
         List<ItemStack> results = craftResults();
         if (results.isEmpty()) {
@@ -629,8 +641,10 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
         }
         if (isIn(this.leftPos + DETAIL_START_X, this.topPos + DETAIL_OP_Y,
                 DETAIL_START_W, DETAIL_BTN_H, mouseX, mouseY)) {
-            // 数量随输入框走：服务端按该数量重新规划、扣料、入库
-            if (planFor(detailItem, detailAmount()) != null) {
+            // 数量随输入框走：服务端按该数量重新规划、扣料、入库。
+            // 必须与绘制端同判 affordable：置灰的按钮若能点，命中区就与视觉状态不一致（服务端会拒，但体验是坏的）
+            AkaishiMatrixCraftSync.PlanView ready = planFor(detailItem, detailAmount());
+            if (ready != null && ready.affordable()) {
                 AkaishiMatrixCraftSync.sendAction(menu.containerId, AkaishiMatrixCraftSync.ACTION_START,
                         craftQuery, new ItemStack(detailItem, detailAmount()));
                 closeCraftDetail();
@@ -678,13 +692,79 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
                 gui.fill(cellX, cellY, cellX + 16, cellY + 16, 0x66FF2020); // 缺料：红罩
             }
         }
-        gui.drawString(this.font, Component.translatable("gui.akaishi.matrix.craft.detail.cost",
-                        plan.ticks() / 20L, plan.energy(), plan.materialIp()),
+        // 成本行：三个数都走统一缩写（加上机器能耗/耗时后量级可达百万级，原样输出会撑出面板）。
+        // 取整方向按 EnergyFormat 的既有约定：能量是<b>应付量</b>（向上，不误导少备能量）、
+        // 材料 IP 是只读占用量（向下，绝不暗示还有余量）、耗时是中性的读数。
+        // 行尾按"最硬的拦路条件"替换（保证整行不超出面板宽度）：
+        // 缺机台 > 要付生命能量（纯能量配方没有材料，材料 IP 恒为 0）> 材料 IP。
+        String seconds = EnergyFormat.format(plan.ticks() / 20L);
+        String chishi = EnergyFormat.formatCeil(plan.energy());
+        Component costLine;
+        if (plan.machineMissing()) {
+            costLine = Component.translatable("gui.akaishi.matrix.craft.detail.cost_machine", seconds, chishi);
+        } else if (plan.powerMissing()) {
+            // 机台在场但拿不到能量（终端缺「操控」/「联动」）：真机加工下机台转不起来，与缺机台同为硬拦路
+            costLine = Component.translatable("gui.akaishi.matrix.craft.detail.cost_power", seconds, chishi);
+        } else if (plan.lifeEnergy() > 0L) {
+            costLine = Component.translatable("gui.akaishi.matrix.craft.detail.cost_life", seconds, chishi,
+                    EnergyFormat.formatCeil(plan.lifeEnergy()));
+        } else {
+            costLine = Component.translatable("gui.akaishi.matrix.craft.detail.cost", seconds, chishi,
+                    EnergyFormat.formatFloor(plan.materialIp()));
+        }
+        // 必须按内容宽度截断：中文模板约 116px 尚可，英文模板（"%s s · energy %s · material IP %s"）本身已约 152px，
+        // 再加三个缩写值必然超出 CONTENT_W(160)。原先注释写了"保证不超宽"，但这里其实没有任何宽度约束。
+        gui.drawString(this.font, this.font.plainSubstrByWidth(costLine.getString(), CONTENT_W),
                 8, DETAIL_COST_Y, plan.affordable() ? TEXT : TEXT_RED, false);
         gui.drawString(this.font, Component.translatable("gui.akaishi.matrix.craft.detail.amount"),
                 8, DETAIL_OP_Y + 3, TEXT_DIM, false);
         GuiWidgets.buttonText(gui, this.font, DETAIL_START_X, DETAIL_OP_Y, DETAIL_START_W, DETAIL_BTN_H,
                 Component.translatable("gui.akaishi.matrix.craft.detail.start"), plan.affordable());
+    }
+
+    /**
+     * 「这条工序由谁提供」的悬停文本：标题 + 逐条来源。不需要机台（纯原版配方）时给一句说明。
+     */
+    private List<Component> processLines(AkaishiMatrixCraftSync.PlanView plan) {
+        List<Component> lines = new ArrayList<>();
+        if (plan.processes().isEmpty()) {
+            lines.add(Component.translatable("gui.akaishi.matrix.craft.detail.source.none"));
+            return lines;
+        }
+        lines.add(Component.translatable("gui.akaishi.matrix.craft.detail.source.header"));
+        for (AkaishiMatrixCraftSync.ProcessView process : plan.processes()) {
+            Component name = processName(process.processId());
+            lines.add(switch (process.tier()) {
+                case 0 -> Component.translatable("gui.akaishi.matrix.craft.detail.source.own", name);
+                case 1 -> Component.translatable("gui.akaishi.matrix.craft.detail.source.declared", name,
+                        ownerNames(process));
+                default -> Component.translatable("gui.akaishi.matrix.craft.detail.source.generic", name);
+            });
+        }
+        return lines;
+    }
+
+    /**
+     * 工序显示名：自研族取 {@code gui.akaishi.process.<配方类型 path>}（= 机器族名，玩家认机器不认配方 id），
+     * 第三方则直接用配方类型 id。缺键时回落 id —— 绝不显示裸 key。
+     */
+    private static Component processName(String processId) {
+        ResourceLocation id = ResourceLocation.tryParse(processId);
+        if (id == null) {
+            return Component.literal(processId);
+        }
+        return Component.translatableWithFallback("gui.akaishi.process." + id.getPath(), processId);
+    }
+
+    /** 已声明工序的提供方块名（在客户端翻成当前语言；方块不存在时退回 id 本身） */
+    private static String ownerNames(AkaishiMatrixCraftSync.ProcessView process) {
+        List<String> names = new ArrayList<>(process.owners().size());
+        for (String ownerId : process.owners()) {
+            ResourceLocation id = ResourceLocation.tryParse(ownerId);
+            Block block = id == null ? null : BuiltInRegistries.BLOCK.get(id);
+            names.add(block == null || block == Blocks.AIR ? ownerId : block.getName().getString());
+        }
+        return String.join(" / ", names);
     }
 
     /** 详情页悬停：贴图格 → 物品名；材料格 → 材料名 + 需要数量 + 够/缺 */
@@ -693,6 +773,17 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
         AkaishiMatrixCraftSync.PlanView plan = planFor(detailItem, detailFetchedAmount);
         if (isIn(this.leftPos + DETAIL_ICON_X, this.topPos + DETAIL_TOP, 16, 16, mouseX, mouseY)) {
             lines.add(new ItemStack(detailItem).getHoverName());
+        } else if (plan != null && plan.machineMissing()
+                && isIn(this.leftPos + 8, this.topPos + DETAIL_COST_Y, 160, 9, mouseX, mouseY)) {
+            // 行尾那三个字（缺机台）说不清要怎么办，悬停给完整说法
+            lines.add(Component.translatable("gui.akaishi.matrix.craft.detail.machine_missing"));
+        } else if (plan != null && plan.powerMissing()
+                && isIn(this.leftPos + 8, this.topPos + DETAIL_COST_Y, 160, 9, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.akaishi.matrix.craft.detail.power_missing"));
+        } else if (plan != null && isIn(this.leftPos + 8, this.topPos + DETAIL_RECIPE_Y - 1, CONTENT_W, 10,
+                mouseX, mouseY)) {
+            // 工序来源：这条订单到底由谁提供（自研机台族 / 第三方已声明到方块 / 第三方粗粒度）
+            lines.addAll(processLines(plan));
         } else if (plan != null) {
             int relX = (int) mouseX - this.leftPos - DETAIL_GRID_X;
             int relY = (int) mouseY - this.topPos - DETAIL_GRID_Y;
@@ -735,11 +826,22 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
     /**
      * 加工任务进度：进度条 + 目标 + 剩余秒数。
      * <p>
-     * 无任务时整块不画（不留空槽），这是界面上唯一的"正在加工"反馈。
+     * 无任务时整块不画（不留空槽），这是界面上唯一的"正在加工"反馈；
+     * 但若上一次是<b>失败</b>结束，那一行改用红字说明原因 —— 失败的任务在服务端已被丢弃，
+     * 这里是玩家唯一能看到"为什么停了"的地方。
      */
     private void renderCraftTask(GuiGraphics gui) {
         AkaishiMatrixCraftSync.TaskView task = menu.craftTaskView();
-        if (task == null || task.type() != AkaishiMatrixCraftSync.TASK_CRAFT || task.totalTicks() <= 0) {
+        if (task == null) {
+            String fail = menu.craftTaskFail();
+            if (fail != null) {
+                Component line = Component.translatable("gui.akaishi.matrix.craft.fail", failLine(fail));
+                gui.drawString(this.font, this.font.plainSubstrByWidth(line.getString(), CONTENT_W),
+                        8, CRAFT_BAR_TEXT_Y, TEXT_RED, false);
+            }
+            return;
+        }
+        if (task.type() != AkaishiMatrixCraftSync.TASK_CRAFT || task.totalTicks() <= 0) {
             return;
         }
         GuiWidgets.track(gui, 8, CRAFT_BAR_Y, CRAFT_BAR_W, CRAFT_BAR_H);
@@ -755,11 +857,33 @@ public class AkaishiMiniMatrixTerminalScreen extends AbstractContainerScreen<Aka
     }
 
     /**
+     * 失败原因代号 → 当前语言文案。
+     * <p>用 {@code translatableWithFallback} 而非直接拼 key：将来新增失败原因而语言文件没跟上时，
+     * 界面显示的是代号本身（信息不丢），不会出现裸 key 或空白。
+     */
+    private static Component failLine(String reason) {
+        return Component.translatableWithFallback("gui.akaishi.matrix.craft.fail." + reason, reason);
+    }
+
+    /**
      * 加工页悬停：结果格子 → 该项的完整详情（名称 + 清单 / 耗时 / 赤能源 / IP + "再点一次开始"）。
      * <p>
      * 格子里只画图标（与储存终端一致），所以物品名与成本都在这里给全。
      */
     private void renderCraftTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        // 底行（进度条那一行）：悬停给"真机加工的真实进度"。机台耗时不归我们算（第三方连速度都读不到），
+        // 只有节点数是我们确知的，故这里把它与目标、预估一并给全 —— 常驻那一行放不下这么多字
+        AkaishiMatrixCraftSync.TaskView task = menu.craftTaskView();
+        if (task != null && task.type() == AkaishiMatrixCraftSync.TASK_CRAFT
+                && isIn(8, CRAFT_BAR_TEXT_Y - 1, CONTENT_W, CRAFT_BAR_H + 3, mouseX, mouseY)) {
+            gui.renderComponentTooltip(this.font, List.of(
+                    task.target().getHoverName(),
+                    Component.translatable("gui.akaishi.matrix.craft.tip.steps",
+                            Math.max(0, Math.min(task.collected(), task.elapsed())), Math.max(0, task.elapsed())),
+                    Component.translatable("gui.akaishi.matrix.craft.tip.eta",
+                            (task.remainingTicks() + 19) / 20)), mouseX, mouseY);
+            return;
+        }
         List<ItemStack> results = craftResults();
         int index = hoveredCraftIndex(mouseX, mouseY, results.size());
         if (index < 0) {

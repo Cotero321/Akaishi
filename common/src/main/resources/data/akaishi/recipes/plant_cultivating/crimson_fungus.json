@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:crimson_fungus" },
+  "consume_input": false,
+  "result": { "item": "minecraft:crimson_fungus", "count": 1 }
+}

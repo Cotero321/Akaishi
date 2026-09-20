@@ -179,7 +179,6 @@ public final class ModCreativeTabs {
         accept(output, ModItems.diamondDust);
         accept(output, ModItems.emeraldDust);
         accept(output, ModItems.quartzDust);
-        accept(output, ModItems.netheriteDust);
         accept(output, ModItems.obsidianDust);
         // 基底体系（变化器产物）
         accept(output, ModItems.coolingBase);
@@ -443,6 +442,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_CRAFT);
         accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_UPGRADE_LINK);
         accept(output, AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_NETWORK_NODE);
+        accept(output, AkaishiMiniMatrixBlocks.CHISHI_WIRELESS_ACCESS_ADAPTER);
         // 无线赤能源体系（方块族 + 便捷件）
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_SHELL);
         accept(output, AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS);

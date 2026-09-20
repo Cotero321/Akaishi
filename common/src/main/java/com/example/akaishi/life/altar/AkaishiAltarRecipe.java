@@ -27,6 +27,7 @@ import java.util.function.Supplier;
  * <p>所有谓词与产物均以 lambda 延迟求值，避免类初始化早于 {@code ModItems.register()} 时读到空 supplier。
  */
 public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
+                                 Supplier<Item> hostItem,
                                  List<Requirement> outer,
                                  Supplier<Item> output,
                                  boolean advanced,
@@ -41,33 +42,42 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
     /** 药剂纯度门槛：满纯度 100（D154） */
     public static final int MIN_POTION_PURITY = 100;
 
-    /** 外圈一类祭品：{@code test} 命中的子祭坛须恰好 {@code count} 座 */
-    public record Requirement(Predicate<ItemStack> test, int count) {
+    /**
+     * 外圈一类祭品：{@code test} 命中的子祭坛须恰好 {@code count} 座。
+     * <p>{@code item} 是该类祭品的<b>代表物品</b>，只用于 JEI 展示 ——
+     * 谓词（按部位/纯度判定）无法反推出具体物品，故由配方自己声明一个代表，
+     * 使 JEI 不必另抄一份配方表（{@code AkaishiAltarRecipeCategory} 直接遍历本表）。
+     */
+    public record Requirement(Predicate<ItemStack> test, int count, Supplier<Item> item) {
 
-        public static Requirement of(int count, Predicate<ItemStack> test) {
-            return new Requirement(test, count);
+        public static Requirement of(int count, Predicate<ItemStack> test, Supplier<Item> item) {
+            return new Requirement(test, count, item);
         }
     }
 
     /** 新配方目录（顺序无关，匹配靠主祭品区分） */
     private static final AkaishiAltarRecipe LEGACY = new AkaishiAltarRecipe(
             stack -> stack.is(ModItems.akaishiIngot.get()),
+            ModItems.akaishiIngot::get,
             List.of(
-                    Requirement.of(2, stack -> stack.is(ModItems.lifeEmbryo.get())),
-                    Requirement.of(2, stack -> stack.is(ModItems.lifeAsh.get())),
+                    Requirement.of(2, stack -> stack.is(ModItems.lifeEmbryo.get()), ModItems.lifeEmbryo::get),
+                    Requirement.of(2, stack -> stack.is(ModItems.lifeAsh.get()), ModItems.lifeAsh::get),
                     Requirement.of(2, stack -> stack.is(ModItems.geneSequence.get())
-                            && AkaishiGeneSequenceItem.getPurity(stack) > AkaishiAltarRitual.MIN_GENE_PURITY),
-                    Requirement.of(2, stack -> stack.is(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem()))),
+                            && AkaishiGeneSequenceItem.getPurity(stack) > AkaishiAltarRitual.MIN_GENE_PURITY,
+                            ModItems.geneSequence::get),
+                    Requirement.of(2, stack -> stack.is(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem()),
+                            () -> ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem())),
             () -> ModItems.lifeFusionIngot.get(),
             false,
             null);
 
     private static final AkaishiAltarRecipe LIFE_TOUCH = new AkaishiAltarRecipe(
             stack -> stack.is(ModItems.lifeFusionIngot.get()),
+            ModItems.lifeFusionIngot::get,
             List.of(
-                    organ(1, BodySlot.LEFT_ARM),
-                    organ(1, BodySlot.RIGHT_ARM),
-                    basic(2, ModItems.lifeEmbryo),
+                    organ(1, ModItems.akaishiOrganLeftArm::get, BodySlot.LEFT_ARM),
+                    organ(1, ModItems.akaishiOrganRightArm::get, BodySlot.RIGHT_ARM),
+                    basic(2, ModItems.lifeEmbryo::get),
                     gene(2),
                     potion(2)),
             () -> ModItems.lifeTouch.get(),
@@ -76,9 +86,10 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
 
     private static final AkaishiAltarRecipe CUB_HEART = new AkaishiAltarRecipe(
             stack -> stack.is(ModItems.lifeFusionIngot.get()),
+            ModItems.lifeFusionIngot::get,
             List.of(
-                    organ(2, BodySlot.HEART),
-                    basic(2, ModItems.lifeEmbryo),
+                    organ(2, ModItems.akaishiOrganHeart::get, BodySlot.HEART),
+                    basic(2, ModItems.lifeEmbryo::get),
                     gene(2),
                     potion(2)),
             () -> ModItems.cubHeart.get(),
@@ -87,9 +98,10 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
 
     private static final AkaishiAltarRecipe MOTHER_SEAL = new AkaishiAltarRecipe(
             stack -> stack.is(ModItems.lifeFusionIngot.get()),
+            ModItems.lifeFusionIngot::get,
             List.of(
-                    organ(2, BodySlot.EYE),
-                    basic(2, ModItems.lifeAsh),
+                    organ(2, ModItems.akaishiOrganEye::get, BodySlot.EYE),
+                    basic(2, ModItems.lifeAsh::get),
                     gene(2),
                     potion(2)),
             () -> ModItems.motherSeal.get(),
@@ -98,9 +110,10 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
 
     private static final AkaishiAltarRecipe FERTILITY_RING = new AkaishiAltarRecipe(
             stack -> stack.is(ModItems.lifeFusionIngot.get()),
+            ModItems.lifeFusionIngot::get,
             List.of(
-                    organ(2, BodySlot.VISCERA),
-                    basic(2, ModItems.lifeAsh),
+                    organ(2, ModItems.akaishiOrganViscera::get, BodySlot.VISCERA),
+                    basic(2, ModItems.lifeAsh::get),
                     gene(2),
                     potion(2)),
             () -> ModItems.fertilityRing.get(),
@@ -135,7 +148,7 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
      * 主题器官祭品：部位命中给定之一、品质 ≥ {@link #MIN_ORGAN_TIER}、
      * 且既非乱码（D56 侵蚀产物）也非原生壳（D25 污染空壳）。
      */
-    private static Requirement organ(int count, BodySlot... slots) {
+    private static Requirement organ(int count, Supplier<Item> item, BodySlot... slots) {
         return Requirement.of(count, stack -> {
             BodySlot actual = AkaishiOrganItem.slotOf(stack);
             if (actual == null) {
@@ -156,23 +169,25 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
                     && tier.ordinal() >= MIN_ORGAN_TIER.ordinal()
                     && !AkaishiOrganItem.isNative(stack)
                     && !AkaishiOrganItem.isCorrupted(stack);
-        });
+        }, item);
     }
 
     /** 基础素材祭品：指定物品，任意纯度/品质 */
     private static Requirement basic(int count, Supplier<Item> item) {
-        return Requirement.of(count, stack -> stack.is(item.get()));
+        return Requirement.of(count, stack -> stack.is(item.get()), item);
     }
 
     /** 基因序列祭品：满纯度 100（D139） */
     private static Requirement gene(int count) {
         return Requirement.of(count, stack -> stack.is(ModItems.geneSequence.get())
-                && AkaishiGeneSequenceItem.getPurity(stack) >= MIN_GENE_PURITY);
+                && AkaishiGeneSequenceItem.getPurity(stack) >= MIN_GENE_PURITY,
+                ModItems.geneSequence::get);
     }
 
     /** 药剂祭品：满纯度 100（D154） */
     private static Requirement potion(int count) {
         return Requirement.of(count, stack -> stack.getItem() instanceof AkaishiPotionItem
-                && AkaishiPotionItem.getPurity(stack) >= MIN_POTION_PURITY);
+                && AkaishiPotionItem.getPurity(stack) >= MIN_POTION_PURITY,
+                ModItems.akaishiPotion::get);
     }
 }

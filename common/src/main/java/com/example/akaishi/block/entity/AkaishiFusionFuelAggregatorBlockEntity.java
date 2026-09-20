@@ -6,12 +6,15 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiFusionFuelAggregatorMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -31,8 +34,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,15 +47,18 @@ import java.util.List;
 
 /**
  * 聚变燃料聚合器方块实体（仅服务端驱动逻辑）。
- * 将活化成分聚合成等离子体：1 个活化成分 → 1000mb 对应等离子体。
- * 活化成分按燃料来源归入三种等离子体罐：
- * - 混合离子体：世界基础 / 高级混合 / 终极混合
- * - 下界离子体：下界复合 / 至纯
- * - 末地离子体：末地混合 / 末地巨龙
+ * 将活化成分聚合成等离子体：1 个活化成分 → 对应等离子体（产量默认走配置）。
  * 输出罐为等离子体专用罐（仅等离子体管道可对接抽取）；换料清零进度防跨类错配。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/plasma_aggregating/*.json}，
+ * 类型 {@code akaishi:plasma_aggregating}）：每种活化成分产出哪种等离子体由配方声明，
+ * 机器侧不再硬编码"成分 → 等离子体"对照表。
+ * <p>罐位仍是<b>物理</b>的（0=混合 1=下界 2=末地），由 {@link #indexOf} 按流体身份定位。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有聚合器"。
  */
 public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     // ===== 数据槽（long 各占高低两槽）=====
     public static final int DATA_ENERGY = 0;
@@ -79,8 +85,9 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
     private int progress;
     /** 速度升级小数余量（避免 (int) 截断使 1~7 级升级无效） */
     private float speedAccum;
-    /** 当前加工的等离子体种类（跨类换料清零进度） */
-    private Fluid currentPlasma;
+    /** 当前生效的配方（数据包提供；换配方即清零进度） */
+    @Nullable
+    private AkaishiFluidProcessRecipe currentRecipe;
 
     /** 运转音播放器（本机音色） */
     private final MachineHum hum = new MachineHum(ModSounds.FUSION_FUEL_AGGREGATOR_HUM, 0.4F, 1.0F);
@@ -140,19 +147,19 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         }
 
         ItemStack inputStack = input.getItem(0);
-        Fluid target = plasmaFor(inputStack);
-        if (target == null) {
+        AkaishiFluidProcessRecipe recipe = selectRecipe(inputStack);
+        if (recipe == null) {
             // 无有效输入 → 清零进度
             progress = 0;
             speedAccum = 0;
-            currentPlasma = null;
+            currentRecipe = null;
             return;
         }
-        // 换料防御：等离子体种类变化 → 清零进度
-        if (target != currentPlasma) {
+        // 换料防御：配方变化 → 清零进度（防跨配方白嫖半程）
+        if (recipe != currentRecipe) {
             progress = 0;
             speedAccum = 0;
-            currentPlasma = target;
+            currentRecipe = recipe;
         }
         // 单次加工耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
         long craftCost = (long) (ModConfig.aggregatorCostPerCraft * getEnergyCostMultiplier());
@@ -160,9 +167,13 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         if (energy.getEnergyStored() < craftCost) {
             return;
         }
+        AkaishiFluidProcessRecipe.FluidSpec output = recipe.fluidOutput();
+        Fluid target = output.fluid();
+        // 产量：配方写了正数就以配方为准，否则用机器配置（7 条配方共用同一产量配置）
+        long produce = output.amount() > 0L ? output.amount() : ModConfig.aggregatorProducePerCraft;
         FluidTank tank = plasmaTanks.get(indexOf(target));
         // 输出罐放不下本次产出 → 暂停等待管道抽走
-        if (tank.getAmount() + ModConfig.aggregatorProducePerCraft > tank.getCapacity()) {
+        if (tank.getAmount() + produce > tank.getCapacity()) {
             return;
         }
         // 机器升级：速度升级提升每 tick 加工进度（每级 +100%，8 级 8 倍速；小数余量累积避免截断）
@@ -175,35 +186,28 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
         }
         if (progress >= ModConfig.aggregatorProcessTicks) {
             progress = 0;
-            inputStack.shrink(1);
+            inputStack.shrink(recipe.inputCount());
             energy.extractEnergy(craftCost, false);
-            tank.fill(FluidStack.create(target, ModConfig.aggregatorProducePerCraft), false);
+            tank.fill(FluidStack.create(target, produce), false);
         }
         setChanged();
     }
 
-    /** 活化成分 → 对应等离子体；非活化成分返回 null */
-    private static Fluid plasmaFor(ItemStack stack) {
-        Item item = stack.getItem();
-        if (item == ModItems.activatedSculkComponent.get()
-                || item == ModItems.activatedAdvancedMixtureComponent.get()
-                || item == ModItems.activatedUltimateMixtureComponent.get()) {
-            return ModFluids.get(ModFluids.MIXED_PLASMA_ID);
-        }
-        if (item == ModItems.activatedNetherCompoundComponent.get()
-                || item == ModItems.activatedPureComponent.get()) {
-            return ModFluids.get(ModFluids.NETHER_PLASMA_ID);
-        }
-        if (item == ModItems.activatedEndMixtureComponent.get()
-                || item == ModItems.activatedDragonComponent.get()) {
-            return ModFluids.get(ModFluids.END_PLASMA_ID);
-        }
-        return null;
+    /**
+     * 输入物品能触发且产等离子的配方；无则 null。
+     * <p>数据包配方按输入物品匹配（组内线性匹配，标签原料也能命中）。
+     */
+    @Nullable
+    private AkaishiFluidProcessRecipe selectRecipe(ItemStack stack) {
+        AkaishiFluidProcessRecipe recipe = AkaishiMachineRecipeIndex.find(level,
+                AkaishiRecipeTypes.PLASMA_AGGREGATING.get(), stack);
+        return recipe != null && recipe.fluidOutput() != null ? recipe : null;
     }
 
-    /** 是否可放入输入槽（仅 7 种活化成分） */
-    public static boolean isActivatedComponent(ItemStack stack) {
-        return !stack.isEmpty() && plasmaFor(stack) != null;
+    /** 本机自述工序族：虚拟加工据此要求场域内确有聚合器（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.PLASMA_AGGREGATING.get();
     }
 
     /** 等离子体 → 罐索引（0=混合 1=下界 2=末地） */

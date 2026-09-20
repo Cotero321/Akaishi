@@ -81,6 +81,12 @@ public final class ForgeItemAccess implements IItemAccess {
         return stack.getCount() - remaining.getCount();
     }
 
+    @Override
+    public boolean hasItemCapability(Level level, BlockPos pos, Direction side) {
+        // 只看"有没有容器"：满仓的机器也必须判为存在，故不能复用 acceptable（那时返回 0）
+        return handlerAt(level, pos, side) != null;
+    }
+
     /** 取面朝侧的能力；无能力时用 {@link InvWrapper} 兜底（只读语义仍走原版容器） */
     private static IItemHandler handlerAt(Level level, BlockPos pos, Direction side) {
         if (level == null || pos == null || !level.isLoaded(pos)) {

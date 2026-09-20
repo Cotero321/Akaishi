@@ -1,0 +1,8 @@
+{
+  "type": "akaishi:mixing",
+  "fluid_inputs": [
+    { "fluid": "akaishi:dragon_fuel", "amount": 50 },
+    { "fluid": "akaishi:pure_fuel", "amount": 50 }
+  ],
+  "fluid_output": { "fluid": "akaishi:ultimate_mixture_fuel", "amount": 50 }
+}

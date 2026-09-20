@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:coal_dust" },
+  "input_count": 9,
+  "result": { "item": "minecraft:coal_block", "count": 1 }
+}

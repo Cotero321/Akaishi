@@ -20,6 +20,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 生命的融合砧：将赤石护甲与生命的融合锭融合为生命融合护甲。
@@ -39,22 +44,28 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
         super(ModBlockEntities.CHISHI_LIFE_FUSION_ANVIL.get(), pos, state);
     }
 
+    /**
+     * 赤石护甲 → 生命融合产物（各消耗 1 枚融合锭）。
+     * <p>
+     * <b>插入顺序即 JEI 展示顺序</b>：用 {@link LinkedHashMap} 而非 {@code Map.of} ——
+     * 后者的迭代顺序不保证稳定，JEI 列表会每次启动都换序。
+     * <p>机器判定（{@link #fusionTargetFor}）与 JEI 展示都读这一份，不再各写一套 if 链 / 列表。
+     */
+    public static final Map<Item, Item> FUSION_TARGETS = buildFusionTargets();
+
+    private static Map<Item, Item> buildFusionTargets() {
+        Map<Item, Item> targets = new LinkedHashMap<>(4);
+        targets.put(ModItems.akaishiHelmet.get(), ModItems.lifeFusionHelmet.get());
+        targets.put(ModItems.akaishiChestplate.get(), ModItems.lifeFusionChestplate.get());
+        targets.put(ModItems.akaishiLeggings.get(), ModItems.lifeFusionLeggings.get());
+        targets.put(ModItems.akaishiBoots.get(), ModItems.lifeFusionBoots.get());
+        return Collections.unmodifiableMap(targets);
+    }
+
     /** 查找赤石护甲对应的融合目标（非赤石护甲返回 null） */
+    @Nullable
     public static Item fusionTargetFor(ItemStack gear) {
-        Item item = gear.getItem();
-        if (item == ModItems.akaishiHelmet.get()) {
-            return ModItems.lifeFusionHelmet.get();
-        }
-        if (item == ModItems.akaishiChestplate.get()) {
-            return ModItems.lifeFusionChestplate.get();
-        }
-        if (item == ModItems.akaishiLeggings.get()) {
-            return ModItems.lifeFusionLeggings.get();
-        }
-        if (item == ModItems.akaishiBoots.get()) {
-            return ModItems.lifeFusionBoots.get();
-        }
-        return null;
+        return FUSION_TARGETS.get(gear.getItem());
     }
 
     /** 是否为可融合的赤石护甲 */

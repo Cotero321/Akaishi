@@ -4,11 +4,14 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
+import com.example.akaishi.craft.recipe.IAkaishiMachineRecipe;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifePurifierMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -30,18 +33,23 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 生命能量提纯器方块实体（仅服务端驱动逻辑）。
  * 双能量输入：赤能源（驱动）+ 生命能量（原料）。
  * 运行：每 tick 抽取最多 1M 赤能源，累计满 10M 时消耗 1000 生命能量
  * 固化出 1 个生命能量固态物（约 10 tick/次）。
+ * 产物来自数据包配方 {@code data/akaishi/recipes/life_purifying/*.json}（纯能量配方，无物品输入）。
  * 槽位：0=输出（生命能量固态物）。
  */
-public class AkaishiLifePurifierBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IUpgradeableMachine {
+public class AkaishiLifePurifierBlockEntity extends BlockEntity
+        implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IUpgradeableMachine,
+        IMachineProcessKind {
 
     public static final int OUTPUT_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -95,11 +103,12 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
         LongDataSlots.write(data, DATA_AKAISHI_CAPACITY, DATA_AKAISHI_CAPACITY_HIGH, akaishi.getMaxEnergy());
         LongDataSlots.write(data, DATA_LIFE_ENERGY, DATA_LIFE_ENERGY_HIGH, life.getEnergyStored());
         LongDataSlots.write(data, DATA_LIFE_CAPACITY, DATA_LIFE_CAPACITY_HIGH, life.getMaxEnergy());
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
+        data.set(DATA_PROGRESS, costTotal <= 0L ? 100 : (int) (progressEnergy * 100 / costTotal));
 
         boolean changed = false;
+        IAkaishiMachineRecipe recipe = currentRecipe();
         // 原料（生命能量）与输出满足条件时投入赤能源推进进度；赤能源不足时进度暂停不清零
-        if (canProcess()) {
+        if (recipe != null && canProcess(recipe)) {
             // 速度升级：每 tick 抽取率按速度倍率提升（总耗已含耗能倍率，提速消耗更快）
             long extract = Math.min((long) (ModConfig.lifePurifierChishiRate * getSpeedMultiplier()
                             * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
@@ -112,17 +121,18 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
                     progressEnergy -= costTotal;
                     // 单次加工生命能量耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
                     life.extractEnergy((long) (ModConfig.lifePurifierLifeCost * getEnergyCostMultiplier()), false);
+                    ItemStack product = recipe.result();
                     ItemStack out = inventory.getItem(OUTPUT_SLOT);
                     if (out.isEmpty()) {
-                        inventory.setItem(OUTPUT_SLOT, new ItemStack(ModItems.akaishiLifeEssenceSolid.get()));
+                        inventory.setItem(OUTPUT_SLOT, product.copy());
                     } else {
-                        out.grow(1);
+                        out.grow(product.getCount());
                     }
                 }
                 changed = true;
             }
         } else {
-            // 生命能量不足或输出已满：重置进度
+            // 生命能量不足 / 输出已满 / 无可用配方：重置进度
             progressEnergy = 0;
         }
         if (changed) {
@@ -130,8 +140,20 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
         }
     }
 
+    /** 固化配方来自数据包（同类型只有一条）；缺失时机器不产出 */
+    @Nullable
+    private IAkaishiMachineRecipe currentRecipe() {
+        return AkaishiMachineRecipeIndex.single(level, AkaishiRecipeTypes.LIFE_PURIFYING.get());
+    }
+
+    /** 机台自述工序族（供场域调度判断"这道机械工序有没有机台能跑"） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.LIFE_PURIFYING.get();
+    }
+
     /** 固化条件：生命能量充足 + 输出可容纳（赤能源检查在 tick 内做，不足时暂停） */
-    private boolean canProcess() {
+    private boolean canProcess(IAkaishiMachineRecipe recipe) {
         // 单次加工生命能量耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
         if (life.getEnergyStored() < (long) (ModConfig.lifePurifierLifeCost * getEnergyCostMultiplier())) {
             return false;
@@ -140,7 +162,8 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity implements Exten
         if (out.isEmpty()) {
             return true;
         }
-        return out.is(ModItems.akaishiLifeEssenceSolid.get()) && out.getCount() < out.getMaxStackSize();
+        ItemStack product = recipe.result();
+        return out.is(product.getItem()) && out.getCount() + product.getCount() <= out.getMaxStackSize();
     }
 
     public Container inventory() {

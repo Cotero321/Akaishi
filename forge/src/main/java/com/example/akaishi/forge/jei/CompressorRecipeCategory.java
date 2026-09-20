@@ -2,7 +2,9 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
-import com.example.akaishi.block.entity.AkaishiCompressorBlockEntity;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
+import net.minecraft.world.item.crafting.RecipeManager;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +21,7 @@ public class CompressorRecipeCategory extends SingleSlotRecipeCategory {
         super(helper, TYPE, new ItemStack(ModBlocks.CHISHI_COMPRESSOR.get()), "jei.akaishi.compressor");
     }
 
-    public static List<Recipe> getAll() {
-        return fromRecipes(AkaishiCompressorBlockEntity.RECIPES);
+    public static List<Recipe> getAll(RecipeManager manager) {
+        return fromProcessRecipes(AkaishiMachineRecipeIndex.all(manager, AkaishiRecipeTypes.COMPRESSING.get()));
     }
 }

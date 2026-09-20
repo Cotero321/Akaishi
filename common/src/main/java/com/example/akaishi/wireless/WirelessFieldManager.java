@@ -175,7 +175,14 @@ public final class WirelessFieldManager {
             return null;
         }
         ChunkPos target = new ChunkPos(pos);
-        for (Field field : fields.values()) {
+        ResourceKey<Level> dimension = level.dimension();
+        for (Map.Entry<Key, Field> entry : fields.entrySet()) {
+            // 维度必须一致：场域是"某一维度里的方形范围"，只比区块 X/Z 会让另一维度同区块坐标的
+            // 机器被误判为"在场"（跨维供能 / 跨维机台准入），是作用域越界
+            if (!entry.getKey().dimension().equals(dimension)) {
+                continue;
+            }
+            Field field = entry.getValue();
             ChunkPos center = new ChunkPos(field.center);
             int dx = Math.abs(target.x - center.x);
             int dz = Math.abs(target.z - center.z);

@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Every dust in this chapter comes from the Akaishi Pulverizer: ores in, dust out, and the downstream machines decide what happens next. Dust is the $(4)universal middleman$(0) for the Compressor and the Transformer — press it into blocks or turn it into bases, depending on what you're short of.$(br2)To stock up, set up a power grid and one Pulverizer: it eats normal and deepslate ores alike, and even Akaishi ore and Obsidian."
+      "text": "Every dust in this chapter comes from the Akaishi Pulverizer, but $(4)Akaishi Dust has a different source$(0): feeding Akaishi Ore to the Pulverizer yields $(4)Compressed Akaishi Essence$(0) (1 ore -> 1), and pulverizing that essence is what gives x2 Akaishi Dust. All other ores still go straight \"ore in, dust out\". Downstream, the Compressor presses dust back into blocks and the Transformer turns it into bases.$(br2)To stock up, set up a power grid and one Pulverizer: it eats normal and deepslate ores alike, and even Akaishi ore and Obsidian."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)The full dust menu:$(0)$(li)Akaishi Dust: 9 press into 1 Akaishi Essence$(li)Coal Dust: 9 press into 1 Coal Block$(li)Iron Dust / Gold Dust: 9 press into the matching block$(li)Copper Dust: 9 press into 1 Copper Block$(li)Lapis Dust: 9 press into 1 Lapis Block — or turn 1 into a Cooling Base$(li)Diamond Dust / Emerald Dust: 9 press into the matching block$(li)Quartz Dust: 9 press into 1 Quartz Block$(li)Netherite Dust: 9 press into 1 Netherite Ingot$(li)Obsidian Dust: $(4)4 press into 1 Obsidian$(0)$(br2)For the pressing details, see the Compressor — feed the Pulverizer the ore that matches the dust you need."
+      "text": "$(bold)The full dust menu:$(0)$(li)Akaishi Dust: pulverized from Compressed Akaishi Essence (1 -> 2); 9 press into 1 Akaishi Essence$(li)Compressed Akaishi Essence: 1 Akaishi Ore pulverizes into 1; or swap 9 Akaishi Dust for 1 in the Transformer$(li)Coal Dust: 9 press into 1 Coal Block$(li)Iron Dust / Gold Dust: 9 press into the matching block$(li)Copper Dust: 9 press into 1 Copper Block$(li)Lapis Dust: 9 press into 1 Lapis Block — or turn 1 into a Cooling Base$(li)Diamond Dust / Emerald Dust: 9 press into the matching block$(li)Quartz Dust: 9 press into 1 Quartz Block$(li)Netherite Dust: 9 press into 1 Netherite Ingot$(li)Obsidian Dust: $(4)4 press into 1 Obsidian$(0)$(br2)For the pressing details, see the Compressor — feed the Pulverizer the ore that matches the dust you need."
     },
     {
       "type": "patchouli:relations",

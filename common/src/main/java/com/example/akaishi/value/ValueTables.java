@@ -222,13 +222,26 @@ public final class ValueTables {
     }
 
     /**
-     * 手动覆盖值：精确 id → 通配符 → #标签 三级匹配。
+     * 手动覆盖值：<b>精确 id → 通配符 → #标签</b> 三级优先级（与配置注释一致），同级内按配置顺序取首个。
+     *
+     * <p><b>不能只按列表顺序扫一遍</b>：那样"先写的 #tag 会盖掉后写的精确 id"，
+     * 与文档承诺的优先级相反 —— 精确 id 是最具体、最该生效的那一档。
      *
      * @return 命中返回分值，未命中返回 -1（分值恒非负，可作为哨兵）
      */
     public double overrideValue(String itemId, Item item) {
         if (overrides.isEmpty()) {
             return -1.0;
+        }
+        for (Override entry : overrides) {
+            if (!entry.isTag() && entry.raw().indexOf('*') < 0 && entry.raw().equals(itemId)) {
+                return entry.score();
+            }
+        }
+        for (Override entry : overrides) {
+            if (!entry.isTag() && entry.raw().indexOf('*') >= 0 && globMatch(entry.raw(), itemId)) {
+                return entry.score();
+            }
         }
         ItemStack stack = null;
         for (Override entry : overrides) {
@@ -239,9 +252,6 @@ public final class ValueTables {
                 if (stack.is(entry.tagKey())) {
                     return entry.score();
                 }
-            } else if (entry.raw().equals(itemId)
-                    || (entry.raw().indexOf('*') >= 0 && globMatch(entry.raw(), itemId))) {
-                return entry.score();
             }
         }
         return -1.0;

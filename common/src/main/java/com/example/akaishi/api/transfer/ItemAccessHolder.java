@@ -138,6 +138,12 @@ public final class ItemAccessHolder {
             return Math.min(room, stack.getCount());
         }
 
+        @Override
+        public boolean hasItemCapability(Level level, BlockPos pos, Direction side) {
+            // 兜底实现只认原版 Container；纯查询，不改动任何状态
+            return containerAt(level, pos) != null;
+        }
+
         private static Container containerAt(Level level, BlockPos pos) {
             if (level == null || pos == null || !level.isLoaded(pos)) {
                 return null;

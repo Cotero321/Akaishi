@@ -67,8 +67,11 @@ public final class AkaishiMiniatureCommand {
             return 0;
         }
         VirtualCraftTask craft = matrix.craftTask();
-        String craftLine = craft == null ? "无"
-                : craft.plan().target().getHoverName().getString() + "（剩余 " + craft.remainingTicks() + " tick）";
+        String craftLine = craft == null
+                ? (matrix.lastCraftFail() == null ? "无" : "无（上次失败：" + matrix.lastCraftFail() + "）")
+                : craft.plan().target().getHoverName().getString()
+                + "（节点 " + craft.completedSteps() + "/" + craft.totalSteps()
+                + " · 预计剩余 " + craft.remainingTicks() + " tick）";
         // 未成型时附上诊断（译名由客户端渲染，服务端只带 key 与参数）
         List<Component> problem = matrix.describeStructureProblem();
         ctx.getSource().sendSuccess(() -> {

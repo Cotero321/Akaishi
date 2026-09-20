@@ -41,6 +41,14 @@ versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
+# 硬依赖：GeckoLib（壁虎库，3D 模型/动画运行时；我们的 Geo 内容无条件依赖它的类）
+[[dependencies.akaishi]]
+modId = "geckolib"
+mandatory = true
+versionRange = "[4.4,)"
+ordering = "NONE"
+side = "BOTH"
+
 [[dependencies.akaishi]]
 modId = "patchouli"
 mandatory = false

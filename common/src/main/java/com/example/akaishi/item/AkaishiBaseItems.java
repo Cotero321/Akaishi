@@ -69,7 +69,6 @@ public final class AkaishiBaseItems {
     public static RegistrySupplier<Item> diamondDust;
     public static RegistrySupplier<Item> emeraldDust;
     public static RegistrySupplier<Item> quartzDust;
-    public static RegistrySupplier<Item> netheriteDust;
     public static RegistrySupplier<Item> obsidianDust;
     public static RegistrySupplier<Item> coolingBase;
     public static RegistrySupplier<Item> coalOreBase;
@@ -125,7 +124,6 @@ public final class AkaishiBaseItems {
         diamondDust = item(ModItems.DIAMOND_DUST_ID);
         emeraldDust = item(ModItems.EMERALD_DUST_ID);
         quartzDust = item(ModItems.QUARTZ_DUST_ID);
-        netheriteDust = item(ModItems.NETHERITE_DUST_ID);
         obsidianDust = item(ModItems.OBSIDIAN_DUST_ID);
         // 基底（变化器产物）
         coolingBase = item(ModItems.COOLING_BASE_ID);

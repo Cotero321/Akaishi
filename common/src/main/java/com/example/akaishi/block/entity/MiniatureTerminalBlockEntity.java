@@ -513,9 +513,12 @@ public class MiniatureTerminalBlockEntity extends BlockEntity
                 ? tag.getUUID(MiniatureTerminalRegistry.TAG_TERMINAL_ID) : null;
         CompoundTag data = tag.getCompound(MiniatureTerminalRegistry.TAG_PAYLOAD);
         boolean incoming = typeId != null || id != null || !data.isEmpty();
-        // 已持有数据时<b>拒绝被覆盖</b>：正常流程里 load 只发生在新造的方块实体上（放置 / 读档 / 区块加载），
+        // 已持有数据时<b>拒绝被覆盖</b>：正常流程里服务端的 load 只发生在新造的方块实体上（放置 / 读档 / 区块加载），
         // 若这里出现"已有数据又被灌一份"，说明有别的路径在动它 —— 宁可保留原有那一份，也不覆盖玩家的终端。
-        if (incoming && isLoadedTerminal()) {
+        // <p>
+        // <b>只限服务端</b>：客户端那份是"服务端镜像"，方块实体数据包本来就该覆盖它。若客户端也拒绝，
+        // {@link #syncToClient()} 下发的更新会被静默丢弃，而菜单是按客户端方块实体构造的 ⇒ 界面读到旧值。
+        if (incoming && isLoadedTerminal() && (level == null || !level.isClientSide)) {
             LOGGER.warn("[akaishi] miniature at {} already holds terminal data; incoming load ignored", worldPosition);
             return;
         }

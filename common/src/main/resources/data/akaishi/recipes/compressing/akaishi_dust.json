@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:akaishi_dust" },
+  "input_count": 9,
+  "result": { "item": "akaishi:akaishi_essence", "count": 1 }
+}

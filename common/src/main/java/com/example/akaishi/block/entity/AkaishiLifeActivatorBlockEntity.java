@@ -4,6 +4,10 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.fluid.FluidTank;
@@ -24,6 +28,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,13 +40,20 @@ import java.util.List;
 
 /**
  * 生命活化器方块实体（仅服务端驱动逻辑）。
- * 缓慢无害化衰竭燃料：废料管道将衰竭燃料注入输入罐，每 tick 至多转化 4mb
- * 为对应的"活化衰竭液体"（1:1），每 1mb 消耗 100 生命能量。
+ * 缓慢无害化衰竭燃料：废料管道将衰竭燃料注入输入罐，每 tick 至多转化
+ * {@link ModConfig#lifeActivatorConvertRate} mb 为对应的"活化衰竭液体"（1:1），
+ * 每 1mb 消耗 {@link ModConfig#lifeActivatorCostPerMb} 生命能量。
  * 活化液体为安全中间产物，由普通液体管道从输出罐抽取。
  * 混合接入设备：输入罐接废料管道家族、输出罐接普通液体管道家族（罐级家族隔离）。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/activating/*.json}，类型 {@code akaishi:activating}）：
+ * 哪种衰竭燃料转成哪种活化液体由配方声明，机器侧不再硬编码 7 分支对照表。
+ * <p><b>转化是 1:1 连续流</b>，没有"批"的概念：配方里的 {@code amount} 只作<b>计价单位</b>
+ * （{@code MachineProcessEnergy} 按"每 amount mB 耗多少生命能量"报价），实际转化量每 tick 由速率决定。
+ * <p>本机自述工序族（{@link IMachineProcessKind}）。
  */
 public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IMachineProcessKind {
 
     /**
      * Menu 同步数据槽：每个 long 拆低/高 32 位两槽无损同步，避免 int 溢出。
@@ -124,10 +136,11 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
         LongDataSlots.write(data, DATA_OUT_CAPACITY, DATA_OUT_CAPACITY_HIGH, outTank.getCapacity());
 
         Fluid fuel = inTank.getFluid();
-        Fluid activated = ModFluids.activatedFuelFor(fuel);
-        if (fuel == null || fuel == Fluids.EMPTY || activated == null || activated == Fluids.EMPTY) {
-            return; // 无废料输入，静默等待
+        AkaishiFluidProcessRecipe recipe = selectRecipe(fuel);
+        if (recipe == null) {
+            return; // 无废料输入（或该燃料没有配方），静默等待
         }
+        Fluid activated = recipe.fluidOutput().fluid();
         // 实际转化量 = min(速率, 该废料存量, 输出余量, 生命能量可支持量)
         long outRoom = outTank.getCapacity() - outTank.getAmount();
         long afford = life.getEnergyStored() / ModConfig.lifeActivatorCostPerMb;
@@ -147,6 +160,28 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
         // 累计活化量拆低/高 16 位段同步，GUI 侧经 LongDataSlots 重组
         LongDataSlots.write(data, DATA_PROCESSED_LOW, DATA_PROCESSED_HIGH, processed);
         setChanged();
+    }
+
+    /** 取输入衰竭燃料对应的配方；无匹配或配方没声明流体产物则 null */
+    @Nullable
+    private AkaishiFluidProcessRecipe selectRecipe(@Nullable Fluid fuel) {
+        if (fuel == null || fuel == Fluids.EMPTY) {
+            return null;
+        }
+        for (AkaishiFluidProcessRecipe candidate
+                : AkaishiMachineRecipeIndex.all(level.getRecipeManager(), AkaishiRecipeTypes.ACTIVATING.get())) {
+            List<AkaishiFluidProcessRecipe.FluidSpec> ins = candidate.fluidInputs();
+            if (ins.size() == 1 && ins.get(0).fluid() == fuel && candidate.fluidOutput() != null) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    /** 本机自述工序族：虚拟加工据此要求场域内确有活化器（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.ACTIVATING.get();
     }
 
     // ===== ExtendedMenuProvider =====

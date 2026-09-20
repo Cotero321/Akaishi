@@ -6,11 +6,14 @@ import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
-import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiFuelMixerMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -27,6 +30,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,14 +41,18 @@ import java.util.List;
 
 /**
  * 燃料混合器方块实体（仅服务端驱动逻辑）。
- * 消耗赤能源，将两种燃料液体按比例调和为高阶混合燃料：
- * - 高级混合燃料：1000mb 末地混合燃料 + 1000mb 下界复合燃料 → 1500mb 高级混合燃料
- * - 终极混合燃料：50mb 末地巨龙燃料 + 50mb 至纯燃料 → 50mb 终极混合燃料
+ * 消耗赤能源，将两种燃料液体按比例调和为高阶混合燃料
+ * （如 1000mb 末地混合燃料 + 1000mb 下界复合燃料 → 1500mb 高级混合燃料）。
  * 2 个通用输入罐（顺序无关，任意摆放）+ 1 个通用输出罐；配方按两罐液体组合判定，
  * 输入量不足 / 输出罐不可容纳 / 组合不匹配时停机。输入罐只可注入、输出罐只可抽取。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/mixing/*.json}，类型 {@code akaishi:mixing}）：
+ * 两路输入流体、各自用量与输出流体都由配方描述，机器侧不再硬编码对照表。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有混合器"。
  */
 public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     /** Menu 同步数据槽：long 各占高低两槽 0/1=赤能量 2/3=赤容量 4/5=输入1量 6/7=输入1容量
      *  8/9=输入2量 10/11=输入2容量 12/13=输出量 14/15=输出容量 16=混合进度 */
@@ -67,26 +75,47 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
     public static final int DATA_PROGRESS = 16;
     public static final int DATA_SLOTS = 17;
 
-    /** 混合配方：两种输入液体 1:1:1 → 一种输出液体 */
-    public record Recipe(Fluid in1, long in1Amount, Fluid in2, long in2Amount, Fluid out, long outAmount) {
-    }
-
-    /** 根据两个输入罐的液体组合判定配方（罐顺序无关）；不匹配返回 null */
-    public static Recipe recipeFor(Fluid f1, Fluid f2) {
-        Fluid end = ModFluids.get(ModFluids.END_MIXTURE_FUEL_ID);
-        Fluid compound = ModFluids.get(ModFluids.NETHER_COMPOUND_FUEL_ID);
-        if ((f1 == end && f2 == compound) || (f1 == compound && f2 == end)) {
-            // 高级混合：1000+1000 → 1500mb（混合增值 50%）
-            return new Recipe(end, 1000L, compound, 1000L,
-                    ModFluids.get(ModFluids.ADVANCED_MIXTURE_FUEL_ID), 1500L);
+    /**
+     * 按两个输入罐的液体组合选配方（罐顺序无关）；无匹配、输入不足或输出罐装不下则返回 null。
+     * <p>数据包配方的两路流体不分先后，故两种摆放都算命中。
+     */
+    @Nullable
+    private AkaishiFluidProcessRecipe selectRecipe() {
+        Fluid in1 = in1Tank.getFluid();
+        Fluid in2 = in2Tank.getFluid();
+        if (in1 == null || in2 == null) {
+            return null;
         }
-        Fluid dragon = ModFluids.get(ModFluids.DRAGON_FUEL_ID);
-        Fluid pure = ModFluids.get(ModFluids.PURE_FUEL_ID);
-        if ((f1 == dragon && f2 == pure) || (f1 == pure && f2 == dragon)) {
-            return new Recipe(dragon, 50L, pure, 50L,
-                    ModFluids.get(ModFluids.ULTIMATE_MIXTURE_FUEL_ID), 50L);
+        for (AkaishiFluidProcessRecipe candidate
+                : AkaishiMachineRecipeIndex.all(level.getRecipeManager(), AkaishiRecipeTypes.MIXING.get())) {
+            List<AkaishiFluidProcessRecipe.FluidSpec> ins = candidate.fluidInputs();
+            AkaishiFluidProcessRecipe.FluidSpec out = candidate.fluidOutput();
+            if (ins.size() != 2 || out == null) {
+                continue; // 本机固定"两进一出"，形状不符的配方不适用
+            }
+            boolean straight = ins.get(0).fluid() == in1 && ins.get(1).fluid() == in2;
+            boolean swapped = ins.get(0).fluid() == in2 && ins.get(1).fluid() == in1;
+            if (!straight && !swapped) {
+                continue;
+            }
+            long need1 = amountOf(ins, in1);
+            long need2 = amountOf(ins, in2);
+            if (in1Tank.getAmount() >= need1 && in2Tank.getAmount() >= need2
+                    && canAdd(outTank, out.fluid(), out.amount())) {
+                return candidate;
+            }
         }
         return null;
+    }
+
+    /** 该流体在配方里的需求量（0 = 配方不含该流体） */
+    private static long amountOf(List<AkaishiFluidProcessRecipe.FluidSpec> specs, Fluid fluid) {
+        for (AkaishiFluidProcessRecipe.FluidSpec spec : specs) {
+            if (spec.fluid() == fluid) {
+                return spec.amount();
+            }
+        }
+        return 0L;
     }
 
     private final SimpleContainerData data;
@@ -144,14 +173,14 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
         LongDataSlots.write(data, DATA_OUT_AMOUNT, DATA_OUT_AMOUNT_HIGH, outTank.getAmount());
         LongDataSlots.write(data, DATA_OUT_CAPACITY, DATA_OUT_CAPACITY_HIGH, outTank.getCapacity());
 
-        Recipe recipe = recipeFor(in1Tank.getFluid(), in2Tank.getFluid());
+        AkaishiFluidProcessRecipe recipe = selectRecipe();
         // 组合不匹配 / 输入不足 / 输出罐无法容纳 → 停机等待，丢弃进度防跨配方挪用
-        if (recipe == null || in1Tank.getAmount() < recipe.in1Amount || in2Tank.getAmount() < recipe.in2Amount
-                || !canAdd(outTank, recipe.out, recipe.outAmount)) {
+        if (recipe == null) {
             progressEnergy = 0;
             data.set(DATA_PROGRESS, 0);
             return;
         }
+        AkaishiFluidProcessRecipe.FluidSpec output = recipe.fluidOutput();
         // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）。
         // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
         long costTotal = (long) (ModConfig.fuelMixerChishiCost * ModConfig.machineCostMultiplier
@@ -163,15 +192,22 @@ public class AkaishiFuelMixerBlockEntity extends BlockEntity implements
             akaishi.extractEnergy(extract, false);
             hum.tick(level, worldPosition);
             progressEnergy += extract;
-            if (progressEnergy >= costTotal) {
+            if (costTotal > 0L && progressEnergy >= costTotal) {
                 progressEnergy -= costTotal;
-                in1Tank.drain(recipe.in1Amount, false);
-                in2Tank.drain(recipe.in2Amount, false);
-                outTank.fill(FluidStack.create(recipe.out, recipe.outAmount), false);
+                in1Tank.drain(amountOf(recipe.fluidInputs(), in1Tank.getFluid()), false);
+                in2Tank.drain(amountOf(recipe.fluidInputs(), in2Tank.getFluid()), false);
+                outTank.fill(FluidStack.create(output.fluid(), output.amount()), false);
             }
             setChanged();
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
+        // 成本为 0（如 [machine] costMultiplier 被配成 0）时不能做除法，直接显示满载
+        data.set(DATA_PROGRESS, costTotal <= 0L ? 100 : (int) (progressEnergy * 100 / costTotal));
+    }
+
+    /** 本机自述工序族：虚拟加工据此要求场域内确有混合器（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.MIXING.get();
     }
 
     /** 输出罐可容纳指定液体（空或同液体且余量足够） */

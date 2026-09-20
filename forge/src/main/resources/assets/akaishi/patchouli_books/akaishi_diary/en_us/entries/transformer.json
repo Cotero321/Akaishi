@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transformer",
-      "text": "The Akaishi Transformer $(4)converts raw ores — or Lapis Dust — into standardized bases$(0): one mineral, one ID. One input in, one base out. Each change takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(li)Lapis Dust → Cooling Base$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)Akaishi ore → Akaishi Ore Base"
+      "text": "The Akaishi Transformer $(4)converts raw ores, Lapis Dust or Akaishi Dust into standardized bases and concentrates$(0): one input in, one output out (Akaishi Dust is processed 9 at a time). Each change takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(li)Lapis Dust → Cooling Base$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)$(4)9 Akaishi Dust → 1 Compressed Akaishi Essence$(0)$(li)$(4)Compressed Akaishi Essence → Akaishi Ore Base$(0)"
     },
     {
       "type": "patchouli:spotlight",
@@ -21,7 +21,7 @@
         "akaishi:ore_bases",
         "akaishi:dusts"
       ],
-      "text": "See $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:dusts)Dusts$(/l) for where the feedstock comes from, and $(l:akaishi:ore_bases)Ore Bases$(/l) for the full family and every recipe that needs them."
+      "text": "See $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:dusts)Dusts$(/l) for where the feedstock comes from, and $(l:akaishi:ore_bases)Ore Bases$(/l) for the full family and every recipe that needs them. Note for the Akaishi line: Akaishi Ore is pulverized into Compressed Akaishi Essence first, and the Akaishi Ore Base now comes from that concentrate rather than straight from the ore."
     }
   ]
 }

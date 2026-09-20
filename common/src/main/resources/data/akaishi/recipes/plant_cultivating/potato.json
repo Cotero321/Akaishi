@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:potato" },
+  "consume_input": false,
+  "result": { "item": "minecraft:potato", "count": 1 }
+}

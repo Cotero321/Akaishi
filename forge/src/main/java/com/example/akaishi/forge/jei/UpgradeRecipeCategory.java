@@ -2,8 +2,10 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.menu.EnergyFormat;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -25,7 +27,7 @@ import java.util.List;
 
 /**
  * JEI 展示的"赤红升级"配方类别：
- * 20M 赤能源 + 1 升级模板 + 1 升级槽位 → 为赤石装备应用一种特殊能力（每种最多 3 级）。
+ * 配置的赤能源（{@code upgradeStationEnergyPerUpgrade}）+ 1 升级模板 + 1 升级槽位 → 为赤石装备应用一种特殊能力（每种最多 3 级）。
  */
 public class UpgradeRecipeCategory implements IRecipeCategory<UpgradeRecipeCategory.UpgradeRecipe> {
 
@@ -78,7 +80,10 @@ public class UpgradeRecipeCategory implements IRecipeCategory<UpgradeRecipeCateg
         GuiWidgets.slotBox(guiGraphics, 44, 30);
         GuiWidgets.slotBox(guiGraphics, 62, 30);
         GuiWidgets.slotBox(guiGraphics, 116, 30);
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("jei.akaishi.cost_upgrade"), 8, 52, 0xFF404040);
+        guiGraphics.drawString(Minecraft.getInstance().font,
+                Component.translatable("jei.akaishi.cost_upgrade",
+                        EnergyFormat.formatFloor(ModConfig.upgradeStationEnergyPerUpgrade)),
+                8, 52, 0xFF404040);
         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(recipe.ability().tooltipKey, 1).plainCopy(),
                 8, 61, 0xFFA03030);
     }

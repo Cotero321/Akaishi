@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:akaishi_crystal" },
+  "input_count": 9,
+  "result": { "item": "akaishi:akaishi_crystal_block", "count": 1 }
+}

@@ -178,7 +178,7 @@ public final class ItemTerminalSearch {
             } catch (Throwable e) {
                 // 捕获 Error：类缺失时抛的是 NoClassDefFoundError，不能让搜索把界面带崩
                 transliteratorFailed = true;
-                LOG.warn("[IT] 拼音转写不可用，退化为名称/注册名匹配", e);
+                LOG.warn("拼音转写不可用，退化为名称/注册名匹配", e);
             }
         }
         if (PINYIN_CACHE.size() >= CACHE_LIMIT) {

@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:emerald_block" },
+  "result": { "item": "akaishi:emerald_ore_base", "count": 9 }
+}

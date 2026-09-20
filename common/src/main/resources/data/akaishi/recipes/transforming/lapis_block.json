@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:transforming",
+  "ingredient": { "item": "minecraft:lapis_block" },
+  "result": { "item": "akaishi:lapis_ore_base", "count": 9 }
+}

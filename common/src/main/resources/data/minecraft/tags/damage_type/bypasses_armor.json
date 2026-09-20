@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "akaishi:altar_drain"
+    "akaishi:altar_drain",
+    "akaishi:true_damage"
   ]
 }

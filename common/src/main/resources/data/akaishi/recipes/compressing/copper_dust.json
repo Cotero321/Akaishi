@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:compressing",
+  "ingredient": { "item": "akaishi:copper_dust" },
+  "input_count": 9,
+  "result": { "item": "minecraft:copper_block", "count": 1 }
+}

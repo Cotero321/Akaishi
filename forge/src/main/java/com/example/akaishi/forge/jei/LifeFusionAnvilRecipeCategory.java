@@ -2,6 +2,7 @@ package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
@@ -18,9 +19,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JEI「生命融合锻台」配方类别：
@@ -99,21 +103,17 @@ public class LifeFusionAnvilRecipeCategory implements IRecipeCategory<LifeFusion
     /** 生命融合配方展示数据 */
     public record LifeFusionRecipe(ItemStack base, ItemStack ingot, ItemStack output) {
 
-        /** 全部融合配方：赤石护甲 4 件 → 生命融合对应件（各消耗 1 枚融合锭） */
+        /**
+         * 全部融合配方：<b>直接遍历机器侧的 {@link AkaishiLifeFusionAnvilBlockEntity#FUSION_TARGETS}</b>。
+         * <p>原先是 JEI 自带一份抄写（机器是 if 链），两边一旦改动就会脱节；现在只有一份数据。
+         */
         public static List<LifeFusionRecipe> getAll() {
-            return List.of(
-                    new LifeFusionRecipe(new ItemStack(ModItems.akaishiHelmet.get()), fusionIngot(),
-                            new ItemStack(ModItems.lifeFusionHelmet.get())),
-                    new LifeFusionRecipe(new ItemStack(ModItems.akaishiChestplate.get()), fusionIngot(),
-                            new ItemStack(ModItems.lifeFusionChestplate.get())),
-                    new LifeFusionRecipe(new ItemStack(ModItems.akaishiLeggings.get()), fusionIngot(),
-                            new ItemStack(ModItems.lifeFusionLeggings.get())),
-                    new LifeFusionRecipe(new ItemStack(ModItems.akaishiBoots.get()), fusionIngot(),
-                            new ItemStack(ModItems.lifeFusionBoots.get())));
-        }
-
-        private static ItemStack fusionIngot() {
-            return new ItemStack(ModItems.lifeFusionIngot.get());
+            List<LifeFusionRecipe> list = new ArrayList<>(AkaishiLifeFusionAnvilBlockEntity.FUSION_TARGETS.size());
+            for (Map.Entry<Item, Item> entry : AkaishiLifeFusionAnvilBlockEntity.FUSION_TARGETS.entrySet()) {
+                list.add(new LifeFusionRecipe(new ItemStack(entry.getKey()),
+                        new ItemStack(ModItems.lifeFusionIngot.get()), new ItemStack(entry.getValue())));
+            }
+            return List.copyOf(list);
         }
     }
 }

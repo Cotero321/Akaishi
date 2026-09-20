@@ -7,12 +7,14 @@ import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
+import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.fluid.FluidTank;
-import com.example.akaishi.fluid.ModFluids;
-import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiEnergyLiquefierMenu;
 import com.example.akaishi.sound.MachineHum;
 import com.example.akaishi.sound.ModSounds;
@@ -25,7 +27,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,28 +35,32 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
  * 能量液化装置方块实体（仅服务端驱动逻辑）。
- * 投入高能量材料，消耗赤能源液化出对应燃料/能量液体：
- * - 下界之星 → 下界至纯能量（高级档，1000mb/个，耗 50M 赤能源）
- * - 凋零玫瑰 → 下界复合能量（低级档，400mb/个，耗 5M 赤能源）
- * - 末地混合物 → 末地混合燃料（中级档，500mb/个，耗 10M 赤能源）
- * - 幽匿生命体 → 幽匿生命燃料（最低档，100mb/个，耗 10M 赤能源）
- * - 巨龙混合物 → 末地巨龙燃料（高级档，500mb/个，耗 50M 赤能源）
+ * 投入高能量材料，消耗赤能源液化出对应燃料/能量液体
+ * （下界之星 → 下界至纯能量、凋零玫瑰 → 下界复合能量、各混合物/幽匿生命体 → 对应燃料）。
  * 产物存于单个通用输出罐（一次处理一种输入），由液体管道抽取，输入槽可接物品管道/漏斗。
- * 槽位：0 = 材料输入槽（下界之星/凋零玫瑰/各混合物，只进不出）；1 = 生命能量固态物槽
- * （末地/幽匿/巨龙燃料液化时消耗 1 个固态物，下界能量液化无需固态物）。
+ * 槽位：0 = 材料输入槽（只进不出）；1 = 辅料槽（配方声明 {@code catalyst} 时消耗，如生命能量固态物）。
+ *
+ * <p><b>配方来自数据包</b>（{@code data/akaishi/recipes/liquefying/*.json}，类型
+ * {@code akaishi:liquefying}）：产物流体、辅料要求与各档赤能源成本都由配方描述，
+ * 机器侧不再硬编码"输入 → 液体/成本"对照表。
+ * <p><b>本机必须声明 energy</b>：液化是"能量换燃料"，配方不写能量等于凭空造燃料，
+ * 故 {@code energy <= 0} 的配方本机不加工。
+ * <p>本机自述工序族（{@link IMachineProcessKind}），使虚拟加工能要求"场域内真有液化机"。
  */
 public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IItemPipeDevice, IDataCarrier, IUpgradeableMachine,
+        IMachineProcessKind {
 
     public static final int INPUT_SLOT = 0;
     /** 生命能量固态物槽（末地/幽匿/巨龙燃料液化消耗） */
@@ -74,38 +79,13 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
     public static final int DATA_PROGRESS = 8;
     public static final int DATA_SLOTS = 9;
 
-    /** 液化配方定义：输入物品 → 产物液体；needsSolid 标记是否需消耗生命能量固态物 */
-    public record Recipe(ItemStack input, long cost, long amount, Fluid output, boolean needsSolid) {
-    }
-
     /** 根据输入物品匹配液化配方；无匹配返回 null */
-    public static Recipe recipeFor(ItemStack stack) {
-        if (stack.is(Items.NETHER_STAR)) {
-            // 高级档：1 颗星 → 1000mb 至纯能量（处理器浓缩为 500mb 至纯燃料）
-            return new Recipe(new ItemStack(Items.NETHER_STAR), 50_000_000L, 1000L,
-                    ModFluids.get(ModFluids.NETHER_PURE_ENERGY_ID), false);
-        }
-        if (stack.is(Items.WITHER_ROSE)) {
-            // 低级档：1 朵玫瑰 → 400mb 复合能量（大幅缩减产出，需积攒多朵加工）
-            return new Recipe(new ItemStack(Items.WITHER_ROSE), 5_000_000L, 400L,
-                    ModFluids.get(ModFluids.NETHER_COMPOUND_ENERGY_ID), false);
-        }
-        if (stack.is(ModItems.endMixture.get())) {
-            // 中级档：浓缩燃料（1 固态物 → 500mb 末地混合燃料）
-            return new Recipe(new ItemStack(ModItems.endMixture.get()), 10_000_000L, 500L,
-                    ModFluids.get(ModFluids.END_MIXTURE_FUEL_ID), true);
-        }
-        if (stack.is(ModItems.dragonMixture.get())) {
-            // 高级档：浓缩燃料（1 固态物 → 500mb，利用率 7 约可燃烧 42 分钟，与合成成本匹配）
-            return new Recipe(new ItemStack(ModItems.dragonMixture.get()), 50_000_000L, 500L,
-                    ModFluids.get(ModFluids.DRAGON_FUEL_ID), true);
-        }
-        if (stack.is(ModItems.sculkLifeform.get())) {
-            // 最低级档：1 个幽匿生命体 → 100mb（大幅缩减产出，利用率 3 约可燃烧 4 分钟）
-            return new Recipe(new ItemStack(ModItems.sculkLifeform.get()), 10_000_000L, 100L,
-                    ModFluids.get(ModFluids.SCULK_LIFE_FUEL_ID), true);
-        }
-        return null;
+    @Nullable
+    public static AkaishiFluidProcessRecipe recipeFor(Level level, ItemStack stack) {
+        AkaishiFluidProcessRecipe recipe = AkaishiMachineRecipeIndex.find(level,
+                AkaishiRecipeTypes.LIQUEFYING.get(), stack);
+        // energy <= 0 视为非法配方（液化必须耗能，否则"零成本造燃料"）：机器不加工
+        return recipe != null && recipe.energy() > 0L ? recipe : null;
     }
 
     private final SimpleContainer inventory;
@@ -115,8 +95,9 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
     private final FluidTank outputTank;
     /** 已投入的赤能源（能量池模式，满配方 cost 完成一次） */
     private long progressEnergy;
-    /** 当前输入物品的注册名，用于物品变化时重置进度 */
-    private String lastItemKey = "";
+    /** 当前生效的配方（数据包提供；换配方即丢弃旧进度，防跨配方挪用能量池） */
+    @Nullable
+    private AkaishiFluidProcessRecipe currentRecipe;
     /** 机器升级槽（速度/能量各一格，单格堆叠 8 封顶） */
     private final MachineUpgradeSlots upgradeSlots = new MachineUpgradeSlots();
 
@@ -155,30 +136,31 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
         LongDataSlots.write(data, DATA_FLUID_AMOUNT, DATA_FLUID_AMOUNT_HIGH, outputTank.getAmount());
         LongDataSlots.write(data, DATA_FLUID_CAPACITY, DATA_FLUID_CAPACITY_HIGH, outputTank.getCapacity());
 
-        Recipe recipe = recipeFor(inventory.getItem(INPUT_SLOT));
-        if (recipe == null) {
+        AkaishiFluidProcessRecipe recipe = recipeFor(level, inventory.getItem(INPUT_SLOT));
+        if (recipe == null || recipe.fluidOutput() == null) {
             progressEnergy = 0;
-            lastItemKey = "";
+            currentRecipe = null;
             data.set(DATA_PROGRESS, 0);
             return;
         }
         // 输入物品变化时丢弃旧进度，避免跨配方挪用能量池
-        String key = recipeKey(inventory.getItem(INPUT_SLOT));
-        if (!key.equals(lastItemKey)) {
+        if (recipe != currentRecipe) {
             progressEnergy = 0;
-            lastItemKey = key;
+            currentRecipe = recipe;
         }
-        // 需要固态物的配方必须持有生命能量固态物（按类型校验而非仅非空，防止管道/误放物品被吞），否则停机等待
-        if (recipe.needsSolid && !inventory.getItem(SOLID_SLOT).is(ModItems.akaishiLifeEssenceSolid.get())) {
+        // 辅料要求：配方声明 catalyst 时必须持有足够数量（按类型校验而非仅非空，防管道/误放物品被吞）
+        Ingredient catalyst = recipe.catalyst();
+        ItemStack solidStack = inventory.getItem(SOLID_SLOT);
+        if (catalyst != null && (!catalyst.test(solidStack) || solidStack.getCount() < recipe.inputCount())) {
             progressEnergy = 0;
             data.set(DATA_PROGRESS, 0);
             return;
         }
         // 配置 [machine] costMultiplier + 速度升级耗能倍率（封顶 4×）：单件赤能源需求与每 tick 抽取额同步放大 → 总耗放大、速度只决定快慢
-        long costTotal = (long) (recipe.cost * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
-        // 目标罐：通用输出罐（产物与罐中异常液体不一致时 fill 会拒绝，安全）
+        long costTotal = (long) (recipe.energy() * ModConfig.machineCostMultiplier * getEnergyCostMultiplier());
+        AkaishiFluidProcessRecipe.FluidSpec output = recipe.fluidOutput();
         boolean changed = false;
-        if (canAdd(outputTank, recipe.amount)) {
+        if (canAdd(outputTank, output.amount())) {
             // 机器升级：速度升级提升每 tick 抽取率（抽得快、加工更快）
             long extract = Math.min((long) (ModConfig.energyLiquefierChishiRate * getSpeedMultiplier()
                             * ModConfig.machineCostMultiplier * getEnergyCostMultiplier()),
@@ -187,17 +169,17 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
                 akaishi.extractEnergy(extract, false);
                 hum.tick(level, worldPosition);
                 progressEnergy += extract;
-                if (progressEnergy >= costTotal) {
+                if (costTotal > 0L && progressEnergy >= costTotal) {
                     progressEnergy -= costTotal;
-                    outputTank.fill(FluidStack.create(recipe.output, recipe.amount), false);
-                    inventory.getItem(INPUT_SLOT).shrink(1);
+                    outputTank.fill(FluidStack.create(output.fluid(), output.amount()), false);
+                    inventory.getItem(INPUT_SLOT).shrink(recipe.inputCount());
                     if (inventory.getItem(INPUT_SLOT).isEmpty()) {
                         inventory.setItem(INPUT_SLOT, ItemStack.EMPTY);
                     }
-                    // 末地/幽匿/巨龙燃料液化消耗 1 个生命能量固态物
-                    if (recipe.needsSolid) {
-                        inventory.getItem(SOLID_SLOT).shrink(1);
-                        if (inventory.getItem(SOLID_SLOT).isEmpty()) {
+                    // 辅料随主料一起消耗（数量与主料一致，见 inputCount 注释）
+                    if (catalyst != null) {
+                        solidStack.shrink(recipe.inputCount());
+                        if (solidStack.isEmpty()) {
                             inventory.setItem(SOLID_SLOT, ItemStack.EMPTY);
                         }
                     }
@@ -207,10 +189,17 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
         } else {
             progressEnergy = 0;
         }
-        data.set(DATA_PROGRESS, (int) (progressEnergy * 100 / costTotal));
+        // 成本为 0（如 [machine] costMultiplier 被配成 0）时不能做除法，直接显示满载
+        data.set(DATA_PROGRESS, costTotal <= 0L ? 100 : (int) (progressEnergy * 100 / costTotal));
         if (changed) {
             setChanged();
         }
+    }
+
+    /** 本机自述工序族：虚拟加工据此要求场域内确有液化机（见 {@link IMachineProcessKind}） */
+    @Override
+    public RecipeType<?> processKind() {
+        return AkaishiRecipeTypes.LIQUEFYING.get();
     }
 
     /** 目标罐是否还能装入指定量液体（罐满则 false） */
@@ -219,11 +208,6 @@ public class AkaishiEnergyLiquefierBlockEntity extends BlockEntity implements
             return amount <= tank.getCapacity();
         }
         return tank.getAmount() + amount <= tank.getCapacity();
-    }
-
-    private static String recipeKey(ItemStack stack) {
-        ResourceLocation id = stack.getItem().arch$registryName();
-        return id == null ? "" : id.toString();
     }
 
     public Container inventory() {

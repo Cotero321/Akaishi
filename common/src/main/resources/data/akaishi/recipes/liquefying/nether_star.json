@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:liquefying",
+  "ingredient": { "item": "minecraft:nether_star" },
+  "energy": 50000000,
+  "fluid_output": { "fluid": "akaishi:nether_pure_energy", "amount": 1000 }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": { "item": "akaishi:lapis_dust" },
+  "result": "minecraft:lapis_lazuli",
+  "experience": 0.2,
+  "cookingtime": 200
+}

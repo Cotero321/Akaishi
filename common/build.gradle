@@ -7,6 +7,11 @@ repositories {
     maven { url "https://maven.theillusivec4.top/" }
     // Patchouli 手册 API（blamejared 仓库）
     maven { url "https://maven.blamejared.com/" }
+    // GeckoLib（壁虎库）官方 Cloudsmith 仓库，与 forge 侧一致
+    maven {
+        url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+        name "GeckoLib"
+    }
 }
 
 dependencies {
@@ -20,6 +25,11 @@ dependencies {
     modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
     // Patchouli 手册 API（可选依赖，mods.toml mandatory=false；运行时未安装经 LinkageError 防御降级）
     modCompileOnly("vazkii.patchouli:Patchouli:${rootProject.patchouli_version}")
+
+    // GeckoLib：BOSS 实体（AgaitolosEntity 实现 GeoEntity）必须放在 common，而 GeckoLib 只发布 forge 构件。
+    // 这里用 modCompileOnly 只取编译期 API 面：common 是纯 Architectury 工程，运行期由 forge 模块的
+    // modImplementation 提供真实 jar，不重复打包，也不会让 common 依赖 forge 运行时类。
+    modCompileOnly("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
 }
  
 sourceSets {

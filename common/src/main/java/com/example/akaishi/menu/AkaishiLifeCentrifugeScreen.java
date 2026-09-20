@@ -1,7 +1,6 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.entity.AkaishiLifeCentrifugeBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -44,6 +43,15 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
         return EnergyFormat.format(v);
     }
 
+    /**
+     * 进度条分母 = 当前配方声明的批量（服务端同步而来）。
+     * <p>无配方时服务端会写 0，这里兜到 1 防除零（条显示为空）。
+     */
+    private long batchMb() {
+        long batch = menu.getBatchMb();
+        return batch > 0L ? batch : 1L;
+    }
+
     /** 带标签状态条：标签在轨道左侧，轨道整条填充不压字 */
     private void drawBar(GuiGraphics gui, int x, int y, String labelKey, long energy, long max, int color) {
         gui.drawString(this.font, Component.translatable(labelKey), x + LABEL_X, y + 1, TEXT, false);
@@ -62,7 +70,7 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
         drawBar(gui, x, y + ENERGY_Y, "gui.akaishi.energy.short",
                 menu.getEnergy(), menu.getEnergyCapacity(), 0xFFE03030);
         drawBar(gui, x, y + PROGRESS_Y, "gui.akaishi.centrifuge.progress",
-                menu.getProgress(), AkaishiLifeCentrifugeBlockEntity.BATCH_MB, 0xFFFFD030);
+                menu.getProgress(), batchMb(), 0xFFFFD030);
 
         // 升级槽（速度/能量/无线，纹理无图案需自绘框 + 槽位左侧标签）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
@@ -100,7 +108,7 @@ public class AkaishiLifeCentrifugeScreen extends AbstractContainerScreen<Akaishi
                     formatEnergy(menu.getEnergy()), formatEnergy(menu.getEnergyCapacity())), mouseX, mouseY);
         } else if (isHovering(TRACK_X, PROGRESS_Y, TRACK_W, BAR_H, mouseX, mouseY)) {
             gui.renderTooltip(this.font, Component.translatable("gui.akaishi.centrifuge.progress_tip",
-                    formatEnergy(menu.getProgress()), formatEnergy(AkaishiLifeCentrifugeBlockEntity.BATCH_MB)), mouseX, mouseY);
+                    formatEnergy(menu.getProgress()), formatEnergy(batchMb())), mouseX, mouseY);
         }
         // 升级槽悬停提示
         if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {

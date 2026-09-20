@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_pulverizer",
-      "text": "The Akaishi Pulverizer $(4)grinds ores down into dust$(0) — the first stop of any ore-processing line. Each grind takes 100 ticks at 15 energy/tick, with a 100k internal buffer; deepslate ores give the same result as normal ones.$(li)Coal / Iron / Gold / Diamond / Emerald / Quartz ore → x2 matching dust$(li)Copper ore → x3 Copper Dust$(li)Lapis ore → x4 Lapis Dust$(li)Redstone ore → x4 vanilla Redstone$(li)Ancient Debris → 1 Netherite Dust$(li)Obsidian → 1 Obsidian Dust$(li)Akaishi ore → x2 Akaishi Dust"
+      "text": "The Akaishi Pulverizer is the first stop of the ore-processing line. Each grind takes 100 ticks at 15 energy/tick, with a 100k internal buffer; deepslate ores give the same result as normal ones.$(br2)$(bold)Akaishi line (two hops):$(0)$(li)Akaishi Ore (4 tiers x 4 environments) -> $(4)1 Compressed Akaishi Essence$(0)$(li)$(4)Compressed Akaishi Essence -> x2 Akaishi Dust$(0)$(br2)$(bold)Other ores (one hop):$(0)$(li)Coal / Iron / Gold / Diamond / Emerald / Quartz ore -> x2 matching dust$(li)Copper ore -> x3 Copper Dust$(li)Lapis ore -> x4 Lapis Dust$(li)Redstone ore -> x4 vanilla Redstone$(li)Ancient Debris -> 1 Netherite Dust$(li)Obsidian -> 1 Obsidian Dust"
     },
     {
       "type": "patchouli:spotlight",

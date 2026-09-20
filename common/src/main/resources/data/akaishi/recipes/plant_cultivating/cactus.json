@@ -1,0 +1,6 @@
+{
+  "type": "akaishi:plant_cultivating",
+  "ingredient": { "item": "minecraft:cactus" },
+  "consume_input": false,
+  "result": { "item": "minecraft:cactus", "count": 1 }
+}

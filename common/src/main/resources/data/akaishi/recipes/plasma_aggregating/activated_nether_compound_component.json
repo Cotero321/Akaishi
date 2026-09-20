@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:plasma_aggregating",
+  "ingredient": { "item": "akaishi:akaishi_activated_nether_compound_component" },
+  "fluid_output": { "fluid": "akaishi:nether_plasma" }
+}

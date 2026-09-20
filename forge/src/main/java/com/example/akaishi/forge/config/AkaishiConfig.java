@@ -1309,7 +1309,8 @@ public final class AkaishiConfig {
                 .define("fluidEnabled", true);
         VALUE_FLUID_PER_MB_CAP = b.comment("流体每 mB 价值上限；0 = 用内置默认 0.5（即单桶 500 分）")
                 .defineInRange("fluidPerMbCap", 0.5, 0.0, 10_000.0);
-        VALUE_OVERRIDES = b.comment("手动指定价值表，三级优先级：精确 id → 通配符 → #tag；格式 id=分值")
+        VALUE_OVERRIDES = b.comment("手动指定价值表，三级优先级：精确 id → 通配符 → #tag；格式 id=分值。"
+                        + "命中者即钉住（权威值），不再被配方原料项抬高")
                 .defineList("overrides", List.of(),
                         (Object o) -> o instanceof String s && s.contains("="));
         VALUE_FLUID_VALUES = b.comment("流体价值表，格式 流体id=每桶分值（支持 * 通配）；"

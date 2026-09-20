@@ -13,6 +13,7 @@ import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiMiniatureBlocks;
 import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.ModBlockEntities;
@@ -60,6 +61,8 @@ public final class AkaishiMod {
         MechanicalDnaProfile.registerDefaults();
         // 旗帜图案域：须先于物品域注册（山羊头旗帜图案物品引用其标签）
         AkaishiBannerPatterns.register();
+        // 加工配方类型与序列化器：须在数据包配方加载前注册
+        AkaishiRecipeTypes.register();
         ModItems.register();
         // 衰竭域须先于方块门面注册：ModBlocks 门面会转发其字段引用
         AkaishiDecayBlocks.register();
@@ -142,6 +145,8 @@ public final class AkaishiMod {
         com.example.akaishi.menu.AkaishiItemPortBindingSync.register();
         // 微缩矩阵终端加工页动作包（C2S 接收器：搜索 / 选中 / 开始加工）
         com.example.akaishi.menu.AkaishiMatrixCraftSync.register();
+        // 网络节点界面开关包（C2S 接收器：本节点「节点屏障」开 / 关）
+        com.example.akaishi.menu.AkaishiMiniMatrixNodeSync.register();
         // 价值分服务：统一存储库排序/统计/筛选与查询指令共用的底层（纯计算，不参与经济兑换）
         AkaishiValueService.install();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成

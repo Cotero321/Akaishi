@@ -37,6 +37,9 @@ public final class WirelessNodeRegistry {
 
     /** 节点放置 / 区块加载时登记（服务端） */
     public static void register(ServerLevel level, BlockPos pos) {
+        // 兜底清理（与 WirelessFieldManager.refresh 同款）：异常停机没走平台钩子时，顺手丢掉已停止的
+        // 实例分组，否则旧 server 会被这张静态表长期钉住（原先只有 ServerStoppedEvent 一处释放点）
+        NODES.keySet().removeIf(server -> server != level.getServer() && !server.isRunning());
         NODES.computeIfAbsent(level.getServer(), server -> ConcurrentHashMap.newKeySet())
                 .add(new Key(level.dimension(), pos.immutable()));
     }

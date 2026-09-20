@@ -3,6 +3,7 @@ package com.example.akaishi.value;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.value.RecipeIngredients.FluidAmount;
@@ -45,13 +46,18 @@ public final class IngredientValues {
      * @param values      物品价值表（自身分打底，迭代中被提升）
      * @param byResult    配方产物 → 配方列表
      * @param fluidPerMb  流体每 mB 分值
+     * @param pinned      <b>钉住集合</b>：手动覆盖命中的物品 + 环钉住表成员。
+     *                    这些物品的值是权威值，迭代<b>不得抬高</b> —— 否则"手动指定价值"会被原料项顶掉（配了不生效）
      */
     public static void iterate(Map<Item, Double> values, Map<Item, List<RecipeCost>> byResult,
-                               Map<Fluid, Double> fluidPerMb) {
+                               Map<Fluid, Double> fluidPerMb, Set<Item> pinned) {
         double cap = cap();
         for (int pass = 0, rounds = iterations(); pass < rounds; pass++) {
             boolean changed = false;
             for (Map.Entry<Item, List<RecipeCost>> entry : byResult.entrySet()) {
+                if (pinned.contains(entry.getKey())) {
+                    continue;
+                }
                 double candidate = Math.min(cap, averageTerm(entry.getValue(), values, fluidPerMb));
                 if (candidate > values.getOrDefault(entry.getKey(), 0.0) + 1.0E-6) {
                     values.put(entry.getKey(), candidate);
@@ -64,12 +70,21 @@ public final class IngredientValues {
         }
     }
 
-    /** 展示用原料项分值（与迭代同口径，已封顶） */
+    /**
+     * 展示用原料项分值（与迭代同口径，已封顶）。
+     *
+     * <p><b>钉住者不产出原料项</b>：{@code computeCost} 是「价值 + 原料项 × 权重」相加的，
+     * 钉住物品的价值已是权威总值，若再叠一份原料项就等于把环抬的那份又加回来了
+     * （赤石粉：价值 8 但原料项 = 浓缩/2 = 40 ⇒ 成本仍虚高 4 倍）。
+     */
     public static Map<Item, Double> terms(Map<Item, List<RecipeCost>> byResult, Map<Item, Double> values,
-                                          Map<Fluid, Double> fluidPerMb) {
+                                          Map<Fluid, Double> fluidPerMb, Set<Item> pinned) {
         Map<Item, Double> terms = new HashMap<>();
         double cap = cap();
         for (Map.Entry<Item, List<RecipeCost>> entry : byResult.entrySet()) {
+            if (pinned.contains(entry.getKey())) {
+                continue;
+            }
             double average = averageTerm(entry.getValue(), values, fluidPerMb);
             if (average > 0.0) {
                 terms.put(entry.getKey(), Math.min(cap, average));

@@ -84,9 +84,10 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
                 AkaishiPlasmaFillerBlockEntity.this.setChanged();
             }
         };
-        this.plasmaTanks.add(plasmaTank(0, ModFluids.get(ModFluids.MIXED_PLASMA_ID)));
-        this.plasmaTanks.add(plasmaTank(1, ModFluids.get(ModFluids.NETHER_PLASMA_ID)));
-        this.plasmaTanks.add(plasmaTank(2, ModFluids.get(ModFluids.END_PLASMA_ID)));
+        // 罐序与配方表同源（下标即罐索引），不另写一套顺序
+        for (int i = 0; i < ROD_RECIPES.size(); i++) {
+            this.plasmaTanks.add(plasmaTank(i, ModFluids.get(ROD_RECIPES.get(i).plasmaId())));
+        }
         this.data = new SimpleContainerData(DATA_SLOTS);
     }
 
@@ -187,15 +188,24 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
         return cur.isEmpty() || (cur.is(rodItem) && cur.getCount() < cur.getMaxStackSize());
     }
 
+    /**
+     * 等离子体 → 燃料棒（<b>下标即罐索引</b>：0=混合 1=下界 2=末地；顺序也是 JEI 展示顺序）。
+     * <p>这是「罐索引 ↔ 等离子体 ↔ 燃料棒」三者的<b>唯一真源</b>：
+     * 罐的构造、{@link #rodItemFor} 与 JEI（{@code PlasmaFillingRecipeCategory}）都读它，
+     * 避免三处各自维护同一套顺序。
+     */
+    public static final List<RodRecipe> ROD_RECIPES = List.of(
+            new RodRecipe(ModFluids.MIXED_PLASMA_ID, ModItems.mixedPlasmaRod.get()),
+            new RodRecipe(ModFluids.NETHER_PLASMA_ID, ModItems.netherPlasmaRod.get()),
+            new RodRecipe(ModFluids.END_PLASMA_ID, ModItems.endPlasmaRod.get()));
+
+    /** 一条灌装配方：某等离子体 X mb + 1 根空反应棒 → 1 根对应燃料棒 */
+    public record RodRecipe(String plasmaId, Item rod) {
+    }
+
     /** 罐索引 → 对应燃料棒物品 */
     private static Item rodItemFor(int idx) {
-        if (idx == 0) {
-            return ModItems.mixedPlasmaRod.get();
-        }
-        if (idx == 1) {
-            return ModItems.netherPlasmaRod.get();
-        }
-        return ModItems.endPlasmaRod.get();
+        return ROD_RECIPES.get(idx).rod();
     }
 
     private void addOutput(int idx) {

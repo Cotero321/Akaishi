@@ -16,7 +16,7 @@
         "akaishi:dusts",
         "akaishi:crystal"
       ],
-      "text": "Run your ores through the $(l:akaishi:pulverizer)Pulverizer$(/l) first, then press the dust here. The full dust list is in $(l:akaishi:dusts)Dusts$(/l), and crystal refining is covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
+      "text": "See the $(l:akaishi:pulverizer)Pulverizer$(/l) for where the dust comes from: Akaishi Ore grinds into $(4)Compressed Akaishi Essence$(0) first, and pulverizing that concentrate is what yields Akaishi Dust — one extra hop before you can press it. The full dust list is in $(l:akaishi:dusts)Dusts$(/l), and crystal refining is covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

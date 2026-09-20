@@ -34,6 +34,9 @@ public final class AkaishiTerminalSecuritySync {
     public static final ResourceLocation ACTION_CHANNEL =
             new ResourceLocation(AkaishiMod.MOD_ID, "terminal_security_action");
 
+    /** 归属者名 / 身份显示名长度上限（收发同口径；原版 readUtf/writeUtf 默认放到 32767，太宽） */
+    private static final int MAX_NAME = 64;
+
     /** 登记：把安全页卡槽里的身份卡写入权限表（卡未绑定身份 ⇒ 写默认条目） */
     public static final byte ACTION_REGISTER = 0;
     /** 移除：按卡槽里那张卡的身份（或未绑定 ⇒ 默认条目）移除登记 */
@@ -104,7 +107,7 @@ public final class AkaishiTerminalSecuritySync {
     public static void registerClient() {
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
             int containerId = buf.readInt();
-            String ownerName = buf.readUtf();
+            String ownerName = buf.readUtf(MAX_NAME);
             boolean hasDefault = buf.readBoolean();
             int defaultPerms = buf.readVarInt();
             int size = buf.readVarInt();
@@ -113,7 +116,7 @@ public final class AkaishiTerminalSecuritySync {
             List<Entry> entries = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 UUID player = buf.readUUID();
-                String name = buf.readUtf();
+                String name = buf.readUtf(MAX_NAME);
                 int perms = buf.readVarInt();
                 entries.add(new Entry(player, name, perms));
             }
@@ -132,13 +135,13 @@ public final class AkaishiTerminalSecuritySync {
     public static void sendSnapshot(ServerPlayer player, int containerId, TerminalSecurity security) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeInt(containerId);
-        buf.writeUtf(security.ownerName());
+        buf.writeUtf(security.ownerName(), MAX_NAME);
         buf.writeBoolean(security.hasDefaultEntry());
         buf.writeVarInt(security.defaultPerms());
         buf.writeVarInt(security.entryCount());
         for (Map.Entry<UUID, Integer> entry : security.entries().entrySet()) {
             buf.writeUUID(entry.getKey());
-            buf.writeUtf(security.displayName(entry.getKey()));
+            buf.writeUtf(security.displayName(entry.getKey()), MAX_NAME);
             buf.writeVarInt(entry.getValue());
         }
         NetworkManager.sendToPlayer(player, SNAPSHOT_CHANNEL, buf);

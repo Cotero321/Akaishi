@@ -1,0 +1,5 @@
+{
+  "type": "akaishi:pulverizing",
+  "ingredient": { "item": "akaishi:akaishi_essence_compressed" },
+  "result": { "item": "akaishi:akaishi_dust", "count": 2 }
+}

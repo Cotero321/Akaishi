@@ -1,6 +1,6 @@
 package com.example.akaishi.forge.jei;
 
-import com.example.akaishi.block.entity.AkaishiSingleSlotMachineBlockEntity;
+import com.example.akaishi.craft.recipe.AkaishiItemProcessRecipe;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -13,12 +13,10 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 单输入单输出机器的 JEI 配方类别抽象基类（压缩机/打粉机/变化器/植物培养机共用）。
@@ -26,8 +24,8 @@ import java.util.Map;
  */
 public abstract class SingleSlotRecipeCategory implements IRecipeCategory<SingleSlotRecipeCategory.Recipe> {
 
-    /** 单输入单输出配方展示数据 */
-    public record Recipe(ItemStack input, ItemStack output) {
+    /** 单输入单输出配方展示数据（输入为候选列表，含标签展开） */
+    public record Recipe(List<ItemStack> inputs, ItemStack output) {
     }
 
     protected final RecipeType<Recipe> type;
@@ -65,7 +63,7 @@ public abstract class SingleSlotRecipeCategory implements IRecipeCategory<Single
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, Recipe recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 44, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.input());
+        builder.addSlot(RecipeIngredientRole.INPUT, 44, 30).addIngredients(VanillaTypes.ITEM_STACK, recipe.inputs());
         builder.addSlot(RecipeIngredientRole.OUTPUT, 116, 30).addIngredient(VanillaTypes.ITEM_STACK, recipe.output());
     }
 
@@ -81,11 +79,15 @@ public abstract class SingleSlotRecipeCategory implements IRecipeCategory<Single
     protected void drawExtra(GuiGraphics gui) {
     }
 
-    /** 从单格机器配方表生成 JEI 展示配方 */
-    protected static List<Recipe> fromRecipes(Map<Item, AkaishiSingleSlotMachineBlockEntity.MachineRecipe> map) {
-        List<Recipe> list = new ArrayList<>();
-        for (AkaishiSingleSlotMachineBlockEntity.MachineRecipe r : map.values()) {
-            list.add(new Recipe(new ItemStack(r.input(), r.inputCount()), new ItemStack(r.output(), r.outputCount())));
+    /** 从数据包配方生成 JEI 展示配方（标签原料展开为全部候选） */
+    protected static List<Recipe> fromProcessRecipes(List<AkaishiItemProcessRecipe> processRecipes) {
+        List<Recipe> list = new ArrayList<>(processRecipes.size());
+        for (AkaishiItemProcessRecipe process : processRecipes) {
+            List<ItemStack> inputs = new ArrayList<>();
+            for (ItemStack candidate : process.ingredient().getItems()) {
+                inputs.add(new ItemStack(candidate.getItem(), process.inputCount()));
+            }
+            list.add(new Recipe(List.copyOf(inputs), process.result().copy()));
         }
         return list;
     }

@@ -104,6 +104,11 @@ repositories {
     maven { url "https://maven.blamejared.com/" }          // Patchouli / JEI
     maven { url "https://maven.theillusivec4.top/" }       // Curios API
     maven { url "https://maven.latvian.dev/releases" }     // KubeJS / Rhino
+    // GeckoLib（壁虎库）：3D 动画库，硬依赖，走官方 Cloudsmith 仓库
+    maven {
+        url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+        name "GeckoLib"
+    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -141,6 +146,16 @@ dependencies {
 
     // Cloth Config（配置 GUI 基础，硬依赖）
     modApi("me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}")
+
+    // GeckoLib（壁虎库，硬依赖）：3D 模型/动画库。
+    // 用 modImplementation 而非 modCompileOnly —— 它不只是编译期 API：
+    // 我们的 Geo 模型/动画在客户端与服务端都要走它的运行时管线（注册动画控制器、模型解析），
+    // 软引用一旦被无条件使用就是 NoClassDefFoundError。声明为硬依赖后，
+    // dev 运行（runClient/runServer）也会自动带上它，不必手动往 run/mods 里丢 jar。
+    modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
+
+    // mclib：GeckoLib 的数学/插值库，被它以 Jar-in-Jar 内嵌在 META-INF/jarjar/mclib-20.jar。
+    // 具体的补声明逻辑见本文件末尾「GeckoLib 的 mclib」段（必须在 dependencies 块之后）。
 
     // ===== 可选依赖（compileOnly 编译 + 运行时检测，不强制玩家安装） =====
 
@@ -199,3 +214,68 @@ processResources {
 tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
     dependsOn(":common:classes")
 }
+
+// ============================================================================
+// GeckoLib 的 mclib：由本模组补回 jarJar 声明
+// ----------------------------------------------------------------------------
+// 为什么必须补（已用运行时探针实测确认，不是推断）：
+//   Forge dev 中所有 mod 类都由同一个 cpw.mods.modlauncher.TransformingClassLoader 加载，
+//   它 getParent() == null（隔离设计），因此普通 classpath 上的 jar 它一概看不见
+//   （探针输出：java.class.path 含 mclib = true，但 Class.forName 抛 ClassNotFoundException）。
+//   类要能被解析，只有两条路：① 该 jar 自身是 mod（含 mods.toml）；② 由某个 mod 通过 jarJar 声明。
+//   mclib 是纯函数库、没有 mods.toml，只能走 ②；而 Loom 重映射 GeckoLib 时会把
+//   META-INF/jarjar/metadata.json 丢掉（重映射后的 jar 里只剩 mclib-20.jar，没有元数据），
+//   Forge 的 JarInJarDependencyLocator 就报 "No dependencies to load found"。
+//   后果：GeckoLib 的 JsonUtil 静态初始化抛
+//   NoClassDefFoundError: com/eliotlash/mclib/math/IValue，只要资源里存在 geo/动画就崩在加载界面。
+// 做法：把 mclib 复制进本模组的 META-INF/jarjar，并补写一份 metadata.json
+//   （内容与格式抄自 GeckoLib 原版 jar 内的同名文件）。
+// ============================================================================
+configurations.create("mclibJarJar") {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+}
+
+dependencies {
+    mclibJarJar "com.eliotlash.mclib:mclib:20"
+}
+
+def mclibMetadataFile = layout.buildDirectory.file("generated/jarjar/metadata.json")
+
+def generateMclibJarJarMetadata = tasks.register("generateMclibJarJarMetadata") {
+    def outFile = mclibMetadataFile
+    outputs.file(outFile)
+    doLast() {
+        def f = outFile.get().asFile
+        f.parentFile.mkdirs()
+        f.text = '''{
+  "jars": [
+    {
+      "identifier": {
+        "group": "com.eliotlash.mclib",
+        "artifact": "mclib"
+      },
+      "version": {
+        "range": "[20,)",
+        "artifactVersion": "20"
+      },
+      "path": "META-INF/jarjar/mclib-20.jar",
+      "isObfuscated": false
+    }
+  ]
+}
+'''
+    }
+}
+
+processResources {
+    from(configurations.mclibJarJar) {
+        into "META-INF/jarjar"
+    }
+    // 用 from(任务) 而非 from(路径)：只有前者能让 Gradle 推断出任务依赖，保证 metadata.json 先于复制生成
+    from(generateMclibJarJarMetadata) {
+        into "META-INF/jarjar"
+    }
+}
+

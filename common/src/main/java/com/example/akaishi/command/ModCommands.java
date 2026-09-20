@@ -44,6 +44,8 @@ public final class ModCommands {
         AkaishiValueCommand.register(dispatcher);
         // 微缩联调指令（生成成型物品终端，免手工搭 5×5×5）
         AkaishiMiniatureCommand.register(dispatcher);
+        // 第三方工序兼容诊断（列出"待声明"的第三方配方类型，给整合包照抄声明表）
+        AkaishiThirdPartyCommand.register(dispatcher);
     }
 
     private static int teleportToNearestGeode(CommandContext<CommandSourceStack> ctx, int radius)

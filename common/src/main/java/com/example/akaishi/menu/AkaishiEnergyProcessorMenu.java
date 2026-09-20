@@ -1,7 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiEnergyProcessorBlockEntity;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
@@ -43,11 +43,11 @@ public class AkaishiEnergyProcessorMenu extends AbstractContainerMenu {
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
-        // 输入槽：只收生命固态物
+        // 输入槽：只排除升级组件；"哪种辅料有效"由数据包配方决定，机器在 tick 内核对（放错不损失）
         addSlot(new Slot(container, AkaishiEnergyProcessorBlockEntity.INPUT_SLOT, 116, 30) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.is(ModItems.akaishiLifeEssenceSolid.get());
+                return !(stack.getItem() instanceof AkaishiMachineUpgradeItem);
             }
         });
 

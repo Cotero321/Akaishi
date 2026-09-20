@@ -12,8 +12,13 @@ import com.example.akaishi.block.AkaishiMiniMatrixUpgradeBlock;
 import com.example.akaishi.block.AkaishiMiniMatrixUpgradeType;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
+import com.example.akaishi.api.energy.IEnergyType;
 import com.example.akaishi.api.storage.IItemTerminalHost;
 import com.example.akaishi.craft.CraftLibrary;
+import com.example.akaishi.craft.ICraftEnergyPool;
+import com.example.akaishi.craft.IProcessSupply;
+import com.example.akaishi.craft.MachineProcessEnergy;
+import com.example.akaishi.craft.ProcessCoverage;
 import com.example.akaishi.craft.VirtualCraftPlanner;
 import com.example.akaishi.craft.VirtualCraftTask;
 import com.example.akaishi.craft.WirelessMachineScanner;
@@ -46,6 +51,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,14 +75,16 @@ import java.util.UUID;
  * 本阶段（P1a）只做「识别与读数」，不涉升级/场域/加工；故无额外 NBT 持久化字段。
  * 实现 {@link IDataCarrier} 以随 {@code AkaishiMachineBlock} 获得掉落数据保留。
  */
-public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements ExtendedMenuProvider, IDataCarrier {
+public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity
+        implements ExtendedMenuProvider, IDataCarrier, ICraftEnergyPool, IProcessSupply {
 
     /** 箱体边长（5×5×5，控制器贴墙） */
     public static final int SIZE = 5;
     /** 重扫间隔（tick）：结构变化不频繁，定时兜底即可，避免每 tick 全量扫描 */
     private static final int RESCAN_INTERVAL = 20;
     /** 网络节点自带子场域的半径（区块）：需求口径「半径 1 区块」 */
-    private static final int NODE_FIELD_RADIUS = 1;
+    /** 每个网络节点自带的子场域半径（区块）：公开给节点界面显示"子场域"一行用 */
+    public static final int NODE_FIELD_RADIUS = 1;
     /** 无线能源直供的轮询间隔（tick）：闸门① 拉取节流，不逐 tick 遍历场域 */
     private static final int ENERGY_INTERVAL = 40;
     /** 单台机器每轮最多接受的能量：让多台机器雨露均沾，而不是被最近的一台吃干 */
@@ -102,6 +110,14 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
      */
     private final TerminalSecurity security = new TerminalSecurity(this::setChanged);
     /**
+     * 本会话已把矩阵安全表继承给哪些终端（按 {@code terminalId} 去重，不落盘）。
+     * <p>
+     * 存在的意义是把"下发时机"从"打开界面"挪到"申领"：不记名单就会每 20 tick 重扫时
+     * 反复 {@code adoptSecurity}（写 NBT + 发包），记了名单则每枚芯片本会话只继承一次；
+     * 重启后名单清空 ⇒ 全部补一遍（幂等，且能补上离线期间的改动）。
+     */
+    private final Set<UUID> securityInherited = new HashSet<>();
+    /**
      * 内腔升级组件计数（下标 = {@link AkaishiMiniMatrixUpgradeType} 序数）：
      * 升级件是方块而非物品，故不存 NBT，每次重扫随结构一起从世界读出。
      */
@@ -122,11 +138,15 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
     private String fieldOwnerName;
 
     /**
-     * 当前虚拟加工任务（<b>并发上限 1</b>：性能闸门之一 —— 加工会占用库与赤能源缓冲，
-     * 单任务串行既保证扣料原子性，也避免一台终端把全库锁死；上限留待后续按升级等级放宽）。
+     * 当前真机加工任务（<b>并发上限 1</b>：性能闸门之一 —— 加工会占用库与机台，
+     * 单任务串行保证投料/对账的账只有一份；上限留待后续按升级等级放宽）。
      */
     @Nullable
     private VirtualCraftTask craftTask;
+
+    /** 上一次加工任务的失败原因（诊断回执用；成功则清空。不落盘） */
+    @Nullable
+    private String lastCraftFail;
 
     /** 能源直供轮询冷却（与重扫/快照各自独立节流） */
     private int energyCooldown;
@@ -151,9 +171,11 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         if (structureDirty || --scanCooldown <= 0) {
             rescan();
         }
-        // 虚拟加工任务逐 tick 推进（倒计时必须按真实 tick 走，不能挂在 20 tick 的重扫节流上）
+        // 真机加工任务逐 tick 推进（投料/收货必须按真实 tick 走，不能挂在 20 tick 的重扫节流上）
         if (craftTask != null && level instanceof ServerLevel serverLevel2) {
             if (craftTask.tick(serverLevel2)) {
+                // 失败原因留着给诊断回执：任务对象本身会被丢弃，原因丢了就成"加工莫名停了"
+                lastCraftFail = craftTask.state() == VirtualCraftTask.State.FAILED ? craftTask.failReason() : null;
                 craftTask = null;
             }
         }
@@ -313,7 +335,7 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
     // ===== 虚拟加工（P4a） =====
 
     /**
-     * 启动一次虚拟加工（目标物品 → 配方树 → 扣料/扣费 → 倒计时 → 产物入库）。
+     * 启动一次<b>真机加工</b>（目标物品 → 配方树 → 逐节点投料进机台 → 等机台加工 → 按期望收货入库）。
      *
      * @return 失败原因（成功返回 null）
      */
@@ -332,12 +354,25 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         // 与界面同一份账：逐级先扣库存（库里有的木板/木棍直接用掉，缺的才现做），
         // 否则会出现"界面说能做、开工说不够"
         Map<Item, Long> stock = CraftLibrary.stock(host.storageUnits());
+        // 与界面同一份口径：必须带 coverage 重算。用不带 coverage 的重载等于按"一台无升级机台"报价，
+        // 而界面明细是用真实机台（台数 / 速度升级）算的 ⇒ 详情报价与实际扣能、进度分母对不上。
+        ProcessCoverage coverage = processCoverage();
         VirtualCraftPlanner.Plan plan = VirtualCraftPlanner.plan(level.getRecipeManager(),
-                level.registryAccess(), target, stock);
+                level.registryAccess(), target, stock, coverage);
         if (plan == null) {
             return "unresolvable";
         }
-        VirtualCraftTask started = VirtualCraftTask.start(level, host, plan);
+        // 机械工序必须有场域内的对应机台（自研机台装了无线接收升级）：不能让加工凭空完成；
+        // 第三方机器另需经「无线接入器」认可（见 ProcessCoverage 的两档口径）。
+        // 这里只是"准入"，执行时由 VirtualCraftTask 按同一片场域找具体机台投料（见 EndpointFinder）
+        if (!coverage.covers(plan.machineKinds())) {
+            return "machine_missing";
+        }
+        // 机台光在场不够：真机加工要机器自己转，拿不到能量就会一直干等到超时 —— 当场拒绝更好
+        if (!plan.machineKinds().isEmpty() && !canPowerMachines()) {
+            return "no_power";
+        }
+        VirtualCraftTask started = VirtualCraftTask.start(level, host, this, plan, fieldRadiusChunks());
         if (started == null) {
             return "not_enough";
         }
@@ -351,6 +386,12 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         return craftTask;
     }
 
+    /** 上一次加工失败的内部原因（诊断回执用；最近一次成功或无记录时为 null） */
+    @Nullable
+    public String lastCraftFail() {
+        return lastCraftFail;
+    }
+
     /** 终止当前加工并回填锁定材料（方块被拆时由方块调用） */
     public void abortCraft(ServerLevel level) {
         if (craftTask != null) {
@@ -362,6 +403,88 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
     /** 上一轮无线能源直供实际送出的能量（联调回执用） */
     public long lastPushedEnergy() {
         return lastPushedEnergy;
+    }
+
+    /**
+     * 场域「工序供给」快照（{@link IProcessSupply}）：一次扫描同时拿到已覆盖的工序族与
+     * "是否存在已认可的第三方机器"（见 {@link ProcessCoverage}）。
+     * <p>机械工序的准入依据：自家机台要在场域内且装了无线接收升级；
+     * 第三方机器要经「无线接入器」认可。两档判定都在 {@link ProcessCoverage#covers} 里。
+     */
+    @Override
+    public ProcessCoverage processCoverage() {
+        if (!(level instanceof ServerLevel server)) {
+            return ProcessCoverage.EMPTY;
+        }
+        return WirelessMachineScanner.coverage(server, worldPosition, fieldRadiusChunks());
+    }
+
+    /**
+     * 场域能否把能量送到机台上（真机加工的门槛之一）。
+     * <p>条件与 {@link #pushWirelessEnergy} 的准入<b>逐条同源</b>：操控（对外写能的资格）+ 联动（供能链路）
+     * + 场域半径 &gt; 0。三缺一，机台节点就只是干等 —— 故必须让判定方（列表高亮 / 详情页）看到同一结论。
+     */
+    @Override
+    public boolean canPowerMachines() {
+        return hasUpgrade(AkaishiMiniMatrixUpgradeType.CONTROL)
+                && hasUpgrade(AkaishiMiniMatrixUpgradeType.LINK)
+                && fieldRadiusChunks() > 0;
+    }
+
+    /**
+     * 场域内某类能量的可动用总量（{@link ICraftEnergyPool}）：把墙上所有该类型芯片的缓冲加起来。
+     */
+    @Override
+    public long availableEnergy(IEnergyType type) {
+        long total = 0L;
+        for (IEnergyStorage storage : energyPools(type)) {
+            total = MachineProcessEnergy.saturatingAdd(total, storage.getEnergyStored());
+        }
+        return total;
+    }
+
+    /**
+     * 从场域内该类芯片扣能量（{@link ICraftEnergyPool}）。
+     * <p>纪律与 {@code relayEnergyBetweenChips} 一致：<b>先逐块模拟能取多少 → 全部够才真扣</b>，
+     * 任何一步不足就整笔拒绝、零改动，绝不凭空销毁能量。
+     */
+    @Override
+    public boolean consumeEnergy(IEnergyType type, long amount) {
+        if (amount <= 0L) {
+            return true;
+        }
+        List<IEnergyStorage> pools = energyPools(type);
+        long[] plan = new long[pools.size()];
+        long remaining = amount;
+        for (int i = 0; i < pools.size() && remaining > 0L; i++) {
+            plan[i] = pools.get(i).extractEnergy(remaining, true);
+            remaining -= plan[i];
+        }
+        if (remaining > 0L) {
+            return false; // 凑不齐：一块都没动过
+        }
+        for (int i = 0; i < pools.size(); i++) {
+            if (plan[i] > 0L) {
+                pools.get(i).extractEnergy(plan[i], false);
+            }
+        }
+        setChanged();
+        return true;
+    }
+
+    /** 场域内容量非零且类型匹配的芯片能量缓冲（按芯片顺序） */
+    private List<IEnergyStorage> energyPools(IEnergyType type) {
+        List<IEnergyStorage> pools = new ArrayList<>();
+        for (IMiniatureChipView chip : chips) {
+            if (chip instanceof MiniatureTerminalBlockEntity be && !be.isRemoved()) {
+                IEnergyStorage storage = be.getEnergyStorage();
+                // 类型必须一致（赤能源不扣生命能量芯片），容量 0 的空壳直接跳过
+                if (storage != null && storage.getType() == type && storage.getMaxEnergy() > 0L) {
+                    pools.add(storage);
+                }
+            }
+        }
+        return pools;
     }
 
     /**
@@ -421,6 +544,8 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         this.chips = formed ? scanChips(box) : List.of();
         if (formed) {
             scanUpgrades(box);
+            // 新申领的芯片在此继承矩阵安全表（口径 5 的下发时机，见 inheritSecurityToNewChips）
+            inheritSecurityToNewChips();
         } else {
             Arrays.fill(upgradeCounts, 0);
             // 结构一旦破损，在跑的加工立即终止并回填锁定材料（不给"拆一半还能出货"的口子）
@@ -434,6 +559,11 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
     /**
      * 把场域登记与内腔读数对齐：成型且有场域升级 ⇒ 注册/刷新；否则释放。
      * <p>
+     * <b>节点申领与主场域解耦</b>：拓展升级（EXTEND）本身就是"给网络节点挂子场域"，
+     * 与有没有主场域（FIELD）无关，故 {@link #claimNodes} 无条件调用 ——
+     * 原先只在 {@code radius > 0} 分支里调用，导致"只装拓展升级"时一个节点都不申领（静默失效），
+     * 而 JEI 与悬浮文案都没写过这条隐藏依赖。名额为 0 时该方法内部会自行全部释放。
+     * <p>
      * 与重扫同频（{@link #RESCAN_INTERVAL} tick），票据的增删由
      * {@link WirelessFieldManager} 内部做参数 diff，重复调用是幂等的。
      */
@@ -445,11 +575,10 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         if (radius > 0) {
             // 持有者坐标 = 终端自身坐标：节点子场域也由本终端申领（同一持有者身份）
             WirelessFieldManager.refresh(serverLevel, worldPosition, radius, worldPosition);
-            claimNodes(serverLevel);
         } else {
             WirelessFieldManager.release(serverLevel, worldPosition, worldPosition);
-            releaseNodes(serverLevel);
         }
+        claimNodes(serverLevel);
     }
 
     /**
@@ -542,8 +671,10 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
             level.setBlock(pos, state.setValue(AkaishiMiniMatrixNetworkNodeBlock.ACTIVE, claimed), 3);
         }
         if (level.getBlockEntity(pos) instanceof AkaishiMiniMatrixNetworkNodeBlockEntity node) {
-            // 归属者只在申领时下发、释放时清掉；setClaimant 自身幂等，不会每轮刷包
-            node.setClaimant(claimed ? fieldOwnerId() : null, claimed ? fieldOwnerName() : null);
+            // 归属者与申领方坐标只在申领时下发、释放时清掉；setClaimant 自身幂等，不会每轮刷包。
+            // 申领方坐标（本终端位置）供节点界面显示"绑定终端"那一行
+            node.setClaimant(claimed ? fieldOwnerId() : null, claimed ? fieldOwnerName() : null,
+                    claimed ? worldPosition : null);
         }
     }
 
@@ -623,7 +754,13 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
                 for (int z = box.min.getZ() + 1; z < box.max.getZ(); z++) {
                     Block block = level.getBlockState(new BlockPos(x, y, z)).getBlock();
                     if (block instanceof AkaishiMiniMatrixUpgradeBlock upgrade) {
-                        upgradeCounts[upgrade.type().ordinal()]++;
+                        AkaishiMiniMatrixUpgradeType type = upgrade.type();
+                        int index = type.ordinal();
+                        // 按声明上限钳制：内腔 27 格能塞 27 块，而生效上限只有 maxCount。
+                        // 不钳的话界面显示 27/3、玩家以为多装有用，实际多出来的全无效（"显示 ≠ 生效"）
+                        if (upgradeCounts[index] < type.maxCount()) {
+                            upgradeCounts[index]++;
+                        }
                     }
                 }
             }
@@ -864,9 +1001,33 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity implements
         for (IMiniatureChipView chip : chips) {
             if (chip instanceof MiniatureTerminalBlockEntity be && be.adoptSecurity(security)) {
                 applied++;
+                UUID id = chip.terminalId();
+                if (id != null) {
+                    securityInherited.add(id); // 已按最新表下发过，重扫时不必再来一次
+                }
             }
         }
         return applied;
+    }
+
+    /**
+     * 新申领的芯片继承矩阵安全表（口径 5 的<b>下发时机</b>）。
+     * <p>
+     * 原先把下发挂在「矩阵界面首帧 {@code broadcastChanges}」上 —— 等于把"打开界面"当成"登记变更"，
+     * 于是任何人开一次界面、什么都不改，也会把矩阵表强推覆盖全部绑定芯片
+     *（新机器矩阵表为空 ⇒ 芯片被改成"无条目 = 全放行"，静默放宽权限）。
+     * 改为在这里按"首次发现"下发，界面只负责"编辑后下发"。
+     */
+    private void inheritSecurityToNewChips() {
+        for (IMiniatureChipView chip : chips) {
+            UUID id = chip.terminalId();
+            if (id == null || !securityInherited.add(id)) {
+                continue;
+            }
+            if (chip instanceof MiniatureTerminalBlockEntity be) {
+                be.adoptSecurity(security);
+            }
+        }
     }
 
     // ===== NBT =====
