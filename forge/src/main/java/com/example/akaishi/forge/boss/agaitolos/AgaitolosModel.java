@@ -6,29 +6,66 @@ import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
 /**
- * 阿盖托洛丝阶段一 Geo 模型（几何 / 贴图 / 动画三资源定位）。
+ * 阿盖托洛丝阶段化 Geo 模型（几何 / 贴图 / 动画三资源定位）。
+ * <p>
+ * 三套资产按阶段索引取用，索引统一由 {@link #phaseIndex} 算出：战斗阶段一 / 二 / 三各一套 geo 与贴图。
+ * 三套 geo 的骨骼名完全一致（40 根同名骨骼，含 {@code head_r} / {@code scythe} / 翼三节），
+ * 故三阶段共用同一份骨架动画 {@code agaitolos_stage1.animation.json}——差异只在几何与贴图；
+ * 将来若新增 stage2/3 专属动画，改 {@link #ANIMATIONS} 对应下标即可。
  * <p>
  * GeckoLib 的客户端渲染类只能放 forge 模块：common 是纯 Architectury 编译面，
  * 只通过 modCompileOnly 取接口 API，不承担渲染实现。
  */
 public class AgaitolosModel extends GeoModel<AgaitolosEntity> {
 
-    private static final ResourceLocation MODEL = new ResourceLocation(AkaishiMod.MOD_ID, "geo/entity/agaitolos_stage1.geo.json");
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage1.png");
-    private static final ResourceLocation ANIMATION = new ResourceLocation(AkaishiMod.MOD_ID, "animations/entity/agaitolos_stage1.animation.json");
+    /** 阶段一资产的下标：复活阶段与任何越界序号都回退到它 */
+    private static final int STAGE_1_INDEX = 0;
+
+    /** 按阶段索引的几何资源：下标 0 / 1 / 2 = 阶段一 / 二 / 三 */
+    private static final ResourceLocation[] MODELS = {
+            new ResourceLocation(AkaishiMod.MOD_ID, "geo/entity/agaitolos_stage1.geo.json"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "geo/entity/agaitolos_stage2.geo.json"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "geo/entity/agaitolos_stage3.geo.json")
+    };
+
+    /** 按阶段索引的贴图资源 */
+    private static final ResourceLocation[] TEXTURES = {
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage1.png"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage2.png"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage3.png")
+    };
+
+    /** 骨架动画：现阶段只有这一份，三套 geo 骨骼同构故可共用 */
+    private static final ResourceLocation SHARED_ANIMATION =
+            new ResourceLocation(AkaishiMod.MOD_ID, "animations/entity/agaitolos_stage1.animation.json");
+
+    /** 按阶段索引的动画资源：三阶段共用同一骨架动画文件 */
+    private static final ResourceLocation[] ANIMATIONS = {SHARED_ANIMATION, SHARED_ANIMATION, SHARED_ANIMATION};
 
     @Override
     public ResourceLocation getModelResource(AgaitolosEntity animatable) {
-        return MODEL;
+        return MODELS[phaseIndex(animatable)];
     }
 
     @Override
     public ResourceLocation getTextureResource(AgaitolosEntity animatable) {
-        return TEXTURE;
+        return TEXTURES[phaseIndex(animatable)];
     }
 
     @Override
     public ResourceLocation getAnimationResource(AgaitolosEntity animatable) {
-        return ANIMATION;
+        return ANIMATIONS[phaseIndex(animatable)];
+    }
+
+    /**
+     * 阶段 → 资产下标（0~2）。
+     * <p>
+     * 用已同步的 {@code DATA_PHASE}：{@code combatOrdinal()} 为 RESPAWN = 0、PHASE_1/2/3 = 1/2/3。
+     * 复活阶段（0）与任何越界序号都钳到阶段一：存档缺键时 {@code getInt} 返回 0 会解析成 RESPAWN，
+     * 不钳位就会拿到 -1 越界崩客户端。
+     */
+    private static int phaseIndex(AgaitolosEntity animatable) {
+        int index = animatable.getPhase().combatOrdinal() - 1;
+        return index < 0 || index >= MODELS.length ? STAGE_1_INDEX : index;
     }
 }

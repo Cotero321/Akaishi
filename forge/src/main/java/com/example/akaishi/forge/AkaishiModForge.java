@@ -24,6 +24,7 @@ import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosBossBarOverlay;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosRenderer;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
 import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
@@ -120,6 +121,7 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -349,11 +351,15 @@ public final class AkaishiModForge {
         }
     }
 
-    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字；侵蚀泛红的血色边缘 */
+    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字；侵蚀泛红的血色边缘；阿盖托洛丝铭牌血条 */
     private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         // 泛红先注册（位于下层），避免盖住低语文字
         event.registerAboveAll("erosion_flash_overlay", new AkaishiErosionFlashOverlay());
         event.registerAboveAll("unnameable_overlay", new AkaishiUnnameableOverlay());
+        // 阿盖托洛丝铭牌血条：锚在原版 boss 血条层（该层已空 —— 本 BOSS 不再用 ServerBossEvent），
+        // 挂上去即占据"原版血条的位置"，且不会与任何原版血条重叠
+        event.registerAbove(VanillaGuiOverlay.BOSS_EVENT_PROGRESS.id(), "agaitolos_boss_bar",
+                new AgaitolosBossBarOverlay());
     }
 
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */

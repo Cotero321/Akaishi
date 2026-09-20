@@ -11,11 +11,13 @@ import software.bernie.geckolib.core.object.PlayState;
  * 常量必须与 {@code assets/akaishi/animations/entity/agaitolos_stage1.animation.json} 中的 clip 名逐字一致，
  * 写错只会在实机渲染时抛 GeckoLibException，编译期查不出来。
  * <p>
- * GeckoLib 每个控制器同一时刻只能播一条 clip，故按用途拆成三个：
+ * GeckoLib 每个控制器同一时刻只能播一条 clip，故按用途拆成五个：
  * <ul>
- *   <li>{@link #CONTROLLER_MAIN} —— 常驻飞行待机；死亡后停播，把骨骼让给死亡控制器</li>
+ *   <li>{@link #CONTROLLER_MAIN} —— 常驻飞行待机；死亡、格挡架势或蓄力时停播，把骨骼让给对应控制器</li>
  *   <li>{@link #CONTROLLER_ACTION} —— 触发式动作（普攻 / 召唤凋零头 / 受击），由服务端 {@code triggerAnim} 派发</li>
  *   <li>{@link #CONTROLLER_DEATH} —— 死亡动画，用 GeckoLib 推荐的「状态轮询」而非触发器</li>
+ *   <li>{@link #CONTROLLER_GUARD} —— 格挡架势，同为状态轮询式（架势是状态，不是一次性动作）</li>
+ *   <li>{@link #CONTROLLER_CHARGE} —— 恶怨倒转蓄力，同为状态轮询式（蓄力是状态，不是一次性动作）</li>
  * </ul>
  * 动画名与控制器名都收在本类，实体侧只调语义方法（{@link #playAttack} 等），不硬写字符串。
  */
@@ -44,6 +46,10 @@ public final class AgaitolosAnimations {
     public static final String CONTROLLER_ACTION = "action";
     /** 死亡控制器名：状态轮询式 */
     public static final String CONTROLLER_DEATH = "death";
+    /** 格挡控制器名：状态轮询式（架势由 DATA_GUARDING 同步，两端各自判定） */
+    public static final String CONTROLLER_GUARD = "guard";
+    /** 蓄力控制器名：状态轮询式（蓄力由 DATA_CHARGING 同步，两端各自判定） */
+    public static final String CONTROLLER_CHARGE = "charge";
 
     /** 控制器过渡时长（tick）：避免姿态硬切 */
     public static final int TRANSITION_TICKS = 5;
@@ -57,14 +63,21 @@ public final class AgaitolosAnimations {
      */
     private static final String TRIGGER_ATTACK = "attack_slash";
     private static final String TRIGGER_CAST = "cast_skull";
+    private static final String TRIGGER_DIVE_SWEEP = "dive_sweep";
     private static final String TRIGGER_HURT = "hurt";
 
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop(IDLE_FLIGHT);
     // 四条动作 clip 在 json 里 loop 均为缺省（PLAY_ONCE）：thenPlay 播完自停，控制器随即交还给状态回调
     private static final RawAnimation ATTACK_ANIM = RawAnimation.begin().thenPlay(ATTACK_SLASH);
     private static final RawAnimation CAST_ANIM = RawAnimation.begin().thenPlay(CAST_SKULL);
+    private static final RawAnimation DIVE_SWEEP_ANIM = RawAnimation.begin().thenPlay(DIVE_SWEEP);
     private static final RawAnimation HURT_ANIM = RawAnimation.begin().thenPlay(HURT);
     private static final RawAnimation DEATH_ANIM = RawAnimation.begin().thenPlay(DEATH);
+    // guard 在 json 里是 1.2s 非循环 clip ⇒ 与其同步的 GUARD_DURATION_TICKS=24，thenPlay 正好播完一次
+    private static final RawAnimation GUARD_ANIM = RawAnimation.begin().thenPlay(GUARD);
+    // charge 在 json 里 loop=true（2s 循环）⇒ 必须用 thenLoop 而非 thenPlay，
+    // 否则一个循环播完就会停在末帧，而蓄力要持续 12s
+    private static final RawAnimation CHARGE_ANIM = RawAnimation.begin().thenLoop(CHARGE);
 
     private AgaitolosAnimations() {
     }
@@ -86,6 +99,11 @@ public final class AgaitolosAnimations {
         boss.triggerAnim(CONTROLLER_ACTION, TRIGGER_HURT);
     }
 
+    /** 俯冲镰扫结算到人：播一次横扫（1.5s 非循环 clip）。仅服务端调用，同步方式同上 */
+    public static void playDiveSweep(AgaitolosEntity boss) {
+        boss.triggerAnim(CONTROLLER_ACTION, TRIGGER_DIVE_SWEEP);
+    }
+
     // ---------------------------------------------------------------- 控制器注册
 
     /**
@@ -97,9 +115,13 @@ public final class AgaitolosAnimations {
      * 服务端/客户端各自都能判定，不需要额外的触发同步，也不需要改 renderer。
      */
     public static void registerControllers(AgaitolosEntity entity, AnimatableManager.ControllerRegistrar controllers) {
-        // 常驻飞行待机；死亡后主动 STOP —— 三个控制器会同时驱动同一批骨骼，不停播会和死亡姿势互相拉扯
+        // 常驻飞行待机；死亡 / 格挡架势 / 蓄力时主动 STOP —— 多个控制器会同时驱动同一批骨骼，
+        // 不停播会和死亡姿势 / 格挡架势 / 蓄力姿势互相拉扯（五者共用同一批骨骼，必须靠状态互斥）。
         controllers.add(new AnimationController<>(entity, CONTROLLER_MAIN, TRANSITION_TICKS,
-                state -> state.getAnimatable().isDeadOrDying() ? PlayState.STOP : state.setAndContinue(IDLE)));
+                state -> state.getAnimatable().isDeadOrDying() || state.getAnimatable().isGuarding()
+                        || state.getAnimatable().isCharging()
+                        ? PlayState.STOP
+                        : state.setAndContinue(IDLE)));
 
         // 动作控制器：状态回调只在「没有触发动画在播」时才会走到这里，此时无事可做 ⇒ STOP 等下一次 triggerAnim。
         // 不能返回 CONTINUE，否则控制器永远停不下来，触发式动画结束后会卡在最后一帧。
@@ -107,10 +129,23 @@ public final class AgaitolosAnimations {
                 state -> PlayState.STOP)
                 .triggerableAnim(TRIGGER_ATTACK, ATTACK_ANIM)
                 .triggerableAnim(TRIGGER_CAST, CAST_ANIM)
+                .triggerableAnim(TRIGGER_DIVE_SWEEP, DIVE_SWEEP_ANIM)
                 .triggerableAnim(TRIGGER_HURT, HURT_ANIM));
 
         // 死亡：transition 照上游取 0，死亡瞬间不需要过渡
         controllers.add(new AnimationController<>(entity, CONTROLLER_DEATH, 0,
                 state -> state.getAnimatable().isDeadOrDying() ? state.setAndContinue(DEATH_ANIM) : PlayState.STOP));
+
+        // 格挡架势：与死亡同理走「状态轮询」而不是触发器 —— 架势是持续状态（由 DATA_GUARDING 同步），
+        // 两端各自轮询即可，不需要一次性的触发同步，实体侧也就不用加 playGuard 入口。
+        // 过渡取动作级的 2 tick：姿态只有 24 tick，过渡太长会把起手/收手糊掉。
+        controllers.add(new AnimationController<>(entity, CONTROLLER_GUARD, ACTION_TRANSITION_TICKS,
+                state -> state.getAnimatable().isGuarding() ? state.setAndContinue(GUARD_ANIM) : PlayState.STOP));
+
+        // 蓄力（恶怨倒转）：与 guard 同款「状态轮询」——蓄力是持续状态（由 DATA_CHARGING 同步），
+        // 两端各自轮询即可，不需要一次性的触发同步，实体侧也就不用加 playCharge 入口。
+        // 过渡同样取动作级的 2 tick：蓄力起手要利落，过渡太长会把"猛地举起球"糊掉。
+        controllers.add(new AnimationController<>(entity, CONTROLLER_CHARGE, ACTION_TRANSITION_TICKS,
+                state -> state.getAnimatable().isCharging() ? state.setAndContinue(CHARGE_ANIM) : PlayState.STOP));
     }
 }

@@ -19,7 +19,16 @@ import net.minecraft.world.phys.Vec3;
  *   <li><b>垂直</b>：无论有无指令都恒定维持「脚下地面顶面 + {@link #HOVER_HEIGHT}」的悬停高度；</li>
  *   <li>把结果写回 {@code deltaMovement}，由 {@code AgaitolosEntity#travel} 消费（该 travel 不含重力项）。</li>
  * </ol>
- * 刻意不消费 {@code wantedY}：本 BOSS 常态低空悬停、不俯冲，高度完全由脚下地形决定。
+ * 刻意不消费 {@code wantedY}：常态低空悬停、不俯冲，高度完全由脚下地形决定
+ * （俯冲镰扫的冲锋位移不在这里，见下）。
+ * <p><b>三类例外</b>：
+ * <ul>
+ *   <li>冲锋中（{@code boss.isDiving()}）：整体让位，水平与垂直都不写，位移由 {@code AgaitolosEntity#tickDiveCharge} 驱动；</li>
+ *   <li>禁飞中（{@code boss.isGrounded()}）：只做水平，垂直分量原样保留（交给 {@code LivingEntity#travel} 的重力把 BOSS 拉下地面）；</li>
+ *   <li>格挡架势（{@code boss.isGuarding()}）：水平归零站定，垂直悬停照常；</li>
+ *   <li>蓄力（{@code boss.isCharging()}，恶怨倒转）：同样水平归零站定、垂直悬停照常
+ *       —— 理由与架势相同（"举球蓄力要站定"，且蓄力姿势不该一边飘一边放）。</li>
+ * </ul>
  */
 public class AgaitolosMoveControl extends MoveControl {
 
@@ -53,13 +62,28 @@ public class AgaitolosMoveControl extends MoveControl {
 
     @Override
     public void tick() {
+        // ⓪ 冲锋中：<b>水平与垂直都完全不写</b>，整体让位。
+        //    冲锋期间 deltaMovement 由 AgaitolosEntity#tickDiveCharge 每 tick 直接写（朝目标 3D 方向 × DIVE_SPEED）。
+        //    若这里继续写：水平会被"导航目标点死区 + 限速"抹平，垂直会被 ③ 的悬停修正拉回 HOVER_HEIGHT，
+        //    结果是俯冲永远贴近不了地面目标、抵达判定次次超时。
+        //    与既有"架势掐断水平"同理，必须在控制器层让位 —— 本 tick 的 travel 在随后执行，实体侧改写来不及。
+        if (isDiving()) {
+            return;
+        }
+
         Vec3 motion = this.mob.getDeltaMovement();
         double motionX = motion.x;
         double motionZ = motion.z;
 
         // ① 水平追击：导航每 tick 都会重新下发 setWantedPosition，故这里只按"当前是否有指令"处理，不把 operation 改回 WAIT。
         //    用 hasWanted() 而不是直接比 Operation：Operation 是 MoveControl 的 protected 嵌套枚举，跨包不便引用。
-        if (this.hasWanted()) {
+        //    格挡架势 / 蓄力例外：两者都要站定，既不产生水平加速、也抹掉残留惯性（垂直悬停照常，见 ③）。
+        //    必须在这一层改而不能在实体侧改：MoveControl#tick 由 Mob#serverAiStep 调用、位于 travel 之前，
+        //    而 travel 已经在 super.aiStep() 内部执行过，实体侧 post-super 清速度对当帧无效。
+        if (isGuarding() || isCharging()) {
+            motionX = 0.0D;
+            motionZ = 0.0D;
+        } else if (this.hasWanted()) {
             double deltaX = this.wantedX - this.mob.getX();
             double deltaZ = this.wantedZ - this.mob.getZ();
             double horizontal = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
@@ -79,16 +103,58 @@ public class AgaitolosMoveControl extends MoveControl {
         }
 
         // ③ 垂直悬停：无移动指令时也执行（否则会随空气阻力缓慢丢失高度）
-        double motionY = 0.0D;
-        double hoverY = this.hoverY();
-        if (!Double.isNaN(hoverY)) {
-            double offset = hoverY - this.mob.getY();
-            if (Math.abs(offset) > VERTICAL_DEAD_ZONE) {
-                motionY = Mth.clamp(offset * VERTICAL_GAIN, -MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED);
+        double motionY;
+        if (isGrounded()) {
+            // 禁飞（被格挡惩罚）：<b>不写垂直分量</b>，原样保留 travel 里累积的重力速度，让 BOSS 自然下坠。
+            // 这里绝不能写 0：本控制器在 travel 之前执行、且每 tick 都会 setDeltaMovement，
+            // 写 0 会把上一 tick 累积的下坠速度清零 ⇒ 重力永远积不起来，BOSS 会一直挂在半空，禁飞形同虚设。
+            motionY = motion.y;
+        } else {
+            motionY = 0.0D;
+            double hoverY = this.hoverY();
+            if (!Double.isNaN(hoverY)) {
+                double offset = hoverY - this.mob.getY();
+                if (Math.abs(offset) > VERTICAL_DEAD_ZONE) {
+                    motionY = Mth.clamp(offset * VERTICAL_GAIN, -MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED);
+                }
             }
         }
 
         this.mob.setDeltaMovement(motionX, motionY, motionZ);
+    }
+
+    /**
+     * 所属生物是否正在俯冲冲锋。为 true 时本控制器整体让位（见 {@link #tick()} ⓪）。
+     * <p>{@code instanceof} 仅作类型兜底（防将来被复用到别的生物上），同 {@link #isGuarding()}。
+     */
+    private boolean isDiving() {
+        return this.mob instanceof AgaitolosEntity boss && boss.isDiving();
+    }
+
+    /**
+     * 所属生物是否被禁飞（被玩家格挡后 30s）。为 true 时停止悬停修正，交给重力。
+     * <p>禁飞结束无需额外处理：本方法转 false 后 ③ 会照常把 BOSS 收敛回
+     * 「脚下地面顶面 + {@link #HOVER_HEIGHT}」，即自动升回常态悬停高度。
+     */
+    private boolean isGrounded() {
+        return this.mob instanceof AgaitolosEntity boss && boss.isGrounded();
+    }
+
+    /**
+     * 所属生物是否正在摆格挡架势。
+     * <p>本控制器只装配给 {@link AgaitolosEntity}，{@code instanceof} 仅作类型兜底（防将来被复用到别的生物上）。
+     */
+    private boolean isGuarding() {
+        return this.mob instanceof AgaitolosEntity boss && boss.isGuarding();
+    }
+
+    /**
+     * 所属生物是否正在「恶怨倒转」蓄力。为 true 时水平归零站定（垂直悬停照常）。
+     * <p>与 {@link #isGuarding()} 同一机制、同一理由：蓄力要举球站定，不能一边飘一边蓄。
+     * <p>{@code instanceof} 仅作类型兜底（防将来被复用到别的生物上）。
+     */
+    private boolean isCharging() {
+        return this.mob instanceof AgaitolosEntity boss && boss.isCharging();
     }
 
     /**

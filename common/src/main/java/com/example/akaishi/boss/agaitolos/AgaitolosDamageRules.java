@@ -1,6 +1,8 @@
 package com.example.akaishi.boss.agaitolos;
 
+import com.example.akaishi.boss.agaitolos.skill.AgaitolosGuardSkill;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -35,12 +37,16 @@ public final class AgaitolosDamageRules {
      * @param maxHealth        当前最大生命（多玩家加成抬高后锁伤上限同步抬高）
      * @param respawning       是否处于复活阶段（无敌）；由实体从同步数据读出后传入
      * @param selfDamage       是否为「被玩家反弹回来的凋零头」造成的自伤（规格：无视减伤与锁伤）
+     * @param guarding         承伤方是否正处于格挡架势；仅作廉价前置短路，<b>真正的判定</b>仍是
+     *                         {@link AgaitolosGuardSkill#isBlocking(LivingEntity, DamageSource)}（§3.3 唯一判定器）
+     * @param blocker          承伤方实体（判定朝向/近战必须拿到实体，故由调用方把自身传入）
      * @param source           伤害来源
      * @param amount           原始伤害量
      * @return 实际生效的伤害量；返回 0 表示本次免伤
      */
     public static float resolve(long gameTime, long lastHurtGameTime, float maxHealth,
-                                boolean respawning, boolean selfDamage, DamageSource source, float amount) {
+                                boolean respawning, boolean selfDamage, boolean guarding, LivingEntity blocker,
+                                DamageSource source, float amount) {
         // ① 非玩家来源免伤（规格："不会受到非玩家的伤害"）。
         // 判据用 getEntity()：玩家射出的箭其 getEntity() 仍是玩家，因此算玩家伤害；陷阱/摔落/其它生物则免伤。
         if (!(source.getEntity() instanceof Player)) {
@@ -55,7 +61,13 @@ public final class AgaitolosDamageRules {
         if (gameTime - lastHurtGameTime < HURT_COOLDOWN_TICKS) {
             return 0.0F;
         }
-        // ④ 【P6 接入】阶段三免疫远程（届时判 source.is(DamageTypeTags.IS_PROJECTILE)）
+        // ④ 格挡闸：状态闸，不是数值口径，故不参与 ⑥⑦（归零就是归零，不乘减伤、不受锁伤影响）。
+        //    放在 ③ 之后是刻意的：冷却期内的攻击已被 ③ 归零，不该再由它触发格挡（否则会白送一次反击）。
+        //    判定唯一走 AgaitolosGuardSkill.isBlocking：BOSS 架势与玩家「格挡成功」是同一件事的两面（§3.3）。
+        if (guarding && AgaitolosGuardSkill.isBlocking(blocker, source)) {
+            return 0.0F;
+        }
+        // 【P6 接入】阶段三免疫远程（届时判 source.is(DamageTypeTags.IS_PROJECTILE)）
         // ⑤ 反弹自伤通道：凋零头被玩家打回 BOSS 时（selfDamage=true）跳过 ⑥⑦，
         //    直接返回原始伤害（规格："BOSS 承受此伤害并且无视自身减伤和锁伤"）。
         //    ③ 的 0.2s 冷却在其之前仍生效：规格只免减伤与锁伤，未免受击冷却。

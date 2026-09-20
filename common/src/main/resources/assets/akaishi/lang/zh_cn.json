@@ -1448,6 +1448,8 @@
   "death.attack.akaishi.altar_drain.player": "%s 在 %s 面前被抽干了",
   "death.attack.akaishi.true_damage": "%1$s 被下界本源抹去了存在",
   "death.attack.akaishi.true_damage.player": "%1$s 被 %2$s 抹去了存在",
+  "death.attack.akaishi.scythe_sweep": "%1$s 被俯冲镰扫拦腰斩断",
+  "death.attack.akaishi.scythe_sweep.player": "%1$s 被 %2$s 的俯冲镰扫拦腰斩断",
   "life.akaishi.organ_passive.jump_boost": "跳跃提升（常驻）",
   "life.akaishi.organ_passive.night_vision": "夜视（常驻）",
   "life.akaishi.organ_passive.fall_immune": "摔落伤害免疫",
