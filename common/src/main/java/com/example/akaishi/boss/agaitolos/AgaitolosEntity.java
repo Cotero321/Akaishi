@@ -332,7 +332,22 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         return this.groundedTicks > 0;
     }
 
-    /** 镰扫是否处于封印期（被玩家格挡的惩罚）：封印期内不起手俯冲镰扫，其它招式照常 */
+    /**
+     * 镰扫是否处于封印期（被玩家格挡的惩罚）。
+     * <p>
+     * <b>封印的作用范围（2026-09-20 用户拍板）</b>：封印<b>只封"大招"</b>，不封基础手段。
+     * 原因是禁飞与封印由 {@link #onSweepBlocked()} 同刻授予、且同为 600 tick，
+     * 而瞬击的唯一起手条件恰恰是"不处于飞行状态"（= 禁飞窗口）—— 若封印也盖住瞬击，
+     * 它的起手窗口会被完全覆盖、一次也放不出来，规格原文「如 BOSS 不处于飞行状态时便可以使用」
+     * 就成了死条文。
+     * <ul>
+     *   <li><b>吃封印</b>：俯冲镰扫（在 {@code tickDiveSweep} 里单独判）；后续"大招"——
+     *       三重投掷 / 天魔灾 / 投技 —— 接入时请走含封印的起手闸；</li>
+     *   <li><b>不吃封印</b>：瞬击（惩罚期的位移补偿，本身不造成伤害）、
+     *       高速踢击（规格原文"<b>任何状态下可用</b>"，"任何状态"含封印期）。</li>
+     * </ul>
+     * ⚠ 待用户确认：恶怨倒转<b>也未被封印</b>（既有口径即如此），是否要把它纳入"大招"名单。
+     */
     public boolean isScytheSealed() {
         return this.scytheSealTicks > 0;
     }
@@ -822,13 +837,14 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      *   <li><b>状态互斥</b>：死亡 / 复活演出 / 架势 / 蓄力 / 冲锋任一成立都不起手 ——
      *       与 {@code tickCharge}、{@code tickGuard}、{@code tickDiveSweep} 的起手闸同款判据，
      *       五者共用同一批骨骼动画，同时成立会互相拉扯；</li>
-     *   <li><b>技能封印</b>（{@link #isScytheSealed()}）：被玩家格挡俯冲镰扫后的 30s 惩罚窗口内，
-     *       新招同样被封 —— 否则"封印"会被绕过去，玩家的格挡收益缩水。</li>
+     *   <li><b>技能封印</b>（{@link #isScytheSealed()}）：封印<b>只封"大招"</b>（俯冲镰扫，
+     *       以及后续接入的三重投掷 / 天魔灾 / 投技），<b>不封瞬击与高速踢击</b>，
+     *       故本方法<b>不含</b>封印判定；作用范围与理由见 {@link #isScytheSealed()} 的 javadoc。</li>
      * </ul>
      */
     private boolean canStartPhaseTwoSkill() {
         return this.isPhaseTwoOrLater() && !this.isDeadOrDying() && !this.isRespawning()
-                && !this.isGuarding() && !this.isCharging() && !this.isDiving() && !this.isScytheSealed();
+                && !this.isGuarding() && !this.isCharging() && !this.isDiving();
     }
 
     /** 是否已进入二阶段（含三阶段）：二阶段招式的阶段门 */
@@ -848,11 +864,10 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 于是瞬击天然是一招"<b>惩罚期的补偿手段</b>"：禁飞期间够不到目标，靠绕后瞬移把距离拉回近战范围
      * （详见 {@link AgaitolosBlinkSkill} 的类注释）。
      * <p>
-     * <b>⚠ 与技能封印的重叠（需用户拍板）</b>：禁飞与封印由 {@code onSweepBlocked} <b>同时</b>授予、
-     * 时长也相同（各 600 tick），而 {@link #canStartPhaseTwoSkill()} 又要求"未被封印"
-     * ⇒ 当前口径下<b>瞬击的唯一起手窗口正好被封印覆盖，实际打不出来</b>。
-     * 本轮按任务书"新技能也必须被封"的要求原样接线（不擅自豁免），此处保留冲突记录；
-     * 若要让瞬击可用，最小改动是二选一：① 封印不覆盖瞬击；② 让禁飞窗口长于封印窗口。
+     * <b>与技能封印的关系（2026-09-20 用户拍板：封印不覆盖瞬击）</b>：禁飞与封印由
+     * {@code onSweepBlocked} <b>同刻授予、且同为 600 tick</b>，若瞬击也受封印约束，它的唯一起手窗口
+     * 就会被完全覆盖、一次也放不出来。故瞬击走 {@link #canStartPhaseTwoSkill()}（<b>不含</b>封印），
+     * 与踢击同属"不吃封印"的基础手段；作用范围见 {@link #isScytheSealed()} 的 javadoc。
      * <p>
      * 冷却落点两分支：<b>成功进完整冷却</b>（{@link AgaitolosBlinkSkill#BLINK_COOLDOWN_TICKS}，
      * 按阶段折算）；<b>落点校验失败只给短重试窗口</b>（{@link AgaitolosBlinkSkill#BLINK_FAILED_RETRY_TICKS}）
