@@ -103,7 +103,10 @@ public final class PlayerBodyCapability {
 
     /** 玩家重生克隆（含死亡/维度切换）：移植器官跨死亡保留——
      * 死亡重生优先从死亡快照恢复（authoritative）；维度切换直接复制旧实体 capability
-     * （避免以登出前旧快照覆盖刚变更的状态）。两种路径均把最新状态写回快照 */
+     * （避免以登出前旧快照覆盖刚变更的状态）。两种路径均把最新状态写回快照。
+     * <p>理智死亡策略（仅死亡路径）：SAN 保留死亡瞬间值、SANC/COG 与首见标记继承（已随快照恢复），
+     * 临时保护与临时上限削减清除——口径唯一落在 {@code SanityState#clearTemporaries}；
+     * 换维度只是位置变化、玩家并未死亡，故不清理临时值（否则走过传送门就能白嫖一次"净化"）。 */
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
         Player player = event.getEntity();
@@ -119,6 +122,7 @@ public final class PlayerBodyCapability {
                 original.getCapability(PLAYER_BODY).ifPresent(old ->
                         player.getCapability(PLAYER_BODY).ifPresent(next -> next.load(old.save())));
             }
+            player.getCapability(PLAYER_BODY).ifPresent(next -> next.getSanity().clearTemporaries());
         } else {
             original.getCapability(PLAYER_BODY).ifPresent(old ->
                     player.getCapability(PLAYER_BODY).ifPresent(next -> next.load(old.save())));

@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "akaishi:true_damage"
+    "akaishi:true_damage",
+    "akaishi:doom",
+    "akaishi:psychic"
   ]
 }

@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
  * <p>
  * 注册实现已按功能域拆分到 {@link AkaishiBaseItems} / {@link AkaishiEnergyItems} /
  * {@link AkaishiReactorItems} / {@link AkaishiFusionItems} / {@link AkaishiLifeItems} /
- * {@link AkaishiTransgeneItems} / {@link AkaishiWirelessItems}。
+ * {@link AkaishiSanityItems} / {@link AkaishiTransgeneItems} / {@link AkaishiWirelessItems} 等域类。
  * 本类仅保留 ID 常量（注册唯一来源）与字段转发，供历史代码经 {@code ModItems.xxx} 访问；
  * 新增注册一律写入对应功能域类，禁止再向本类堆积。
  */
@@ -111,6 +111,8 @@ public final class ModItems {
     public static final String LIFE_BOOK_ID = "akaishi_life_book";
     /** 基因详解：Patchouli 手册物品，右键打开 akaishi:gene_detail */
     public static final String GENE_BOOK_ID = "akaishi_gene_book";
+    /** 禁忌秘典：自研知识/研究系统入口（右键翻开；明确不走 Patchouli） */
+    public static final String FORBIDDEN_CODEX_ID = "forbidden_codex";
     /** 山羊头旗帜图案：织布机图案物，选用 akaishi:goat_skull 徽记 */
     public static final String GOAT_SKULL_BANNER_PATTERN_ID = "goat_skull_banner_pattern";
     /** 赤石采集手环（hands 槽）：挖掘方块概率掉落赤石晶 */
@@ -160,6 +162,14 @@ public final class ModItems {
     public static final String LIFE_WIRELESS_PORTABLE_TERMINAL_ID = "akaishi_life_wireless_portable_terminal";
     /** 终端身份卡 ID（无线网络认证钥匙） */
     public static final String WIRELESS_IDENTITY_CARD_ID = "akaishi_wireless_identity_card";
+    /** 金西瓜：理智食补食物（30s 内共回 10 SAN + 5s 生命回复 I；首用抬升上限 +5） */
+    public static final String GOLDEN_MELON_SLICE_ID = "golden_melon_slice";
+    /** 理智回复剂：5s 内共回 30 SAN，冷却 30 分钟（窗口/冷却口径见 SanityTonicService） */
+    public static final String SANITY_TONIC_ID = "sanity_tonic";
+    /** 高级理智恢复剂：5s 内共回 40 SAN，冷却 20 分钟（用户原文，疑似写反，见 SanityTonicService） */
+    public static final String GREATER_SANITY_TONIC_ID = "greater_sanity_tonic";
+    /** 花环（charm 槽）：佩戴每分钟 +1 SAN，每秒 -1 耐久，720 秒后损毁 */
+    public static final String SANITY_GARLAND_ID = "sanity_garland";
 
     // ==================== 字段转发壳（注册完成后指向对应域类）====================
 
@@ -265,6 +275,7 @@ public final class ModItems {
     public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
+    public static RegistrySupplier<Item> goldenMelonSlice;
     public static RegistrySupplier<Item> lifeEnergyWand;
     public static RegistrySupplier<Item> akaishiOrganEye;
     public static RegistrySupplier<Item> akaishiOrganHeart;
@@ -290,6 +301,14 @@ public final class ModItems {
     public static RegistrySupplier<Item> activatedPureComponent;
     public static RegistrySupplier<Item> activatedDragonComponent;
     public static RegistrySupplier<Item> activatedUltimateMixtureComponent;
+
+    // —— 理智域（AkaishiSanityItems）——
+    public static RegistrySupplier<Item> sanityTonic;
+    public static RegistrySupplier<Item> greaterSanityTonic;
+    public static RegistrySupplier<Item> sanityGarland;
+
+    // —— 秘典域（AkaishiCodexItems）：自研知识/研究系统 ——
+    public static RegistrySupplier<Item> forbiddenCodex;
 
     // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓）——
     public static RegistrySupplier<Item> akaishiWitherSeed;
@@ -339,6 +358,8 @@ public final class ModItems {
         AkaishiReactorItems.register();
         AkaishiFusionItems.register();
         AkaishiLifeItems.register();
+        AkaishiSanityItems.register();
+        AkaishiCodexItems.register();
         AkaishiTransgeneItems.register();
         AkaishiWirelessItems.register();
         AkaishiMechanicalItems.register();
@@ -445,6 +466,7 @@ public final class ModItems {
         lifeFusionBoots = AkaishiLifeItems.lifeFusionBoots;
         akaishiPotion = AkaishiLifeItems.akaishiPotion;
         rejectionSerum = AkaishiLifeItems.rejectionSerum;
+        goldenMelonSlice = AkaishiLifeItems.goldenMelonSlice;
         lifeEnergyWand = AkaishiLifeItems.lifeEnergyWand;
         akaishiOrganEye = AkaishiLifeItems.akaishiOrganEye;
         akaishiOrganHeart = AkaishiLifeItems.akaishiOrganHeart;
@@ -470,6 +492,14 @@ public final class ModItems {
         activatedPureComponent = AkaishiLifeItems.activatedPureComponent;
         activatedDragonComponent = AkaishiLifeItems.activatedDragonComponent;
         activatedUltimateMixtureComponent = AkaishiLifeItems.activatedUltimateMixtureComponent;
+
+        // —— 理智域 ——
+        sanityTonic = AkaishiSanityItems.sanityTonic;
+        greaterSanityTonic = AkaishiSanityItems.greaterSanityTonic;
+        sanityGarland = AkaishiSanityItems.sanityGarland;
+
+        // —— 秘典域 ——
+        forbiddenCodex = AkaishiCodexItems.forbiddenCodex;
 
         // —— 转基因域 ——
         akaishiWitherSeed = AkaishiTransgeneItems.akaishiWitherSeed;

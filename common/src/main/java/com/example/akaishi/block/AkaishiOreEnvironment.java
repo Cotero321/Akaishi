@@ -16,7 +16,7 @@ public enum AkaishiOreEnvironment {
     NETHER("nether_", new TagMatchTest(BlockTags.NETHER_CARVER_REPLACEABLES), 0, 128),
     END("end_", new BlockMatchTest(Blocks.END_STONE), 0, 128);
 
-    /** 方块 id 前缀，如 deepslate_akaishi_ore_low */
+    /** 方块 id 前缀，如 deepslate_akaishi_ore_medium */
     private final String idPrefix;
     private final RuleTest target;
     private final int minY;

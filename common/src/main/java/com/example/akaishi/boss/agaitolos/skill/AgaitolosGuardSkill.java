@@ -40,7 +40,11 @@ public final class AgaitolosGuardSkill {
     /** 半角 60° 的余弦阈值 = cos(60°) = 0.5。用点积比较代替 acos 求夹角，省一次反三角 */
     private static final double GUARD_HALF_ARC_COS = Math.cos(Math.toRadians(GUARD_ARC_DEGREES * 0.5D));
 
-    /** 水平方向的退化阈值（平方）：小于此值视为「与 BOSS 落在同一垂直线上」 */
+    /**
+     * 水平方向的退化阈值（平方）：小于此值视为「与 BOSS 落在同一垂直线上」。
+     * <p>即水平距离 &lt; {@code 1.0E-3} 格（1 毫米）：两个水平分量都已小到无法归一化出可信方向。
+     * 该阈值同时用于"伤害来源"与"BOSS 朝向"两侧（口径一致，见 {@link #isWithinFrontArc}）。
+     */
     private static final double HORIZONTAL_EPSILON_SQR = 1.0E-6D;
 
     private AgaitolosGuardSkill() {
@@ -82,15 +86,36 @@ public final class AgaitolosGuardSkill {
     /**
      * 伤害来源是否落在 BOSS 正面的 {@link #GUARD_ARC_DEGREES} 度锥内。
      * <p>
-     * 判据是"来源位置的水平方向"与"BOSS 视线的水平方向"两个单位向量的点积 ≥ cos(半角)，
+     * 判据是"来源位置的水平单位方向"与"BOSS 水平朝向单位向量"的点积 ≥ cos(半角)，
      * 含边界角 ⇒ 正好 ±60°。
      * <p>
-     * 两处退化都判 <b>false</b>（不算正面，于是<b>不被格挡</b>）：
-     * ① 来源几乎在正上/正下方时水平分量≈0 —— 水平面上的朝向无从谈起，等于"头顶脚下不算正面"；
-     * ② BOSS 视线几乎垂直时同理。
+     * <b>两处退化都必须给出确定性结果，不允许"恰好判成非正面"</b>（2026-09-21 修正）：
+     * 原先两处退化都返回 {@code false}（= 不算正面 ⇒ 不格挡），于是玩家几乎贴在 BOSS
+     * <b>正下方</b>（悬停 2 格时的常态站位）时，水平分量趋近 0 ⇒ 判成"背后偷袭" ⇒
+     * <b>明明在架盾却挡不住</b>。现在两侧都按"退化即视为正面/挡下"取向收口：
+     * <ol>
+     *   <li><b>来源水平分量 ≈ 0</b>（伤害来自正上/正下方）：水平面上根本不存在"前/后"这一对概念 ⇒
+     *       判 <b>{@code true}（算正面）</b>。头顶脚下不可能是绕后偷袭，判 false 只会让贴脸/脚底
+     *       打它时"看不到它架盾"。阈值 {@link #HORIZONTAL_EPSILON_SQR} = 1 毫米。</li>
+     *   <li><b>视线水平分量 ≈ 0</b>（俯仰 ≈ ±90°）：{@code getLookAngle()} 的水平分量是
+     *       {@code cos(俯仰) × 水平朝向}，垂直时被压成 0，但<b>yaw 本身仍在</b> ⇒ 回退到
+     *       {@code yaw} 推出的水平朝向 {@code (-sin(yaw), cos(yaw))}（与 {@code Entity#getYRot}
+     *       同约定），绝不因"视线垂直"整下判不出朝向。同一回退手法已在
+     *       {@code AgaitolosDiveSweepSkill#isWithinSweep} 与 {@code AgaitolosActionFx#facingYaw} 使用。</li>
+     * </ol>
+     * 注意这里与俯冲镰扫的退化取向已经<b>一致</b>（都是"退化即视为命中"）：漏挡与漏打都是静默失效，
+     * 两侧没有理由相反。锥角仍严格是 {@link #GUARD_ARC_DEGREES} 度，<b>没有</b>放大到 360°。
+     * <p>
+     * <b>朝向基准刻意取身体 yaw（{@code getLookAngle()} 的水平分量）而不是头部朝向 {@code yHeadRot}</b>：
+     * 头部每一 tick 都被 {@code MeleeAttackGoal}/{@code LookAtPlayerGoal} 对准当前目标，
+     * 拿它当基准等于"360° 无死角"，从背后永远打不进去；身体 yaw 是架势自己锁定的朝向
+     * （起手时对准目标，见 {@code AgaitolosEntity#startGuard} 的朝向锁定），
+     * 从背后绕过去仍能穿透 —— 这正是架势的可惩罚面。
      * <p>
      * 用 {@code getSourcePosition()} 而非直接伤害实体位置：该方法优先取
      * {@code damageSourcePosition}，其次才是 {@code directEntity.position()}，语义就是"伤害来自哪里"。
+     * {@code null} 分支对本 BOSS 不可达（{@link #isMelee} 已保证 {@code directEntity} 是实体），
+     * 保留仅作兜底：判不出方向时按既有"非正面"处理，不引入免伤。
      */
     private static boolean isWithinFrontArc(AgaitolosEntity boss, DamageSource source) {
         Vec3 sourcePos = source.getSourcePosition();
@@ -100,18 +125,29 @@ public final class AgaitolosGuardSkill {
         double deltaX = sourcePos.x - boss.getX();
         double deltaZ = sourcePos.z - boss.getZ();
         double horizontalSqr = deltaX * deltaX + deltaZ * deltaZ;
+        // 退化 ①：来源与 BOSS 同一垂直线（正上/正下方）⇒ 水平面上无"前/后"可言 ⇒ 视为正面
         if (horizontalSqr < HORIZONTAL_EPSILON_SQR) {
-            return false;
+            return true;
         }
         double inverse = 1.0D / Math.sqrt(horizontalSqr);
-        Vec3 toSource = new Vec3(deltaX * inverse, 0.0D, deltaZ * inverse);
+        double toSourceX = deltaX * inverse;
+        double toSourceZ = deltaZ * inverse;
+        // 水平朝向：优先取视线的水平分量；视线近乎垂直（俯仰≈±90°）时该分量退化，回退到 yaw 推出的水平朝向
         Vec3 look = boss.getLookAngle();
         double lookHorizontalSqr = look.x * look.x + look.z * look.z;
+        double facingX;
+        double facingZ;
         if (lookHorizontalSqr < HORIZONTAL_EPSILON_SQR) {
-            return false;
+            double yaw = Math.toRadians(boss.getYRot());
+            facingX = -Math.sin(yaw);
+            facingZ = Math.cos(yaw);
+        } else {
+            double lookInverse = 1.0D / Math.sqrt(lookHorizontalSqr);
+            facingX = look.x * lookInverse;
+            facingZ = look.z * lookInverse;
         }
-        double cosAngle = (toSource.x * look.x + toSource.z * look.z) / Math.sqrt(lookHorizontalSqr);
-        return cosAngle >= GUARD_HALF_ARC_COS;
+        // 两个水平单位向量的点积即夹角余弦（与扫面的同款写法）
+        return toSourceX * facingX + toSourceZ * facingZ >= GUARD_HALF_ARC_COS;
     }
 
     /**

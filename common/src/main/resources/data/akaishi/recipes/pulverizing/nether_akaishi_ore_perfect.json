@@ -1,5 +1,0 @@
-{
-  "type": "akaishi:pulverizing",
-  "ingredient": { "item": "akaishi:nether_akaishi_ore_perfect" },
-  "result": { "item": "akaishi:akaishi_essence_compressed", "count": 1 }
-}

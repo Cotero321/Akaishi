@@ -11,7 +11,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "There are $(bold)16 kinds$(0) of cluster: 4 environments (Overworld / Deepslate / Nether / End) × 4 density grades.$(br2)$(bold)The four grades:$(0)$(li)Low-Density — most common, 1 crystal per block$(li)Medium-Density — 2 crystals$(li)Perfect — 3 crystals$(li)Flawless — rarest, 4 crystals$(br2)$(bold)Drops are fixed:$(0) Fortune does nothing here, so skip the enchant; Silk Touch lets you carry the whole cluster home.$(br2)$(4)Richer means rarer$(0) — to turn what you mine into essence and ingots, read \"$(l:akaishi:crystal)Crystal & Essence$(/l)\"."
+      "text": "There are $(bold)4 kinds$(0) of cluster: 4 environments (Overworld / Deepslate / Nether / End) × a single density grade (Medium).$(br2)$(bold)Drops are fixed:$(0) 2 crystals per block — Fortune does nothing here, so skip the enchant; Silk Touch lets you carry the whole cluster home.$(br2)To turn what you mine into essence and ingots, read \"$(l:akaishi:crystal)Crystal & Essence$(/l)\"."
     },
     {
       "type": "patchouli:relations",

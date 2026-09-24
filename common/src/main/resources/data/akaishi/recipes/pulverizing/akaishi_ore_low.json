@@ -1,5 +1,0 @@
-{
-  "type": "akaishi:pulverizing",
-  "ingredient": { "item": "akaishi:akaishi_ore_low" },
-  "result": { "item": "akaishi:akaishi_essence_compressed", "count": 1 }
-}

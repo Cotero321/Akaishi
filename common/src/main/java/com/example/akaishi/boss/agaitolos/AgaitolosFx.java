@@ -24,6 +24,10 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * 所有常量均为<b>待调手感值</b>（P8 转配置项）。位置的绝对精度受限于服务端拿不到骨骼坐标，
  * 一律按碰撞箱 + 朝向做近似（详见 {@link #orbPosition}）。
+ * <p>
+ * <b>与本类并列的还有 {@link AgaitolosActionFx}</b>：那边是"挥刀 / 格挡 / 受击"这类由技能结算点驱动的
+ * <b>动作</b>粒子，本类只留"出场 / 蓄力 / 死亡"这类由阶段机与计时器驱动的<b>演出</b>粒子；
+ * 拆成两个类是为了各自不过长（RULES §8），两类的服务端限定、无状态、识别色口径完全一致。
  */
 public final class AgaitolosFx {
 
@@ -53,6 +57,30 @@ public final class AgaitolosFx {
 
     /** 汇聚粒子每簇数量：2。待调手感值 / P8 转配置项 */
     public static final int CHARGE_ORB_CONVERGE_COUNT = 2;
+
+    /** 蓄力<b>强化段</b>的发射间隔（tick）：4 —— 比光球本体（2）稀一档，亮核与汇聚环保留"点缀"定位。待调手感值 / P8 转配置项 */
+    public static final int CHARGE_UPGRADE_INTERVAL_TICKS = 4;
+
+    /** 蓄力亮核每簇粒子数：1（END_ROD 是白亮星点，多放就晃眼）。待调手感值 / P8 转配置项 */
+    public static final int CHARGE_CORE_COUNT = 1;
+
+    /** 蓄力亮核的扩散（格）：0.05（钉在球心，给"球在发亮"而不是"球在冒白点"）。待调手感值 / P8 转配置项 */
+    public static final double CHARGE_CORE_SPREAD = 0.05D;
+
+    /** 蓄力汇聚环的采样点数：8（手写取点才能成环，理由同 {@link #introShockRing}）。待调手感值 / P8 转配置项 */
+    public static final int CHARGE_RING_POINTS = 8;
+
+    /** 蓄力汇聚环半径（格）：2.4（约三倍躯干宽，读作"能量从四周被吸来"）。待调手感值 / P8 转配置项 */
+    public static final double CHARGE_RING_RADIUS = 2.4D;
+
+    /** 蓄力汇聚环相对球心的下沉量（格）：2.2（环取低处，才有"往球心收"的方向感）。待调手感值 / P8 转配置项 */
+    public static final double CHARGE_RING_DROP = 2.2D;
+
+    /** 汇聚环每点粒子数：1。待调手感值 / P8 转配置项 */
+    public static final int CHARGE_RING_COUNT = 1;
+
+    /** 汇聚环点的扩散（格）：0.15（保持"点"，连成环而不是糊成盘）。待调手感值 / P8 转配置项 */
+    public static final double CHARGE_RING_SPREAD = 0.15D;
 
     /** 出场爆发的粒子数：60。待调手感值 / P8 转配置项 */
     public static final int INTRO_BURST_COUNT = 60;
@@ -89,6 +117,12 @@ public final class AgaitolosFx {
 
     /** 出场粒子柱每层每簇的粒子数：6。待调手感值 / P8 转配置项 */
     public static final int INTRO_PILLAR_COUNT = 6;
+
+    /** 出场粒子柱的<b>亮芯</b>每层粒子数：1（END_ROD 白亮星，柱心一亮，整根柱才不显得只是青焰在飘）。待调手感值 / P8 转配置项 */
+    public static final int INTRO_PILLAR_CORE_COUNT = 1;
+
+    /** 出场粒子柱亮芯的扩散（格）：0.08（钉在轴上，不参与环绕）。待调手感值 / P8 转配置项 */
+    public static final double INTRO_PILLAR_CORE_SPREAD = 0.08D;
 
     /** 出场粒子柱的环绕半径（格）：1.1（略大于碰撞箱半宽 0.8，贴着周身而不穿进模型）。待调手感值 / P8 转配置项 */
     public static final double INTRO_PILLAR_RADIUS = 1.1D;
@@ -142,6 +176,17 @@ public final class AgaitolosFx {
      * 是原版粒子里最像"悬停的紫色能量球"的；{@code DRAGON_BREATH} 虽是淡紫软雾但寿命短、会淡出，
      * 单独用来做球心会显得虚，所以留给下方那一簇"能量汇聚"（下沉 {@link #CHARGE_ORB_CONVERGE_DROP} 格），
      * 两簇叠加才有"球心实、外围在往里收"的层次。
+     * <p>
+     * <b>强化段（每 {@link #CHARGE_UPGRADE_INTERVAL_TICKS} tick 一次）</b>由两簇组成，用来把 12s 的蓄力
+     * 从"一直有个紫球"抬到"能量在往里灌、且越举越亮"：
+     * <ul>
+     *   <li><b>亮核</b> {@code END_ROD}：原版唯一的白亮星点，钉在球心给"发光"的读数 ——
+     *       纯紫粒子在昏暗战场上会被环境压住，加一颗冷白才有亮度锚点（与识别色同族，不引入暖色）；</li>
+     *   <li><b>汇聚环</b>：球心下方 {@link #CHARGE_RING_DROP} 格、半径 {@link #CHARGE_RING_RADIUS} 格的
+     *       一圈采样点。{@code sendParticles} 给不了"朝内的初速"（偏移是高斯位置扰动），故"往里收"
+     *       只能靠<b>环在低处、球在高处</b>这一位置关系读出方向（视觉上像被吸上去）。
+     *       采样点手写而非交给高斯偏移，理由同 {@link #introShockRing}。</li>
+     * </ul>
      */
     public static void chargedOrb(AgaitolosEntity boss) {
         if (!(boss.level() instanceof ServerLevel level)) {
@@ -156,6 +201,21 @@ public final class AgaitolosFx {
         level.sendParticles(ParticleTypes.DRAGON_BREATH, orb.x, orb.y - CHARGE_ORB_CONVERGE_DROP, orb.z,
                 CHARGE_ORB_CONVERGE_COUNT, CHARGE_ORB_CONVERGE_SPREAD, CHARGE_ORB_CONVERGE_SPREAD,
                 CHARGE_ORB_CONVERGE_SPREAD, CHARGE_ORB_SPEED);
+        // 强化段另按更稀的间隔发射：与本体同频会让球心过曝、也会把每 tick 的包量抬上去
+        if (boss.tickCount % CHARGE_UPGRADE_INTERVAL_TICKS != 0) {
+            return;
+        }
+        level.sendParticles(ParticleTypes.END_ROD, orb.x, orb.y, orb.z, CHARGE_CORE_COUNT,
+                CHARGE_CORE_SPREAD, CHARGE_CORE_SPREAD, CHARGE_CORE_SPREAD, CHARGE_ORB_SPEED);
+        double ringY = orb.y - CHARGE_RING_DROP;
+        for (int i = 0; i < CHARGE_RING_POINTS; ++i) {
+            double angle = (Math.PI * 2.0D) * i / CHARGE_RING_POINTS;
+            level.sendParticles(ParticleTypes.DRAGON_BREATH,
+                    orb.x + Math.cos(angle) * CHARGE_RING_RADIUS, ringY,
+                    orb.z + Math.sin(angle) * CHARGE_RING_RADIUS,
+                    CHARGE_RING_COUNT, CHARGE_RING_SPREAD, CHARGE_RING_SPREAD, CHARGE_RING_SPREAD,
+                    CHARGE_ORB_SPEED);
+        }
     }
 
     /**
@@ -197,9 +257,14 @@ public final class AgaitolosFx {
         double progress = introAgeTicks / (double) AgaitolosEntity.INTRO_PILLAR_END_TICKS;
         double rise = progress * INTRO_PILLAR_RISE;
         for (int layer = 0; layer < INTRO_PILLAR_LAYERS; ++layer) {
-            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, boss.getX(),
-                    boss.getY() + layer * INTRO_PILLAR_LAYER_HEIGHT + rise, boss.getZ(),
+            double layerY = boss.getY() + layer * INTRO_PILLAR_LAYER_HEIGHT + rise;
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, boss.getX(), layerY, boss.getZ(),
                     INTRO_PILLAR_COUNT, INTRO_PILLAR_RADIUS, INTRO_PILLAR_SPREAD_Y, INTRO_PILLAR_RADIUS,
+                    INTRO_PILLAR_SPEED);
+            // 亮芯：同样逐层抬高（与柱体同一 rise），只加白亮星不改柱的解构 —— 强化段刻意只做"加亮"，
+            // 不动层数与半径：那两个是柱体形状的来源，改了就是换设计而不是强化
+            level.sendParticles(ParticleTypes.END_ROD, boss.getX(), layerY, boss.getZ(), INTRO_PILLAR_CORE_COUNT,
+                    INTRO_PILLAR_CORE_SPREAD, INTRO_PILLAR_CORE_SPREAD, INTRO_PILLAR_CORE_SPREAD,
                     INTRO_PILLAR_SPEED);
         }
     }

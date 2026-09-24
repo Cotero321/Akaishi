@@ -1,7 +1,0 @@
-{
-  "parent": "akaishi:block/template_ore_overlay",
-  "textures": {
-    "base": "akaishi:block/end_akaishi_ore_low",
-    "ore": "akaishi:block/end_akaishi_ore_low_overlay"
-  }
-}

@@ -1,9 +1,11 @@
 package com.example.akaishi.life.altar;
 
+import com.example.akaishi.api.sanity.SanityServices;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
+import com.example.akaishi.sanity.content.SanityBuiltinFirstEncounters;
 import com.example.akaishi.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -110,6 +112,12 @@ public final class AkaishiAltarRitual {
             return null;
         }
         int tier = host.getStructureTier();
+        // 【禁忌秘典·预留接线点（本轮默认不接）】将来若要用秘典产出的"已解锁键"锁住某条仪式，
+        // 判定必须放在<b>知道玩家身份</b>的地方，而不是本方法里 —— 这里只认祭品，拿不到是谁在供奉。
+        // 接法：在 AkaishiMotherAltarMenu 的供奉动作处（或先由方块实体记下供奉者 UUID，再回到本方法）
+        // 调 CodexUnlocks.requireUnlock(player, 该配方对应的键)，不通过就不消耗祭品、不产出。
+        // 键的命名约定见 CodexUnlocks（akaishi:codex/<节点路径>）。
+        // 现状：一行都不接 ⇒ 五条配方全部照旧可用，老存档玩法不变。
         for (AkaishiAltarRecipe recipe : AkaishiAltarRecipe.all()) {
             if (tier < recipe.requiredTier() || !recipe.hostOffering().test(hostStack)) {
                 continue;
@@ -207,6 +215,9 @@ public final class AkaishiAltarRitual {
                 player.sendSystemMessage(Component.translatable("message.akaishi.altar.ritual.done",
                         Component.translatable(ritualKey)));
             }
+            // 首见：初次完成母神祭坛仪式（行为类，环境轮询表达不了"完成了一次仪式"；
+            // 是否首次由核心按玩家存档判定，本处只负责"发生了什么"）
+            SanityServices.get().reportFirstEncounter(player, SanityBuiltinFirstEncounters.MOTHER_ALTAR);
         }
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                 hostPos.getX() + 0.5D, hostPos.getY() + 1.5D, hostPos.getZ() + 0.5D,

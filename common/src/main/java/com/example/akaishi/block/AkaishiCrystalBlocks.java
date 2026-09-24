@@ -18,7 +18,7 @@ import net.minecraft.world.level.material.MapColor;
  */
 public final class AkaishiCrystalBlocks {
 
-    /** 赤石水晶母岩（瑕疵）：晶洞外层自然生成，可生长水晶簇，可在聚合器升级 */
+    /** 赤石水晶母岩（瑕疵）：随机散布于晶洞内表面（水晶块层），可生长水晶簇，可在聚合器升级 */
     public static RegistrySupplier<Block> CHISHI_GEODE_FLAWED = null;
     /** 赤石水晶母岩（普通） */
     public static RegistrySupplier<Block> CHISHI_GEODE_NORMAL = null;
@@ -53,7 +53,7 @@ public final class AkaishiCrystalBlocks {
     /** 注册全部水晶体系方块（由 AkaishiMod.init 调用） */
     public static void register() {
         Registrar<Block> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
-        // 赤石水晶母岩（4 级）：晶洞外层自然生成，放置后生长水晶簇，聚合器可升级
+        // 赤石水晶母岩（4 级）：随机散布于晶洞内表面，放置后生长水晶簇，聚合器可升级
         CHISHI_GEODE_FLAWED = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_geode_flawed",
                 () -> new AkaishiGeodeBlock(AkaishiGeodeBlock.GeodeTier.FLAWED, MapColor.COLOR_LIGHT_GRAY));
         CHISHI_GEODE_NORMAL = AkaishiBlockRegistrar.registerMachineBlock(registrar, "akaishi_geode_normal",

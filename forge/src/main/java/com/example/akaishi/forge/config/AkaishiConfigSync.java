@@ -160,6 +160,15 @@ public final class AkaishiConfigSync {
         ModConfig.decayZoneEnabled = AkaishiConfig.DECAY_ZONE_ENABLED.get();
         ModConfig.sunlightBurnEnabled = AkaishiConfig.SUNLIGHT_BURN_ENABLED.get();
         ModConfig.overloadEnabled = AkaishiConfig.OVERLOAD_ENABLED.get();
+        // 理智系统（总开关 + 三项手感时长；总开关随配置同步包下发，客户端 HUD 据此停画）
+        ModConfig.sanityEnabled = AkaishiConfig.SANITY_ENABLED.get();
+        ModConfig.sanityDarkLightCooldownTicks = AkaishiConfig.SANITY_DARK_LIGHT_COOLDOWN_TICKS.get();
+        ModConfig.sanityFoodRefreshTicks = AkaishiConfig.SANITY_FOOD_REFRESH_TICKS.get();
+        ModConfig.sanityNetherRoofY = AkaishiConfig.SANITY_NETHER_ROOF_Y.get();
+        ModConfig.sanityNaturalRegenPeriodTicks = AkaishiConfig.SANITY_NATURAL_REGEN_PERIOD_TICKS.get();
+        ModConfig.sanityFlowerCountThreshold = AkaishiConfig.SANITY_FLOWER_COUNT_THRESHOLD.get();
+        ModConfig.sanitySleepDeprivationDays = AkaishiConfig.SANITY_SLEEP_DEPRIVATION_DAYS.get();
+        ModConfig.sanitySleepDeprivationDailyDebit = AkaishiConfig.SANITY_SLEEP_DEPRIVATION_DAILY_DEBIT.get();
         // 赤石饰品扩展槽
         ModConfig.curioSlotUnlockRequired = AkaishiConfig.CURIO_SLOT_UNLOCK_REQUIRED.get();
         ModConfig.curioSlotUnlockThresholds = toIntArray(AkaishiConfig.CURIO_SLOT_UNLOCK_THRESHOLDS.get());

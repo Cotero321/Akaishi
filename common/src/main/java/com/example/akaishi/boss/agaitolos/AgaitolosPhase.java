@@ -41,16 +41,6 @@ public enum AgaitolosPhase {
         return this.combatOrdinal;
     }
 
-    /** 是否为战斗阶段（复活阶段不算） */
-    public boolean isCombatPhase() {
-        return this.combatOrdinal >= 1;
-    }
-
-    /** 是否处于复活阶段 */
-    public boolean isRespawn() {
-        return this == RESPAWN;
-    }
-
     /**
      * 下一个战斗阶段：PHASE_1 → PHASE_2 → PHASE_3 → PHASE_3。
      * <p>

@@ -22,12 +22,18 @@ import java.util.List;
  */
 public final class ModCommands {
 
-    /** 赤石水晶母岩方块（4 个等级） */
+    /**
+     * 晶洞标记方块：4 级母岩 + 水晶块（洞内主体）+ 水晶簇。
+     * 母岩只在内表面按 8.3% 随机散布（每洞仅数块），单靠它扫描几乎必漏，
+     * 故把成层出现的水晶块与水晶簇一并作为定位标记。
+     */
     private static final List<Block> GEODES = List.of(
             AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED.get(),
             AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL.get(),
             AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE.get(),
-            AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get());
+            AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT.get(),
+            AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK.get(),
+            AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER.get());
 
     /** 扫描步长：跳过部分方块换取速度（晶洞体积远超步长，不会漏掉） */
     private static final int SCAN_STEP = 4;
@@ -46,6 +52,8 @@ public final class ModCommands {
         AkaishiMiniatureCommand.register(dispatcher);
         // 第三方工序兼容诊断（列出"待声明"的第三方配方类型，给整合包照抄声明表）
         AkaishiThirdPartyCommand.register(dispatcher);
+        // 理智系统调试（五层数值 / 各规则状态 / 强制结算 / 清零食补链）
+        AkaishiSanityCommand.register(dispatcher);
     }
 
     private static int teleportToNearestGeode(CommandContext<CommandSourceStack> ctx, int radius)

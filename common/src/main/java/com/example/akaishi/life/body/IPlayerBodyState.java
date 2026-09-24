@@ -1,6 +1,7 @@
 package com.example.akaishi.life.body;
 
 import com.example.akaishi.life.mechanical.MechanicalIntegration;
+import com.example.akaishi.sanity.SanityState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -93,6 +94,40 @@ public interface IPlayerBodyState {
 
     /** 每 tick 调用：激活到期（到达 untilGameTime）自动结束，刚结束返回 true */
     boolean tickBreakthrough(long gameTime);
+
+    // ===== 精神污染（阿盖托洛丝「天魔＊灾」：BOSS 伤害类型改写的玩家侧持久标记）=====
+
+    /**
+     * 精神污染窗口的截止游戏刻 —— <b>唯一读法</b>是 {@code AgaitolosPsychic#isConverted}：
+     * <ul>
+     *   <li>{@code 0} = 从未被污染（也即"BOSS 打你仍是原来的伤害类型"）；</li>
+     *   <li>正数 = 30s 改写窗口的截止刻（在此期间 BOSS 的伤害一律改判精神伤害）；</li>
+     *   <li>{@link Long#MAX_VALUE} = 窗口已走完，<b>此后永久</b>改写（规格"此技能结束后伤害类型不变"）。</li>
+     * </ul>
+     * <p><b>为什么落在躯体状态里</b>：它是"玩家侧、跨存档、跨死亡都要留"的标记，
+     * 而本 capability 是本项目<b>唯一</b>一条已验证过"落盘 + 死亡快照 + 重生/换维度克隆"的玩家持久化链路
+     * （见 forge 侧 {@code PlayerBodyCapability}）。另立一套 capability 只为存一个 long 属于过度设计。
+     */
+    long getPsychicUntil();
+
+    /** 写入精神污染窗口（0 = 清除；{@code Long.MAX_VALUE} = 转永久） */
+    void setPsychicUntil(long untilGameTime);
+
+    // ===== 理智状态（内部数据层 com.example.akaishi.sanity.SanityState）=====
+
+    /**
+     * 玩家理智状态（五层数值 + 首见标记 + 各机制运行状态）。
+     *
+     * <p><b>为什么借住本 capability</b>：与精神污染同一理由——本 capability 是本项目唯一一条
+     * 已验证"落盘 + 死亡即时快照 + 重生/换维度克隆"的玩家持久化链路，而理智必须跨存档/跨死亡/跨维度。
+     * 另立 capability 只会多出第二套死亡与克隆语义要维护。
+     *
+     * <p><b>死亡策略的落点</b>：克隆时平台侧对死亡路径调用 {@code SanityState#clearTemporaries()}
+     * （临时保护与临时上限削减清除），SAN/SANC/COG 与首见标记随快照整体继承。
+     *
+     * <p>返回对象永不为 null（capability 挂载即持有），调用方不需要判空。
+     */
+    SanityState getSanity();
 
     /** 持久化为 NBT（玩家存档用） */
     CompoundTag save();

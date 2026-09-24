@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "akaishi:block/akaishi_wireless_input_port"
+    "all": "akaishi:block/akaishi_item_input_port"
   }
 }

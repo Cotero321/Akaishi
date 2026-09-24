@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 培养机成功率、加工耗时等）；专用服务器上服务端与客户端的 common.toml
  * 各自独立，必须在玩家登录与配置热重载时推送服务端值覆盖客户端本地值，
  * 否则界面标尺/成功率与实际服务端行为不一致。
- * 仅同步"客户端界面会显示"的字段，其余纯服务端数值无需网络开销。
+ * 仅同步"客户端界面/客户端渲染会读到"的字段，其余纯服务端数值无需网络开销。
  */
 public final class ConfigSyncS2C {
 
@@ -87,6 +87,8 @@ public final class ConfigSyncS2C {
             // 场域屏障可见性：消费端是纯客户端渲染（WirelessFieldRenderer），
             // COMMON 配置不会自动下发，必须随包同步服务端权威值
             boolean wirelessFieldOwnerOnly = buf.readBoolean();
+            // 理智系统总开关：消费端含纯客户端渲染（理智 HUD），同样必须同步服务端权威值
+            boolean sanityEnabled = buf.readBoolean();
             Minecraft.getInstance().execute(() -> {
                 ModConfig.maxRejection = maxRejection;
                 ModConfig.reactorTempMax = reactorTempMax;
@@ -146,6 +148,7 @@ public final class ConfigSyncS2C {
                 ModConfig.combatCritDamageCap = combatCritDamageCap;
                 ModConfig.combatDodgeChanceCap = combatDodgeChanceCap;
                 ModConfig.wirelessFieldOwnerOnly = wirelessFieldOwnerOnly;
+                ModConfig.sanityEnabled = sanityEnabled;
             });
         });
     }
@@ -212,6 +215,7 @@ public final class ConfigSyncS2C {
         buf.writeDouble(ModConfig.combatDodgeChanceCap);
         // 与读端最后一个字段严格对称
         buf.writeBoolean(ModConfig.wirelessFieldOwnerOnly);
+        buf.writeBoolean(ModConfig.sanityEnabled);
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }
 

@@ -3,6 +3,7 @@ package com.example.akaishi.life.body;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.mechanical.MechanicalIntegration;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.sanity.SanityState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -22,6 +23,8 @@ import java.util.Map;
  * - 移植：槽位必须为空，成功即占用，并按器官品质写入初始排斥值。
  * - 摘除：立即对玩家造成无视护甲的固定伤害（创造模式豁免），排斥值随之清零。
  * - 排斥值：0-100 钳制，由基因系统在移植/装配时累加；达到 100 该器官失效。
+ * - 另承载理智状态（SanityState）与精神污染窗口：二者都需要"跨存档 + 跨死亡 + 跨维度"，
+ *   借本 capability 复用已跑通的落盘/快照/克隆链路，避免另立玩家持久化载体。
  */
 public class PlayerBodyState implements IPlayerBodyState {
 
@@ -48,6 +51,9 @@ public class PlayerBodyState implements IPlayerBodyState {
     private static final String TAG_BT_PCT = "bt_pct";
     private static final String TAG_BT_UNTIL = "bt_until";
     private static final String TAG_MECHANICAL_INTEGRATION = "mechanical_integration";
+    private static final String TAG_PSYCHIC_UNTIL = "psychic_until";
+    /** 理智状态嵌套段（键与键内字段见 SanityState.TAG_ROOT） */
+    private static final String TAG_SANITY = SanityState.TAG_ROOT;
 
     /** 槽位 → 器官物品 */
     private final Map<BodySlot, ItemStack> organs = new EnumMap<>(BodySlot.class);
@@ -62,6 +68,10 @@ public class PlayerBodyState implements IPlayerBodyState {
     private long btUntil = -1L;
     /** 机械器官整合度（只涨不降；load 时整体替换，故非 final） */
     private MechanicalIntegration mechanicalIntegration = new MechanicalIntegration();
+    /** 精神污染窗口截止刻（0 = 无；Long.MAX_VALUE = 永久；语义见 IPlayerBodyState#getPsychicUntil） */
+    private long psychicUntil;
+    /** 理智状态（五层数值 + 首见标记 + 各机制运行状态）：借住本 capability 以获得同一条持久化链路 */
+    private final SanityState sanity = new SanityState();
     /** 是否已完成原生器官填充（旧存档无此标记时自动补位） */
     private boolean initialized;
 
@@ -260,6 +270,25 @@ public class PlayerBodyState implements IPlayerBodyState {
         return false;
     }
 
+    // ===== 精神污染 =====
+
+    @Override
+    public long getPsychicUntil() {
+        return psychicUntil;
+    }
+
+    @Override
+    public void setPsychicUntil(long untilGameTime) {
+        this.psychicUntil = Math.max(0L, untilGameTime);
+    }
+
+    // ===== 理智状态 =====
+
+    @Override
+    public SanityState getSanity() {
+        return sanity;
+    }
+
     @Override
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
@@ -303,6 +332,12 @@ public class PlayerBodyState implements IPlayerBodyState {
         tag.putBoolean(TAG_INITIALIZED, initialized);
         // 机械整合度（含浮点增长余数）
         tag.put(TAG_MECHANICAL_INTEGRATION, mechanicalIntegration.save());
+        // 精神污染：只在有时写入（0 = 从未污染，与"键不存在"同义，不必落盘）
+        if (psychicUntil > 0L) {
+            tag.putLong(TAG_PSYCHIC_UNTIL, psychicUntil);
+        }
+        // 理智状态：整段写入，段内自带"只在有值时写"的口径
+        tag.put(TAG_SANITY, sanity.save());
         return tag;
     }
 
@@ -351,6 +386,10 @@ public class PlayerBodyState implements IPlayerBodyState {
         initialized = tag.getBoolean(TAG_INITIALIZED);
         // 机械整合度（整体替换）
         mechanicalIntegration = MechanicalIntegration.load(tag.getCompound(TAG_MECHANICAL_INTEGRATION));
+        // 精神污染：缺键 ⇒ 0（从未污染，安全默认）；异常负值也只当 0，绝不写回负数
+        psychicUntil = Math.max(0L, tag.getLong(TAG_PSYCHIC_UNTIL));
+        // 理智状态：缺段 / 缺键一律取内置默认（SAN/SANC 默认 100，其余 0）
+        sanity.load(tag.getCompound(TAG_SANITY));
         // 加载后立即补位（旧存档/新玩家），保证躯体始终满位
         ensureInitialized();
     }

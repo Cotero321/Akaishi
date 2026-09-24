@@ -2,15 +2,12 @@ package com.example.akaishi.block;
 
 /**
  * 赤石矿簇浓度等级。
- * 浓度越高：掉落赤石晶越多、矿脉越小但越稀有。
+ * 当前只保留中浓度一档（低浓度/完美/无暇已随方块一并移除，恢复时在此加回常量即可）。
  */
 public enum AkaishiOreTier {
-    LOW("low", 1, 20, 9),
-    MEDIUM("medium", 2, 10, 6),
-    PERFECT("perfect", 3, 4, 4),
-    FLAWLESS("flawless", 4, 1, 2);
+    MEDIUM("medium", 2, 10, 6);
 
-    /** id 后缀，如 akaishi_ore_low */
+    /** id 后缀，如 akaishi_ore_medium */
     private final String suffix;
     /** 开采固定掉落数量（不受时运/幸运影响） */
     private final int dropCount;

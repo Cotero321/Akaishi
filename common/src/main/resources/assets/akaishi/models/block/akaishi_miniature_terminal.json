@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "akaishi:block/akaishi_item_terminal"
+    "all": "akaishi:block/akaishi_miniature_terminal"
   }
 }

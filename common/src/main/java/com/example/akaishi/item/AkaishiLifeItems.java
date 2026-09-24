@@ -13,6 +13,7 @@ import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 
@@ -39,6 +40,8 @@ public final class AkaishiLifeItems {
     public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
+    /** 金西瓜：理智系统的食补食物（食用属性见 register 处注释） */
+    public static RegistrySupplier<Item> goldenMelonSlice;
     /** 生命能量权杖：为发射器绑定目标坐标 */
     public static RegistrySupplier<Item> lifeEnergyWand;
     public static RegistrySupplier<Item> akaishiOrganEye;
@@ -92,6 +95,12 @@ public final class AkaishiLifeItems {
                 () -> new AkaishiPotionItem(new Item.Properties().stacksTo(16)));
         rejectionSerum = item(ModItems.REJECTION_SERUM_ID,
                 () -> new AkaishiRejectionSerumItem(new Item.Properties().stacksTo(16)));
+        // 金西瓜：理智体系的食补食物（本模组首个自有食物物品）
+        //   食用属性对标金苹果档位：饱食度 6 / 饱和度 1.2；alwaysEat 保证饱食度满时仍可食用（否则拿不到理智收益）。
+        //   理智侧效果（30s 内共回 10 SAN、附加 5s 生命回复 I、首用上限 +5）全在 sanity.content 的档位表里，物品本身零逻辑。
+        //   贴图暂复用原版 minecraft:item/glistering_melon_slice（待美术侧出图后替换，见模型 json）。
+        goldenMelonSlice = item(ModItems.GOLDEN_MELON_SLICE_ID, () -> new Item(new Item.Properties()
+                .food(new FoodProperties.Builder().nutrition(6).saturationMod(1.2f).alwaysEat().build())));
         // 生命能量权杖：为能量发射器绑定目标坐标（两步式：选发射器 → 点目标方块）
         lifeEnergyWand = item(ModItems.LIFE_ENERGY_WAND_ID, AkaishiLifeEnergyWandItem::new);
         // 器官物品（9 槽位各一，基因来源/品质存 NBT，不可堆叠）

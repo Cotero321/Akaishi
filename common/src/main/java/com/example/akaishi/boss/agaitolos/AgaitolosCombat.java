@@ -1,6 +1,7 @@
 package com.example.akaishi.boss.agaitolos;
 
 import com.example.akaishi.AkaishiMod;
+import com.example.akaishi.effect.ModDamageTypes;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -76,7 +77,64 @@ public final class AgaitolosCombat {
     public static final ResourceKey<DamageType> HEAVY_STRIKE = ResourceKey.create(
             Registries.DAMAGE_TYPE, new ResourceLocation(AkaishiMod.MOD_ID, "heavy_strike"));
 
+    /**
+     * 自定义伤害类型键：凋亡（持续伤害；数据层见 {@code data/akaishi/damage_type/doom.json}）。
+     * <p>
+     * 标签口径（{@code data/minecraft/tags/damage_type/}）：
+     * <ul>
+     *   <li>{@code bypasses_armor} / {@code bypasses_resistance} / {@code bypasses_enchantments} ——
+     *       规格「无视抗性 / 免疫」的落点：护甲点数、抗性提升、保护类附魔都不减伤；</li>
+     *   <li>刻意<b>不</b>进 {@code bypasses_cooldown}（与 {@link #TRUE_DAMAGE} 的关键差别）：
+     *       凋亡是周期性掉血，若每跳都穿过无敌帧就会把目标的 {@code invulnerableTime} 每 8 tick 刷回 20，
+     *       此后 BOSS 自己的普攻/技能会整段落进"只结算增量伤害"分支（少掉血 + 不播受击动画）。
+     *       详见 {@code DoomEffect} 的类注释。</li>
+     * </ul>
+     */
+    public static final ResourceKey<DamageType> DOOM = ResourceKey.create(
+            Registries.DAMAGE_TYPE, new ResourceLocation(AkaishiMod.MOD_ID, "doom"));
+
+    /**
+     * 自定义伤害类型键：三重投掷（阶段三空中三连弹体；数据层见
+     * {@code data/akaishi/damage_type/triple_throw.json}）。
+     * <p>标签口径与 {@link #SCYTHE_SWEEP} 完全一致：只进 {@code bypasses_armor}，
+     * 因为规格「此攻击无视 30% 的防御」在调用方已按 {@code damageAfterPartialArmorBypass} 预折算过一次
+     * （生效护甲比例 0.7），不进该标签会被原版护甲步骤二次减免；抗性提升与保护类附魔照常生效。
+     * <p>刻意<b>不复用</b> {@code scythe_sweep}：伤害类型同时承担死亡消息
+     * （{@code death.attack.akaishi.*}），拿"俯冲镰扫"的消息去播"被三连投掷砸死"会读成另一个技能。
+     */
+    public static final ResourceKey<DamageType> TRIPLE_THROW = ResourceKey.create(
+            Registries.DAMAGE_TYPE, new ResourceLocation(AkaishiMod.MOD_ID, "triple_throw"));
+
+    /**
+     * 自定义伤害类型键：精神伤害（阶段三「天魔＊灾」改写的伤害；数据层见
+     * {@code data/akaishi/damage_type/psychic.json}）。
+     * <p>标签口径（{@code data/minecraft/tags/damage_type/}）：{@code bypasses_armor} +
+     * {@code bypasses_resistance} + {@code bypasses_enchantments} 三件齐备 ——
+     * 这是"精神攻击不吃物理防护"这条规格的落点：护甲点数、抗性提升、保护类附魔一律不减伤。
+     * <p>刻意<b>不</b>进 {@code bypasses_cooldown}：精神伤害仍要受目标无敌帧约束
+     * （与 {@link #DOOM} 同款取舍，理由见该常量的注释）。
+     * <p>它<b>不是</b>某一招的专属类型，而是「天魔＊灾」之后<b>替换</b> BOSS 其它伤害类型的容器：
+     * 替换口径唯一收在 {@code AgaitolosPsychic}（谁被污染、何时转永久），本类只负责造源。
+     * <p><b>键的真源在中立类</b> {@link ModDamageTypes#PSYCHIC}：理智系统同样要读这个键，
+     * 若键留在这里，理智侧就得 import {@code boss.agaitolos}（违反"理智与 BOSS 解耦"）。
+     * 本常量只是<b>转发别名</b>，id 与数据层标签一概未动，既有 {@code AgaitolosCombat.PSYCHIC} 引用点无需改动。
+     */
+    public static final ResourceKey<DamageType> PSYCHIC = ModDamageTypes.PSYCHIC;
+
     private AgaitolosCombat() {
+    }
+
+    /**
+     * 构造凋亡的持续伤害源（供 {@code DoomEffect} 每跳调用）。
+     * <p>不带 causer：1.20.1 的 {@code MobEffectInstance} 不保存施加者，效果自己跳血时没有归属实体，
+     * 死亡消息因此走无攻击者那条键。客户端 / 非 ServerLevel 环境返回 {@code generic()} 兜底，避免 NPE。
+     */
+    public static DamageSource doom(Level level) {
+        if (level instanceof ServerLevel serverLevel) {
+            Registry<DamageType> registry = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+            return new DamageSource(registry.getHolderOrThrow(DOOM));
+        }
+        return level.damageSources().generic();
     }
 
     /**
@@ -161,6 +219,55 @@ public final class AgaitolosCombat {
         if (level instanceof ServerLevel serverLevel) {
             Registry<DamageType> registry = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
             Holder<DamageType> holder = registry.getHolderOrThrow(HEAVY_STRIKE);
+            if (directEntity == null && causingEntity != null) {
+                return new DamageSource(holder, causingEntity);
+            }
+            return new DamageSource(holder, directEntity, causingEntity);
+        }
+        return level.damageSources().generic();
+    }
+
+    /**
+     * 构造三重投掷的伤害源（阶段三技能「三重投掷」的伤害面）。
+     * <p>
+     * 与 {@link #heavyStrike} 逐行同构，只有伤害类型换成 {@link #TRIPLE_THROW}：
+     * 三者共用同一条"按比例削甲"的调用契约 —— 调用方（{@code AgaitolosWitherSkull} 的破防变体）
+     * 先用 {@link #damageAfterPartialArmorBypass} 把「护甲 × 0.7、韧性 × 0.7」折算一次，
+     * 再由本类型（已进 {@code bypasses_armor}）施加，使原版护甲步骤整段跳过、不二次减免。
+     * <p>
+     * 保留 {@code directEntity}（三重投掷时是本 BOSS 打出的凋零头）：
+     * 它既是"这发头是自己射的"的识别依据，也是被玩家打回后走
+     * {@code AgaitolosDamageRules} ⑤ 自伤通道的判据来源（与远程攻击同一口径）。
+     */
+    public static DamageSource tripleThrow(Level level, Entity directEntity, Entity causingEntity) {
+        if (level instanceof ServerLevel serverLevel) {
+            Registry<DamageType> registry = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+            Holder<DamageType> holder = registry.getHolderOrThrow(TRIPLE_THROW);
+            if (directEntity == null && causingEntity != null) {
+                return new DamageSource(holder, causingEntity);
+            }
+            return new DamageSource(holder, directEntity, causingEntity);
+        }
+        return level.damageSources().generic();
+    }
+
+    /**
+     * 构建/替换成精神伤害源（阶段三「天魔＊灾」改写 BOSS 伤害类型的落点）。
+     * <p>
+     * 与 {@link #heavyStrike} 同构，只有伤害类型换成 {@link #PSYCHIC}；唯一的差别在<b>用法</b>：
+     * 它不是"某一招专属"，而是把<b>已经构造好</b>的那一发换壳 —— 调用方（{@code AgaitolosPsychic}）
+     * 把原源的 {@code directEntity / causingEntity} 原样传进来，故：
+     * <ul>
+     *   <li><b>击杀归属不变</b>：{@code getEntity()} 仍是 BOSS，死亡消息走
+     *       {@code death.attack.akaishi.psychic.player}；</li>
+     *   <li><b>反弹自伤判定不变</b>：被玩家打回的凋零头 {@code directEntity} 仍是那个弹体，
+     *       {@code AgaitolosEntity#isReflectedSkull} 照旧成立（换壳不会把反弹通道弄丢）。</li>
+     * </ul>
+     */
+    public static DamageSource psychic(Level level, Entity directEntity, Entity causingEntity) {
+        if (level instanceof ServerLevel serverLevel) {
+            Registry<DamageType> registry = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+            Holder<DamageType> holder = registry.getHolderOrThrow(PSYCHIC);
             if (directEntity == null && causingEntity != null) {
                 return new DamageSource(holder, causingEntity);
             }

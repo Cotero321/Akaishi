@@ -15,6 +15,17 @@ import java.util.List;
  * <p>common 侧不可见 Curios API，无法自行统计佩戴件数，故此处只定义抽象，
  * 由平台层（forge）在初始化时注入实现。缺省实现全部返回中性值，
  * 保证未注入时行为与既有版本一致。</p>
+ *
+ * <p><b>禁忌秘典·预留接线点（本轮默认不接）</b>：将来若要用秘典产出的"已解锁键"锁住四件禁断饰品
+ * （或其槽位），接线位置就是本类 —— 四件的佩戴/生效判定全部经由这里向平台层提问。
+ * 届时两种接法：
+ * <ol>
+ *   <li>在各改造/佩戴入口调用 {@code socketsLocked(player)} 之前加一句
+ *       {@code if (!CodexUnlocks.requireUnlock(player, 键)) return;}；</li>
+ *   <li>或把 {@code socketLockQuery} 的注入实现本身改成"未解锁即视为锁死"。</li>
+ * </ol>
+ * 键的命名约定见 {@code CodexUnlocks}（{@code akaishi:codex/<节点路径>}）。
+ * 现状：一条都不接 ⇒ 四件饰品与 9 槽封锁规则全部照旧，老存档行为不变。</p>
  */
 public final class ForbiddenSetHooks {
 

@@ -2,6 +2,7 @@ package com.example.akaishi.forge;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
+import com.example.akaishi.api.hud.AkaishiHudRegistry;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
@@ -10,6 +11,7 @@ import com.example.akaishi.block.AkaishiFusionBlocks;
 import com.example.akaishi.block.AkaishiItemTerminalBlocks;
 import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
+import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiOreDef;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiTransgeneBlocks;
@@ -24,10 +26,13 @@ import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosArenaEvents;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosBossBarOverlay;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosDoomHandler;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosMusicHandler;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosRenderer;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
+import com.example.akaishi.forge.client.AkaishiDeepSeaFogHandler;
 import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
 import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
 import com.example.akaishi.forge.client.AkaishiConfigScreenFactory;
@@ -41,6 +46,9 @@ import com.example.akaishi.forge.client.WirelessNodeFieldRenderer;
 import com.example.akaishi.forge.client.AkaishiUnnameableHandler;
 import com.example.akaishi.forge.client.AkaishiErosionFlashOverlay;
 import com.example.akaishi.forge.client.AkaishiUnnameableOverlay;
+import com.example.akaishi.forge.client.hud.AkaishiHudLayer;
+import com.example.akaishi.forge.client.hud.AkaishiSanityHudElement;
+import com.example.akaishi.forge.client.AkaishiSanityVisionPostHandler;
 import com.example.akaishi.forge.client.AkaishiUnnameablePostHandler;
 import com.example.akaishi.api.miniature.IMiniaturizableTerminal;
 import com.example.akaishi.miniature.MiniatureCollapse;
@@ -63,6 +71,16 @@ import com.example.akaishi.forge.life.AkaishiMechanicalEffectHandler;
 import com.example.akaishi.forge.life.AkaishiSocketEffectHandler;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityCombatHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityDamageHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityDamageSeenHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityFoodHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityKillHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityPotionBrewing;
+import com.example.akaishi.forge.sanity.AkaishiSanitySleepHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityUnnameableHandler;
+import com.example.akaishi.forge.sanity.shadow.ShadowRenderer;
+import com.example.akaishi.sanity.shadow.ShadowEntity;
 import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
 import com.example.akaishi.forge.value.AkaishiValueForgeEvents;
 import com.example.akaishi.forge.value.ValuePlatformImpl;
@@ -128,6 +146,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.api.distmarker.Dist;
@@ -187,6 +206,10 @@ public final class AkaishiModForge {
 
         // 注册 4 种液体（下界至纯/复合能量 + 至纯/复合燃料）到 Forge 注册表
         ModFluidsImpl.register(FMLJavaModLoadingContext.get().getModEventBus());
+        // 理智回复药水的酿造配方：addMix 是 Forge 补进原版 PotionBrewing 的 API（common 不可见），
+        // 且必须等药水注册完成，故放在 common setup（enqueueWork 内执行）
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (FMLCommonSetupEvent event) -> event.enqueueWork(AkaishiSanityPotionBrewing::register));
         // 注入外部液体访问桥（MEK 等第三方液体能力对接）
         ForgeFluidBridge.init();
         // 第三方物流能力（能量除外）：任何实现 IItemPipeDevice / IFluidPipeDevice 的机器方块自动
@@ -260,6 +283,30 @@ public final class AkaishiModForge {
         // 机械义体特殊效果（DNA 授予）：tick / 受击 / 击退消费，缺注册则义体效果不可见亦无效
         MinecraftForge.EVENT_BUS.register(AkaishiMechanicalEffectHandler.INSTANCE);
 
+        // 理智系统·精神伤害减免：只处理 akaishi:psychic 伤害（减伤口径在 common 的 SanityDamageGuard 内）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityDamageHandler.INSTANCE);
+
+        // 禁忌秘典·"挨过的伤害类型"记档：LivingHurtEvent 里把玩家被打中的伤害类型记进 SanityState
+        // （供秘典 DAMAGE 条件查询；与理智开关无关，故独立于上面的理智处理器）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityDamageSeenHandler.INSTANCE);
+
+        // 理智系统·阈值惩罚（伤害侧）：攻击效能 / 易伤 / 护甲效能 / 0% 档精神化 / 骷髅凋零
+        // 同时挂 LivingHurtEvent（护甲之前）与 LivingDamageEvent（最终值），依据见该类类注释
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityCombatHandler.INSTANCE);
+
+        // 理智系统·食补触发：原版进食 Finish 事件 → common 的食补入口（窗口分摊在 common 的 tick 里跑）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityFoodHandler.INSTANCE);
+
+        // 理智系统·遭遇不可名状的起手扣减：效果被施加到玩家身上时结算一次（MobEffectEvent.Added）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityUnnameableHandler.INSTANCE);
+
+        // 理智系统·击杀类首见上报：LivingDeathEvent 里按"责任实体是玩家"归因
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityKillHandler.INSTANCE);
+
+        // 理智系统·睡眠（P6）：PlayerWakeUpEvent 的"睡到天亮"给 +3；LivingHurtEvent 里把
+        // 幻翼的原版咬击转成"睡眠剥夺状态下的附加 psychic 伤害"（具体投放由 common 的待投递队列做）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanitySleepHandler.INSTANCE);
+
         // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
         MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
 
@@ -273,6 +320,12 @@ public final class AkaishiModForge {
 
         // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
+
+        // 阿盖托洛丝阶段三「凋亡」的降低治疗层：common 无治疗钩子，故在此消费 Forge 的 LivingHealEvent
+        MinecraftForge.EVENT_BUS.register(AgaitolosDoomHandler.INSTANCE);
+
+        // 下界牢狱：召唤仪式右键入口（RightClickBlock）+ 场地方块不可破坏（BreakEvent / ExplosionEvent.Detonate）
+        MinecraftForge.EVENT_BUS.register(AgaitolosArenaEvents.INSTANCE);
 
         // 衰竭区域死寂：区域内禁止生物自然生成
         MinecraftForge.EVENT_BUS.register(AkaishiDecaySpawnBlocker.INSTANCE);
@@ -352,13 +405,19 @@ public final class AkaishiModForge {
         }
     }
 
-    /** 注册客户端 HUD 叠加层：「不可名状」的边缘粗线 + 噪点 + 低语文字；侵蚀泛红的血色边缘；阿盖托洛丝铭牌血条 */
+    /** 注册客户端 HUD 叠加层：「不可名状」边缘粗线 + 噪点 + 低语；侵蚀泛红；统一 HUD 渲染层（含理智条）；阿盖托洛丝铭牌血条 */
     private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         // 泛红先注册（位于下层），避免盖住低语文字
         event.registerAboveAll("erosion_flash_overlay", new AkaishiErosionFlashOverlay());
         event.registerAboveAll("unnameable_overlay", new AkaishiUnnameableOverlay());
+        // 统一 HUD 渲染层：理智条等"贴边自绘"组件先登记到 api.hud 注册表，
+        // 再由本层统一解算锚点 / 组内堆叠 / 与原版 HUD 避让（元素自身不再硬编码屏幕坐标）。
+        // 先登记元素、后注册图层：图层首个渲染帧就会读到元素表（注册表按版本号缓存）。
+        AkaishiHudRegistry.register(new AkaishiSanityHudElement());
+        event.registerAboveAll("akaishi_hud_layer", new AkaishiHudLayer());
         // 阿盖托洛丝铭牌血条：锚在原版 boss 血条层（该层已空 —— 本 BOSS 不再用 ServerBossEvent），
-        // 挂上去即占据"原版血条的位置"，且不会与任何原版血条重叠
+        // 挂上去即占据"原版血条的位置"，且不会与任何原版血条重叠。
+        // 它属于"以屏幕中轴为不动点的独立层"，不进统一 HUD 层（见 api.hud 的 package-info 边界说明）。
         event.registerAbove(VanillaGuiOverlay.BOSS_EVENT_PROGRESS.id(), "agaitolos_boss_bar",
                 new AgaitolosBossBarOverlay());
     }
@@ -376,8 +435,8 @@ public final class AkaishiModForge {
         RenderTypeRegistry.register(RenderType.cutout(),
                 AkaishiDecayBlocks.CHISHI_DECAY_DOOR.get(),
                 AkaishiDecayBlocks.CHISHI_DECAY_TRAPDOOR.get());
-        // 16 种矿石为「底材 cube_all + 外凸 1/16 格矿斑层」两层：矿斑层贴图透明底，
-        // 必须注册 cutout，否则透明区渲染成黑色；正面两层重合、斜看产生视差立体感
+        // 赤石矿簇为「底材 cube_all + 贴面矿斑层」两层：矿斑层贴图透明底，
+        // 必须注册 cutout，否则透明区渲染成黑色（矿斑层为贴面 0.005 格，不外凸、不做伪 3D 视差）
         List<Block> oreBlocks = new ArrayList<>(AkaishiFoundationBlocks.ALL_ORES.size());
         for (AkaishiOreDef def : AkaishiFoundationBlocks.ALL_ORES) {
             oreBlocks.add(AkaishiFoundationBlocks.get(def));
@@ -385,6 +444,7 @@ public final class AkaishiModForge {
         RenderTypeRegistry.register(RenderType.cutout(), oreBlocks.toArray(new Block[0]));
         // 结构玻璃为半透明材质，注册 translucent 才能正确混合显示内部结构
         RenderTypeRegistry.register(RenderType.translucent(),
+                AkaishiMiniMatrixBlocks.CHISHI_MINI_MATRIX_STRUCTURE_GLASS.get(),
                 AkaishiReactorBlocks.CHISHI_REACTOR_STRUCTURE_GLASS.get(),
                 AkaishiFusionBlocks.CHISHI_FUSION_STRUCTURE_GLASS.get(),
                 AkaishiMatrixBlocks.CHISHI_GEN_MATRIX_STRUCTURE_GLASS.get(),
@@ -405,6 +465,10 @@ public final class AkaishiModForge {
         EntityRenderers.register(ModEntities.AGAITOLOS.get(), AgaitolosRenderer::new);
         // 阿盖托洛丝的远程弹体：复用原版凋零头渲染器（子类可被 EntityRenderer<WitherSkull> 直接渲染）
         EntityRenderers.register(ModEntities.AGAITOLOS_WITHER_SKULL.get(), WitherSkullRenderer::new);
+        // 影怪：GeckoLib 几何动画渲染 + 眼睛自发光图层（图层在渲染器构造器内注册）
+        EntityRenderers.register(ModEntities.SHADOW.get(), ShadowRenderer::new);
+        // 影怪的精神弹：同样复用原版凋零头渲染器（零新增贴图，见 ShadowBolt 类注释）
+        EntityRenderers.register(ModEntities.SHADOW_BOLT.get(), WitherSkullRenderer::new);
         // 管道方向标识：输出=臂端收窄尖口，输入=臂端外扩喇叭口（物品/赤能源/生命能量/液体/废料/等离子全族）
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ITEM_PIPE.get(), PipeSideOverlayRenderer::new);
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ENERGY_PIPE.get(), PipeSideOverlayRenderer::new);
@@ -419,13 +483,17 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINI_MATRIX_NETWORK_NODE.get(), WirelessNodeFieldRenderer::new);
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
+        // 深海视野锁定（P6）：主世界海洋群系 Y<0 时大幅收拢雾距并染深水色；
+        // 与上面的衰减区雾效按"雾距叠乘、雾色各自插值"并存（口径见该类类注释）
+        MinecraftForge.EVENT_BUS.register(AkaishiDeepSeaFogHandler.INSTANCE);
         // 「不可名状」视野扭曲：相机滚转/抖动与 FOV 脉动
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameableHandler.INSTANCE);
         // 「不可名状」后处理：整帧对比度提升 + 电视机花白
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameablePostHandler.INSTANCE);
+        // 低理智视野后处理：灰化 / 血丝 / 黑白（与上者互斥，不可名状优先；依据见该类类注释）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityVisionPostHandler.INSTANCE);
         // 阿盖托洛丝战斗音乐：附近有存活 BOSS 时挂一条跟随它的循环位置音效（客户端 TickableSoundInstance）
         MinecraftForge.EVENT_BUS.register(AgaitolosMusicHandler.INSTANCE);
-
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();
     }
@@ -443,6 +511,8 @@ public final class AkaishiModForge {
     /** 自定义生物的属性供应商（每个自定义 LivingEntity 类型必须注册一次） */
     private void onEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.AGAITOLOS.get(), AgaitolosEntity.createAttributes().build());
+        // 影怪：非 Mob 的 LivingEntity 同样必须在此登记属性供应商，否则实体构造时读不到 MAX_HEALTH 即崩
+        event.put(ModEntities.SHADOW.get(), ShadowEntity.createAttributes().build());
     }
 
     /**

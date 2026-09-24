@@ -50,9 +50,6 @@ public final class AgaitolosPace {
      * <p>乘数落点（三处，全部读本方法，不各自硬写）：
      * {@code AgaitolosMoveControl} 的水平加速度 / 水平限速 / 垂直限速、
      * {@code AgaitolosEntity#tickDiveCharge} 的 {@code DIVE_SPEED}。
-     * <p>原版 Goal 的节奏（近战出手间隔、远程 60 tick 间隔）不在此列：它们由
-     * {@code MeleeAttackGoal} / {@code RangedAttackGoal} 内部计时，改它要重建 Goal；
-     * 本轮只保证"移动 + 技能冷却"这两条规格直接点名的更快，避免动到 Goal 装配面。
      */
     public static double moveSpeed(AgaitolosPhase phase) {
         switch (phase) {
@@ -66,7 +63,17 @@ public final class AgaitolosPace {
         }
     }
 
-    /** 该阶段的技能冷却系数（&lt; 1 表示冷却更短） */
+    /**
+     * 该阶段的技能冷却系数（&lt; 1 表示冷却更短）。
+     * <p>消费方：俯冲镰扫 / 格挡 / 恶怨倒转 / 瞬击 / 高速踢击（各技能类里的 COOLDOWN 常量经
+     * {@link #scaledCooldown} 折算）、普攻间隔（{@code AgaitolosMeleeSkill#MELEE_INTERVAL_TICKS}）、
+     * 远程间隔（{@code AgaitolosSkullSkill#SKULL_COOLDOWN_TICKS}），以及
+     * {@code AgaitolosSkillDirector} 的出手节拍（{@code BEAT_TICKS_BASE}）。
+     * <p>
+     * <b>2026-09-21 补</b>：普攻/远程的间隔原先由原版 {@code MeleeAttackGoal}/{@code RangedAttackGoal}
+     * 内部计时（本表管不到，属"二阶段更快"的一个缺口）；现在两个间隔都由 {@code AgaitolosEntity}
+     * 显式持有，于是"二阶段更快"覆盖<b>移动 + 全部招式冷却 + 出手节拍</b>三件事，没有漏网的招。
+     */
     public static double cooldownScale(AgaitolosPhase phase) {
         switch (phase) {
             case PHASE_2:

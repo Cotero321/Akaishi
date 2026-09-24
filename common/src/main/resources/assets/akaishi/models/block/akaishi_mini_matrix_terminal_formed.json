@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "akaishi:block/akaishi_purifier_matrix_controller_formed"
+    "all": "akaishi:block/akaishi_mini_matrix_terminal_formed"
   }
 }

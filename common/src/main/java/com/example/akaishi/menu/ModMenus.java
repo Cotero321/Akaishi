@@ -241,6 +241,8 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiMiniMatrixTerminalMenu>> CHISHI_MINI_MATRIX_TERMINAL;
     /** 网络节点菜单类型（只读绑定信息 + 本节点屏障开关；176×112，无背包区） */
     public static RegistrySupplier<MenuType<AkaishiMiniMatrixNodeMenu>> CHISHI_MINI_MATRIX_NODE;
+    /** 禁忌秘典菜单类型（手持物品界面，无任何槽位；进度与条件由 S2C 快照下发） */
+    public static RegistrySupplier<MenuType<AkaishiCodexMenu>> CHISHI_CODEX;
 
     private ModMenus() {
     }
@@ -1454,6 +1456,15 @@ public final class ModMenus {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mini_matrix_node"), () -> miniMatrixNodeType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(miniMatrixNodeType, AkaishiMiniMatrixNodeScreen::new));
+
+        // 禁忌秘典：手持物品界面（无槽位、无方块实体），进度快照与条件求值由服务端下发
+        MenuType<AkaishiCodexMenu> codexType = MenuRegistry.ofExtended(
+                (syncId, inv, buf) -> new AkaishiCodexMenu(syncId, inv));
+        CHISHI_CODEX = (RegistrySupplier<MenuType<AkaishiCodexMenu>>) (Object) RegistrarManager
+                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
+                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_forbidden_codex"), () -> codexType);
+        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
+                MenuRegistry.registerScreenFactory(codexType, AkaishiCodexScreen::new));
 
         // 物品储存单元：D18 只读视图（54 槽 + 占用/剩余 IP），无任何写入路径
         MenuType<AkaishiItemStorageUnitMenu> itemStorageUnitType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

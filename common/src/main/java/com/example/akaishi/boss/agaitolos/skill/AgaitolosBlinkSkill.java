@@ -24,7 +24,8 @@ import net.minecraft.world.phys.Vec3;
  * 又不至于让 BOSS 在 30s 里彻底失去威胁。
  * <p>
  * <b>本类只负责"怎么瞬"与"能不能瞬"</b>：起手闸（状态互斥 / 阶段门 / 封印 / 是否禁飞 / 冷却）
- * 一律由 {@code AgaitolosEntity#tickBlink} 持有，与 {@code tickDiveSweep} 的分工一致 ——
+ * 一律由 {@code AgaitolosEntity#startBlink} 持有（节拍与冷却由 {@code AgaitolosSkillDirector} 仲裁），
+ * 与 {@code tickDiveState} 的分工一致 ——
  * 技能不自持计时、不碰实体状态字段。
  * <p>
  * <b>瞬击本身不结算伤害</b>：规格与定案表都只写"瞬移 + 落点校验"，没有给伤害数字；

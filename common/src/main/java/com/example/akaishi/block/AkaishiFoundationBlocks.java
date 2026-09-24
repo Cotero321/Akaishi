@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 赤石基础域方块注册：16 种矿石 + 粗制块/提纯器/精华块等基础材料块，以及
+ * 赤石基础域方块注册：4 种赤石矿石（主世界/深板岩/下界/末地四种环境 × 中浓度）+ 粗制块/提纯器/精华块等基础材料块，以及
  * 装备打造器/升级台/融合砧/压缩机/打粉机/变化器/活化处理链/燃料链等通用加工机器。
  * <p>
  * 从 ModBlocks 拆分出的域注册类（矿石走「方块 + BlockItem」循环，机器经
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class AkaishiFoundationBlocks {
 
-    /** 全部 16 个矿石组合定义 */
+    /** 全部矿石组合定义（环境 × 浓度，当前浓度只保留中浓度 ⇒ 4 种） */
     public static final List<AkaishiOreDef> ALL_ORES = buildAllOres();
 
     /** 组合定义 → 方块延迟注册引用 */
@@ -76,7 +76,7 @@ public final class AkaishiFoundationBlocks {
     public static void register() {
         Registrar<Block> blockRegistrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
 
-        // 16 种矿石：方块实例必须延迟到注册事件中创建（new Block 会创建侵入式 Holder，
+        // 矿石：方块实例必须延迟到注册事件中创建（new Block 会创建侵入式 Holder，
         // 若在注册表冻结后执行将抛 "Registry is already frozen"）
         for (AkaishiOreDef def : ALL_ORES) {
             ResourceLocation id = new ResourceLocation(AkaishiMod.MOD_ID, def.id());
@@ -131,9 +131,9 @@ public final class AkaishiFoundationBlocks {
         return BLOCK_BY_DEF.get(def).get();
     }
 
-    /** 生成 4 × 4 全部组合 */
+    /** 生成「环境 × 浓度」全部组合（当前浓度只保留中浓度 ⇒ 4 种） */
     private static List<AkaishiOreDef> buildAllOres() {
-        List<AkaishiOreDef> defs = new ArrayList<>(16);
+        List<AkaishiOreDef> defs = new ArrayList<>(4);
         for (AkaishiOreEnvironment env : AkaishiOreEnvironment.values()) {
             for (AkaishiOreTier tier : AkaishiOreTier.values()) {
                 defs.add(new AkaishiOreDef(tier, env));

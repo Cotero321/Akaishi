@@ -1,14 +1,15 @@
 package com.example.akaishi.boss.agaitolos.skill;
 
 import com.example.akaishi.boss.agaitolos.AgaitolosCombat;
+import com.example.akaishi.boss.agaitolos.AgaitolosDoom;
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
+import com.example.akaishi.boss.agaitolos.AgaitolosPsychic;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -66,7 +67,7 @@ public final class AgaitolosDiveSweepSkill {
      * 结算一次俯冲镰扫的伤害（仅服务端；由 {@link AgaitolosEntity} 的冲锋收尾处调用，见其 {@code finishDive}）。
      *
      * @return 是否<b>有玩家落入横扫范围</b>（含被格挡者）—— 调用方据此进冷却（动画已在冲锋起手时播，
-     *         见 {@code AgaitolosEntity#tickDiveSweep}，此处不再重复触发）。
+     *         见 {@code AgaitolosEntity#startDiveSweep}，此处不再重复触发）。
      *         被格挡也算"这一刀挥出去了"，否则格挡成功后 BOSS 会每 tick 空挥（无冷却）。
      */
     public static boolean perform(AgaitolosEntity boss) {
@@ -85,7 +86,9 @@ public final class AgaitolosDiveSweepSkill {
             //    魔法分支用原版 minecraft:magic 而非自制类型：vanilla 已把 minecraft:magic 放进 bypasses_armor
             //    （实测 data/minecraft/tags/damage_type/bypasses_armor.json 含 "minecraft:magic"），
             //    即"魔法伤害不吃护甲点数"是原版既定语义，与本技能要表达的"魔法伤害"一致，无需另造数据。
-            boolean withered = player.hasEffect(MobEffects.WITHER);
+            //    "带凋零"由 AgaitolosDoom#isWitheredOrDoomed 判定：阶段三 BOSS 施加的是凋亡，须一并认下
+            //    （否则阶段三这条"带凋零转魔法伤害"会静默失效）
+            boolean withered = AgaitolosDoom.isWitheredOrDoomed(player);
             DamageSource source = withered
                     ? magicSweep(boss)
                     : AgaitolosCombat.scytheSweep(player.level(), null, boss);
@@ -122,7 +125,10 @@ public final class AgaitolosDiveSweepSkill {
                 boss.onSweepBlocked();
                 continue;
             }
-            player.hurt(source, damage);
+            // 阶段三「天魔＊灾」之后：受击方已被改写时，本次横扫整体改判精神伤害
+            // （口径唯一收在 AgaitolosPsychic）。优先级刻意取"改写 > 带凋零转魔法"：
+            // 规格说的是"BOSS 的伤害类型替换为精神伤害"，那是全局替换，不该被"这个人恰好带着凋零"顶掉。
+            player.hurt(AgaitolosPsychic.forVictim(source, player, boss.level().getGameTime()), damage);
         }
         return anyInSweep;
     }
@@ -163,7 +169,9 @@ public final class AgaitolosDiveSweepSkill {
         }
         if (horizontalSqr < HORIZONTAL_EPSILON_SQR) {
             // BOSS 正下方/正上方：180° 扇面在水平面上退化为一点，朝向无从谈起 ⇒ 判为<b>命中</b>
-            // （与格挡判定"退化即 false"刻意相反：这里漏判等于悬停正上方时白扫一刀，而扫到的就是脚下的目标）
+            //（漏判等于悬停正上方时白扫一刀，而脚下站的就是目标）。
+            // 注：承伤侧的 {@code AgaitolosGuardSkill#isWithinFrontArc} 自 2026-09-21 起也改成"退化即视为正面/
+            // 挡下"，两侧取向已一致 —— 漏打与漏挡同属静默失效，没有理由相反。
             return true;
         }
         double inverse = 1.0D / Math.sqrt(horizontalSqr);

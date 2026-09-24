@@ -33,7 +33,7 @@ import net.minecraft.world.level.ItemLike;
  *   <li>{@link #MECHANICAL_TAB_ID} 机械改造：机械器官 / 部件模板 / 加工件 / 机械材料 / 3 台机器</li>
  *   <li>{@link #LIFE_TAB_ID} 生命科技：生物器官 / 样本 / 药剂 / 生命能量 / 手术与基因机器</li>
  *   <li>{@link #MACHINES_TAB_ID} 机器与结构：能源 / 管道 / 储罐 / 多方块结构件</li>
- *   <li>{@link #FORBIDDEN_TAB_ID} 禁忌：扩展槽四件禁忌饰品</li>
+ *   <li>{@link #FORBIDDEN_TAB_ID} 禁忌：扩展槽四件禁忌饰品 + 禁忌秘典（自研知识/研究系统入口）</li>
  * </ol>
  */
 public final class ModCreativeTabs {
@@ -99,7 +99,7 @@ public final class ModCreativeTabs {
     // ==================== 栏 1：主栏（通用材料 / 装备 / 工具 / 采集体系） ====================
 
     private static void addMainItems(CreativeModeTab.Output output) {
-        // 16 个赤石矿簇方块
+        // 赤石矿簇方块（4 个环境 × 中浓度）
         for (AkaishiOreDef def : ModBlocks.ALL_ORES) {
             output.accept(new ItemStack(ModBlocks.get(def)));
         }
@@ -299,6 +299,12 @@ public final class ModCreativeTabs {
         // 药剂
         accept(output, ModItems.akaishiPotion);
         accept(output, ModItems.rejectionSerum);
+        // 金西瓜（理智食补食物：30s 共回 10 SAN + 5s 生命回复 I，首用上限 +5）
+        accept(output, ModItems.goldenMelonSlice);
+        // 理智系统·物品与酿造（P5）：两瓶药剂 + 花环饰品（均暂无配方，仅创造栏可得）
+        accept(output, ModItems.sanityTonic);
+        accept(output, ModItems.greaterSanityTonic);
+        accept(output, ModItems.sanityGarland);
         // 仓储
         accept(output, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT);
         accept(output, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT);
@@ -547,6 +553,8 @@ public final class ModCreativeTabs {
         accept(output, ModItems.cubHeart);
         accept(output, ModItems.motherSeal);
         accept(output, ModItems.fertilityRing);
+        // 禁忌秘典：自研知识/研究系统的入口（本轮无配方，仅创造栏可得）
+        accept(output, ModItems.forbiddenCodex);
     }
 
     /** 判空后把注册内容（物品/方块，均实现 ItemLike）放入创造标签（注册完成前为 null，防御性跳过） */

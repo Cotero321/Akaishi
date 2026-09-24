@@ -35,6 +35,17 @@ public class AgaitolosModel extends GeoModel<AgaitolosEntity> {
             new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage3.png")
     };
 
+    /**
+     * 按阶段索引的<b>发光遮罩</b>（emissive）：与本体贴图同尺寸、同 UV 布局，
+     * 只保留眼睛／浮颅眼窝与牙列／镰刀刃口与魂宝石／胸前亮块与描边／翼膜破洞边缘等自发光区域，其余像素全透明。
+     * <p>由 {@code AgaitolosGlowLayer} 以全亮混合方式覆在本体之上消费（见其类注释的 API 依据）。
+     */
+    private static final ResourceLocation[] GLOW_TEXTURES = {
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage1_glow.png"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage2_glow.png"),
+            new ResourceLocation(AkaishiMod.MOD_ID, "textures/entity/agaitolos_stage3_glow.png")
+    };
+
     /** 骨架动画：现阶段只有这一份，三套 geo 骨骼同构故可共用 */
     private static final ResourceLocation SHARED_ANIMATION =
             new ResourceLocation(AkaishiMod.MOD_ID, "animations/entity/agaitolos_stage1.animation.json");
@@ -67,5 +78,19 @@ public class AgaitolosModel extends GeoModel<AgaitolosEntity> {
     private static int phaseIndex(AgaitolosEntity animatable) {
         int index = animatable.getPhase().combatOrdinal() - 1;
         return index < 0 || index >= MODELS.length ? STAGE_1_INDEX : index;
+    }
+
+    /**
+     * 阶段对应的发光遮罩资源（供 {@code AgaitolosGlowLayer} 使用）。
+     * <p>
+     * 刻意把这张表与取值一起留在本类、而不是让图层自带一份：下标口径只有 {@link #phaseIndex}
+     * 一处，本体贴图（{@link #getTextureResource}）与遮罩必然同步换档；
+     * 若日后新增阶段四，只需扩 {@link #MODELS} / {@link #TEXTURES} / {@link #GLOW_TEXTURES} 三张表。
+     * <p>
+     * 定为 {@code static}：调用方是渲染图层，它只拿得到 {@code GeoModel} 接口引用，
+     * 为避免向下转型而直接以类名调用。
+     */
+    public static ResourceLocation glowTexture(AgaitolosEntity animatable) {
+        return GLOW_TEXTURES[phaseIndex(animatable)];
     }
 }

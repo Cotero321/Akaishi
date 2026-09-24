@@ -1,6 +1,7 @@
 package com.example.akaishi.boss.agaitolos.skill;
 
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
+import com.example.akaishi.boss.agaitolos.AgaitolosPsychic;
 import java.util.List;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -92,7 +93,9 @@ public final class AgaitolosReversalSkill {
             if (!player.isAlive() || player.distanceToSqr(boss) > radiusSqr) {
                 continue;
             }
-            player.hurt(source, damage);
+            // 精神污染（阶段三「天魔＊灾」）换壳：被污染的玩家受到的这一发同样按精神伤害结算。
+            // 只换伤害源、不动数值与节拍；未污染时 forVictim 原样返回（逐位不变）。
+            player.hurt(AgaitolosPsychic.forVictim(source, player, boss.level().getGameTime()), damage);
         }
     }
 

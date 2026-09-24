@@ -61,6 +61,7 @@ gradle-local.properties
 .trae/
 .codeium/
 .continue/
+.dsh-project-memory/
 .aider*
 AGENTS.md
 CLAUDE.md

@@ -1,5 +1,6 @@
 package com.example.akaishi.boss.agaitolos;
 
+import com.example.akaishi.boss.agaitolos.arena.NetherPrisonArena;
 import com.example.akaishi.boss.agaitolos.entity.AgaitolosWitherSkull;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosBlinkSkill;
 import com.example.akaishi.boss.agaitolos.skill.AgaitolosDiveSweepSkill;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -20,11 +22,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -37,6 +41,7 @@ import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import java.util.UUID;
 
 /**
  * 阿盖托洛丝【下界本源】实体主体。
@@ -48,9 +53,65 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * 阶段独立成类（{@link AgaitolosPhase}），本类只做编排，不把逻辑堆成巨型类。
  * <p>
  * <b>血条不由本类持有</b>：显示职责整体移交客户端自定义 overlay（forge 侧
- * {@code AgaitolosBossBarOverlay}）。原版 {@code ServerBossEvent}（旧 {@code AgaitolosBossBar}）已删除 ——
+ * {@code AgaitolosBossBarOverlay}）。原版 {@code ServerBossEvent} 血条路线（早期那个只做参与者对账的
+ * 服务端血条类）已整体删除，本目录下不再有任何服务端血条代码 ——
  * 它既画不出需求里的铭牌贴图与阶段换皮，留着还会与自定义血条<b>同时显示两条</b>，
  * 属于典型「看得到用不到」的残留。本类只负责把阶段/复活状态同步出去供客户端读取。
+ * <p>
+ * <b>2026-09-21 补：战斗决策层与"不还手"根因修复</b>
+ * <ul>
+ *   <li><b>根因</b>：原版 {@code MeleeAttackGoal} 判可达距离时只用自己的 {@code getBbWidth()}²
+ *       （实测字节码，不读 {@link #getMeleeAttackRangeSqr}），而本 BOSS 常态悬停在玩家上方 2 格 ⇒
+ *       光竖直差就 4.0 &gt; 3.84，<b>近战一次都挥不出</b>；同时远程的 {@code RangedAttackGoal}
+ *       与近战 Goal 抢同一组 Flag、优先级又更低 ⇒ 被永久饿死。两者叠加 = 玩家贴脸打它、它只会飘着。
+ *       修法见 {@link AgaitolosMeleeAttackGoal}（近战判据）+ {@code AgaitolosSkillDirector}（远程改由决策层放）。</li>
+ *   <li><b>决策层</b>：起手判定从各 {@code tickXxx} 的顺次闸整体上移到 {@link AgaitolosSkillDirector}
+ *       （距离分层 + 权重随机 + 全局动作锁 + 阶段/玩家状态修正）；本类只保留<b>进行中状态</b>
+ *       （{@code tickChargeState}/{@code tickGuardState}/{@code tickDiveState}）与<b>执行入口</b>
+ *       （{@code startGuard}/{@code startCharge}/{@code startDiveSweep}/{@code startBlink}/{@code startKick}）。</li>
+ *   <li><b>报复与脱战</b>：{@link #hurt} 一进来就 {@link #retaliate}（被打即锁定攻击者）+
+ *       目标选择器新增 {@code HurtByTargetGoal}；脱战低空巡逻、卡住重寻路都在决策层里。</li>
+ * </ul>
+ * <p>
+ * <b>2026-09-21 补（第二轮：生存实测四项反馈）</b>
+ * <ul>
+ *   <li><b>召唤太频繁</b>：{@link #MINION_COOLDOWN_TICKS} 300 → 900（阶段分化仍走 {@link AgaitolosPace}，
+ *       见该常量的改前/改后表）；叠加"整队回收"后场上不再叠罗汉。</li>
+ *   <li><b>召唤物内斗</b>：{@code AgaitolosMinionSkill} 用原版 Team 把 BOSS 与召唤物放进同一支队伍
+ *       （原版唯一的友军判定），并让 BOSS 自己的凋零头不再命中自家召唤物。</li>
+ *   <li><b>技能结束召唤物不消失</b>：四个出口统一调 {@code AgaitolosMinionSkill#dismissAll}
+ *       —— {@link #endChargeCompleted()} / {@link #endChargeInterrupted()} / {@link #enterRespawn()} /
+ *        {@link #die} 与 {@link #remove}（区块卸载那一支由召唤物自身的看门狗
+ *       {@code AgaitolosMinion} 兜）。</li>
+ *   <li><b>多待在地上</b>：新增<b>地面档</b> {@link #isPerched()}（近身缠斗时贴地，最短 3s、最迟 10s 后升空），
+ *       高度消费在 {@code AgaitolosMoveControl#PERCH_HEIGHT}，切换节律见 {@link #tickPerchState()}。</li>
+ *   <li><b>贴地不再播飞行待机（第三轮）</b>：地面档三件套 clip（{@code land} / {@code idle_ground} /
+ *       {@code takeoff}）已接入动画 MAIN 控制器，客户端靠同步状态 {@link #getPerchState()} 分支，
+ *       见 {@code AgaitolosAnimations#groundAwareIdle}。</li>
+ * </ul>
+ * <p>
+ * <b>2026-09-21 补（阶段三三项"无新动画"内容）</b>
+ * <ul>
+ *   <li><b>凋亡</b>：阶段三起，BOSS 的三处"上凋零"全部改施加 {@code akaishi:doom}
+ *       （统一入口 {@link AgaitolosDoom}，读凋零的结算也一并认凋亡），效果定义见 {@code DoomEffect}；</li>
+ *   <li><b>免疫远程</b>：见 {@link #isProjectileImmune()} 与 {@link AgaitolosDamageRules#resolve} 的第 ⑥ 闸
+ *       （弹射物完全免伤，但"被玩家打回来的凋零头"走自伤通道、不受此闸约束）；</li>
+ *   <li><b>超低空悬停</b>：阶段三空中档降到 {@code AgaitolosMoveControl#PHASE_3_HOVER_HEIGHT}（2.0 → 1.0），
+ *       近战可达尺子仍按<b>最大</b>空中档折算（见 {@link #getMeleeAttackRangeSqr}）。</li>
+ * </ul>
+ * <p>
+ * <b>2026-09-21 补（阶段三五招：真有 clip 了）</b>
+ * <ul>
+ *   <li><b>五条新 clip</b>（{@code triple_throw} / {@code grab_sweep} / {@code grab_smash} /
+ *       {@code calamity_cast} / {@code bombard}）接进既有控制器：四条一次性动作复用 ACTION 触发式，
+ *       循环的 {@code bombard} 另开第七个<b>状态轮询</b>控制器（同步位 {@code DATA_BOMBARDING}）；</li>
+ *   <li><b>状态机收在 {@code AgaitolosPhaseThreeState}</b>：三连出手节拍 / 高空轰炸 /
+ *       抓取态（踩住）/ 劈击 / 施法，本类只保留同步位、转发入口与每 tick 一次推进；</li>
+ *   <li><b>起手仍归决策层</b>：五招以"仅阶段三 + 吃大招封印 + 各自的距离层"接进
+ *       {@code AgaitolosSkillDirector} 的权重表，保命招硬闸与距离分层一字未动；</li>
+ *   <li><b>精神伤害改写</b>（天魔＊灾）：唯一口径在 {@code AgaitolosPsychic}，
+ *       玩家侧持久标记落在既有 capability（死亡/换维度/重启都不丢）。</li>
+ * </ul>
  */
 public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackMob {
 
@@ -77,6 +138,30 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 服务端结算（位移/闸门）也读同一份真源，不需要额外的触发包。
      */
     private static final EntityDataAccessor<Boolean> DATA_INTRO =
+            SynchedEntityData.defineId(AgaitolosEntity.class, EntityDataSerializers.BOOLEAN);
+
+    /**
+     * 同步数据：<b>地面档展示状态</b>（四态，见 {@link #PERCH_STATE_AIRBORNE} 等常量）。
+     * <p>
+     * 与架势 / 蓄力 / 出场同属<b>状态轮询式</b>：状态由服务端写、客户端读（{@link #getPerchState()}），
+     * 动画的 MAIN 控制器两端各自轮询同一份真源（见 {@code AgaitolosAnimations#groundAwareIdle}），
+     * 不需要一次性的触发同步，实体侧也就不必加 playXxx 入口。
+     * <p>
+     * <b>为什么不直接同步 {@link #isPerched()} 那个布尔</b>：高度档布尔只够驱动位移（空中 2 格 / 贴地 0 格），
+     * 而动画还要知道"正在落地过渡还是正在升空过渡"才能播 land / takeoff 两条 0.6s clip；
+     * 用四态 int 一个 accessor 同时表达"稳态/过渡"与"方向"，且整轮节律里只写 4 次（见 {@link #tickPerchState()}）。
+     */
+    private static final EntityDataAccessor<Integer> DATA_PERCH_STATE =
+            SynchedEntityData.defineId(AgaitolosEntity.class, EntityDataSerializers.INT);
+
+    /**
+     * 同步数据：是否正在「饱和轰炸」（阶段三）。
+     * <p>与架势 / 蓄力 / 出场同属<b>状态轮询式</b>：轰炸是一段最长 {@code BOMBARD_DURATION_TICKS} 的持续状态，
+     * 客户端动画控制器轮询它来驱动<b>那条 loop clip</b>（见 {@code AgaitolosAnimations#CONTROLLER_BOMBARD}）
+     * —— 触发式播放对循环 clip 没有停止口，故只能走状态。
+     * <p>写方只有一个：{@code AgaitolosPhaseThreeState}（起手立、期满/中止撤），故两端不会读到中间态。
+     */
+    private static final EntityDataAccessor<Boolean> DATA_BOMBARDING =
             SynchedEntityData.defineId(AgaitolosEntity.class, EntityDataSerializers.BOOLEAN);
 
     /** 复活阶段时长：4s = 80 tick（用户拍板；期间回满生命，结束时击飞周围玩家） */
@@ -199,11 +284,42 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     public static final float CHARGE_BREAK_DAMAGE_RATIO = 0.06F;
 
     /**
-     * 恶怨倒转的冷却（tick）：300 = 15s，**在蓄力结束后**才开始计时。待调手感值 / P8 转配置项
-     * <p>取值依据：规格未给冷却。召唤物会留在场上继续作战，冷却太短会让场上堆成一片凋零骷髅海；
-     * 取 15s 后，"上一轮分队被清光 → 下一次起手"的最短间隔 = 15s（若被提前打断）到 12+15=27s（自然结束）。
+     * 恶怨倒转的冷却（tick）：900 = 45s，**在蓄力结束后**才开始计时。<b>待调手感值 / P8 转配置项</b>
+     * <p>
+     * <b>2026-09-21 由 300（15s）上调到 900（45s）</b>，理由（用户实测反馈"召唤怪物太频繁了"，两条根因）：
+     * <ol>
+     *   <li><b>基准太短</b>：本招在"蓄力 12s（{@link #CHARGE_DURATION_TICKS}）之后"才起算冷却，
+     *       故改前一轮完整的间隔只有 12+15 = 27s（阶段二三经 {@link AgaitolosPace#cooldownScale} 再缩到
+     *       23.25s / 21s）——<b>每 20 秒就往场上多塞 10 只凋零骷髅</b>，观感必然是"一直在招"。</li>
+     *   <li><b>旧分队不消失（已同时修）</b>：技能结束不清场时，冷却到点就能在旧分队头上再招一支，
+     *       场上会叠成 20、30 只（问题叠加放大）。清场落点见 {@code AgaitolosMinionSkill#dismissAll}。</li>
+     * </ol>
+     * <p>
+     * <b>阶段差异化沿用既有唯一倍率表</b>：本常量仍走 {@link AgaitolosPace#scaledCooldown}，
+     * 不另立"召唤专用节奏"，故与决策层的出手节拍（{@code AgaitolosSkillDirector#beatTicksFor}）同源、不会互相打架：
+     * <table border="1">
+     *   <caption>改前 / 改后</caption>
+     *   <tr><th>阶段</th><th>冷却系数</th><th>改前冷却</th><th>改前整轮间隔</th><th>改后冷却</th><th>改后整轮间隔</th></tr>
+     *   <tr><td>一</td><td>1.00</td><td>15.0s</td><td>27.0s</td><td>45.0s</td><td><b>57.0s</b></td></tr>
+     *   <tr><td>二</td><td>0.75</td><td>11.25s</td><td>23.25s</td><td>33.75s</td><td><b>45.75s</b></td></tr>
+     *   <tr><td>三</td><td>0.60</td><td>9.0s</td><td>21.0s</td><td>27.0s</td><td><b>39.0s</b></td></tr>
+     * </table>
+     * 即"一阶段最少、二/三阶段略多"（用户口径），且每一轮都给玩家留足清场与喘息窗口。
+     * 若要回调：600 ⇒ 一阶段整轮 42s（更凶），1200 ⇒ 66s（更松）。
      */
-    public static final int MINION_COOLDOWN_TICKS = 300;
+    public static final int MINION_COOLDOWN_TICKS = 900;
+
+    /**
+     * 主动索敌锁定后、<b>失去视线仍继续追击</b>的容忍时长（tick）：200 = 10s。<b>待调手感值 / P8 转配置项</b>
+     * <p>取值依据：它由 {@code TargetGoal#setUnseenMemoryTicks} 消费（原版默认 60 = 3s）。
+     * 60 tick 太短——玩家绕一根柱子、或者跳下一个平台，BOSS 就会"跟丢"并停在原地；
+     * 而本 BOSS 是飞行单位、本来就该咬得住。10s 足够玩家做一次完整的走位拉扯，
+     * 又不至于让它隔着半个牢狱死追（超过 {@code FOLLOW_RANGE} 仍会正常脱锁）。
+     * <p>注意：这一项只影响"<b>锁定之后</b>能不能看不见"，<b>索敌</b>本身仍要求视线
+     * （{@code TargetingConditions#checkLineOfSight} 默认为真，且不随 mustSee 改变）；
+     * "被打就锁定"那条路径由 {@code HurtByTargetGoal} 负责，它内部固定 300 tick。
+     */
+    public static final int TARGET_UNSEEN_MEMORY_TICKS = 200;
 
     private static final String NBT_PHASE = "AgaitolosPhase";
     private static final String NBT_RESPAWN_TICKS = "AgaitolosRespawnTicks";
@@ -221,6 +337,10 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     private static final String NBT_CHARGE_DAMAGE = "AgaitolosChargeDamage";
     private static final String NBT_BLINK_COOLDOWN = "AgaitolosBlinkCooldown";
     private static final String NBT_KICK_COOLDOWN = "AgaitolosKickCooldown";
+    private static final String NBT_MELEE_COOLDOWN = "AgaitolosMeleeCooldown";
+    private static final String NBT_RANGED_COOLDOWN = "AgaitolosRangedCooldown";
+    /** 已定案的「场内人数」（缩放用），见 {@link AgaitolosScaling} */
+    private static final String NBT_PLAYER_COUNT = "AgaitolosPlayerCount";
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -274,6 +394,54 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /** 高速踢击（二阶段）冷却剩余 tick（服务端权威，不参与同步；已落盘，同上） */
     private int kickCooldownTicks;
 
+    /**
+     * 普攻间隔剩余 tick（服务端权威，不参与同步；已落盘）。
+     * <p>
+     * <b>为什么实体必须显式持有它</b>：本轮之前这个间隔藏在原版 {@code MeleeAttackGoal} 的
+     * {@code attackInterval}（实测 = 20 tick）里。现在普攻的出手闸收进 {@link AgaitolosSkillDirector}
+     * 与 {@link #doHurtTarget}（决策层也会直接调 {@code doHurtTarget}），若不在实体侧也留一份，
+     * 决策层会每个节拍都放普攻、把普攻速度凭空翻倍。
+     * <p>基准值取 {@link AgaitolosMeleeSkill#MELEE_INTERVAL_TICKS}（与原版同值 20），
+     * 再按阶段折算（{@code AgaitolosPace#scaledCooldown}）⇒ 二、三阶段的普攻更密，与"二阶段更快速"同向。
+     */
+    private int meleeCooldownTicks;
+
+    /**
+     * 远程凋零头冷却剩余 tick（服务端权威，不参与同步；已落盘）。
+     * <p>基准值取 {@link AgaitolosSkullSkill#SKULL_COOLDOWN_TICKS}（= 原 {@code RangedAttackGoal} 的
+     * 60 tick 间隔字面量，随该 Goal 一起搬进技能类），按阶段折算。
+     */
+    private int rangedCooldownTicks;
+
+    /**
+     * 已定案的「场内人数」n（服务端权威，不参与同步；<b>落盘</b>）。
+     * <p>
+     * <b>只在两个时刻重算</b>（用户拍板：不做实时跟随）：① BOSS 入场（首次 summon 分支）；
+     * ② 每次进阶段（{@link #advancePhase}）。玩家中途进出<b>不</b>改动本值 ——
+     * 否则血量上限会随进出忽大忽小，BossBar 与"每失去一半血进阶段"的节奏全部失真。
+     * <p>必须落盘：区块卸载/重启会重建实体，不落盘则"已按 3 人算好的血量上限"会跟着实体的
+     * 属性修饰符一起读回、而伤害系数退回 1.0 —— 两条口径立刻分叉（血量按 3 人、伤害按 1 人）。
+     */
+    private int scaledPlayerCount = 1;
+
+    /**
+     * 战斗决策层：<b>选招的唯一入口</b>（"这一拍放哪一招"）。
+     * <p>
+     * <b>为什么用字段初始化而不是在 {@link #registerGoals()} 里 new 一个传给 Goal</b>：
+     * {@code registerGoals()} 是由 {@code Mob} 的<b>构造器</b>回调的，早于本类的字段初始化，
+     * 那时任何"构造时注入"的写法拿到的都是 {@code null}（且只会在运行期某次空指针时才暴露）。
+     * 本类与决策层的交互全部走方法调用（{@link #aiStep} 主动 tick、Goal 不持有它），故无此风险。
+     */
+    private final AgaitolosSkillDirector skillDirector = new AgaitolosSkillDirector();
+
+    /**
+     * 阶段三五招的状态机（三重投掷 / 饱和轰炸 / 投技①② / 天魔＊灾）。
+     * <p>与 {@link #skillDirector} 同一分工：本类不把它们的计时塞进自己的字段，
+     * 只每 tick 调一次 {@code phaseThree.tick(this)} 并把起手入口转发出去
+     * （理由与"这些字段为什么单独一个类"见 {@code AgaitolosPhaseThreeState} 的类注释）。
+     */
+    private final AgaitolosPhaseThreeState phaseThree = new AgaitolosPhaseThreeState();
+
     /** 出场演出剩余 tick（服务端权威；客户端只需要"是否在出场"，同 respawning 的分工）。<b>不落盘</b>，理由见 {@link #readAdditionalSaveData} */
     private int introTicks;
 
@@ -283,17 +451,49 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      */
     private double introDescentTargetY;
 
+    /**
+     * 是否处于<b>地面档</b>（服务端权威；不落盘）。
+     * <p>档位的唯一消费点是 {@code AgaitolosMoveControl} ③（垂直目标高度），故这个布尔本身不需要同步：
+     * 位置由原版实体同步，高度已经体现在坐标里。客户端动画要用的"展示状态"另走 {@link #DATA_PERCH_STATE}
+     * （多带"过渡中/朝哪个方向"，见 {@link #getPerchState()}）。
+     * <p>不落盘：读档/区块卸载后从"空中档"重新开始（最多 4s 后再落地），不会出现"读档后还记得
+     * 上一轮站在地上"这种无法解释的行为，与决策层的战术记忆同一口径。
+     */
+    private boolean perched;
+
+    /** 已在地面档停留的 tick 数（迟滞用；进入地面档时归零） */
+    private int perchedTicks;
+
+    /** 已离开地面档的 tick 数（节律用；<b>封顶</b>在 {@link #PERCH_AIRBORNE_MIN_TICKS}，故不会溢出） */
+    private int airborneTicks;
+
+    /**
+     * 落地 / 升空过渡的剩余 tick（只在 {@link #PERCH_STATE_LANDING} / {@link #PERCH_STATE_TAKEOFF} 期间递减）。
+     * <p><b>两个消费点</b>：
+     * <ol>
+     *   <li>动画展示：过渡态 → 稳态的切换点（闸门）；</li>
+     *   <li><b>升降位移的匀速分母</b>（2026-09-21 对齐）：{@code AgaitolosMoveControl} ③-a 在窗口内改用
+     *       "剩余高度 ÷ 剩余 tick" 的匀速收敛，使"位置到位"与 12t 的过渡 clip <b>严格同刻</b>结束。
+     *       稳态下的高度收敛（③-b 的比例 + 限速）不读它。</li>
+     * </ol>
+     */
+    private int perchTransitionTicks;
+
     public AgaitolosEntity(EntityType<? extends AgaitolosEntity> type, Level level) {
         super(type, level);
         // 低空飞行移动控制器。原版 Mob 没有 createMoveControl() 钩子（凋灵/幻翼也都是构造器里直接赋值），故在此替换
         this.moveControl = new AgaitolosMoveControl(this);
     }
 
-    /** 基础属性；多玩家加成（§1.11）在 P3 之后再接（用户本轮确认暂不做） */
+    /**
+     * 基础属性。
+     * <p>两个基础值取 {@link AgaitolosScaling} 的常量（单一真源）：随在场玩家数增强时，
+     * 缩放量 = {@code 基础值 × (缩放系数 − 1)}，故基础值必须与缩放算式同源，否则同一份加成会被算成两个数。
+     */
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 1444.0D)
-                .add(Attributes.ATTACK_DAMAGE, 30.0D)
+                .add(Attributes.MAX_HEALTH, AgaitolosScaling.BASE_HEALTH)
+                .add(Attributes.ATTACK_DAMAGE, AgaitolosScaling.BASE_ATTACK_DAMAGE)
                 .add(Attributes.MOVEMENT_SPEED, 0.25D)
                 .add(Attributes.FOLLOW_RANGE, 64.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
@@ -313,6 +513,10 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 出场默认 false：读档重建的实体不从存档恢复演出（见 readAdditionalSaveData），
         // 只有"首次召唤分支"会把它立起来
         this.entityData.define(DATA_INTRO, Boolean.FALSE);
+        // 地面档展示状态默认 = 空中档（不落盘，理由同 perched 字段：读档/区块卸载后从空中档重新开始）
+        this.entityData.define(DATA_PERCH_STATE, PERCH_STATE_AIRBORNE);
+        // 轰炸默认 false：读档重建的实体不从存档恢复"正在轰炸"（进行中状态一律不落盘，见 AgaitolosPhaseThreeState）
+        this.entityData.define(DATA_BOMBARDING, Boolean.FALSE);
     }
 
     /** 当前阶段（服务端读权威值，客户端读同步值） */
@@ -340,7 +544,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         return this.entityData.get(DATA_GUARDING);
     }
 
-    /** 架势只由本类的 {@link #tickGuard()} 与 {@link #endGuard()} 开合，技能不自持计时 */
+    /** 架势由决策层经 {@link #startGuard(LivingEntity)} 开启、由 {@link #tickGuardState()} 与 {@link #endGuard()} 收合，技能不自持计时 */
     private void setGuarding(boolean guarding) {
         this.entityData.set(DATA_GUARDING, guarding);
     }
@@ -362,7 +566,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         return this.entityData.get(DATA_CHARGING);
     }
 
-    /** 蓄力只由本类的 {@link #tickCharge()} / {@link #finishCharge()} 开合，技能不自持计时（同架势） */
+    /** 蓄力由决策层经 {@link #startCharge(LivingEntity)} 开启、由 {@link #tickChargeState()} / {@link #finishCharge()} 收合（同架势） */
     private void setCharging(boolean charging) {
         this.entityData.set(DATA_CHARGING, charging);
     }
@@ -377,6 +581,22 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.entityData.set(DATA_INTRO, intro);
     }
 
+    /**
+     * 是否正在「饱和轰炸」（阶段三）：服务端读权威值，客户端读同步值。
+     * <p>三处消费：动画的 bombard 控制器（两端各自轮询）、MAIN 控制器的互斥停播、以及
+     * {@code AgaitolosMoveControl} 的"高空档"（{@code BOMBARD_HOVER_HEIGHT}）。
+     * <p><b>与 {@code AgaitolosPhaseThreeState} 的分工</b>：本方法只表达"这一刻是不是在轰炸"，
+     * 计时/节拍/冷却全在状态机那一侧（与 {@code isGuarding()} ↔ {@code tickGuardState()} 同款分工）。
+     */
+    public boolean isBombarding() {
+        return this.entityData.get(DATA_BOMBARDING);
+    }
+
+    /** 轰炸同步位只由 {@code AgaitolosPhaseThreeState} 开合（起手立、期满/整段中止撤），技能不自持计时 */
+    void setBombarding(boolean bombarding) {
+        this.entityData.set(DATA_BOMBARDING, bombarding);
+    }
+
     // ---------------------------------------------------------------- 冲锋 / 禁飞 / 封印状态
 
     /** 是否正在冲锋（俯冲位移中，服务端权威）：冲锋期间位移由本类直接写，{@code AgaitolosMoveControl} 全让位 */
@@ -386,10 +606,15 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
 
     /**
      * 是否被禁飞（被玩家格挡的惩罚）：禁飞期间不再悬停，改走带重力的原版 travel 落到地面。
-     * <p>禁飞结束时无需任何额外处理：{@code AgaitolosMoveControl} ③ 的垂直悬停修正会自动把它升回
-     * {@code HOVER_HEIGHT} 的常态高度。
-     * <p><b>已知观感缺口（本轮不解决）</b>：现有 8 条 clip 里没有"落地待机"动画，禁飞期间仍会播
-     * {@code idle_flight}（看起来还在飘）。彻底解决需要新增一条地面待机 clip，属建模任务。
+     * <p>禁飞结束时无需任何额外处理：{@code AgaitolosMoveControl} ③ 的垂直修正会自动把它升回
+     * 当前高度档（空中档取本阶段的高度，见 {@code AgaitolosMoveControl#airborneHeight}；若此刻正处地面档
+     * {@link #isPerched()} 则维持贴地）。
+     * <p><b>禁飞期的动画（2026-09-21 补）</b>：禁飞只是"不给垂直分量、交给重力"，落地位置随机，
+     * 故没有（也不该有）专门的禁飞姿态 —— 它自己不驱动动画。实际观感由地面档接管：
+     * 玩家刚挡下横扫、人就贴在旁边，禁飞落地的 BOSS 会在 {@link #PERCH_AIRBORNE_MIN_TICKS}（4s）内
+     * 被 {@link #tickPerchState()} 判为可贴地并切进地面档，此后就播 {@code idle_ground} 而不再是
+     * {@code idle_flight}（地面档动画见 {@link #isPerched()}）。禁飞期若目标恰好不在近战可达内，
+     * 则这段时间仍会播飞行待机 —— 属"没有禁飞专属姿态"的已知取舍，不是失效。
      */
     public boolean isGrounded() {
         return this.groundedTicks > 0;
@@ -404,7 +629,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 它的起手窗口会被完全覆盖、一次也放不出来，规格原文「如 BOSS 不处于飞行状态时便可以使用」
      * 就成了死条文。
      * <ul>
-     *   <li><b>吃封印</b>：俯冲镰扫（在 {@code tickDiveSweep} 里单独判）；后续"大招"——
+     *   <li><b>吃封印</b>：俯冲镰扫（决策层打分与 {@link #startDiveSweep(LivingEntity)} 复校里各判一次）；后续"大招"——
      *       三重投掷 / 天魔灾 / 投技 —— 接入时请走含封印的起手闸；</li>
      *   <li><b>不吃封印</b>：瞬击（惩罚期的位移补偿，本身不造成伤害）、
      *       高速踢击（规格原文"<b>任何状态下可用</b>"，"任何状态"含封印期）。</li>
@@ -450,6 +675,267 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         }
     }
 
+    /**
+     * 招式冷却的服务端计时递减（每 tick 一次，不为负）。
+     * <p>
+     * <b>为什么集中在一个方法里</b>：这些计数原先各自藏在 {@code tickGuard}/{@code tickDiveSweep}/
+     * {@code tickBlink}/{@code tickKick} 内部，起手判定被移交给 {@link AgaitolosSkillDirector} 之后，
+     * 递减若继续留在那几条方法里，就会出现"决策层先读冷却、状态推进后递减"的顺序依赖
+     * （同一 tick 内读到的可能是还没减的旧值）。集中到一处、由 {@link #aiStep} 在决策层之前调用，
+     * 顺序就只有一种。
+     * <p>与 {@link #tickPenaltyTimers()} 的分工：那一条是<b>玩家争取来的惩罚窗口</b>（禁飞/封印/召唤冷却），
+     * 这一条是<b>BOSS 自己的出手节奏</b>（架势/横扫/瞬击/踢击/普攻/远程）。
+     */
+    private void tickActionCooldowns() {
+        if (this.guardCooldownTicks > 0) {
+            --this.guardCooldownTicks;
+        }
+        if (this.diveSweepCooldownTicks > 0) {
+            --this.diveSweepCooldownTicks;
+        }
+        if (this.blinkCooldownTicks > 0) {
+            --this.blinkCooldownTicks;
+        }
+        if (this.kickCooldownTicks > 0) {
+            --this.kickCooldownTicks;
+        }
+        if (this.meleeCooldownTicks > 0) {
+            --this.meleeCooldownTicks;
+        }
+        if (this.rangedCooldownTicks > 0) {
+            --this.rangedCooldownTicks;
+        }
+        // 阶段三五招的冷却也收在这一个调用点（口径同上：所有冷却都在决策层读之前统一递减一次）。
+        // 它们<b>逐招写在本类会再长 5 个字段</b>，故计时器归 AgaitolosPhaseThreeState 持有，
+        // 但"什么时候减"仍只有这一个入口 —— 顺序依赖问题与上面五招完全同款地不存在。
+        this.phaseThree.tickCooldowns();
+    }
+
+    /**
+     * 只读探针：某一招的剩余冷却（供 {@link AgaitolosSkillDirector} 判断"这一拍选不选它"）。
+     * <p><b>只读不写</b>：计时的持有与递减仍在本类（{@link #tickActionCooldowns()}），
+     * 决策层只消费状态——"状态归实体持有"这条既有分工不因为引入决策层而改变，
+     * 否则又会退化成"两个地方都能改冷却"的两套口径。
+     */
+    int remainingCooldown(AgaitolosSkillDirector.Move move) {
+        switch (move) {
+            case MELEE:
+                return this.meleeCooldownTicks;
+            case RANGED:
+                return this.rangedCooldownTicks;
+            case DIVE_SWEEP:
+                return this.diveSweepCooldownTicks;
+            case GUARD:
+                return this.guardCooldownTicks;
+            case REVERSAL:
+                return this.minionCooldownTicks;
+            case BLINK:
+                return this.blinkCooldownTicks;
+            case KICK:
+                return this.kickCooldownTicks;
+            // 阶段三五招：计时器归 AgaitolosPhaseThreeState 持有，这里只是只读转发
+            // （默认分支的 Integer.MAX_VALUE 会把这些招判成"永远在冷却中"，
+            //  漏一个 case 就表现为"某一招永远不出现"，故五招必须逐一列出）
+            case TRIPLE_THROW:
+            case BOMBARD:
+            case GRAB_SWEEP:
+            case GRAB_SMASH:
+            case CALAMITY:
+                return this.phaseThree.remainingCooldown(move);
+            default:
+                return Integer.MAX_VALUE;
+        }
+    }
+
+    // ---------------------------------------------------------------- 地面档（"多待在地上"，2026-09-21 补）
+
+    /**
+     * 地面档的<b>最短停留</b>（tick）：60 = 3s。<b>待调手感值 / P8 转配置项</b>
+     * <p>作用 = 迟滞：落地后 3s 内无论目标怎么走都不起飞，避免"目标一抖动就升降"的每 tick 抖动。
+     */
+    public static final int PERCH_MIN_TICKS = 60;
+
+    /**
+     * 地面档的<b>最长停留</b>（tick）：200 = 10s。<b>待调手感值 / P8 转配置项</b>
+     * <p>作用 = 强制节律：到点必升空一次，保证"落地 ↔ 升空"是一个玩家看得见的循环，
+     * 而不是"一旦贴脸就永远趴在地上"（那会丢掉本 BOSS 的飞行辨识度，也会让部分需要空间的招失去意义）。
+     * <p>同时也是"贴地若被地形卡住"的自解出口：最多 10s 就升空脱离（见 {@code AgaitolosMoveControl#PERCH_HEIGHT}）。
+     */
+    public static final int PERCH_MAX_TICKS = 200;
+
+    /**
+     * 地面档之后的<b>最短空中停留</b>（tick）：80 = 4s。<b>待调手感值 / P8 转配置项</b>
+     * <p>作用 = 节律的下半段：升空后至少飞 4s 才允许再落地，避免"落-起-落"高频抖动。
+     * <p>本常量同时是 {@link #airborneTicks} 的封顶值（判据只需"是否已满"，不必真计时，故不会溢出）。
+     */
+    public static final int PERCH_AIRBORNE_MIN_TICKS = 80;
+
+    /**
+     * 地面档的<b>脱离距离</b>（格）：4.5。<b>待调手感值 / P8 转配置项</b>
+     * <p>
+     * 与进入条件（{@code isTargetWithinMeleeReach}，含悬停折算约 3.18 格）刻意留出差值，
+     * 形成迟滞区间：目标在 3.18~4.5 格之间来回走位时档位不变，避免在阈值上反复横跳。
+     */
+    public static final double PERCH_RELEASE_RANGE = 4.5D;
+
+    /** 地面档展示状态：<b>空中档</b>（纯飞行待机，MAIN 播 idle_flight） */
+    public static final int PERCH_STATE_AIRBORNE = 0;
+
+    /** 地面档展示状态：<b>落地过渡</b>（12t，MAIN 播 land，播完接 idle_ground） */
+    public static final int PERCH_STATE_LANDING = 1;
+
+    /** 地面档展示状态：<b>贴地稳态</b>（MAIN 播 idle_ground 循环） */
+    public static final int PERCH_STATE_PERCHED = 2;
+
+    /** 地面档展示状态：<b>升空过渡</b>（12t，MAIN 播 takeoff，播完接 idle_flight） */
+    public static final int PERCH_STATE_TAKEOFF = 3;
+
+    /**
+     * 落地过渡窗口（tick）：12 = 0.6s，与 clip {@code animation.agaitolos.land} <b>逐字对齐</b>。
+     * <p>改 clip 时长必须同步改这里：窗口是"过渡态 → 贴地稳态"的切换点，短了会把 land 掐掉一截、
+     * 长了会让 land 播完停在末帧（末帧 == idle_ground 首帧，观感上仍不跳，但会显得落地后僵一下）。<b>待调手感值</b>
+     */
+    public static final int LAND_TRANSITION_TICKS = 12;
+
+    /** 升空过渡窗口（tick）：12 = 0.6s，与 clip {@code animation.agaitolos.takeoff} 逐字对齐（口径同上） */
+    public static final int TAKEOFF_TRANSITION_TICKS = 12;
+
+    /**
+     * 是否处于地面档（近身缠斗时贴地）。<b>服务端权威</b>，唯一消费点是
+     * {@code AgaitolosMoveControl} ③ 的垂直目标高度（空中档 vs 地面档）。
+     * <p>
+     * <b>切换节律（全部由 {@link #tickPerchState()} 推进，这里只列口径）</b>：
+     * <ol>
+     *   <li><b>落地</b>：已在空中满 {@link #PERCH_AIRBORNE_MIN_TICKS}（4s）<b>且</b>目标进入近战可达
+     *       （复用 {@code isTargetWithinMeleeReach} —— 与普攻/格挡/踢击同一把尺子，不另立距离口径）；</li>
+     *   <li><b>保持</b>：至少 {@link #PERCH_MIN_TICKS}（3s），之后满足任一即<b>升空</b>：
+     *       ① 目标超出 {@link #PERCH_RELEASE_RANGE}（4.5 格）或失去目标；
+     *       ② 已待满 {@link #PERCH_MAX_TICKS}（10s）；</li>
+     *   <li><b>升降过程</b>：不做瞬移 —— {@code AgaitolosMoveControl} 仍走"按高度差收敛 + 限速"，
+     *       2 格高度差约 10~16 tick 走完，与落地/升空过渡 clip 的 12t 大体同步（见下）。</li>
+     * </ol>
+     * <b>与 {@link #isGrounded()}（被格挡后的禁飞惩罚）是两个概念，刻意不合并</b>：禁飞是"不写垂直分量、
+     * 交给重力"，地面档是"垂直收敛到更低的档位"；两者可以叠加（禁飞期本来就在地上，地面档让惩罚结束后
+     * 不要立刻弹回空中）。混用会让"瞬击只在禁飞窗口可用"这条规则连带被改坏。
+     * <p>
+     * <b>为什么落地位不缩短近战可达尺子</b>：{@link #getMeleeAttackRangeSqr} 仍按最大悬停高度
+     * （{@code AgaitolosMoveControl.HOVER_HEIGHT}）折算。落地后这把尺子等于放宽了约 2 格，
+     * 属"保守侧"——刚修好的还手能力不会因为落地而变弱（宁可多够 2 格，也不要出现"落地后反倒打不着"）。
+     * 若实机觉得落地后够得太远，再改成按当前档位折算。
+     * <p>
+     * <b>动画（2026-09-21 已接入）</b>：地面档不再是"人站在地上、姿态还在飘"——MAIN 控制器按
+     * 同步状态 {@link #getPerchState()} 分支，落地过渡播 {@code land}、贴地播 {@code idle_ground}、
+     * 升空过渡播 {@code takeoff}（常量与分支见 {@code AgaitolosAnimations}）。
+     * 本布尔仍只管"高度档"，不参与动画判定（动画需要四态，见 {@link #getPerchState()}）。
+     */
+    public boolean isPerched() {
+        return this.perched;
+    }
+
+    /**
+     * 地面档的<b>展示状态</b>（服务端写、客户端读；动画 MAIN 控制器轮询它，见 {@code AgaitolosAnimations#groundAwareIdle}）。
+     * <p>
+     * 四态：{@link #PERCH_STATE_AIRBORNE} / {@link #PERCH_STATE_LANDING} / {@link #PERCH_STATE_PERCHED}
+     * / {@link #PERCH_STATE_TAKEOFF}。
+     * <p>
+     * <b>为什么是四态 int 而不是"布尔 + 过渡标志"</b>：动画需要在两个方向上各播一条过渡 clip，
+     * 而"过渡中"与"朝哪个方向"合起来正好是 4 个互斥取值；用一个 INT 一次带走，
+     * 客户端只需一个 accessor 与一次比较（省掉第二个同步字段，也省掉"两字段不一致"的可能）。
+     * 与 {@link #isPerched()} 的关系是纯派生：LANDING/PERCHED ⇒ perched 为 true（高度已朝地面收敛），
+     * AIRBORNE/TAKEOFF ⇒ perched 为 false（高度已朝空中收敛）——两条边在同一 tick 一起翻，
+     * 故过渡 clip 与升降位移是同刻起跑的（见 {@link #tickPerchState()}）。
+     */
+    public int getPerchState() {
+        return this.entityData.get(DATA_PERCH_STATE);
+    }
+
+    /**
+     * 只读探针：过渡窗口的剩余 tick（0 = 不在过渡中）。
+     * <p>消费点只有 {@code AgaitolosMoveControl} ③-a（当匀速收敛的分母）。
+     * 节律（进入 / 递减 / 退出）仍由本类独占（{@link #tickPerchState()}），控制器只读 ——
+     * 与 {@link #isPerched()}（高度档）和 {@link #getPerchState()}（展示状态）的既有分工一致。
+     * <p>无需同步：只有服务端控制器读它（客户端只读 {@link #getPerchState()} 那条四态数据去选 clip）。
+     */
+    int getPerchTransitionTicks() {
+        return this.perchTransitionTicks;
+    }
+
+    /**
+     * 写地面档展示状态。<b>只在值时显式判等后写</b>：整轮节律只翻 4 次
+     * （LANDING → PERCHED → TAKEOFF → AIRBORNE），不存在每 tick 反复 set 造成的无谓同步量；
+     * 判等也让"同步量"这件事不依赖原版 {@code SynchedEntityData#set} 对同值是否短路。
+     */
+    private void setPerchState(int state) {
+        if (this.getPerchState() == state) {
+            return;
+        }
+        this.entityData.set(DATA_PERCH_STATE, state);
+    }
+
+    /**
+     * 地面档的状态推进（服务端权威，每 tick 一次）：<b>过渡窗口 + 落地条件 + 三段迟滞 + 强制升空</b>。
+     * <p>
+     * 只动"高度档位"一个布尔、展示状态一个 int 与三个计数，不碰任何招式状态（不占决策层的全局动作锁、
+     * 不影响冷却），故与 {@link AgaitolosSkillDirector} 的仲裁完全正交：落地期间照样能普攻 / 格挡 / 蓄力 / 被踢击，
+     * 也照样能被决策层派招（俯冲的位移由 {@code tickDiveCharge} 独占，地面档不参与）。
+     * <p>
+     * 演出与死亡期间整段跳过：那几段的位移由 {@code tickIntro} / 回复演出独占，
+     * {@code AgaitolosMoveControl} 也已整体让位，此时切档没有任何意义（只会让计数白白推进）。
+     * <p>
+     * <b>本方法只在服务端跑</b>：唯一调用点 {@link #aiStep()} 在客户端已提前 return，
+     * 故对同步数据 {@code DATA_PERCH_STATE} 的写入天然是"服务端权威"（客户端只读不写）。
+     */
+    private void tickPerchState() {
+        if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
+            return;
+        }
+        // ① 过渡窗口（落地 / 升空各 12t，与对应 clip 等长）：到期即切到稳态，供动画把"过渡 clip → 稳态循环"接上。
+        //    与下面的档位判定互不干扰：窗口只影响展示状态，高度档（perched）在过渡的第一 tick 就已经翻好了。
+        //    只在过渡态里递减（稳态下计数器不参与，也就不会长跑到负值）
+        int perchState = this.getPerchState();
+        if ((perchState == PERCH_STATE_LANDING || perchState == PERCH_STATE_TAKEOFF)
+                && --this.perchTransitionTicks <= 0) {
+            this.setPerchState(perchState == PERCH_STATE_LANDING ? PERCH_STATE_PERCHED : PERCH_STATE_AIRBORNE);
+        }
+        LivingEntity target = this.getTarget();
+        if (this.perched) {
+            // 地面档：先满最短停留（迟滞），再判"目标走远"或"待太久"
+            if (++this.perchedTicks < PERCH_MIN_TICKS) {
+                return;
+            }
+            // 抓取态（投技①）期间<b>不升空</b>：那一招的语义是"把玩家踩在脚下"，
+            // 若恰好卡在 PERCH_MAX_TICKS 的升空点上，就会把"踩住"变成"拎着人上天"，
+            // 而且松手时玩家会被留在半空吃一段下落伤害 —— 与"压制"的语义相反。
+            // 抓取最长只有 HOLD_TICKS(22t)，远小于 PERCH_MAX_TICKS 的量级，故这点延迟肉眼不可见。
+            if (this.phaseThree.isHoldingTarget()) {
+                return;
+            }
+            boolean targetLeft = target == null || !target.isAlive()
+                    || this.distanceTo(target) > PERCH_RELEASE_RANGE;
+            if (targetLeft || this.perchedTicks >= PERCH_MAX_TICKS) {
+                this.perched = false;
+                this.perchedTicks = 0;
+                this.airborneTicks = 0;
+                // 高度档与展示状态同刻翻：升空过渡 clip 与"朝空中档收敛"是同一 tick 起跑的两件事
+                this.perchTransitionTicks = TAKEOFF_TRANSITION_TICKS;
+                this.setPerchState(PERCH_STATE_TAKEOFF);
+            }
+            return;
+        }
+        // 空中档：先攒满最短空中停留（保证升空是一段可感知的节律，而不是刚起飞又落），再判能否落地。
+        // airborneTicks 封顶在阈值上：后半段判据只需"是否已满"，不需要真实时长，也就不存在溢出
+        if (this.airborneTicks < PERCH_AIRBORNE_MIN_TICKS) {
+            ++this.airborneTicks;
+            return;
+        }
+        if (target != null && target.isAlive() && this.isTargetWithinMeleeReach(target)) {
+            this.perched = true;
+            this.perchedTicks = 0;
+            this.perchTransitionTicks = LAND_TRANSITION_TICKS;
+            this.setPerchState(PERCH_STATE_LANDING);
+        }
+    }
+
     // ---------------------------------------------------------------- 存档
 
     @Override
@@ -458,6 +944,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         tag.putInt(NBT_PHASE, getPhase().combatOrdinal());
         tag.putInt(NBT_RESPAWN_TICKS, this.respawnTicks);
         tag.putBoolean(NBT_INITIAL_RESPAWN_DONE, this.initialRespawnDone);
+        // 已定案的场内人数一并落盘（理由见字段注释）：它决定伤害缩放系数，而血量上限是以属性修饰符
+        // 的形式独立落盘的 ⇒ 两者必须同时落盘，否则读档后会出现"血量按 3 人、伤害按 1 人"的分叉
+        tag.putInt(NBT_PLAYER_COUNT, this.scaledPlayerCount);
         // 架势与冷却一并落盘（理由同 DATA_RESPAWNING）：读档/区块卸载会重建实体，
         // 不落盘则"正举着格挡"的 BOSS 读档后白送一次免伤，冷却也会被重置成可立刻连挡。
         tag.putBoolean(NBT_GUARDING, this.isGuarding());
@@ -480,22 +969,42 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 二阶段两招的冷却同理落盘：不落盘则读档会白送一次瞬击/踢击（且与"冷却已过"无法区分）
         tag.putInt(NBT_BLINK_COOLDOWN, this.blinkCooldownTicks);
         tag.putInt(NBT_KICK_COOLDOWN, this.kickCooldownTicks);
+        // 普攻/远程的出手间隔同理落盘：不落盘则读档会白送一次贴脸连击（普攻间隔原本藏在原版 Goal 里，
+        // 读档本来也会被重置；现在由实体持有，就把它一并按同一口径处理，不留特例）
+        tag.putInt(NBT_MELEE_COOLDOWN, this.meleeCooldownTicks);
+        tag.putInt(NBT_RANGED_COOLDOWN, this.rangedCooldownTicks);
+        // 阶段三五招：只落冷却（口径同上 —— 不落盘则读档会白送一次大招）；
+        // 进行中的状态（三连节拍 / 轰炸 / 抓取 / 劈击 / 施法）**刻意不落盘**，
+        // 理由见 AgaitolosPhaseThreeState 的类注释（抓取态续播要凭一个可能失效的 UUID 去控人，风险远大于收益）
+        this.phaseThree.save(tag);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        // 缺键时 getInt 返回 0 ⇒ 序号 0 = 复活阶段，但 respawnTicks 也为 0 ⇒ 下面的 setRespawning 不会开无敌。
-        // 新召唤（空 NBT）由 aiStep 的首次 tick 正常推进复活阶段，不依赖这里。
-        this.setPhase(AgaitolosPhase.byCombatOrdinal(tag.getInt(NBT_PHASE)));
+        // 缺键时 getInt 返回 0，而 0 在 AgaitolosPhase 里是 RESPAWN（不是 PHASE_1）——
+        // 复活阶段<b>永远不会由阶段机产生</b>（enterRespawn 只动 respawning 布尔，不动阶段字段），
+        // 所以存档里出现 0 只可能是"键不存在"（典型场景：/summon 生成时原版会把命令 NBT 整个 load 一遍，
+        // 那里没有本键）。若照搬 getInt 的 0，BOSS 会永久停在 RESPAWN：
+        // checkPhaseAdvance 对它取不到阈值（-1）直接 return ⇒ <b>永远进不了二/三阶段</b>
+        // （表现：招式永远只有一阶段那五招、模型不换、节奏不加快）。
+        // 故这里显式区分"键不存在"与"值为 0"：缺键一律当 PHASE_1（新实体的正确初值）。
+        this.setPhase(tag.contains(NBT_PHASE)
+                ? AgaitolosPhase.byCombatOrdinal(tag.getInt(NBT_PHASE))
+                : AgaitolosPhase.PHASE_1);
         this.respawnTicks = Math.max(0, tag.getInt(NBT_RESPAWN_TICKS));
         // 存档里若还在复活阶段，恢复无敌与倒计时：BOSS 不能靠读档跳过无敌期
         this.setRespawning(this.respawnTicks > 0);
         this.initialRespawnDone = tag.getBoolean(NBT_INITIAL_RESPAWN_DONE);
+        // 场内人数（缩放用）：缺键一律当 1（= 单人，与改动前逐位一致）。
+        // 读回后<b>重挂一次</b>缩放修饰符而不是只赋值：applyScalingFor 是幂等的（摘旧挂新），
+        // 且 super.readAdditionalSaveData 已把属性块（含永久修饰符）与当前血量读完 ⇒ 这里既保留
+        // "血量按比例不变"，又顺手把"旧存档缺修饰符 / 属性被外部工具改过"的坏数据纠正回与人数一致。
+        this.applyScalingFor(tag.contains(NBT_PLAYER_COUNT) ? tag.getInt(NBT_PLAYER_COUNT) : 1);
         // 缺键时 getInt 返回 0 ⇒ 冷却为 0（可立刻起手），属安全默认
         this.guardTicks = Math.max(0, tag.getInt(NBT_GUARD_TICKS));
         this.guardCooldownTicks = Math.max(0, tag.getInt(NBT_GUARD_COOLDOWN));
-        // 架势随存档恢复；但剩余 tick 已为 0（异常存档）时不该继续举着，交给 tickGuard 下一 tick 收势
+        // 架势随存档恢复；但剩余 tick 已为 0（异常存档）时不该继续举着，交给 tickGuardState 下一 tick 收势
         this.setGuarding(tag.getBoolean(NBT_GUARDING) && this.guardTicks > 0);
         // 四个计时一律做下界保护：缺键 ⇒ 0（安全默认，等同"没有在冲锋/禁飞/封印/冷却"），
         // 异常存档里的负值也只当 0，绝不把状态搞成负数（负数会让 isDiving() 等判定失真）
@@ -504,7 +1013,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.groundedTicks = Math.max(0, tag.getInt(NBT_GROUNDED_TICKS));
         this.scytheSealTicks = Math.max(0, tag.getInt(NBT_SCYTHE_SEAL_TICKS));
         // 蓄力 / 召唤冷却同做下界保护；蓄力随存档恢复，但剩余 tick 已为 0（异常存档）时不该继续举着，
-        // 交给 tickCharge 下一 tick 收势
+        // 交给 tickChargeState 下一 tick 收势
         this.chargeTicks = Math.max(0, tag.getInt(NBT_CHARGE_TICKS));
         this.minionCooldownTicks = Math.max(0, tag.getInt(NBT_MINION_COOLDOWN));
         // 下界保护：缺键 ⇒ 0（安全默认，等同"这一轮蓄力还没被打进任何伤害"）；
@@ -513,7 +1022,14 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 二阶段两招的冷却同做下界保护（缺键 ⇒ 0 = 可立刻起手，安全默认；异常负值也只当 0）
         this.blinkCooldownTicks = Math.max(0, tag.getInt(NBT_BLINK_COOLDOWN));
         this.kickCooldownTicks = Math.max(0, tag.getInt(NBT_KICK_COOLDOWN));
+        // 普攻/远程间隔同做下界保护（口径与上面四招完全一致：缺键 ⇒ 0 = 可立刻出手）
+        this.meleeCooldownTicks = Math.max(0, tag.getInt(NBT_MELEE_COOLDOWN));
+        this.rangedCooldownTicks = Math.max(0, tag.getInt(NBT_RANGED_COOLDOWN));
         this.setCharging(tag.getBoolean(NBT_CHARGING) && this.chargeTicks > 0);
+        // 阶段三五招：只读冷却（缺键 ⇒ 0 = 可立刻起手，安全默认；异常负值也只当 0，由状态机内部钳制）。
+        // 进行中的状态一律复位成"没在演"：bombard 的同步位由 defineSynchedData 的默认 false 保证，
+        // 抓取态则因为"本类不再逐 tick 钉人"而天然消失 —— 这就是它最硬的一条松手出口。
+        this.phaseThree.load(tag);
         // 出场演出<b>刻意不落盘</b>（没有对应的 NBT 键），读回时一律复位成"没在出场"：
         // ① 它是首次召唤的一次性演出（initialRespawnDone 已落盘保证不重演），续播没有意义；
         // ② 续播还会错位 —— 降临的基准是"开演那一 tick 的悬停高度"，服务器存盘/区块卸载后这个基准已经丢了，
@@ -521,6 +1037,85 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 复位后由 AgaitolosMoveControl ③ 的悬停修正把 BOSS 收回常态高度，无需额外处理。
         this.introTicks = 0;
         this.setIntroPlaying(false);
+    }
+
+    // ---------------------------------------------------------------- 随在场玩家数增强（§0 第 71 行 / §1 定案表第 11 条）
+
+    /**
+     * 生命缩放修饰符的 UUID。
+     * <p>做成 {@code ADDITION} 的<b>永久</b>修饰符而不是直接改基础值：{@code AttributeInstance#save()} 会写
+     * 基础值 + 永久修饰符两者，但走修饰符才能让"重算"变成幂等的"摘旧的、挂新的"（见
+     * {@link #setScalingBonus}），基础值则始终是规格里的 1444 / 30 这两个数，读起来不会自相矛盾。
+     */
+    private static final UUID UUID_SCALE_HEALTH = UUID.fromString("a1c2e3f4-0b17-4c58-9d6e-2f3a4b5c6d71");
+
+    /** 攻击力缩放修饰符的 UUID（理由同 {@link #UUID_SCALE_HEALTH}） */
+    private static final UUID UUID_SCALE_ATTACK = UUID.fromString("a1c2e3f4-0b17-4c58-9d6e-2f3a4b5c6d72");
+
+    /**
+     * <b>重算</b>场内人数并按它缩放生命与攻击力（服务端；只在入场与每次进阶段两个点调用）。
+     * <p>调用点见 {@code aiStep} 的首次召唤分支与 {@link #advancePhase}；<b>不做</b>每 tick 跟随，
+     * 理由见 {@link #scaledPlayerCount}。
+     */
+    private void applyPlayerCountScaling() {
+        this.applyScalingFor(AgaitolosScaling.countPresentPlayers(this));
+    }
+
+    /**
+     * 按给定人数缩放（幂等）。
+     * <p>
+     * <b>为什么按"比例"保留当前血量而不是按绝对值</b>：入场那一路刚把血量压到
+     * {@code INTRO_HEALTH_RATIO}（见 {@code aiStep}），若直接抬高上限，压在 25% 的血会变成
+     * "1877 上限里的 361（19%）"，出场演出的回血曲线立刻走形；按比例搬移则"压到 25%"的语义不变。
+     * 阶段推进那一路本来就紧接 {@link #enterRespawn} 的回满，故这条口径对它同样无害。
+     *
+     * @param players 已定案的场内人数（未钳制，由 {@link AgaitolosScaling} 内部钳制）
+     */
+    private void applyScalingFor(int players) {
+        this.scaledPlayerCount = AgaitolosScaling.clampPlayerCount(players);
+        float healthRatio = this.getMaxHealth() > 0.0F ? this.getHealth() / this.getMaxHealth() : 1.0F;
+        setScalingBonus(Attributes.MAX_HEALTH, UUID_SCALE_HEALTH, "Agaitolos player scaling health",
+                AgaitolosScaling.BASE_HEALTH * (AgaitolosScaling.healthScale(this.scaledPlayerCount) - 1.0D));
+        setScalingBonus(Attributes.ATTACK_DAMAGE, UUID_SCALE_ATTACK, "Agaitolos player scaling attack",
+                AgaitolosScaling.BASE_ATTACK_DAMAGE * (AgaitolosScaling.damageScale(this.scaledPlayerCount) - 1.0D));
+        // 上限变了：按旧比例搬回当前血量（setHealth 内部按新上限夹取，故缩小时也不会超上限）
+        this.setHealth(this.getMaxHealth() * healthRatio);
+    }
+
+    /**
+     * 幂等地设置一条属性加成：先按 UUID 摘掉旧值，再按需挂新值。
+     * <p>用 {@code addPermanentModifier} 而非 {@code addTransientModifier}：前者会被
+     * {@code AttributeInstance#save()} 序列化 ⇒ 区块卸载/读档后加成<b>不丢</b>
+     * （原版 {@code Mob#finalizeSpawn} 的刷怪加成正是这么做的）。
+     * <p>加成为 0（单人局）时<b>不挂</b>：少一条无意义的修饰符，也让存档里的属性块保持干净。
+     */
+    private void setScalingBonus(Attribute attribute, UUID id, String name, double bonus) {
+        AttributeInstance instance = this.getAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        instance.removeModifier(id);
+        if (bonus > 1.0E-6D) {
+            instance.addPermanentModifier(new AttributeModifier(id, name, bonus, AttributeModifier.Operation.ADDITION));
+        }
+    }
+
+    /** 已定案的场内人数 n（落盘；客户端读到的是默认 1 —— 本值只在服务端被消费） */
+    public int getScaledPlayerCount() {
+        return this.scaledPlayerCount;
+    }
+
+    /** 生命缩放系数（1 人 = 1.0）：供血量上限的读法与调试用 */
+    public double getHealthScale() {
+        return AgaitolosScaling.healthScale(this.scaledPlayerCount);
+    }
+
+    /**
+     * <b>固定数值伤害</b>的缩放系数（1 人 = 1.0）：供普攻真实段与凋零头弹体读取。
+     * <p>百分比最大生命的招式（俯冲镰扫/踢击/投技）<b>不</b>读它，理由见 {@link AgaitolosScaling} 的类注释。
+     */
+    public double getDamageScale() {
+        return AgaitolosScaling.damageScale(this.scaledPlayerCount);
     }
 
     // ---------------------------------------------------------------- 阶段机 / 复活阶段
@@ -540,6 +1135,16 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             // （详见 INTRO_HEALTH_RATIO 的注释）。只此一处压血，阶段推进触发的复活不压。
             this.setHealth(this.getMaxHealth() * INTRO_HEALTH_RATIO);
             this.enterRespawn();
+            // 铺下界牢狱场地（分级施工/快照落盘/重启自愈全在 NetherPrisonArena 内，实体侧只留这一个入口）。
+            // 必须在 startIntro() 之前调用：场地中心取"召唤点"（blockPosition），
+            // 而出场演出第一件事就是把 BOSS 抬到悬停高度上方，放在后面会把中心抬高 3.5 格。
+            NetherPrisonArena.begin(this);
+            // 随在场玩家数增强：<b>入场即定案一次</b>（§0 第 71 行 / §1 第 11 条，用户拍板不做实时跟随）。
+            // 必须排在 begin 之后：牢狱记录此刻已建立 ⇒ 人数判据走"牢狱 box"这条正路
+            // （排在 begin 之前只能退化为半径兜底，还会把刚压好的 25% 血算成另一套上限）。
+            // 也必须排在 startIntro 之前：出场降临的目标高度按新的悬停几何算，不受本次缩放影响，但
+            // setHealth 的基准（getMaxHealth）必须已经是缩放后的值，否则开场血线走形
+            this.applyPlayerCountScaling();
             // 纯表现：出场瞬间的一次性青蓝爆发（识别色同族），不参与任何结算
             AgaitolosFx.introBurst(this);
             // 出场演出（三段编排）与复活阶段同刻开演、同窗结束：开演那一刻就把 BOSS 抬到悬停高度上方，
@@ -552,19 +1157,33 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         } else {
             this.checkPhaseAdvance();
         }
+        // ---- 计时（与"选招"无关，一律无条件推进）----
+        // 惩罚计时（禁飞/封印/召唤冷却）与招式冷却分开：前者是玩家争取来的窗口，后者是 BOSS 自己的节奏，
+        // 混在一个方法里改一处很容易把另一处的口径带偏（历史上"改一招忘一招"的常见来源）。
         this.tickPenaltyTimers();
-        // 蓄力必须排在格挡/冲锋之前：它要在本 tick 内先把 isCharging() 立起来，
-        // 后面两条的起手闸才会因 !isCharging() 让位，状态互斥才成立
-        this.tickCharge();
-        this.tickGuard();
-        this.tickDiveSweep();
-        // 二阶段两招排在最后：它们的起手闸含 !isDiving()/!isGuarding()/!isCharging()，
-        // 必须等上面三者在本 tick 先把状态立起来，才能保证"同一 tick 不会一边冲锋一边瞬移"
-        //（顺序若反过来，本 tick 起手的冲锋/架势/蓄力会被这两招绕过，状态互斥就失效了）
-        this.tickBlink();
-        this.tickKick();
+        this.tickActionCooldowns();
+        // ---- 进行中状态（只推进"已经在演"的那一招，不再承担起手判定）----
+        // 起手判定已整体移交 AgaitolosSkillDirector：这三条只剩倒计时、打断出口与冲锋位移，
+        // 顺序不再需要"谁先立状态"这种约定（状态互斥由决策层的全局动作锁保证，比原先的顺次闸更硬）
+        this.tickChargeState();
+        this.tickGuardState();
+        this.tickDiveState();
+        // ---- 阶段三五招的进行中状态（三重投掷节拍 / 高空轰炸 / 抓取态 / 劈击 / 施法）----
+        // 与上面三条同一档：只推进"已经在演"的那一招，起手判定归决策层；
+        // 放在决策层之前，保证"本 tick 刚结束的状态"已释放全局动作锁，决策层不会白等一拍。
+        // 抓取态（投技①）的钉住动作也在这里逐 tick 执行，故它不持有任何玩家侧状态。
+        this.phaseThree.tick(this);
+        // ---- 地面档：只切"垂直高度档位"（空中 2 格 / 贴地 0 格），不碰任何招式状态 ----
+        // 放在状态推进之后、决策层之前：本 tick 切出来的档位会被下一 tick 的
+        // AgaitolosMoveControl ③ 读到（moveControl.tick 在 super.aiStep() 内已跑过，故当帧不生效，
+        // 这与"实体写 deltaMovement、下一帧 travel 消费"是同一个半拍延迟，肉眼不可见）
+        this.tickPerchState();
+        // ---- 战斗决策层：这一拍放哪一招（唯一入口）----
+        // 放在所有状态推进之后：本 tick 刚结束的招已释放动作锁，决策层能立刻看到最新状态；
+        // 也保证"某招在本 tick 被中断"时不会再被决策层当成"正在演"而白等一拍
+        this.skillDirector.tick(this);
         // 出场演出排在<b>最末</b>：它要独占位移（写竖直分量），必须等所有可能改速度的状态都跑完；
-        // 放在这里也保证"起手闸拦住的动作"先被判一遍，本 tick 不会既起手又降临
+        // 放在这里也保证"被决策层拦住的动作"先被判一遍，本 tick 不会既起手又降临
         this.tickIntro();
     }
 
@@ -627,7 +1246,12 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 一次性瞬抬 3.5 格由原版位置包下发给客户端，客户端会插值过去，读作"闪现在空中"。
      */
     private void startIntro() {
-        double hoverY = AgaitolosMoveControl.hoverY(this.level(), this.getX(), this.getY(), this.getZ());
+        // 目标高度取「本阶段真正的空中档高度」（AgaitolosMoveControl#airborneHeight）：
+        // 与 MoveControl ③ 每 tick 维持的高度是同一个出口，演出结束时落点就是它之后该待的位置。
+        // 出场必然发生在阶段一（首次召唤那一 tick），但这里刻意按阶段取而不是写死 HOVER_HEIGHT ——
+        // 阶段三降高之后，两处若各写一份，将来任何"阶段切换后再演出"的场景都会漂移出一次二次升降。
+        double hoverY = AgaitolosMoveControl.hoverY(this.level(), this.getX(), this.getY(), this.getZ(),
+                AgaitolosMoveControl.airborneHeight(this.getPhase()));
         // 虚空/深井里扫不到地面（NaN）时不强行算高度，退化为"原地不动"，演出其余两段照常
         this.introDescentTargetY = Double.isNaN(hoverY) ? this.getY() : hoverY;
         this.setPos(this.getX(), this.introDescentTargetY + INTRO_DESCENT_HEIGHT, this.getZ());
@@ -664,14 +1288,31 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /** 推进阶段：落阶段 + 进复活阶段。换模型（P7）与解锁招式（P4~P6）后续在此接入 */
     private void advancePhase(AgaitolosPhase next) {
         this.setPhase(next);
+        // 随在场玩家数增强：<b>每次进阶段重算一次</b>（§1 第 11 条，用户拍板的口径 —— 玩家中途进出
+        // 只在阶段边界生效）。放在 enterRespawn 之前：复活阶段会把血量回满，上限必须先定案，
+        // 回血的分母（getMaxHealth() / RESPAWN_DURATION_TICKS）才是新上限的 1/80。
+        // 同时这里也是"阶段阈值跟着上限走"的另一半：阈值本就读 当前 上限的比例（AgaitolosPhase#healthThresholdRatio），
+        // 上限一涨，二/三阶段的门槛立刻同步上涨（见该枚举的 javadoc）。
+        this.applyPlayerCountScaling();
         this.enterRespawn();
     }
 
-    /** 进入复活阶段：无敌 + 4s 内回满，倒计时归零时击飞周围玩家 */
+    /**
+     * 进入复活阶段：无敌 + 4s 内回满，倒计时归零时击飞周围玩家。
+     * <p>
+     * <b>同时整队回收召唤物</b>（首次召唤与阶段推进两条入口都经这里）：复活是"无敌 + 回血 + 4s 演出"的
+     * 场景边界 —— 这段窗口里留在场上的小怪只会单方面追打玩家（BOSS 无敌、又不该让"召唤物还能打"
+     * 成为复活的附带伤害）。阶段推进必然先把蓄力打断（{@code tickChargeState} 的 ① 闸会走到
+     * {@code endChargeInterrupted}，那里已经清过一次），这里是同一口径的显式化：
+     * <b>"进入复活 ⇒ 场上无召唤物"是一条不变量，不依赖调用顺序</b>。
+     * <p>首次召唤那一 tick 也走本方法，此时场上本来就没有召唤物，{@code dismissAll} 是空操作
+     * （代价只是一次 64 格实体查询，一次性开销）。
+     */
     private void enterRespawn() {
         this.initialRespawnDone = true;
         this.respawnTicks = RESPAWN_DURATION_TICKS;
         this.setRespawning(true);
+        AgaitolosMinionSkill.dismissAll(this);
     }
 
     /** 复活阶段每 tick：回血并递减倒计时，归零则收尾 */
@@ -684,6 +1325,9 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         this.heal(this.getMaxHealth());
         this.setRespawning(false);
         this.knockbackNearbyPlayers();
+        // 规格 §0：复活后对下界牢狱内的所有生物（含玩家）施加凋零 III 持续 5s。
+        // 挂在这里而不是"首次召唤"分支：复活阶段有两个入口（首次召唤 / 阶段推进），两处都要表现
+        NetherPrisonArena.applyRespawnWither(this);
     }
 
     /** 复活结束的击飞：半径内玩家被推离 BOSS 并上抛 */
@@ -709,38 +1353,98 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     // ---------------------------------------------------------------- 格挡架势（一阶段）
 
     /**
-     * 格挡架势的状态推进（服务端权威，每 tick 一次）：冷却递减 → 架势倒计时 → 满足条件则起手。
+     * 格挡架势的<b>进行中状态</b>推进（服务端权威，每 tick 一次）：架势倒计时 + 强制收势出口 + 姿态朝向对齐。
+     * <p>起手判定已移交 {@link AgaitolosSkillDirector}：<b>"该不该架"由决策层的保命招硬闸确定性判定</b>
+     * （{@code shouldGuardForced}，不参与权重掷骰 —— 2026-09-21 修正：交回掷骰会让"该架的时候多半不架"），
+     * 本方法只剩两件事：①"已经在举的架势怎么结束"（倒计时归零、或撞上复活/出场/死亡演出必须立刻收势）；
+     * ② 守住架势方向 —— 每 tick 把头按回起手锁定的身体朝向（2026-09-21 补，理由见方法内注释）。
      * <p>架势只是"状态"，判定与消费在别处：伤害归零见 {@link AgaitolosDamageRules#resolve} 的 ④ 闸，
      * 朝向/近战判定见 {@link AgaitolosGuardSkill#isBlocking}，动画见 {@code AgaitolosAnimations} 的 guard 控制器。
      */
-    private void tickGuard() {
-        if (this.guardCooldownTicks > 0) {
-            --this.guardCooldownTicks;
-        }
-        if (this.isGuarding()) {
-            // 复活阶段/死亡/出场演出必须立刻撤架势：无敌演出期间还举着格挡会与死亡/复活/降临姿势打架，也白吃一次免伤
-            if (this.isRespawning() || this.isIntroPlaying() || this.isDeadOrDying() || --this.guardTicks <= 0) {
-                this.endGuard();
-            }
+    private void tickGuardState() {
+        if (!this.isGuarding()) {
             return;
         }
-        // 冲锋期间不做其它事：正在俯冲就不起手架势（否则"一边冲一边举盾"，语义与动画都会打架）
-        if (this.guardCooldownTicks <= 0 && !this.isRespawning() && !this.isIntroPlaying() && !this.isDiving()
-                && !this.isCharging() && this.shouldEnterGuard()) {
-            this.setGuarding(true);
-            this.guardTicks = AgaitolosGuardSkill.GUARD_DURATION_TICKS;
-            // 架势要站定：先停掉寻路，否则 Goal 会继续下发目标点。
-            // （水平加速另在 AgaitolosMoveControl 里掐断——travel 在 super.aiStep() 内已执行，此处清速度对当帧无效）
-            this.getNavigation().stop();
+        // 复活阶段/死亡/出场演出必须立刻撤架势：无敌演出期间还举着格挡会与死亡/复活/降临姿势打架，也白吃一次免伤
+        if (this.isRespawning() || this.isIntroPlaying() || this.isDeadOrDying() || --this.guardTicks <= 0) {
+            this.endGuard();
+        } else {
+            // 姿态朝向对齐：把头部朝向按回身体朝向（身体 yaw 见 startGuard 的起手锁定）。
+            // 原版 LookControl 每 tick 都把 yHeadRot 转向当前目标，而客户端渲染的身体朝向
+            // （BodyRotationControl 跟随 yHeadRot）因此会跟着玩家转过去 —— 不对齐就会出现
+            // "身子已经转向玩家、但格挡锥仍锁在起手方向"的所见非所得错位（用户反馈的"明明在架盾却挡不住"）。
+            // 对齐后：渲染朝向 == 格挡锥方向（AgaitolosGuardSkill#isWithinFrontArc 读 yRot）
+            // == 护盾纹方向（AgaitolosActionFx#guardAura 也读 look 的水平分量）。
+            // 另一侧保证在 AgaitolosMoveControl：它在架势期间跳过身体 yaw 的转向（见其 tick() ⓪''），
+            // 故这里的锁定不会每 tick 被"转向目标"覆盖掉 —— 两处合起来才是"整个架势朝向不变"。
+            // 代价是架势期间头部不再追人，这恰是我们要的语义：举镰是一段"有方向的承诺"，
+            // 玩家能看到它锁定了哪一侧，从那一侧之外绕过去就能打穿。
+            this.setYHeadRot(this.getYRot());
         }
+        // 纯表现：架势仍在的每 tick 刷一帧正面护盾纹；放在撤架势判定<b>之后</b>，
+        // 本 tick 刚放下的架势不会再亮一帧，避免"盾已收还亮着"
+        AgaitolosActionFx.guardAura(this);
     }
 
     /**
-     * 是否该起手格挡：有攻击目标 + 水平距离已进近战可达范围（= 马上要挨打）。触发条件为待调手感值 / P8 转配置项。
-     * <p>距离口径复用 {@link #getMeleeAttackRangeSqr}（已按悬停高度放大），让"起手格挡"与"打得着它"用同一把尺子。
+     * 执行入口：起手格挡架势（由 {@link AgaitolosSkillDirector} 在"保命招硬闸命中格挡"时调用）。
+     * <p>前置复校（冷却/距离）与决策层的硬闸判据同源（{@code AgaitolosSkillDirector#shouldGuardForced}）：
+     * 决策层据此"必定"起手，这里再挡一次，保证"即使将来有人在别处直接调用本方法"也不会绕过冷却。
+     * <p>
+     * <b>起手瞬间锁定朝向（2026-09-21 补，2026-09-21 二轮复核后保留）</b>：把身体朝向对准目标，格挡锥才有意义。
+     * 姿势角度的判定读的是 {@link #getYRot()} 的水平分量（见
+     * {@link AgaitolosGuardSkill#isWithinFrontArc}）。身体 yaw 自本轮起由
+     * {@code AgaitolosMoveControl} 每 tick 朝目标限速转动（根因修复，字节码证据见该类 javadoc），
+     * 故"起手那一刻的朝向"通常已经≈目标方向；但这里的显式对准<b>必须保留</b>，两条理由：
+     * <ol>
+     *   <li><b>硬保证</b>：转速是限速的（{@code MAX_YAW_SPEED_DEGREES} 度/tick），起手前一刻可能还差几度；
+     *       架势锥只有 120°（半角 60°），"差几度"不该由运气决定 ⇒ 起手这一帧直接对准，锥心零误差；</li>
+     *   <li><b>可惩罚面</b>：{@code AgaitolosMoveControl#tick()} ⓪'' 在<b>架势期间跳过转向</b>，
+     *       故这里的锁定在整个 24t 架势里保持不变 —— 玩家仍能从锁定方向之外绕过去打穿（不是 360° 无死角）。</li>
+     * </ol>
+     * 写 {@code yHeadRot} 的理由同 {@code AgaitolosBlinkSkill#faceTarget}：渲染的头部朝向读它，
+     * 不写会看到"身子转了、头还在看原来的方向"。
+     *
+     * @return 是否真的起手（冷却中/距离不满足/已被别的状态占用时为 false，此时不消耗全局节拍）
      */
-    private boolean shouldEnterGuard() {
-        LivingEntity target = this.getTarget();
+    boolean startGuard(LivingEntity target) {
+        if (this.guardCooldownTicks > 0 || this.isRespawning() || this.isIntroPlaying() || this.isDiving()
+                || this.isCharging() || !this.isTargetWithinGuardRange(target)) {
+            return false;
+        }
+        this.setGuarding(true);
+        this.guardTicks = AgaitolosGuardSkill.GUARD_DURATION_TICKS;
+        // 朝向锁定：身体 + 头部同写（俯仰不锁 —— 它由 LookControl 按目标眼睛高度逐 tick 给，
+        // 不影响水平面的格挡锥，也让"低头看着脚下的人"这一幕保留）
+        float yaw = this.yawTowards(target);
+        this.setYRot(yaw);
+        this.setYHeadRot(yaw);
+        // 架势要站定：先停掉寻路，否则 Goal 会继续下发目标点。
+        // （水平加速另在 AgaitolosMoveControl 里掐断——travel 在 super.aiStep() 内已执行，此处清速度对当帧无效）
+        this.getNavigation().stop();
+        return true;
+    }
+
+    /**
+     * 水平朝向目标所需的 yaw（度）。公式与 {@code AgaitolosBlinkSkill#faceTarget} 同源
+     * （原版惯例：{@code atan2(dz, dx)} 转角度后 − 90°；MC 里 yaw 0 = 朝 +Z、−90 = 朝 +X）。
+     * <p>水平位移为 0（目标恰在正上/正下方）时得 {@code atan2(0, 0) = 0} ⇒ 一个<b>确定</b>但任意的角；
+     * 该情形下"是否正面"由 {@link AgaitolosGuardSkill#isWithinFrontArc} 的退化分支直接判为正面，
+     * 不依赖这里的取值。
+     */
+    private float yawTowards(LivingEntity target) {
+        double deltaX = target.getX() - this.getX();
+        double deltaZ = target.getZ() - this.getZ();
+        return (float) (Mth.atan2(deltaZ, deltaX) * (180.0D / Math.PI)) - 90.0F;
+    }
+
+    /**
+     * 只读探针：是否该起手格挡 —— 目标存活 + 水平距离已进近战可达范围（= 马上要挨打）。
+     * <p>距离口径复用 {@link #getMeleeAttackRangeSqr}（已按悬停高度放大），让"起手格挡"与"打得着它"用同一把尺子；
+     * 判据本身仍是<b>水平</b>距离² 与那个 3D 可达² 比较（沿用既有口径，不擅自改成 3D —— 那会改变起手时机）。
+     * <p>供 {@link AgaitolosSkillDirector} 打分使用（本类不自持"要不要格挡"的判断，只提供探针）。
+     */
+    boolean isTargetWithinGuardRange(LivingEntity target) {
         if (target == null || !target.isAlive()) {
             return false;
         }
@@ -749,10 +1453,22 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         return deltaX * deltaX + deltaZ * deltaZ <= this.getMeleeAttackRangeSqr(target);
     }
 
+    /**
+     * 只读探针：目标是否已进<b>近战可达距离</b>（3D，含悬停高度折算）。
+     * <p>
+     * 与 {@code AgaitolosMeleeAttackGoal} 用的是<b>同一个</b> {@link #getMeleeAttackRangeSqr}：
+     * 决策层用它判断"这一拍要不要选普攻"，Goal 用它判断"这一刀能不能挥出去"，
+     * 两处若各算一套，就会出现"打分说打得着、挥出去落空"或反过来的空拍。
+     */
+    boolean isTargetWithinMeleeReach(LivingEntity target) {
+        return target != null && target.isAlive()
+                && this.distanceToSqr(target) <= this.getMeleeAttackRangeSqr(target);
+    }
+
     // ---------------------------------------------------------------- 恶怨倒转（一阶段：召唤分队 + 蓄力）
 
     /**
-     * 「恶怨倒转」的状态推进（服务端权威，每 tick 一次）：起手判定 → 蓄力倒计时 → 收尾。
+     * 「恶怨倒转」的<b>进行中状态</b>推进（服务端权威，每 tick 一次）：蓄力倒计时 → 四条取消条件 → 收尾。
      * <p>
      * 规格：召唤凋零骷髅分队（见 {@link AgaitolosMinionSkill#summon}）后进入蓄力状态 12s；
      * 期间造成<b>足量的伤害</b>则取消此状态；<b>未取消</b>则吸取周围小怪剩余血量造成 1/5 的魔法伤害（范围 20 格）。
@@ -767,51 +1483,59 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 拆成两个语义入口而不是给公共清理加布尔参数：这样"哪条路径会吸血"由<b>方法名</b>直接表达，
      * 只有 {@code endChargeCompleted} 里写着 {@code drainMinions}，被打断路径物理上无从误触发。
      * <p>
-     * 起手闸：冷却中 / 与架势·冲锋·复活·死亡任一冲突 / 无存活目标，都不放。
-     * 与架势、冲锋互斥是刻意的：三者共用同一批骨骼动画，同时成立会互相拉扯（见 {@code AgaitolosAnimations}）。
+     * <b>起手已不在本方法</b>：见 {@link #startCharge(LivingEntity)}（由 {@link AgaitolosSkillDirector} 调用）。
      */
-    private void tickCharge() {
-        if (this.isCharging()) {
-            // 纯表现：蓄力每 tick 上报一次，节流在 AgaitolosFx 内部（每 2 tick 一帧）。
-            // 放在收尾判断之前：本 tick 只要 isCharging() 仍成立就发一帧，末帧多发一次无副作用。
-            AgaitolosFx.chargedOrb(this);
-            // ① 死亡/复活/出场演出必须立刻收势（与 tickGuard 同一口径）：打断，不结算吸血
-            if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
-                this.endChargeInterrupted();
-                return;
-            }
-            // ② 打断阈值（规格："如期间造成足量的伤害便取消此状态"）。
-            //    阈值 = 最大生命 × CHARGE_BREAK_DAMAGE_RATIO（1444 × 6% ≈ 87），累计值由 hurt() 在
-            //    伤害真正落地时累加、起手时归零。打断 ⇒ 不结算吸血（"取消此状态"即整招作废）。
-            //    取值口径与算式见 CHARGE_BREAK_DAMAGE_RATIO 的 javadoc（6% 是为了让单人也能打断）。
-            if (this.chargeDamageTaken >= this.getMaxHealth() * CHARGE_BREAK_DAMAGE_RATIO) {
-                this.endChargeInterrupted();
-                return;
-            }
-            // ③ 分队全灭：提前收势，不结算（没有小怪可吸，本就不该给伤害）。
-            //    判"全灭"用 ALIVE_CHECK_RADIUS（64）而不是吸血结算的 20：召唤物追出去很远也算活着，
-            //    否则会把"追敌中"误判成"已阵亡"、蓄力被提前打断。
-            if (AgaitolosMinionSkill.findLivingMinions(this, AgaitolosMinionSkill.ALIVE_CHECK_RADIUS).isEmpty()) {
-                this.endChargeInterrupted();
-                return;
-            }
-            // ④ 期满（自然结束）：规格"如未取消便吸取周围小怪剩余血量造成 1/5 魔法伤害"的唯一触发点。
-            //    倒计时放在最后递减：上面三条一旦判定成立就直接返回，此处不必再管剩余 tick（endCharge* 会清零）
-            if (--this.chargeTicks <= 0) {
-                this.endChargeCompleted();
-            }
+    private void tickChargeState() {
+        if (!this.isCharging()) {
             return;
         }
-        if (this.minionCooldownTicks > 0 || this.isGuarding() || this.isDiving()
+        // 纯表现：蓄力每 tick 上报一次，节流在 AgaitolosFx 内部（每 2 tick 一帧）。
+        // 放在收尾判断之前：本 tick 只要 isCharging() 仍成立就发一帧，末帧多发一次无副作用。
+        AgaitolosFx.chargedOrb(this);
+        // ① 死亡/复活/出场演出必须立刻收势（与 tickGuardState 同一口径）：打断，不结算吸血
+        if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
+            this.endChargeInterrupted();
+            return;
+        }
+        // ② 打断阈值（规格："如期间造成足量的伤害便取消此状态"）。
+        //    阈值 = 最大生命 × CHARGE_BREAK_DAMAGE_RATIO（1444 × 6% ≈ 87），累计值由 hurt() 在
+        //    伤害真正落地时累加、起手时归零。打断 ⇒ 不结算吸血（"取消此状态"即整招作废）。
+        //    取值口径与算式见 CHARGE_BREAK_DAMAGE_RATIO 的 javadoc（6% 是为了让单人也能打断）。
+        if (this.chargeDamageTaken >= this.getMaxHealth() * CHARGE_BREAK_DAMAGE_RATIO) {
+            this.endChargeInterrupted();
+            return;
+        }
+        // ③ 分队全灭：提前收势，不结算（没有小怪可吸，本就不该给伤害）。
+        //    判"全灭"用 ALIVE_CHECK_RADIUS（64）而不是吸血结算的 20：召唤物追出去很远也算活着，
+        //    否则会把"追敌中"误判成"已阵亡"、蓄力被提前打断。
+        if (AgaitolosMinionSkill.findLivingMinions(this, AgaitolosMinionSkill.ALIVE_CHECK_RADIUS).isEmpty()) {
+            this.endChargeInterrupted();
+            return;
+        }
+        // ④ 期满（自然结束）：规格"如未取消便吸取周围小怪剩余血量造成 1/5 魔法伤害"的唯一触发点。
+        //    倒计时放在最后递减：上面三条一旦判定成立就直接返回，此处不必再管剩余 tick（endCharge* 会清零）
+        if (--this.chargeTicks <= 0) {
+            this.endChargeCompleted();
+        }
+    }
+
+    /**
+     * 执行入口：起手「恶怨倒转」（由 {@link AgaitolosSkillDirector} 在"这一拍选中召唤"时调用）。
+     * <p>
+     * 与其它招的互斥不再写在这里：决策层的全局动作锁已经保证"同一时刻只允许一招在演"
+     * （起手前会检查 {@code isDiving()/isGuarding()/isCharging()/复活/演出}）。
+     * 本方法只保留两条<b>本招专属</b>的前置：召唤冷却未过、目标有效 —— 前者是规格给它的 15s 冷却，
+     * 后者是"召唤物要共享谁的目标"（见 {@link AgaitolosMinionSkill#summon}）。
+     * <p>先召唤再立状态：召唤失败（异常情况下 0 只落位）时下一 tick 就会因"全灭"立刻收势并进冷却，
+     * 不会每 tick 空转起手。
+     *
+     * @return 是否真的起手（冷却中/目标无效时为 false，此时不消耗全局节拍）
+     */
+    boolean startCharge(LivingEntity target) {
+        if (this.minionCooldownTicks > 0 || target == null || !target.isAlive()
                 || this.isRespawning() || this.isIntroPlaying() || this.isDeadOrDying()) {
-            return;
+            return false;
         }
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive()) {
-            return;
-        }
-        // 先召唤再立状态：召唤失败（异常情况下 0 只落位）时下一 tick 就会因"全灭"立刻收势并进冷却，
-        // 不会每 tick 空转起手
         AgaitolosMinionSkill.summon(this);
         this.chargeTicks = CHARGE_DURATION_TICKS;
         // 上一轮的承伤累计必须归零后再起手：否则"被打断过的那一轮"的累计会残留，
@@ -825,6 +1549,7 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 参数 (duration, amplifier=0, ambient=false, visible=false, showIcon=false)：不要药水气泡粒子，
         // 只要轮廓（气泡会被误读成"中毒"一类状态）。
         this.addEffect(new MobEffectInstance(MobEffects.GLOWING, CHARGE_GLOW_DURATION_TICKS, 0, false, false, false));
+        return true;
     }
 
     /**
@@ -832,19 +1557,27 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 先做公共清理，再结算「恶怨倒转」的吸血（规格："如未取消便吸取周围小怪剩余血量造成 1/5 的魔法伤害"）。
      * <p>结算收在 {@link AgaitolosReversalSkill#drainMinions}：本类只表达"这一轮蓄力没被打断"这一语义，
      * 半径、伤害折算与归属筛选归技能持有（与 {@link AgaitolosGuardSkill#counterAttack} 同一分工）。
+     * <p><b>三步顺序不可调换</b>：{@code finishCharge}（撤蓄力状态，动画/出手闸先回常态）→
+     * {@code drainMinions}（按规格吸血，内部 kill 掉 20 格内的）→ {@code dismissAll}（收尾清场）。
+     * 若把清场提到吸血之前，吸血会把"已经消失的小怪"当成 0 血来算 ⇒ 这一招直接空放。
      */
     private void endChargeCompleted() {
         this.finishCharge();
         // 先收干净状态再结算：结算会杀死召唤物，期间 BOSS 不该还处于"蓄力中"（否则动画/出手闸会打架）
         AgaitolosReversalSkill.drainMinions(this);
+        // 收尾清场：把 20 格外的漏网者、以及结算瞬间新追近的残余一并回收（口径见 dismissAll 的 javadoc）
+        AgaitolosMinionSkill.dismissAll(this);
     }
 
     /**
      * 蓄力收尾（<b>被打断</b>）：死亡 / 复活 / 承伤达阈值 / 召唤物全灭走这条，<b>不结算吸血</b>
      * （规格：蓄力被打断即"此状态被取消"，吸不到任何东西 —— 这正是玩家抢输出的收益）。
+     * <p>同时<b>整队回收</b>：打断的收益是"这一招白放"，不该变成"留下一整队小怪继续追着玩家打"
+     * —— 旧口径只收状态不清场，正是用户实测到的"释放完技能之后怪物不会消失"。
      */
     private void endChargeInterrupted() {
         this.finishCharge();
+        AgaitolosMinionSkill.dismissAll(this);
     }
 
     /**
@@ -866,21 +1599,16 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     // ---------------------------------------------------------------- 俯冲镰扫（一阶段：位移 + 惩罚）
 
     /**
-     * 俯冲镰扫的状态推进（服务端权威，每 tick 一次），<b>两段式</b>：
-     * <ol>
-     *   <li><b>冲锋中</b>（{@link #isDiving()}）→ {@link #tickDiveCharge()}：每 tick 朝目标高速推进，
-     *       抵达或超时后收尾并结算一次横扫；</li>
-     *   <li><b>未在冲锋</b> → 起手判定：满足"冷却结束 + 不在架势 + 不在复活/死亡 + 未被封印 +
-     *       水平距离落在 [{@link #DIVE_MIN_RANGE}, {@link #DIVE_TRIGGER_RANGE}]"即进入冲锋，
-     *       并<b>立即</b>播 {@code dive_sweep} 动画。</li>
-     * </ol>
+     * 俯冲镰扫的<b>进行中状态</b>推进（服务端权威，每 tick 一次）：冲锋位移 → 抵达/超时收尾结算。
+     * <p>
+     * 两段式里的"冲锋中"这一段（{@link #isDiving()} → {@link #tickDiveCharge()}）留在这里；
+     * <b>起手判定已移交</b> {@link AgaitolosSkillDirector}（"这一拍选不选俯冲"由决策层掷骰决定，
+     * 冷却/封印/水平距离这三项也由它打分），执行入口见 {@link #startDiveSweep(LivingEntity)}。
+     * <p>
      * 位移本体在 {@link #tickDiveCharge()}（本类直接写 {@code deltaMovement}，{@code AgaitolosMoveControl} 全让位）；
-     * 伤害结算与范围筛选全部收在 {@link AgaitolosDiveSweepSkill#perform(AgaitolosEntity)}，本方法只负责"何时放"。
+     * 伤害结算与范围筛选全部收在 {@link AgaitolosDiveSweepSkill#perform(AgaitolosEntity)}。
      */
-    private void tickDiveSweep() {
-        if (this.diveSweepCooldownTicks > 0) {
-            --this.diveSweepCooldownTicks;
-        }
+    private void tickDiveState() {
         // 死亡/复活/出场演出期间中断冲锋：不结算横扫（演出期间不该出手），也不让计时残留到下一条命
         if (this.isDeadOrDying() || this.isRespawning() || this.isIntroPlaying()) {
             this.diveTicks = 0;
@@ -888,23 +1616,28 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         }
         if (this.isDiving()) {
             this.tickDiveCharge();
-            return;
         }
-        // 起手闸：冷却中 / 正举着架势 / 被玩家格挡后封印期内 / 出场演出中 —— "这一轮不放"的几种情况。
-        // 与格挡架势互斥：架势是"这一轮放弃进攻"的取舍，不能一边举盾一边俯冲；
-        // 封印期只封这一招，普攻与凋零头照常。横扫本身是当帧一次性结算，没有持续时间状态，故不存在反向重叠。
+    }
+
+    /**
+     * 执行入口：起手俯冲镰扫（由 {@link AgaitolosSkillDirector} 在"这一拍选中俯冲"时调用）。
+     * <p>前置复校与决策层打分同源：冷却未过 / 正举着架势 / 蓄力中 / 被格挡后封印期内 /
+     * 水平距离不在 [{@link #DIVE_MIN_RANGE}, {@link #DIVE_TRIGGER_RANGE}] —— 任一成立都不起手。
+     * 封印期只封这一招（普攻与凋零头照常），作用范围见 {@link #isScytheSealed()} 的 javadoc。
+     *
+     * @return 是否真的起手（被上面任一条挡下时为 false，此时不消耗全局节拍）
+     */
+    boolean startDiveSweep(LivingEntity target) {
         if (this.diveSweepCooldownTicks > 0 || this.isGuarding() || this.isCharging() || this.isScytheSealed()
-                || this.isIntroPlaying()) {
-            return;
-        }
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive() || !isWithinDiveTriggerRange(target)) {
-            return;
+                || this.isRespawning() || this.isIntroPlaying()
+                || target == null || !target.isAlive() || !this.isWithinDiveTriggerRange(target)) {
+            return false;
         }
         this.diveTicks = DIVE_MAX_TICKS;
         // 纯表现：冲锋起手即播。dive_sweep clip 本身覆盖「俯冲 + 横扫」两段，
         // 故冲锋收尾结算时<b>不再</b>重复触发（否则横扫段会被打断重播）。
         AgaitolosAnimations.playDiveSweep(this);
+        return true;
     }
 
     /**
@@ -926,6 +1659,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             return;
         }
         Vec3 aim = diveAimPoint(target);
+        // 纯表现：只在"真的在推进"的 tick 拖尾（上面的收尾分支已 return，故起手/收尾帧不会拖一条假尾）
+        AgaitolosActionFx.diveTrail(this);
         double deltaX = aim.x - this.getX();
         double deltaY = aim.y - this.getY();
         double deltaZ = aim.z - this.getZ();
@@ -945,7 +1680,11 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /** 冲锋收尾：清零计时并结算一次横扫；有人落入范围才进冷却（口径沿用上一轮：被格挡也算"这一刀挥出去了"） */
     private void finishDive() {
         this.diveTicks = 0;
-        if (AgaitolosDiveSweepSkill.perform(this)) {
+        boolean swept = AgaitolosDiveSweepSkill.perform(this);
+        // 纯表现：挥刀这一帧先落特效，再判冷却 —— 结算结果只决定"空挥还是命中"（特效强度），
+        // 不影响冷却口径（仍是 swept 决定），故顺序只关乎观感：让刀光与伤害同帧出现
+        AgaitolosActionFx.diveSweepImpact(this, swept);
+        if (swept) {
             // 冷却按阶段折算（二阶段起更短）：倍率表见 AgaitolosPace，阶段一恒为原值
             this.diveSweepCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosDiveSweepSkill.SWEEP_COOLDOWN_TICKS);
         }
@@ -957,11 +1696,12 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     }
 
     /**
-     * 是否满足冲锋起手距离：与目标的<b>水平</b>距离落在 [{@link #DIVE_MIN_RANGE}, {@link #DIVE_TRIGGER_RANGE}]。
+     * 只读探针：是否满足冲锋起手距离 —— 与目标的<b>水平</b>距离落在 [{@link #DIVE_MIN_RANGE}, {@link #DIVE_TRIGGER_RANGE}]。
      * <p>用水平距离而非 3D 距离：悬停高度不该影响"够不够近"（沿用被替换掉的旧起手判定的口径）。
      * 超过上界交给飞行巡航接近；小于下界交给普攻/格挡 —— 贴脸再俯冲既无位移意义，也会把贴身战搅成连招。
+     * <p>供 {@link AgaitolosSkillDirector} 打分与 {@link #startDiveSweep(LivingEntity)} 复校共用（同一口径，不复制第二份）。
      */
-    private boolean isWithinDiveTriggerRange(LivingEntity target) {
+    boolean isWithinDiveTriggerRange(LivingEntity target) {
         double deltaX = target.getX() - this.getX();
         double deltaZ = target.getZ() - this.getZ();
         double distanceSqr = deltaX * deltaX + deltaZ * deltaZ;
@@ -981,12 +1721,18 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      *   <li><b>阶段门</b>：两招都是规格里的二阶段招式（设计文档 §0 阶段二 / §5 的 P5），
      *       阶段一起手会破坏"二阶段才解锁"的契约；</li>
      *   <li><b>状态互斥</b>：死亡 / 复活演出 / 出场演出 / 架势 / 蓄力 / 冲锋任一成立都不起手 ——
-     *       与 {@code tickCharge}、{@code tickGuard}、{@code tickDiveSweep} 的起手闸同款判据，
-     *       共用同一批骨骼动画，同时成立会互相拉扯；</li>
+     *       与 {@link AgaitolosSkillDirector} 的全局动作锁同款判据（该锁已把这几项统一收口，
+     *       不再需要各招各写一份互斥列表，历史上"改一招忘一招"正是这么来的）；</li>
      *   <li><b>技能封印</b>（{@link #isScytheSealed()}）：封印<b>只封"大招"</b>（俯冲镰扫，
      *       以及后续接入的三重投掷 / 天魔灾 / 投技），<b>不封瞬击与高速踢击</b>，
      *       故本方法<b>不含</b>封印判定；作用范围与理由见 {@link #isScytheSealed()} 的 javadoc。</li>
      * </ul>
+     * <p>
+     * <b>与决策层的关系（本轮新增）</b>：起手的主闸已上移到 {@link AgaitolosSkillDirector}
+     * （它用全局动作锁保证"同一时刻只允许一招在演"，并把阶段门与封印口径一并纳入打分）。
+     * 本方法保留为<b>执行入口自己的复校</b>：{@code startBlink}/{@code startKick} 在被决策层调用时仍会走一遍，
+     * 这样"将来有人在别处直接调用这两个入口"也不会绕过互斥条件（防御性重复，不是两份口径——
+     * 判据本身只有这一处实现）。
      */
     private boolean canStartPhaseTwoSkill() {
         return this.isPhaseTwoOrLater() && !this.isDeadOrDying() && !this.isRespawning()
@@ -999,12 +1745,24 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     }
 
     /**
-     * 「瞬击」的状态推进（服务端权威，每 tick 一次），两段式与俯冲镰扫同构：
-     * <ol>
-     *   <li>冷却递减；</li>
-     *   <li>起手闸通过后，仅在<b>不处于飞行状态</b>（{@link #isGrounded()}）时尝试起手，
-     *       再交给 {@link AgaitolosBlinkSkill} 做距离判定、落点校验与瞬移。</li>
-     * </ol>
+     * 是否处于「免疫远程」的阶段（<b>阶段三专属</b>，规格："BOSS 免疫远程攻击"）。
+     * <p>
+     * 判据用 {@code combatOrdinal() >= PHASE_3}（与 {@link #isPhaseTwoOrLater()} 同一写法）：
+     * 复活阶段序数为 0，天然不在此列 —— 那一段的免伤由受击管线第 ② 步（复活无敌）负责，
+     * 两条口径不重叠。
+     * <p>
+     * <b>唯一消费点</b>是 {@link AgaitolosDamageRules#resolve} 的第 ⑥ 闸（弹射物伤害归零）。
+     * 本方法只回答"这个阶段要不要免疫"，"什么算弹射物"的口径在
+     * {@link AgaitolosDamageRules#isProjectileDamage} 一处，不在这里复制第二份。
+     */
+    public boolean isProjectileImmune() {
+        return getPhase().combatOrdinal() >= AgaitolosPhase.PHASE_3.combatOrdinal();
+    }
+
+    /**
+     * 执行入口：起手「瞬击」（由 {@link AgaitolosSkillDirector} 在"这一拍选中瞬击"时调用）；
+     * 两段式里的"冷却"由 {@link #tickActionCooldowns()} 统一递减，本方法只剩落点判定与瞬移。
+     * <p>
      * <b>"不飞行"为什么只能是禁飞窗口</b>：本 BOSS 常态低空悬停（{@code AgaitolosMoveControl} 恒定维持高度），
      * 唯一的落地状态就是被玩家格挡俯冲镰扫后授予的 30s 禁飞（{@link #onSweepBlocked()}）。
      * 于是瞬击天然是一招"<b>惩罚期的补偿手段</b>"：禁飞期间够不到目标，靠绕后瞬移把距离拉回近战范围
@@ -1018,70 +1776,131 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 冷却落点两分支：<b>成功进完整冷却</b>（{@link AgaitolosBlinkSkill#BLINK_COOLDOWN_TICKS}，
      * 按阶段折算）；<b>落点校验失败只给短重试窗口</b>（{@link AgaitolosBlinkSkill#BLINK_FAILED_RETRY_TICKS}）
      * —— 失败不传送、不改朝向、不扣完整冷却，只是别每 tick 重扫方块。
+     *
+     * @return 是否真的起手（阶段未开放/状态冲突/不在地面/落点校验失败时为 false）
      */
-    private void tickBlink() {
-        if (this.blinkCooldownTicks > 0) {
-            --this.blinkCooldownTicks;
-        }
-        if (!this.canStartPhaseTwoSkill()) {
-            return;
-        }
-        // 非飞行状态（= 禁飞窗口）是这一招的启用前提，规格原文即如此
-        if (!this.isGrounded()) {
-            return;
-        }
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive() || !AgaitolosBlinkSkill.canBlink(this, target)) {
-            return;
+    boolean startBlink(LivingEntity target) {
+        if (!this.canStartPhaseTwoSkill() || !this.isGrounded()
+                || target == null || !target.isAlive() || !AgaitolosBlinkSkill.canBlink(this, target)) {
+            return false;
         }
         if (AgaitolosBlinkSkill.perform(this, target)) {
             this.blinkCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosBlinkSkill.BLINK_COOLDOWN_TICKS);
-        } else {
-            this.blinkCooldownTicks = AgaitolosBlinkSkill.BLINK_FAILED_RETRY_TICKS;
+            return true;
         }
+        // 落点校验没过：只吃短重试窗口，且<b>不算起手</b>（决策层据此只给一个短重试节拍，不空等整拍）
+        this.blinkCooldownTicks = AgaitolosBlinkSkill.BLINK_FAILED_RETRY_TICKS;
+        return false;
     }
 
     /**
-     * 「高速踢击」的状态推进（服务端权威，每 tick 一次）：冷却递减 → 起手闸 → 目标与距离 → 交给技能结算。
+     * 执行入口：起手「高速踢击」（由 {@link AgaitolosSkillDirector} 在"这一拍选中踢击"时调用）。
      * <p>
      * <b>与瞬击恰相反，本招不限定飞行/地面</b>（规格："任何状态下可用"）：悬停、禁飞、任何高度都能起手；
      * 但仍受 {@link #canStartPhaseTwoSkill()} 的六项互斥约束（死亡/复活/架势/蓄力/冲锋/封印）
      * —— "任何状态"指的是空间状态，不是"可以一边蓄力一边踢"。
      * <p>
-     * 目标与距离一律复用既有口径：目标取 {@code getTarget()}（唯一由 {@code NearestAttackableTargetGoal<Player>}
-     * 选定），距离取 {@link #getMeleeAttackRangeSqr}（含悬停高度折算，与普攻/格挡同一把尺子）。
-     * 出手即进冷却（被盾牌挡下也算"这一脚踢出去了"，与俯冲镰扫同一取舍），避免格挡成功时每 tick 空踢。
+     * 目标与距离一律复用既有口径：距离取 {@link #getMeleeAttackRangeSqr}（含悬停高度折算，
+     * 与普攻/格挡同一把尺子）。出手即进冷却（被盾牌挡下也算"这一脚踢出去了"，与俯冲镰扫同一取舍），
+     * 避免格挡成功时每 tick 空踢。
+     *
+     * @return 是否真的起手（阶段未开放/状态冲突/距离不够时为 false）
      */
-    private void tickKick() {
-        if (this.kickCooldownTicks > 0) {
-            --this.kickCooldownTicks;
-        }
-        if (!this.canStartPhaseTwoSkill()) {
-            return;
-        }
-        LivingEntity target = this.getTarget();
-        if (target == null || !target.isAlive() || !AgaitolosKickSkill.isWithinKickRange(this, target)) {
-            return;
+    boolean startKick(LivingEntity target) {
+        if (!this.canStartPhaseTwoSkill() || target == null || !target.isAlive()
+                || !AgaitolosKickSkill.isWithinKickRange(this, target)) {
+            return false;
         }
         if (AgaitolosKickSkill.perform(this, target)) {
             this.kickCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosKickSkill.KICK_COOLDOWN_TICKS);
+            return true;
         }
+        return false;
+    }
+
+    // ---------------------------------------------------------------- 阶段三五招（2026-09-21 补）
+
+    /**
+     * 只读探针：阶段三五招是否有招在演（全局动作锁的一段）。
+     * <p>两个消费点：{@code AgaitolosSkillDirector#isBusy}（决定"这一拍还派不派新招"）与
+     * {@link #doHurtTarget}（拦住原版 {@code MeleeAttackGoal} 那条旁路）。
+     * <p>计时与节拍的持有者在 {@code AgaitolosPhaseThreeState}，本方法只是转发
+     * （与 {@code isGuarding()} ↔ {@code tickGuardState()} 同款分工）。
+     */
+    boolean isPhaseThreeBusy() {
+        return this.phaseThree.isBusy();
+    }
+
+    /**
+     * 执行入口：起手「三重投掷」（由 {@link AgaitolosSkillDirector} 在"这一拍选中三重投掷"时调用）。
+     * <p>本类只转发给状态机，起手复校（冷却 / 封印 / 状态互斥 / 阶段三 / 空中 / 射程）在
+     * {@code AgaitolosPhaseThreeState#startTripleThrow} 里，节拍与 clip 的对齐关系见
+     * {@code AgaitolosTripleThrowSkill}（三次出手落在 clip 的 6 / 12 / 18 tick）。
+     *
+     * @return 是否真的起手（未过复校时为 false，此时不消耗全局节拍）
+     */
+    boolean startTripleThrow(LivingEntity target) {
+        return this.phaseThree.startTripleThrow(this, target);
+    }
+
+    /**
+     * 执行入口：起手「饱和轰炸」（阶段三高空投弹，唯一一条循环 clip 驱动的持续状态）。
+     * <p>起手成功后同步位 {@code DATA_BOMBARDING} 立起（动画与高空档都靠它），期满或整段中止时撤销。
+     * <p>「被反弹则自伤」不需要本招额外接线：投出的仍是自家凋零头，玩家打回后 owner 变玩家，
+     * 命中 BOSS 时自然落进 {@code AgaitolosDamageRules} 的 ⑤ 自伤通道（详见 {@code AgaitolosBombardSkill}）。
+     */
+    boolean startBombard(LivingEntity target) {
+        return this.phaseThree.startBombard(this, target);
+    }
+
+    /**
+     * 执行入口：起手「投技①（踩住 + 镰扫）」（阶段三、BOSS 在地面档、目标贴地且贴身）。
+     * <p>抓取态的四条解除出口与"锁位移 + 跟随"的实现在状态机与 {@code AgaitolosGrabSkill} 里，
+     * 本类只转发（<b>抓取不往玩家侧写任何状态</b>，故不可能永久锁人）。
+     */
+    boolean startGrabSweep(LivingEntity target) {
+        return this.phaseThree.startGrabSweep(this, target);
+    }
+
+    /**
+     * 执行入口：起手「投技②（抓摔 + 劈击）」。
+     * <p>clip 播到 0.6s 时结算 20% 最大生命的真实伤害；本入口与状态机不碰任何客户端状态，
+     * 也不改变任何伤害/冷却口径。（2026-09-24：原「BOSS 特写」相机表现已彻底删除。）
+     */
+    boolean startGrabSmash(LivingEntity target) {
+        return this.phaseThree.startGrabSmash(this, target);
+    }
+
+    /**
+     * 执行入口：起手「天魔＊灾」（阶段三，24 格内隔空锁定）。
+     * <p>0.5s 处落地"不可名状 + 精神伤害改写"，改写口径（含"此后永久"与玩家侧落盘）唯一收在
+     * {@code AgaitolosPsychic}；本入口不重复任何一条那条口径。
+     */
+    boolean startCalamity(LivingEntity target) {
+        return this.phaseThree.startCalamity(this, target);
     }
 
     // ---------------------------------------------------------------- 受击 / 生命周期
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        // 受击报复排在一切结算之前：<b>"你打我了"这件事必须与"这一下打没打动"完全解耦</b>。
+        // 若放在下面几条 return 之后，那么"被格挡 / 复活无敌 / 0.2s 冷却内"的这一次受击就不会触发报复——
+        // 而玩家在无敌期狂点鼠标恰恰是最容易观察到"它不还手"的场景。
+        this.retaliate(source);
         // 格挡预判：与 resolve 的 ④ 闸走的是**同一**个 AgaitolosGuardSkill.isBlocking（§3.3「同一判定器」）。
         // 这里只负责"格挡成功 → 发动反击 + 收势"，伤害归零的口径仍由 resolve 决定（本分支直接短路，等价于归零）。
         // 必须在 resolve 之前判：counterAttack 会顺手收势，若先 resolve，判定会因架势已撤而落空。
         if (AgaitolosGuardSkill.isBlocking(this, source)) {
             AgaitolosGuardSkill.counterAttack(this, source);
+            // 纯表现：格挡成功的火花落在"伤害来源"那一侧（取 source 的位置，理由见 AgaitolosActionFx#guardSpark）。
+            // 放在 counterAttack 之后无副作用：它只收架势与推人，不动 source
+            AgaitolosActionFx.guardSpark(this, source);
             return false;
         }
         float resolved = AgaitolosDamageRules.resolve(this.level().getGameTime(), this.lastHurtGameTime,
-                this.getMaxHealth(), this.isRespawning(), isReflectedSkull(source), this.isGuarding(), this,
-                source, amount);
+                this.getMaxHealth(), this.isRespawning(), isReflectedSkull(source), this.isGuarding(),
+                this.isProjectileImmune(), this, source, amount);
         if (resolved <= 0.0F) {
             return false;
         }
@@ -1100,13 +1919,47 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
             }
             // 纯表现：伤害真正落地才播受击动作；不参与结算，也不改返回值
             AgaitolosAnimations.playHurt(this);
+            // 纯表现：受击反馈粒子与受击动作同刻（同一个 applied 闸内，没真吃到伤害就不冒）
+            AgaitolosActionFx.hurtFeedback(this);
         }
         return applied;
+    }
+
+    /**
+     * 受击报复：把伤害归属者（玩家）锁成当前目标。
+     * <p>
+     * <b>为什么必须显式做这一步</b>：本类此前<b>从不主动 setTarget</b>，唯一的目标来源是
+     * {@code NearestAttackableTargetGoal<Player>} 的主动索敌（mustSee=true ⇒ 索敌要求视线）。
+     * 于是"从背后打、隔着掩体打、刚进场时打"都可能落在"没有目标"的状态里：
+     * BOSS 既不追也不还手，玩家看到的就是"我打它，它不理我"。
+     * 配套的 {@code HurtByTargetGoal}（见 {@link #registerGoals()}）读的是 {@code getLastHurtByMob}，
+     * 而那条字段由 {@code LivingEntity#hurt} 写——只有伤害<b>真正落地</b>时才写；
+     * 复活无敌 / 0.2s 冷却 / 被格挡这几条早期 return 都会绕过它，故这里独立补一道。
+     * <p>
+     * <b>不覆盖已有目标</b>：正在打的人不该因为旁边有人蹭了一下就换目标
+     * （那属于 {@code HurtByTargetGoal} 的职责，它按"最后打我的人"排序，同样不会乱换）。
+     * 这里只补"当前没有有效目标"这一种情况。
+     */
+    private void retaliate(DamageSource source) {
+        if (!(source.getEntity() instanceof Player player) || !player.isAlive()) {
+            return;
+        }
+        LivingEntity current = this.getTarget();
+        if (current == null || !current.isAlive()) {
+            this.setTarget(player);
+        }
     }
 
     @Override
     public void die(DamageSource source) {
         super.die(source);
+        // 整队回收召唤物：BOSS 一死，分队就没有存在理由（它们是这一招的产物，不是野外怪）。
+        // 放 die() 而不是等 tickDeath 收尾：死亡演出还有 2.5s（DEATH_TICKS），
+        // 若等到那时才清，玩家会看到"BOSS 已经倒了，小怪还在打人"这半段错位。
+        AgaitolosMinionSkill.dismissAll(this);
+        // 下界牢狱开始还原（设计 §4.4 的"BOSS 死亡 ⇒ 场地还原"）：只置状态、不动方块，
+        // 逐格还原由 NetherPrisonArena 的分批节拍做，死亡演出（2.5s）与还原可以并行
+        NetherPrisonArena.end(this);
         // 纯表现：死亡瞬间的一次性青蓝爆发。只做表现、不干扰结算与回收。
         // die() 每次死亡只会进来一次：原版 LivingEntity#hurt 在 isDeadOrDying() 时直接 return false，
         // 且 LivingEntity#die 自身有 !this.dead 闸，故不会重复爆发。
@@ -1130,17 +1983,46 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     @Override
     protected void tickDeath() {
         ++this.deathTime;
+        // 纯表现：死亡演出期间逐帧外逸的灵魂（服务端限定在 AgaitolosActionFx 内兜底）。
+        // 挂在演出计时上而不是 die()：die() 只有一帧，而"灵魂外逸上升"是一段需要逐帧推进的过程
+        AgaitolosActionFx.deathSoulRise(this, this.deathTime);
         if (this.deathTime >= DEATH_TICKS && !this.level().isClientSide() && !this.isRemoved()) {
             this.level().broadcastEntityEvent(this, (byte) 60);
             this.remove(Entity.RemovalReason.KILLED);
         }
     }
 
+    /**
+     * 实体被"从世界移除"（死亡收尾 {@code KILLED} / {@code discard} / 换维度）时整队回收召唤物。
+     * <p>
+     * <b>为什么挂在 {@code remove} 而不是 {@code setRemoved}</b>（实测 1.20.1 字节码）：
+     * {@code Entity#setRemoved} 是 <b>final</b>（编译期就会报"无法覆盖 final 方法"），
+     * 而 {@code Entity#remove(reason)} 内部正是 {@code setRemoved(reason)} + {@code invalidateCaps()}、
+     * {@code LivingEntity#remove} 再补 {@code brain.clearMemories()} ⇒ 覆写 {@code remove} 就覆盖了
+     * 所有走 {@code remove}/{@code discard} 的路径。
+     * <p>
+     * <b>区块卸载这一支不在这里</b>：{@code PersistentEntitySectionManager#unloadEntity(EntityAccess)}
+     * 直接调 {@code setRemoved(UNLOADED_TO_CHUNK)}，<b>不经过 {@code remove}</b>，而 {@code setRemoved}
+     * 又是 final（无钩子可挂）。故那一种情形改由<b>召唤物自带的看门狗</b>兜底：
+     * {@code AgaitolosMinionWatchdogGoal} 每 tick 查一次"主人还在不在、还在不在蓄力"，主人被卸载即自我消散；
+     * 即便看门狗也随着召唤物的区块一起卸载（重载后变回原版凋零骷髅、丢掉这个 Goal），
+     * BOSS 自身的蓄力状态是落盘的，重载后蓄力照常推进并在 ≤12s 内走到收尾清场，不会留下永久孤儿。
+     * <p>{@code UNLOADED_WITH_PLAYER} 被排除：那一条发生在整维度回收（关服/删维度）的时刻，
+     * 世界正在拆，此刻遍历并 discard 其它实体没有收益、只有风险。
+     * <p><b>幂等</b>：没有存活召唤物时只是一次 64 格查询 + 一次裁判空队，可被多个出口重复调用。
+     */
     @Override
     public void remove(RemovalReason reason) {
         super.remove(reason);
         // 血条已整体移交客户端 overlay：实体离开客户端世界后 overlay 自然扫不到它，
         // 这里不再需要（也没有）任何服务端血条资源要回收。
+        if (!this.level().isClientSide() && reason != RemovalReason.UNLOADED_WITH_PLAYER) {
+            AgaitolosMinionSkill.dismissAll(this);
+            // /kill 直接走 remove(KILLED)（不经 die），换维度/普通 discard 也走这里 ⇒ 场地还原挂在此处才全覆盖。
+            // 幂等：die() 已经置过还原态时这次是空操作；区块卸载（UNLOADED_TO_CHUNK）不经 remove，
+            // 那一条由 NetherPrisonArena 的 ACTIVE 看门狗兜底（设计 §4.4 同样要求"区块卸载也要能还"）
+            NetherPrisonArena.end(this);
+        }
     }
 
     @Override
@@ -1179,8 +2061,23 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         // 架势期间不出手：一手格挡一手打人观感很怪，也会让"格挡 = 这一轮放弃进攻"的取舍失效。
         // 蓄力（恶怨倒转）同理：规格要求"手握紫色球往天上举"，这一轮整体让位给召唤与蓄力，
         // 出手既与 charge 姿势打架，也会让"蓄力是一个可被打断的窗口"这一代价语义失效。
-        // 出场演出同理：这 4s 是"降临"，一律不起手（与所有技能起手闸同一口径，见各 tick* 的闸门）。
-        if (this.isGuarding() || this.isCharging() || this.isIntroPlaying()) {
+        // 出场演出同理：这 4s 是"降临"，一律不起手（与所有技能起手闸同一口径，见各 tickXxx 的闸门）。
+        // 复活阶段同理（本轮补齐）：那是"回血 + 无敌"的恢复窗口，招式的起手已被决策层整体禁掉，
+        // 只剩原版 MeleeAttackGoal 会直接调本方法这条旁路——补上这一项，"复活期间不出手"才没有漏洞
+        //（与 isRespawning 期间所有 tickXxxState 都会中断同一口径）。
+        // 冲锋同理（本轮补）：俯冲镰扫的收尾处会结算一次横扫，冲锋途中再补一记普攻等于一招两段伤害，
+        // 也与决策层"同一时刻只允许一招在演"的契约冲突。
+        // 阶段三五招同理（2026-09-21 补）：它们各自是一段有节拍的持续状态（三连出手 / 投弹 / 踩住 / 施法），
+        // 期间补一记普攻既与动作 clip 抢骨骼，也等于"一边施法一边打人"。决策层已不会派普攻，
+        // 这里补的是原版 MeleeAttackGoal 那条旁路（它只认自己的可达判据）。
+        if (this.isGuarding() || this.isCharging() || this.isIntroPlaying() || this.isRespawning() || this.isDiving()
+                || this.phaseThree.isBusy()) {
+            return false;
+        }
+        // 普攻间隔（本轮新收口在此）：原版 {@code MeleeAttackGoal} 的 20 tick 间隔只作用于它自己那条路径，
+        // 而 {@link AgaitolosSkillDirector} 也会直接调本方法 ⇒ 两边必须共用<b>这一个</b>字段，
+        // 否则普攻频率会被叠成两倍（决策层每拍一次 + Goal 自己每 20 tick 一次）。
+        if (this.meleeCooldownTicks > 0) {
             return false;
         }
         // 普攻必须整套走 skill（物理 + 凋零 + 真实伤害），不能只留原版 Mob#doHurtTarget
@@ -1188,7 +2085,12 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
         if (hit) {
             // 纯表现：命中才播挥砍，不影响上面的结算结果
             AgaitolosAnimations.playAttack(this);
+            // 纯表现：斩击弧与挥砍动作同刻（同样只在 hit 分支内 —— 空挥没有刃痕）
+            AgaitolosActionFx.meleeSlash(this);
         }
+        // 无论命中与否都起算间隔：挥空也是"这一刀挥出去了"（与横扫"被格挡也算挥出去"同一取舍），
+        // 否则目标走位躲开会让 BOSS 每 tick 补刀。基准 20 tick（原版同值）再按阶段折算。
+        this.meleeCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosMeleeSkill.MELEE_INTERVAL_TICKS);
         return hit;
     }
 
@@ -1201,21 +2103,29 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     }
 
     /**
-     * 远程攻击（一阶段「召唤凋零头颅」）：由 {@link RangedAttackGoal} 按固定间隔调用。
+     * 远程攻击（一阶段「召唤凋零头颅」）：<b>由 {@link AgaitolosSkillDirector} 在"这一拍选中远程"时直接调用</b>。
+     * <p>原先它由原版 {@code RangedAttackGoal} 按固定间隔调用，但该 Goal 与 {@code MeleeAttackGoal}
+     * 抢同一组 Flag（MOVE + LOOK）、优先级又更低，实测<b>一次都放不出来</b>（详见 {@link #registerGoals()}）。
+     * 现在节奏由决策层给（见 {@link #rangedCooldownTicks}），本方法只负责"把这一发打出去"。
      * <p>实际生成逻辑收在 {@link AgaitolosSkullSkill}，本类只做接口接线。
      *
      * @param velocity 原版的距离系数（0~1）；本招按固定初速发射，故未使用
      */
     @Override
     public void performRangedAttack(LivingEntity target, float velocity) {
-        // 出场演出期间一律不起手（与 doHurtTarget 同一口径）：RangedAttackGoal 的间隔到点也会被这里挡下，
-        // 不发射弹体、不播施法动作，避免"一边降临一边吐凋零头"
-        if (this.isIntroPlaying()) {
+        // 出场演出期间一律不起手（与 doHurtTarget 同一口径）：即便被外部直接调用，也不发射弹体、不播施法动作，
+        // 避免"一边降临一边吐凋零头"
+        if (this.isIntroPlaying() || target == null || !target.isAlive()) {
             return;
         }
         AgaitolosSkullSkill.fire(this, target);
         // 纯表现：发射动作与弹体生成同刻触发
         AgaitolosAnimations.playCast(this);
+        // 纯表现：掌心聚集 + 离手弹道（一个入口含两段，理由见 AgaitolosActionFx#skullCast）。
+        // 放在 fire 之后：弹体已是既成事实，粒子只做注脚，不会出现"有特效没弹体"
+        AgaitolosActionFx.skullCast(this, target);
+        // 发射即起算冷却：基准 60 tick（原 RangedAttackGoal 的间隔）再按阶段折算
+        this.rangedCooldownTicks = AgaitolosPace.scaledCooldown(this, AgaitolosSkullSkill.SKULL_COOLDOWN_TICKS);
     }
 
     /**
@@ -1236,8 +2146,8 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
      * 飞行寻路：替换 {@link Monster} 默认的 {@code GroundPathNavigation}。
      * <p>配置照抄原版凋灵（同为 Monster 系飞行怪）：不开门、可浮水；不再调 {@code setCanPassDoors(true)}，
      * 因为 {@code FlyingPathNavigation#createPathFinder} 已默认开启。
-     * <p>{@code MeleeAttackGoal} / {@code RangedAttackGoal} 走的是 {@code createPath(Entity)} / {@code moveTo(Entity)}，
-     * 在飞行导航下照常成立（{@code canUpdatePath()} 恒真），故两条 Goal 无需改动。
+     * {@code AgaitolosMeleeAttackGoal} / 决策层的脱困重寻路走的是 {@code createPath(Entity)} / {@code moveTo(Entity)}，
+     * 在飞行导航下照常成立（{@code canUpdatePath()} 恒真），故近战 Goal 无需改动导航。
      */
     @Override
     protected PathNavigation createNavigation(Level level) {
@@ -1304,12 +2214,33 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
     /**
      * 近战可达距离：把常态悬停高度折算进来。
      * <p>
-     * 原版 {@code MeleeAttackGoal} 的判据是「脚对脚 3D 距离 ≤ {@code getMeleeAttackRangeSqr}」，
-     * 而本 BOSS 悬停在玩家上方 {@link AgaitolosMoveControl#HOVER_HEIGHT} 格 —— 光是这段竖直差
-     * 就已经顶破门槛（0.9 宽时门槛 ≈ 1.96 格，竖直差 2.0 即超出），
-     * 结果就是<b>普攻永远触发不了、只剩远程输出</b>。
-     * 这里把悬停高度加进可达距离，使「悬停在低空仍能下劈命中地面玩家」成立；
-     * 用 {@link AgaitolosMoveControl#HOVER_HEIGHT} 而不是写死数字，将来调悬停高度时二者不会失配。
+     * <b>⚠ 原注释里的一个错误假设（已按字节码实测修正，也是"打它不还手"的根因）</b>：
+     * 这里曾写着"原版 {@code MeleeAttackGoal} 的判据是 3D 距离 ≤ {@code getMeleeAttackRangeSqr}"——
+     * <b>不成立</b>。实测 Forge 1.20.1-47.3.0 的 {@code MeleeAttackGoal#getAttackReachSqr} 是：
+     * <pre>
+     *   return this.mob.getBbWidth() * 2.0F * this.mob.getBbWidth() * 2.0F + target.getBbWidth();
+     * </pre>
+     * 它<b>根本不读本方法</b>。于是本方法当时的"修复"完全落空：0.9 宽时原版门槛 = 1.8² + 0.6 = 3.84（≈1.96 格），
+     * 而本 BOSS 悬停在玩家脚上 {@link AgaitolosMoveControl#HOVER_HEIGHT}=2.0 格，光竖直差就是 2.0² = 4.0 &gt; 3.84
+     * ⇒ <b>普攻永远触发不了</b>（远程又被同 Flag 的 Goal 饿死，故表现是"完全不还手"）。
+     * <p>
+     * 真正的落地方式是让近战 Goal 走本方法：见 {@link AgaitolosMeleeAttackGoal}（只改那一处判据）。
+     * 本方法因此有三个消费方，口径必须只有这一份：近战 Goal 的出手判定、
+     * 决策层 {@link AgaitolosSkillDirector} 的普攻打分、以及 {@link AgaitolosKickSkill} 的踢击可达。
+     * <p>
+     * <b>折算基准取「最大空中档高度」而不是"当前阶段的高度"（2026-09-21 阶段三降高时复核）</b>：
+     * 本式用的是 {@link AgaitolosMoveControl#HOVER_HEIGHT}（= 一/二阶段的常态高度 2.0），
+     * 而阶段三的实际空中档是 {@link AgaitolosMoveControl#PHASE_3_HOVER_HEIGHT}（1.0）、
+     * 地面档更是 0.0 ⇒ 这把尺子在任何阶段都<b>不小于</b>该阶段的实际所需，属保守侧：
+     * <ul>
+     *   <li>阶段三：实际竖直差只有 1.0，而折算项按 2.0 给 ⇒ 多让约 1 格水平余量 ——
+     *       不会出现"降了高度反而打不着"，最多是"够得着一点点就挥刀"；</li>
+     *   <li>地面档：竖直差 0 ⇒ 同理偏宽松。这正是 {@link #isPerched()} 注释里写明的既有取舍
+     *       （宁可多够 2 格，也不要出现"落地后反倒打不着"）。</li>
+     * </ul>
+     * 若实机觉得阶段三"够得太远"，改法是把本式换成按当前档位折算（读
+     * {@code AgaitolosMoveControl#airborneHeight(getPhase())} / {@link #isPerched()})，
+     * <b>而不是</b>去动 {@code HOVER_HEIGHT} —— 后者会连带改掉一、二阶段的悬停手感。
      */
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity target) {
@@ -1319,13 +2250,25 @@ public class AgaitolosEntity extends Monster implements GeoEntity, RangedAttackM
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, true));
-        // 远程凋零头：60 tick = 3s 一发、24 格内可放（待调手感值 / P8 转配置项）。
-        // 与优先级 2 的近战不冲突：目标脱离近战距离时 MeleeAttackGoal 不再可用，本条接管。
-        this.goalSelector.addGoal(3, new RangedAttackGoal(this, 1.0D, 60, 24.0F));
+        // 近战 + 追击。必须用本项目的子类：原版 MeleeAttackGoal 按自己算的 getBbWidth()² 判可达距离，
+        // 不读 getMeleeAttackRangeSqr，而本 BOSS 悬停在玩家上方 2.0 格 ⇒ 竖直差一项就顶破门槛、
+        // 贴到脸上也挥不出一刀（"玩家打它却不还手"的直接原因，证据与推导见 AgaitolosMeleeAttackGoal 注释）。
+        this.goalSelector.addGoal(2, new AgaitolosMeleeAttackGoal(this, 1.0D, true));
+        // 远程凋零头（60 tick = 3s 一发、24 格内可放）<b>不再用原版 RangedAttackGoal</b>：
+        // 它与 MeleeAttackGoal 抢同一组 Flag（实测两者都 setFlags(MOVE, LOOK)），而 MeleeAttackGoal 优先级 2 更高、
+        // 且它的 canUse 只要求"有存活目标"⇒ 永远成立 ⇒ 优先级 3 的远程 Goal 被<b>永久饿死、一次都放不出来</b>
+        //（原注释写的"目标脱离近战距离时本条接管"不成立：MeleeAttackGoal 不会因为距离远就停）。
+        // 现在远程与普攻一起由 AgaitolosSkillDirector 决定"这一拍放哪个"，节奏常量已搬进 AgaitolosSkullSkill。
         // 观察距离 32 格；不加这条 BOSS 不会转头看人，观感很呆
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 32.0F));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        // 受击报复：优先级 0（高于主动索敌）。未被打时它的 canUse 恒假，不影响正常索敌。
+        this.targetSelector.addGoal(0, new HurtByTargetGoal(this));
+        // 主动索敌：mustSee=true ⇒ <b>索敌</b>要求视线（逃不掉，TargetingConditions 的 checkLineOfSight 默认为真），
+        // 但它同时决定"锁定后能容忍多久看不见"——TargetGoal 的 unseenTicks/unseenMemoryTicks 机制。
+        // 显式调长该记忆时长，让玩家绕柱子、跳下平台时 BOSS 不会立刻放弃追击。
+        NearestAttackableTargetGoal<Player> nearestPlayer = new NearestAttackableTargetGoal<>(this, Player.class, true);
+        nearestPlayer.setUnseenMemoryTicks(TARGET_UNSEEN_MEMORY_TICKS);
+        this.targetSelector.addGoal(1, nearestPlayer);
     }
 
     @Override

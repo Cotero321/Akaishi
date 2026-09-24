@@ -288,6 +288,28 @@ public final class ModConfig {
     /** 躯体超载 debuff（全身总排斥预算惩罚） */
     public static volatile boolean overloadEnabled = true;
 
+    // ==================== 理智系统 ====================
+    /**
+     * 理智系统总开关：false = 整套不结算（环境规则与暗处状态机不推进、食补窗口不分摊）、客户端 HUD 不绘制。
+     * <p>调试指令仍可查询（确认"确实没在扣"），但 set/env/food 会被拒绝——见 {@code AkaishiSanityCommand}。
+     * <p>该值随 {@code ConfigSyncS2C} 下发，避免专用服务器上"服务端关了、客户端还在画 HUD"的显示分歧。
+     */
+    public static volatile boolean sanityEnabled = true;
+    /** 暗处机制：重见光明后的冷却（tick）；0 = 用内置默认 18000（15 分钟） */
+    public static volatile int sanityDarkLightCooldownTicks = 18_000;
+    /** 食补：连续食用衰减的重置时间（tick）；0 = 用内置默认 18000（15 分钟） */
+    public static volatile int sanityFoodRefreshTicks = 18_000;
+    /** 下界顶部基岩层判据：脚部 Y ≥ 该值视为身处下界顶部；0 = 用内置默认 128 */
+    public static volatile int sanityNetherRoofY = 128;
+    /** 自然恢复基础周期（tick）；0 = 用内置默认 6000（5 分钟 +1 SAN） */
+    public static volatile int sanityNaturalRegenPeriodTicks = 6_000;
+    /** 自然恢复的花丛加成所需花朵数量阈值；0 = 用内置默认 10 */
+    public static volatile int sanityFlowerCountThreshold = 10;
+    /** 睡眠剥夺：连续多少个游戏日不睡开始每日扣减；0 = 用内置默认 5 */
+    public static volatile int sanitySleepDeprivationDays = 5;
+    /** 睡眠剥夺：每个游戏日扣减的 SAN；0 = 用内置默认 10 */
+    public static volatile double sanitySleepDeprivationDailyDebit = 10.0;
+
     // ==================== 赤石饰品扩展槽 ====================
     /** 扩展槽是否需要赤石进度解锁（false = 四槽始终开启） */
     public static volatile boolean curioSlotUnlockRequired = true;

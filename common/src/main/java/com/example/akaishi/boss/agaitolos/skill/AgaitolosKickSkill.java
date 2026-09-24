@@ -1,7 +1,9 @@
 package com.example.akaishi.boss.agaitolos.skill;
 
 import com.example.akaishi.boss.agaitolos.AgaitolosCombat;
+import com.example.akaishi.boss.agaitolos.AgaitolosDoom;
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
+import com.example.akaishi.boss.agaitolos.AgaitolosPsychic;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -73,7 +75,7 @@ public final class AgaitolosKickSkill {
      * 目标是否在踢击可达范围内。
      * <p>刻意复用实体自己那把尺子 {@link AgaitolosEntity#getMeleeAttackRangeSqr}：
      * 它已经把常态悬停高度折算进可达距离，于是"踢得着"与"普攻打得着"用的是同一把尺子
-     * （与 {@code AgaitolosEntity#shouldEnterGuard} 复用同一判据同理），不另写一套距离口径。
+     * （与 {@code AgaitolosEntity#isTargetWithinGuardRange} 复用同一判据同理），不另写一套距离口径。
      */
     public static boolean isWithinKickRange(AgaitolosEntity boss, LivingEntity target) {
         double deltaX = target.getX() - boss.getX();
@@ -83,7 +85,7 @@ public final class AgaitolosKickSkill {
     }
 
     /**
-     * 执行一次高速踢击（仅服务端；由 {@code AgaitolosEntity#tickKick} 在起手闸通过后调用）。
+     * 执行一次高速踢击（仅服务端；由 {@code AgaitolosEntity#startKick} 在决策层选中且复校通过后调用）。
      *
      * @return 是否<b>已经出招</b>（含被盾牌挡下）—— 调用方据此进冷却。
      *         被挡下也算"这一脚踢出去了"，否则格挡成功会让 BOSS 每 tick 空踢（与俯冲镰扫同一取舍）。
@@ -106,10 +108,12 @@ public final class AgaitolosKickSkill {
             // 不调用 onSweepBlocked（禁飞/封印是俯冲镰扫专属惩罚，规格没有把它挂到踢击上）。
             return true;
         }
-        target.hurt(source, damage);
-        // e. 凋零 III + 缓慢：等级复用普攻的 WITHER_AMPLIFIER（统一口径），施加者记为本 BOSS 保证击杀归属
-        target.addEffect(new MobEffectInstance(MobEffects.WITHER, WITHER_DURATION_TICKS,
-                AgaitolosMeleeSkill.WITHER_AMPLIFIER), boss);
+        // 阶段三「天魔＊灾」之后：受击方已被改写时本脚整体换成精神伤害（口径唯一收在 AgaitolosPsychic）。
+        // 判定用的探针源不换：格挡口径与伤害类型是两件事，换壳只影响落地时的伤害类型
+        target.hurt(AgaitolosPsychic.forVictim(source, target, boss.level().getGameTime()), damage);
+        // e. 凋零 III + 缓慢：等级复用普攻的 WITHER_AMPLIFIER（统一口径），施加者记为本 BOSS 保证击杀归属。
+        //    阶段三由 AgaitolosDoom 分流成"凋亡 III"（等级/时长口径不变，只换效果定义）
+        AgaitolosDoom.applyWitherOrDoom(boss, target, WITHER_DURATION_TICKS, AgaitolosMeleeSkill.WITHER_AMPLIFIER);
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION_TICKS,
                 SLOWNESS_AMPLIFIER), boss);
         return true;

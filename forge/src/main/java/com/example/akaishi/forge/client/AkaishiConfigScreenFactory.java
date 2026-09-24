@@ -137,6 +137,18 @@ public final class AkaishiConfigScreenFactory {
         booleanToggle(toggles, eb, "toggles.overloadToggle", AkaishiConfig.OVERLOAD_ENABLED);
         // 场域屏障可见性：默认所有人可见（环境提示），可改为仅归属者与同队可见
         booleanToggle(toggles, eb, "toggles.wirelessFieldOwnerOnly", AkaishiConfig.WIRELESS_FIELD_OWNER_ONLY);
+        // 理智系统总开关：关掉即整套停摆（规则/食补/HUD），调试指令只保留查询
+        booleanToggle(toggles, eb, "toggles.sanityEnabled", AkaishiConfig.SANITY_ENABLED);
+
+        // ===== 理智系统（三项手感时长；数值本身冻结，仅暴露"最影响体感"的三项）=====
+        ConfigCategory sanity = category(builder, "sanity");
+        intField(sanity, eb, "sanity.darkLightCooldownTicks", AkaishiConfig.SANITY_DARK_LIGHT_COOLDOWN_TICKS);
+        intField(sanity, eb, "sanity.foodRefreshTicks", AkaishiConfig.SANITY_FOOD_REFRESH_TICKS);
+        intField(sanity, eb, "sanity.netherRoofY", AkaishiConfig.SANITY_NETHER_ROOF_Y);
+        intField(sanity, eb, "sanity.naturalRegenPeriodTicks", AkaishiConfig.SANITY_NATURAL_REGEN_PERIOD_TICKS);
+        intField(sanity, eb, "sanity.flowerCountThreshold", AkaishiConfig.SANITY_FLOWER_COUNT_THRESHOLD);
+        intField(sanity, eb, "sanity.sleepDeprivationDays", AkaishiConfig.SANITY_SLEEP_DEPRIVATION_DAYS);
+        doubleField(sanity, eb, "sanity.sleepDeprivationDailyDebit", AkaishiConfig.SANITY_SLEEP_DEPRIVATION_DAILY_DEBIT);
 
         // ===== 赤石饰品扩展槽 =====
         ConfigCategory curioSlots = category(builder, "curio_slots");

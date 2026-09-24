@@ -245,6 +245,24 @@ public final class AkaishiConfig {
     public static final ForgeConfigSpec.BooleanValue SUNLIGHT_BURN_ENABLED;
     public static final ForgeConfigSpec.BooleanValue OVERLOAD_ENABLED;
 
+    // ==================== 理智系统 ====================
+    /** 理智系统总开关（false = 环境规则/暗处状态机/食补窗口全不推进、HUD 不绘制；调试指令只可查询） */
+    public static final ForgeConfigSpec.BooleanValue SANITY_ENABLED;
+    /** 暗处机制：重见光明后的冷却（tick，0 = 用内置默认 18000） */
+    public static final ForgeConfigSpec.IntValue SANITY_DARK_LIGHT_COOLDOWN_TICKS;
+    /** 食补：连续食用衰减的重置时间（tick，0 = 用内置默认 18000） */
+    public static final ForgeConfigSpec.IntValue SANITY_FOOD_REFRESH_TICKS;
+    /** 下界顶部基岩层判据 Y（0 = 用内置默认 128） */
+    public static final ForgeConfigSpec.IntValue SANITY_NETHER_ROOF_Y;
+    /** 自然恢复基础周期（tick，0 = 用内置默认 6000 = 5 分钟） */
+    public static final ForgeConfigSpec.IntValue SANITY_NATURAL_REGEN_PERIOD_TICKS;
+    /** 自然恢复的花丛加成所需花朵数量阈值（0 = 用内置默认 10） */
+    public static final ForgeConfigSpec.IntValue SANITY_FLOWER_COUNT_THRESHOLD;
+    /** 睡眠剥夺：连续多少个游戏日不睡开始惩罚（0 = 用内置默认 5） */
+    public static final ForgeConfigSpec.IntValue SANITY_SLEEP_DEPRIVATION_DAYS;
+    /** 睡眠剥夺：每个游戏日扣减的 SAN（0 = 用内置默认 10） */
+    public static final ForgeConfigSpec.DoubleValue SANITY_SLEEP_DEPRIVATION_DAILY_DEBIT;
+
     // ---- 赤石饰品扩展槽 ----
     public static final ForgeConfigSpec.BooleanValue CURIO_SLOT_UNLOCK_REQUIRED;
     public static final ForgeConfigSpec.ConfigValue<List<? extends Integer>> CURIO_SLOT_UNLOCK_THRESHOLDS;
@@ -866,6 +884,46 @@ public final class AkaishiConfig {
                 .define("sunlightBurn", true);
         OVERLOAD_ENABLED = b.comment("躯体超载减益（按总排斥结算）是否生效")
                 .define("overload", true);
+        SANITY_ENABLED = b.comment("理智系统总开关：",
+                        "false = 环境规则与暗处状态机不推进、食补窗口不分摊、客户端 HUD 不绘制（整套停摆）",
+                        "调试指令 /akaishi sanity get 仍可查询，但 set / env / food 会被拒绝",
+                        "该值随配置同步包下发，专用服务器上客户端不会出现「服务端关了、HUD 还在画」的分歧")
+                .define("sanityEnabled", true);
+        b.pop();
+
+        // ==================== 理智系统 ====================
+        // 总开关与其它机制开关同放 toggles（便于一键全关）；三项手感时长单列一节
+        b.push("sanity");
+        SANITY_DARK_LIGHT_COOLDOWN_TICKS = b.comment("暗处机制：玩家「重见光明」（直见天空且白天）后的冷却 (tick)；",
+                        "冷却期内 dark_high / dark_low 两条规则都不扣，冷却结束且仍在暗处则重新开始一次暴露周期；",
+                        "0 = 用内置默认 18000（15 分钟）")
+                .defineInRange("darkLightCooldownTicks", 18_000, 0, Integer.MAX_VALUE);
+        SANITY_FOOD_REFRESH_TICKS = b.comment("食补：连续食用衰减的重置时间 (tick)；",
+                        "超过该时长再吃同一物品，效力回到第 1 档（100%）；",
+                        "0 = 用内置默认 18000（15 分钟）")
+                .defineInRange("foodRefreshTicks", 18_000, 0, Integer.MAX_VALUE);
+        SANITY_NETHER_ROOF_Y = b.comment("下界顶部基岩层判据：脚部 Y ≥ 该值视为身处下界顶部（每 60s 扣 5 理智）；",
+                        "1.20.1 下界基岩顶面为 y=127，站上顶部即 y≥128，故默认 128；",
+                        "0 = 用内置默认 128")
+                .defineInRange("netherRoofY", 128, 0, 320);
+        SANITY_NATURAL_REGEN_PERIOD_TICKS = b.comment("自然恢复：每多少 tick 回 1 点理智（基础周期）；",
+                        "生效条件 = 有顶（不可见天）+ 在地面 + 脚部方块光 > 10；",
+                        "效率加成（乘在速度上，用进度累积器落地，不会被取整抹平）：",
+                        "  周围花朵数 > 阈值 +10%（不叠加）、饱食度满 +10%、再乘 COG 的自然恢复倍率（×1/×1.5/×2）；",
+                        "0 = 用内置默认 6000（5 分钟）")
+                .defineInRange("naturalRegenPeriodTicks", 6_000, 0, Integer.MAX_VALUE);
+        SANITY_FLOWER_COUNT_THRESHOLD = b.comment("自然恢复：花丛加成所需的花朵数量阈值（脚部为中心 9×3×9 盒内、按方块标签 #minecraft:flowers 计数，5s 扫描一次）；",
+                        "超过该值即 +10%，不随朵数叠加；设得极大可视为关闭花丛加成；",
+                        "0 = 用内置默认 10")
+                .defineInRange("flowerCountThreshold", 10, 0, 1000);
+        SANITY_SLEEP_DEPRIVATION_DAYS = b.comment("睡眠剥夺：连续多少个游戏日不睡开始每日扣减（游戏日 = 主世界 dayTime / 24000）；",
+                        "睡过整夜（自然起床）会重置该计时；离线跨越的日界不追罚；",
+                        "0 = 用内置默认 5")
+                .defineInRange("sleepDeprivationDays", 5, 0, 1000);
+        SANITY_SLEEP_DEPRIVATION_DAILY_DEBIT = b.comment("睡眠剥夺：每个游戏日扣减的理智（原始量，临时保护可优先抵扣）；",
+                        "该状态下幻翼对玩家的咬击会额外附带一段 akaishi:psychic 精神伤害；",
+                        "0 = 用内置默认 10")
+                .defineInRange("sleepDeprivationDailyDebit", 10.0, 0.0, 1000.0);
         b.pop();
 
         // ==================== 赤石饰品扩展槽 ====================
