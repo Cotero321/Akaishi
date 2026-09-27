@@ -1,11 +1,9 @@
 package com.example.akaishi.life.altar;
 
-import com.example.akaishi.api.sanity.SanityServices;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
-import com.example.akaishi.sanity.content.SanityBuiltinFirstEncounters;
 import com.example.akaishi.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -216,8 +214,8 @@ public final class AkaishiAltarRitual {
                         Component.translatable(ritualKey)));
             }
             // 首见：初次完成母神祭坛仪式（行为类，环境轮询表达不了"完成了一次仪式"；
-            // 是否首次由核心按玩家存档判定，本处只负责"发生了什么"）
-            SanityServices.get().reportFirstEncounter(player, SanityBuiltinFirstEncounters.MOTHER_ALTAR);
+            // 是否首次由监听方按玩家存档判定，本处只负责广播"发生了什么"）
+            AltarRitualHooks.ritualCompleted(player);
         }
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                 hostPos.getX() + 0.5D, hostPos.getY() + 1.5D, hostPos.getZ() + 0.5D,

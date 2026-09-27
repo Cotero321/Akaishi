@@ -55,7 +55,8 @@ public final class SanityServiceImpl implements ISanityService {
             return null;
         }
         IPlayerBodyState body = PlayerBodyHelper.of(player);
-        return body == null ? null : body.getSanity();
+        // 躯体状态段接口在核心层，具体实现由本模块注入（未安装本模块时不会是 SanityState ⇒ 返回 null）
+        return body != null && body.getSanity() instanceof SanityState sanity ? sanity : null;
     }
 
     /** 服务端权威状态：客户端或无 capability 一律返回 null（写路径据此前置返回） */

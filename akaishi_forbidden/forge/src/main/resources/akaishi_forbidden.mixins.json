@@ -3,11 +3,12 @@
   "minVersion": "0.8",
   "package": "com.example.akaishi.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
-  "client": [
-    "MechanicalItemRendererMixin"
+  "mixins": [
+    "PlayerFoodExhaustionMixin"
   ],
-  "server": [],
+  "client": [
+    "PostPassMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

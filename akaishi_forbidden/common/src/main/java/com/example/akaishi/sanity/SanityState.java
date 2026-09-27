@@ -1,5 +1,6 @@
 package com.example.akaishi.sanity;
 
+import com.example.akaishi.api.life.IBodySubState;
 import com.example.akaishi.api.sanity.SanityValues;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -36,7 +37,7 @@ import java.util.Set;
  * 四个子表都按字符串原样存 id，空段整体不落盘；节点被移除或改名后存档不清档。
  * 同步脏标记属于运行期簿记，<b>不落盘</b>。
  */
-public final class SanityState {
+public final class SanityState implements IBodySubState {
 
     // ===== 默认值与口径常量（均为待调手感值）=====
 

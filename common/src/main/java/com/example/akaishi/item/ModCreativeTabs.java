@@ -293,10 +293,6 @@ public final class ModCreativeTabs {
         accept(output, ModItems.rejectionSerum);
         // 金西瓜（理智食补食物：30s 共回 10 SAN + 5s 生命回复 I，首用上限 +5）
         accept(output, ModItems.goldenMelonSlice);
-        // 理智系统·物品与酿造（P5）：两瓶药剂 + 花环饰品（均暂无配方，仅创造栏可得）
-        accept(output, ModItems.sanityTonic);
-        accept(output, ModItems.greaterSanityTonic);
-        accept(output, ModItems.sanityGarland);
         // 仓储
         accept(output, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT);
         accept(output, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT);

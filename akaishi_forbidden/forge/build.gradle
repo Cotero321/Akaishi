@@ -7,9 +7,28 @@ architectury {
     forge()
 }
 
-// 启用 Loom 的 Forge 平台支持，创建 forge 依赖配置（空块即可，本模块无 mixin）
+// 启用 Loom 的 Forge 平台支持，并声明本模块自己的 mixin 配置
+// （P3b：理智相关的 PlayerFoodExhaustionMixin / PostPassMixin 随理智系统迁入本模块）
 loom {
     forge {
+        mixinConfig "akaishi_forbidden.mixins.json"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.minecraftforge.net/"
+        name "Forge"
+    }
+    maven {
+        url "https://maven.architectury.dev/"
+        name "Architectury"
+    }
+    // GeckoLib（影怪几何动画渲染器需要，与本体一致）
+    maven {
+        url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+        name "GeckoLib"
     }
 }
 
@@ -96,6 +115,14 @@ dependencies {
     crossMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
     crossMod(project(path: ":forge", configuration: "namedElements")) { transitive false }
     crossMod(project(path: ":common", configuration: "namedElements")) { transitive false }
+
+    // GeckoLib：影怪渲染器（GeoEntityRenderer / GeoModel / GeoRenderLayer）编译期与 dev 运行都需要。
+    // 不 include：本体 tech 已声明为硬依赖，运行时由玩家安装的 geckolib 提供，避免重复打包。
+    modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
+
+    // Architectury API：平台侧读 common 侧注册表字段（RegistrySupplier）需要编译期类型。
+    // 只 compileOnly、不 include：运行时的 architectury 由本体 jar-in-jar 唯一提供（见 forbiddencommon/build.gradle）。
+    modCompileOnly("dev.architectury:architectury-forge:9.2.14")
 
     // 注：architectury / cloth-config 等由本体 akaishi 提供，不在此重复 include。
 }

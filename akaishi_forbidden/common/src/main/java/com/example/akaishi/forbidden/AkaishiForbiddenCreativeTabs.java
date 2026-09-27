@@ -2,6 +2,7 @@ package com.example.akaishi.forbidden;
 
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.item.AkaishiCodexItems;
+import com.example.akaishi.item.AkaishiSanityItems;
 import com.example.akaishi.item.ModItems;
 
 import dev.architectury.registry.registries.RegistrarManager;
@@ -52,6 +53,11 @@ public final class AkaishiForbiddenCreativeTabs {
         accept(output, ModItems.fertilityRing);
         // 禁忌秘典：自研知识/研究系统的入口（无配方，仅创造栏可得）
         accept(output, AkaishiCodexItems.forbiddenCodex);
+        // 理智系统·物品与酿造（P3b 自生命科技栏改列本禁忌栏）：两瓶药剂 + 花环饰品
+        // （均暂无配方，仅创造栏可得；花环为饰品，药剂走酿造台）
+        accept(output, AkaishiSanityItems.sanityTonic);
+        accept(output, AkaishiSanityItems.greaterSanityTonic);
+        accept(output, AkaishiSanityItems.sanityGarland);
     }
 
     /** 判空后把注册内容（物品/方块，均实现 ItemLike）放入创造标签（注册完成前为 null，防御性跳过） */

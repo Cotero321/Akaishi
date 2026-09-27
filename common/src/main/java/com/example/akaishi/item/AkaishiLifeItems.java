@@ -97,7 +97,7 @@ public final class AkaishiLifeItems {
                 () -> new AkaishiRejectionSerumItem(new Item.Properties().stacksTo(16)));
         // 金西瓜：理智体系的食补食物（本模组首个自有食物物品）
         //   食用属性对标金苹果档位：饱食度 6 / 饱和度 1.2；alwaysEat 保证饱食度满时仍可食用（否则拿不到理智收益）。
-        //   理智侧效果（30s 内共回 10 SAN、附加 5s 生命回复 I、首用上限 +5）全在 sanity.content 的档位表里，物品本身零逻辑。
+        //   理智侧效果（30s 内共回 10 SAN、附加 5s 生命回复 I、首用上限 +5）全在禁忌模块的理智档位表里，物品本身零逻辑。
         //   贴图暂复用原版 minecraft:item/glistering_melon_slice（待美术侧出图后替换，见模型 json）。
         goldenMelonSlice = item(ModItems.GOLDEN_MELON_SLICE_ID, () -> new Item(new Item.Properties()
                 .food(new FoodProperties.Builder().nutrition(6).saturationMod(1.2f).alwaysEat().build())));

@@ -1,9 +1,10 @@
 package com.example.akaishi.life.body;
 
+import com.example.akaishi.api.life.BodySubStateFactory;
+import com.example.akaishi.api.life.IBodySubState;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.life.mechanical.MechanicalIntegration;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
-import com.example.akaishi.sanity.SanityState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -23,7 +24,8 @@ import java.util.Map;
  * - 移植：槽位必须为空，成功即占用，并按器官品质写入初始排斥值。
  * - 摘除：立即对玩家造成无视护甲的固定伤害（创造模式豁免），排斥值随之清零。
  * - 排斥值：0-100 钳制，由基因系统在移植/装配时累加；达到 100 该器官失效。
- * - 另承载理智状态（SanityState）与精神污染窗口：二者都需要"跨存档 + 跨死亡 + 跨维度"，
+ * - 另承载子系统状态段（{@link IBodySubState}，如禁忌模块的理智状态）与精神污染窗口：
+ *   二者都需要"跨存档 + 跨死亡 + 跨维度"，
  *   借本 capability 复用已跑通的落盘/快照/克隆链路，避免另立玩家持久化载体。
  */
 public class PlayerBodyState implements IPlayerBodyState {
@@ -52,8 +54,8 @@ public class PlayerBodyState implements IPlayerBodyState {
     private static final String TAG_BT_UNTIL = "bt_until";
     private static final String TAG_MECHANICAL_INTEGRATION = "mechanical_integration";
     private static final String TAG_PSYCHIC_UNTIL = "psychic_until";
-    /** 理智状态嵌套段（键与键内字段见 SanityState.TAG_ROOT） */
-    private static final String TAG_SANITY = SanityState.TAG_ROOT;
+    /** 子系统状态段嵌套段（如理智用的段名 "sanity"；实现由内容模块经工厂注入） */
+    private static final String TAG_SANITY = "sanity";
 
     /** 槽位 → 器官物品 */
     private final Map<BodySlot, ItemStack> organs = new EnumMap<>(BodySlot.class);
@@ -70,8 +72,8 @@ public class PlayerBodyState implements IPlayerBodyState {
     private MechanicalIntegration mechanicalIntegration = new MechanicalIntegration();
     /** 精神污染窗口截止刻（0 = 无；Long.MAX_VALUE = 永久；语义见 IPlayerBodyState#getPsychicUntil） */
     private long psychicUntil;
-    /** 理智状态（五层数值 + 首见标记 + 各机制运行状态）：借住本 capability 以获得同一条持久化链路 */
-    private final SanityState sanity = new SanityState();
+    /** 子系统状态段（如理智：五层数值 + 首见标记 + 各机制运行状态）：借住本 capability 以获得同一条持久化链路 */
+    private final IBodySubState sanity = BodySubStateFactory.create();
     /** 是否已完成原生器官填充（旧存档无此标记时自动补位） */
     private boolean initialized;
 
@@ -282,10 +284,10 @@ public class PlayerBodyState implements IPlayerBodyState {
         this.psychicUntil = Math.max(0L, untilGameTime);
     }
 
-    // ===== 理智状态 =====
+    // ===== 子系统状态段 =====
 
     @Override
-    public SanityState getSanity() {
+    public IBodySubState getSanity() {
         return sanity;
     }
 

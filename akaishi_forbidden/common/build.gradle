@@ -4,6 +4,17 @@ architectury {
     common("forge")
 }
 
+repositories {
+    // Curios API 官方仓库（饰品基类 API 需要，与本体 common 一致）
+    maven { url "https://maven.theillusivec4.top/" }
+    // GeckoLib（影怪几何动画模型/动画控制器需要）
+    maven {
+        url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+        name "GeckoLib"
+    }
+    mavenCentral()
+}
+
 // 跨模组依赖用自定义配置而非 modImplementation：
 // ArchLoom 会把 modImplementation 的项目依赖当"外部 mod"在配置期急切读取其 dev jar 元数据，
 // 干净构建时该 jar 尚不存在会直接失败；本仓库既有的 common→forge 依赖同样用自定义配置实现。
@@ -24,4 +35,11 @@ dependencies {
     // [[dependencies.akaishi_forbidden]]（akaishi_core / akaishi）成对声明。
     coreCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
     techCommon(project(path: ":common", configuration: "namedElements")) { transitive false }
+
+    // GeckoLib：影怪实体实现 GeoEntity、动画控制器用它的类；只取编译期 API 面，
+    // 运行期由本体 forge 的 modImplementation 提供真实 jar（与本体 common 同一做法，不重复打包）。
+    modCompileOnly("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
+
+    // Curios API：花环饰品实现 ICurioItem 需要编译期 API（运行时由本体侧 Curios 提供完整 jar）
+    modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
 }

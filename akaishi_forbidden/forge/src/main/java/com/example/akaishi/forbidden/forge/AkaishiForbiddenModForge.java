@@ -1,18 +1,69 @@
 package com.example.akaishi.forbidden.forge;
 
+import com.example.akaishi.command.AkaishiSanityCommand;
+import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.forbidden.AkaishiForbiddenMod;
+import com.example.akaishi.forge.sanity.AkaishiSanityCombatHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityDamageHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityDamageSeenHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityFoodHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityKillHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityPotionBrewing;
+import com.example.akaishi.forge.sanity.AkaishiSanitySleepHandler;
+import com.example.akaishi.forge.sanity.AkaishiSanityUnnameableHandler;
+import com.example.akaishi.sanity.shadow.ShadowEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * 赤石禁忌的 Forge 平台入口（mods.toml 中 modId = akaishi_forbidden 的实现类）。
  *
- * <p>P1 阶段仅完成构造与通用初始化转发，不注册任何游戏内容，也不引入 Architectury 运行时依赖
- * （避免与本体 jar 内嵌的 architectury-forge 形成重复装载）；P3 迁入禁忌内容时再接入 Architectury 总线。
+ * <p>P3a 仅完成构造与通用初始化转发；P3b 起承接理智系统的平台生效层：
+ * 8 个 Forge 事件处理器、酿造配方、影怪属性/渲染器、HUD 元素、深海视野锁定、
+ * 低理智视野后处理与 {@code /akaishi sanity} 调试指令 —— 均与迁前逐处一致（只换模块位置）。
  */
 @Mod(AkaishiForbiddenMod.MOD_ID)
 public final class AkaishiForbiddenModForge {
 
     public AkaishiForbiddenModForge() {
+        // 通用初始化（物品/效果/实体/创造栏/菜单/网络包/理智服务与节拍）
         AkaishiForbiddenMod.init();
+
+        // 理智回复药水的酿造配方：addMix 是 Forge 补进原版 PotionBrewing 的 API（common 不可见），
+        // 且必须等药水注册完成，故放在 common setup（enqueueWork 内执行）
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (FMLCommonSetupEvent event) -> event.enqueueWork(AkaishiSanityPotionBrewing::register));
+        // 影怪属性供应商：非 Mob 的 LivingEntity 同样必须在此登记，否则实体构造时读不到 MAX_HEALTH 即崩
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (EntityAttributeCreationEvent event) ->
+                        event.put(AkaishiForbiddenEntities.SHADOW.get(), ShadowEntity.createAttributes().build()));
+
+        // 理智系统·精神伤害减免：只处理 akaishi:psychic 伤害（减伤口径在 common 的 SanityDamageGuard 内）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityDamageHandler.INSTANCE);
+        // 禁忌秘典·"挨过的伤害类型"记档：LivingHurtEvent 里把玩家被打中的伤害类型记进 SanityState
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityDamageSeenHandler.INSTANCE);
+        // 理智系统·阈值惩罚（伤害侧）：攻击效能 / 易伤 / 护甲效能 / 0% 档精神化 / 骷髅凋零
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityCombatHandler.INSTANCE);
+        // 理智系统·食补触发：原版进食 Finish 事件 → common 的食补入口
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityFoodHandler.INSTANCE);
+        // 理智系统·遭遇不可名状的起手扣减：效果被施加到玩家身上时结算一次（MobEffectEvent.Added）
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityUnnameableHandler.INSTANCE);
+        // 理智系统·击杀类首见上报：LivingDeathEvent 里按"责任实体是玩家"归因
+        MinecraftForge.EVENT_BUS.register(AkaishiSanityKillHandler.INSTANCE);
+        // 理智系统·睡眠（P6）：睡醒奖励 + 幻翼附加精神伤害投递
+        MinecraftForge.EVENT_BUS.register(AkaishiSanitySleepHandler.INSTANCE);
+
+        // 理智系统调试指令：/akaishi sanity get|set|env|food
+        MinecraftForge.EVENT_BUS.addListener(
+                (RegisterCommandsEvent event) -> AkaishiSanityCommand.register(event.getDispatcher()));
+
+        // 客户端专属注册（渲染器 / HUD 元素 / 雾效 / 后处理）：延时到客户端求值，服务端不加载客户端类型
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AkaishiForbiddenClientSetup::register);
     }
 }

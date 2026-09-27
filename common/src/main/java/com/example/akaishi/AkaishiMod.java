@@ -1,7 +1,6 @@
 package com.example.akaishi;
 
 import com.example.akaishi.api.energy.EnergyTypeRegistry;
-import com.example.akaishi.api.sanity.SanityServices;
 import com.example.akaishi.block.AkaishiCrystalBlocks;
 import com.example.akaishi.block.AkaishiDecayBlocks;
 import com.example.akaishi.block.AkaishiEnergyBlocks;
@@ -42,21 +41,6 @@ import com.example.akaishi.menu.ModMenus;
 import com.example.akaishi.miniature.AkaishiMiniatureAdapters;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
-import com.example.akaishi.sanity.SanityEnvironmentSettlement;
-import com.example.akaishi.sanity.SanityFirstEncounterSettlement;
-import com.example.akaishi.sanity.SanityNaturalRegen;
-import com.example.akaishi.sanity.SanityPenaltySettlement;
-import com.example.akaishi.sanity.SanityPhantomDive;
-import com.example.akaishi.sanity.SanityServiceImpl;
-import com.example.akaishi.sanity.SanitySleepDeprivation;
-import com.example.akaishi.sanity.SanitySyncS2C;
-import com.example.akaishi.sanity.content.SanityBuiltinFirstEncounters;
-import com.example.akaishi.sanity.content.SanityBuiltinFood;
-import com.example.akaishi.sanity.content.SanityBuiltinRestores;
-import com.example.akaishi.sanity.content.SanityBuiltinRules;
-import com.example.akaishi.sanity.content.SanityBuiltinThresholdCuts;
-import com.example.akaishi.sanity.content.SanityFoodSettlement;
-import com.example.akaishi.sanity.content.SanityRestorePotions;
 import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.value.AkaishiValueService;
 import dev.architectury.event.events.common.TickEvent;
@@ -108,9 +92,6 @@ public final class AkaishiMod {
         ModMenus.register();
         // 自定义状态效果（衰变）
         ModEffects.register();
-        // 理智回复药水（原版酿造链路）：药水实例引用上面的 akaishi:sanity_restore 效果，
-        // 故必须排在其后；酿造台配方在 forge 侧注册（common 无酿造 API）
-        SanityRestorePotions.register();
         // 底层战斗属性（暴击率/暴击伤害/闪避）：两条数值线共用的属性载体
         ModCombatAttributes.register();
         // 衰竭区域：服务端每 tick 结算减益/环境转化/生物转化
@@ -119,31 +100,6 @@ public final class AkaishiMod {
         TickEvent.SERVER_LEVEL_POST.register(DecayZoneSync::serverTick);
         // 下界牢狱场地（阿盖托洛丝）：分批施工 / 分批还原 / 重启自愈 + 复活期凋零，每维度每 tick 驱动
         TickEvent.SERVER_LEVEL_POST.register(NetherPrisonArena::serverTick);
-        // 理智系统：内部实现注册（对外契约只在 api.sanity）+ 环境结算与数值同步两条服务端 tick
-        SanityServices.register(SanityServiceImpl.instance());
-        // 内置内容：环境规则与食补档位一律走对外 API 注册（与附属同权，否决回调/豁免对它同样生效）
-        SanityBuiltinRules.register();
-        SanityBuiltinFood.register();
-        // 首见全表（声明式条目由环境节拍轮询，行为类条目由对应钩子上报）+ 首见聊天提示
-        SanityBuiltinFirstEncounters.register();
-        SanityFirstEncounterSettlement.registerNotifier();
-        // SANC 恢复来源（首用类）：消费点在 SanityRestoreService，与食补挂同一个"用完一口"事件
-        SanityBuiltinRestores.register();
-        // 阈值惩罚·上限削减账本：跨档建账/取消走对外 API 的阈值钩子（内置内容同样经注册表，与附属同权）
-        SanityBuiltinThresholdCuts.register();
-        TickEvent.SERVER_LEVEL_POST.register(SanityEnvironmentSettlement::serverTick);
-        // 阈值惩罚·持续类落地（tempCut 账本、60/20/0 档效果、攻速与精神化标记）：与上面同一 1s 节拍
-        TickEvent.SERVER_LEVEL_POST.register(SanityPenaltySettlement::serverTick);
-        // 0% 档「幻翼自杀式袭击」的逐 tick 驱动：幻翼的"俯冲助推/撞击自毁"需要逐 tick 推进，
-        // 而"征用哪几只幻翼"由上面 1s 节拍的 0% 档分支标记（见 SanityPhantomDive）
-        TickEvent.SERVER_LEVEL_POST.register(SanityPhantomDive::serverTick);
-        // 食补窗口逐 tick 分摊（窗口总量要摊到窗口内每个 tick，不能并入 1s 的环境节拍）
-        TickEvent.SERVER_LEVEL_POST.register(SanityFoodSettlement::serverTick);
-        // 自然恢复（P6）：有顶 + 在地面 + 方块光 > 10 时按进度累积器缓慢回理智（1s 节拍）
-        TickEvent.SERVER_LEVEL_POST.register(SanityNaturalRegen::serverTick);
-        // 睡眠剥夺（P6）：睡醒奖励 / 每日扣减（1s 节拍，只在主世界推日）+ 幻翼附加精神伤害投递（逐 tick）
-        TickEvent.SERVER_LEVEL_POST.register(SanitySleepDeprivation::serverTick);
-        TickEvent.SERVER_LEVEL_POST.register(SanitySyncS2C::serverTick);
         // 物品终端注册表（储存口绑定清单）：按节拍主动清扫失效条目
         // （拆方块/坍缩拆芯片/区块卸载/换存档残留都不能再留下"幽灵条目"，不依赖有人开界面）
         TickEvent.SERVER_LEVEL_POST.register(com.example.akaishi.wireless.ItemTerminalRegistry::serverTick);
@@ -156,8 +112,6 @@ public final class AkaishiMod {
             ConfigSyncS2C.registerClient();
             // 屏幕泛红表现（侵蚀跑满 / 吸取被吸，D100/D180）
             ScreenFlashS2C.registerClient();
-            // 理智数值快照（S2C 接收器，仅客户端注册；供后续 HUD 读取只读镜像）
-            SanitySyncS2C.registerClient();
             // 物品终端库页条目快照（S2C 接收器，仅客户端注册）
             AkaishiItemTerminalSync.registerClient();
             // 无线终端安全页权限表快照（S2C 接收器，仅客户端注册）

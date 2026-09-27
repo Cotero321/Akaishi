@@ -3,6 +3,7 @@ package com.example.akaishi.sanity.content;
 import com.example.akaishi.AkaishiMod;
 import com.example.akaishi.api.sanity.ISanityRestoreSource;
 import com.example.akaishi.api.sanity.SanityRestoreRegistry;
+import com.example.akaishi.item.AkaishiSanityItems;
 import com.example.akaishi.item.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -90,10 +91,10 @@ public final class SanityBuiltinRestores {
                 TIER_ENCHANTED_GOLDEN_APPLE, stack -> stack.is(Items.ENCHANTED_GOLDEN_APPLE)));
         // 理智回复剂：+6（P5 落地物品；窗口补量走 SanityTonicService，与本首用档位互不干涉）
         SanityRestoreRegistry.register(new ItemSource(id("restore_sanity_tonic"),
-                TIER_SANITY_TONIC, stack -> stack.is(ModItems.sanityTonic.get())));
+                TIER_SANITY_TONIC, stack -> stack.is(AkaishiSanityItems.sanityTonic.get())));
         // 高级理智恢复剂：+7
         SanityRestoreRegistry.register(new ItemSource(id("restore_greater_sanity_tonic"),
-                TIER_GREATER_SANITY_TONIC, stack -> stack.is(ModItems.greaterSanityTonic.get())));
+                TIER_GREATER_SANITY_TONIC, stack -> stack.is(AkaishiSanityItems.greaterSanityTonic.get())));
     }
 
     private static ResourceLocation id(String path) {

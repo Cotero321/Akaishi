@@ -1,7 +1,7 @@
 package com.example.akaishi.sanity.shadow;
 
 import com.example.akaishi.decay.DecayZoneManager;
-import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.sanity.SanityPenalties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -124,7 +124,7 @@ public final class ShadowSpawner {
             if (spot == null) {
                 continue;
             }
-            ShadowEntity shadow = new ShadowEntity(ModEntities.SHADOW.get(), level);
+            ShadowEntity shadow = new ShadowEntity(AkaishiForbiddenEntities.SHADOW.get(), level);
             shadow.setPos(spot.x, spot.y, spot.z);
             // 落点校验用实体自身碰撞箱（尺寸来自 EntityType），比手写判据更贴合"它塞得进去吗"
             if (!level.noCollision(shadow) || DecayZoneManager.isSpawnBlocked(level, shadow.blockPosition())) {

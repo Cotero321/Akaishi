@@ -1,7 +1,7 @@
 package com.example.akaishi.sanity.shadow;
 
 import com.example.akaishi.effect.ModDamageTypes;
-import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.sanity.SanityPenalties;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -80,7 +80,7 @@ public final class ShadowCombat {
         }
         shadow.setRangedCooldown(scaledTicks(BOLT_COOLDOWN_TICKS, tier));
         shadow.playAction(ShadowAnimations.TRIGGER_ATTACK, ShadowAnimations.ATTACK_TICKS);
-        ShadowBolt bolt = new ShadowBolt(ModEntities.SHADOW_BOLT.get(), shadow.level());
+        ShadowBolt bolt = new ShadowBolt(AkaishiForbiddenEntities.SHADOW_BOLT.get(), shadow.level());
         // owner = 影怪：既是击杀归属，也是"别打自己"的判据（见 ShadowBolt#onHit）
         bolt.setOwner(shadow);
         bolt.setDamage(BOLT_DAMAGE * SanityPenalties.shadowDamageMultiplier(tier));

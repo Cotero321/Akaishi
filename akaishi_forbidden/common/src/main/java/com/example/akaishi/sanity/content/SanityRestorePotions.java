@@ -1,7 +1,7 @@
 package com.example.akaishi.sanity.content;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.effect.SanityRestoreEffect;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -48,7 +48,7 @@ public final class SanityRestorePotions {
     }
 
     /**
-     * 注册两支药水（由 {@code AkaishiMod.init} 调用，须排在 {@link ModEffects#register()} 之后：
+     * 注册两支药水（由 {@code AkaishiForbiddenMod.init} 调用，须排在 {@link AkaishiForbiddenEffects#register()} 之后：
      * 药水实例创建时要读已注册的 {@code akaishi:sanity_restore} 效果；注册表事件顺序上
      * {@code MOB_EFFECT} 早于 {@code POTION}，故跨注册表引用在此处是安全的）。
      */
@@ -60,9 +60,11 @@ public final class SanityRestorePotions {
         Registrar<Potion> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.POTION);
         SANITY_RESTORE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, SANITY_RESTORE_ID),
                 () -> new Potion(SANITY_RESTORE_ID,
-                        new MobEffectInstance(ModEffects.SANITY_RESTORE.get(), SanityRestoreEffect.WINDOW_TICKS, 0)));
+                        new MobEffectInstance(AkaishiForbiddenEffects.SANITY_RESTORE.get(),
+                                SanityRestoreEffect.WINDOW_TICKS, 0)));
         STRONG_SANITY_RESTORE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, STRONG_SANITY_RESTORE_ID),
                 () -> new Potion(STRONG_SANITY_RESTORE_ID,
-                        new MobEffectInstance(ModEffects.SANITY_RESTORE.get(), SanityRestoreEffect.WINDOW_TICKS, 1)));
+                        new MobEffectInstance(AkaishiForbiddenEffects.SANITY_RESTORE.get(),
+                                SanityRestoreEffect.WINDOW_TICKS, 1)));
     }
 }

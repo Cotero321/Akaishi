@@ -28,6 +28,13 @@ import java.util.function.Supplier;
  */
 public final class AkaishiSanityItems {
 
+    /** 理智回复剂注册 id（P3b 起由本类持有：注册 id 唯一来源随域类迁移，值不变） */
+    public static final String SANITY_TONIC_ID = "sanity_tonic";
+    /** 高级理智恢复剂注册 id */
+    public static final String GREATER_SANITY_TONIC_ID = "greater_sanity_tonic";
+    /** 花环注册 id */
+    public static final String SANITY_GARLAND_ID = "sanity_garland";
+
     private AkaishiSanityItems() {
     }
 
@@ -41,16 +48,16 @@ public final class AkaishiSanityItems {
     public static void register() {
         // 理智剂：可堆叠（无瓶胆回收语义，故不像药水那样限 1），右键进入 32t 饮用动作；
         // 数值与冷却全在 SanityTonicService 的常量里（待调手感值）
-        sanityTonic = item(ModItems.SANITY_TONIC_ID, () -> new SanityTonicItem(
-                new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON), ModItems.SANITY_TONIC_ID,
+        sanityTonic = item(SANITY_TONIC_ID, () -> new SanityTonicItem(
+                new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON), SANITY_TONIC_ID,
                 SanityTonicService.TONIC_TOTAL_SAN, SanityTonicService.WINDOW_TICKS,
                 SanityTonicService.TONIC_COOLDOWN_TICKS));
-        greaterSanityTonic = item(ModItems.GREATER_SANITY_TONIC_ID, () -> new SanityTonicItem(
-                new Item.Properties().stacksTo(16).rarity(Rarity.RARE), ModItems.GREATER_SANITY_TONIC_ID,
+        greaterSanityTonic = item(GREATER_SANITY_TONIC_ID, () -> new SanityTonicItem(
+                new Item.Properties().stacksTo(16).rarity(Rarity.RARE), GREATER_SANITY_TONIC_ID,
                 SanityTonicService.GREATER_TONIC_TOTAL_SAN, SanityTonicService.WINDOW_TICKS,
                 SanityTonicService.GREATER_TONIC_COOLDOWN_TICKS));
         // 花环：durability(720) 会同时把堆叠限为 1（原版 Properties 语义），耐久值即"已佩戴秒数"
-        sanityGarland = item(ModItems.SANITY_GARLAND_ID, () -> new AkaishiSanityGarland(
+        sanityGarland = item(SANITY_GARLAND_ID, () -> new AkaishiSanityGarland(
                 new Item.Properties().durability(AkaishiSanityGarland.MAX_DURABILITY).rarity(Rarity.UNCOMMON)));
     }
 

@@ -52,8 +52,6 @@ public final class ModCommands {
         AkaishiMiniatureCommand.register(dispatcher);
         // 第三方工序兼容诊断（列出"待声明"的第三方配方类型，给整合包照抄声明表）
         AkaishiThirdPartyCommand.register(dispatcher);
-        // 理智系统调试（五层数值 / 各规则状态 / 强制结算 / 清零食补链）
-        AkaishiSanityCommand.register(dispatcher);
     }
 
     private static int teleportToNearestGeode(CommandContext<CommandSourceStack> ctx, int radius)
