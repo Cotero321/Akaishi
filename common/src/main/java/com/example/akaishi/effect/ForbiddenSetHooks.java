@@ -1,6 +1,5 @@
 package com.example.akaishi.effect;
 
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -34,9 +33,17 @@ public final class ForbiddenSetHooks {
         int bonusFor(LivingEntity wearer);
     }
 
-    /** 视野扭曲抑制判定：套装集齐则屏蔽视觉扭曲表现（D43，仅客户端） */
+    /**
+     * 视野扭曲抑制判定：套装集齐则屏蔽视觉扭曲表现（D43，仅客户端）。
+     * <p>
+     * <b>参数为何是 {@link Player} 而非 {@link net.minecraft.client.player.LocalPlayer}</b>：
+     * 本类会被服务端加载（多处方块/BE 经 {@code socketsLocked} 引用），而 {@code LocalPlayer}
+     * 是标注为仅客户端的类型 —— 签名里出现它，专服加载本类时校验字节码即会崩
+     * （invalid dist DEDICATED_SERVER）。调用端传入的 {@code LocalPlayer} 是 {@code Player} 子类，
+     * 语义与行为不变。
+     */
     public interface DistortionSuppressor {
-        boolean isSuppressed(LocalPlayer player);
+        boolean isSuppressed(Player player);
     }
 
     /** 槽位封锁判定：佩戴任意一件禁忌饰品即锁死全部 9 槽，全摘下才解锁（D13/D16/D115） */
@@ -70,7 +77,7 @@ public final class ForbiddenSetHooks {
     }
 
     /** 是否应屏蔽本地玩家的视野扭曲表现 */
-    public static boolean isDistortionSuppressed(LocalPlayer player) {
+    public static boolean isDistortionSuppressed(Player player) {
         return distortionSuppressor.isSuppressed(player);
     }
 

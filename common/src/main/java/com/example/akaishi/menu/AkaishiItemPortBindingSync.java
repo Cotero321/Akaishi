@@ -113,43 +113,54 @@ public final class AkaishiItemPortBindingSync {
 
     // ===== S2C：清单快照 =====
 
-    public static void registerClient() {
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
-            int containerId = buf.readInt();
-            boolean bound = buf.readBoolean();
-            BoundTarget boundTarget = null;
-            if (bound) {
-                UUID terminalId = buf.readUUID();
-                Component name = readComponent(buf.readUtf());
-                String shortId = buf.readUtf();
-                String posText = buf.readUtf();
-                boolean live = buf.readBoolean();
-                boundTarget = new BoundTarget(terminalId, name, shortId, posText, live);
-            }
-            int size = buf.readVarInt();
-            List<Entry> entries = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-                // 维度按 ResourceLocation 字符串收发；解析失败的脏条目直接丢弃，不牵连整包
-                UUID terminalId = buf.readUUID();
-                ResourceLocation dimension = ResourceLocation.tryParse(buf.readUtf());
-                BlockPos pos = buf.readBlockPos();
-                String ownerName = buf.readUtf();
-                Component name = readComponent(buf.readUtf());
-                String shortId = buf.readUtf();
-                if (dimension != null) {
-                    entries.add(new Entry(terminalId, dimension, pos, ownerName, name, shortId));
+    /**
+     * 客户端专属接收器。外层类服务端也会加载（C2S 的 {@link #register()} 服务端必调），
+     * 而本段要读 {@code Minecraft.player}（类型 {@code LocalPlayer} 仅客户端），留在外层会让
+     * 专服加载外层类时校验字节码即崩。抽到本嵌套类后外层零客户端引用；
+     * 本类只经 {@code EnvExecutor.runInEnv(Env.CLIENT, ...)} 在客户端加载。
+     */
+    public static final class Client {
+        private Client() {
+        }
+
+        public static void registerClient() {
+            NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
+                int containerId = buf.readInt();
+                boolean bound = buf.readBoolean();
+                BoundTarget boundTarget = null;
+                if (bound) {
+                    UUID terminalId = buf.readUUID();
+                    Component name = readComponent(buf.readUtf());
+                    String shortId = buf.readUtf();
+                    String posText = buf.readUtf();
+                    boolean live = buf.readBoolean();
+                    boundTarget = new BoundTarget(terminalId, name, shortId, posText, live);
                 }
-            }
-            BoundTarget decodedTarget = boundTarget;
-            // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
-            Minecraft.getInstance().execute(() -> {
-                Player player = Minecraft.getInstance().player;
-                if (player != null && player.containerMenu instanceof Target target
-                        && player.containerMenu.containerId == containerId) {
-                    target.acceptBinding(entries, decodedTarget);
+                int size = buf.readVarInt();
+                List<Entry> entries = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    // 维度按 ResourceLocation 字符串收发；解析失败的脏条目直接丢弃，不牵连整包
+                    UUID terminalId = buf.readUUID();
+                    ResourceLocation dimension = ResourceLocation.tryParse(buf.readUtf());
+                    BlockPos pos = buf.readBlockPos();
+                    String ownerName = buf.readUtf();
+                    Component name = readComponent(buf.readUtf());
+                    String shortId = buf.readUtf();
+                    if (dimension != null) {
+                        entries.add(new Entry(terminalId, dimension, pos, ownerName, name, shortId));
+                    }
                 }
+                BoundTarget decodedTarget = boundTarget;
+                // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
+                Minecraft.getInstance().execute(() -> {
+                    Player player = Minecraft.getInstance().player;
+                    if (player != null && player.containerMenu instanceof Target target
+                            && player.containerMenu.containerId == containerId) {
+                        target.acceptBinding(entries, decodedTarget);
+                    }
+                });
             });
-        });
+        }
     }
 
     public static void sendSnapshot(ServerPlayer player, int containerId, List<Entry> entries,

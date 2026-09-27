@@ -44,6 +44,7 @@ import com.example.akaishi.value.AkaishiValueService;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
+import dev.architectury.utils.EnvExecutor;
 
 /**
  * 模组通用入口，承载跨平台共享的初始化逻辑。
@@ -111,17 +112,24 @@ public final class AkaishiMod {
             // 屏幕泛红表现（侵蚀跑满 / 吸取被吸，D100/D180）
             ScreenFlashS2C.registerClient();
             // 物品终端库页条目快照（S2C 接收器，仅客户端注册）
-            AkaishiItemTerminalSync.registerClient();
+            // 说明：终端/端口各同步类的客户端解码段（读 Minecraft.player，类型 LocalPlayer 仅客户端）已抽进
+            // 其嵌套 Client 类，并经 EnvExecutor 的嵌套 Supplier 调用 —— 专服不实例化内层 lambda，因而不会加载客户端类。
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> AkaishiItemTerminalSync.Client.registerClient());
             // 无线终端安全页权限表快照（S2C 接收器，仅客户端注册）
-            com.example.akaishi.menu.AkaishiTerminalSecuritySync.registerClient();
+            EnvExecutor.runInEnv(Env.CLIENT,
+                    () -> () -> com.example.akaishi.menu.AkaishiTerminalSecuritySync.Client.registerClient());
             // 端口远程绑定清单快照（S2C 接收器，仅客户端注册）
-            com.example.akaishi.menu.AkaishiPortBindingSync.registerClient();
+            EnvExecutor.runInEnv(Env.CLIENT,
+                    () -> () -> com.example.akaishi.menu.AkaishiPortBindingSync.Client.registerClient());
             // 储存口远程绑定清单快照（S2C 接收器，仅客户端注册）
-            com.example.akaishi.menu.AkaishiItemPortBindingSync.registerClient();
+            EnvExecutor.runInEnv(Env.CLIENT,
+                    () -> () -> com.example.akaishi.menu.AkaishiItemPortBindingSync.Client.registerClient());
             // 微缩矩阵终端视图快照（S2C 接收器，仅客户端注册）
-            com.example.akaishi.menu.AkaishiMiniMatrixSync.registerClient();
+            EnvExecutor.runInEnv(Env.CLIENT,
+                    () -> () -> com.example.akaishi.menu.AkaishiMiniMatrixSync.Client.registerClient());
             // 微缩矩阵终端加工页视图（S2C 接收器，仅客户端注册）
-            com.example.akaishi.menu.AkaishiMatrixCraftSync.registerClient();
+            EnvExecutor.runInEnv(Env.CLIENT,
+                    () -> () -> com.example.akaishi.menu.AkaishiMatrixCraftSync.Client.registerClient());
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();

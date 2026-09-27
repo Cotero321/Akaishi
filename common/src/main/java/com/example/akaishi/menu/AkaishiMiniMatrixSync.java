@@ -62,34 +62,44 @@ public final class AkaishiMiniMatrixSync {
     private AkaishiMiniMatrixSync() {
     }
 
-    /** 客户端注册接收器（AkaishiMod.init 的客户端分支调用） */
-    public static void registerClient() {
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
-            int containerId = buf.readInt();
-            boolean formed = buf.readBoolean();
-            int[] upgrades = new int[AkaishiMiniMatrixUpgradeType.values().length];
-            for (int i = 0; i < upgrades.length; i++) {
-                upgrades[i] = buf.readVarInt();
-            }
-            long pushedEnergy = buf.readVarLong();
-            long chipTransfer = buf.readVarLong();
-            int declared = buf.readVarInt();
-            int count = Math.min(Math.max(declared, 0), MAX_ROWS);
-            List<ChipRow> rows = new ArrayList<>(count);
-            for (int i = 0; i < count; i++) {
-                rows.add(new ChipRow(buf.readBoolean(), buf.readUtf(MAX_NAME), buf.readUtf(MAX_SHORT_ID),
-                        buf.readUtf(MAX_TYPE), buf.readVarLong(), buf.readVarLong(),
-                        buf.readVarLong(), buf.readVarLong(), buf.readBlockPos()));
-            }
-            // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
-            Minecraft.getInstance().execute(() -> {
-                var player = Minecraft.getInstance().player;
-                if (player != null && player.containerMenu instanceof Target target
-                        && player.containerMenu.containerId == containerId) {
-                    target.acceptMatrix(formed, upgrades, pushedEnergy, chipTransfer, rows);
+    /**
+     * 客户端专属接收器。外层类服务端也会加载（{@link #sendSnapshot} 由服务端菜单调用），
+     * 而本段要读 {@code Minecraft.player}（类型 {@code LocalPlayer} 仅客户端），留在外层会让
+     * 专服加载外层类时校验字节码即崩。抽到本嵌套类后外层零客户端引用；
+     * 本类只经 {@code EnvExecutor.runInEnv(Env.CLIENT, ...)} 在客户端加载。
+     */
+    public static final class Client {
+        private Client() {
+        }
+
+        public static void registerClient() {
+            NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
+                int containerId = buf.readInt();
+                boolean formed = buf.readBoolean();
+                int[] upgrades = new int[AkaishiMiniMatrixUpgradeType.values().length];
+                for (int i = 0; i < upgrades.length; i++) {
+                    upgrades[i] = buf.readVarInt();
                 }
+                long pushedEnergy = buf.readVarLong();
+                long chipTransfer = buf.readVarLong();
+                int declared = buf.readVarInt();
+                int count = Math.min(Math.max(declared, 0), MAX_ROWS);
+                List<ChipRow> rows = new ArrayList<>(count);
+                for (int i = 0; i < count; i++) {
+                    rows.add(new ChipRow(buf.readBoolean(), buf.readUtf(MAX_NAME), buf.readUtf(MAX_SHORT_ID),
+                            buf.readUtf(MAX_TYPE), buf.readVarLong(), buf.readVarLong(),
+                            buf.readVarLong(), buf.readVarLong(), buf.readBlockPos()));
+                }
+                // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
+                Minecraft.getInstance().execute(() -> {
+                    var player = Minecraft.getInstance().player;
+                    if (player != null && player.containerMenu instanceof Target target
+                            && player.containerMenu.containerId == containerId) {
+                        target.acceptMatrix(formed, upgrades, pushedEnergy, chipTransfer, rows);
+                    }
+                });
             });
-        });
+        }
     }
 
     /** 服务端：推送一次矩阵视图快照（视图版本变化时调用） */

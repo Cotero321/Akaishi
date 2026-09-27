@@ -103,32 +103,42 @@ public final class AkaishiTerminalSecuritySync {
 
     // ===== S2C：权限表快照 =====
 
-    /** 客户端注册接收器（AkaishiMod.init 的客户端分支调用） */
-    public static void registerClient() {
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
-            int containerId = buf.readInt();
-            String ownerName = buf.readUtf(MAX_NAME);
-            boolean hasDefault = buf.readBoolean();
-            int defaultPerms = buf.readVarInt();
-            int size = buf.readVarInt();
-            // 条数钳到服务端口径上限：解码端不信任对端给的 size（畸形包会让客户端预分配爆内存）
-            int count = Math.min(size, TerminalSecurity.MAX_ENTRIES);
-            List<Entry> entries = new ArrayList<>(count);
-            for (int i = 0; i < count; i++) {
-                UUID player = buf.readUUID();
-                String name = buf.readUtf(MAX_NAME);
-                int perms = buf.readVarInt();
-                entries.add(new Entry(player, name, perms));
-            }
-            // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
-            Minecraft.getInstance().execute(() -> {
-                var player = Minecraft.getInstance().player;
-                if (player != null && player.containerMenu instanceof Target snapshotTarget
-                        && player.containerMenu.containerId == containerId) {
-                    snapshotTarget.acceptSecurity(ownerName, hasDefault, defaultPerms, entries);
+    /**
+     * 客户端专属接收器。外层类服务端也会加载（C2S 的 {@link #register()} 服务端必调），
+     * 而本段要读 {@code Minecraft.player}（类型 {@code LocalPlayer} 仅客户端），留在外层会让
+     * 专服加载外层类时校验字节码即崩。抽到本嵌套类后外层零客户端引用；
+     * 本类只经 {@code EnvExecutor.runInEnv(Env.CLIENT, ...)} 在客户端加载。
+     */
+    public static final class Client {
+        private Client() {
+        }
+
+        public static void registerClient() {
+            NetworkManager.registerReceiver(NetworkManager.Side.S2C, SNAPSHOT_CHANNEL, (buf, context) -> {
+                int containerId = buf.readInt();
+                String ownerName = buf.readUtf(MAX_NAME);
+                boolean hasDefault = buf.readBoolean();
+                int defaultPerms = buf.readVarInt();
+                int size = buf.readVarInt();
+                // 条数钳到服务端口径上限：解码端不信任对端给的 size（畸形包会让客户端预分配爆内存）
+                int count = Math.min(size, TerminalSecurity.MAX_ENTRIES);
+                List<Entry> entries = new ArrayList<>(count);
+                for (int i = 0; i < count; i++) {
+                    UUID player = buf.readUUID();
+                    String name = buf.readUtf(MAX_NAME);
+                    int perms = buf.readVarInt();
+                    entries.add(new Entry(player, name, perms));
                 }
+                // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
+                Minecraft.getInstance().execute(() -> {
+                    var player = Minecraft.getInstance().player;
+                    if (player != null && player.containerMenu instanceof Target snapshotTarget
+                            && player.containerMenu.containerId == containerId) {
+                        snapshotTarget.acceptSecurity(ownerName, hasDefault, defaultPerms, entries);
+                    }
+                });
             });
-        });
+        }
     }
 
     /** 服务端：推送一次权限表快照（权限表变化时调用） */

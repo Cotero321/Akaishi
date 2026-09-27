@@ -253,74 +253,84 @@ public final class AkaishiMatrixCraftSync {
 
     // ===== S2C =====
 
-    /** 客户端注册接收器（AkaishiMod.init 的客户端分支调用） */
-    public static void registerClient() {
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, VIEW_CHANNEL, (buf, context) -> {
-            int containerId = buf.readInt();
-            byte type = buf.readByte();
-            List<ItemStack> results = List.of();
-            PlanView plan = null;
-            TaskView task = null;
-            String taskFail = null;
-            boolean building = false;
-            int readyCount = 0;
-            switch (type) {
-                case VIEW_CATALOG -> {
-                    building = buf.readBoolean();
-                    // 可直接制作的条目数：越界值直接钳到 [0, 条数]，不信任对端
-                    int readyDeclared = buf.readVarInt();
-                    int declared = buf.readVarInt();
-                    int count = Math.min(Math.max(declared, 0), MAX_CATALOG);
-                    readyCount = Math.min(Math.max(readyDeclared, 0), count);
-                    List<ItemStack> read = new ArrayList<>(count);
-                    for (int i = 0; i < count; i++) {
-                        // 只传物品 id：解析失败或对端注册表里没有的 id 退化为空气，空栈不进目录
-                        ResourceLocation id = ResourceLocation.tryParse(buf.readUtf(MAX_ITEM_ID));
-                        if (id == null) {
-                            continue;
+    /**
+     * 客户端专属接收器。外层类服务端也会加载（C2S 的 {@link #register()} 与各 {@code send*} 服务端必调），
+     * 而本段要读 {@code Minecraft.player}（类型 {@code LocalPlayer} 仅客户端），留在外层会让
+     * 专服加载外层类时校验字节码即崩。抽到本嵌套类后外层零客户端引用；
+     * 本类只经 {@code EnvExecutor.runInEnv(Env.CLIENT, ...)} 在客户端加载。
+     */
+    public static final class Client {
+        private Client() {
+        }
+
+        public static void registerClient() {
+            NetworkManager.registerReceiver(NetworkManager.Side.S2C, VIEW_CHANNEL, (buf, context) -> {
+                int containerId = buf.readInt();
+                byte type = buf.readByte();
+                List<ItemStack> results = List.of();
+                PlanView plan = null;
+                TaskView task = null;
+                String taskFail = null;
+                boolean building = false;
+                int readyCount = 0;
+                switch (type) {
+                    case VIEW_CATALOG -> {
+                        building = buf.readBoolean();
+                        // 可直接制作的条目数：越界值直接钳到 [0, 条数]，不信任对端
+                        int readyDeclared = buf.readVarInt();
+                        int declared = buf.readVarInt();
+                        int count = Math.min(Math.max(declared, 0), MAX_CATALOG);
+                        readyCount = Math.min(Math.max(readyDeclared, 0), count);
+                        List<ItemStack> read = new ArrayList<>(count);
+                        for (int i = 0; i < count; i++) {
+                            // 只传物品 id：解析失败或对端注册表里没有的 id 退化为空气，空栈不进目录
+                            ResourceLocation id = ResourceLocation.tryParse(buf.readUtf(MAX_ITEM_ID));
+                            if (id == null) {
+                                continue;
+                            }
+                            Item item = BuiltInRegistries.ITEM.get(id);
+                            if (item != Items.AIR) {
+                                read.add(new ItemStack(item));
+                            }
                         }
-                        Item item = BuiltInRegistries.ITEM.get(id);
-                        if (item != Items.AIR) {
-                            read.add(new ItemStack(item));
+                        results = read;
+                    }
+                    case VIEW_PLAN -> plan = buf.readBoolean() ? readPlan(buf) : null;
+                    case VIEW_TASK -> {
+                        if (buf.readBoolean()) {
+                            task = readTask(buf);
+                        } else {
+                            // 无任务时才带失败原因（失败的任务对象已被服务端丢弃）：空串 = 没有失败
+                            String reason = buf.readUtf(MAX_FAIL_REASON);
+                            taskFail = reason.isEmpty() ? null : reason;
                         }
                     }
-                    results = read;
-                }
-                case VIEW_PLAN -> plan = buf.readBoolean() ? readPlan(buf) : null;
-                case VIEW_TASK -> {
-                    if (buf.readBoolean()) {
-                        task = readTask(buf);
-                    } else {
-                        // 无任务时才带失败原因（失败的任务对象已被服务端丢弃）：空串 = 没有失败
-                        String reason = buf.readUtf(MAX_FAIL_REASON);
-                        taskFail = reason.isEmpty() ? null : reason;
+                    default -> {
+                        return; // 未知类型：直接丢弃，不做任何落地
                     }
                 }
-                default -> {
-                    return; // 未知类型：直接丢弃，不做任何落地
-                }
-            }
-            final List<ItemStack> accepted = results;
-            final PlanView acceptedPlan = plan;
-            final TaskView acceptedTask = task;
-            final String acceptedFail = taskFail;
-            final boolean acceptedBuilding = building;
-            final int acceptedReady = readyCount;
-            // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
-            Minecraft.getInstance().execute(() -> {
-                var player = Minecraft.getInstance().player;
-                if (player != null && player.containerMenu instanceof Target target
-                        && player.containerMenu.containerId == containerId) {
-                    if (type == VIEW_CATALOG) {
-                        target.acceptCraftCatalog(accepted, acceptedBuilding, acceptedReady);
-                    } else if (type == VIEW_PLAN) {
-                        target.acceptCraftPlan(acceptedPlan);
-                    } else {
-                        target.acceptCraftTask(acceptedTask, acceptedFail);
+                final List<ItemStack> accepted = results;
+                final PlanView acceptedPlan = plan;
+                final TaskView acceptedTask = task;
+                final String acceptedFail = taskFail;
+                final boolean acceptedBuilding = building;
+                final int acceptedReady = readyCount;
+                // 网络线程只解码，落地回客户端主线程，避免与渲染线程并发读写
+                Minecraft.getInstance().execute(() -> {
+                    var player = Minecraft.getInstance().player;
+                    if (player != null && player.containerMenu instanceof Target target
+                            && player.containerMenu.containerId == containerId) {
+                        if (type == VIEW_CATALOG) {
+                            target.acceptCraftCatalog(accepted, acceptedBuilding, acceptedReady);
+                        } else if (type == VIEW_PLAN) {
+                            target.acceptCraftPlan(acceptedPlan);
+                        } else {
+                            target.acceptCraftTask(acceptedTask, acceptedFail);
+                        }
                     }
-                }
+                });
             });
-        });
+        }
     }
 
     /**
