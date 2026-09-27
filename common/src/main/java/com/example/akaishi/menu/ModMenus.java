@@ -163,8 +163,6 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiMiniMatrixTerminalMenu>> CHISHI_MINI_MATRIX_TERMINAL;
     /** 网络节点菜单类型（只读绑定信息 + 本节点屏障开关；176×112，无背包区） */
     public static RegistrySupplier<MenuType<AkaishiMiniMatrixNodeMenu>> CHISHI_MINI_MATRIX_NODE;
-    /** 禁忌秘典菜单类型（手持物品界面，无任何槽位；进度与条件由 S2C 快照下发） */
-    public static RegistrySupplier<MenuType<AkaishiCodexMenu>> CHISHI_CODEX;
 
     private ModMenus() {
     }
@@ -173,7 +171,7 @@ public final class ModMenus {
      * 注册全部菜单类型。按原 {@code register()} 的注册顺序逐域委托：
      * 基础机械（1~21）→ 反应堆（22~25）→ 生命器官（26~39）→ 矩阵与加工机（40~48）→
      * 矿机与聚变前哨（49~55）→ 无线终端（56~61）→ 聚变堆（62~64）→ 机械改造与祭坛（65~68）→
-     * 终端与储存（69~74）。域内与域间顺序都与原文件逐位一致。
+     * 终端与储存（69~74；禁忌秘典已于 P3a 迁往 akaishi_forbidden）。域内与域间顺序都与原文件逐位一致。
      */
     public static void register() {
         BasicMenuRegs.register();

@@ -23,8 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * 菜单注册 · 终端与储存族（承接 {@link ModMenus} 原注册序第 69~74 位）：
- * 物品终端、微缩矩阵终端、网络节点、禁忌秘典、物品储存单元、储存无线输入口/输出口。
- * <p>类内注册顺序与原 {@code ModMenus.register()} 逐位一致。
+ * 物品终端、微缩矩阵终端、网络节点、物品储存单元、储存无线输入口/输出口。
+ * <p>类内注册顺序与原 {@code ModMenus.register()} 逐位一致（禁忌秘典已随 P3a 迁往 akaishi_forbidden）。
  */
 final class TerminalMenuRegs {
 
@@ -87,15 +87,6 @@ final class TerminalMenuRegs {
                 .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mini_matrix_node"), () -> miniMatrixNodeType);
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(miniMatrixNodeType, AkaishiMiniMatrixNodeScreen::new));
-
-        // 禁忌秘典：手持物品界面（无槽位、无方块实体），进度快照与条件求值由服务端下发
-        MenuType<AkaishiCodexMenu> codexType = MenuRegistry.ofExtended(
-                (syncId, inv, buf) -> new AkaishiCodexMenu(syncId, inv));
-        ModMenus.CHISHI_CODEX = (RegistrySupplier<MenuType<AkaishiCodexMenu>>) (Object) RegistrarManager
-                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
-                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_forbidden_codex"), () -> codexType);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
-                MenuRegistry.registerScreenFactory(codexType, AkaishiCodexScreen::new));
 
         // 物品储存单元：D18 只读视图（54 槽 + 占用/剩余 IP），无任何写入路径
         MenuType<AkaishiItemStorageUnitMenu> itemStorageUnitType = MenuRegistry.ofExtended((syncId, inv, buf) -> {

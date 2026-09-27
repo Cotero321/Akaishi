@@ -42,7 +42,7 @@ public class AkaishiCodexMenu extends AbstractContainerMenu implements AkaishiCo
     private boolean snapshotDirty = true;
 
     public AkaishiCodexMenu(int id, Inventory inv) {
-        super(ModMenus.CHISHI_CODEX.get(), id);
+        super(AkaishiCodexMenuRegs.CHISHI_CODEX.get(), id);
         this.player = inv.player;
     }
 

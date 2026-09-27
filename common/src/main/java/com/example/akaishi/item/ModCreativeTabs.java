@@ -27,14 +27,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 /**
- * 创造模式物品栏分类（按体系拆分为 5 栏）：
+ * 创造模式物品栏分类（按体系拆分为 4 栏）：
  * <ol>
  *   <li>{@link #CHISHI_TAB_ID} 赤石之章：通用材料 / 装备 / 工具 / 采集体系（主栏），帕秋莉手册引用</li>
  *   <li>{@link #MECHANICAL_TAB_ID} 机械改造：机械器官 / 部件模板 / 加工件 / 机械材料 / 3 台机器</li>
  *   <li>{@link #LIFE_TAB_ID} 生命科技：生物器官 / 样本 / 药剂 / 生命能量 / 手术与基因机器</li>
  *   <li>{@link #MACHINES_TAB_ID} 机器与结构：能源 / 管道 / 储罐 / 多方块结构件</li>
- *   <li>{@link #FORBIDDEN_TAB_ID} 禁忌：扩展槽四件禁忌饰品 + 禁忌秘典（自研知识/研究系统入口）</li>
  * </ol>
+ * <p>原第 5 栏「禁忌」随禁忌秘典一并迁往 {@code akaishi_forbidden}（未装禁忌包即无该栏）。
  */
 public final class ModCreativeTabs {
 
@@ -46,8 +46,6 @@ public final class ModCreativeTabs {
     public static final String LIFE_TAB_ID = "akaishi_life";
     /** 机器与结构栏 id */
     public static final String MACHINES_TAB_ID = "akaishi_machines";
-    /** 禁忌栏 id（扩展槽四件禁忌饰品） */
-    public static final String FORBIDDEN_TAB_ID = "akaishi_forbidden";
 
     private ModCreativeTabs() {
     }
@@ -85,14 +83,6 @@ public final class ModCreativeTabs {
                         .title(Component.translatable("itemGroup.akaishi.machines"))
                         .icon(() -> new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get()))
                         .displayItems((params, output) -> addMachinesItems(output))
-                        .build());
-
-        // 5. 禁忌栏（扩展槽四件）
-        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, FORBIDDEN_TAB_ID),
-                () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 4)
-                        .title(Component.translatable("itemGroup.akaishi.forbidden"))
-                        .icon(() -> new ItemStack(ModItems.motherSeal.get()))
-                        .displayItems((params, output) -> addForbiddenItems(output))
                         .build());
     }
 
@@ -546,17 +536,6 @@ public final class ModCreativeTabs {
         // 创造模式能量源（测试用）
         accept(output, AkaishiEnergyBlocks.CHISHI_CREATIVE_ENERGY_CELL);
         accept(output, AkaishiLifeBlocks.CHISHI_CREATIVE_LIFE_CELL);
-    }
-
-    // ==================== 栏 5：禁忌（扩展槽四件） ====================
-
-    private static void addForbiddenItems(CreativeModeTab.Output output) {
-        accept(output, ModItems.lifeTouch);
-        accept(output, ModItems.cubHeart);
-        accept(output, ModItems.motherSeal);
-        accept(output, ModItems.fertilityRing);
-        // 禁忌秘典：自研知识/研究系统的入口（本轮无配方，仅创造栏可得）
-        accept(output, ModItems.forbiddenCodex);
     }
 
     /** 判空后把注册内容（物品/方块，均实现 ItemLike）放入创造标签（注册完成前为 null，防御性跳过） */

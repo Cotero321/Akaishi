@@ -111,8 +111,6 @@ public final class ModItems {
     public static final String LIFE_BOOK_ID = "akaishi_life_book";
     /** 基因详解：Patchouli 手册物品，右键打开 akaishi:gene_detail */
     public static final String GENE_BOOK_ID = "akaishi_gene_book";
-    /** 禁忌秘典：自研知识/研究系统入口（右键翻开；明确不走 Patchouli） */
-    public static final String FORBIDDEN_CODEX_ID = "forbidden_codex";
     /** 山羊头旗帜图案：织布机图案物，选用 akaishi:goat_skull 徽记 */
     public static final String GOAT_SKULL_BANNER_PATTERN_ID = "goat_skull_banner_pattern";
     /** 赤石采集手环（hands 槽）：挖掘方块概率掉落赤石晶 */
@@ -307,9 +305,6 @@ public final class ModItems {
     public static RegistrySupplier<Item> greaterSanityTonic;
     public static RegistrySupplier<Item> sanityGarland;
 
-    // —— 秘典域（AkaishiCodexItems）：自研知识/研究系统 ——
-    public static RegistrySupplier<Item> forbiddenCodex;
-
     // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓）——
     public static RegistrySupplier<Item> akaishiWitherSeed;
     public static RegistrySupplier<Item> akaishiWitherCondensate;
@@ -359,7 +354,6 @@ public final class ModItems {
         AkaishiFusionItems.register();
         AkaishiLifeItems.register();
         AkaishiSanityItems.register();
-        AkaishiCodexItems.register();
         AkaishiTransgeneItems.register();
         AkaishiWirelessItems.register();
         AkaishiMechanicalItems.register();
@@ -497,9 +491,6 @@ public final class ModItems {
         sanityTonic = AkaishiSanityItems.sanityTonic;
         greaterSanityTonic = AkaishiSanityItems.greaterSanityTonic;
         sanityGarland = AkaishiSanityItems.sanityGarland;
-
-        // —— 秘典域 ——
-        forbiddenCodex = AkaishiCodexItems.forbiddenCodex;
 
         // —— 转基因域 ——
         akaishiWitherSeed = AkaishiTransgeneItems.akaishiWitherSeed;

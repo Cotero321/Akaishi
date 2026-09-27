@@ -15,6 +15,11 @@ configurations {
 }
 
 dependencies {
+    // Architectury API：注册表 / 菜单 / 网络包 / 环境判断都要用到。
+    // 只取编译期与本地运行依赖、不 include：architectury 运行时由本体 akaishi 统一以 jar-in-jar 提供，
+    // 避免同一 mod 被三份 jar 重复内嵌（见 §26.5 踩坑 5）。
+    modImplementation("dev.architectury:architectury:9.2.14")
+
     // Gradle 侧跨模组依赖（编译 + 运行 classpath），与 forbiddenforge/mods.toml 的
     // [[dependencies.akaishi_forbidden]]（akaishi_core / akaishi）成对声明。
     coreCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }

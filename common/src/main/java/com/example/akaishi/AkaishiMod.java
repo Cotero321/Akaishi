@@ -36,7 +36,6 @@ import com.example.akaishi.menu.AkaishiSurgerySync;
 import com.example.akaishi.menu.AkaishiPotionSync;
 import com.example.akaishi.menu.AkaishiTraitReforgerSync;
 import com.example.akaishi.menu.AkaishiGeneManagerSync;
-import com.example.akaishi.menu.AkaishiCodexSync;
 import com.example.akaishi.menu.AkaishiOrganVaultSync;
 import com.example.akaishi.menu.AkaishiItemTerminalSync;
 import com.example.akaishi.menu.ModMenus;
@@ -171,8 +170,6 @@ public final class AkaishiMod {
             com.example.akaishi.menu.AkaishiMiniMatrixSync.registerClient();
             // 微缩矩阵终端加工页视图（S2C 接收器，仅客户端注册）
             com.example.akaishi.menu.AkaishiMatrixCraftSync.registerClient();
-            // 禁忌秘典进度快照（S2C 接收器，仅客户端注册）
-            AkaishiCodexSync.registerClient();
         }
         // 生命结构台目标槽位选择包（C2S 接收器，服务端生效，客户端注册无害）
         AkaishiLifeStructSync.register();
@@ -202,8 +199,6 @@ public final class AkaishiMod {
         com.example.akaishi.menu.AkaishiMatrixCraftSync.register();
         // 网络节点界面开关包（C2S 接收器：本节点「节点屏障」开 / 关）
         com.example.akaishi.menu.AkaishiMiniMatrixNodeSync.register();
-        // 禁忌秘典研究请求包（C2S 接收器：推进阶段 / 举行仪式，门槛一律服务端重算）
-        AkaishiCodexSync.register();
         // 价值分服务：统一存储库排序/统计/筛选与查询指令共用的底层（纯计算，不参与经济兑换）
         AkaishiValueService.install();
         // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成
