@@ -1,6 +1,7 @@
 package com.example.akaishi.item;
 
 import com.example.akaishi.api.security.AkaishiSecurityPermission;
+import com.example.akaishi.api.security.SecurityCardAccess;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -42,6 +43,32 @@ public class AkaishiWirelessIdentityCardItem extends Item {
     private static final String TAG_PLAYER_NAME = "PlayerName";
     /** 权限位掩码 */
     private static final String TAG_PERMS = "Perms";
+
+    static {
+        // 向核心的身份卡访问间接层注册本类实现：核心模块不认识具体物品类，安全判定经该层读卡
+        // （见 api.security.SecurityCardAccess；未注册时核心按"非身份卡"处理）
+        SecurityCardAccess.register(new SecurityCardAccess.Provider() {
+            @Override
+            public boolean isCard(ItemStack stack) {
+                return stack.getItem() instanceof AkaishiWirelessIdentityCardItem;
+            }
+
+            @Override
+            public int permsOf(ItemStack stack) {
+                return AkaishiWirelessIdentityCardItem.permsOf(stack);
+            }
+
+            @Override
+            public UUID playerOf(ItemStack stack) {
+                return AkaishiWirelessIdentityCardItem.playerOf(stack);
+            }
+
+            @Override
+            public String playerNameOf(ItemStack stack) {
+                return AkaishiWirelessIdentityCardItem.playerNameOf(stack);
+            }
+        });
+    }
 
     public AkaishiWirelessIdentityCardItem(Properties properties) {
         super(properties);

@@ -1,0 +1,131 @@
+plugins {
+    id 'com.gradleup.shadow' version '8.3.6'
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+// 启用 Loom 的 Forge 平台支持，创建 forge 依赖配置（空块即可，本模块无 mixin）
+loom {
+    forge {
+    }
+}
+
+// 产物名与 modId 对齐：akaishi_forbidden-<version>.jar
+base {
+    archivesName = "akaishi_forbidden"
+}
+
+configurations {
+    common
+    shadowCommon
+    crossMod // 跨模组依赖（核心 + 本体），普通配置而非 modImplementation，理由见 forbiddencommon/build.gradle
+    compileClasspath.extendsFrom common, crossMod
+    runtimeClasspath.extendsFrom common, crossMod
+    developmentForge.extendsFrom common, crossMod
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier.set("dev-shadow")
+    exclude 'META-INF/versions/**'
+    mergeServiceFiles()
+    exclude 'module-info.class'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+jar {
+    archiveClassifier.set("dev")
+    from("${rootProject.projectDir}/LICENSE") {
+        rename { "${it}_${base.archivesName.get()}" }
+    }
+    manifest {
+        attributes([
+            'Specification-Title'    : 'Akaishi Forbidden Mod',
+            'Specification-Vendor'   : 'Akaishi Author',
+            'Specification-Version'  : '1',
+            'Implementation-Title'   : project.name,
+            'Implementation-Version' : project.version,
+            'Implementation-Vendor'  : 'Akaishi Author'
+        ])
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        minecraft_version      : '1.20.1',
+        minecraft_version_range: '[1.20.1,1.21)',
+        forge_version          : project.forge_version,
+        forge_version_range    : '[47,48)',
+        loader_version_range   : '[47,)',
+        mod_id                 : 'akaishi_forbidden',
+        mod_name               : 'Akaishi Forbidden',
+        mod_version            : project.version,
+        mod_authors            : 'Akaishi Author',
+        mod_description        : 'Akaishi Forbidden - optional forbidden content'
+    ]
+
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+dependencies {
+    // 本模块自身的 common 源码
+    common(project(path: ":forbiddencommon", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":forbiddencommon", configuration: "transformProductionForge")) { transitive false }
+
+    // Forge 平台
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // ===== 跨模组依赖（Gradle 侧：编译 + 运行 classpath）=====
+    // 单向：禁忌 → 核心 + 本体。平台类来自 *forge，common 类来自各自 common 子项目
+    // （Architectury 的 common 与 forge 是两个独立项目，平台的 namedElements 不含 common 类）。
+    // 与本模块 mods.toml 的 [[dependencies.akaishi_forbidden]]（akaishi_core / akaishi，mandatory + AFTER）成对声明。
+    crossMod(project(path: ":coreforge", configuration: "namedElements")) { transitive false }
+    crossMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+    crossMod(project(path: ":forge", configuration: "namedElements")) { transitive false }
+    crossMod(project(path: ":common", configuration: "namedElements")) { transitive false }
+
+    // 注：architectury / cloth-config 等由本体 akaishi 提供，不在此重复 include。
+}
+
+// Source JAR 组装（合并禁忌 common 源码）
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def commonSources = project(":forbiddencommon").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir project(":forbiddencommon").sourceSets.main.resources
+        }
+    }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
+    dependsOn(":forbiddencommon:classes")
+}

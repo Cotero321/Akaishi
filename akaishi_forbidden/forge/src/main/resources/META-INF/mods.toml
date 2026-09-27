@@ -1,0 +1,42 @@
+# 赤石禁忌（Akaishi Forbidden）Mods.toml
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "MIT"
+
+[[mods]]
+modId = "akaishi_forbidden"
+version = "${mod_version}"
+displayName = "赤石禁忌 Akaishi Forbidden"
+authors = "Akaishi Author"
+description = '''赤石模组的禁忌内容模块（可选安装）。
+包含母神祭坛、生命融合、禁忌秘典、BOSS 阿盖托洛丝与理智系统；未安装本模块时这些内容不注册、不出现。'''
+
+[[dependencies.akaishi_forbidden]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,48)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.akaishi_forbidden]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,1.21)"
+ordering = "NONE"
+side = "BOTH"
+
+# 硬依赖：赤石核心（API/基础设施），必须先于本模块加载
+[[dependencies.akaishi_forbidden]]
+modId = "akaishi_core"
+mandatory = true
+versionRange = "[1.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+# 硬依赖：赤石科技（本体），禁忌内容消费其物品/方块/接口，必须先于本模块加载
+[[dependencies.akaishi_forbidden]]
+modId = "akaishi"
+mandatory = true
+versionRange = "[1.0,)"
+ordering = "AFTER"
+side = "BOTH"

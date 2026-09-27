@@ -14,7 +14,18 @@ repositories {
     }
 }
 
+// 跨模组依赖（单向：科技本体 → 赤石核心）：用自定义配置而非 modImplementation project(...)，
+// 理由同 akaishi_forbidden/common/build.gradle —— ArchLoom 会在配置期急切读取项目依赖的 dev jar 元数据。
+configurations {
+    coreMod
+    compileClasspath.extendsFrom coreMod
+    runtimeClasspath.extendsFrom coreMod
+}
+
 dependencies {
+    // 赤石核心（API/基础设施）：api/ 已上移，编译与运行都需要其类（平台类来自 :coreforge）
+    coreMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+
     // Architectury API（作为 mod 依赖以启用 Loom 重映射）
     modImplementation("dev.architectury:architectury:9.2.14")
 

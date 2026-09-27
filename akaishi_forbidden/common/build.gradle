@@ -1,0 +1,22 @@
+// 赤石禁忌（可选内容）—— common 侧骨架。
+// 依赖方向单向：禁忌 → 本体(科技) + 核心；核心/本体绝不反向依赖禁忌。
+architectury {
+    common("forge")
+}
+
+// 跨模组依赖用自定义配置而非 modImplementation：
+// ArchLoom 会把 modImplementation 的项目依赖当"外部 mod"在配置期急切读取其 dev jar 元数据，
+// 干净构建时该 jar 尚不存在会直接失败；本仓库既有的 common→forge 依赖同样用自定义配置实现。
+configurations {
+    coreCommon
+    techCommon
+    compileClasspath.extendsFrom coreCommon, techCommon
+    runtimeClasspath.extendsFrom coreCommon, techCommon
+}
+
+dependencies {
+    // Gradle 侧跨模组依赖（编译 + 运行 classpath），与 forbiddenforge/mods.toml 的
+    // [[dependencies.akaishi_forbidden]]（akaishi_core / akaishi）成对声明。
+    coreCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+    techCommon(project(path: ":common", configuration: "namedElements")) { transitive false }
+}

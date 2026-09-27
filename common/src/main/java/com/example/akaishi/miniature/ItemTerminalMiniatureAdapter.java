@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +33,10 @@ public final class ItemTerminalMiniatureAdapter implements MiniatureTerminalAdap
     }
 
     @Override
-    public MiniatureTerminalState createState(MiniatureTerminalBlockEntity be, CompoundTag payload) {
-        return new ItemTerminalMiniatureState(be, payload);
+    public MiniatureTerminalState createState(BlockEntity be, CompoundTag payload) {
+        // 通用层按 BlockEntity 传参；唯一调用方是 MiniatureTerminalBlockEntity 自身（见其 apply()）
+        return be instanceof MiniatureTerminalBlockEntity terminal
+                ? new ItemTerminalMiniatureState(terminal, payload) : null;
     }
 
     @Override
@@ -43,8 +46,9 @@ public final class ItemTerminalMiniatureAdapter implements MiniatureTerminalAdap
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory inv, MiniatureTerminalBlockEntity be) {
-        IItemTerminalHost host = be.state() == null ? null : be.state().itemHost();
+    public AbstractContainerMenu createMenu(int id, Inventory inv, BlockEntity be) {
+        IItemTerminalHost host = be instanceof MiniatureTerminalBlockEntity terminal && terminal.state() != null
+                ? terminal.state().itemHost() : null;
         return host == null ? null : new AkaishiItemTerminalMenu(id, inv, host);
     }
 

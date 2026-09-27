@@ -1,0 +1,124 @@
+plugins {
+    id 'com.gradleup.shadow' version '8.3.6'
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+// 启用 Loom 的 Forge 平台支持，创建 forge 依赖配置（空块即可，本模块无 mixin）
+loom {
+    forge {
+    }
+}
+
+// 产物名与 modId 对齐：akaishi_core-<version>.jar（与本体 akaishi-forge-*.jar 可区分）
+base {
+    archivesName = "akaishi_core"
+}
+
+configurations {
+    common
+    shadowCommon // 不使用 shadow 插件的默认配置，避免与 Loom 冲突
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier.set("dev-shadow")
+    exclude 'META-INF/versions/**'
+    mergeServiceFiles()
+    exclude 'module-info.class'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+jar {
+    archiveClassifier.set("dev")
+    from("${rootProject.projectDir}/LICENSE") {
+        rename { "${it}_${base.archivesName.get()}" }
+    }
+    manifest {
+        attributes([
+            'Specification-Title'    : 'Akaishi Core Mod',
+            'Specification-Vendor'   : 'Akaishi Author',
+            'Specification-Version'  : '1',
+            'Implementation-Title'   : project.name,
+            'Implementation-Version' : project.version,
+            'Implementation-Vendor'  : 'Akaishi Author'
+        ])
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        minecraft_version      : '1.20.1',
+        minecraft_version_range: '[1.20.1,1.21)',
+        forge_version          : project.forge_version,
+        forge_version_range    : '[47,48)',
+        loader_version_range   : '[47,)',
+        mod_id                 : 'akaishi_core',
+        mod_name               : 'Akaishi Core',
+        mod_version            : project.version,
+        mod_authors            : 'Akaishi Author',
+        mod_description        : 'Akaishi Core - API and infrastructure'
+    ]
+
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+dependencies {
+    // 核心 common 源码：编译/开发用 namedElements，发布用 transformProductionForge（重映射后的 common 产物）
+    common(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":corecommon", configuration: "transformProductionForge")) { transitive false }
+
+    // Forge 平台
+    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // 注：架构级第三方依赖（architectury / cloth-config）由本体 akaishi 提供，
+    // 核心与禁忌不再各自 include，避免同一 mod id 的 jar-in-jar 重复装载。
+}
+
+// Source JAR 组装（合并核心 common 源码）
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def commonSources = project(":corecommon").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            // 合并核心 common 的资源（P1 为空；保证与发布 jar 结构一致）
+            srcDir project(":corecommon").sourceSets.main.resources
+        }
+    }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// dev 运行前强制重编核心 common（若后续为核心里加了 run 配置，保证改动生效）
+tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
+    dependsOn(":corecommon:classes")
+}

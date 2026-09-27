@@ -61,5 +61,20 @@ dependencyResolutionManagement {
 }
 rootProject.name = 'akaishi'
 // 包含子项目（仅 Forge 平台）
+// ① 科技本体：common + forge（modId = akaishi，既有源码零改动）
 include 'common'
 include 'forge'
+
+// ② 赤石核心（API/基础设施，modId = akaishi_core）
+// 项目名唯一（corecommon/coreforge），避免与既有 common/forge 冲突；
+// architectury { common("forge") } 的参数是加载器枚举名而非项目名，平台侧用 project(path) 显式引用。
+include 'corecommon'
+project(':corecommon').projectDir = file('akaishi_core/common')
+include 'coreforge'
+project(':coreforge').projectDir = file('akaishi_core/forge')
+
+// ③ 赤石禁忌（可选内容，modId = akaishi_forbidden），依赖核心 + 本体
+include 'forbiddencommon'
+project(':forbiddencommon').projectDir = file('akaishi_forbidden/common')
+include 'forbiddenforge'
+project(':forbiddenforge').projectDir = file('akaishi_forbidden/forge')

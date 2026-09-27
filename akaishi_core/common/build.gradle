@@ -1,0 +1,13 @@
+// 赤石核心（API/基础设施）—— common 侧。
+// P2 起承载从本体抽出的 api/（62 文件）与终端安全 / 流体槽等「零反向依赖」基础设施；
+// 本模块自身不注册任何游戏内容（三模块共用 akaishi: 命名空间，内容仍归本体与禁忌）。
+architectury {
+    common("forge")
+}
+
+dependencies {
+    // Architectury API：api/ 的流体接口与 FluidTank 使用 dev.architectury.fluid.FluidStack。
+    // 只取编译期 API 面、不 include：architectury 运行时由本体 akaishi 统一以 jar-in-jar 提供，
+    // 避免同一 mod 被三份 jar 重复内嵌（见 §26.5 踩坑 5）。
+    modImplementation("dev.architectury:architectury:9.2.14")
+}

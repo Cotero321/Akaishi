@@ -35,9 +35,10 @@ loom {
 configurations {
     common
     shadowCommon // Don't use shadow from the shadow plugin since it conflicts with Loom.
-    compileClasspath.extendsFrom common
-    runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    crossMod // 跨模组依赖（赤石核心），普通配置而非 modImplementation，理由见 akaishi_forbidden/forge/build.gradle
+    compileClasspath.extendsFrom common, crossMod
+    runtimeClasspath.extendsFrom common, crossMod
+    developmentForge.extendsFrom common, crossMod
 }
 
 shadowJar {
@@ -140,6 +141,13 @@ dependencies {
     // Forge 平台
     forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
+    // ===== 跨模组依赖（Gradle 侧：编译 + 运行 classpath）=====
+    // 单向：科技本体 → 赤石核心。平台类来自 :coreforge，common 类来自 :corecommon
+    // （Architectury 的 common 与 forge 是两个独立项目，平台的 namedElements 不含 common 类）。
+    // 与本模块 mods.toml 的 [[dependencies.akaishi]]（modId = akaishi_core，mandatory + AFTER）成对声明。
+    crossMod(project(path: ":coreforge", configuration: "namedElements")) { transitive false }
+    crossMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+
     // Architectury API - 使用 Jar-in-Jar 内嵌
     modApi("dev.architectury:architectury-forge:9.2.14")
     include("dev.architectury:architectury-forge:9.2.14")
@@ -210,9 +218,10 @@ processResources {
 }
 
 // dev 运行前强制重编 common：forge dev 直接加载 common/build/classes/java/main（无 common jar），
-// 不重编会导致 common 改动不生效（IDE 的 bin/main 不参与运行）
+// 不重编会导致 common 改动不生效（IDE 的 bin/main 不参与运行）。核心 common 同理。
 tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
     dependsOn(":common:classes")
+    dependsOn(":corecommon:classes")
 }
 
 // ============================================================================

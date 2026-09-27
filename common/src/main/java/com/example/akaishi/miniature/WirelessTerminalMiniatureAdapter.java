@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -67,8 +68,10 @@ public final class WirelessTerminalMiniatureAdapter implements MiniatureTerminal
     }
 
     @Override
-    public MiniatureTerminalState createState(MiniatureTerminalBlockEntity be, CompoundTag payload) {
-        return new WirelessTerminalMiniatureState(be, payload, family, energyType);
+    public MiniatureTerminalState createState(BlockEntity be, CompoundTag payload) {
+        // 通用层按 BlockEntity 传参；唯一调用方是 MiniatureTerminalBlockEntity 自身（见其 apply()）
+        return be instanceof MiniatureTerminalBlockEntity terminal
+                ? new WirelessTerminalMiniatureState(terminal, payload, family, energyType) : null;
     }
 
     @Override
@@ -83,8 +86,9 @@ public final class WirelessTerminalMiniatureAdapter implements MiniatureTerminal
      */
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory inv, MiniatureTerminalBlockEntity be) {
-        IWirelessTerminalHost host = be.state() instanceof IWirelessTerminalHost h ? h : null;
+    public AbstractContainerMenu createMenu(int id, Inventory inv, BlockEntity be) {
+        IWirelessTerminalHost host = be instanceof MiniatureTerminalBlockEntity terminal
+                && terminal.state() instanceof IWirelessTerminalHost h ? h : null;
         if (host == null) {
             return null;
         }
