@@ -52,6 +52,8 @@ public final class MechanicalOrganTooltip {
     private static final String KEY_TRAIT_LINE = "tooltip.akaishi.mechanical.trait_line";
     private static final String KEY_MATERIALS_DNA = "tooltip.akaishi.mechanical.materials_dna";
     private static final String KEY_PART_LINE = "tooltip.akaishi.mechanical.part_line";
+    /** 等级口径提示：本页显示的是「该器官自身」等级，实际生效取全身最高（跨器官） */
+    private static final String KEY_LEVEL_SCOPE = "tooltip.akaishi.mechanical.level_scope";
     /** 特性区标题后的上限提示（语言无关的灰度数字，提示企划 D5「单器官特性上限」） */
     private static final Component TRAITS_CAP_HINT =
             Component.literal(" §8[≤" + MechanicalLevels.MAX_TRAITS + "]");
@@ -118,6 +120,7 @@ public final class MechanicalOrganTooltip {
                     level,
                     Component.translatable(trait.descriptionKey(level))));
         }
+        lines.add(Component.translatable(KEY_LEVEL_SCOPE));
     }
 
     /** Ctrl：材料与 DNA 区（四部件逐行 + 调校/协同/效果） */
@@ -138,6 +141,7 @@ public final class MechanicalOrganTooltip {
                     dnaName(dnaId),
                     dnaLevelOf(dnaId, dnaLevels)));
         }
+        lines.add(Component.translatable(KEY_LEVEL_SCOPE));
 
         // DNA 调校总览（旧单字段：仅四部件同源时才有值，与既有展示口径一致）
         String dnaId = MechanicalOrganItem.getDnaProfileId(stack);

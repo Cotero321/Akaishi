@@ -173,8 +173,9 @@ public final class MechanicalOrganResolver {
      * 供运行时按部件计数推导等级；空白/none 项跳过；内置与附属效果一视同仁）。
      * <p>
      * 注意：运行时 {@code AkaishiMechanicalEffectHandler} 按「器官内 DNA 来源的出现次数」推导单器官等级
-     * （同一 DNA 出现 N 次 ⇒ 该器官 LvN），再跨器官取最高等级为有效等级，故此处保留的重复项<b>会</b>参与等级计算
-     * （受部件限装约束：单基因最多装 2 类部件 ⇒ 单器官同 DNA 部件数 ≤2 ⇒ 该器官等级实际 ≤Lv2）。
+     * （同一 DNA 出现 N 次 ⇒ 该器官 LvN），再跨器官取最高等级为有效等级，故此处保留的重复项<b>会</b>参与等级计算。
+     * 受部件限装约束：<b>实体级 / 机制型</b>基因最多装 2 类部件 ⇒ 单器官同 DNA 部件数 ≤2 ⇒ 该器官等级 ≤Lv2；
+     * <b>组级</b>基因（血统大类）放开为全部 4 部件 ⇒ 四部件同源时该器官可达 Lv4。
      */
     private static List<IMechanicalDnaEffect> collectEffects(
             List<MechanicalPartTemplate> templates) {

@@ -128,10 +128,17 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
         if (dropdownOpen == 0) {
             drawGrid(gui, x, y, MechanicalOrganType.values(), menu.getSelectedOrgan(), 0, 3, Set.of());
         } else {
-            drawGrid(gui, x, y, MechanicalPartType.values(), menu.getSelectedPart(), 1, 2, disallowedParts());
-            if (!disallowedParts().isEmpty()) {
+            Set<MechanicalPartType> disallowed = disallowedParts();
+            drawGrid(gui, x, y, MechanicalPartType.values(), menu.getSelectedPart(), 1, 2, disallowed);
+            int hintY = y + OV_GRID_Y + 2 * OV_CELL_H + 4;
+            if (!disallowed.isEmpty()) {
                 gui.drawString(this.font, Component.translatable("gui.akaishi.mech.part_disallowed_hint"),
-                        x + OV_X + 4, y + OV_GRID_Y + 2 * OV_CELL_H + 4, 0xFFA0A0A0, false);
+                        x + OV_X + 4, hintY, 0xFFA0A0A0, false);
+            } else if (!MechanicalDnaProfile.NONE_ID.equals(resolveDnaInSlot().id())) {
+                // 无部件约束的基因（组级）：网格全亮无灰显，明确提示「可装任意部件」，
+                // 避免玩家误以为「所有基因都能装任意部件」
+                gui.drawString(this.font, Component.translatable("gui.akaishi.mech.part_any_hint"),
+                        x + OV_X + 4, hintY, 0xFFA0A0A0, false);
             }
         }
         gui.pose().popPose();
@@ -158,11 +165,16 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
         }
     }
 
-    /** 当前 DNA 槽基因禁止装入的部件集合（无约束或槽为空 ⇒ 空集） */
-    private Set<MechanicalPartType> disallowedParts() {
+    /** 读取 DNA 槽解析出的基因（槽为空/非来源 ⇒ NONE，永不为 null） */
+    private MechanicalDnaProfile resolveDnaInSlot() {
         int dnaSlot = AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 2;
         ItemStack dnaStack = dnaSlot < menu.slots.size() ? menu.slots.get(dnaSlot).getItem() : ItemStack.EMPTY;
-        MechanicalDnaProfile dna = MechanicalDnaSources.resolve(dnaStack);
+        return MechanicalDnaSources.resolve(dnaStack);
+    }
+
+    /** 当前 DNA 槽基因禁止装入的部件集合（无约束或槽为空 ⇒ 空集） */
+    private Set<MechanicalPartType> disallowedParts() {
+        MechanicalDnaProfile dna = resolveDnaInSlot();
         if (!dna.hasPartConstraint()) {
             return Set.of();
         }

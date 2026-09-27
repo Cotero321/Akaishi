@@ -265,21 +265,17 @@ public final class MechanicalDnaProfile {
         // 无DNA调校（NONE 恒为全部允许）
         register(NONE_ID, c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.NONE, ALL_PARTS);
 
-        // ---- 分组级（与内置分组一一对应，保证各组基因全部有落点）----
+        // ---- 分组级（兜底覆盖整组「血统大类」；仅成员无实体级基因的分组才会走到此分支）----
         // 组级基因是「血统大类」，本就泛用 ⇒ 不设部件约束（四部件皆可同源）；
         // 四部件同用同一组级基因 ⇒ 单器官计数 4 ⇒ 该 DNA 效果达 Lv4（四级曲线满级可达）。
+        // 注：EXPLOSIVE/BOSS/ENDER 三组的每个成员都已有实体级基因（实体优先于分组），分组分支不可达，
+        //     故不注册（防孤儿，RULES §1）。
         // 温血：代谢/恢复（低血自愈）
         register("akaishi:warm_blooded", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION);
         // 亡灵：坚韧防御 + 凋零攻击
         register("akaishi:undead", c(0, 2, 1, -1, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK);
-        // 爆炸：爆破功能特化
-        register("akaishi:explosive", c(0, -1, 2, 0, 0, 0, 0, 2, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST);
         // 异变：全能偏攻
         register("akaishi:aberration", c(0, 0, 1, 1, 0, 1, 1, 0, 0, 0), MechanicalSpecialEffect.POISON_RESIST);
-        // 末影：瞬移/感知
-        register("akaishi:ender", c(0, -1, 0, 0, 2, 0, 0, 0, 1, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN);
-        // 首领：压迫感/生命护甲
-        register("akaishi:boss", c(0, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST);
         // 龙族：倍率/火焰
         register("akaishi:dragon", c(2, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK);
 
