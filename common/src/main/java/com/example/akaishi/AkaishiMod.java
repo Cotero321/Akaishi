@@ -17,7 +17,6 @@ import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.block.entity.ModBlockEntities;
-import com.example.akaishi.boss.agaitolos.arena.NetherPrisonArena;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.decay.DecayZoneManager;
 import com.example.akaishi.decay.DecayZoneSync;
@@ -98,8 +97,6 @@ public final class AkaishiMod {
         TickEvent.SERVER_LEVEL_POST.register(DecayZoneManager::serverTick);
         // 衰竭区域污染强度同步：服务端周期推送玩家所在区域强度（伪群系氛围）
         TickEvent.SERVER_LEVEL_POST.register(DecayZoneSync::serverTick);
-        // 下界牢狱场地（阿盖托洛丝）：分批施工 / 分批还原 / 重启自愈 + 复活期凋零，每维度每 tick 驱动
-        TickEvent.SERVER_LEVEL_POST.register(NetherPrisonArena::serverTick);
         // 物品终端注册表（储存口绑定清单）：按节拍主动清扫失效条目
         // （拆方块/坍缩拆芯片/区块卸载/换存档残留都不能再留下"幽灵条目"，不依赖有人开界面）
         TickEvent.SERVER_LEVEL_POST.register(com.example.akaishi.wireless.ItemTerminalRegistry::serverTick);

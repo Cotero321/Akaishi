@@ -2,7 +2,7 @@ package com.example.akaishi.boss.agaitolos.skill;
 
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.boss.agaitolos.entity.AgaitolosWitherSkull;
-import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -70,7 +70,7 @@ public final class AgaitolosSkullSkill {
         if (boss.level().isClientSide()) {
             return null;
         }
-        AgaitolosWitherSkull skull = new AgaitolosWitherSkull(ModEntities.AGAITOLOS_WITHER_SKULL.get(), boss.level());
+        AgaitolosWitherSkull skull = new AgaitolosWitherSkull(AkaishiForbiddenEntities.AGAITOLOS_WITHER_SKULL.get(), boss.level());
         // owner = BOSS：既是击杀归属，也是「是否被反弹」的判据来源（被反弹后 owner 会变成玩家）
         skull.setOwner(boss);
         // 不可破坏地形：dangerous=false 降低飞行惯性、取消对火方块的额外破坏。

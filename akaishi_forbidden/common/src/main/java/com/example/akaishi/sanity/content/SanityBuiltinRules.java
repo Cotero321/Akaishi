@@ -6,6 +6,7 @@ import com.example.akaishi.api.sanity.SanityChangeSource;
 import com.example.akaishi.api.sanity.SanityContext;
 import com.example.akaishi.api.sanity.SanityRuleRegistry;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.sanity.SanityServiceImpl;
 import net.minecraft.resources.ResourceLocation;
@@ -183,7 +184,7 @@ public final class SanityBuiltinRules {
         if (entity.hasEffect(MobEffects.WITHER)) {
             return true;
         }
-        MobEffect doom = ModEffects.DOOM == null ? null : ModEffects.DOOM.get();
+        MobEffect doom = AkaishiForbiddenEffects.DOOM == null ? null : AkaishiForbiddenEffects.DOOM.get();
         return doom != null && entity.hasEffect(doom);
     }
 

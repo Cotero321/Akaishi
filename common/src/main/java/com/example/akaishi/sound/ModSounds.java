@@ -142,15 +142,9 @@ public final class ModSounds {
     public static final RegistrySupplier<SoundEvent> UNNAMEABLE_WHISPER = reg("unnameable_whisper");
 
     // ==================== BOSS 战斗音乐 ====================
-
-    /**
-     * 阿盖托洛丝战斗音乐（53s 无缝循环素材）。
-     * <p>
-     * 与机器 {@code *_hum} 不同，本条<b>不由服务端播放</b>：它是位置音效且需要"BOSS 一死立刻停"，
-     * 只有客户端的循环 SoundInstance 能做到（服务端 {@code playSound} 播出去就收不回来），
-     * 故实际消费方是 forge 客户端 {@code AgaitolosMusicHandler} / {@code AgaitolosThemeSound}。
-     */
-    public static final RegistrySupplier<SoundEvent> AGAITOLOS_THEME = reg("agaitolos_theme");
+    // 阿盖托洛丝战斗音乐（agaitolos_theme，53s 无缝循环）随 BOSS 迁往 akaishi_forbidden：
+    // SoundEvent 注册代码见 AkaishiForbiddenSounds；本表不再持有该事件。
+    // ⚠ sounds.json 与本表音效文件同属 assets/akaishi/，故该条目与 .ogg 仍留在本体资源内（id 不变）。
 
     /** 强制类加载：确保 SoundEvent 在注册事件前完成注册（游戏启动阶段由 AkaishiMod.init 调用） */
     public static void touch() {

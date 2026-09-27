@@ -1,7 +1,7 @@
 package com.example.akaishi.forge.boss.agaitolos;
 
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.effect.DoomEffect;
-import com.example.akaishi.effect.ModEffects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
@@ -39,7 +39,7 @@ public final class AgaitolosDoomHandler {
         LivingEntity entity = event.getEntity();
         // 注册表尚未就绪（理论上不可达）时不干预：本事件的宿主是"任何实体回血"，
         // 绝不能因为本模组自己的空指针把别人的治疗打断（异常隔离优先）
-        MobEffect doom = ModEffects.DOOM == null ? null : ModEffects.DOOM.get();
+        MobEffect doom = AkaishiForbiddenEffects.DOOM == null ? null : AkaishiForbiddenEffects.DOOM.get();
         if (doom == null || !entity.hasEffect(doom)) {
             return;
         }

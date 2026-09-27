@@ -3,7 +3,7 @@ package com.example.akaishi.boss.agaitolos.summon;
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.boss.agaitolos.arena.ArenaGeometry;
 import com.example.akaishi.boss.agaitolos.arena.NetherPrisonArena;
-import com.example.akaishi.entity.ModEntities;
+import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -115,7 +115,7 @@ public final class AgaitolosSummonRitual {
             return true;
         }
         // ⑤ 生成：位置 = 锚点正上方（出场演出会把它抬到悬停高度上方再降临，故无需在此摆位）
-        AgaitolosEntity boss = ModEntities.AGAITOLOS.get().create(level);
+        AgaitolosEntity boss = AkaishiForbiddenEntities.AGAITOLOS.get().create(level);
         if (boss == null) {
             reply(level, anchor, player, "failed");
             return true;

@@ -1,7 +1,7 @@
 package com.example.akaishi.forge.boss.agaitolos;
 
 import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
-import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -44,7 +44,7 @@ public final class AgaitolosThemeSound extends AbstractTickableSoundInstance {
      */
     AgaitolosThemeSound(AgaitolosEntity boss, float volume, float pitch, double radius, long seed) {
         // 音源用 MUSIC：自动尊重玩家"音乐"滑块，且与"唱片 / 环境音"通道分开
-        super(ModSounds.AGAITOLOS_THEME.get(), SoundSource.MUSIC, RandomSource.create(seed));
+        super(AkaishiForbiddenSounds.AGAITOLOS_THEME.get(), SoundSource.MUSIC, RandomSource.create(seed));
         this.boss = boss;
         this.radiusSqr = radius * radius;
         this.looping = true;

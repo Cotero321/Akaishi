@@ -2,6 +2,7 @@ package com.example.akaishi.forbidden;
 
 import com.example.akaishi.api.life.BodySubStateFactory;
 import com.example.akaishi.api.sanity.SanityServices;
+import com.example.akaishi.boss.agaitolos.arena.NetherPrisonArena;
 import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.item.AkaishiCodexItems;
@@ -25,6 +26,7 @@ import com.example.akaishi.sanity.content.SanityBuiltinRules;
 import com.example.akaishi.sanity.content.SanityBuiltinThresholdCuts;
 import com.example.akaishi.sanity.content.SanityFoodSettlement;
 import com.example.akaishi.sanity.content.SanityRestorePotions;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.platform.Platform;
@@ -36,8 +38,10 @@ import dev.architectury.utils.Env;
  * <p><b>P3a</b>：禁忌秘典（物品 / 创造栏「禁忌」/ 菜单与界面 / 网络包）已自本体迁入本模块。
  * <p><b>P3b</b>：理智系统（{@code sanity} 实现包 + {@code api/sanity} 契约 + 影怪实体 + 效果 +
  * 相关物品 + 调试指令 + 服务端结算节拍 + S2C 同步）整体自本体与核心迁入本模块。
+ * <p><b>P3c</b>：BOSS「阿盖托洛丝（下界本源）」（{@code boss/agaitolos} 实现包 + 下界牢狱场地 +
+ * 召唤仪式 + 凋亡效果 + 凋零头颅实体 + 战斗音乐 SoundEvent 注册）整体自本体迁入本模块。
  * 未安装本模块时这些内容一律不注册（注册命名空间仍为三模块共用的 {@code akaishi:}）；
- * 其余禁忌内容（母神祭坛 / 生命融合 / BOSS 阿盖托洛丝）在后续阶段迁入。
+ * 其余禁忌内容（母神祭坛 / 生命融合）在后续阶段迁入。
  */
 public final class AkaishiForbiddenMod {
     /** 模组 ID，需与禁忌模块 mods.toml 中的 modId 保持一致 */
@@ -59,6 +63,7 @@ public final class AkaishiForbiddenMod {
         // 禁忌秘典物品
         AkaishiCodexItems.register();
         // 理智系统：影怪 + 精神弹实体类型；状态效果 akaishi:sanity_restore；物品（两瓶药剂 + 花环）
+        // P3c：同一注册方法内追加 BOSS 实体（agaitolos / agaitolos_wither_skull）与效果 akaishi:doom
         AkaishiForbiddenEntities.register();
         AkaishiForbiddenEffects.register();
         AkaishiSanityItems.register();
@@ -111,5 +116,11 @@ public final class AkaishiForbiddenMod {
         if (Platform.getEnvironment() == Env.CLIENT) {
             SanitySyncS2C.registerClient();
         }
+
+        // ===== BOSS 阿盖托洛丝（P3c 自本体迁入）=====
+        // 下界牢狱场地：分批施工 / 分批还原 / 重启自愈 + 复活期凋零，每维度每 tick 驱动
+        TickEvent.SERVER_LEVEL_POST.register(NetherPrisonArena::serverTick);
+        // 强制触发音效注册类加载：SoundEvent 注册需在注册事件前完成（BOSS 战斗音乐 akaishi:agaitolos_theme）
+        AkaishiForbiddenSounds.touch();
     }
 }

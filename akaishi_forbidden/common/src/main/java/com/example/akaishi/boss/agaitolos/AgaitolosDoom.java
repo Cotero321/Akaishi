@@ -1,6 +1,6 @@
 package com.example.akaishi.boss.agaitolos;
 
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -53,7 +53,7 @@ public final class AgaitolosDoom {
         if (entity.hasEffect(MobEffects.WITHER)) {
             return true;
         }
-        MobEffect doom = ModEffects.DOOM == null ? null : ModEffects.DOOM.get();
+        MobEffect doom = AkaishiForbiddenEffects.DOOM == null ? null : AkaishiForbiddenEffects.DOOM.get();
         return doom != null && entity.hasEffect(doom);
     }
 
@@ -73,7 +73,7 @@ public final class AgaitolosDoom {
             return;
         }
         if (isDoomPhase(boss)) {
-            MobEffect doom = ModEffects.DOOM == null ? null : ModEffects.DOOM.get();
+            MobEffect doom = AkaishiForbiddenEffects.DOOM == null ? null : AkaishiForbiddenEffects.DOOM.get();
             // 注册表尚未就绪（理论上不可达：本方法只在游戏内被调用）时退化为凋零，不静默什么也不做
             if (doom != null) {
                 target.addEffect(new MobEffectInstance(doom, durationTicks, amplifier), boss);

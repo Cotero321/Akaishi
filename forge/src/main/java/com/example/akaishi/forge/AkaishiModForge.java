@@ -20,16 +20,10 @@ import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.block.entity.AkaishiReactorControllerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFusionControllerBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
-import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.command.ModCommands;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ConfigSyncS2C;
 import com.example.akaishi.entity.ModEntities;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosArenaEvents;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosBossBarOverlay;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosDoomHandler;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosMusicHandler;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosRenderer;
 import com.example.akaishi.forge.client.AkaishiDecayFogHandler;
 import com.example.akaishi.forge.client.AkaishiLifeEnergyProjectileRenderer;
 import com.example.akaishi.forge.client.armor.AkaishiMekaSuitArmorModel;
@@ -85,7 +79,6 @@ import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.WitherSkullRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -113,7 +106,6 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -126,7 +118,6 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -233,9 +224,6 @@ public final class AkaishiModForge {
         // 玩家属性供应商，否则会丢失全部原版属性并触发 "Registry Object not present" 崩溃。
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onEntityAttributeModification);
 
-        // 阿盖托洛丝 BOSS 属性：自定义生物必须在此注册属性供应商，否则实体生成即崩
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onEntityAttributes);
-
         // 原生动力护甲层：分件几何绑定到人形骨骼，不依赖 Geo/GeckoLib。
         FMLJavaModLoadingContext.get().getModEventBus().addListener(
                 (EntityRenderersEvent.RegisterLayerDefinitions event) -> event.registerLayerDefinition(
@@ -278,12 +266,6 @@ public final class AkaishiModForge {
 
         // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
-
-        // 阿盖托洛丝阶段三「凋亡」的降低治疗层：common 无治疗钩子，故在此消费 Forge 的 LivingHealEvent
-        MinecraftForge.EVENT_BUS.register(AgaitolosDoomHandler.INSTANCE);
-
-        // 下界牢狱：召唤仪式右键入口（RightClickBlock）+ 场地方块不可破坏（BreakEvent / ExplosionEvent.Detonate）
-        MinecraftForge.EVENT_BUS.register(AgaitolosArenaEvents.INSTANCE);
 
         // 衰竭区域死寂：区域内禁止生物自然生成
         MinecraftForge.EVENT_BUS.register(AkaishiDecaySpawnBlocker.INSTANCE);
@@ -363,7 +345,7 @@ public final class AkaishiModForge {
         }
     }
 
-    /** 注册客户端 HUD 叠加层：「不可名状」边缘粗线 + 噪点 + 低语；侵蚀泛红；统一 HUD 渲染层（含理智条）；阿盖托洛丝铭牌血条 */
+    /** 注册客户端 HUD 叠加层：「不可名状」边缘粗线 + 噪点 + 低语；侵蚀泛红；统一 HUD 渲染层（含理智条） */
     private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         // 泛红先注册（位于下层），避免盖住低语文字
         event.registerAboveAll("erosion_flash_overlay", new AkaishiErosionFlashOverlay());
@@ -371,11 +353,7 @@ public final class AkaishiModForge {
         // 统一 HUD 渲染层：理智条等"贴边自绘"组件由禁忌模块登记到 api.hud 注册表，
         // 再由本层统一解算锚点 / 组内堆叠 / 与原版 HUD 避让（元素自身不再硬编码屏幕坐标）。
         event.registerAboveAll("akaishi_hud_layer", new AkaishiHudLayer());
-        // 阿盖托洛丝铭牌血条：锚在原版 boss 血条层（该层已空 —— 本 BOSS 不再用 ServerBossEvent），
-        // 挂上去即占据"原版血条的位置"，且不会与任何原版血条重叠。
-        // 它属于"以屏幕中轴为不动点的独立层"，不进统一 HUD 层（见 api.hud 的 package-info 边界说明）。
-        event.registerAbove(VanillaGuiOverlay.BOSS_EVENT_PROGRESS.id(), "agaitolos_boss_bar",
-                new AgaitolosBossBarOverlay());
+        // 阿盖托洛丝铭牌血条随 BOSS 迁往禁忌模块（P3c 迁出，由 AkaishiForbiddenClientSetup 注册）
     }
 
     /** 方块渲染类型（仅客户端触发）：透明贴图方块必须显式指定渲染层（水晶簇 cutout / 结构玻璃 translucent） */
@@ -417,11 +395,7 @@ public final class AkaishiModForge {
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_LIFE_ENERGY_EMITTER.get(), LifeEnergyEmitterRenderer::new);
         // 生命能量弹：相机朝向的发光公告板
         EntityRenderers.register(ModEntities.LIFE_ENERGY_PROJECTILE.get(), AkaishiLifeEnergyProjectileRenderer::new);
-        // 阿盖托洛丝：GeckoLib 几何动画渲染（阶段一模型/动画，P7 再接三阶段换模）
-        EntityRenderers.register(ModEntities.AGAITOLOS.get(), AgaitolosRenderer::new);
-        // 阿盖托洛丝的远程弹体：复用原版凋零头渲染器（子类可被 EntityRenderer<WitherSkull> 直接渲染）
-        EntityRenderers.register(ModEntities.AGAITOLOS_WITHER_SKULL.get(), WitherSkullRenderer::new);
-        // 影怪 / 精神弹渲染器由禁忌模块注册（P3b 随理智系统迁出）
+        // 阿盖托洛丝与其凋零头颅渲染器、影怪 / 精神弹渲染器均由禁忌模块注册（P3b/P3c 迁出）
         // 管道方向标识：输出=臂端收窄尖口，输入=臂端外扩喇叭口（物品/赤能源/生命能量/液体/废料/等离子全族）
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ITEM_PIPE.get(), PipeSideOverlayRenderer::new);
         BlockEntityRenderers.<BlockEntity>register(ModBlockEntities.CHISHI_ENERGY_PIPE.get(), PipeSideOverlayRenderer::new);
@@ -441,8 +415,7 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameableHandler.INSTANCE);
         // 「不可名状」后处理：整帧对比度提升 + 电视机花白
         MinecraftForge.EVENT_BUS.register(AkaishiUnnameablePostHandler.INSTANCE);
-        // 阿盖托洛丝战斗音乐：附近有存活 BOSS 时挂一条跟随它的循环位置音效（客户端 TickableSoundInstance）
-        MinecraftForge.EVENT_BUS.register(AgaitolosMusicHandler.INSTANCE);
+        // 阿盖托洛丝战斗音乐随 BOSS 迁往禁忌模块（P3c 迁出，由 AkaishiForbiddenClientSetup 注册）
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();
     }
@@ -455,12 +428,6 @@ public final class AkaishiModForge {
         event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_CHANCE.get());
         event.add(EntityType.PLAYER, ModCombatAttributes.CRIT_DAMAGE.get());
         event.add(EntityType.PLAYER, ModCombatAttributes.DODGE_CHANCE.get());
-    }
-
-    /** 自定义生物的属性供应商（每个自定义 LivingEntity 类型必须注册一次） */
-    private void onEntityAttributes(EntityAttributeCreationEvent event) {
-        event.put(ModEntities.AGAITOLOS.get(), AgaitolosEntity.createAttributes().build());
-        // 影怪的属性供应商由禁忌模块注册（P3b 随理智系统迁出）
     }
 
     /**

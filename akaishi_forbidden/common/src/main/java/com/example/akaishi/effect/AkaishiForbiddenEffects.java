@@ -9,11 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 
 /**
- * 禁忌模块·状态效果注册（P3b 随理智系统从本体 {@code ModEffects} 迁入）。
+ * 禁忌模块·状态效果注册（P3b 随理智系统、P3c 随 BOSS 从本体 {@code ModEffects} 迁入）。
  *
  * <p>「理智恢复」是理智回复药水的载体效果，随理智系统归本模块；
- * 注册 id 与迁前逐字一致：{@code akaishi:sanity_restore}（命名空间仍为三模块共用的 {@code akaishi:}）。
- * 其余效果（衰变 / 不可名状 / 凋亡）留在本体 {@code ModEffects}。
+ * 「凋亡」是 BOSS 阿盖托洛丝阶段三的上位减益，随 BOSS 归本模块；
+ * 注册 id 与迁前逐字一致：{@code akaishi:sanity_restore} / {@code akaishi:doom}（命名空间仍为三模块共用的 {@code akaishi:}）。
+ * 其余效果（衰变 / 不可名状）留在本体 {@code ModEffects}。
  */
 public final class AkaishiForbiddenEffects {
 
@@ -24,6 +25,13 @@ public final class AkaishiForbiddenEffects {
      */
     public static RegistrySupplier<MobEffect> SANITY_RESTORE;
 
+    /**
+     * 凋亡：阿盖托洛丝阶段三的减益（周期掉血 + 降低治疗）。
+     * <p>施加侧唯一入口见 {@code com.example.akaishi.boss.agaitolos.AgaitolosDoom}
+     * （阶段一/二仍施加原版凋零，阶段三改施加本效果）；治疗降低的平台消费在 {@code AgaitolosDoomHandler}。
+     */
+    public static RegistrySupplier<MobEffect> DOOM;
+
     private AkaishiForbiddenEffects() {
     }
 
@@ -32,5 +40,6 @@ public final class AkaishiForbiddenEffects {
         Registrar<MobEffect> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.MOB_EFFECT);
         SANITY_RESTORE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "sanity_restore"),
                 SanityRestoreEffect::new);
+        DOOM = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "doom"), DoomEffect::new);
     }
 }

@@ -1,8 +1,11 @@
 package com.example.akaishi.forbidden.forge;
 
+import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.command.AkaishiSanityCommand;
 import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.forbidden.AkaishiForbiddenMod;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosArenaEvents;
+import com.example.akaishi.forge.boss.agaitolos.AgaitolosDoomHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityCombatHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityDamageHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityDamageSeenHandler;
@@ -26,7 +29,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
  *
  * <p>P3a 仅完成构造与通用初始化转发；P3b 起承接理智系统的平台生效层：
  * 8 个 Forge 事件处理器、酿造配方、影怪属性/渲染器、HUD 元素、深海视野锁定、
- * 低理智视野后处理与 {@code /akaishi sanity} 调试指令 —— 均与迁前逐处一致（只换模块位置）。
+ * 低理智视野后处理与 {@code /akaishi sanity} 调试指令；P3c 起承接 BOSS 阿盖托洛丝的平台生效层：
+ * 凋亡降低治疗、下界牢狱场地事件、BOSS 属性与渲染器、铭牌血条与战斗音乐 —— 均与迁前逐处一致（只换模块位置）。
  */
 @Mod(AkaishiForbiddenMod.MOD_ID)
 public final class AkaishiForbiddenModForge {
@@ -43,6 +47,10 @@ public final class AkaishiForbiddenModForge {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(
                 (EntityAttributeCreationEvent event) ->
                         event.put(AkaishiForbiddenEntities.SHADOW.get(), ShadowEntity.createAttributes().build()));
+        // 阿盖托洛丝 BOSS 属性：自定义生物必须在此注册属性供应商，否则实体生成即崩（P3c 自本体迁入）
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (EntityAttributeCreationEvent event) ->
+                        event.put(AkaishiForbiddenEntities.AGAITOLOS.get(), AgaitolosEntity.createAttributes().build()));
 
         // 理智系统·精神伤害减免：只处理 akaishi:psychic 伤害（减伤口径在 common 的 SanityDamageGuard 内）
         MinecraftForge.EVENT_BUS.register(AkaishiSanityDamageHandler.INSTANCE);
@@ -58,6 +66,12 @@ public final class AkaishiForbiddenModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiSanityKillHandler.INSTANCE);
         // 理智系统·睡眠（P6）：睡醒奖励 + 幻翼附加精神伤害投递
         MinecraftForge.EVENT_BUS.register(AkaishiSanitySleepHandler.INSTANCE);
+
+        // BOSS 阿盖托洛丝（P3c 自本体迁入）：
+        // 阶段三「凋亡」的降低治疗层：common 无治疗钩子，故在此消费 Forge 的 LivingHealEvent
+        MinecraftForge.EVENT_BUS.register(AgaitolosDoomHandler.INSTANCE);
+        // 下界牢狱：召唤仪式右键入口（RightClickBlock）+ 场地方块不可破坏（BreakEvent / ExplosionEvent.Detonate）
+        MinecraftForge.EVENT_BUS.register(AgaitolosArenaEvents.INSTANCE);
 
         // 理智系统调试指令：/akaishi sanity get|set|env|food
         MinecraftForge.EVENT_BUS.addListener(
