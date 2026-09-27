@@ -157,6 +157,10 @@ public class MechanicalPartItem extends Item {
             if (allowed != null) {
                 tooltip.add(allowed);
             }
+            Component drawback = drawbackLine(dna);
+            if (drawback != null) {
+                tooltip.add(drawback);
+            }
         }
         // 十维权重（基础 + 材料 + DNA 修正，逐项 clamp 0~5；复用模板聚合逻辑保证与机器一致）
         if (organType != null && partType != null && material != null) {
@@ -198,5 +202,18 @@ public class MechanicalPartItem extends Item {
             first = false;
         }
         return Component.translatable("tooltip.akaishi.mechanical.allowed_parts", parts);
+    }
+
+    /**
+     * 「代价：…」行；该基因无负面代价（或 null）返回 {@code null}。
+     * 供机械部件与基因来源（基因序列 Fragment 等）tooltip 复用。
+     */
+    @Nullable
+    public static Component drawbackLine(MechanicalDnaProfile dna) {
+        if (dna == null || !dna.hasDrawback()) {
+            return null;
+        }
+        return Component.translatable("tooltip.akaishi.mechanical.drawback",
+                Component.translatable(dna.drawbackKey()));
     }
 }

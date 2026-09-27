@@ -63,6 +63,19 @@ public final class MechanicalSpecialEffect implements IMechanicalDnaEffect {
     public static final MechanicalSpecialEffect KNOCKBACK_ON_HIT = create("KNOCKBACK_ON_HIT", "akaishi:knockback_on_hit");
     /** 负面时长减免（参考 OrganPassive.ANTIDOTE 思路） */
     public static final MechanicalSpecialEffect DEBUFF_RESIST = create("DEBUFF_RESIST", "akaishi:debuff_resist");
+    // ---- 机制型基因（自带负面代价；无实体/分组来源，属性由 MechanicalDnaProfile 逐条挂载）----
+    /** 过热核心：血量越低攻击越高，代价是持续掉血 */
+    public static final MechanicalSpecialEffect OVERHEAT_CORE = create("OVERHEAT_CORE", "akaishi:overheat_core");
+    /** 寄生共生：击杀回血，代价是饥饿消耗加速 */
+    public static final MechanicalSpecialEffect PARASITIC_SYMBIOSIS = create("PARASITIC_SYMBIOSIS", "akaishi:parasitic_symbiosis");
+    /** 回声定位：周期标记周围生物，代价是受爆炸伤害加重 */
+    public static final MechanicalSpecialEffect ECHOLOCATION = create("ECHOLOCATION", "akaishi:echolocation");
+    /** 装甲过载：临时提升护甲，代价是移动速度下降 */
+    public static final MechanicalSpecialEffect ARMOR_OVERLOAD = create("ARMOR_OVERLOAD", "akaishi:armor_overload");
+    /** 神经痉挛：触发时下一击必定暴击，代价是期间攻击间隔变长 */
+    public static final MechanicalSpecialEffect NEURAL_SPASM = create("NEURAL_SPASM", "akaishi:neural_spasm");
+    /** 代谢透支：生命恢复提速，代价是恢复期间附带虚弱 */
+    public static final MechanicalSpecialEffect METABOLIC_OVERDRAFT = create("METABOLIC_OVERDRAFT", "akaishi:metabolic_overdraft");
 
     static {
         // 内置效果注入公共注册表：附属模组可按 ID 查询 / 展示，并挂接执行钩子

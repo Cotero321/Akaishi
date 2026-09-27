@@ -276,6 +276,8 @@ public final class AkaishiModForge {
         AkaishiMod.init();
         // 机械材料特性处理器（T5）：7 钩子处理器须在特性定义注册之后绑定
         com.example.akaishi.forge.life.trait.MechanicalTraitHandlers.register();
+        // 机制型机械基因（6 个）：效果定义 + 运行时处理器须在机械基因注册之后绑定
+        com.example.akaishi.forge.life.dna.MechanicalDnaHandlers.register();
         // 相邻容器物品访问：装上 forge 物品能力实现（common 侧默认只有原版容器兜底）
         com.example.akaishi.api.transfer.ItemAccessHolder.install(new com.example.akaishi.forge.transfer.ForgeItemAccess());
 

@@ -35,6 +35,8 @@ public final class MechanicalDnaProfile {
     private final IMechanicalDnaEffect effect;
     /** 该 DNA 允许装入的部件类型（不可变、非空；全部允许即视为无约束） */
     private final Set<MechanicalPartType> allowedParts;
+    /** 是否自带「负面代价」说明（tooltip 据此决定是否显示 drawback 行） */
+    private final boolean drawback;
 
     public MechanicalDnaProfile(String id, MechanicalPartWeight corrections, IMechanicalDnaEffect effect) {
         this(id, corrections, effect, ALL_PARTS);
@@ -42,6 +44,11 @@ public final class MechanicalDnaProfile {
 
     public MechanicalDnaProfile(String id, MechanicalPartWeight corrections, IMechanicalDnaEffect effect,
                                 Set<MechanicalPartType> allowedParts) {
+        this(id, corrections, effect, allowedParts, false);
+    }
+
+    public MechanicalDnaProfile(String id, MechanicalPartWeight corrections, IMechanicalDnaEffect effect,
+                                Set<MechanicalPartType> allowedParts, boolean drawback) {
         this.id = id;
         this.corrections = corrections;
         this.effect = effect != null ? effect : MechanicalSpecialEffect.NONE;
@@ -49,6 +56,7 @@ public final class MechanicalDnaProfile {
         this.allowedParts = allowedParts == null || allowedParts.isEmpty()
                 ? ALL_PARTS
                 : Collections.unmodifiableSet(EnumSet.copyOf(allowedParts));
+        this.drawback = drawback;
     }
 
     /** DNA 唯一标识，如 "akaishi:skeleton" */
@@ -71,6 +79,16 @@ public final class MechanicalDnaProfile {
     /** 是否存在部件约束（全部允许 ⇒ false，展示层据此决定是否显示「可装部件」行） */
     public boolean hasPartConstraint() {
         return allowedParts.size() < MechanicalPartType.values().length;
+    }
+
+    /** 是否自带负面代价说明（仅机制型基因置位；展示层据此显示 drawback 行） */
+    public boolean hasDrawback() {
+        return drawback;
+    }
+
+    /** 负面代价说明的本地化键（仅 {@link #hasDrawback()} 为真时有对应文案） */
+    public String drawbackKey() {
+        return descriptionKey() + ".drawback";
     }
 
     /** 本地化键 */
@@ -101,7 +119,7 @@ public final class MechanicalDnaProfile {
      */
     public static MechanicalDnaProfile register(String id, MechanicalPartWeight corrections,
                                                 IMechanicalDnaEffect effect) {
-        return register(id, corrections, effect, ALL_PARTS);
+        return register(id, corrections, effect, ALL_PARTS, false);
     }
 
     /**
@@ -112,8 +130,20 @@ public final class MechanicalDnaProfile {
      */
     public static MechanicalDnaProfile register(String id, MechanicalPartWeight corrections,
                                                 IMechanicalDnaEffect effect, Set<MechanicalPartType> allowedParts) {
+        return register(id, corrections, effect, allowedParts, false);
+    }
+
+    /**
+     * 注册一种 DNA 调校模板（带部件约束 + 负面代价标记）。
+     *
+     * @param drawback 是否自带负面代价（true ⇒ 展示层显示 {@link #drawbackKey()} 一行）
+     * @see #register(String, MechanicalPartWeight, IMechanicalDnaEffect, Set)
+     */
+    public static MechanicalDnaProfile register(String id, MechanicalPartWeight corrections,
+                                                IMechanicalDnaEffect effect, Set<MechanicalPartType> allowedParts,
+                                                boolean drawback) {
         validateId(id);
-        MechanicalDnaProfile dna = new MechanicalDnaProfile(id, clamp(corrections), effect, allowedParts);
+        MechanicalDnaProfile dna = new MechanicalDnaProfile(id, clamp(corrections), effect, allowedParts, drawback);
         if (REGISTRY.putIfAbsent(id, dna) != null) {
             throw new IllegalArgumentException("MechanicalDnaProfile already registered: " + id);
         }
@@ -291,6 +321,26 @@ public final class MechanicalDnaProfile {
         // 美西螈：两栖再生 → 散热（水下呼吸）
         register("akaishi:axolotl", c(1, 2, 0, 0, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.WATER_BREATHING,
                 parts(MechanicalPartType.COOLING));
+
+        // ---- 机制型基因（自带负面代价；非实体/分组来源，暂无可达采集路径 ⇒ 见报告"未决"）----
+        // 过热核心：血量越低攻击越高（分段爬升），代价持续掉血 → 模块
+        register("akaishi:overheat_core", c(0, -1, 2, 0, 0, 0, 0, 1, 0, 0), MechanicalSpecialEffect.OVERHEAT_CORE,
+                parts(MechanicalPartType.MODULE), true);
+        // 寄生共生：击杀回血，代价饥饿消耗加速 → 散热
+        register("akaishi:parasitic_symbiosis", c(0, 1, 1, 0, 0, 0, 0, 0, 0, 1), MechanicalSpecialEffect.PARASITIC_SYMBIOSIS,
+                parts(MechanicalPartType.COOLING), true);
+        // 回声定位：周期标记周围生物，代价受爆炸伤害加重 → 核心
+        register("akaishi:echolocation", c(0, -1, 0, 0, 0, 0, 1, 0, 2, 1), MechanicalSpecialEffect.ECHOLOCATION,
+                parts(MechanicalPartType.CORE), true);
+        // 装甲过载：临时提升护甲，代价移动速度下降 → 外壳
+        register("akaishi:armor_overload", c(0, 1, 0, 0, -1, 2, 0, 0, 0, 0), MechanicalSpecialEffect.ARMOR_OVERLOAD,
+                parts(MechanicalPartType.SHELL), true);
+        // 神经痉挛：触发时下一击必定暴击，代价期间攻击间隔变长 → 核心
+        register("akaishi:neural_spasm", c(0, -1, 1, 0, 0, 0, 2, 0, 0, 0), MechanicalSpecialEffect.NEURAL_SPASM,
+                parts(MechanicalPartType.CORE), true);
+        // 代谢透支：生命恢复提速，代价恢复期间附带虚弱 → 散热
+        register("akaishi:metabolic_overdraft", c(0, 2, -1, 0, 1, 0, 0, 0, 0, 0), MechanicalSpecialEffect.METABOLIC_OVERDRAFT,
+                parts(MechanicalPartType.COOLING), true);
     }
 
     /** 部件集合快捷构造（至少一个参数） */

@@ -27,6 +27,15 @@ public interface IMechanicalDnaEffectHandler {
     default void onAttack(Player attacker, LivingEntity target, int level) {
     }
 
+    /** 玩家命中结算前回调，返回修正后的伤害值；默认原样返回。{@code level} = 跨器官有效等级（1~4）。 */
+    default float modifyOutgoingDamage(Player attacker, LivingEntity target, float amount, int level) {
+        return amount;
+    }
+
+    /** 玩家击杀目标后回调（可做击杀回血等）。{@code level} = 跨器官有效等级（1~4）。 */
+    default void onKill(Player player, LivingEntity victim, int level) {
+    }
+
     /** 玩家受击结算前回调，返回修正后的伤害值；默认原样返回。{@code level} = 跨器官有效等级（1~4）。 */
     default float modifyIncomingDamage(Player player, DamageSource source, float amount, int level) {
         return amount;
@@ -35,5 +44,13 @@ public interface IMechanicalDnaEffectHandler {
     /** 玩家被击退结算前回调，返回修正后的击退强度；默认原样返回。{@code level} = 跨器官有效等级（1~4）。 */
     default float modifyKnockback(Player player, float strength, int level) {
         return strength;
+    }
+
+    /** 该效果的跨器官有效等级生效时回调（用于挂载临时属性修饰符）。{@code level} = 跨器官有效等级（1~4）。 */
+    default void onEquip(Player player, int level) {
+    }
+
+    /** 该效果的跨器官有效等级失效时回调（用于清理临时属性修饰符）。{@code level} = 失效前的有效等级（1~4）。 */
+    default void onUnequip(Player player, int level) {
     }
 }

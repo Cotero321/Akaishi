@@ -159,6 +159,7 @@ public final class AkaishiMechanicalEffectHandler {
                         entry.getKey(), entry.getValue());
                 IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
                 if (handler != null) {
+                    amount = handler.modifyOutgoingDamage(attacker, target, amount, entry.getValue());
                     handler.onAttack(attacker, target, entry.getValue());
                 }
             }
@@ -188,7 +189,7 @@ public final class AkaishiMechanicalEffectHandler {
         event.setStrength(strength);
     }
 
-    /** 击杀钩子：每种材料特性按有效等级回调 onKill 一次（DNA 效果无此钩子）。 */
+    /** 击杀钩子：每种材料特性按有效等级回调 onKill 一次；DNA 效果同样按有效等级回调一次。 */
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide || !(event.getSource().getEntity() instanceof Player player)) {
@@ -199,9 +200,15 @@ public final class AkaishiMechanicalEffectHandler {
             return;
         }
         LivingEntity victim = event.getEntity();
-        for (Map.Entry<String, Integer> entry
-                : MechanicalAggregation.traitLevels(MechanicalAggregation.organs(state)).entrySet()) {
+        List<ItemStack> organs = MechanicalAggregation.organs(state);
+        for (Map.Entry<String, Integer> entry : MechanicalAggregation.traitLevels(organs).entrySet()) {
             IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(entry.getKey());
+            if (handler != null) {
+                handler.onKill(player, victim, entry.getValue());
+            }
+        }
+        for (Map.Entry<ResourceLocation, Integer> entry : MechanicalAggregation.effectLevels(organs).entrySet()) {
+            IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
             if (handler != null) {
                 handler.onKill(player, victim, entry.getValue());
             }
@@ -213,6 +220,7 @@ public final class AkaishiMechanicalEffectHandler {
     /**
      * 与上次快照差分：按「跨器官有效等级集合」的差集触发 onEquip / onUnequip
      * （等级变化时先 onUnequip 旧等级、再 onEquip 新等级；不再是逐器官触发）。
+     * 材料特性与 DNA 效果各差一遍（DNA 侧供挂载临时属性修饰符的效果在失效时清理）。
      */
     private static void handleEquipDiff(Player player, IPlayerBodyState state, List<ItemStack> organs) {
         EnumMap<BodySlot, ItemStack> previous = LAST_ORGANS.computeIfAbsent(
@@ -230,7 +238,8 @@ public final class AkaishiMechanicalEffectHandler {
         if (!changed) {
             return;
         }
-        Map<String, Integer> before = MechanicalAggregation.traitLevels(previousOrgans(previous));
+        List<ItemStack> previousOrgans = previousOrgans(previous);
+        Map<String, Integer> before = MechanicalAggregation.traitLevels(previousOrgans);
         Map<String, Integer> after = MechanicalAggregation.traitLevels(organs);
         Set<String> ids = new LinkedHashSet<>(before.keySet());
         ids.addAll(after.keySet());
@@ -241,6 +250,27 @@ public final class AkaishiMechanicalEffectHandler {
                 continue;
             }
             IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(id);
+            if (handler == null) {
+                continue;
+            }
+            if (old != null) {
+                handler.onUnequip(player, old);
+            }
+            if (now != null) {
+                handler.onEquip(player, now);
+            }
+        }
+        Map<ResourceLocation, Integer> beforeEffects = MechanicalAggregation.effectLevels(previousOrgans);
+        Map<ResourceLocation, Integer> afterEffects = MechanicalAggregation.effectLevels(organs);
+        Set<ResourceLocation> effectIds = new LinkedHashSet<>(beforeEffects.keySet());
+        effectIds.addAll(afterEffects.keySet());
+        for (ResourceLocation id : effectIds) {
+            Integer old = beforeEffects.get(id);
+            Integer now = afterEffects.get(id);
+            if (Objects.equals(old, now)) {
+                continue;
+            }
+            IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(id);
             if (handler == null) {
                 continue;
             }
