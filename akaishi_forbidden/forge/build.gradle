@@ -41,7 +41,7 @@ repositories {
         url "https://maven.architectury.dev/"
         name "Architectury"
     }
-    // GeckoLib（影怪几何动画渲染器需要，与本体一致）
+    // GeckoLib（影怪几何动画渲染器需要的本模块硬依赖）
     maven {
         url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
         name "GeckoLib"
@@ -71,6 +71,12 @@ shadowJar {
     exclude "architectury.common.json"
     configurations = [project.configurations.shadowCommon]
     archiveClassifier.set("dev-shadow")
+
+    // mclib 的 jarJar 补丁只对 dev 生效：ShadowJar 不会把嵌套 jar 打进发布产物（实测发布 jar 内只有
+    // metadata.json，没有 mclib-20.jar），而发布环境由玩家安装的官方 GeckoLib 自带 mclib。
+    // 为避免发布产物里留下「指向不存在文件」的悬空声明，这里把该 metadata 排除出发布产物。
+    // dev 运行走 build/resources/main（两个文件都在），不受此排除影响。
+    exclude 'META-INF/jarjar/metadata.json'
     exclude 'META-INF/versions/**'
     mergeServiceFiles()
     exclude 'module-info.class'
@@ -137,8 +143,15 @@ dependencies {
     crossCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
     crossCommon(project(path: ":common", configuration: "namedElements")) { transitive false }
 
-    // GeckoLib：影怪渲染器（GeoEntityRenderer / GeoModel / GeoRenderLayer）编译期与 dev 运行都需要。
-    // 不 include：本体 tech 已声明为硬依赖，运行时由玩家安装的 geckolib 提供，避免重复打包。
+    // GeckoLib：影怪几何动画渲染器（GeoEntityRenderer / GeoModel / GeoRenderLayer）编译期与 dev 运行都需要。
+    // 用 modImplementation 而非 modCompileOnly —— 它不只是编译期 API：影怪与 BOSS 阿盖托洛丝的
+    // Geo 模型/动画在客户端与服务端都要走它的运行时管线（注册动画控制器、模型解析），
+    // 软引用一旦被无条件使用就是 NoClassDefFoundError。声明为硬依赖后，
+    // dev 运行（runClient/runServer）也会自动带上它，不必手动往 run/mods 里丢 jar。
+    // 不 include：GeckoLib 是【禁忌模块自身】的硬依赖，由本模块声明（见本模块 mods.toml），
+    // 运行时由玩家安装的 geckolib 提供，避免重复打包。
+    // 注：GeckoLib 依赖暂挂在禁忌模块（本体已无 Geo 内容）；若日后本体重新需要 Geo 内容，
+    //     需把本段与 mods.toml 依赖一并迁回本体。
     modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
 
     // Architectury API：平台侧读 common 侧注册表字段（RegistrySupplier）需要编译期类型。
@@ -188,8 +201,71 @@ sourceSets {
     }
 }
 
+// ============================================================================
+// GeckoLib 的 mclib：由本模块补回 jarJar 声明
+// ----------------------------------------------------------------------------
+// 为什么必须补（已用运行时探针实测确认，不是推断）：
+//   Forge dev 中所有 mod 类都由同一个 cpw.mods.modlauncher.TransformingClassLoader 加载，
+//   它 getParent() == null（隔离设计），因此普通 classpath 上的 jar 它一概看不见
+//   （探针输出：java.class.path 含 mclib = true，但 Class.forName 抛 ClassNotFoundException）。
+//   类要能被解析，只有两条路：① 该 jar 自身是 mod（含 mods.toml）；② 由某个 mod 通过 jarJar 声明。
+//   mclib 是纯函数库、没有 mods.toml，只能走 ②；而 Loom 重映射 GeckoLib 时会把
+//   META-INF/jarjar/metadata.json 丢掉（重映射后的 jar 里只剩 mclib-20.jar，没有元数据），
+//   Forge 的 JarInJarDependencyLocator 就报 "No dependencies to load found"。
+//   后果：GeckoLib 的 JsonUtil 静态初始化抛
+//   NoClassDefFoundError: com/eliotlash/mclib/math/IValue，只要资源里存在 geo/动画就崩在加载界面。
+// 做法：把 mclib 复制进本模块的 META-INF/jarjar，并补写一份 metadata.json
+//   （内容与格式抄自 GeckoLib 原版 jar 内的同名文件）。
+// 归属：本段原挂在本体 forge，随 Geo 内容（影怪 / BOSS 阿盖托洛丝）一并迁入本模块；
+//   由于 GeckoLib 现由本模块声明为硬依赖，mclib 的 jarJar 补声明的唯一真源也应在本模块。
+// ============================================================================
+configurations.create("mclibJarJar") {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+}
+
+dependencies {
+    mclibJarJar "com.eliotlash.mclib:mclib:20"
+}
+
+def mclibMetadataFile = layout.buildDirectory.file("generated/jarjar/metadata.json")
+
+def generateMclibJarJarMetadata = tasks.register("generateMclibJarJarMetadata") {
+    def outFile = mclibMetadataFile
+    outputs.file(outFile)
+    doLast() {
+        def f = outFile.get().asFile
+        f.parentFile.mkdirs()
+        f.text = '''{
+  "jars": [
+    {
+      "identifier": {
+        "group": "com.eliotlash.mclib",
+        "artifact": "mclib"
+      },
+      "version": {
+        "range": "[20,)",
+        "artifactVersion": "20"
+      },
+      "path": "META-INF/jarjar/mclib-20.jar",
+      "isObfuscated": false
+    }
+  ]
+}
+'''
+    }
+}
+
 processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(configurations.mclibJarJar) {
+        into "META-INF/jarjar"
+    }
+    // 用 from(任务) 而非 from(路径)：只有前者能让 Gradle 推断出任务依赖，保证 metadata.json 先于复制生成
+    from(generateMclibJarJarMetadata) {
+        into "META-INF/jarjar"
+    }
 }
 
 // dev 运行前先编出三个模块的 classes（dev 直接加载 build/classes 目录，无 jar 参与）

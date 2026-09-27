@@ -37,7 +37,7 @@ dependencies {
     techCommon(project(path: ":common", configuration: "namedElements")) { transitive false }
 
     // GeckoLib：影怪实体实现 GeoEntity、动画控制器用它的类；只取编译期 API 面，
-    // 运行期由本体 forge 的 modImplementation 提供真实 jar（与本体 common 同一做法，不重复打包）。
+    // 运行期由本模块 forge 侧的 modImplementation 提供真实 jar（不重复打包）。
     modCompileOnly("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
 
     // Curios API：花环饰品实现 ICurioItem 需要编译期 API（运行时由本体侧 Curios 提供完整 jar）
