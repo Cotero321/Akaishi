@@ -1,5 +1,7 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
+import com.example.akaishi.life.mechanical.MechanicalDnaSources;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
@@ -7,6 +9,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * 模板制造厂界面：左上双能源小半截条（赤 y=24 / 生命 y=32）+ 右上升级槽（y=8）+ 器官/部件下拉选择 + 箭头进度。
@@ -120,28 +126,53 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
                 Component.translatable(dropdownOpen == 0 ? "gui.akaishi.mech.select_organ" : "gui.akaishi.mech.select_part"),
                 x + OV_X + 4, y + OV_TITLE_Y, 0xFF3F3F3F, false);
         if (dropdownOpen == 0) {
-            drawGrid(gui, x, y, MechanicalOrganType.values(), menu.getSelectedOrgan(), 0, 3);
+            drawGrid(gui, x, y, MechanicalOrganType.values(), menu.getSelectedOrgan(), 0, 3, Set.of());
         } else {
-            drawGrid(gui, x, y, MechanicalPartType.values(), menu.getSelectedPart(), 1, 2);
+            drawGrid(gui, x, y, MechanicalPartType.values(), menu.getSelectedPart(), 1, 2, disallowedParts());
+            if (!disallowedParts().isEmpty()) {
+                gui.drawString(this.font, Component.translatable("gui.akaishi.mech.part_disallowed_hint"),
+                        x + OV_X + 4, y + OV_GRID_Y + 2 * OV_CELL_H + 4, 0xFFA0A0A0, false);
+            }
         }
         gui.pose().popPose();
     }
 
-    /** 网格绘制选项（cols 列，选中项高亮），options 为器官/部件枚举数组 */
-    private void drawGrid(GuiGraphics gui, int baseX, int baseY, Enum<?>[] options, int selected, int type, int cols) {
+    /** 网格绘制选项（cols 列，选中项高亮），disabled 项灰显且不可点选 */
+    private void drawGrid(GuiGraphics gui, int baseX, int baseY, Enum<?>[] options, int selected,
+                          int type, int cols, Set<MechanicalPartType> disabled) {
         int cellW = gridCellWidth(cols);
         for (int i = 0; i < options.length; i++) {
             int cx = baseX + OV_X + 4 + (i % cols) * (cellW + 4);
             int cy = baseY + OV_GRID_Y + (i / cols) * OV_CELL_H;
             boolean sel = i == selected;
-            gui.fill(cx, cy, cx + cellW, cy + OV_CELL_H - 2, sel ? 0xFFC9C9C9 : 0xFF9E9E9E);
-            gui.fill(cx, cy, cx + cellW, cy + 1, 0xFF373737);
+            boolean dis = type == 1 && disabled.contains(options[i]);
+            gui.fill(cx, cy, cx + cellW, cy + OV_CELL_H - 2,
+                    dis ? 0xFF6E6E6E : (sel ? 0xFFC9C9C9 : 0xFF9E9E9E));
+            gui.fill(cx, cy, cx + cellW, cy + 1, dis ? 0xFF4A4A4A : 0xFF373737);
             gui.fill(cx, cy + OV_CELL_H - 3, cx + cellW, cy + OV_CELL_H - 2, 0xFFFFFFFF);
-            gui.fill(cx, cy, cx + 1, cy + OV_CELL_H - 2, 0xFF373737);
+            gui.fill(cx, cy, cx + 1, cy + OV_CELL_H - 2, dis ? 0xFF4A4A4A : 0xFF373737);
             gui.fill(cx + cellW - 1, cy, cx + cellW, cy + OV_CELL_H - 2, 0xFFFFFFFF);
             String key = (type == 0 ? "mechanical.organ." : "mechanical.part.") + options[i].name().toLowerCase();
-            gui.drawString(this.font, Component.translatable(key), cx + 3, cy + 4, sel ? 0xFF202020 : 0xFF3F3F3F, false);
+            int color = dis ? 0xFF6A6A6A : (sel ? 0xFF202020 : 0xFF3F3F3F);
+            gui.drawString(this.font, Component.translatable(key), cx + 3, cy + 4, color, false);
         }
+    }
+
+    /** 当前 DNA 槽基因禁止装入的部件集合（无约束或槽为空 ⇒ 空集） */
+    private Set<MechanicalPartType> disallowedParts() {
+        int dnaSlot = AbstractMechanicalMachineMenu.UPGRADE_SLOT_COUNT + 2;
+        ItemStack dnaStack = dnaSlot < menu.slots.size() ? menu.slots.get(dnaSlot).getItem() : ItemStack.EMPTY;
+        MechanicalDnaProfile dna = MechanicalDnaSources.resolve(dnaStack);
+        if (!dna.hasPartConstraint()) {
+            return Set.of();
+        }
+        Set<MechanicalPartType> disallowed = EnumSet.noneOf(MechanicalPartType.class);
+        for (MechanicalPartType part : MechanicalPartType.values()) {
+            if (!dna.allows(part)) {
+                disallowed.add(part);
+            }
+        }
+        return disallowed;
     }
 
     /** 网格单元宽度：面板内边距 4，列间距 4 */
@@ -248,6 +279,9 @@ public class AkaishiMechanicalTemplateFactoryScreen extends AbstractContainerScr
                 if (idx >= 0) {
                     if (dropdownOpen == 0) {
                         MechanicalSelectSync.sendSelection(menu.getBlockPos(), idx, menu.getSelectedPart());
+                    } else if (disallowedParts().contains(MechanicalPartType.values()[idx])) {
+                        // 灰显部件：与当前 DNA 基因不匹配，拒绝选择（保持浮层展开）
+                        return true;
                     } else {
                         MechanicalSelectSync.sendSelection(menu.getBlockPos(), menu.getSelectedOrgan(), idx);
                     }

@@ -9,9 +9,11 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
 
 /**
  * 内置 DNA 特殊效果的「四级曲线」实现（T5，企划 §5）。
@@ -50,6 +52,21 @@ public final class MechanicalDnaEffects {
     /** 凋零攻击：等级增幅 / 时长 tick（Lv1 I2s / Lv2 I3s / Lv3 II3s / Lv4 II4s） */
     private static final int[] WITHER_AMPLIFIER = {0, 0, 1, 1};
     private static final int[] WITHER_TICKS = {40, 60, 60, 80};
+    // ---- T7 Stage 2 新增曲线（待调手感值）----
+    /** 摔落减免：伤害保留 70/45/20/0%（Lv4 完全免摔落） */
+    private static final TraitTier FALL_RETAIN = TraitTier.of(0.70F, 0.45F, 0.20F, 0.0F);
+    /** 自动拾取：半径 4/5/6/7 格，每 10 tick 一次（镜像 OrganPassive.AUTO_PICKUP） */
+    private static final int AUTO_PICKUP_INTERVAL = 10;
+    private static final TraitTier AUTO_PICKUP_RANGE = TraitTier.of(4, 5, 6, 7);
+    /** 击退目标：推力 0.25/0.35/0.45/0.55（镜像 OrganPassive.KNOCKBACK_ON_HIT） */
+    private static final TraitTier KNOCKBACK_POWER = TraitTier.of(0.25F, 0.35F, 0.45F, 0.55F);
+    /** 负面时长减免：负面药水时长上限 tick 200/160/120/80（10s/8s/6s/4s） */
+    private static final TraitTier DEBUFF_CAP_TICKS = TraitTier.of(200, 160, 120, 80);
+    /** 纳入时长减免的负面效果集合 */
+    private static final MobEffect[] NEGATIVE_EFFECTS = {
+            MobEffects.POISON, MobEffects.WITHER, MobEffects.WEAKNESS, MobEffects.MOVEMENT_SLOWDOWN,
+            MobEffects.HUNGER, MobEffects.DIG_SLOWDOWN, MobEffects.CONFUSION, MobEffects.BLINDNESS,
+            MobEffects.LEVITATION};
 
     private static int clamp(int level) {
         return Math.max(1, Math.min(MAX_LEVEL, level));
@@ -96,6 +113,25 @@ public final class MechanicalDnaEffects {
         }
         if (MechanicalSpecialEffect.TELEPORT_COOLDOWN.id().equals(effectId)) {
             applyTeleportCooldown(player, level);
+            return;
+        }
+        // ---- T7 Stage 2 新增：夜视 / 水下呼吸 / 自动拾取 / 负面时长减免 ----
+        if (MechanicalSpecialEffect.NIGHT_VISION.id().equals(effectId)) {
+            applyPotion(player, MobEffects.NIGHT_VISION, 0);
+            return;
+        }
+        if (MechanicalSpecialEffect.WATER_BREATHING.id().equals(effectId)) {
+            applyPotion(player, MobEffects.WATER_BREATHING, 0);
+            return;
+        }
+        if (MechanicalSpecialEffect.AUTO_PICKUP.id().equals(effectId)) {
+            if (player.tickCount % AUTO_PICKUP_INTERVAL == 0) {
+                pickupNearbyItems(player, AUTO_PICKUP_RANGE.atInt(level));
+            }
+            return;
+        }
+        if (MechanicalSpecialEffect.DEBUFF_RESIST.id().equals(effectId)) {
+            applyDebuffCap(player, DEBUFF_CAP_TICKS.atInt(level));
         }
     }
 
@@ -107,6 +143,11 @@ public final class MechanicalDnaEffects {
         if (MechanicalSpecialEffect.EXPLOSION_RESIST.id().equals(effectId)
                 && source.is(DamageTypeTags.IS_EXPLOSION)) {
             return amount * EXPLOSION_RETAIN.at(level);
+        }
+        // T7 Stage 2：摔落免疫（Lv4 完全免摔落）
+        if (MechanicalSpecialEffect.FALL_IMMUNE.id().equals(effectId)
+                && source.is(DamageTypeTags.IS_FALL)) {
+            return amount * FALL_RETAIN.at(level);
         }
         return amount;
     }
@@ -130,6 +171,12 @@ public final class MechanicalDnaEffects {
         if (MechanicalSpecialEffect.WITHER_ATTACK.id().equals(effectId)) {
             int i = clamp(level) - 1;
             applyToTarget(target, MobEffects.WITHER, WITHER_AMPLIFIER[i], WITHER_TICKS[i]);
+            return;
+        }
+        // T7 Stage 2：命中把目标沿击退方向顶开（与武器击退叠加）
+        if (MechanicalSpecialEffect.KNOCKBACK_ON_HIT.id().equals(effectId)) {
+            target.knockback(KNOCKBACK_POWER.at(level),
+                    target.getX() - attacker.getX(), target.getZ() - attacker.getZ());
         }
     }
 
@@ -190,6 +237,33 @@ public final class MechanicalDnaEffects {
     private static void applyToTarget(LivingEntity target, MobEffect effect, int amplifier, int durationTicks) {
         if (!target.hasEffect(effect)) {
             target.addEffect(new MobEffectInstance(effect, durationTicks, amplifier, false, false));
+        }
+    }
+
+    /** 自动拾取：半径内无拾取延迟的掉落物直接入包（镜像 OrganPassive.AUTO_PICKUP 的拾取判定）。 */
+    private static void pickupNearbyItems(Player player, int range) {
+        AABB box = player.getBoundingBox().inflate(range);
+        for (ItemEntity item : player.level().getEntitiesOfClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            if (item.hasPickUpDelay()) {
+                continue;
+            }
+            if (player.getInventory().add(item.getItem())) {
+                item.discard();
+            }
+        }
+    }
+
+    /** 负面时长减免：把在身的负面药水时长压到上限（保留增幅/粒子可见性，不叠加、不改等级）。 */
+    private static void applyDebuffCap(Player player, int capTicks) {
+        for (MobEffect negative : NEGATIVE_EFFECTS) {
+            MobEffectInstance inst = player.getEffect(negative);
+            if (inst != null && inst.getDuration() > capTicks) {
+                int amplifier = inst.getAmplifier();
+                boolean ambient = inst.isAmbient();
+                boolean visible = inst.isVisible();
+                player.removeEffect(negative);
+                player.addEffect(new MobEffectInstance(negative, capTicks, amplifier, ambient, visible));
+            }
         }
     }
 }

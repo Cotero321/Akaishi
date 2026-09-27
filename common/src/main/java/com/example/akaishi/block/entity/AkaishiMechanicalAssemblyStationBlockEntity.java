@@ -158,6 +158,11 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
             if (dna == null) {
                 dna = MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
             }
+            // 兜底二次校验（写入新器官时）：基因与部件不匹配（手改 NBT / 旧存档越界）时回退 NONE。
+            // 已存在的成品器官 NBT 不被读取路径清理，其越界基因照常生效（不追溯）。
+            if (dna != null && !dna.allows(part)) {
+                dna = MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
+            }
             templates.add(new MechanicalPartTemplate(organ, part, material, dna));
             materialIds.add(material != null ? material.id() : "akaishi:iron");
             // 逐部件照实记录 DNA 来源（不要求同源、不跳过 none），供运行时按部件计数推导等级

@@ -1,17 +1,15 @@
 package com.example.akaishi.block.entity;
 
-import com.example.akaishi.api.life.ISampleGroup;
 import com.example.akaishi.item.AkaishiMechanicalItems;
 import com.example.akaishi.item.MechanicalPartItem;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
+import com.example.akaishi.life.mechanical.MechanicalDnaSources;
 import com.example.akaishi.life.mechanical.MechanicalMachineCosts;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
 import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.life.mechanical.MechanicalPartWeight;
-import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
-import com.example.akaishi.life.sequence.AkaishiGeneSequenceItem;
 import com.example.akaishi.menu.AkaishiMechanicalTemplateFactoryMenu;
 import com.example.akaishi.sound.ModSounds;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -156,7 +154,7 @@ public class AkaishiMechanicalTemplateFactoryBlockEntity extends AbstractMechani
 
     /** DNA 槽载体：基因序列片段或生命样本（两者均带分组与生物来源） */
     public static boolean isDnaSource(ItemStack stack) {
-        return stack.is(ModItems.geneSequence.get()) || stack.is(ModItems.lifeSample.get());
+        return MechanicalDnaSources.isDnaSource(stack);
     }
 
     @Override
@@ -168,6 +166,8 @@ public class AkaishiMechanicalTemplateFactoryBlockEntity extends AbstractMechani
         // 物流可绕过菜单槽位限制，非空 DNA 槽必须是基因序列/生命样本，否则拒绝制作
         ItemStack dnaStack = getItem(SLOT_DNA);
         if (!dnaStack.isEmpty() && !isDnaSource(dnaStack)) return false;
+        // 主规则：DNA 基因与所选部件不匹配时拒绝制作（物流插入同样被挡；写入路径另有兜底回退 NONE）
+        if (!resolveDna().allows(selectedPartType())) return false;
         ItemStack out = getItem(SLOT_OUTPUT);
         return out.isEmpty() || (out.is(AkaishiMechanicalItems.mechanicalPartTemplate.get())
                 && out.getCount() < out.getMaxStackSize());
@@ -175,22 +175,7 @@ public class AkaishiMechanicalTemplateFactoryBlockEntity extends AbstractMechani
 
     /** 读取 DNA 槽推导调校模板；槽位为空或来源缺失时回退无调校 */
     private MechanicalDnaProfile resolveDna() {
-        ItemStack dnaStack = getItem(SLOT_DNA);
-        if (dnaStack.isEmpty()) {
-            return MechanicalDnaProfile.resolveForSample(null, null);
-        }
-        String groupId = null;
-        String entityId = null;
-        if (dnaStack.is(ModItems.geneSequence.get())) {
-            ISampleGroup group = AkaishiGeneSequenceItem.getGroup(dnaStack);
-            groupId = group != null ? group.getId() : null;
-            entityId = AkaishiGeneSequenceItem.getEntityId(dnaStack);
-        } else if (dnaStack.is(ModItems.lifeSample.get())) {
-            ISampleGroup group = AkaishiLifeSampleItem.getGroup(dnaStack);
-            groupId = group != null ? group.getId() : null;
-            entityId = AkaishiLifeSampleItem.getEntityId(dnaStack);
-        }
-        return MechanicalDnaProfile.resolveForSample(groupId, entityId);
+        return MechanicalDnaSources.resolve(getItem(SLOT_DNA));
     }
 
     @Override

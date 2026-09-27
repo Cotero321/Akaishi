@@ -1,7 +1,9 @@
 package com.example.akaishi.life.sequence;
 
 import com.example.akaishi.api.life.ISampleGroup;
+import com.example.akaishi.item.MechanicalPartItem;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.life.mechanical.MechanicalDnaSources;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.AkaishiLifeSampleItem;
 import com.example.akaishi.life.sample.SampleGroup;
@@ -97,5 +99,10 @@ public class AkaishiGeneSequenceItem extends Item {
         tooltip.add(Component.translatable("gui.akaishi.gene_sequence.tier",
                 Component.translatable("life.akaishi.organ_tier." + tierOf(purity).name().toLowerCase())));
         tooltip.add(Component.translatable("gui.akaishi.gene_sequence.hint"));
+        // 该基因解析出的机械 DNA 若有部件约束，标注可装部件（无约束不显示）
+        Component allowedParts = MechanicalPartItem.allowedPartsLine(MechanicalDnaSources.resolve(stack));
+        if (allowedParts != null) {
+            tooltip.add(allowedParts);
+        }
     }
 }

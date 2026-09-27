@@ -9,6 +9,7 @@ import com.example.akaishi.life.mechanical.MechanicalPartWeight;
 import com.example.akaishi.life.mechanical.MechanicalProperty;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -66,8 +67,18 @@ public class MechanicalPartItem extends Item {
         tag.putString(TAG_PART_TYPE, partType.name());
         tag.putString(TAG_MATERIAL_ID, material.id());
         tag.putString(TAG_ORGAN_TYPE, organType.name());
-        tag.putString(TAG_DNA_PROFILE_ID, dna.id());
+        // 兜底校验：DNA 不允许装入该部件时回退 NONE（防手改 NBT / 旧存档越界），写入路径是唯一约束点
+        tag.putString(TAG_DNA_PROFILE_ID, resolveAllowedDna(dna, partType).id());
         tag.putBoolean(TAG_PROCESSED, processed);
+    }
+
+    /** DNA 与部件不匹配（或缺失）时回退无调校；匹配则原样返回。 */
+    private static MechanicalDnaProfile resolveAllowedDna(MechanicalDnaProfile dna, MechanicalPartType partType) {
+        if (dna != null && dna.allows(partType)) {
+            return dna;
+        }
+        MechanicalDnaProfile none = MechanicalDnaProfile.get(MechanicalDnaProfile.NONE_ID);
+        return none != null ? none : dna;
     }
 
     // ==================== 读取器 ====================
@@ -142,6 +153,10 @@ public class MechanicalPartItem extends Item {
         if (dna != null && !MechanicalDnaProfile.NONE_ID.equals(dna.id())) {
             tooltip.add(Component.translatable("tooltip.akaishi.mechanical.dna",
                     Component.translatable(dna.descriptionKey())));
+            Component allowed = allowedPartsLine(dna);
+            if (allowed != null) {
+                tooltip.add(allowed);
+            }
         }
         // 十维权重（基础 + 材料 + DNA 修正，逐项 clamp 0~5；复用模板聚合逻辑保证与机器一致）
         if (organType != null && partType != null && material != null) {
@@ -159,5 +174,29 @@ public class MechanicalPartItem extends Item {
         if (processed) {
             tooltip.add(Component.translatable("tooltip.akaishi.mechanical.processed"));
         }
+    }
+
+    /**
+     * 「可装部件：核心 / 模块」行；无部件约束（全部允许）返回 {@code null}。
+     * 供机械部件与基因来源（基因序列 Fragment 等）tooltip 复用。
+     */
+    @Nullable
+    public static Component allowedPartsLine(MechanicalDnaProfile dna) {
+        if (dna == null || !dna.hasPartConstraint()) {
+            return null;
+        }
+        MutableComponent parts = Component.empty();
+        boolean first = true;
+        for (MechanicalPartType type : MechanicalPartType.values()) {
+            if (!dna.allows(type)) {
+                continue;
+            }
+            if (!first) {
+                parts.append(Component.literal(" / "));
+            }
+            parts.append(Component.translatable("mechanical.part." + type.name().toLowerCase()));
+            first = false;
+        }
+        return Component.translatable("tooltip.akaishi.mechanical.allowed_parts", parts);
     }
 }

@@ -50,6 +50,19 @@ public final class MechanicalSpecialEffect implements IMechanicalDnaEffect {
     public static final MechanicalSpecialEffect TELEPORT_COOLDOWN = create("TELEPORT_COOLDOWN", "akaishi:teleport_cooldown");
     /** 攻击附带凋零 */
     public static final MechanicalSpecialEffect WITHER_ATTACK = create("WITHER_ATTACK", "akaishi:wither_attack");
+    // ---- T7 Stage 2 新增（均镜像生物侧 OrganPassive，不新造强度天花板）----
+    /** 常驻夜视（镜像 OrganPassive.NIGHT_VISION） */
+    public static final MechanicalSpecialEffect NIGHT_VISION = create("NIGHT_VISION", "akaishi:night_vision");
+    /** 水下呼吸（镜像 OrganPassive.WATER_BREATHING） */
+    public static final MechanicalSpecialEffect WATER_BREATHING = create("WATER_BREATHING", "akaishi:water_breathing");
+    /** 摔落免疫（镜像 OrganPassive.FALL_IMMUNE，按等级减伤至完全免疫） */
+    public static final MechanicalSpecialEffect FALL_IMMUNE = create("FALL_IMMUNE", "akaishi:fall_immune");
+    /** 自动拾取周围掉落物（镜像 OrganPassive.AUTO_PICKUP） */
+    public static final MechanicalSpecialEffect AUTO_PICKUP = create("AUTO_PICKUP", "akaishi:auto_pickup");
+    /** 命中把目标顶开（镜像 OrganPassive.KNOCKBACK_ON_HIT） */
+    public static final MechanicalSpecialEffect KNOCKBACK_ON_HIT = create("KNOCKBACK_ON_HIT", "akaishi:knockback_on_hit");
+    /** 负面时长减免（参考 OrganPassive.ANTIDOTE 思路） */
+    public static final MechanicalSpecialEffect DEBUFF_RESIST = create("DEBUFF_RESIST", "akaishi:debuff_resist");
 
     static {
         // 内置效果注入公共注册表：附属模组可按 ID 查询 / 展示，并挂接执行钩子

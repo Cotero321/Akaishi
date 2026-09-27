@@ -63,6 +63,7 @@ public final class SampleGroup implements ISampleGroup {
                         || t == EntityType.GUARDIAN || t == EntityType.ELDER_GUARDIAN || t == EntityType.IRON_GOLEM
                         || t == EntityType.SNOW_GOLEM || t == EntityType.ALLAY
                         || t == EntityType.GHAST || t == EntityType.VINDICATOR
+                        || t == EntityType.RAVAGER
                         // 下界系（1.16+ 火狱生态）：猪灵/蛮兵、疣猪兽、女巫
                         || t == EntityType.PIGLIN || t == EntityType.PIGLIN_BRUTE
                         || t == EntityType.HOGLIN || t == EntityType.WITCH;

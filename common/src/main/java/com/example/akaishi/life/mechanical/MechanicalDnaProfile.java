@@ -23,6 +23,9 @@ public final class MechanicalDnaProfile {
 
     /** 无调校基因（默认值） */
     public static final String NONE_ID = "akaishi:none";
+    /** 全部允许的部件集合（无约束） */
+    private static final Set<MechanicalPartType> ALL_PARTS =
+            Collections.unmodifiableSet(EnumSet.allOf(MechanicalPartType.class));
     /** ID 未注册时的兜底实例，避免每次解析都新建对象 */
     private static final MechanicalDnaProfile NONE_FALLBACK =
             new MechanicalDnaProfile(NONE_ID, MechanicalPartWeight.ZERO, MechanicalSpecialEffect.NONE);
@@ -30,11 +33,22 @@ public final class MechanicalDnaProfile {
     private final String id;
     private final MechanicalPartWeight corrections;
     private final IMechanicalDnaEffect effect;
+    /** 该 DNA 允许装入的部件类型（不可变、非空；全部允许即视为无约束） */
+    private final Set<MechanicalPartType> allowedParts;
 
     public MechanicalDnaProfile(String id, MechanicalPartWeight corrections, IMechanicalDnaEffect effect) {
+        this(id, corrections, effect, ALL_PARTS);
+    }
+
+    public MechanicalDnaProfile(String id, MechanicalPartWeight corrections, IMechanicalDnaEffect effect,
+                                Set<MechanicalPartType> allowedParts) {
         this.id = id;
         this.corrections = corrections;
         this.effect = effect != null ? effect : MechanicalSpecialEffect.NONE;
+        // 空集合视为无约束（全部允许），避免附属误传空集导致基因无处可装
+        this.allowedParts = allowedParts == null || allowedParts.isEmpty()
+                ? ALL_PARTS
+                : Collections.unmodifiableSet(EnumSet.copyOf(allowedParts));
     }
 
     /** DNA 唯一标识，如 "akaishi:skeleton" */
@@ -45,6 +59,19 @@ public final class MechanicalDnaProfile {
 
     /** 特殊效果（内置或附属扩展，永不为 null） */
     public IMechanicalDnaEffect effect() { return effect; }
+
+    /** 允许装入的部件类型（不可变集合，永不为空） */
+    public Set<MechanicalPartType> allowedParts() { return allowedParts; }
+
+    /** 该 DNA 是否可装入给定部件；null 部件一律拒绝 */
+    public boolean allows(MechanicalPartType partType) {
+        return partType != null && allowedParts.contains(partType);
+    }
+
+    /** 是否存在部件约束（全部允许 ⇒ false，展示层据此决定是否显示「可装部件」行） */
+    public boolean hasPartConstraint() {
+        return allowedParts.size() < MechanicalPartType.values().length;
+    }
 
     /** 本地化键 */
     public String descriptionKey() {
@@ -74,8 +101,19 @@ public final class MechanicalDnaProfile {
      */
     public static MechanicalDnaProfile register(String id, MechanicalPartWeight corrections,
                                                 IMechanicalDnaEffect effect) {
+        return register(id, corrections, effect, ALL_PARTS);
+    }
+
+    /**
+     * 注册一种 DNA 调校模板（带部件约束）。
+     *
+     * @param allowedParts 允许装入的部件类型（null/空集 = 全部允许，即无约束）
+     * @see #register(String, MechanicalPartWeight, IMechanicalDnaEffect)
+     */
+    public static MechanicalDnaProfile register(String id, MechanicalPartWeight corrections,
+                                                IMechanicalDnaEffect effect, Set<MechanicalPartType> allowedParts) {
         validateId(id);
-        MechanicalDnaProfile dna = new MechanicalDnaProfile(id, clamp(corrections), effect);
+        MechanicalDnaProfile dna = new MechanicalDnaProfile(id, clamp(corrections), effect, allowedParts);
         if (REGISTRY.putIfAbsent(id, dna) != null) {
             throw new IllegalArgumentException("MechanicalDnaProfile already registered: " + id);
         }
@@ -153,32 +191,111 @@ public final class MechanicalDnaProfile {
         }
     }
 
-    /** 注册本模组内置 DNA 调校模板 */
+    /** 注册本模组内置 DNA 调校模板（部件约束按「语义类别」指派，见各条注释） */
     public static void registerDefaults() {
-        // 无DNA调校
-        register(NONE_ID, c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.NONE);
+        // 无DNA调校（NONE 恒为全部允许）
+        register(NONE_ID, c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.NONE, ALL_PARTS);
 
         // ---- 分组级（与内置分组一一对应，保证各组基因全部有落点）----
-        register("akaishi:warm_blooded", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION); // 温血：生命/护甲/机动
-        register("akaishi:undead", c(0, 2, 1, -1, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK);                 // 亡灵：耐打/护甲/凋零
-        register("akaishi:explosive", c(0, -1, 2, 0, 0, 0, 0, 2, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST);           // 爆炸：攻击/暴伤
-        register("akaishi:aberration", c(0, 0, 1, 1, 0, 1, 1, 0, 0, 0), MechanicalSpecialEffect.POISON_RESIST);              // 异变：全能偏攻
-        register("akaishi:ender", c(0, -1, 0, 0, 2, 0, 0, 0, 1, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN);              // 末影：移速/范围/闪避
-        register("akaishi:boss", c(0, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST);                // 首领：生命/攻击/护甲
-        register("akaishi:dragon", c(2, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK);                   // 龙族：倍率/生命/攻击
+        // 温血：代谢/恢复 → 散热（+外壳，兼护甲）
+        register("akaishi:warm_blooded", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION,
+                parts(MechanicalPartType.COOLING, MechanicalPartType.SHELL));
+        // 亡灵：坚韧防御 + 凋零攻击 → 外壳（+模块）
+        register("akaishi:undead", c(0, 2, 1, -1, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.MODULE));
+        // 爆炸：爆破功能特化 → 模块
+        register("akaishi:explosive", c(0, -1, 2, 0, 0, 0, 0, 2, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST,
+                parts(MechanicalPartType.MODULE));
+        // 异变：全能偏攻 → 模块
+        register("akaishi:aberration", c(0, 0, 1, 1, 0, 1, 1, 0, 0, 0), MechanicalSpecialEffect.POISON_RESIST,
+                parts(MechanicalPartType.MODULE));
+        // 末影：瞬移/感知 → 核心
+        register("akaishi:ender", c(0, -1, 0, 0, 2, 0, 0, 0, 1, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN,
+                parts(MechanicalPartType.CORE));
+        // 首领：压迫感/生命护甲 → 核心（+外壳）
+        register("akaishi:boss", c(0, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST,
+                parts(MechanicalPartType.CORE, MechanicalPartType.SHELL));
+        // 龙族：倍率/火焰 → 模块（+外壳）
+        register("akaishi:dragon", c(2, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK,
+                parts(MechanicalPartType.MODULE, MechanicalPartType.SHELL));
 
         // ---- 实体级（具体生物样本优先命中）----
-        register("akaishi:skeleton", c(0, -1, 0, 0, 0, 0, 2, 1, 1, 0), MechanicalSpecialEffect.CRITICAL_BOOST);   // 骷髅：精准远程
-        register("akaishi:spider", c(0, 0, 0, 1, 2, 0, 0, 0, 0, 1), MechanicalSpecialEffect.NONE);                // 蜘蛛：敏捷攀爬
-        register("akaishi:creeper", c(0, 0, 1, 0, 0, 1, 0, 1, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST);   // 苦力怕：爆破
-        register("akaishi:bee", c(0, 0, 0, 1, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.POISON_RESIST);           // 蜜蜂：迅捷毒刺
-        register("akaishi:zombie", c(0, 2, 1, -1, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION); // 僵尸：不死坚韧
-        register("akaishi:blaze", c(1, -1, 2, 0, -1, 0, 0, 1, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK);        // 烈焰人：烈焰爆发
-        register("akaishi:dolphin", c(0, 1, 0, 0, 2, 0, 0, 0, 0, 0), MechanicalSpecialEffect.UNDERWATER_SPEED);   // 海豚：水生灵巧
-        register("akaishi:piglin", c(0, 0, 1, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.GOLD_ARMOR_BONUS);    // 猪灵：贪婪金装
-        register("akaishi:iron_golem", c(0, 2, 0, -1, -1, 2, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST); // 铁傀儡：重装铁壁
-        register("akaishi:enderman", c(1, 0, 0, 0, 1, 0, 0, 0, 1, 1), MechanicalSpecialEffect.TELEPORT_COOLDOWN);  // 末影人：空间闪现
-        register("akaishi:wither_skeleton", c(1, -1, 1, 1, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK); // 凋灵骷髅：凋零斩击
+        // 骷髅：精准远程（感知） → 核心
+        register("akaishi:skeleton", c(0, -1, 0, 0, 0, 0, 2, 1, 1, 0), MechanicalSpecialEffect.CRITICAL_BOOST,
+                parts(MechanicalPartType.CORE));
+        // 蜘蛛：敏捷攀爬（神经） → 核心
+        register("akaishi:spider", c(0, 0, 0, 1, 2, 0, 0, 0, 0, 1), MechanicalSpecialEffect.NONE,
+                parts(MechanicalPartType.CORE));
+        // 苦力怕：爆破 → 模块
+        register("akaishi:creeper", c(0, 0, 1, 0, 0, 1, 0, 1, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST,
+                parts(MechanicalPartType.MODULE));
+        // 蜜蜂：迅捷毒刺 → 模块
+        register("akaishi:bee", c(0, 0, 0, 1, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.POISON_RESIST,
+                parts(MechanicalPartType.MODULE));
+        // 僵尸：不死坚韧 → 外壳
+        register("akaishi:zombie", c(0, 2, 1, -1, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION,
+                parts(MechanicalPartType.SHELL));
+        // 烈焰人：烈焰爆发 → 模块
+        register("akaishi:blaze", c(1, -1, 2, 0, -1, 0, 0, 1, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK,
+                parts(MechanicalPartType.MODULE));
+        // 海豚：水生灵巧（代谢） → 散热
+        register("akaishi:dolphin", c(0, 1, 0, 0, 2, 0, 0, 0, 0, 0), MechanicalSpecialEffect.UNDERWATER_SPEED,
+                parts(MechanicalPartType.COOLING));
+        // 猪灵：贪婪金装（防护共鸣） → 外壳
+        register("akaishi:piglin", c(0, 0, 1, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.GOLD_ARMOR_BONUS,
+                parts(MechanicalPartType.SHELL));
+        // 铁傀儡：重装铁壁 → 外壳
+        register("akaishi:iron_golem", c(0, 2, 0, -1, -1, 2, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST,
+                parts(MechanicalPartType.SHELL));
+        // 末影人：空间闪现（感知） → 核心
+        register("akaishi:enderman", c(1, 0, 0, 0, 1, 0, 0, 0, 1, 1), MechanicalSpecialEffect.TELEPORT_COOLDOWN,
+                parts(MechanicalPartType.CORE));
+        // 凋灵骷髅：凋零斩击 → 模块
+        register("akaishi:wither_skeleton", c(1, -1, 1, 1, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK,
+                parts(MechanicalPartType.MODULE));
+
+        // ---- T7 Stage 2 实体级扩展（12 个，各带不同的十维修正 + 一个镜像生物侧的效果）----
+        // 循声守卫：声感/压迫 → 核心（暗视感知）
+        register("akaishi:warden", c(1, 1, 2, 0, 0, 0, 0, 0, 1, 0), MechanicalSpecialEffect.NIGHT_VISION,
+                parts(MechanicalPartType.CORE));
+        // 凋灵：亡灵主宰 → 外壳/模块（负面减免）
+        register("akaishi:wither", c(1, 2, 1, 0, 0, 1, 0, 0, 0, 0), MechanicalSpecialEffect.DEBUFF_RESIST,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.MODULE));
+        // 恶魂：浮空火球 → 外壳/模块（浮空免摔）
+        register("akaishi:ghast", c(1, 2, 0, -1, 0, 1, 0, 0, 1, 0), MechanicalSpecialEffect.FALL_IMMUNE,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.MODULE));
+        // 史莱姆：黏液缓冲 → 外壳/散热（弹跳免摔）
+        register("akaishi:slime", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FALL_IMMUNE,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.COOLING));
+        // 女巫：炼药采集 → 模块（自动拾取）
+        register("akaishi:witch", c(0, 0, 1, 0, 0, 0, 1, 1, 1, 0), MechanicalSpecialEffect.AUTO_PICKUP,
+                parts(MechanicalPartType.MODULE));
+        // 守卫者：水生守卫 → 模块/外壳（水下呼吸）
+        register("akaishi:guardian", c(0, 0, 2, 1, 0, 1, 0, 0, 1, 0), MechanicalSpecialEffect.WATER_BREATHING,
+                parts(MechanicalPartType.MODULE, MechanicalPartType.SHELL));
+        // 幻翼：夜行俯冲 → 核心（夜视）
+        register("akaishi:phantom", c(0, 0, 1, 0, 2, 0, 1, 0, 0, 1), MechanicalSpecialEffect.NIGHT_VISION,
+                parts(MechanicalPartType.CORE));
+        // 劫掠兽：冲撞撞飞 → 模块/外壳（击退目标）
+        register("akaishi:ravager", c(1, 1, 2, 1, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_ON_HIT,
+                parts(MechanicalPartType.MODULE, MechanicalPartType.SHELL));
+        // 疣猪兽：兽性冲撞 → 模块（击退目标）
+        register("akaishi:hoglin", c(0, 1, 2, 0, 1, 0, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_ON_HIT,
+                parts(MechanicalPartType.MODULE));
+        // 炽足兽：熔岩耐受 → 散热/外壳（负面减免）
+        register("akaishi:strider", c(0, 1, 0, 0, 2, 1, 0, 0, 0, 0), MechanicalSpecialEffect.DEBUFF_RESIST,
+                parts(MechanicalPartType.COOLING, MechanicalPartType.SHELL));
+        // 北极熊：抗寒坚体 → 外壳/散热（负面减免）
+        register("akaishi:polar_bear", c(0, 2, 1, 0, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.DEBUFF_RESIST,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.COOLING));
+        // 美西螈：两栖再生 → 散热（水下呼吸）
+        register("akaishi:axolotl", c(1, 2, 0, 0, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.WATER_BREATHING,
+                parts(MechanicalPartType.COOLING));
+    }
+
+    /** 部件集合快捷构造（至少一个参数） */
+    private static Set<MechanicalPartType> parts(MechanicalPartType... types) {
+        return EnumSet.copyOf(Arrays.asList(types));
     }
 
     /** 逐项将修正值裁剪到 -1~+2 */
