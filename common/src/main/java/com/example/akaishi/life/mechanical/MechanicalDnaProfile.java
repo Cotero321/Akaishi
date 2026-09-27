@@ -108,6 +108,15 @@ public final class MechanicalDnaProfile {
             Collections.synchronizedMap(new LinkedHashMap<>());
 
     /**
+     * 实体来源别名：实体 key（去命名空间、小写，如 {@code magma_cube}）→ 既有基因 id。
+     * <p>用于把「非实体 / 非分组来源」的机制型基因绑到具体生物样本上：打该生物取得的样本 /
+     * 基因序列经 {@link #resolveForSample} 解析即得该基因（沿用既有解析口径，不新造获取机制）。
+     * <b>仅在实体的 key 无直接注册时兜底</b>，因此不会覆盖既有实体级 / 分组级基因。
+     */
+    private static final Map<String, String> ENTITY_ALIASES =
+            Collections.synchronizedMap(new LinkedHashMap<>());
+
+    /**
      * 注册一种 DNA 调校模板。
      * 附属模组可在 own init 中调用此方法新增 DNA 来源。
      *
@@ -177,8 +186,25 @@ public final class MechanicalDnaProfile {
     }
 
     /**
-     * 按样本来源推导 DNA：先具体实体（{@code entityId}，如 minecraft:zombie），
-     * 再分组（{@code groupId}，如 undead），均未命中回退 {@link #NONE_ID}。
+     * 把某生物实体绑定为既有基因的来源（实体级别名，沿用既有解析口径）。
+     * <p>绑定后：击杀 / 采集该生物得到的样本与其解构出的基因序列，都会在
+     * {@link #resolveForSample} 中解析为该基因。若该实体的 key 已直接注册（实体级或分组级），
+     * 则既有注册优先、别名不生效——因此请绑定未被占用的生物。
+     *
+     * @param entityId 实体注册名，如 "minecraft:magma_cube"（命名空间可省略）
+     * @param geneId   目标基因 id，如 "akaishi:overheat_core"（按 id 惰性解析，可先绑定后注册）
+     */
+    public static void bindEntitySource(String entityId, String geneId) {
+        if (entityId == null || entityId.isBlank() || geneId == null || geneId.isBlank()) {
+            return;
+        }
+        ENTITY_ALIASES.put(normalizeKey(entityId), geneId);
+    }
+
+    /**
+     * 按样本来源推导 DNA：先具体实体（{@code entityId}，如 minecraft:zombie，含
+     * {@link #bindEntitySource} 登记的实体级别名），再分组（{@code groupId}，如 undead），
+     * 均未命中回退 {@link #NONE_ID}。
      * <p>
      * 查找对命名空间不敏感：完整 ID 优先精确命中（支持 {@code mymod:xxx}），
      * 未命中则回退内置 {@code akaishi:path}，兼容原版实体与裸 path 分组。
@@ -200,7 +226,7 @@ public final class MechanicalDnaProfile {
         return none != null ? none : NONE_FALLBACK;
     }
 
-    /** 完整 ID 精确命中 → 裸 path 兼容 {@code akaishi} 命名空间 → 带命名空间回退内置 path */
+    /** 完整 ID 精确命中 → 裸 path 兼容 {@code akaishi} 命名空间 → 实体来源别名 → 未命中 */
     private static MechanicalDnaProfile lookup(String rawId) {
         if (rawId == null || rawId.isBlank()) {
             return null;
@@ -210,9 +236,22 @@ public final class MechanicalDnaProfile {
         if (exact != null) {
             return exact;
         }
+        String path = normalizeKey(trimmed);
+        MechanicalDnaProfile byPath = REGISTRY.get("akaishi:" + path);
+        if (byPath != null) {
+            return byPath;
+        }
+        // 实体来源别名：把机制型基因绑到具体生物（仅在无直接注册时兜底，不覆盖既有基因）
+        String aliasTarget = ENTITY_ALIASES.get(path);
+        return aliasTarget != null ? REGISTRY.get(aliasTarget) : null;
+    }
+
+    /** 规范化来源 key：去命名空间、小写（实体别名与 {@code akaishi:path} 回退共用同一口径） */
+    private static String normalizeKey(String rawId) {
+        String trimmed = rawId.trim();
         int colon = trimmed.indexOf(':');
         String path = colon >= 0 ? trimmed.substring(colon + 1) : trimmed;
-        return REGISTRY.get("akaishi:" + path.toLowerCase(Locale.ROOT));
+        return path.toLowerCase(Locale.ROOT);
     }
 
     private static void validateId(String id) {
@@ -322,7 +361,7 @@ public final class MechanicalDnaProfile {
         register("akaishi:axolotl", c(1, 2, 0, 0, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.WATER_BREATHING,
                 parts(MechanicalPartType.COOLING));
 
-        // ---- 机制型基因（自带负面代价；非实体/分组来源，暂无可达采集路径 ⇒ 见报告"未决"）----
+        // ---- 机制型基因（自带负面代价；生物来源见本方法末尾的 bindEntitySource 绑定）----
         // 过热核心：血量越低攻击越高（分段爬升），代价持续掉血 → 模块
         register("akaishi:overheat_core", c(0, -1, 2, 0, 0, 0, 0, 1, 0, 0), MechanicalSpecialEffect.OVERHEAT_CORE,
                 parts(MechanicalPartType.MODULE), true);
@@ -341,6 +380,15 @@ public final class MechanicalDnaProfile {
         // 代谢透支：生命恢复提速，代价恢复期间附带虚弱 → 散热
         register("akaishi:metabolic_overdraft", c(0, 2, -1, 0, 1, 0, 0, 0, 0, 0), MechanicalSpecialEffect.METABOLIC_OVERDRAFT,
                 parts(MechanicalPartType.COOLING), true);
+
+        // ---- 机制型基因的生物来源绑定（实体级：打该生物 ⇒ 样本/基因序列解析为该基因）----
+        // 均选未被既有基因占用的生物；silverfish / vex 另需在 SampleGroup 白名单补入（否则样本不可采集）
+        bindEntitySource("minecraft:magma_cube", "akaishi:overheat_core");
+        bindEntitySource("minecraft:silverfish", "akaishi:parasitic_symbiosis");
+        bindEntitySource("minecraft:bat", "akaishi:echolocation");
+        bindEntitySource("minecraft:shulker", "akaishi:armor_overload");
+        bindEntitySource("minecraft:vex", "akaishi:neural_spasm");
+        bindEntitySource("minecraft:turtle", "akaishi:metabolic_overdraft");
     }
 
     /** 部件集合快捷构造（至少一个参数） */

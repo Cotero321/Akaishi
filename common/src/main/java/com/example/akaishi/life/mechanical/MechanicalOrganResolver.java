@@ -70,7 +70,7 @@ public final class MechanicalOrganResolver {
         }
 
         // 检测协同加成
-        SynergyResult synergy = detectSynergy(templates, weights);
+        SynergyResult synergy = detectSynergy(weights);
 
         double[] values = new double[MechanicalProperty.COUNT];
         for (MechanicalProperty prop : MechanicalProperty.values()) {
@@ -105,8 +105,7 @@ public final class MechanicalOrganResolver {
      * 检测四个部件的权重分布是否形成特定协同模式。
      * 返回触发协同加成描述键列表与各属性百分比加成（按 {@link MechanicalProperty#ordinal()} 索引）。
      */
-    private static SynergyResult detectSynergy(List<MechanicalPartTemplate> templates,
-                                                MechanicalPartWeight[] weights) {
+    private static SynergyResult detectSynergy(MechanicalPartWeight[] weights) {
         List<String> keys = new ArrayList<>();
         double[] bonuses = new double[MechanicalProperty.COUNT];
 
@@ -166,24 +165,6 @@ public final class MechanicalOrganResolver {
             bonuses[MechanicalProperty.DODGE.ordinal()] += 0.10;
         }
 
-        // 5. 同源：四个部件「DNA 来源」相同且不为 NONE（九属性全体 +2%）——判定的是 DNA（t.dnaProfile()），非材料
-        //    （待调手感值：DNA 四级化后「四部件同 DNA」已由跨器官有效等级给出 Lv4，本条若仍 +5% 属对同一件事双重计酬，故压低至 +2%）
-        Set<MechanicalDnaProfile> dnaSet = new HashSet<>();
-        for (MechanicalPartTemplate t : templates) {
-            dnaSet.add(t.dnaProfile());
-        }
-        if (dnaSet.size() == 1) {
-            MechanicalDnaProfile dna = dnaSet.iterator().next();
-            if (!MechanicalDnaProfile.NONE_ID.equals(dna.id())) {
-                keys.add("mechanical.synergy.same_source");
-                for (MechanicalProperty prop : MechanicalProperty.values()) {
-                    if (prop != MechanicalProperty.OVERALL_MULTIPLIER) {
-                        bonuses[prop.ordinal()] += 0.02;
-                    }
-                }
-            }
-        }
-
         return new SynergyResult(keys, bonuses);
     }
 
@@ -191,8 +172,9 @@ public final class MechanicalOrganResolver {
      * 收集所有部件的DNA特殊效果（保持部件顺序、<b>保留重复项</b>——同一 DNA 跨部件出现多次时原样保留，
      * 供运行时按部件计数推导等级；空白/none 项跳过；内置与附属效果一视同仁）。
      * <p>
-     * 注意：运行时 {@code AkaishiMechanicalEffectHandler} 仍按「器官内 DNA 来源的出现次数」推导单器官等级，
-     * 再跨器官汇总为有效等级，故此处保留的重复项<b>会</b>参与等级计算（同一 DNA 出现 4 次 ⇒ 该器官 Lv4）。
+     * 注意：运行时 {@code AkaishiMechanicalEffectHandler} 按「器官内 DNA 来源的出现次数」推导单器官等级
+     * （同一 DNA 出现 N 次 ⇒ 该器官 LvN），再跨器官取最高等级为有效等级，故此处保留的重复项<b>会</b>参与等级计算
+     * （受部件限装约束：单基因最多装 2 类部件 ⇒ 单器官同 DNA 部件数 ≤2 ⇒ 该器官等级实际 ≤Lv2）。
      */
     private static List<IMechanicalDnaEffect> collectEffects(
             List<MechanicalPartTemplate> templates) {

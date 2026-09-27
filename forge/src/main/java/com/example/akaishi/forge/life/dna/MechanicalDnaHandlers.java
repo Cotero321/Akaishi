@@ -27,7 +27,7 @@ import java.util.UUID;
  * 一个 {@link IMechanicalDnaEffectHandler} 实现（运行时逻辑，注册于 {@link MechanicalEffectHandlerRegistry}）。
  * 与既有 16 个内置效果完全同构，未新造机制。
  * <p>
- * <b>强度口径</b>：全部数值按「跨器官汇总后的有效等级」1~4 档取值（{@code MechanicalAggregation.effectLevels}），
+ * <b>强度口径</b>：全部数值按「跨器官有效等级」1~4 档取值（{@code MechanicalAggregation.effectLevels}，取各器官最高等级），
  * 分发层<b>每个效果只回调一次</b>，禁止逐器官线性叠加。全部数值均为<b>待调手感值</b>。
  * <p>
  * <b>自带负面</b>：每个基因都有一条真实生效的代价（掉血 / 掉饥饿 / 受伤加重 / 减速 / 攻速下降 / 虚弱）。

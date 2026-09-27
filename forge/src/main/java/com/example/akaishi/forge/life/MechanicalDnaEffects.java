@@ -18,8 +18,8 @@ import net.minecraft.world.phys.AABB;
 /**
  * 内置 DNA 特殊效果的「四级曲线」实现（T5，企划 §5）。
  * <p>
- * 所有强度按<b>跨器官汇总后的有效等级</b>（1~4）取值，由 {@code AkaishiMechanicalEffectHandler} 每个效果只调用一次；
- * 有效等级 = {@code clamp(max(各器官等级) + 携带该效果的器官数 - 1, 1, 4)}。
+ * 所有强度按<b>跨器官有效等级</b>（1~4）取值，由 {@code AkaishiMechanicalEffectHandler} 每个效果只调用一次；
+ * 有效等级 = {@code max(各器官单器官等级)}（单器官等级 = 该 DNA 在本器官 4 部件中的出现次数，clamp 1~4）。
  * <p>
  * 基调：现状 ≈ Lv2~3，Lv4 略强于现状（企划 §5）。全部数值均为<b>待调手感值</b>。
  */

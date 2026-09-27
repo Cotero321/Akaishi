@@ -15,8 +15,8 @@ import java.util.UUID;
 /**
  * 特性处理器的公共查询 / 属性挂载工具。
  * <p>
- * 等级口径统一走 {@link MechanicalAggregation}：每个特性在玩家全身跨器官汇总为<b>唯一有效等级</b>
- * （{@code clamp(max + 器官数 - 1, 1, maxLevel)}），处理器只需读取该等级，不再自行按器官累加。
+ * 等级口径统一走 {@link MechanicalAggregation}：每个特性在玩家全身取<b>唯一有效等级</b>
+ * （单器官计数 clamp 1~maxLevel，跨器官取最大值），处理器只需读取该等级，不再自行按器官累加。
  */
 final class TraitSupport {
 

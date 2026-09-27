@@ -30,11 +30,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 机械义体效果处理器（Forge 服务端，平衡收敛：汇总后单次回调）。
+ * 机械义体效果处理器（Forge 服务端，平衡收敛：单器官计数取最大 + 单次回调）。
  * <p>
- * <b>分发模型</b>：先经 {@link MechanicalAggregation} 对每个「特性 ID / DNA 效果 ID」跨器官汇总出
- * <b>唯一有效等级</b>，再<b>每种条目只回调 handler 一次</b>（参数即有效等级）。
- * 不再逐器官调用，跨器官叠加被 {@code clamp(max + 器官数 - 1, 1, maxLevel)} 封顶，避免线性失控。
+ * <b>分发模型</b>：先经 {@link MechanicalAggregation} 对每个「特性 ID / DNA 效果 ID」取跨器官<b>最高等级</b>，
+ * 再<b>每种条目只回调 handler 一次</b>（参数即有效等级）。
+ * 不再逐器官调用；等级只由单器官内部计数决定，跨器官取最大值，避免线性失控。
  * <ul>
  *   <li>材料特性：{@link MechanicalTraitHandlerRegistry} 按特性 ID 取处理器，每个特性一次钩子调用；</li>
  *   <li>DNA 效果：{@link MechanicalEffectHandlerRegistry} 按效果 ID 取处理器，每个效果一次调用；</li>

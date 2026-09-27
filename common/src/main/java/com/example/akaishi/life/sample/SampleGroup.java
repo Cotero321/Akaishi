@@ -64,6 +64,8 @@ public final class SampleGroup implements ISampleGroup {
                         || t == EntityType.SNOW_GOLEM || t == EntityType.ALLAY
                         || t == EntityType.GHAST || t == EntityType.VINDICATOR
                         || t == EntityType.RAVAGER
+                        // 非自然强敌补充：蠹虫 / 恼鬼（机制型机械基因的生物来源，见 MechanicalDnaProfile）
+                        || t == EntityType.SILVERFISH || t == EntityType.VEX
                         // 下界系（1.16+ 火狱生态）：猪灵/蛮兵、疣猪兽、女巫
                         || t == EntityType.PIGLIN || t == EntityType.PIGLIN_BRUTE
                         || t == EntityType.HOGLIN || t == EntityType.WITCH;

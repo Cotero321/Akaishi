@@ -13,8 +13,8 @@ import net.minecraft.world.entity.player.Player;
  * <p>
  * 所有回调均运行在服务端，且仅在玩家装备了带该效果的机械器官时触发。
  * <p>
- * <b>参数语义（平衡收敛）</b>：{@code level} = <b>跨器官汇总后的有效等级</b>（1~4）——
- * {@code clamp(max(各器官等级) + 携带该效果的器官数 - 1, 1, 4)}；
+ * <b>参数语义（平衡收敛）</b>：{@code level} = <b>跨器官有效等级</b>（1~4）——
+ * 单器官等级 = clamp(该 DNA 在本器官 4 部件中的出现次数, 1, 4)，跨器官取各器官等级的最大值；
  * 分发层<b>每个效果只回调一次</b>（不再逐器官调用、不跨器官累计等级）。
  */
 public interface IMechanicalDnaEffectHandler {
