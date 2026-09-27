@@ -21,11 +21,11 @@ import net.minecraft.world.entity.player.Player;
  */
 public interface IMechanicalTraitHandler {
 
-    /** 器官被装上时回调（每个带该特性的器官一次）。 */
+    /** 该特性的跨器官有效等级出现或变化时回调一次（不再是逐器官回调）。 */
     default void onEquip(Player player, int level) {
     }
 
-    /** 器官被卸下时回调（每个带该特性的器官一次）。 */
+    /** 该特性的跨器官有效等级失效或变化时回调一次（不再是逐器官回调）。 */
     default void onUnequip(Player player, int level) {
     }
 
