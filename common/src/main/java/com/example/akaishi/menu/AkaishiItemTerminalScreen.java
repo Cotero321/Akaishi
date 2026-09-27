@@ -3,6 +3,8 @@ package com.example.akaishi.menu;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.akaishi.api.storage.IItemTerminalHost;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -35,6 +37,8 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
     private static final int COLOR_SCROLL_HANDLE_DARK = 0xFF3A3A3A;
     /** 滚动把柄最小高度，保证条目很少时仍可抓取 */
     private static final int MIN_HANDLE_H = 12;
+    /** 存取失败原因行（与 HINT_Y 共格）：红字，与库区状态红字同色 */
+    private static final int COLOR_REJECT = 0xFFA03030;
 
     private static final int IP_BAR_X = 8;
     private static final int IP_BAR_Y = 17;
@@ -254,9 +258,18 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
         gui.drawString(this.font, this.title, 8, 6, TEXT, false);
         Component units = Component.translatable("gui.akaishi.item_terminal.units", this.menu.unitCount());
         gui.drawString(this.font, units, this.imageWidth - 8 - this.font.width(units), 6, TEXT_DIM, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.item_terminal.ip",
-                        EnergyFormat.format(this.menu.usedIp()), EnergyFormat.format(this.menu.capacityIp())),
-                8, IP_TEXT_Y, TEXT, false);
+        Component ip = Component.translatable("gui.akaishi.item_terminal.ip",
+                EnergyFormat.format(this.menu.usedIp()), EnergyFormat.format(this.menu.capacityIp()));
+        gui.drawString(this.font, ip, 8, IP_TEXT_Y, TEXT, false);
+        // 槽位占用在原地常显（与悬停同一数据槽来源）：可存量取「槽位」与「IP」两个累计型约束的较小者，
+        // 只把 IP 画出来会让"IP 还富余 126M 却存不进"完全看不出原因（§19 连续两轮误判的根因）。
+        // IP 行右端是本面板唯一的空位：先量宽再画，放不下就退回悬停（ip_tip.slots），绝不压字。
+        Component slots = Component.translatable("gui.akaishi.item_terminal.slots_inline",
+                Integer.toString(this.menu.usedSlots()), Integer.toString(this.menu.totalSlots()));
+        int slotsX = this.imageWidth - 8 - this.font.width(slots);
+        if (slotsX >= 8 + this.font.width(ip) + 6) {
+            gui.drawString(this.font, slots, slotsX, IP_TEXT_Y, TEXT_DIM, false);
+        }
         // 切页按钮标签（安全 ↔ 返回）
         Component tabLabel = Component.translatable(securityPage
                 ? "gui.akaishi.security.back" : "gui.akaishi.security.tab");
@@ -268,8 +281,6 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
                     TEXT, TEXT_DIM, 0xFF2E7D32);
             return;
         }
-        gui.drawString(this.font, Component.translatable("gui.akaishi.item_terminal.hint"),
-                8, HINT_Y, TEXT_DIM, false);
         // 库区状态提示：未成型 / 未贴装单元 / 库空 三种原因必须分开显示 ——
         // 三者在界面上都是"空库"，但处置方式完全不同
         Component status = null;
@@ -291,6 +302,95 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
             gui.drawString(this.font, status, (this.imageWidth - this.font.width(status)) / 2,
                     AkaishiItemTerminalMenu.SLOT_Y + 30, statusColor, false);
         }
+        // 最近一次存取被拒绝的原因（库页动作 / 搬运引擎 / 储存口回传）：常驻一行红字，
+        // 与永久操作提示共用 y=133 那一格 —— 有原因时优先显示原因。动作栏那份是瞬时的、易被忽略，
+        // 而"存不进去却毫无提示"正是历史上只靠动作栏造成的。数字放进悬停提示（放不下不压字号）。
+        int reject = this.menu.rejectReason();
+        if (reject != IItemTerminalHost.REJECT_NONE) {
+            gui.drawString(this.font, Component.translatable(rejectKey(reject)), 8, HINT_Y, COLOR_REJECT, false);
+        } else {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.item_terminal.hint"),
+                    8, HINT_Y, TEXT_DIM, false);
+        }
+    }
+
+    /**
+     * 回执原因码 → 行内短句 lang 键。
+     * <p>
+     * 行内可用宽 = 面板宽 184 − 两侧各 8 = 168px：短句统一 ≤ 11 汉字 / ≤ 25 英文字符
+     * （≈ 138px），保证双语都不截断、不压字号；具体数字一律走悬停。
+     */
+    private static String rejectKey(int reason) {
+        return switch (reason) {
+            case IItemTerminalHost.REJECT_DEPOSIT_UNFORMED -> "gui.akaishi.item_terminal.reject.deposit.unformed";
+            case IItemTerminalHost.REJECT_DEPOSIT_NO_UNIT -> "gui.akaishi.item_terminal.reject.deposit.no_unit";
+            case IItemTerminalHost.REJECT_DEPOSIT_NO_SPACE -> "gui.akaishi.item_terminal.reject.deposit.no_space";
+            case IItemTerminalHost.REJECT_DEPOSIT_SLOTS_FULL -> "gui.akaishi.item_terminal.reject.deposit.slots_full";
+            case IItemTerminalHost.REJECT_DEPOSIT_IP_FULL -> "gui.akaishi.item_terminal.reject.deposit.ip_full";
+            case IItemTerminalHost.REJECT_DEPOSIT_ENERGY_SHORT -> "gui.akaishi.item_terminal.reject.deposit.energy_short";
+            case IItemTerminalHost.REJECT_DEPOSIT_MAX_IP -> "gui.akaishi.item_terminal.reject.deposit.max_ip";
+            case IItemTerminalHost.REJECT_DEPOSIT_PERMISSION -> "gui.akaishi.item_terminal.reject.deposit.permission";
+            case IItemTerminalHost.REJECT_DEPOSIT_MISMATCH -> "gui.akaishi.item_terminal.reject.deposit.mismatch";
+            case IItemTerminalHost.REJECT_WITHDRAW_UNFORMED -> "gui.akaishi.item_terminal.reject.withdraw.unformed";
+            case IItemTerminalHost.REJECT_WITHDRAW_NO_UNIT -> "gui.akaishi.item_terminal.reject.withdraw.no_unit";
+            case IItemTerminalHost.REJECT_WITHDRAW_ENERGY_SHORT -> "gui.akaishi.item_terminal.reject.withdraw.energy_short";
+            case IItemTerminalHost.REJECT_WITHDRAW_PERMISSION -> "gui.akaishi.item_terminal.reject.withdraw.permission";
+            case IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM -> "gui.akaishi.item_terminal.reject.withdraw.no_item";
+            case IItemTerminalHost.REJECT_WITHDRAW_NO_ROOM -> "gui.akaishi.item_terminal.reject.withdraw.no_room";
+            default -> "gui.akaishi.item_terminal.reject.unknown";
+        };
+    }
+
+    /** 悬停详情：把"该去改什么"与具体数字给全（行内只放得下短句，故数字一律放这里） */
+    private List<Component> rejectTooltip() {
+        int reason = this.menu.rejectReason();
+        List<Component> lines = new ArrayList<>(2);
+        lines.add(Component.translatable(rejectKey(reason)));
+        lines.add(rejectTip(reason));
+        return lines;
+    }
+
+    /** 剩余 IP（容量 − 已用；由服务端权威数据槽推导，不另开数据槽） */
+    private long remainingIp() {
+        return Math.max(0L, this.menu.capacityIp() - this.menu.usedIp());
+    }
+
+    private Component rejectTip(int reason) {
+        return switch (reason) {
+            case IItemTerminalHost.REJECT_DEPOSIT_ENERGY_SHORT, IItemTerminalHost.REJECT_WITHDRAW_ENERGY_SHORT ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.energy",
+                            EnergyFormat.exact(this.menu.rejectFeeNeed()),
+                            EnergyFormat.exact(this.menu.bufferedEnergy()));
+            case IItemTerminalHost.REJECT_DEPOSIT_MAX_IP ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.max_ip",
+                            EnergyFormat.format(this.menu.maxBatchIp(true)),
+                            EnergyFormat.format(this.menu.effectiveBufferCapacity()),
+                            Integer.toString(this.menu.effectiveFeeModules()));
+            case IItemTerminalHost.REJECT_DEPOSIT_NO_SPACE ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.space");
+            // 两个累计型约束各自触顶：槽位满必须带上"IP 仍有多少富余"，IP 不足必须带上"还剩多少 IP"，
+            // 否则玩家看到"1.8M / 128M"仍会以为有空间（本项目曾连续两轮据此误判）
+            case IItemTerminalHost.REJECT_DEPOSIT_SLOTS_FULL ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.slots_full",
+                            Integer.toString(this.menu.usedSlots()), Integer.toString(this.menu.totalSlots()),
+                            EnergyFormat.format(remainingIp()));
+            case IItemTerminalHost.REJECT_DEPOSIT_IP_FULL ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.ip_full",
+                            EnergyFormat.format(remainingIp()));
+            case IItemTerminalHost.REJECT_DEPOSIT_MISMATCH ->
+                    Component.translatable("gui.akaishi.item_terminal.reject.tip.mismatch");
+            case IItemTerminalHost.REJECT_DEPOSIT_PERMISSION, IItemTerminalHost.REJECT_WITHDRAW_PERMISSION ->
+                    Component.translatable("gui.akaishi.item_terminal.fail.denied");
+            case IItemTerminalHost.REJECT_DEPOSIT_UNFORMED, IItemTerminalHost.REJECT_WITHDRAW_UNFORMED ->
+                    Component.translatable("gui.akaishi.item_terminal.fail.unformed");
+            case IItemTerminalHost.REJECT_DEPOSIT_NO_UNIT, IItemTerminalHost.REJECT_WITHDRAW_NO_UNIT ->
+                    Component.translatable("gui.akaishi.item_terminal.fail.no_unit");
+            case IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM ->
+                    Component.translatable("gui.akaishi.item_terminal.fail.no_item");
+            case IItemTerminalHost.REJECT_WITHDRAW_NO_ROOM ->
+                    Component.translatable("gui.akaishi.item_terminal.fail.no_room");
+            default -> Component.translatable("gui.akaishi.item_terminal.hint");
+        };
     }
 
     @Override
@@ -381,6 +481,12 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
                 return;
             }
         }
+        // 存取失败原因行（与操作提示共格）：悬停给"该去改什么 + 具体数字"（仅库页有这一行）
+        if (!securityPage && this.menu.rejectReason() != IItemTerminalHost.REJECT_NONE
+                && isHovering(8, HINT_Y, this.imageWidth - 16, 9, mouseX, mouseY)) {
+            gui.renderComponentTooltip(this.font, rejectTooltip(), mouseX, mouseY);
+            return;
+        }
         if (isHovering(IP_BAR_X, IP_BAR_Y, IP_BAR_W, IP_BAR_H, mouseX, mouseY)) {
             gui.renderComponentTooltip(this.font, List.of(
                     Component.translatable("gui.akaishi.item_terminal.ip_tip",
@@ -389,6 +495,10 @@ public class AkaishiItemTerminalScreen extends AbstractContainerScreen<AkaishiIt
                             EnergyFormat.format(this.menu.maxBatchIp(false)),
                             EnergyFormat.format(this.menu.effectiveBufferCapacity()),
                             this.menu.effectiveFeeModules()),
+                    // 槽位占用：可存量取「槽位余量」与「IP 余量」的较小者，两个用量必须并排显示 ——
+                    // 只显示 IP 时，"IP 还剩 126M 却存不进去"在界面上完全看不出原因
+                    Component.translatable("gui.akaishi.item_terminal.ip_tip.slots",
+                            Integer.toString(this.menu.usedSlots()), Integer.toString(this.menu.totalSlots())),
                     // 库总览：槽位不再画数字，总量信息在这里给全
                     Component.translatable("gui.akaishi.item_lib.summary",
                             Integer.toString(this.menu.visibleEntryCount()),

@@ -16,6 +16,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Map;
@@ -90,7 +91,17 @@ public final class WardenBossHandler {
         }
     }
 
-    /** Boss 保护 2/2：免疫毒/凋零/饥饿/虚弱（不受负面药剂与效果干扰） */
+    /**
+     * Boss 保护 2/2：免疫毒/凋零/饥饿/虚弱（不受负面药剂与效果干扰）。
+     * <p>
+     * <b>为什么用 {@code setResult(DENY)} 而不是 {@code setCanceled}</b>（2026-09-24 崩溃取证）：
+     * Forge 47.3.0 的 {@link MobEffectEvent.Applicable} 是 <b>{@code @HasResult}</b> 而非
+     * {@code @Cancelable}（javap 实测类签名 extends MobEffectEvent、无 ICancellableEvent；
+     * 源码 javadoc 明写 "This event is not Cancelable / This event HasResult / DENY will not apply"）。
+     * 对不可取消事件调 {@code setCanceled} 会直接抛
+     * {@code UnsupportedOperationException}——此前该调用潜伏未爆，直到 BOSS 场地
+     * 「复活后全场凋零 III」第一次把凋零挂到场内监守者身上才引爆（服务端 tick 崩溃）。
+     */
     @SubscribeEvent
     public void onEffectImmune(MobEffectEvent.Applicable event) {
         LivingEntity entity = event.getEntity();
@@ -100,7 +111,7 @@ public final class WardenBossHandler {
         MobEffect effect = event.getEffectInstance().getEffect();
         if (effect == MobEffects.POISON || effect == MobEffects.WITHER
                 || effect == MobEffects.HUNGER || effect == MobEffects.WEAKNESS) {
-            event.setCanceled(true);
+            event.setResult(Event.Result.DENY);
         }
     }
 

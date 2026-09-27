@@ -110,18 +110,31 @@ public class AkaishiItemStorageUnitScreen extends AbstractContainerScreen<Akaish
         Component remaining = Component.translatable("gui.akaishi.item_storage_unit.remaining",
                 EnergyFormat.format(this.menu.remainingIp()));
         gui.drawString(this.font, remaining, this.imageWidth - 8 - this.font.width(remaining), 6, TEXT_DIM, false);
-        gui.drawString(this.font, Component.translatable("gui.akaishi.item_storage_unit.hint"),
-                8, HINT_Y, TEXT_DIM, false);
+        Component hint = Component.translatable("gui.akaishi.item_storage_unit.hint");
+        gui.drawString(this.font, hint, 8, HINT_Y, TEXT_DIM, false);
+        // 槽位占用常显（与物品终端同一口径 / 同一数据源）：一槽多堆后"有没有空槽放新种类"才是真实瓶颈，
+        // 只放悬停等于把约束藏起来。右对齐落位，画之前先量宽 —— 万一与左侧提示重叠就宁可不画
+        // （数字始终能在 IP 条悬停里看到，绝不出现两组文字压在一起）。
+        Component slots = Component.translatable("gui.akaishi.item_storage_unit.slots",
+                Integer.toString(this.menu.usedSlots()), Integer.toString(this.menu.totalSlots()));
+        int slotsX = this.imageWidth - 8 - this.font.width(slots);
+        if (slotsX >= 8 + this.font.width(hint) + 4) {
+            gui.drawString(this.font, slots, slotsX, HINT_Y, TEXT, false);
+        }
     }
 
     @Override
     protected void renderTooltip(GuiGraphics gui, int mouseX, int mouseY) {
         if (isHovering(BAR_X, BAR_Y, BAR_W, BAR_H, mouseX, mouseY)) {
+            // 槽位占用与 IP 用量并排给全：一槽多堆后可存量的真实瓶颈是"没有空槽放新种类"，
+            // 只显示 IP 会让"IP 还富余却存不进新种类"完全看不出原因（终端侧同教训）
             gui.renderComponentTooltip(this.font, List.of(
                     Component.translatable("gui.akaishi.item_storage_unit.ip_tip",
                             EnergyFormat.format(this.menu.usedIp()),
                             EnergyFormat.format(this.menu.capacityIp()),
-                            EnergyFormat.format(this.menu.remainingIp())),
+                            EnergyFormat.format(this.menu.remainingIp()),
+                            Integer.toString(this.menu.usedSlots()),
+                            Integer.toString(this.menu.totalSlots())),
                     Component.translatable("gui.akaishi.item_lib.summary",
                             Integer.toString(this.menu.viewSize()),
                             EnergyFormat.format(this.menu.viewItemTotal()))), mouseX, mouseY);

@@ -54,13 +54,26 @@ public class AkaishiItemStorageUnitMenu extends AbstractContainerMenu {
     public static final int DATA_CAPACITY_HIGH = 5;
     public static final int DATA_CAPACITY_HIGH2 = 6;
     public static final int DATA_CAPACITY_HIGH3 = 7;
-    public static final int DATA_SLOTS = 8;
+    /**
+     * 各槽<b>真实件数</b>的数据槽基址：每槽占 2 槽（低 16 位 / 高 16 位）。
+     * <p>
+     * 为什么必须另走数据槽：一槽多堆后单槽件数可远超单堆上限，而 {@code getItem()} 是夹到单堆上限的
+     * 视图堆、原版槽同步的 NBT {@code Count} 又是 byte（大数量会回绕）⇒ 客户端拿不到真实件数。
+     */
+    public static final int DATA_SLOT_COUNT_BASE = 8;
+    /** 已占用槽位（非空槽数）：与物品终端同一口径的展示量 */
+    public static final int DATA_USED_SLOTS = DATA_SLOT_COUNT_BASE + UnitReadOnlyContainer.SIZE * 2;
+    /** 槽位总数（各阶一致） */
+    public static final int DATA_TOTAL_SLOTS = DATA_USED_SLOTS + 1;
+    public static final int DATA_SLOTS = DATA_TOTAL_SLOTS + 1;
 
     private final AkaishiItemStorageUnitBlockEntity unit;
     private final ContainerData data = new SimpleContainerData(DATA_SLOTS);
     private final Player player;
     /** 只读视图容器：客户端界面按类合并视图的数据源（{@code viewSize/viewTotal} 只在客户端有意义） */
     private final UnitReadOnlyContainer view;
+    /** 客户端：从数据槽读出的各槽真实件数（复用数组，免每帧分配） */
+    private final long[] viewCounts = new long[UnitReadOnlyContainer.SIZE];
     /**
      * 「原版槽渲染这一趟」标记。
      * <p>
@@ -102,8 +115,51 @@ public class AkaishiItemStorageUnitMenu extends AbstractContainerMenu {
                     this.unit.getStoredIp());
             LongDataSlots.write(this.data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, DATA_CAPACITY_HIGH2,
                     DATA_CAPACITY_HIGH3, this.unit.getIpCapacity());
+            // 一槽多堆：视图堆数量被夹到单堆上限，真实件数只能另走数据槽下发（客户端要显示大条目总量）
+            int used = 0;
+            for (int i = 0; i < UnitReadOnlyContainer.SIZE; i++) {
+                long count = this.unit.storedCount(i);
+                int index = slotCountIndex(i);
+                LongDataSlots.write(this.data, index, index + 1, count);
+                if (count > 0L && !this.unit.getItem(i).isEmpty()) {
+                    used++;
+                }
+            }
+            this.data.set(DATA_USED_SLOTS, LongDataSlots.clampShort(used));
+            this.data.set(DATA_TOTAL_SLOTS, LongDataSlots.clampShort(UnitReadOnlyContainer.SIZE));
         }
         super.broadcastChanges();
+    }
+
+    /** 第 slot 槽真实件数的低 16 位数据槽下标（高 16 位为 +1） */
+    private static int slotCountIndex(int slot) {
+        return DATA_SLOT_COUNT_BASE + slot * 2;
+    }
+
+    /**
+     * 客户端：把数据槽里的真实件数推给只读视图（视图堆数量被夹到单堆上限，不能当件数用）。
+     * 服务端投影不参与渲染，跳过。
+     */
+    private void pushViewCounts() {
+        if (!this.player.level().isClientSide()) {
+            return;
+        }
+        for (int i = 0; i < UnitReadOnlyContainer.SIZE; i++) {
+            int index = slotCountIndex(i);
+            this.viewCounts[i] = LongDataSlots.read(this.data, index, index + 1);
+        }
+        this.view.setSlotCounts(this.viewCounts);
+    }
+
+    /** 已占用槽位（非空槽数；服务端权威值）：与 IP 用量并列展示的「另一个累计型约束」用量 */
+    public int usedSlots() {
+        return this.data.get(DATA_USED_SLOTS);
+    }
+
+    /** 槽位总数（各阶一致；数据槽尚未到达时退回编译期常量） */
+    public int totalSlots() {
+        int total = this.data.get(DATA_TOTAL_SLOTS);
+        return total > 0 ? total : UnitReadOnlyContainer.SIZE;
     }
 
     /** 已占用 IP（服务端权威值） */
@@ -124,6 +180,7 @@ public class AkaishiItemStorageUnitMenu extends AbstractContainerMenu {
 
     /** 按类合并后的可视条目数（客户端）：一种物品占一格 */
     public int viewSize() {
+        pushViewCounts();
         return this.view.viewSize();
     }
 
@@ -139,11 +196,13 @@ public class AkaishiItemStorageUnitMenu extends AbstractContainerMenu {
 
     /** 第 cell 格的合并总件数（客户端） */
     public long viewTotal(int cell) {
+        pushViewCounts();
         return this.view.viewTotal(cell);
     }
 
     /** 合并后的总件数（客户端） */
     public long viewItemTotal() {
+        pushViewCounts();
         return this.view.viewItemTotal();
     }
 

@@ -25,16 +25,11 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
     private static final int LIFE_BAR_X = 56, LIFE_BAR_Y = 52, BAR_W = 100, BAR_H = 8;
     /** 解构进度条区域（与能量条同行对齐，底缘 y76 避开玩家背包槽 y84 起） */
     private static final int PROGRESS_X = 56, PROGRESS_Y = 68, PROGRESS_W = 100, PROGRESS_H = 8;
-    /** 机器槽位数量（升级槽 3 + 输入/输出槽 2，贴图无槽位图形需自绘框） */
-    private static final int MACHINE_SLOTS = MachineUpgradeSlots.SLOT_COUNT
+    /** 机器槽位数量（升级槽 2 + 输入/输出槽 2，贴图无槽位图形需自绘框；无线接收格已移除） */
+    private static final int MACHINE_SLOTS = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS
             + AkaishiGeneAnalyzerBlockEntity.SLOT_COUNT;
     /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角 y=8 顶部留白，规则 3） */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
-    /**
-     * 无线接收格：本界面 (116,8) 被中上带「存储」按钮占用（且该按钮在 mouseClicked 里优先命中），
-     * 故改放能量格正下方；与槽位下方「升级」标签右缘 (152) 恰好相邻，不重叠。
-     */
-    private static final int WIRELESS_SLOT_X = 152, WIRELESS_SLOT_Y = 26;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
     /** 存储开关按钮（移置中上带，避开右上角升级槽与左侧标题；仅在相邻存储库时显示） */
     private static final int STORE_X = 90, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
@@ -196,12 +191,6 @@ public class AkaishiGeneAnalyzerScreen extends AbstractContainerScreen<AkaishiGe
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
-                    mouseX, mouseY);
-        }
-        if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)) {
-            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
-                    Component.translatable(menu.hasWirelessReceiver()
-                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 存储按钮悬停提示

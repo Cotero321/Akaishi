@@ -37,6 +37,11 @@ public final class LongDataSlots {
         return ((data.get(highIndex) & 0xFFFF) << 16) | (data.get(lowIndex) & 0xFFFF);
     }
 
+    /** 把小数值（槽位数等）钳到单槽可用范围 0..0xFFFF（超范围会被 short 传输截成负数） */
+    public static int clampShort(int value) {
+        return value < 0 ? 0 : Math.min(value, 0xFFFF);
+    }
+
     /** 写入完整 long 64 位：位 0..15 / 16..31 / 32..47 / 48..63 分别落入 4 槽 */
     public static void write(ContainerData data, int lowIndex, int highIndex, int high2Index, int high3Index, long value) {
         data.set(lowIndex, (int) (value & 0xFFFFL));

@@ -46,7 +46,6 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
     /** 升级槽固定面板右上角 Y=8（规则 3），位于 3×3 区右上方；标签置于槽位左侧 */
     private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
     private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
-    private static final int WIRELESS_SLOT_X = 116, WIRELESS_SLOT_Y = 8;
     /** 存储开关按钮（移置顶部中间，避开左上标题与右上角升级槽；仅在相邻存储库时显示） */
     private static final int STORE_X = 72, STORE_Y = 6, STORE_W = 32, STORE_H = 10;
 
@@ -176,10 +175,9 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
         gui.drawString(this.font, Component.translatable("gui.akaishi.surgery.solid_in", menu.getSolidCount()),
                 x + SOLID_SLOT_X + 20, y + SOLID_SLOT_Y + 2, 0xFF3F3F3F, false);
 
-        // 升级槽（速度/能量/无线接收，固定面板右上角，自绘框 + 槽位左侧标签）
+        // 升级槽（速度/能量，固定面板右上角，自绘框 + 槽位左侧标签；无线接收格已移除）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + WIRELESS_SLOT_X, y + WIRELESS_SLOT_Y);
 
         // 移植/摘除按钮
         drawButton(gui, x + IMPLANT_X, y + BTN_Y, "gui.akaishi.surgery.implant", canImplant());
@@ -316,13 +314,13 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
                     mouseX, mouseY);
         }
         // 器官输入/固态物槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名）
-        // 槽位索引 = 升级槽之后的业务槽（升级槽数由 MachineUpgradeSlots.SLOT_COUNT 决定，勿写死）
+        // 槽位索引 = 升级槽之后的业务槽（本机升级槽数由 MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS 决定，勿写死）
         if (isHovering(ORG_SLOT_X, ORG_SLOT_Y, 18, 18, mouseX, mouseY)
-                && menu.slots.get(MachineUpgradeSlots.SLOT_COUNT).getItem().isEmpty()) {
+                && menu.slots.get(MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS).getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.surgery.organ_slot_tip"), mouseX, mouseY);
         } else if (isHovering(SOLID_SLOT_X, SOLID_SLOT_Y, 18, 18, mouseX, mouseY)
-                && menu.slots.get(MachineUpgradeSlots.SLOT_COUNT + 1).getItem().isEmpty()) {
+                && menu.slots.get(MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS + 1).getItem().isEmpty()) {
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.surgery.solid_slot_tip"), mouseX, mouseY);
         }
@@ -337,13 +335,6 @@ public class AkaishiSurgeryScreen extends AbstractContainerScreen<AkaishiSurgery
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
-                    mouseX, mouseY);
-        }
-        // 无线接收槽：按已装/未装给出状态提示
-        if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)) {
-            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
-                            Component.translatable(menu.hasWirelessReceiver()
-                                    ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         BodySlot[] slots = BodySlot.values();

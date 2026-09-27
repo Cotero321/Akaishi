@@ -1,5 +1,6 @@
 package com.example.akaishi.craft;
 
+import com.example.akaishi.block.entity.AkaishiMaterialFuserBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.craft.recipe.AkaishiEnergyProcessRecipe;
 import com.example.akaishi.craft.recipe.AkaishiFluidProcessRecipe;
@@ -41,6 +42,7 @@ public final class MachineProcessEnergy {
         PLANT_CULTIVATING,
         AGGREGATING,
         LIFE_PURIFYING,
+        FUSING,
         FRACTIONATING,
         LIQUEFYING,
         FUEL_PROCESSING,
@@ -200,6 +202,8 @@ public final class MachineProcessEnergy {
             case LIFE_PURIFYING -> new Cost(
                     saturatingMultiply(scaled(ModConfig.lifePurifierTotalCost), energyCostMultiplier(spec)),
                     lifePurifierLifeCost(spec));
+            // 材料融合器：单次总耗由配方声明（缺省 1M）摊到基础耗时上，与机器侧逐 tick 抽取同口径
+            case FUSING -> tickFamily(fuserPerTick(recipe), AkaishiMaterialFuserBlockEntity.BASE_TICKS, spec);
             // 分馏器：一口价（每完成一次扣一次），机器侧没乘 [machine] costMultiplier ⇒ 这里也不乘，
             // 否则"计划报价 ≠ 机器实收"
             case FRACTIONATING -> chishiOnly(
@@ -253,6 +257,8 @@ public final class MachineProcessEnergy {
             // 成本里的 costMultiplier 与抽取速率里的同一项相消 ⇒ 只需 基础总耗 / (速率 × 速度倍率)
             case LIFE_PURIFYING -> poolTicks(ModConfig.lifePurifierTotalCost,
                     ModConfig.lifePurifierChishiRate, spec);
+            // 材料融合器：进度按速度倍率推进，实际耗时 = 基础耗时 / 速度倍率
+            case FUSING -> scaledTicks(AkaishiMaterialFuserBlockEntity.BASE_TICKS, spec);
             // 分馏器：进度按速度倍率推进，故实际耗时 = 基础耗时 / 速度倍率
             case FRACTIONATING -> scaledTicks(ModConfig.fractionatorProcessTicks, spec);
             // 液化机：能量池模式，耗时 = 总耗 / (抽取速率 × 速度倍率)
@@ -343,6 +349,9 @@ public final class MachineProcessEnergy {
         if (type == AkaishiRecipeTypes.LIFE_PURIFYING.get()) {
             return Family.LIFE_PURIFYING;
         }
+        if (type == AkaishiRecipeTypes.FUSING.get()) {
+            return Family.FUSING;
+        }
         if (type == AkaishiRecipeTypes.FRACTIONATING.get()) {
             return Family.FRACTIONATING;
         }
@@ -386,6 +395,21 @@ public final class MachineProcessEnergy {
      */
     private static long declaredEnergy(@Nullable Recipe<?> recipe) {
         return recipe instanceof IAkaishiMachineRecipe machine ? Math.max(0L, machine.energy()) : 0L;
+    }
+
+    /**
+     * 材料融合器的每 tick 抽取额：单次加工总耗（配方声明 {@code energy}，缺省
+     * {@link AkaishiMaterialFuserBlockEntity#DEFAULT_ENERGY_PER_CRAFT}）按基础耗时摊平。
+     * <p>机器侧算式逐位对齐（{@code 每 tick 抽取 = scaled(本值) × 耗能倍率}，进度按速度倍率推进），
+     * 故"计划报价"与"机器实收"同源。
+     */
+    private static long fuserPerTick(Recipe<?> recipe) {
+        long total = declaredEnergy(recipe);
+        if (total <= 0L) {
+            total = AkaishiMaterialFuserBlockEntity.DEFAULT_ENERGY_PER_CRAFT;
+        }
+        int ticks = AkaishiMaterialFuserBlockEntity.BASE_TICKS;
+        return ticks <= 0 ? total : Math.max(1L, (total + ticks - 1L) / ticks);
     }
 
     /**

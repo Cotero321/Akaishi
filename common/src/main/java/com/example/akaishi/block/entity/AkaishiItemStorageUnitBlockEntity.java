@@ -84,10 +84,16 @@ public class AkaishiItemStorageUnitBlockEntity extends BlockEntity
         return data.slots();
     }
 
-    /** 只读取槽（界面 / 终端浏览用） */
+    /** 只读取视图堆（界面 / 终端浏览用）：数量夹到单堆上限，真实件数见 {@link #storedCount(int)} */
     @Override
     public ItemStack getItem(int slot) {
         return data.getItem(slot);
+    }
+
+    /** 单槽真实件数（一槽多堆：可远超单堆上限） */
+    @Override
+    public long storedCount(int slot) {
+        return data.storedCount(slot);
     }
 
     /** 单槽已占用 IP（只读，供物品库按占用排序，无需重查价值表） */

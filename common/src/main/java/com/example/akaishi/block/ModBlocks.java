@@ -69,10 +69,11 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_DECAY_SOIL;
     public static RegistrySupplier<Block> CHISHI_DECAY_LOG;
 
-    // —— 机械域（AkaishiMechanicalBlocks）：模板制造厂 / 加工制作厂 / 组装加工台 ——
+    // —— 机械域（AkaishiMechanicalBlocks）：模板制造厂 / 加工制作厂 / 组装加工台 / 材料融合器 ——
     public static RegistrySupplier<Block> CHISHI_MECHANICAL_TEMPLATE_FACTORY;
     public static RegistrySupplier<Block> CHISHI_MECHANICAL_PROCESSING_FACTORY;
     public static RegistrySupplier<Block> CHISHI_MECHANICAL_ASSEMBLY_STATION;
+    public static RegistrySupplier<Block> CHISHI_MATERIAL_FUSER;
 
     private ModBlocks() {
     }
@@ -137,6 +138,7 @@ public final class ModBlocks {
         CHISHI_MECHANICAL_TEMPLATE_FACTORY = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY;
         CHISHI_MECHANICAL_PROCESSING_FACTORY = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY;
         CHISHI_MECHANICAL_ASSEMBLY_STATION = AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION;
+        CHISHI_MATERIAL_FUSER = AkaishiMechanicalBlocks.CHISHI_MATERIAL_FUSER;
     }
 
     /** 获取对应组合定义的方块（转发基础域，注册完成后可用） */

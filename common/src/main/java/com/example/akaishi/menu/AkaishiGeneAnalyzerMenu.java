@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 2 + 输入/输出槽 2），玩家背包紧随其后 */
-    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + AkaishiGeneAnalyzerBlockEntity.SLOT_COUNT;
+    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS + AkaishiGeneAnalyzerBlockEntity.SLOT_COUNT;
 
     private final Container container;
     private final ContainerData data;
@@ -56,10 +56,8 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
                 () -> linkState != null && linkState.open));
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
-        // 无线接收格放 (152,26)：本界面中上带已有「存储」按钮 (90,6)-(122,16) 会压住 (116,8)，
-        // 且其 mouseClicked 优先命中该按钮 → 放左上角会导致「点槽位却切浮层」，故改放能量格正下方
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 152, 26,
-                () -> linkState != null && linkState.open));
+        // 生命系机器无线接收格已彻底移除（原先放 (152,26) 以避开「存储」按钮）；旧档残留件当场退还玩家
+        MachineUpgradeSlots.refundWireless(upgrades, inv.player);
 
         // 输入槽：仅接受纯度 ≥25 的生命样本（未达解构门槛只能用于药剂）
         addSlot(new OverlayHidingSlot(container, AkaishiGeneAnalyzerBlockEntity.INPUT_SLOT, 56, 30,
@@ -129,7 +127,8 @@ public class AkaishiGeneAnalyzerMenu extends AbstractContainerMenu {
 
     /** 无线接收升级是否已装（界面提示用） */
     public boolean hasWirelessReceiver() {
-        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+        // 生命系机器无线接收格已移除 ⇒ 恒 false（保留方法避免影响既有调用点）
+        return false;
     }
 
     @Override

@@ -5,8 +5,10 @@ import com.example.akaishi.item.AkaishiMachineUpgradeItem;
 import com.example.akaishi.item.MachineUpgradeType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -27,6 +29,15 @@ public class MachineUpgradeSlots extends SimpleContainer {
     /** 无线接收升级格：装 1 个即让该机器参与无线场域调度 */
     public static final int SLOT_WIRELESS = 2;
     public static final int SLOT_COUNT = 3;
+
+    /**
+     * 移除无线接收格后的升级槽数（生命系机器专用：速度 0 / 能量 1）。
+     * <p>
+     * 生命系机器的无线接收格已按需求<b>彻底移除</b>，但其菜单下标体系仍以「升级槽在前」为基准：
+     * 这些机器一律以本常量替代 {@link #SLOT_COUNT} 计算 {@code MACHINE_SLOT_END} 与 shift 点击区间，
+     * 从而保持「升级槽 0..1 → 业务槽 2..N-1 → 玩家背包 N..」下标连续、无空洞、不错位。
+     */
+    public static final int SLOT_COUNT_NO_WIRELESS = 2;
 
     /**
      * 无线接收格的统一界面坐标。
@@ -77,6 +88,27 @@ public class MachineUpgradeSlots extends SimpleContainer {
     /** 是否已装无线接收升级（机器侧接入无线场域的唯一判定依据） */
     public boolean hasWirelessReceiver() {
         return getItem(SLOT_WIRELESS).getCount() > 0;
+    }
+
+    /**
+     * 生命系机器专用：把无线接收格内的残留升级件退还玩家（服务端调用；<b>物品守恒，绝不销毁</b>）。
+     * <p>
+     * 生命系机器已不再注册该槽，旧档/旧机器里可能仍存有已装件；打开界面（构建菜单）时调用本方法，
+     * 能放背包就放背包，放不下就掉落在玩家脚下。客户端侧直接返回，避免两侧各退一次。
+     */
+    public static void refundWireless(Container upgrades, Player player) {
+        if (!(upgrades instanceof MachineUpgradeSlots slots) || player.level().isClientSide) {
+            return;
+        }
+        ItemStack stack = slots.getItem(SLOT_WIRELESS);
+        if (stack.isEmpty()) {
+            return;
+        }
+        slots.setItem(SLOT_WIRELESS, ItemStack.EMPTY);
+        // Inventory#add 会就地消耗 stack；返回 false 时 stack 里剩下的就是没放下的余量
+        if (!player.getInventory().add(stack) && !stack.isEmpty()) {
+            player.drop(stack, false);
+        }
     }
 
     /** 速度倍率：1 + 数量，8 个封顶 8.0；再乘配置 [machine] workSpeed 全局速度倍率（默认 1.0 = 不变） */

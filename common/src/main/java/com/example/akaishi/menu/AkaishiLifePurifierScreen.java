@@ -66,10 +66,9 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, 0xFFFFD030);
         }
 
-        // 升级槽（速度/能量/无线，纹理无图案需自绘框 + 槽位上方标签）
+        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方标签；无线接收格已按需求移除）
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + 116, y + 8);
     }
 
     @Override
@@ -107,12 +106,6 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
-                    mouseX, mouseY);
-        }
-        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
-            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
-                    Component.translatable(menu.hasWirelessReceiver()
-                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
         // 输出槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）

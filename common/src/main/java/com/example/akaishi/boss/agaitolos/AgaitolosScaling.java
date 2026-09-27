@@ -4,8 +4,14 @@ import com.example.akaishi.boss.agaitolos.arena.ArenaGeometry;
 import com.example.akaishi.boss.agaitolos.arena.ArenaRecord;
 import com.example.akaishi.boss.agaitolos.arena.ArenaSnapshotStore;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+
+import java.util.UUID;
 
 /**
  * 阿盖托洛丝「随在场玩家数增强」（设计文档 §0 第 71 行 / §1 定案表第 11 条）的<b>唯一口径</b>。
@@ -186,5 +192,67 @@ public final class AgaitolosScaling {
      */
     public static int scaledMinionCount(int baseCount, int perPlayer, int hardCap, int players) {
         return Math.min(hardCap, baseCount + perPlayer * (clampPlayerCount(players) - 1));
+    }
+
+    // ---------------------------------------------------------------- 缩放落点（修饰符挂载，2026-09-24 拆分轮自实体搬入）
+
+    /**
+     * 生命缩放修饰符的 UUID。
+     * <p>做成 {@code ADDITION} 的<b>永久</b>修饰符而不是直接改基础值：{@code AttributeInstance#save()} 会写
+     * 基础值 + 永久修饰符两者，但走修饰符才能让"重算"变成幂等的"摘旧的、挂新的"（见
+     * {@link #setScalingBonus}），基础值则始终是规格里的 1444 / 30 这两个数，读起来不会自相矛盾。
+     */
+    private static final UUID UUID_SCALE_HEALTH = UUID.fromString("a1c2e3f4-0b17-4c58-9d6e-2f3a4b5c6d71");
+
+    /** 攻击力缩放修饰符的 UUID（理由同 {@link #UUID_SCALE_HEALTH}） */
+    private static final UUID UUID_SCALE_ATTACK = UUID.fromString("a1c2e3f4-0b17-4c58-9d6e-2f3a4b5c6d72");
+
+    /**
+     * <b>重算</b>场内人数并按它缩放生命与攻击力（服务端；只在入场与每次进阶段两个点调用）。
+     * <p>调用点见 {@code aiStep} 的首次召唤分支与 {@link AgaitolosPhaseMachine#advancePhase}；
+     * <b>不做</b>每 tick 跟随，理由见 {@link AgaitolosEntity#scaledPlayerCount}。
+     */
+    public static void applyPlayerCountScaling(AgaitolosEntity boss) {
+        applyFor(boss, countPresentPlayers(boss));
+    }
+
+    /**
+     * 按给定人数缩放（幂等）。
+     * <p>
+     * <b>为什么按"比例"保留当前血量而不是按绝对值</b>：入场那一路刚把血量压到
+     * {@code INTRO_HEALTH_RATIO}（见 {@code aiStep}），若直接抬高上限，压在 25% 的血会变成
+     * "1877 上限里的 361（19%）"，出场演出的回血曲线立刻走形；按比例搬移则"压到 25%"的语义不变。
+     * 阶段推进那一路本来就紧接 {@link AgaitolosPhaseMachine#enterRespawn} 的回满，故这条口径对它同样无害。
+     *
+     * @param boss   目标 BOSS（人数定案值落在其 {@code scaledPlayerCount} 字段上并随实体落盘）
+     * @param players 已定案的场内人数（未钳制，由 {@link AgaitolosScaling} 内部钳制）
+     */
+    public static void applyFor(AgaitolosEntity boss, int players) {
+        boss.scaledPlayerCount = clampPlayerCount(players);
+        float healthRatio = boss.getMaxHealth() > 0.0F ? boss.getHealth() / boss.getMaxHealth() : 1.0F;
+        setScalingBonus(boss, Attributes.MAX_HEALTH, UUID_SCALE_HEALTH, "Agaitolos player scaling health",
+                BASE_HEALTH * (healthScale(boss.scaledPlayerCount) - 1.0D));
+        setScalingBonus(boss, Attributes.ATTACK_DAMAGE, UUID_SCALE_ATTACK, "Agaitolos player scaling attack",
+                BASE_ATTACK_DAMAGE * (damageScale(boss.scaledPlayerCount) - 1.0D));
+        // 上限变了：按旧比例搬回当前血量（setHealth 内部按新上限夹取，故缩小时也不会超上限）
+        boss.setHealth(boss.getMaxHealth() * healthRatio);
+    }
+
+    /**
+     * 幂等地设置一条属性加成：先按 UUID 摘掉旧值，再按需挂新值。
+     * <p>用 {@code addPermanentModifier} 而非 {@code addTransientModifier}：前者会被
+     * {@code AttributeInstance#save()} 序列化 ⇒ 区块卸载/读档后加成<b>不丢</b>
+     * （原版 {@code Mob#finalizeSpawn} 的刷怪加成正是这么做的）。
+     * <p>加成为 0（单人局）时<b>不挂</b>：少一条无意义的修饰符，也让存档里的属性块保持干净。
+     */
+    private static void setScalingBonus(AgaitolosEntity boss, Attribute attribute, UUID id, String name, double bonus) {
+        AttributeInstance instance = boss.getAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        instance.removeModifier(id);
+        if (bonus > 1.0E-6D) {
+            instance.addPermanentModifier(new AttributeModifier(id, name, bonus, AttributeModifier.Operation.ADDITION));
+        }
     }
 }

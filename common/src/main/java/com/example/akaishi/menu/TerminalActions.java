@@ -5,7 +5,9 @@ import java.util.List;
 import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.api.storage.IItemStorageUnit;
 import com.example.akaishi.api.storage.IItemTerminalHost;
+import com.example.akaishi.storage.TerminalSpaceCheck;
 import com.example.akaishi.value.ItemPoints;
+import com.example.akaishi.value.ItemTerminalFee;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,7 +29,11 @@ import net.minecraft.world.item.ItemStack;
  * 本类<b>只在服务端调用</b>：客户端仅发动作与「选中物」，数量与费用全部由服务端重新推导。
  * <p>
  * <b>失败必须可见</b>：本界面是纯点击驱动，静默 no-op 会让玩家完全无法判断问题在哪，
- * 因此每条拒绝路径都会经动作栏回一条具体原因（见 {@link Outcome}）。
+ * 因此每条拒绝路径都会做两件事：① 动作栏回一条短句（{@link Outcome}）；
+ * ② 经 {@link IItemTerminalHost#noteReject} 把原因与数字写进终端回执，由库页界面<b>常驻</b>显示
+ * （动作栏是瞬时的、易被忽略，历史上于是出现"存不进去却毫无提示"）。
+ * 原因码一律取自 {@link IItemTerminalHost#REJECT_*}；费用数字一律走 {@link ItemTerminalFee}，
+ * 与储存口（{@code AkaishiItemPortBlockEntity}）同一套算式，不另立费率口径。
  */
 public final class TerminalActions {
 
@@ -56,7 +62,7 @@ public final class TerminalActions {
         /** 库里没有这件物品 */
         NO_ITEM("gui.akaishi.item_terminal.fail.no_item"),
         /** 背包放不下 */
-        NO_INV_ROOM("gui.akaishi.item_terminal.fail.no_room"),
+        NO_ROOM("gui.akaishi.item_terminal.fail.no_room"),
         /** 安全表未授予本方向权限（存入需「存」、取出需「取」） */
         DENIED("gui.akaishi.item_terminal.fail.denied");
 
@@ -67,18 +73,35 @@ public final class TerminalActions {
         }
     }
 
-    /** 单笔结果：成功时带光标结果堆（null = 不改写光标），失败时带原因 */
-    private record Result(ItemStack carried, Outcome outcome) {
+    /**
+     * 单笔结果：成功时带光标结果堆（null = 不改写光标），失败时带原因
+     * （动作栏文案 + 终端回执原因码 + 本批所需赤能源，后两者供库页界面常驻显示）。
+     */
+    private record Result(ItemStack carried, Outcome outcome, int reject, long feeNeed) {
         static Result ok(ItemStack carried) {
-            return new Result(carried, Outcome.OK);
+            return new Result(carried, Outcome.OK, IItemTerminalHost.REJECT_NONE, 0L);
         }
 
         static Result okNoCursor() {
-            return new Result(null, Outcome.OK);
+            return new Result(null, Outcome.OK, IItemTerminalHost.REJECT_NONE, 0L);
         }
 
-        static Result fail(Outcome outcome) {
-            return new Result(null, outcome);
+        /** 明确拒绝：动作栏短句 + 终端回执原因码 */
+        static Result fail(Outcome outcome, int reject) {
+            return new Result(null, outcome, reject, 0L);
+        }
+
+        /** 明确拒绝（赤能源 / 单笔上限）：额外带回本批所需赤能源供悬停给数字 */
+        static Result fail(Outcome outcome, int reject, long feeNeed) {
+            return new Result(null, outcome, reject, feeNeed);
+        }
+
+        /**
+         * 有意不做任何动作（手持物与点中条目不同）：动作栏<b>不</b>打扰，
+         * 但要写进终端回执 —— 否则这条历史上完全静默的分支仍是"点了没反应"。
+         */
+        static Result notApplicable(int reject) {
+            return new Result(null, Outcome.OK, reject, 0L);
         }
     }
 
@@ -96,23 +119,34 @@ public final class TerminalActions {
      */
     public static void perform(IItemTerminalHost terminal, AbstractContainerMenu menu,
             Player player, byte action, ItemStack key) {
-        if (terminal == null || !terminal.isFormed()) {
-            notify(player, Outcome.UNFORMED);
+        if (terminal == null) {
+            return;
+        }
+        ItemStack carried = menu.getCarried();
+        // 方向判定放在前置闸门之前：这样"未成型 / 无单元 / 无权限"也报得出是"存"还是"取"被拒。
+        // 判定只看点中的条目与光标持有物，无副作用；闸门的<b>优先级顺序</b>与历史上完全一致。
+        boolean depositIntent = key.isEmpty() || (!carried.isEmpty() && ItemStack.isSameItemSameTags(carried, key));
+        int rejectFormed = reject(depositIntent, IItemTerminalHost.REJECT_DEPOSIT_UNFORMED,
+                IItemTerminalHost.REJECT_WITHDRAW_UNFORMED);
+        int rejectNoUnit = reject(depositIntent, IItemTerminalHost.REJECT_DEPOSIT_NO_UNIT,
+                IItemTerminalHost.REJECT_WITHDRAW_NO_UNIT);
+        int rejectDenied = reject(depositIntent, IItemTerminalHost.REJECT_DEPOSIT_PERMISSION,
+                IItemTerminalHost.REJECT_WITHDRAW_PERMISSION);
+        if (!terminal.isFormed()) {
+            finish(terminal, menu, player, Result.fail(Outcome.UNFORMED, rejectFormed));
             return;
         }
         List<IItemStorageUnit> units = terminal.storageUnits();
         if (units.isEmpty()) {
-            notify(player, Outcome.NO_UNIT);
+            finish(terminal, menu, player, Result.fail(Outcome.NO_UNIT, rejectNoUnit));
             return;
         }
-        ItemStack carried = menu.getCarried();
         // 方向权限：本笔是"存入"还是"取出"，据此查安全表（与端口同一套口径：输入口=存、输出口=取）。
         // 权限表为空时全放行（项目"使用"口径），因此单人/未配置的终端不受影响。
-        boolean depositIntent = key.isEmpty() || (!carried.isEmpty() && ItemStack.isSameItemSameTags(carried, key));
         AkaishiSecurityPermission needed = depositIntent
                 ? AkaishiSecurityPermission.INJECT : AkaishiSecurityPermission.EXTRACT;
         if (!player.hasPermissions(4) && !terminal.security().check(player.getUUID(), needed)) {
-            notify(player, Outcome.DENIED);
+            finish(terminal, menu, player, Result.fail(Outcome.DENIED, rejectDenied));
             return;
         }
         Result result;
@@ -125,11 +159,22 @@ public final class TerminalActions {
         } else if (ItemStack.isSameItemSameTags(carried, key)) {
             result = deposit(terminal, units, carried, single(action));
         } else {
-            // 手持异类物品：不猜意图，静默忽略（不算失败，不打扰玩家）
-            result = Result.okNoCursor();
+            // 手持异类物品：不猜意图（不算失败、不打扰玩家），但要让界面说得出"点了为什么没动"
+            result = Result.notApplicable(IItemTerminalHost.REJECT_DEPOSIT_MISMATCH);
         }
+        finish(terminal, menu, player, result);
+    }
+
+    /** 按本笔方向取"存入码 / 取出码"中的对应一个 */
+    private static int reject(boolean deposit, int depositCode, int withdrawCode) {
+        return deposit ? depositCode : withdrawCode;
+    }
+
+    /** 单笔收尾：回写光标 → 动作栏短句 → 终端回执（成功即清空回执） */
+    private static void finish(IItemTerminalHost terminal, AbstractContainerMenu menu, Player player, Result result) {
         apply(menu, result.carried());
         notify(player, result.outcome());
+        terminal.noteReject(result.reject(), result.feeNeed());
     }
 
     /** 单件动作（右键族）：只处理 1 件 */
@@ -168,25 +213,28 @@ public final class TerminalActions {
         // acceptable 与传入堆量无关（只看物品 + NBT），故用单件探测即可
         ItemStack probe = carried.copyWithCount(1);
         long per = ItemPoints.perItem(probe);
-        long space = 0L;
-        for (IItemStorageUnit unit : units) {
-            space += unit.acceptable(probe);
-        }
+        // 可存量 = 「槽位余量」与「IP 余量」两个累计型约束的较小者（唯一算式见 TerminalSpaceCheck）
+        long space = TerminalSpaceCheck.acceptable(terminal, probe);
         if (space <= 0L) {
-            return Result.fail(Outcome.NO_SPACE);
+            // 细分到真实触顶的那一项：槽位满（IP 还富余）与 IP 不足的处置方式完全不同，
+            // 笼统一句"无空间"会让玩家照着"IP 还有 126M"去穷举错误方向
+            return Result.fail(Outcome.NO_SPACE, TerminalSpaceCheck.classifyDepositBlock(terminal, probe));
         }
         // 单笔上限：缓冲能承担的费用对应的 IP（缓冲为 0 或减免后仍不够一件 ⇒ 属于能量不足）
         long byFee = terminal.maxBatchIp(true) / per;
         if (byFee <= 0L) {
-            return Result.fail(Outcome.NO_ENERGY);
+            // 缓冲容量本身太小 ⇒ 报"超单笔上限"，并把这一件的费用带上（界面悬停据此给数字）
+            return Result.fail(Outcome.NO_ENERGY, IItemTerminalHost.REJECT_DEPOSIT_MAX_IP,
+                    feeNeedOf(terminal, per, true));
         }
         int amount = (int) Math.min(single ? 1L : carried.getCount(),
                 Math.min(Math.min(space, byFee), Integer.MAX_VALUE));
         if (amount <= 0) {
-            return Result.fail(Outcome.NO_SPACE);
+            return Result.fail(Outcome.NO_SPACE, IItemTerminalHost.REJECT_DEPOSIT_NO_SPACE);
         }
         if (!terminal.tryChargeFee(per * amount, true)) {
-            return Result.fail(Outcome.NO_ENERGY);
+            return Result.fail(Outcome.NO_ENERGY, IItemTerminalHost.REJECT_DEPOSIT_ENERGY_SHORT,
+                    feeNeedOf(terminal, per * amount, true));
         }
         int moved = 0;
         for (IItemStorageUnit unit : units) {
@@ -201,7 +249,8 @@ public final class TerminalActions {
             moved += unit.insert(probe.copyWithCount(Math.min(accept, amount - moved)));
         }
         if (moved <= 0) {
-            return Result.fail(Outcome.NO_SPACE);
+            // 预检通过了却一件没落账（单元状态在本 tick 内突变）：仍按"无空间"回报
+            return Result.fail(Outcome.NO_SPACE, IItemTerminalHost.REJECT_DEPOSIT_NO_SPACE);
         }
         int left = carried.getCount() - moved;
         return Result.ok(left <= 0 ? ItemStack.EMPTY : carried.copyWithCount(left));
@@ -219,17 +268,21 @@ public final class TerminalActions {
             List<IItemStorageUnit> units, ItemStack key, int requested) {
         TerminalEntry entry = find(units, key);
         if (entry == null) {
-            return Result.fail(Outcome.NO_ITEM);
+            return Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM);
         }
         int amount = (int) Math.min(entry.amount(), Math.max(0, requested));
         if (amount <= 0) {
-            return Result.fail(Outcome.NO_ITEM);
+            return Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM);
         }
-        if (!chargeFor(terminal, entry, amount)) {
-            return Result.fail(Outcome.NO_ENERGY);
+        long ip = ledgerIp(entry, amount);
+        if (ip > 0L && !terminal.tryChargeFee(ip, false)) {
+            return Result.fail(Outcome.NO_ENERGY, IItemTerminalHost.REJECT_WITHDRAW_ENERGY_SHORT,
+                    feeNeedOf(terminal, ip, false));
         }
         ItemStack out = take(entry, amount);
-        return out == null ? Result.fail(Outcome.NO_ITEM) : Result.ok(out);
+        return out == null
+                ? Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM)
+                : Result.ok(out);
     }
 
     /** 整条取出进背包（AE2 SHIFT_CLICK）：按背包剩余空位夹量，不经光标 */
@@ -237,19 +290,24 @@ public final class TerminalActions {
             List<IItemStorageUnit> units, Player player, ItemStack key) {
         TerminalEntry entry = find(units, key);
         if (entry == null) {
-            return Result.fail(Outcome.NO_ITEM);
+            return Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM);
         }
         int room = freeSpace(player.getInventory(), entry.display());
         if (room <= 0) {
-            return Result.fail(Outcome.NO_INV_ROOM);
+            return Result.fail(Outcome.NO_ROOM, IItemTerminalHost.REJECT_WITHDRAW_NO_ROOM);
         }
         int amount = (int) Math.min(entry.amount(), room);
-        if (amount <= 0 || !chargeFor(terminal, entry, amount)) {
-            return Result.fail(amount <= 0 ? Outcome.NO_ITEM : Outcome.NO_ENERGY);
+        if (amount <= 0) {
+            return Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM);
+        }
+        long ip = ledgerIp(entry, amount);
+        if (ip > 0L && !terminal.tryChargeFee(ip, false)) {
+            return Result.fail(Outcome.NO_ENERGY, IItemTerminalHost.REJECT_WITHDRAW_ENERGY_SHORT,
+                    feeNeedOf(terminal, ip, false));
         }
         ItemStack out = take(entry, amount);
         if (out == null) {
-            return Result.fail(Outcome.NO_ITEM);
+            return Result.fail(Outcome.NO_ITEM, IItemTerminalHost.REJECT_WITHDRAW_NO_ITEM);
         }
         // 背包放不下就落地，避免物品凭空消失（夹量已保证正常情况装得下）
         if (!player.getInventory().add(out)) {
@@ -258,19 +316,24 @@ public final class TerminalActions {
         return Result.okNoCursor();
     }
 
-    /** 模拟取出 amount 件的账本 IP 并扣费（不改动任何物品） */
-    private static boolean chargeFor(IItemTerminalHost terminal, TerminalEntry entry, int amount) {
+    /**
+     * 本笔取出要消费的账本 IP（模拟；不改动任何物品）。
+     * <p>
+     * 口径与「先模拟再扣费」的旧实现在每条路径上取值相同，只是把"扣费成败"与"IP 是多少"
+     * 分成两个可独立读取的量，好让失败回执带得出数字。
+     */
+    private static long ledgerIp(TerminalEntry entry, int amount) {
         long ip = 0L;
         int need = amount;
         for (TerminalEntry.Slice slice : entry.slices()) {
             if (need <= 0) {
                 break;
             }
-            int take = Math.min(need, slice.count());
+            int take = (int) Math.min(need, slice.count());
             ip += withdrawIp(slice.unit(), slice.slot(), slice.count(), take);
             need -= take;
         }
-        return ip <= 0L || terminal.tryChargeFee(ip, false);
+        return ip;
     }
 
     /**
@@ -279,14 +342,29 @@ public final class TerminalActions {
      * 复刻单元 {@code extract} 的扣减公式：整槽取空 = 全部账本值，部分取出按比例向下取整，
      * 全程不重算价值表 ⇒ 价值表热重载后费用不漂移（D10）。库页取出与无线输出口共用本方法。
      *
-     * @param storedCount 取出前该槽件数
+     * @param storedCount 取出前该槽真实件数（一槽多堆下可超单堆上限，须用
+     *                    {@link IItemStorageUnit#storedCount(int)} 而非视图堆数量）
      */
-    public static long withdrawIp(IItemStorageUnit unit, int slot, int storedCount, int amount) {
+    public static long withdrawIp(IItemStorageUnit unit, int slot, long storedCount, int amount) {
         if (unit == null || amount <= 0 || storedCount <= 0) {
             return 0L;
         }
         long slotIp = unit.getSlotIp(slot);
         return amount >= storedCount ? slotIp : slotIp * amount / storedCount;
+    }
+
+    /**
+     * 一笔 IP 所需赤能源（回执数字用）。
+     * <p>
+     * 费率减免份数取终端权威数据槽，换算走 {@link ItemTerminalFee} —— 与终端 {@code tryChargeFee}
+     * 及储存口的 {@code noteFeeShortfall} 同一算式，<b>不引入第二套费率口径</b>。
+     */
+    private static long feeNeedOf(IItemTerminalHost terminal, long ip, boolean deposit) {
+        if (ip <= 0L) {
+            return 0L;
+        }
+        int modules = terminal.data().get(IItemTerminalHost.DATA_FEE_MODULES);
+        return deposit ? ItemTerminalFee.depositCost(ip, modules) : ItemTerminalFee.withdrawCost(ip, modules);
     }
 
     /** 按分片顺序真实取出；分片取自本笔开头即时聚合的结果，单线程下不会中途变化 */
@@ -298,7 +376,7 @@ public final class TerminalActions {
             if (need <= 0) {
                 break;
             }
-            ItemStack taken = slice.unit().extract(slice.slot(), Math.min(need, slice.count()));
+            ItemStack taken = slice.unit().extract(slice.slot(), (int) Math.min(need, slice.count()));
             if (taken.isEmpty()) {
                 continue;
             }

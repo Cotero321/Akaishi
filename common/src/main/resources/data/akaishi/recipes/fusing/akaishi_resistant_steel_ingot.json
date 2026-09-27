@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "akaishi:coal_dust" },
+  "input_count": 4,
+  "ingredient2": { "item": "akaishi:iron_dust" },
+  "input_count2": 6,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_resistant_steel_ingot", "count": 1 }
+}

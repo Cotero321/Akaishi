@@ -87,6 +87,22 @@ public final class ForgeItemAccess implements IItemAccess {
         return handlerAt(level, pos, side) != null;
     }
 
+    @Override
+    public ItemStack peek(Level level, BlockPos pos, Direction side, Predicate<ItemStack> filter) {
+        IItemHandler handler = handlerAt(level, pos, side);
+        if (handler == null) {
+            return ItemStack.EMPTY;
+        }
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            ItemStack probe = handler.getStackInSlot(slot);
+            if (probe.isEmpty() || (filter != null && !filter.test(probe))) {
+                continue;
+            }
+            return probe.copy(); // 纯查询：getStackInSlot 只读，不触发任何状态变更
+        }
+        return ItemStack.EMPTY;
+    }
+
     /** 取面朝侧的能力；无能力时用 {@link InvWrapper} 兜底（只读语义仍走原版容器） */
     private static IItemHandler handlerAt(Level level, BlockPos pos, Direction side) {
         if (level == null || pos == null || !level.isLoaded(pos)) {

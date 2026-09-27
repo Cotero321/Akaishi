@@ -41,6 +41,8 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(
                 new PurificationRecipeCategory(helper),
                 new AggregationRecipeCategory(helper),
+                // 材料融合：两种原料 + 赤能源 → 机械材料（机械材料的唯一获取途径）
+                new FusingRecipeCategory(helper),
                 new ForgingRecipeCategory(helper),
                 // 生命融合锻台：赤石装备 + 生命融合锭 → 生命融合装备（获得途径展示）
                 new LifeFusionAnvilRecipeCategory(helper),
@@ -98,6 +100,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         registration.addRecipes(LifeActivatingRecipeCategory.TYPE, LifeActivatingRecipeCategory.ActivatingRecipe.getAll(recipeManager));
         // 单输入单输出处理机器配方 + 聚合器配方：数据包配方（data/akaishi/recipes/<机器>/）
         registration.addRecipes(AggregationRecipeCategory.TYPE, AggregationRecipeCategory.getAll(recipeManager));
+        registration.addRecipes(FusingRecipeCategory.TYPE, FusingRecipeCategory.getAll(recipeManager));
         registration.addRecipes(CompressorRecipeCategory.TYPE, CompressorRecipeCategory.getAll(recipeManager));
         registration.addRecipes(PulverizerRecipeCategory.TYPE, PulverizerRecipeCategory.getAll(recipeManager));
         registration.addRecipes(TransformerRecipeCategory.TYPE, TransformerRecipeCategory.getAll(recipeManager));
@@ -169,6 +172,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY.get(), "jei.akaishi.mechanical_template_factory");
         addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY.get(), "jei.akaishi.mechanical_processing_factory");
         addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION.get(), "jei.akaishi.mechanical_assembly_station");
+        addIngredientInfo(registration, AkaishiMechanicalBlocks.CHISHI_MATERIAL_FUSER.get(), "jei.akaishi.material_fuser");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.mechanicalPartTemplate.get(), "jei.akaishi.mechanical_part_template");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.mechanicalProcessedPart.get(), "jei.akaishi.mechanical_processed_part");
         // 机械义体成品（9 槽位同一机制，以心脏为代表说明；其余 8 件同族同机制）

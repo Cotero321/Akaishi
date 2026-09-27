@@ -50,6 +50,10 @@ public final class AkaishiRecipeTypes {
     public static RegistrySupplier<RecipeType<AkaishiEnergyProcessRecipe>> LIFE_PURIFYING;
     public static RegistrySupplier<RecipeSerializer<AkaishiEnergyProcessRecipe>> LIFE_PURIFYING_SERIALIZER;
 
+    /** 材料融合器：两种原料 + 赤能源 → 机械材料（每格数量各自声明，见 {@code ingredient2/input_count2}） */
+    public static RegistrySupplier<RecipeType<AkaishiEnergyProcessRecipe>> FUSING;
+    public static RegistrySupplier<RecipeSerializer<AkaishiEnergyProcessRecipe>> FUSING_SERIALIZER;
+
     /** 活化分馏器：活化结晶 → 活化成分（副产衰竭结晶） */
     public static RegistrySupplier<RecipeType<AkaishiItemProcessRecipe>> FRACTIONATING;
     public static RegistrySupplier<RecipeSerializer<AkaishiItemProcessRecipe>> FRACTIONATING_SERIALIZER;
@@ -92,6 +96,9 @@ public final class AkaishiRecipeTypes {
         AGGREGATING_SERIALIZER = energySerializer("aggregating", AGGREGATING);
         LIFE_PURIFYING = energyType("life_purifying");
         LIFE_PURIFYING_SERIALIZER = energySerializer("life_purifying", LIFE_PURIFYING);
+        // 材料融合器：复用能量加工配方类与序列化器，仅类型 id 不同（双原料由 ingredient2 承载）
+        FUSING = energyType("fusing");
+        FUSING_SERIALIZER = energySerializer("fusing", FUSING);
         FRACTIONATING = type("fractionating");
         FRACTIONATING_SERIALIZER = serializer("fractionating", FRACTIONATING);
         LIQUEFYING = fluidType("liquefying");

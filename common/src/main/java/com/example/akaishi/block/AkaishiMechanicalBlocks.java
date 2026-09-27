@@ -27,6 +27,8 @@ public final class AkaishiMechanicalBlocks {
     public static RegistrySupplier<Block> CHISHI_MECHANICAL_PROCESSING_FACTORY;
     /** 机械改造组装加工台：四个加工部件 → 成品机械器官 */
     public static RegistrySupplier<Block> CHISHI_MECHANICAL_ASSEMBLY_STATION;
+    /** 材料融合器：两种原料 + 赤能源 → 机械材料（9 种机械材料的唯一获取途径） */
+    public static RegistrySupplier<Block> CHISHI_MATERIAL_FUSER;
 
     public static void register() {
         Registrar<Block> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.BLOCK);
@@ -59,6 +61,12 @@ public final class AkaishiMechanicalBlocks {
                         .strength(5.0F, 6.0F)
                         .requiresCorrectToolForDrops(),
                         () -> ModBlockEntities.CHISHI_MECHANICAL_ASSEMBLY_STATION.get())
+        );
+
+        CHISHI_MATERIAL_FUSER = AkaishiBlockRegistrar.registerMachineBlock(
+                registrar,
+                "akaishi_material_fuser",
+                () -> new AkaishiMaterialFuserBlock()
         );
     }
 }

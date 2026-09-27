@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "akaishi:akaishi_resistant_steel_ingot" },
+  "input_count": 1,
+  "ingredient2": { "item": "akaishi:netherite_ore_base" },
+  "input_count2": 4,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_precision_alloy_ingot", "count": 1 }
+}

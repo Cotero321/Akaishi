@@ -19,6 +19,7 @@ import com.example.akaishi.miniature.ItemTerminalMiniatureAdapter;
 import com.example.akaishi.miniature.ItemTerminalMiniatureState;
 import com.example.akaishi.multiblock.ItemTerminalStructure;
 import com.example.akaishi.storage.ItemStorageUnitData;
+import com.example.akaishi.storage.TerminalRejectLog;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemTerminalFee;
 import com.example.akaishi.wireless.ItemTerminalRegistry;
@@ -107,6 +108,8 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     /** 已施加弱加载票据的区块（diff 用：目标集合之外的一律释放，防票据泄漏） */
     private final Set<ChunkPos> loadedChunks = new LinkedHashSet<>();
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
+    /** 最近一次存取被拒绝的原因回执（界面呈现用；见 {@link IItemTerminalHost#noteReject}） */
+    private final TerminalRejectLog rejectLog = new TerminalRejectLog();
 
     public AkaishiItemTerminalBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHISHI_ITEM_TERMINAL.get(), pos, state);
@@ -114,8 +117,9 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AkaishiItemTerminalBlockEntity be) {
-        // 心跳：储存无线输入/输出口靠它按终端 ID 定位本终端（超时自动摘除）
-        ItemTerminalRegistry.heartbeat(level, be.terminalId, pos, be.security.ownerName());
+        // 心跳：储存无线输入/输出口靠它按终端 ID 定位本终端（超时自动摘除）；
+        // 名称一并上报（默认显示名 / 将来的自定义名），供绑定页显示"绑的是哪台"
+        ItemTerminalRegistry.heartbeat(level, be.terminalId, pos, be.security.ownerName(), be.getDisplayName());
         be.tickServer();
     }
 
@@ -181,9 +185,20 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
         LongDataSlots.write(data, DATA_CAPACITY_LOW, DATA_CAPACITY_HIGH, DATA_CAPACITY_HIGH2, DATA_CAPACITY_HIGH3, capacity);
         LongDataSlots.write(data, DATA_BUFFER_LOW, DATA_BUFFER_HIGH, DATA_BUFFER_HIGH2, DATA_BUFFER_HIGH3, energy.getEnergyStored());
         data.set(DATA_UNIT_COUNT, liveUnitCount());
+        // 槽位占用：与 IP 同为"可存量的累计型约束"，必须一起上屏（只显示 IP 会让"槽位先满"看不见）
+        data.set(DATA_USED_SLOTS, LongDataSlots.clampShort(usedSlotCount()));
+        data.set(DATA_TOTAL_SLOTS, LongDataSlots.clampShort(totalSlotCount()));
         LongDataSlots.write(data, DATA_EFFECTIVE_BUFFER_LOW, DATA_EFFECTIVE_BUFFER_HIGH,
                 DATA_EFFECTIVE_BUFFER_HIGH2, DATA_EFFECTIVE_BUFFER_HIGH3, bufferMax);
         data.set(DATA_FEE_MODULES, effectiveFeeModules());
+        // 最近一次存取被拒绝的原因（库页动作 / 搬运引擎 / 储存口回传）：只回放，不参与任何判定
+        rejectLog.writeTo(data);
+    }
+
+    /** 记录一次存取被拒绝的原因（见 {@link IItemTerminalHost#noteReject}；纯回执，不改行为） */
+    @Override
+    public void noteReject(int rejectReason, long feeNeed) {
+        rejectLog.note(rejectReason, feeNeed);
     }
 
     // ===== 储存单元聚合（D5：外侧 1 格贴装） =====
@@ -279,6 +294,34 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
         return total;
     }
 
+    /** 已占用槽位合计（各单元非空槽计数）：纯展示量，不参与任何判定 */
+    public int usedSlotCount() {
+        int used = 0;
+        for (BlockEntity be : unitEntities) {
+            if (be.isRemoved() || !(be instanceof IItemStorageUnit unit)) {
+                continue;
+            }
+            int slots = unit.slots();
+            for (int i = 0; i < slots; i++) {
+                if (!unit.getItem(i).isEmpty()) {
+                    used++;
+                }
+            }
+        }
+        return used;
+    }
+
+    /** 槽位总数合计（各单元槽位数之和）：与 {@link #usedSlotCount()} 配对展示 */
+    public int totalSlotCount() {
+        int total = 0;
+        for (BlockEntity be : unitEntities) {
+            if (!be.isRemoved() && be instanceof IItemStorageUnit unit) {
+                total += unit.slots();
+            }
+        }
+        return total;
+    }
+
     /** 存活储存单元（只读契约视图）：库页聚合与落账的唯一入口 */
     public List<IItemStorageUnit> storageUnits() {
         List<IItemStorageUnit> units = new ArrayList<>(unitEntities.size());
@@ -296,10 +339,12 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
     }
 
     /**
-     * 库内容指纹：按「单元序 → 槽序」混合（物品 + 堆量 + NBT）。
+     * 库内容指纹：按「单元序 → 槽序」混合（物品 + <b>真实件数</b> + NBT）。
      * <p>
-     * 显式混入堆量而非直接用 {@code ItemStack.hashCode()}：后者在部分实现下不含数量，
-     * 会让「并入已有堆」这种只增数量的改动被判为无变化而漏推快照。
+     * 显式混入件数而非直接用 {@code ItemStack.hashCode()}：后者在部分实现下不含数量，
+     * 会让「并入已有堆」这种只增数量的改动被判为无变化而漏推快照。件数取
+     * {@link IItemStorageUnit#storedCount(int)}（一槽多堆下视图堆数量恒定夹到单堆上限，
+     * 用它做指纹会让「大条目继续变多」永远不算变化）。
      */
     private long computeContentHash() {
         long hash = 1L;
@@ -311,7 +356,7 @@ public class AkaishiItemTerminalBlockEntity extends BlockEntity
             for (int slot = 0; slot < slots; slot++) {
                 ItemStack stack = unit.getItem(slot);
                 hash = 31L * hash + (stack.isEmpty() ? 0L
-                        : 31L * (31L * stack.getItem().hashCode() + stack.getCount())
+                        : 31L * (31L * stack.getItem().hashCode() + unit.storedCount(slot))
                                 + Objects.hashCode(stack.getTag()));
             }
         }

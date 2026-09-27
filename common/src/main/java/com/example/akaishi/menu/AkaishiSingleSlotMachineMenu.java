@@ -16,13 +16,21 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 单输入单输出处理机器菜单抽象基类（升级槽 3 + 输入 + 输出 + 玩家背包 + 数据槽）。
- * 槽位布局四台机器统一：输入(26,40)、输出(98,40)、无线接收升级(116,8)、速度升级(134,8)、能量升级(152,8)
- * （升级槽固定面板右上角 Y=8），背包 (8,124) 起（窗口高 198）。
+ * 槽位布局四台机器统一（**遵循规则3：升级槽固定面板右上角并排 y=8**，与全项目其它机器一致）：
+ * 输入(26,40)、输出(98,40)、无线接收升级(116,8)、速度升级(134,8)、能量升级(152,8)，
+ * 背包 (8,124) 起（窗口高 198）。
+ * <p>
+ * 本类是「三套坐标」的唯一真源：自绘槽框与悬停命中区一律读 {@code menu.slots.get(i).x/y}，
+ * 不再各自硬编码。
  */
 public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu {
 
     /** 机器区槽数（升级槽 3 + 输入 1 + 输出 1），玩家背包紧随其后 */
     public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT + 2;
+    /** 输入槽在 {@code slots} 中的下标（升级槽占 0..SLOT_COUNT-1） */
+    public static final int SLOT_INPUT_INDEX = MachineUpgradeSlots.SLOT_COUNT;
+    /** 输出槽在 {@code slots} 中的下标 */
+    public static final int SLOT_OUTPUT_INDEX = MachineUpgradeSlots.SLOT_COUNT + 1;
 
     private final ContainerData data;
     private final Container inventory;
@@ -35,7 +43,9 @@ public abstract class AkaishiSingleSlotMachineMenu extends AbstractContainerMenu
         this.inventory = inventory;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量/无线接收各一格，固定面板右上角 Y=8，互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）
+        // 升级槽（速度/能量/无线接收各一格；**固定面板右上角并排 y=8 顶部留白（规则3）**，
+        // 与全项目其它机器一致；互斥过滤由 MachineUpgradeSlots.canPlaceItem 完成）。
+        // 注册顺序必须与 MachineUpgradeSlots.SLOT_* 一致：menu 下标 0=速度、1=能量、2=无线接收
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));

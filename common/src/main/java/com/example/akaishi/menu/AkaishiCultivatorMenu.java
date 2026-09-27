@@ -23,8 +23,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AkaishiCultivatorMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 3 + 输入/材料槽 2），玩家背包紧随其后 */
-    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT
+    /** 机器区槽数（升级槽 2 + 输入/材料槽 2），玩家背包紧随其后 */
+    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS
             + AkaishiCultivatorBlockEntity.SLOT_COUNT;
 
     private final Container container;
@@ -60,9 +60,8 @@ public class AkaishiCultivatorMenu extends AbstractContainerMenu {
                 () -> linkState != null && linkState.open));
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
                 () -> linkState != null && linkState.open));
-        // 无线接收格补在能量格左侧 (116,8)：必须与前面两格同批入槽，机器区槽数才与 MACHINE_SLOT_END 对齐
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8,
-                () -> linkState != null && linkState.open));
+        // 生命系机器无线接收格已彻底移除；旧档残留件当场退还玩家（物品守恒）
+        MachineUpgradeSlots.refundWireless(upgrades, inv.player);
 
         // 输入槽：生命样本（纯度 <100，满纯度无需再提纯）或器官（品质 <IV）
         addSlot(new OverlayHidingSlot(container, AkaishiCultivatorBlockEntity.INPUT_SLOT, 56, 30,
@@ -131,7 +130,8 @@ public class AkaishiCultivatorMenu extends AbstractContainerMenu {
 
     /** 无线接收升级是否已装（界面提示用） */
     public boolean hasWirelessReceiver() {
-        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+        // 生命系机器无线接收格已移除 ⇒ 恒 false（保留方法避免影响既有调用点）
+        return false;
     }
 
     /** 当前输入物品对应档位的成功率（提纯按纯度区间、升级按品质，无输入返回 0） */

@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class TerminalEntry {
 
-    /** 分片：条目落在某个单元某个槽位上的一段 */
-    public record Slice(IItemStorageUnit unit, int slot, int count) {
+    /** 分片：条目落在某个单元某个槽位上的一段（件数为<b>真实件数</b>，一槽多堆下可超单堆上限） */
+    public record Slice(IItemStorageUnit unit, int slot, long count) {
     }
 
     /** 展示堆：数量恒为 1，只承载物品与 NBT（真实数量见 {@link #amount()}） */

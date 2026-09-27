@@ -7,6 +7,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 import java.util.function.Supplier;
 
@@ -101,6 +102,9 @@ public final class AkaishiMechanicalItems {
 
     /** 机械材料物品 → MechanicalMaterial.id（加工厂材料槽据此判定材料种类），非机械材料返回 null */
     public static String materialIdOf(net.minecraft.world.item.Item item) {
+        if (item == ModItems.akaishiIngot.get()) return "akaishi:chishi";
+        // 铁：基础档材料，直接以原版铁锭为来源（机械材料此前只有注册与贴图、没有物品）
+        if (item == Items.IRON_INGOT) return "akaishi:iron";
         if (item == redstoneAlloyIngot.get()) return "akaishi:redstone_alloy";
         if (item == ceramicCompositePlate.get()) return "akaishi:ceramic_composite";
         if (item == resistantSteelIngot.get()) return "akaishi:resistant_steel";

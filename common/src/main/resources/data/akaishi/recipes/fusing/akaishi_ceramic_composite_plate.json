@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "minecraft:clay" },
+  "input_count": 3,
+  "ingredient2": { "item": "akaishi:iron_ore_base" },
+  "input_count2": 4,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_ceramic_composite_plate", "count": 1 }
+}

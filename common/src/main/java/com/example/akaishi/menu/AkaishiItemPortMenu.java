@@ -6,6 +6,7 @@ import com.example.akaishi.api.storage.IItemTerminalHost;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.wireless.ItemTerminalRegistry;
 
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +25,9 @@ import java.util.UUID;
 
 /**
  * 储存无线输入/输出口菜单（输入口/输出口共用，两页：运行 / 绑定）。
- * 方向/绑定态/上次搬运件数/绑定身份短号经数据槽同步；
- * 绑定清单走 {@link AkaishiItemPortBindingSync} 的 S2C 快照（服务端算，客户端只读）。
+ * 方向/绑定态/上次搬运件数/绑定身份短号/搬运失败原因经数据槽同步；
+ * 绑定清单 + 已绑定目标（名称/短号/位置/是否仍可用）走 {@link AkaishiItemPortBindingSync}
+ * 的 S2C 快照（服务端算，客户端只读）。
  * <p>
  * <b>过滤网</b>：9 格真槽位（{@code slots} 下标 36..44，玩家槽之后），背后挂
  * {@link ItemPortFilterContainer} —— 服务端直读写方块实体的过滤数组（单一数据源），
@@ -60,8 +63,8 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
     private final Player player;
     /** 绑定页快照（客户端渲染只读） */
     private List<AkaishiItemPortBindingSync.Entry> bindingEntries = List.of();
-    /** 已绑定终端标签（客户端；空串=未绑定） */
-    private String boundLabel = "";
+    /** 已绑定目标（客户端；null=未绑定）：名称/短号/位置/是否仍可用，由服务端判定下发 */
+    private AkaishiItemPortBindingSync.BoundTarget boundTarget;
     /** 服务端：已推送的清单签名（内容变化才推） */
     private String sentBindingSignature = "";
     /** 过滤网 9 格容器：直读写方块实体过滤数组（客户端镜像承接原版槽同步） */
@@ -113,17 +116,44 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
             return;
         }
         List<AkaishiItemPortBindingSync.Entry> entries = buildBindingEntries(serverPlayer);
-        String bound = host.boundTargetLabel();
-        // 清单内容 + 当前绑定 一起做签名：任一变化（含终端上下线）即重推
-        String signature = bound + '|' + entries.size() + '|' + entries.hashCode();
+        AkaishiItemPortBindingSync.BoundTarget target = buildBoundTarget(serverPlayer);
+        // 签名按"会显示出来的值"逐字段拼：Component 在 1.20.1 没有 equals/hashCode，
+        // 用集合哈希会让快照每 tick 重推（空包）
+        String signature = signature(entries, target);
         if (!signature.equals(this.sentBindingSignature)) {
             this.sentBindingSignature = signature;
-            AkaishiItemPortBindingSync.sendSnapshot(serverPlayer, this.containerId, entries, bound);
+            AkaishiItemPortBindingSync.sendSnapshot(serverPlayer, this.containerId, entries, target);
         }
         // 过滤网不再走自定义包：9 格真槽位由 super.broadcastChanges() 的原版槽同步接管
     }
 
-    /** 可绑定清单：该玩家具备「布局」权限且已加载的同维度物品终端（服务端算，客户端只读） */
+    /** 推送签名（清单 + 绑定目标，含名称）：任一变化即重推 */
+    private static String signature(List<AkaishiItemPortBindingSync.Entry> entries,
+            AkaishiItemPortBindingSync.BoundTarget target) {
+        StringBuilder sb = new StringBuilder(96);
+        if (target != null) {
+            sb.append(target.terminalId()).append('|').append(target.live()).append('|')
+                    .append(target.shortId()).append('|').append(target.posText()).append('|')
+                    .append(nameText(target.name()));
+        }
+        sb.append('|').append(entries.size());
+        for (AkaishiItemPortBindingSync.Entry entry : entries) {
+            sb.append('|').append(entry.terminalId()).append(',').append(entry.dimension()).append(',')
+                    .append(entry.pos().asLong()).append(',').append(entry.ownerName()).append(',')
+                    .append(entry.shortId()).append(',').append(nameText(entry.name()));
+        }
+        return sb.toString();
+    }
+
+    /** 名称组件的签名字面（服务端语言解析；只求稳定可比，不用于展示） */
+    private static String nameText(Component name) {
+        return name == null ? "" : name.getString();
+    }
+
+    /**
+     * 可绑定清单：该玩家具备「布局」权限、已加载、<b>已成型</b>的同维度物品终端
+     * （服务端算，客户端只读；失效条目由注册表在本方法内即时摘除）。
+     */
     private List<AkaishiItemPortBindingSync.Entry> buildBindingEntries(ServerPlayer serverPlayer) {
         if (!(serverPlayer.level() instanceof ServerLevel level)) {
             return List.of();
@@ -132,16 +162,42 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
         List<AkaishiItemPortBindingSync.Entry> entries = new ArrayList<>();
         for (ItemTerminalRegistry.Entry entry : ItemTerminalRegistry.bindableTerminals(level, serverPlayer)) {
             entries.add(new AkaishiItemPortBindingSync.Entry(entry.terminalId(), dimension,
-                    entry.pos(), entry.ownerName() == null ? "" : entry.ownerName()));
+                    entry.pos(), entry.ownerName() == null ? "" : entry.ownerName(),
+                    entry.name(), entry.shortId()));
         }
         return entries;
     }
 
-    /** 客户端：接收清单快照 */
+    /**
+     * 已绑定目标快照（服务端判定，客户端只读）：名称 + 短号 + 位置 + <b>是否仍可用</b>。
+     * <p>
+     * "可用"与端口搬运同一口径（{@link ItemTerminalRegistry#resolve}：未注册 / 超时 / 区块未加载 /
+     * 坐标被别的终端顶替都为不可用）。因此界面不会把"已经不存在的终端"画成一条正常绑定；
+     * 位置取注册表最后已知值，注册表已清空时位置留空（界面显示"位置未知"）。
+     */
+    private AkaishiItemPortBindingSync.BoundTarget buildBoundTarget(ServerPlayer serverPlayer) {
+        UUID terminalId = host.boundTerminalIdView();
+        if (terminalId == null) {
+            return null;
+        }
+        net.minecraft.server.MinecraftServer server = serverPlayer.getServer();
+        boolean live = server != null && ItemTerminalRegistry.resolve(server, terminalId) != null;
+        ItemTerminalRegistry.Snapshot snapshot = ItemTerminalRegistry.locate(terminalId);
+        if (snapshot == null) {
+            return new AkaishiItemPortBindingSync.BoundTarget(terminalId, Component.empty(),
+                    ItemTerminalRegistry.shortId(terminalId), "", false);
+        }
+        String posText = AkaishiItemPortBindingSync.label(snapshot.dimension().location(), snapshot.pos());
+        return new AkaishiItemPortBindingSync.BoundTarget(terminalId, snapshot.name(), snapshot.shortId(),
+                posText, live);
+    }
+
+    /** 客户端：接收清单快照 + 已绑定目标 */
     @Override
-    public void acceptBinding(List<AkaishiItemPortBindingSync.Entry> entries, String boundLabel) {
+    public void acceptBinding(List<AkaishiItemPortBindingSync.Entry> entries,
+            AkaishiItemPortBindingSync.BoundTarget target) {
         this.bindingEntries = List.copyOf(entries);
-        this.boundLabel = boundLabel == null ? "" : boundLabel;
+        this.boundTarget = target;
     }
 
     /** 服务端：绑定 / 解绑（绑定复核目标终端「布局」权限，op 等级 4 放行；解绑只看本口绑定态） */
@@ -172,6 +228,14 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
         host.bindTerminal(terminalId, actor.getUUID());
         actor.displayClientMessage(Component.translatable("message.akaishi.item_port.bound",
                 host.boundTargetLabel()), true);
+        // 前置提示（只提示、不改权限语义）：绑定用的是 BUILD（布局），搬运用的是 INJECT/EXTRACT ——
+        // 两者是不同权限位，于是"能绑但没有方向权限"会表现为"绑定成功却永远不搬"。绑定时就讲清楚。
+        AkaishiSecurityPermission required = host.isOutput()
+                ? AkaishiSecurityPermission.EXTRACT : AkaishiSecurityPermission.INJECT;
+        if (!actor.hasPermissions(4) && !terminal.security().check(actor.getUUID(), required)) {
+            actor.displayClientMessage(Component.translatable(
+                    "message.akaishi.item_port.bound_no_dir_permission", required.displayName()), true);
+        }
     }
 
     // ===== 运行页：过滤网（AE2 总线配置槽口径的真槽位） =====
@@ -215,9 +279,14 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
         return bindingEntries;
     }
 
-    /** 绑定页/运行页：已绑定终端标签（客户端；空串=未绑定） */
-    public String boundLabel() {
-        return boundLabel;
+    /** 绑定页/运行页：已绑定目标（客户端只读；null=未绑定） */
+    public AkaishiItemPortBindingSync.BoundTarget boundTarget() {
+        return boundTarget;
+    }
+
+    /** 已绑定终端 ID（客户端只读；null=未绑定）：候选行高亮按 <b>ID</b> 比对，不用显示串 */
+    public UUID boundTargetId() {
+        return boundTarget == null ? null : boundTarget.terminalId();
     }
 
     private void addPlayerSlots(Inventory inv) {
@@ -286,6 +355,26 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
         return data.get(AkaishiItemPortBlockEntity.DATA_IS_OUTPUT) != 0;
     }
 
+    /**
+     * 口的实际朝向（界面显示用）：客户端读<b>本地方块实体</b>的 {@code FACING} 方块状态。
+     * <p>
+     * 方块状态随区块同步下发，两端一致且自带于本地，故<b>无需新增数据槽 / 协议</b>
+     * （客户端菜单本身就是按坐标取本地方块实体构造的，见 {@code TerminalMenuRegs}）。
+     *
+     * @return 朝向；方块实体缺失或状态异常时返回 null
+     */
+    public Direction facing() {
+        return host == null ? null : host.facingDirection();
+    }
+
+    /**
+     * 面朝处的方块状态（界面据此把"面朝非容器"细分为"空气 / 具体方块"）。
+     * 读本地方块状态即可，同样不涉及协议。
+     */
+    public BlockState facingState() {
+        return host == null ? null : host.facingState();
+    }
+
     /** 上次搬运件数（数据槽同步） */
     public int lastMoved() {
         return data.get(AkaishiItemPortBlockEntity.DATA_LAST_MOVED);
@@ -296,10 +385,38 @@ public class AkaishiItemPortMenu extends AbstractContainerMenu implements Akaish
         return data.get(AkaishiItemPortBlockEntity.DATA_ENERGY_SHORT) != 0;
     }
 
+    /**
+     * 搬运失败原因（数据槽同步，{@code AkaishiItemPortBlockEntity.REASON_*}）。
+     * <p>
+     * 兜底：早期路径只置了"赤能源不足"标志位（槽 5）而没走原因槽时，这里同样报 ENERGY_SHORT，
+     * 保证界面告警不会因为两个槽的写入时点不同而丢。
+     */
+    public int transferReason() {
+        int code = data.get(AkaishiItemPortBlockEntity.DATA_REASON);
+        if (code == AkaishiItemPortBlockEntity.REASON_NONE && energyShort()) {
+            return AkaishiItemPortBlockEntity.REASON_ENERGY_SHORT;
+        }
+        return code;
+    }
+
     /** 绑定身份短 ID（8 位 hex；0=未绑定；低/高 2 槽按 16 位段重组） */
     public int identityHash() {
         return LongDataSlots.readInt(data, AkaishiItemPortBlockEntity.DATA_IDENTITY_HASH,
                 AkaishiItemPortBlockEntity.DATA_IDENTITY_HASH_HIGH);
+    }
+
+    /**
+     * 上次「赤能源不足」时本批所需赤能源（追加槽 7；其余原因为 0，界面据此给数字，不再只报"不足"）。
+     * <p>
+     * 数据槽经 short 传输，故服务端写入时已钳到 16 位，读取端再按 16 位无符号掩码还原。
+     */
+    public int feeNeed() {
+        return data.get(AkaishiItemPortBlockEntity.DATA_FEE_NEED) & 0xFFFF;
+    }
+
+    /** 上次「赤能源不足」时终端缓冲赤能源（追加槽 8；口径与 {@link #feeNeed()} 同） */
+    public int feeHave() {
+        return data.get(AkaishiItemPortBlockEntity.DATA_FEE_HAVE) & 0xFFFF;
     }
 
     @Override

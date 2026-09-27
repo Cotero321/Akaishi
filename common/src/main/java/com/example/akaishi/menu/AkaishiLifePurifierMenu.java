@@ -17,8 +17,8 @@ import net.minecraft.world.item.ItemStack;
  */
 public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 3 + 输出槽 1），玩家背包紧随其后 */
-    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT
+    /** 机器区槽数（升级槽 2 + 输出槽 1），玩家背包紧随其后 */
+    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS
             + AkaishiLifePurifierBlockEntity.SLOT_COUNT;
 
     private final Container container;
@@ -39,10 +39,11 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧，固定面板右上角并排 y=8，规则3）
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧，固定面板右上角并排 y=8，规则3）
+        // 生命系机器无线接收格已彻底移除：旧档/旧机器残留件当场退还玩家（物品守恒）
+        MachineUpgradeSlots.refundWireless(upgrades, inv.player);
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
         addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8));
 
         // 输出槽：只出不进
         addSlot(new Slot(container, AkaishiLifePurifierBlockEntity.OUTPUT_SLOT, 116, 30) {
@@ -104,7 +105,8 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
     /** 无线接收升级是否已装（界面提示用） */
     public boolean hasWirelessReceiver() {
-        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+        // 生命系机器无线接收格已移除 ⇒ 恒 false（保留方法避免影响既有调用点）
+        return false;
     }
 
     @Override

@@ -332,6 +332,16 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu
         return this.data.get(IItemTerminalHost.DATA_UNIT_COUNT);
     }
 
+    /** 已占用槽位合计（服务端权威值）：与 IP 用量并列展示的「另一个累计型约束」用量 */
+    public int usedSlots() {
+        return this.data.get(IItemTerminalHost.DATA_USED_SLOTS);
+    }
+
+    /** 槽位总数合计（服务端权威值） */
+    public int totalSlots() {
+        return this.data.get(IItemTerminalHost.DATA_TOTAL_SLOTS);
+    }
+
     /** 有效赤能源缓冲容量（服务端权威值：配置基准 + 缓冲扩展组件加成） */
     public long effectiveBufferCapacity() {
         return LongDataSlots.read(this.data, IItemTerminalHost.DATA_EFFECTIVE_BUFFER_LOW,
@@ -353,6 +363,22 @@ public class AkaishiItemTerminalMenu extends AbstractContainerMenu
      */
     public long maxBatchIp(boolean deposit) {
         return ItemTerminalFee.maxIp(effectiveBufferCapacity(), deposit, effectiveFeeModules());
+    }
+
+    /**
+     * 最近一次存取被拒绝的原因（{@link IItemTerminalHost#REJECT_*}；{@link IItemTerminalHost#REJECT_NONE} = 无失败）。
+     * <p>
+     * 服务端权威值：库页动作（{@code TerminalActions}）、搬运引擎与储存口都会回传，
+     * 故界面既能看到"自己点的那一下为什么失败"，也能看到"输入口一直搬不进来"的原因。
+     */
+    public int rejectReason() {
+        return this.data.get(IItemTerminalHost.DATA_REJECT_REASON);
+    }
+
+    /** 被拒绝那一笔所需赤能源（只在赤能源不足 / 超单笔上限时有意义，其余为 0） */
+    public long rejectFeeNeed() {
+        return LongDataSlots.readInt(this.data, IItemTerminalHost.DATA_REJECT_FEE_NEED_LOW,
+                IItemTerminalHost.DATA_REJECT_FEE_NEED_HIGH);
     }
 
     // ===== 服务端：库内容变化时重推快照 =====

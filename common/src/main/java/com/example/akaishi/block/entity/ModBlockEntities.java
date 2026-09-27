@@ -222,6 +222,8 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiMechanicalProcessingFactoryBlockEntity>> CHISHI_MECHANICAL_PROCESSING_FACTORY;
     /** 机械改造组装加工台方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiMechanicalAssemblyStationBlockEntity>> CHISHI_MECHANICAL_ASSEMBLY_STATION;
+    /** 材料融合器方块实体类型（两原料 + 赤能源 → 机械材料） */
+    public static RegistrySupplier<BlockEntityType<AkaishiMaterialFuserBlockEntity>> CHISHI_MATERIAL_FUSER;
     /** 物品终端方块实体类型（外墙主方块，IP 物品库中枢） */
     public static RegistrySupplier<BlockEntityType<AkaishiItemTerminalBlockEntity>> CHISHI_ITEM_TERMINAL;
     /** 物品储存单元方块实体类型（三阶共用一个类型，等级由方块本身决定） */
@@ -557,6 +559,9 @@ public final class ModBlockEntities {
         // 组装加工台（四加工件 + 双能源 → 成品器官）
         CHISHI_MECHANICAL_ASSEMBLY_STATION = be("akaishi_mechanical_assembly_station",
                 AkaishiMechanicalAssemblyStationBlockEntity::new, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION);
+        // 材料融合器（两种原料 + 赤能源 → 机械材料）
+        CHISHI_MATERIAL_FUSER = be("akaishi_material_fuser", AkaishiMaterialFuserBlockEntity::new,
+                AkaishiMechanicalBlocks.CHISHI_MATERIAL_FUSER);
         // ===== 物品终端（IP 物品库） =====
         // 终端本体（外墙主方块：5×5×5 同族壳体成型，聚合外围贴装的储存单元）
         CHISHI_ITEM_TERMINAL = be("akaishi_item_terminal", AkaishiItemTerminalBlockEntity::new,

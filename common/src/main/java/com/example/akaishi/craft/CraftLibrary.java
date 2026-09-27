@@ -145,7 +145,10 @@ public final class CraftLibrary {
                 if (left <= 0L) {
                     break;
                 }
-                int want = (int) Math.min(left, slice.count());
+                // 一槽多堆：槽里可能远超单堆上限，但单次取出的堆仍须是原版合法的（≤单堆上限），
+                // 由外层循环按需多次取，避免产出超大堆在后续投料 / 落盘时损坏
+                int maxStack = slice.unit().getItem(slice.slot()).getMaxStackSize();
+                int want = (int) Math.min(left, Math.min(slice.count(), Math.max(1, maxStack)));
                 ItemStack got = slice.unit().extract(slice.slot(), want);
                 if (!got.isEmpty()) {
                     taken.add(got);

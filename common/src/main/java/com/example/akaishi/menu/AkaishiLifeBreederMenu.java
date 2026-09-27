@@ -22,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 3 + 器官/序列/结晶/输出槽 4），玩家背包紧随其后 */
-    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT
+    /** 机器区槽数（升级槽 2 + 器官/序列/结晶/输出槽 4），玩家背包紧随其后 */
+    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS
             + AkaishiLifeBreederBlockEntity.SLOT_COUNT;
 
     private final Container container;
@@ -53,13 +53,13 @@ public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
         this.upgrades = upgrades;
         this.blockPos = pos;
 
-        // 升级槽（速度/能量/无线各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
-        // 固定面板右上角 y=8 顶部留白（规则 3）；与浮层第一行末尾三格坐标重叠，须随浮层开关失活让位）
+        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；
+        // 固定面板右上角 y=8 顶部留白（规则 3）；与浮层第一行末尾两格坐标重叠，须随浮层开关失活让位）
+        // 生命系机器无线接收格已彻底移除；旧档残留件当场退还玩家（物品守恒）
+        MachineUpgradeSlots.refundWireless(upgrades, inv.player);
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8,
                 () -> linkState != null && linkState.open));
         addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8,
-                () -> linkState != null && linkState.open));
-        addSlot(new MachineUpgradeHidingSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 116, 8,
                 () -> linkState != null && linkState.open));
 
         // 器官输入槽：仅接受可继续培养（非原生、未达突变上限）的器官
@@ -149,7 +149,8 @@ public class AkaishiLifeBreederMenu extends AbstractContainerMenu {
 
     /** 无线接收升级是否已装（界面提示用） */
     public boolean hasWirelessReceiver() {
-        return upgrades instanceof MachineUpgradeSlots slots && slots.hasWirelessReceiver();
+        // 生命系机器无线接收格已移除 ⇒ 恒 false（保留方法避免影响既有调用点）
+        return false;
     }
 
     @Override

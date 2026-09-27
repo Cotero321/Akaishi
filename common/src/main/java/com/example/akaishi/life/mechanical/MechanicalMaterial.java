@@ -82,6 +82,7 @@ public final class MechanicalMaterial {
         register("akaishi:redstone_alloy", 7, w(1, 0, 2, 3, 0, 0, 1, 0, 0, 0));      // 迅捷脉冲：攻速/攻击
         register("akaishi:ceramic_composite", 7, w(1, 0, 0, 0, 4, 0, 0, 0, 0, 2));   // 轻质机动：移速/闪避
         register("akaishi:resistant_steel", 7, w(1, 3, 0, 0, 0, 3, 0, 0, 0, 0));     // 重装卸力：生命/护甲
+        register("akaishi:chishi", 7, w(2, 1, 1, 1, 0, 1, 1, 0, 0, 0));              // 赤石：泛用底座（中级）
         // 高级（9点）——双轴特化
         register("akaishi:precision_alloy", 9, w(2, 0, 1, 0, 0, 0, 2, 2, 2, 0));     // 精准斩杀：暴击/范围
         register("akaishi:polymerized_redstone", 9, w(3, 0, 2, 3, 0, 0, 1, 0, 0, 0)); // 超频输出：倍率/攻速

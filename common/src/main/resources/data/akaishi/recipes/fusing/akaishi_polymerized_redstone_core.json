@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "akaishi:akaishi_redstone_alloy_ingot" },
+  "input_count": 2,
+  "ingredient2": { "item": "akaishi:akaishi_ingot" },
+  "input_count2": 2,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_polymerized_redstone_core", "count": 1 }
+}

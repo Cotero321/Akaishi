@@ -206,10 +206,12 @@ public class MiniatureTerminalBlockEntity extends BlockEntity
         if (state != null) {
             state.tick();
         }
-        // 物品族终端要能被储存无线输入/输出口按 ID 找到 ⇒ 上报心跳（与物品终端同一条注册表）
+        // 物品族终端要能被储存无线输入/输出口按 ID 找到 ⇒ 上报心跳（与物品终端同一条注册表）；
+        // 名称一并上报（本类 getDisplayName() 经适配器返回族名，绑定页据此显示）
         IItemTerminalHost host = itemHost();
         if (host != null) {
-            ItemTerminalRegistry.heartbeat(level, terminalId, worldPosition, host.security().ownerName());
+            ItemTerminalRegistry.heartbeat(level, terminalId, worldPosition, host.security().ownerName(),
+                    getDisplayName());
         }
     }
 

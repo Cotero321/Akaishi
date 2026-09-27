@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "akaishi:akaishi_ceramic_composite_plate" },
+  "input_count": 1,
+  "ingredient2": { "item": "akaishi:akaishi_life_essence_solid" },
+  "input_count2": 4,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_bio_ceramic_plate", "count": 1 }
+}

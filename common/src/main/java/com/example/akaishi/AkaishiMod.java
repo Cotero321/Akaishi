@@ -145,6 +145,9 @@ public final class AkaishiMod {
         // 睡眠剥夺（P6）：睡醒奖励 / 每日扣减（1s 节拍，只在主世界推日）+ 幻翼附加精神伤害投递（逐 tick）
         TickEvent.SERVER_LEVEL_POST.register(SanitySleepDeprivation::serverTick);
         TickEvent.SERVER_LEVEL_POST.register(SanitySyncS2C::serverTick);
+        // 物品终端注册表（储存口绑定清单）：按节拍主动清扫失效条目
+        // （拆方块/坍缩拆芯片/区块卸载/换存档残留都不能再留下"幽灵条目"，不依赖有人开界面）
+        TickEvent.SERVER_LEVEL_POST.register(com.example.akaishi.wireless.ItemTerminalRegistry::serverTick);
         // 躯体状态同步包：仅客户端注册接收器（服务端通过 sendToPlayer 主动推送）
         // 用 Platform 判断环境，避免 EnvExecutor 重载签名对 fabric EnvType 的解析依赖
         if (Platform.getEnvironment() == Env.CLIENT) {

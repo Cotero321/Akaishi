@@ -13,6 +13,7 @@ import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.menu.TerminalActions;
 import com.example.akaishi.storage.ItemStorageUnitData;
+import com.example.akaishi.storage.TerminalRejectLog;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemPoints;
 import com.example.akaishi.value.ItemTerminalFee;
@@ -79,6 +80,8 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
     private final int feeModules;
 
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
+    /** 最近一次存取被拒绝的原因回执（界面呈现用；与方块终端同一份口径，见 {@link IItemTerminalHost#noteReject}） */
+    private final TerminalRejectLog rejectLog = new TerminalRejectLog();
     private int contentRevision;
     private long contentHash;
 
@@ -170,12 +173,23 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
         LongDataSlots.write(data, DATA_BUFFER_LOW, DATA_BUFFER_HIGH, DATA_BUFFER_HIGH2, DATA_BUFFER_HIGH3,
                 energy.getEnergyStored());
         data.set(DATA_UNIT_COUNT, units.size());
+        // 槽位占用：与 IP 同为"可存量的累计型约束"，必须一起上屏（口径与方块终端逐字一致）
+        data.set(DATA_USED_SLOTS, LongDataSlots.clampShort(usedSlotCount()));
+        data.set(DATA_TOTAL_SLOTS, LongDataSlots.clampShort(totalSlotCount()));
         LongDataSlots.write(data, DATA_EFFECTIVE_BUFFER_LOW, DATA_EFFECTIVE_BUFFER_HIGH,
                 DATA_EFFECTIVE_BUFFER_HIGH2, DATA_EFFECTIVE_BUFFER_HIGH3, energy.getMaxEnergy());
         data.set(DATA_FEE_MODULES, feeModules);
+        // 最近一次存取被拒绝的原因（库页动作 / 搬运引擎 / 储存口回传）：只回放，不参与任何判定
+        rejectLog.writeTo(data);
     }
 
-    /** 库内容指纹（口径同物品终端：显式混入堆量，NBT 一并参与） */
+    /** 记录一次存取被拒绝的原因（见 {@link IItemTerminalHost#noteReject}；纯回执，不改行为） */
+    @Override
+    public void noteReject(int rejectReason, long feeNeed) {
+        rejectLog.note(rejectReason, feeNeed);
+    }
+
+    /** 库内容指纹（口径同物品终端：显式混入<b>真实件数</b>，NBT 一并参与） */
     private long computeContentHash() {
         long hash = 1L;
         for (ItemStorageUnitData unit : units) {
@@ -183,7 +197,7 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
             for (int slot = 0; slot < slots; slot++) {
                 ItemStack stack = unit.getItem(slot);
                 hash = 31L * hash + (stack.isEmpty() ? 0L
-                        : 31L * (31L * stack.getItem().hashCode() + stack.getCount())
+                        : 31L * (31L * stack.getItem().hashCode() + unit.storedCount(slot))
                                 + Objects.hashCode(stack.getTag()));
             }
         }
@@ -202,6 +216,29 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
         long total = 0L;
         for (ItemStorageUnitData unit : units) {
             total += unit.getStoredIp();
+        }
+        return total;
+    }
+
+    /** 已占用槽位合计（各单元非空槽计数）：纯展示量，不参与任何判定 */
+    private int usedSlotCount() {
+        int used = 0;
+        for (ItemStorageUnitData unit : units) {
+            int slots = unit.slots();
+            for (int slot = 0; slot < slots; slot++) {
+                if (!unit.getItem(slot).isEmpty()) {
+                    used++;
+                }
+            }
+        }
+        return used;
+    }
+
+    /** 槽位总数合计（各单元槽位数之和）：与 {@link #usedSlotCount()} 配对展示 */
+    private int totalSlotCount() {
+        int total = 0;
+        for (ItemStorageUnitData unit : units) {
+            total += unit.slots();
         }
         return total;
     }
@@ -348,9 +385,11 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
                 if (stored.isEmpty()) {
                     continue;
                 }
-                int take = Math.min(want, stored.getCount());
+                // 一槽多堆：真实件数走 storedCount（视图堆数量恒定夹到单堆上限）；
+                // 单次取出仍受 BATCH_LIMIT 约束，故返回的堆始终是原版合法的
+                int take = (int) Math.min(want, unit.storedCount(i));
                 // 先扣费再取物：不足则整笔拒绝，物品与账本零改动
-                if (!chargeWithdraw(unit, i, stored, take)) {
+                if (!chargeWithdraw(unit, i, take)) {
                     return ItemStack.EMPTY;
                 }
                 return unit.extract(i, take);
@@ -364,8 +403,10 @@ public final class ItemTerminalMiniatureState implements MiniatureTerminalState,
         return ip <= 0L || tryChargeFee(ip, true);
     }
 
-    private boolean chargeWithdraw(IItemStorageUnit unit, int slot, ItemStack stored, int amount) {
-        long ip = TerminalActions.withdrawIp(unit, slot, stored.getCount(), amount);
+    private boolean chargeWithdraw(IItemStorageUnit unit, int slot, int amount) {
+        // 取出费按单元账本的比例扣减，件数须用真实件数（一槽多堆下视图堆数量恒定夹到单堆上限），
+        // 与库页取出 / 储存口输出共用 TerminalActions.withdrawIp 这一唯一算法源
+        long ip = TerminalActions.withdrawIp(unit, slot, unit.storedCount(slot), amount);
         return ip <= 0L || tryChargeFee(ip, false);
     }
 

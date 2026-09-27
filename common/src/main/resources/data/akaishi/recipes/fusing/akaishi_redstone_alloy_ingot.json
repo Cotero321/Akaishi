@@ -1,0 +1,9 @@
+{
+  "type": "akaishi:fusing",
+  "ingredient": { "item": "akaishi:redstone_ore_base" },
+  "input_count": 9,
+  "ingredient2": { "item": "akaishi:iron_dust" },
+  "input_count2": 4,
+  "energy": 1000000,
+  "result": { "item": "akaishi:akaishi_redstone_alloy_ingot", "count": 1 }
+}

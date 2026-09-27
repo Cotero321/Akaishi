@@ -66,10 +66,9 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
         }
 
         // 输入/材料/输出槽已烘焙于贴图（30/56/116），无需自绘；
-        // 升级槽（134/152/116）贴图无图形，需自绘框 + 标签（置于槽位左侧，避免压到顶部能量条）
+        // 升级槽（134/152）贴图无图形，需自绘框 + 标签（置于槽位左侧，避免压到顶部能量条）；无线接收格已移除
         GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
         GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + 116, y + 8);
         // 生命能量条（绿）
         GuiWidgets.track(gui, x + LIFE_BAR_X, y + LIFE_BAR_Y, BAR_W, BAR_H);
         long life = menu.getLifeEnergy();
@@ -275,12 +274,6 @@ public class AkaishiLifeStructScreen extends AbstractContainerScreen<AkaishiLife
             gui.renderTooltip(this.font,
                     Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
                             "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
-                    mouseX, mouseY);
-        }
-        if (isHovering(116, 8, 16, 16, mouseX, mouseY)) {
-            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
-                    Component.translatable(menu.hasWirelessReceiver()
-                            ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
     }

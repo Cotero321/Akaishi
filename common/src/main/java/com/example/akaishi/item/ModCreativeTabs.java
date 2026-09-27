@@ -208,6 +208,8 @@ public final class ModCreativeTabs {
         accept(output, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY);
         accept(output, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_PROCESSING_FACTORY);
         accept(output, AkaishiMechanicalBlocks.CHISHI_MECHANICAL_ASSEMBLY_STATION);
+        // 材料融合器（9 种机械材料的唯一获取途径：两原料 + 赤能源）
+        accept(output, AkaishiMechanicalBlocks.CHISHI_MATERIAL_FUSER);
         // 机械器官（9 槽位）
         accept(output, ModItems.mechanicalEye);
         accept(output, ModItems.mechanicalHeart);

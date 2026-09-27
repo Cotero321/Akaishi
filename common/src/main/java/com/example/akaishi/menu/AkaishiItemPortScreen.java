@@ -5,9 +5,11 @@ import com.example.akaishi.block.entity.AkaishiItemPortBlockEntity;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,8 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
     private static final int TEXT_DIM = 0xFF707070;
     private static final int TEXT_GREEN = 0xFF2E7D32;
     private static final int TEXT_RED = 0xFFB03030;
+    /** 信息态（合法但需说明，如面朝物品管道）：中性偏蓝，与红字错误明确区分 */
+    private static final int TEXT_INFO = 0xFF2F6385;
 
     // 切页按钮（53×12，两页并排，y=16 避开标题）
     private static final int TAB_W = 53;
@@ -56,10 +60,20 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
     private static final int RUN_TEXT_W = 96;
     /** 上次搬运件数 y：下移到解绑按钮之下，让出右侧过滤网列 */
     private static final int LAST_MOVED_Y = 92;
-    /** 赤能源不足告警 y：上次搬运件数下一行（止于 y≈113，不压背包 y=124） */
-    private static final int ENERGY_SHORT_Y = 104;
+    /**
+     * 搬运失败原因 y（与旧「赤能源不足」告警同一格，只换文案来源；止于 y≈113，不压背包 y=124）。
+     * <p>
+     * 左列可用宽 {@link #RUN_TEXT_W}=96px（右列 x≥110 是过滤网），故所有原因文案按
+     * <b>「一眼知道去改什么」的短句</b>写（≤8 个汉字 ≈ 72px），不靠截断。
+     * <p>
+     * 同格也承载<b>信息态</b>（{@code REASON_PIPE} 面朝物品管道，非错误）：用中性色 {@link #TEXT_INFO}
+     * 与红字错误区分，完整说明走悬停提示（见 {@link #reasonHovered}）。
+     */
+    private static final int REASON_Y = 104;
 
-    // 绑定页布局：状态两行 + 最多 6 行候选终端（行高 11，止于 y≈122，背包自 124）
+    // 绑定页布局：状态两行 + 最多 6 行候选终端（行高 11，止于 y≈122，背包槽框顶边自 123）
+    // 行内容 = 「[已绑定] 名称 · 短号」：坐标进悬停提示（整行宽 158 装不下 名称+短号+坐标，
+    // 见本轮版式预算；按约定"放不下就重排、不压缩字号"）
     private static final int BIND_STATUS_Y = 36;
     private static final int BIND_LIST_Y = 58;
     private static final int BIND_ROW_H = 11;
@@ -121,21 +135,22 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
         }
     }
 
-    /** 页1：运行（方向 / 已绑定终端 / 绑定身份 / 解绑 / 上次搬运 + 过滤网标题与提示） */
+    /** 页1：运行（方向 / 已绑定终端 / 绑定身份 / 解绑 / 上次搬运 + 失败原因 + 过滤网标题与提示） */
     private void renderRunPage(GuiGraphics gui) {
         // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
         int x = 0;
         int y = 0;
         boolean bound = menu.isBound();
         // 左列文字统一按 RUN_TEXT_W 裁剪：右列 x≥110 留给过滤网，长绑定标签不得侵入
+        // 朝向与实际一致：读本地方块状态的 FACING（无需协议）；文案格式「方向：输入口 · 朝下」
         gui.drawString(this.font, this.font.plainSubstrByWidth(Component.translatable(
                 "gui.akaishi.item_port.direction",
                 Component.translatable(menu.isOutput()
-                        ? "gui.akaishi.item_port.output" : "gui.akaishi.item_port.input")).getString(),
+                        ? "gui.akaishi.item_port.output" : "gui.akaishi.item_port.input"),
+                facingText()).getString(),
                 RUN_TEXT_W), x + 8, y + 36, TEXT, false);
-        String label = menu.boundLabel();
         gui.drawString(this.font, this.font.plainSubstrByWidth(Component.translatable(
-                        "gui.akaishi.item_port.bound_to", label.isEmpty() ? "----" : label).getString(),
+                        "gui.akaishi.item_port.bound_to", bound ? boundText() : "----").getString(),
                 RUN_TEXT_W), x + 8, y + 48, bound ? TEXT : TEXT_DIM, false);
         gui.drawString(this.font, this.font.plainSubstrByWidth(Component.translatable(
                         "gui.akaishi.item_port.identity",
@@ -149,11 +164,16 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
         // 上次搬运件数（运行页实时刷新；解绑后归零）：下移让出右侧过滤网列
         gui.drawString(this.font, Component.translatable("gui.akaishi.item_port.last_moved", menu.lastMoved()),
                 x + 8, y + LAST_MOVED_Y, TEXT_DIM, false);
-        // 赤能源不足：红字告警（与左列同宽裁剪，不侵入右侧过滤网列）
-        if (menu.energyShort()) {
-            gui.drawString(this.font, this.font.plainSubstrByWidth(
-                            Component.translatable("gui.akaishi.item_port.energy_short").getString(), RUN_TEXT_W),
-                    x + 8, y + ENERGY_SHORT_Y, TEXT_RED, false);
+        // 搬运失败原因（红字）与信息态（中性色）：十类错误显式提示 + 面朝物品管道的合法说明
+        // （面朝物品管道不是错误 ⇒ 不报红，避免玩家误以为是配置问题）
+        // 显示谁由服务端定（DATA_REASON）：外部通路（管道/第三方）的失败带有效期，窗口内优先于信息态，
+        // 故这里"面朝物品管道"也可能被顶替成真实阻塞原因 —— 界面只负责按码分色渲染
+        int reasonCode = menu.transferReason();
+        Component reasonText = reasonText(reasonCode);
+        if (reasonText != null) {
+            gui.drawString(this.font, this.font.plainSubstrByWidth(reasonText.getString(), RUN_TEXT_W),
+                    x + 8, y + REASON_Y,
+                    reasonCode == AkaishiItemPortBlockEntity.REASON_PIPE ? TEXT_INFO : TEXT_RED, false);
         }
         // 右列过滤网：标题（网格本体在 renderBg 自绘）+ 「空 = 全部通过」提示
         gui.drawString(this.font, Component.translatable("gui.akaishi.item_port.filter"),
@@ -164,19 +184,111 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
     }
 
     /**
-     * 页2：远程绑定（列出对你有「布局」权限且在线的物品终端，点一行即绑定，无需身份卡）。
+     * 失败原因 / 信息态文案（{@code AkaishiItemPortBlockEntity.REASON_*}；{@code REASON_NONE} 返回 null）。
+     * <p>
+     * {@code REASON_PERMISSION} 按本口方向选文案（输入口缺「存入」、输出口缺「取出」）—— 只用一个原因码、
+     * 文案由界面按 {@link AkaishiItemPortMenu#isOutput()} 决定，避免为方向各占一个码。
+     * <p>
+     * {@code REASON_NO_CONTAINER} 交由 {@link #noContainerText()} 细分为空气 / 其它方块；
+     * {@code REASON_PIPE} 为<b>信息态</b>（面朝物品管道），文案中性、由 {@link #renderRunPage} 用中性色绘制。
+     * <p>
+     * 两个过滤码（{@code REASON_FILTER_MISMATCH} = 塞进来的物品不在过滤网内 /
+     * {@code REASON_NO_MATCHING_STOCK} = 终端内没有匹配过滤网的物品）同属红字错误，
+     * 且<b>只可能在过滤网已配置时出现</b>（全空 = 全通 ⇒ 不产生任何过滤提示）。
+     */
+    private Component reasonText(int reason) {
+        return switch (reason) {
+            case AkaishiItemPortBlockEntity.REASON_NO_TARGET ->
+                    Component.translatable("gui.akaishi.item_port.reason.no_target");
+            case AkaishiItemPortBlockEntity.REASON_NOT_FORMED ->
+                    Component.translatable("gui.akaishi.item_port.reason.not_formed");
+            case AkaishiItemPortBlockEntity.REASON_NO_UNITS ->
+                    Component.translatable("gui.akaishi.item_port.reason.no_units");
+            case AkaishiItemPortBlockEntity.REASON_ENERGY_SHORT ->
+                    Component.translatable("gui.akaishi.item_port.energy_short");
+            case AkaishiItemPortBlockEntity.REASON_PERMISSION -> Component.translatable(menu.isOutput()
+                    ? "gui.akaishi.item_port.reason.permission.extract"
+                    : "gui.akaishi.item_port.reason.permission.inject");
+            case AkaishiItemPortBlockEntity.REASON_NO_CONTAINER -> noContainerText();
+            case AkaishiItemPortBlockEntity.REASON_TERMINAL_FULL ->
+                    Component.translatable("gui.akaishi.item_port.reason.terminal_full");
+            case AkaishiItemPortBlockEntity.REASON_TARGET_FULL ->
+                    Component.translatable("gui.akaishi.item_port.reason.target_full");
+            case AkaishiItemPortBlockEntity.REASON_PIPE ->
+                    Component.translatable("gui.akaishi.item_port.reason.pipe");
+            case AkaishiItemPortBlockEntity.REASON_FILTER_MISMATCH ->
+                    Component.translatable("gui.akaishi.item_port.reason.filter_mismatch");
+            case AkaishiItemPortBlockEntity.REASON_NO_MATCHING_STOCK ->
+                    Component.translatable("gui.akaishi.item_port.reason.filter_no_match");
+            default -> null;
+        };
+    }
+
+    /**
+     * 「面朝处没有容器」的细分文案：读<b>本地方块状态</b>区分"空气"与"其它方块"
+     * （液体/能量管道、机器等非物品容器），并带上面朝方块的显示名，玩家一眼知道该换成什么。
+     * <p>
+     * 物品管道不走这里：面朝物品管道是合法信息态（{@code REASON_PIPE}，中性色）。
+     * 读不到方块状态时退回通用文案（不显示裸 key）。
+     */
+    private Component noContainerText() {
+        BlockState state = menu.facingState();
+        if (state == null) {
+            return Component.translatable("gui.akaishi.item_port.reason.no_container");
+        }
+        if (state.isAir()) {
+            return Component.translatable("gui.akaishi.item_port.reason.facing_air");
+        }
+        return Component.translatable("gui.akaishi.item_port.reason.facing_block", state.getBlock().getName());
+    }
+
+    /** 朝向文案（读不到显示 {@code ----}）：六向键随双语，避免裸 key */
+    private String facingText() {
+        Direction facing = menu.facing();
+        return facing == null ? "----" : Component.translatable(facingKey(facing)).getString();
+    }
+
+    private static String facingKey(Direction facing) {
+        return switch (facing) {
+            case UP -> "gui.akaishi.item_port.facing.up";
+            case DOWN -> "gui.akaishi.item_port.facing.down";
+            case NORTH -> "gui.akaishi.item_port.facing.north";
+            case SOUTH -> "gui.akaishi.item_port.facing.south";
+            case WEST -> "gui.akaishi.item_port.facing.west";
+            case EAST -> "gui.akaishi.item_port.facing.east";
+        };
+    }
+
+    /** 已绑定目标一行文本：「名称 · 短号」（位置放不下，改由悬停提示给出） */
+    private String boundText() {
+        AkaishiItemPortBindingSync.BoundTarget target = menu.boundTarget();
+        return target == null ? "----" : rowName(target.name()) + " · " + target.shortId();
+    }
+
+    /** 名称兜底：空名（读不到方块实体 / 旧档残留）显示为「未知终端」，不显示裸 key */
+    private String rowName(Component name) {
+        return name == null || name.getString().isEmpty()
+                ? Component.translatable("gui.akaishi.item_port.unknown_terminal").getString()
+                : name.getString();
+    }
+
+    /**
+     * 页2：远程绑定（列出对你有「布局」权限、已成型且在线的物品终端，点一行即绑定，无需身份卡）。
      * 绑定身份 = 你本人，口每 {@code PERIOD} tick 按该身份复核方向权限（输入口=存入 / 输出口=取出）。
+     * <p>
+     * 行内容 =「[已绑定] 名称 · 短号」；名称优先自定义名、其次默认显示名（微缩芯片为族名），
+     * 短号用于区分同名终端。坐标（维度 x,y,z）改由<b>悬停提示</b>给出：整行宽 158 装不下三段，
+     * 按约定重排到提示里而不是压缩字号。选中行与"已绑定"判定一律按 <b>终端 ID</b> 比对。
      */
     private void renderBindPage(GuiGraphics gui) {
         // renderLabels 已 translate(leftPos,topPos)，此处为 GUI 相对坐标
         int x = 0;
         int y = 0;
-        String bound = menu.boundLabel();
-        gui.drawString(this.font, Component.translatable("gui.akaishi.item_port.bound_to",
-                bound.isEmpty() ? "----" : bound), x + 8, y + BIND_STATUS_Y, TEXT, false);
-        gui.drawString(this.font, Component.translatable(menu.isBound()
-                        ? "gui.akaishi.item_port.state.bound" : "gui.akaishi.item_port.state.unbound"),
-                x + 8, y + BIND_STATUS_Y + 10, menu.isBound() ? TEXT_GREEN : TEXT_RED, false);
+        gui.drawString(this.font, this.font.plainSubstrByWidth(Component.translatable(
+                        "gui.akaishi.item_port.bound_to", menu.isBound() ? boundText() : "----").getString(),
+                BIND_LIST_W), x + 8, y + BIND_STATUS_Y, TEXT, false);
+        gui.drawString(this.font, this.font.plainSubstrByWidth(bindStateText().getString(), BIND_LIST_W),
+                x + 8, y + BIND_STATUS_Y + 10, bindStateColor(), false);
         List<AkaishiItemPortBindingSync.Entry> entries = menu.bindingEntries();
         if (entries.isEmpty()) {
             gui.drawString(this.font, this.font.plainSubstrByWidth(
@@ -186,10 +298,9 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
         }
         for (int i = 0; i < entries.size() && i < BIND_ROWS; i++) {
             AkaishiItemPortBindingSync.Entry entry = entries.get(i);
-            boolean selected = boundRow(entry).equals(bound);
+            boolean selected = entry.terminalId().equals(menu.boundTargetId());
             String text = Component.translatable("gui.akaishi.item_port.entry",
-                    AkaishiItemPortBindingSync.label(entry.dimension(), entry.pos()),
-                    entry.ownerName().isEmpty() ? "----" : entry.ownerName()).getString();
+                    rowName(entry.name()), entry.shortId()).getString();
             int rowY = y + BIND_LIST_Y + i * BIND_ROW_H;
             // 选中行：标记在**行首**，终端信息接在其后 —— 避免长文字与行尾标记挤在一起
             int labelX = x + 10;
@@ -203,9 +314,24 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
         }
     }
 
-    /** 候选行对应的绑定标签（与 {@code host.boundTargetLabel()} 同格式，用于行高亮比对） */
-    private static String boundRow(AkaishiItemPortBindingSync.Entry entry) {
-        return AkaishiItemPortBindingSync.label(entry.dimension(), entry.pos());
+    /**
+     * 绑定态文案：未绑定 / 已绑定且目标可用 / 已绑定但目标已失效。
+     * <p>
+     * 最后一类是本轮重点：绑定关系是落盘的，终端被拆或坍缩后再拆芯片时绑定仍在，
+     * 界面必须照实说"目标已失效"，不能把缓存坐标画成一条正常绑定（幽灵行）。
+     */
+    private Component bindStateText() {
+        AkaishiItemPortBindingSync.BoundTarget target = menu.boundTarget();
+        if (target == null) {
+            return Component.translatable("gui.akaishi.item_port.state.unbound");
+        }
+        return Component.translatable(target.live()
+                ? "gui.akaishi.item_port.state.bound" : "gui.akaishi.item_port.state.invalid");
+    }
+
+    private int bindStateColor() {
+        AkaishiItemPortBindingSync.BoundTarget target = menu.boundTarget();
+        return target != null && target.live() ? TEXT_GREEN : TEXT_RED;
     }
 
     /** 鼠标所在候选行（不在列表内返回 -1） */
@@ -231,16 +357,90 @@ public class AkaishiItemPortScreen extends AbstractContainerScreen<AkaishiItemPo
         this.renderBackground(gui);
         super.render(gui, mouseX, mouseY, partialTick);
         // 1.20.1 原版 render 不画悬浮文本，必须由子类显式补这一趟（背包 / 快捷栏 / 过滤槽物品名）
-        if (bindRowAt(mouseX, mouseY) >= 0 && currentPage == 1) {
-            // 绑定页：候选行悬停提示（操作说明 + 权限口径）
+        List<AkaishiItemPortBindingSync.Entry> entries = menu.bindingEntries();
+        int row = currentPage == 1 ? bindRowAt(mouseX, mouseY) : -1;
+        if (row >= 0 && row < entries.size()) {
+            // 绑定页：候选行悬停提示（操作说明 + 权限口径 + 归属者 + 位置；行内装不下的信息都在这里）
+            AkaishiItemPortBindingSync.Entry entry = entries.get(row);
             gui.renderComponentTooltip(this.font, List.of(
                     Component.translatable("gui.akaishi.item_port.bind_row.tip"),
-                    Component.translatable("gui.akaishi.item_port.bind_row.dir")), mouseX, mouseY);
+                    Component.translatable("gui.akaishi.item_port.bind_row.dir"),
+                    Component.translatable("gui.akaishi.item_port.bind_row.owner",
+                            entry.ownerName().isEmpty() ? "----" : entry.ownerName()),
+                    Component.translatable("gui.akaishi.item_port.bind_row.pos",
+                            AkaishiItemPortBindingSync.label(entry.dimension(), entry.pos()))),
+                    mouseX, mouseY);
+        } else if (currentPage == 1 && menu.boundTarget() != null && bindStatusHovered(mouseX, mouseY)) {
+            // 绑定页：状态行悬停 —— 已绑定终端的位置（行内只放名称与短号，位置在此给出）
+            renderBoundPosTooltip(gui, mouseX, mouseY);
+        } else if (currentPage == 0 && reasonTooltip() != null && reasonHovered(mouseX, mouseY)) {
+            // 运行页原因行悬停：行内只放短句（左列 96px 装不下完整说明），解释放到提示里
+            gui.renderComponentTooltip(this.font, List.of(reasonTooltip()), mouseX, mouseY);
         } else if (currentPage == 0 && hoveredFilterSlot() >= 0 && this.menu.getCarried().isEmpty()) {
             renderFilterTooltip(gui, mouseX, mouseY);
         } else {
             this.renderTooltip(gui, mouseX, mouseY);
         }
+    }
+
+    /** 鼠标是否停在绑定页的状态两行上（名称行 + 绑定态行） */
+    private boolean bindStatusHovered(double mouseX, double mouseY) {
+        return mouseX >= this.leftPos + 8 && mouseX < this.leftPos + 168
+                && mouseY >= this.topPos + BIND_STATUS_Y - 1
+                && mouseY < this.topPos + BIND_STATUS_Y + 19;
+    }
+
+    /** 鼠标是否停在运行页的原因 / 信息行上（左列 96px 宽、9px 高的一格） */
+    private boolean reasonHovered(double mouseX, double mouseY) {
+        return mouseX >= this.leftPos + 8 && mouseX < this.leftPos + 8 + RUN_TEXT_W
+                && mouseY >= this.topPos + REASON_Y && mouseY < this.topPos + REASON_Y + 9;
+    }
+
+    /**
+     * 原因行的悬停说明：只有"行内短句讲不清"的三类才有 ——
+     * <ul>
+     *   <li>{@code REASON_PIPE}：合法信息态（面朝物品管道），要解释"为何本口的抓取/推出不适用"；</li>
+     *   <li>两个过滤码：要解释"只有与 9 格内物品一致的才放行、<b>9 格全空 = 全部通过</b>"，
+     *       否则玩家不知道自己是没配过滤网还是配错了；</li>
+     *   <li>{@code REASON_ENERGY_SHORT}：要给<b>数字</b>（本批需多少 / 当前缓冲多少），
+     *       行内 96px 装不下，只能放悬停里（见 {@link #energyShortTip()}）。</li>
+     * </ul>
+     * 其余原因（未成型 / 无单元 / 权限 / 各种满）短句已自明，不加提示以免堆叠遮挡。
+     */
+    private Component reasonTooltip() {
+        return switch (menu.transferReason()) {
+            case AkaishiItemPortBlockEntity.REASON_PIPE ->
+                    Component.translatable("gui.akaishi.item_port.reason.pipe.tip");
+            case AkaishiItemPortBlockEntity.REASON_FILTER_MISMATCH,
+                 AkaishiItemPortBlockEntity.REASON_NO_MATCHING_STOCK ->
+                    Component.translatable("gui.akaishi.item_port.reason.filter.tip");
+            case AkaishiItemPortBlockEntity.REASON_ENERGY_SHORT -> energyShortTip();
+            default -> null;
+        };
+    }
+
+    /**
+     * 「赤能源不足」的数字提示：本批所需赤能源 + 终端当前缓冲（服务端在收费失败时算好，经追加槽同步）。
+     * <p>
+     * 两个数字都 ≤0 时不给提示（罕见的兜底态），免得显示成"需 0 / 缓冲 0"误导玩家。
+     */
+    private Component energyShortTip() {
+        int need = menu.feeNeed();
+        return need <= 0 ? null : Component.translatable(
+                "gui.akaishi.item_port.reason.energy_short.tip", need, menu.feeHave());
+    }
+
+    /** 已绑定目标的位置提示（服务端给的「维度 x,y,z」；注册表已清空时显示"位置未知"） */
+    private void renderBoundPosTooltip(GuiGraphics gui, int mouseX, int mouseY) {
+        AkaishiItemPortBindingSync.BoundTarget target = menu.boundTarget();
+        if (target == null) {
+            return;
+        }
+        String pos = target.posText().isEmpty()
+                ? Component.translatable("gui.akaishi.item_port.pos_unknown").getString()
+                : target.posText();
+        gui.renderComponentTooltip(this.font, List.of(
+                Component.translatable("gui.akaishi.item_port.bind_row.pos", pos)), mouseX, mouseY);
     }
 
     /**

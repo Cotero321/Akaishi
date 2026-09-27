@@ -49,6 +49,9 @@ public final class TerminalInventory {
      * 遍历顺序恒为「单元序 → 槽序」，且结果用 {@link LinkedHashMap} 保序，
      * 使同一次聚合的条目顺序稳定（单元列表顺序由结构扫描给出，亦稳定），
      * 避免客户端列表在刷新时跳动。
+     * <p>
+     * 件数取 {@link IItemStorageUnit#storedCount(int)}（<b>真实件数</b>）：一槽多堆下
+     * {@code getItem(slot).getCount()} 只是夹到单堆上限的视图数量，拿它聚合会让大条目显示成 64。
      */
     public static List<TerminalEntry> snapshot(List<IItemStorageUnit> units) {
         Map<StackKey, List<TerminalEntry.Slice>> grouped = new LinkedHashMap<>();
@@ -60,7 +63,7 @@ public final class TerminalInventory {
                     continue;
                 }
                 grouped.computeIfAbsent(StackKey.of(stack), k -> new ArrayList<>())
-                        .add(new TerminalEntry.Slice(unit, slot, stack.getCount()));
+                        .add(new TerminalEntry.Slice(unit, slot, unit.storedCount(slot)));
             }
         }
         List<TerminalEntry> entries = new ArrayList<>(grouped.size());
