@@ -142,6 +142,7 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
         // 从四个加工件 NBT 重建部件模板（保留材料/DNA，权重自动重算）
         List<MechanicalPartTemplate> templates = new ArrayList<>(4);
         List<String> materialIds = new ArrayList<>(4);
+        List<String> dnaIds = new ArrayList<>(4);
         for (int slot = SLOT_CORE; slot <= SLOT_COOLING; slot++) {
             ItemStack stack = getItem(slot);
             MechanicalOrganType organ = MechanicalPartItem.getOrganType(stack);
@@ -159,6 +160,8 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
             }
             templates.add(new MechanicalPartTemplate(organ, part, material, dna));
             materialIds.add(material != null ? material.id() : "akaishi:iron");
+            // 逐部件照实记录 DNA 来源（不要求同源、不跳过 none），供运行时按部件计数推导等级
+            dnaIds.add(dna.id());
         }
 
         // DNA 同源标记：四部件来源完全一致且非空源才写入成品（运行时同源协同 / 整合加速据此判定）
@@ -176,6 +179,8 @@ public class AkaishiMechanicalAssemblyStationBlockEntity extends AbstractMechani
         MechanicalAssembledStats stats = MechanicalOrganResolver.resolve(organ, templates);
         ItemStack result = MechanicalOrganItem.create(stats, materialIds);
         MechanicalOrganItem.setDnaProfileId(result, dnaId);
+        // 新增逐部件 DNA 列表（不动旧单字段语义）
+        MechanicalOrganItem.setPartDnaIds(result, dnaIds);
         setItem(SLOT_OUTPUT, result);
         for (int slot = SLOT_CORE; slot <= SLOT_COOLING; slot++) {
             setItem(slot, ItemStack.EMPTY);

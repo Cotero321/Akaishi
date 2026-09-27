@@ -186,17 +186,23 @@ public final class MechanicalOrganResolver {
         return new SynergyResult(keys, bonuses);
     }
 
-    /** 收集所有部件的DNA特殊效果，去重（保持部件顺序；内置与附属效果一视同仁） */
+    /**
+     * 收集所有部件的DNA特殊效果（保持部件顺序、<b>保留重复项</b>——同一 DNA 跨部件出现多次时原样保留，
+     * 供运行时按部件计数推导等级；空白/none 项跳过；内置与附属效果一视同仁）。
+     * <p>
+     * 注意：运行时 {@code AkaishiMechanicalEffectHandler#collectSources} 会按槽位对效果 ID 去重，
+     * 故此处重复项不改变现有生效强度（仅 NBT 列表长度变化）。
+     */
     private static List<IMechanicalDnaEffect> collectEffects(
             List<MechanicalPartTemplate> templates) {
-        Set<IMechanicalDnaEffect> set = new LinkedHashSet<>();
+        List<IMechanicalDnaEffect> effects = new ArrayList<>(templates.size());
         for (MechanicalPartTemplate t : templates) {
             IMechanicalDnaEffect effect = t.dnaProfile().effect();
             if (!MechanicalSpecialEffect.isNone(effect)) {
-                set.add(effect);
+                effects.add(effect);
             }
         }
-        return List.copyOf(set);
+        return List.copyOf(effects);
     }
 
     /** 协同检测结果：描述键 + 各属性百分比加成（按属性序数索引） */

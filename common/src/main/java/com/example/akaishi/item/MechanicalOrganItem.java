@@ -53,6 +53,8 @@ public class MechanicalOrganItem extends Item implements IInstallableOrgan {
     public static final String TAG_EFFECTS = "mech_effects";
     /** DNA 调校来源 id（四部件同源时写入，供同源协同 / 整合加速判定） */
     public static final String TAG_DNA_ID = "mech_dna_id";
+    /** 逐部件 DNA 来源 id 列表（与 {@link #TAG_MATERIALS} 同构，允许重复、不要求同源） */
+    public static final String TAG_DNA_IDS = "mech_dna";
 
     public MechanicalOrganItem(Properties properties) {
         super(properties);
@@ -185,6 +187,33 @@ public class MechanicalOrganItem extends Item implements IInstallableOrgan {
             return MechanicalDnaProfile.NONE_ID;
         }
         return tag.getString(TAG_DNA_ID);
+    }
+
+    /** 写入逐部件 DNA 来源 id 列表（照实记录 4 条，允许重复与同源无关；空列表则清除该段） */
+    public static void setPartDnaIds(ItemStack stack, List<String> dnaIds) {
+        CompoundTag tag = stack.getOrCreateTag();
+        if (dnaIds == null || dnaIds.isEmpty()) {
+            tag.remove(TAG_DNA_IDS + "_count");
+            return;
+        }
+        tag.putInt(TAG_DNA_IDS + "_count", dnaIds.size());
+        for (int i = 0; i < dnaIds.size(); i++) {
+            String id = dnaIds.get(i);
+            tag.putString(TAG_DNA_IDS + "_" + i, id != null ? id : MechanicalDnaProfile.NONE_ID);
+        }
+    }
+
+    /** 读取逐部件 DNA 来源 id 列表（下标与 CORE/MODULE/SHELL/COOLING 槽位顺序一致；旧存档缺段返回空列表） */
+    public static List<String> getPartDnaIds(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null) return List.of();
+        int count = tag.getInt(TAG_DNA_IDS + "_count");
+        if (count <= 0) return List.of();
+        java.util.ArrayList<String> ids = new java.util.ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            ids.add(tag.getString(TAG_DNA_IDS + "_" + i));
+        }
+        return ids;
     }
 
     /** 读取成品携带的协同加成描述键 */
