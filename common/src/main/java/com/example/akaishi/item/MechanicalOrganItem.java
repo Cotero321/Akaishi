@@ -9,7 +9,6 @@ import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
 import com.example.akaishi.life.mechanical.MechanicalIntegrationService;
 import com.example.akaishi.life.mechanical.MechanicalMaterial;
 import com.example.akaishi.life.mechanical.MechanicalOrganType;
-import com.example.akaishi.life.mechanical.MechanicalPartType;
 import com.example.akaishi.life.mechanical.MechanicalProperty;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +19,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -28,10 +26,9 @@ import java.util.List;
  * <p>
  * 由组装加工台将四个加工部件组装而成，存储最终聚合属性。
  * 渲染由 BEWLR 根据四个材料的纹理动态合成最终外观。
+ * 悬浮文本（Shift 特性 / Ctrl 材料与 DNA）见 {@link MechanicalOrganTooltip}。
  */
 public class MechanicalOrganItem extends Item implements IInstallableOrgan {
-
-    private static final DecimalFormat DF = new DecimalFormat("#.##");
 
     // NBT 键
     public static final String TAG_ORGAN_TYPE = "mech_organ_type";
@@ -279,60 +276,7 @@ public class MechanicalOrganItem extends Item implements IInstallableOrgan {
     public void appendHoverText(ItemStack stack, @Nullable Level level,
                                  List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-
-        CompoundTag tag = stack.getTag();
-        if (tag == null) return;
-
-        // 器官类型
-        MechanicalOrganType organType = getOrganType(stack);
-        if (organType != null) {
-            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.organ_type",
-                    Component.translatable("mechanical.organ." + organType.name().toLowerCase())));
-        }
-
-        // 四个部件材料（存储下标与 CORE/MODULE/SHELL/COOLING 槽位顺序一致）
-        List<String> materialIds = getMaterialIds(stack);
-        MechanicalPartType[] partTypes = MechanicalPartType.values();
-        for (int i = 0; i < materialIds.size() && i < partTypes.length; i++) {
-            String id = materialIds.get(i);
-            MechanicalMaterial material = MechanicalMaterial.get(id);
-            Component name = material != null
-                    ? Component.translatable(material.descriptionKey())
-                    : Component.literal(id);
-            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.material_part",
-                    Component.translatable("mechanical.part." + partTypes[i].name().toLowerCase()), name));
-        }
-
-        // 十维属性（倍率轴 + 九属性）
-        for (MechanicalProperty prop : MechanicalProperty.values()) {
-            tooltip.add(Component.translatable(prop.tooltipKey(),
-                    Component.literal(DF.format(tag.getDouble(tagKey(prop))))));
-        }
-
-        // DNA 调校来源（无来源不显示）
-        String dnaId = getDnaProfileId(stack);
-        if (!MechanicalDnaProfile.NONE_ID.equals(dnaId)) {
-            MechanicalDnaProfile dna = MechanicalDnaProfile.get(dnaId);
-            if (dna != null) {
-                tooltip.add(Component.translatable("tooltip.akaishi.mechanical.dna",
-                        Component.translatable(dna.descriptionKey())));
-            }
-        }
-
-        // 协同加成
-        int synergyCount = tag.getInt(TAG_SYNERGIES + "_count");
-        for (int i = 0; i < synergyCount; i++) {
-            String key = tag.getString(TAG_SYNERGIES + "_" + i);
-            if (!key.isEmpty()) {
-                tooltip.add(Component.translatable("tooltip.akaishi.mechanical.synergy",
-                        Component.translatable(key)));
-            }
-        }
-
-        // 特殊效果
-        for (IMechanicalDnaEffect effect : getEffects(stack)) {
-            tooltip.add(Component.translatable("tooltip.akaishi.mechanical.effect",
-                    Component.translatable(effect.getTranslationKey())));
-        }
+        // 按键分支（Shift=特性 / Ctrl=材料与 DNA / 未按键=概览+提示）与效果去重见 MechanicalOrganTooltip
+        tooltip.addAll(MechanicalOrganTooltip.buildHoverLines(stack));
     }
 }
