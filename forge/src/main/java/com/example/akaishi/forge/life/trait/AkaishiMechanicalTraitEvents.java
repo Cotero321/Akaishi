@@ -17,7 +17,6 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +29,7 @@ import java.util.Map;
  *   <li>{@code prospector} 探矿协议：{@code BlockEvent.BreakEvent} 按概率额外掉落矿物；</li>
  *   <li>{@code data_harvest} 数据收割：{@code LivingExperienceDropEvent} 提升击杀经验。</li>
  * </ul>
- * 全部数值均为<b>待调手感值</b>；等级按「每器官各自等级」逐器官累加（M2）。
+ * 全部数值均为<b>待调手感值</b>；等级统一走 {@link TraitSupport#effectiveLevel}（跨器官有效等级，单次取值）。
  */
 public final class AkaishiMechanicalTraitEvents {
 
@@ -50,7 +49,7 @@ public final class AkaishiMechanicalTraitEvents {
 
     // ==================== 净化滤芯 ====================
 
-    /** 负面效果被施加时登记「提前移除」截止刻（逐器官缩减乘算）。 */
+    /** 负面效果被施加时登记「提前移除」截止刻（按跨器官有效等级单次缩减）。 */
     @SubscribeEvent
     public void onEffectAdded(MobEffectEvent.Added event) {
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) {
@@ -64,14 +63,11 @@ public final class AkaishiMechanicalTraitEvents {
         if (duration <= 0) {
             return; // 无限时长不动
         }
-        List<Integer> levels = TraitSupport.levels(player, MechanicalTraits.DEBUFF_WARD);
-        if (levels.isEmpty()) {
+        int level = TraitSupport.effectiveLevel(player, MechanicalTraits.DEBUFF_WARD);
+        if (level <= 0) {
             return;
         }
-        double retain = 1.0D;
-        for (int level : levels) {
-            retain *= 1.0D - DEBUFF_REDUCTION.at(level);
-        }
+        double retain = 1.0D - DEBUFF_REDUCTION.at(level);
         long deadline = (long) player.tickCount + (long) (duration * retain);
         MechanicalTraitRuntime.of(player.getUUID()).debuffDeadlines.put(added.getEffect(), deadline);
     }
@@ -108,12 +104,9 @@ public final class AkaishiMechanicalTraitEvents {
         if (player.level().isClientSide) {
             return;
         }
-        double bonus = 0;
-        for (int level : TraitSupport.levels(player, MechanicalTraits.EXCAVATOR)) {
-            bonus += EXCAVATE_BONUS.at(level);
-        }
-        if (bonus > 0) {
-            event.setNewSpeed(event.getNewSpeed() * (float) (1.0D + bonus));
+        int level = TraitSupport.effectiveLevel(player, MechanicalTraits.EXCAVATOR);
+        if (level > 0) {
+            event.setNewSpeed(event.getNewSpeed() * (float) (1.0D + EXCAVATE_BONUS.at(level)));
         }
     }
 
@@ -127,11 +120,12 @@ public final class AkaishiMechanicalTraitEvents {
         if (!(event.getLevel() instanceof Level level)) {
             return;
         }
-        double chance = 0;
-        for (int lv : TraitSupport.levels(player, MechanicalTraits.PROSPECTOR)) {
-            chance += PROSPECT_CHANCE.at(lv);
+        int traitLevel = TraitSupport.effectiveLevel(player, MechanicalTraits.PROSPECTOR);
+        if (traitLevel <= 0) {
+            return;
         }
-        if (chance <= 0 || player.getRandom().nextDouble() >= Math.min(chance, 1.0D)) {
+        double chance = PROSPECT_CHANCE.at(traitLevel);
+        if (player.getRandom().nextDouble() >= Math.min(chance, 1.0D)) {
             return;
         }
         ItemStack extra = new ItemStack(event.getState().getBlock().asItem());
@@ -147,12 +141,9 @@ public final class AkaishiMechanicalTraitEvents {
         if (player == null) {
             return;
         }
-        double bonus = 0;
-        for (int level : TraitSupport.levels(player, MechanicalTraits.DATA_HARVEST)) {
-            bonus += HARVEST_BONUS.at(level);
-        }
-        if (bonus > 0) {
-            event.setDroppedExperience((int) (event.getDroppedExperience() * (1.0D + bonus)));
+        int level = TraitSupport.effectiveLevel(player, MechanicalTraits.DATA_HARVEST);
+        if (level > 0) {
+            event.setDroppedExperience((int) (event.getDroppedExperience() * (1.0D + HARVEST_BONUS.at(level))));
         }
     }
 

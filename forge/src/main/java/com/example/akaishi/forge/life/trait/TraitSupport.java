@@ -1,63 +1,36 @@
 package com.example.akaishi.forge.life.trait;
 
-import com.example.akaishi.item.MechanicalOrganItem;
-import com.example.akaishi.life.body.BodySlot;
+import com.example.akaishi.forge.life.MechanicalAggregation;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
-import com.example.akaishi.life.mechanical.MechanicalLevels;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * 特性处理器的公共查询 / 属性挂载工具。
  * <p>
- * 等级口径统一走 {@link MechanicalLevels#traitLevels(ItemStack)}：单器官内按材料出现次数计（1~4），
- * 跨器官按 M2「各器官各自生效」——{@link #levels} 返回每个器官各自的等级，需要"各器官独立回调"
- * 的处理器直接遍历该列表即可。
+ * 等级口径统一走 {@link MechanicalAggregation}：每个特性在玩家全身跨器官汇总为<b>唯一有效等级</b>
+ * （{@code clamp(max + 器官数 - 1, 1, maxLevel)}），处理器只需读取该等级，不再自行按器官累加。
  */
 final class TraitSupport {
 
     private TraitSupport() {
     }
 
-    /** 玩家全部机械器官中，携带指定特性的「每器官各自等级」（空列表 = 无器官携带）。 */
-    static List<Integer> levels(Player player, String traitId) {
+    /** 指定特性在玩家全身汇总后的「有效等级」（无则 0）。 */
+    static int effectiveLevel(Player player, String traitId) {
         IPlayerBodyState state = PlayerBodyHelper.of(player);
         if (state == null) {
-            return List.of();
+            return 0;
         }
-        List<Integer> out = new ArrayList<>(BodySlot.values().length);
-        for (BodySlot slot : BodySlot.values()) {
-            ItemStack organ = state.getOrgan(slot);
-            if (!(organ.getItem() instanceof MechanicalOrganItem)) {
-                continue;
-            }
-            Integer level = MechanicalLevels.traitLevels(organ).get(traitId);
-            if (level != null) {
-                out.add(level);
-            }
-        }
-        return out;
-    }
-
-    /** 携带指定特性的器官中最高的等级（无则 0）。 */
-    static int maxLevel(Player player, String traitId) {
-        int max = 0;
-        for (int level : levels(player, traitId)) {
-            if (level > max) {
-                max = level;
-            }
-        }
-        return max;
+        Integer level = MechanicalAggregation.traitLevels(MechanicalAggregation.organs(state)).get(traitId);
+        return level == null ? 0 : level;
     }
 
     /**

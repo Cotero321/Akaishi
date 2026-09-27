@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 /**
  * 攻击向材料特性处理器（6 个）。
  * <p>
- * 全部数值均为<b>待调手感值</b>；等级由分发层按「该器官内的等级」逐器官传入（M2）。
+ * 全部数值均为<b>待调手感值</b>；等级由分发层传入「跨器官汇总后的有效等级」，每个特性每次钩子只回调一次。
  */
 final class AttackTraitHandlers {
 
@@ -60,7 +60,7 @@ final class AttackTraitHandlers {
 
     /**
      * 连击驱动：每次命中累叠，每层 +3%/4%/5%/6%，层数上限 3/4/5/6。
-     * <p>连击窗口与"同 tick 只计一次"（多器官共用状态）见 {@link MechanicalTraitRuntime}。（待调手感值）
+     * <p>连击窗口与"同 tick 只计一次"（跨器官共用状态）见 {@link MechanicalTraitRuntime}。（待调手感值）
      */
     private static final class ComboDriver implements IMechanicalTraitHandler {
         private static final TraitTier PER_STACK = TraitTier.of(0.03F, 0.04F, 0.05F, 0.06F);

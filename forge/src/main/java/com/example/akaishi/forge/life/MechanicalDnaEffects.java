@@ -16,9 +16,8 @@ import net.minecraft.world.item.Items;
 /**
  * 内置 DNA 特殊效果的「四级曲线」实现（T5，企划 §5）。
  * <p>
- * 所有强度按<b>该器官内的 DNA 等级</b>（1~4）取值，由 {@code AkaishiMechanicalEffectHandler} 逐器官分发调用；
- * 连续型效果（毒素免疫 / 低血自愈 / 水下加速 / 金装共鸣 / 瞬移冷却）由分发层取"全身最强一份"后调用一次，
- * 瞬时型效果（爆炸抗性 / 火焰 / 凋零 / 击退）逐器官叠加。
+ * 所有强度按<b>跨器官汇总后的有效等级</b>（1~4）取值，由 {@code AkaishiMechanicalEffectHandler} 每个效果只调用一次；
+ * 有效等级 = {@code clamp(max(各器官等级) + 携带该效果的器官数 - 1, 1, 4)}。
  * <p>
  * 基调：现状 ≈ Lv2~3，Lv4 略强于现状（企划 §5）。全部数值均为<b>待调手感值</b>。
  */

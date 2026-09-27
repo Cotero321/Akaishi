@@ -24,8 +24,8 @@ final class MobilityTraitHandlers {
     }
 
     /**
-     * 动能增幅：持续移动 4/3/3/2s 后移速 +4%/6%/8%/10%。
-     * <p>本特性自行按全身器官汇总（M2 加算）后挂单个瞬时修饰符；{@code level} 参数不使用。
+     * 动能增幅：持续移动 4/3/3/2s 后移速 +4%/6%/8%/10%（按有效等级取值）。
+     * <p>统一走框架的跨器官有效等级，不再自行按全身器官汇总。
      */
     private static final class KineticBoost implements IMechanicalTraitHandler {
         private static final TraitTier DELAY_SECONDS = TraitTier.of(4, 3, 3, 2);
@@ -36,22 +36,13 @@ final class MobilityTraitHandlers {
             if (player.level().isClientSide) {
                 return;
             }
-            java.util.List<Integer> organLevels = TraitSupport.levels(player, MechanicalTraits.KINETIC_BOOST);
             MechanicalTraitRuntime.State st = MechanicalTraitRuntime.of(player.getUUID());
             float walk = player.walkDist;
             boolean moving = Math.abs(walk - st.lastWalkDist) > 0.001F;
             st.lastWalkDist = walk;
             st.movingTicks = moving ? st.movingTicks + 1 : 0;
 
-            int best = 0;
-            double bonus = 0;
-            for (int lv : organLevels) {
-                best = Math.max(best, lv);
-                bonus += BONUS.at(lv);
-            }
-            if (best == 0 || st.movingTicks < (int) (DELAY_SECONDS.at(best) * 20)) {
-                bonus = 0;
-            }
+            double bonus = st.movingTicks < (int) (DELAY_SECONDS.at(level) * 20) ? 0 : BONUS.at(level);
             TraitSupport.setModifier(player, Attributes.MOVEMENT_SPEED, MechanicalTraits.KINETIC_BOOST,
                     bonus, AttributeModifier.Operation.MULTIPLY_TOTAL);
         }

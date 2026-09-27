@@ -11,13 +11,13 @@ import net.minecraft.world.entity.player.Player;
  * 需为特性实现本接口并在 {@link MechanicalTraitHandlerRegistry} 注册。
  * 未注册处理器的特性只展示、不生效（不会报错）。
  * <p>
- * <b>调用模型（M2：各器官各自生效）</b>：所有回调都按「器官」逐个触发 ——
- * 玩家身上每个携带该特性的器官，都会以自己的 {@code level} 调用一次回调；
- * 因此多个低级器官会各自叠加调用（不存在跨器官的等级合并）。
+ * <b>调用模型（平衡收敛：汇总后单次回调）</b>：分发层先跨器官把同一特性汇总为一个「有效等级」
+ * （{@code clamp(max(各器官等级) + 携带该特性的器官数 - 1, 1, maxLevel)}），
+ * 再<b>每个特性只回调一次</b>；不再逐器官调用、也不存在按器官的多次叠加。
  * <p>
  * 所有回调均运行在服务端，且仅在玩家装备了带该特性的机械器官时触发。
  *
- * @param level 该器官内本特性的等级（1 ~ {@link IMechanicalTrait#maxLevel()}）
+ * @param level 跨器官汇总后的有效等级（1 ~ {@link IMechanicalTrait#maxLevel()}）
  */
 public interface IMechanicalTraitHandler {
 

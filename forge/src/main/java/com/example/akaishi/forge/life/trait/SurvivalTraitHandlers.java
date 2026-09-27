@@ -15,7 +15,8 @@ import net.minecraft.world.entity.player.Player;
  * 生存向材料特性处理器（6 个中的 5 个；{@code debuff_ward} 需平台事件，见
  * {@link AkaishiMechanicalTraitEvents}）。
  * <p>
- * 全部数值均为<b>待调手感值</b>；等级由分发层按「该器官内的等级」逐器官传入（M2）。
+ * 全部数值均为<b>待调手感值</b>；等级由分发层传入「跨器官汇总后的<b>有效等级</b>」，
+ * 每个特性每次钩子只回调一次（不再逐器官累加）。
  */
 final class SurvivalTraitHandlers {
 
@@ -30,7 +31,7 @@ final class SurvivalTraitHandlers {
         MechanicalTraitHandlerRegistry.register(MechanicalTraits.SHOCK_ABSORB, new ShockAbsorb());
     }
 
-    /** 强化骨架：受击 -1/-1/-2/-2；Lv4 额外 5% 概率完全免伤。（待调手感值） */
+    /** 强化骨架：受击 -1/-1/-2/-2（按有效等级单次应用）；Lv4 额外 5% 概率完全免伤（每次受击只掷一次）。（待调手感值） */
     private static final class ReinforcedFrame implements IMechanicalTraitHandler {
         private static final TraitTier REDUCTION = TraitTier.of(1, 1, 2, 2);
         private static final float L4_IMMUNE_CHANCE = 0.05F;
@@ -45,8 +46,8 @@ final class SurvivalTraitHandlers {
     }
 
     /**
-     * 生命储备：最大生命 +2/+4/+6/+8。
-     * <p>本特性自行按全身器官汇总（M2 加算）后挂单个瞬时修饰符；{@code level} 参数不使用。
+     * 生命储备：最大生命 +2/+4/+6/+8（按有效等级取值）。
+     * <p>统一走框架的跨器官有效等级，不再自行按全身器官汇总。
      */
     private static final class VitalReserve implements IMechanicalTraitHandler {
         private static final TraitTier BONUS = TraitTier.of(2, 4, 6, 8);
@@ -56,12 +57,8 @@ final class SurvivalTraitHandlers {
             if (player.level().isClientSide) {
                 return;
             }
-            double total = 0;
-            for (int lv : TraitSupport.levels(player, MechanicalTraits.VITAL_RESERVE)) {
-                total += BONUS.at(lv);
-            }
             TraitSupport.setModifier(player, Attributes.MAX_HEALTH, MechanicalTraits.VITAL_RESERVE,
-                    total, AttributeModifier.Operation.ADDITION);
+                    BONUS.at(level), AttributeModifier.Operation.ADDITION);
         }
 
         @Override
@@ -71,7 +68,7 @@ final class SurvivalTraitHandlers {
         }
     }
 
-    /** 自修复：脱战 8/6/5/4s 后，每 20/20/20/10 tick 回 1 点血（M2 逐器官叠加）。（待调手感值） */
+    /** 自修复：脱战 8/6/5/4s 后，每 20/20/20/10 tick 回 1 点血（按有效等级单次生效）。（待调手感值） */
     private static final class SelfRepair implements IMechanicalTraitHandler {
         private static final TraitTier DELAY_SECONDS = TraitTier.of(8, 6, 5, 4);
         private static final TraitTier HEAL_INTERVAL_TICKS = TraitTier.of(20, 20, 20, 10);
@@ -93,7 +90,7 @@ final class SurvivalTraitHandlers {
         }
     }
 
-    /** 烧蚀装甲：受击伤害 -10%/-15%/-20%/-25%（逐器官乘算）。（待调手感值） */
+    /** 烧蚀装甲：受击伤害 -10%/-15%/-20%/-25%（按有效等级单次乘算）。（待调手感值） */
     private static final class AblationArmor implements IMechanicalTraitHandler {
         private static final TraitTier RETAIN = TraitTier.of(0.90F, 0.85F, 0.80F, 0.75F);
 
