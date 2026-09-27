@@ -590,7 +590,8 @@ public final class AkaishiBodyPassiveHandler {
                         && level.canSeeSky(player.blockPosition())
                         && !player.hasEffect(MobEffects.FIRE_RESISTANCE)
                         && !OrganEffectResolver.hasPassive(organs, OrganPassive.FIRE_IMMUNE)) {
-                    player.setSecondsOnFire(3);
+                    // 燃烧时长 3 秒/来源，按来源数跨器官叠加、无上限（1 来源 = 旧版 3 秒；3 = 每来源秒数，待调手感值）
+                    player.setSecondsOnFire(3 * count);
                 }
             }
             case RAPID_EXHAUSTION -> {

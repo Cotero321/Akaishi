@@ -175,9 +175,10 @@ public final class AkaishiBodyCombatHandler {
             event.setCanceled(true);
             return;
         }
-        if (OrganEffectResolver.hasPassive(state, OrganPassive.FIRE_WEAKNESS)
-                && event.getSource().is(DamageTypeTags.IS_FIRE)) {
-            amount *= 1.5F; // 怕火：火焰伤害 +50%
+        // 怕火：火焰伤害 +50%/来源，按来源数跨器官叠加、无上限（负面照实累加；1 来源 = 旧版 ×1.5，向后兼容）
+        OrganEffectResolver.PassiveStrengths fireWeak = OrganEffectResolver.strengthsOf(state, OrganPassive.FIRE_WEAKNESS);
+        if (fireWeak.count() > 0 && event.getSource().is(DamageTypeTags.IS_FIRE)) {
+            amount *= 1.0F + 0.5F * fireWeak.count(); // 0.5 = 每来源增量（待调手感值）
         }
         // 脆骨体质（凋灵骷髅臂的代价）：近战/弹射/摔落等物理受击加深（火焰/爆炸来源除外，玻璃大炮）
         OrganEffectResolver.PassiveStrengths vuln = OrganEffectResolver.strengthsOf(state, OrganPassive.VULNERABLE);
