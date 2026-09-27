@@ -1,6 +1,6 @@
 package com.example.akaishi.boss.agaitolos;
 
-import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -186,7 +186,7 @@ public final class AgaitolosPhaseThreeSounds {
             return;
         }
         LivingEntity source = target != null ? target : boss;
-        play(level, source, ModSounds.UNNAMEABLE_WHISPER.get(), CALAMITY_VOLUME, CALAMITY_PITCH);
+        play(level, source, AkaishiForbiddenSounds.UNNAMEABLE_WHISPER.get(), CALAMITY_VOLUME, CALAMITY_PITCH);
     }
 
     // ---------------------------------------------------------------- 共用实现

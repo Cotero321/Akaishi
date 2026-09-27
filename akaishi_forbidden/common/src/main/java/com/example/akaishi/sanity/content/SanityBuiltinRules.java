@@ -7,7 +7,6 @@ import com.example.akaishi.api.sanity.SanityContext;
 import com.example.akaishi.api.sanity.SanityRuleRegistry;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.effect.AkaishiForbiddenEffects;
-import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.sanity.SanityServiceImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -167,7 +166,7 @@ public final class SanityBuiltinRules {
      *
      * <p><b>为什么不复用 BOSS 侧那个方法</b>：那会让理智系统反向 import BOSS 包，
      * 违反"理智系统与 BOSS 解耦"（键与判据都不许反向依赖）。两边各持一份"读效果"的判据，
-     * 依赖的只是效果注册表（{@link MobEffects} / {@link ModEffects}），互不耦合。
+     * 依赖的只是效果注册表（{@link MobEffects} / {@link AkaishiForbiddenEffects}），互不耦合。
      *
      * <p><b>不会重复结算</b>：这是<b>同一条规则</b>的布尔门 —— 同时挂凋零与凋亡时门仍只返回 true，
      * 规则的 {@code periodTicks} 只推进一次、{@code amountPerPeriod} 只扣一次。
@@ -197,7 +196,7 @@ public final class SanityBuiltinRules {
 
     /** 任意生物是否带着 {@code akaishi:unnameable}（首见"遭遇不可名状"合并条共用同一口径） */
     public static boolean hasUnnameable(LivingEntity entity) {
-        MobEffect unnameable = ModEffects.UNNAMEABLE == null ? null : ModEffects.UNNAMEABLE.get();
+        MobEffect unnameable = AkaishiForbiddenEffects.UNNAMEABLE == null ? null : AkaishiForbiddenEffects.UNNAMEABLE.get();
         return unnameable != null && entity != null && entity.hasEffect(unnameable);
     }
 

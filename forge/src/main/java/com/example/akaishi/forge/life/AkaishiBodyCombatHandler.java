@@ -9,7 +9,7 @@ import com.example.akaishi.life.organ.OrganPassive;
 import com.example.akaishi.life.organ.OrganSpecial;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.SampleGroup;
-import com.example.akaishi.item.AkaishiLifeFusionSet;
+import com.example.akaishi.item.PoweredArmorQuery;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -247,15 +247,15 @@ public final class AkaishiBodyCombatHandler {
     }
 
     private static float applyEnergyShield(LivingDamageEvent event, Player victim, float amount) {
-        if (amount <= 0.0F || !AkaishiLifeFusionSet.isFullSet(victim)) {
+        if (amount <= 0.0F || !PoweredArmorQuery.fullSet(victim)) {
             return amount;
         }
-        long need = (long) Math.ceil(amount * AkaishiLifeFusionSet.ENERGY_PER_DAMAGE);
-        long drained = AkaishiLifeFusionSet.drainEnergy(victim, need);
+        long need = (long) Math.ceil(amount * PoweredArmorQuery.energyPerDamage());
+        long drained = PoweredArmorQuery.drainEnergy(victim, need);
         if (drained <= 0) {
             return amount;
         }
-        float negated = drained / (float) AkaishiLifeFusionSet.ENERGY_PER_DAMAGE;
+        float negated = drained / (float) PoweredArmorQuery.energyPerDamage();
         if (negated >= amount) {
             event.setCanceled(true);
             return 0.0F;
@@ -313,11 +313,11 @@ public final class AkaishiBodyCombatHandler {
 
     /** 生命融合套装是否强化 BOSS/龙肢体被动：穿齐 4 件且移植了 BOSS/龙族来源器官 */
     private static boolean isBossDragonEnhanced(Player player) {
-        if (!AkaishiLifeFusionSet.isFullSet(player)) {
+        if (!PoweredArmorQuery.fullSet(player)) {
             return false;
         }
         IPlayerBodyState state = PlayerBodyHelper.of(player);
-        return state != null && AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state);
+        return state != null && PoweredArmorQuery.hasBossOrDragonOrgan(player, state);
     }
 
     /**

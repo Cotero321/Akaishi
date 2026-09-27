@@ -2,10 +2,11 @@ package com.example.akaishi.block.entity;
 
 import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.item.IItemPipeDevice;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiLifeFusionAnvilMenu;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import com.example.akaishi.sound.MachineHum;
-import com.example.akaishi.sound.ModSounds;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -41,7 +42,7 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
     private final SimpleContainer inventory = new SimpleContainer(SLOT_COUNT);
 
     public AkaishiLifeFusionAnvilBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CHISHI_LIFE_FUSION_ANVIL.get(), pos, state);
+        super(AkaishiForbiddenBlockEntities.CHISHI_LIFE_FUSION_ANVIL.get(), pos, state);
     }
 
     /**
@@ -55,10 +56,10 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
 
     private static Map<Item, Item> buildFusionTargets() {
         Map<Item, Item> targets = new LinkedHashMap<>(4);
-        targets.put(ModItems.akaishiHelmet.get(), ModItems.lifeFusionHelmet.get());
-        targets.put(ModItems.akaishiChestplate.get(), ModItems.lifeFusionChestplate.get());
-        targets.put(ModItems.akaishiLeggings.get(), ModItems.lifeFusionLeggings.get());
-        targets.put(ModItems.akaishiBoots.get(), ModItems.lifeFusionBoots.get());
+        targets.put(ModItems.akaishiHelmet.get(), AkaishiForbiddenItems.lifeFusionHelmet.get());
+        targets.put(ModItems.akaishiChestplate.get(), AkaishiForbiddenItems.lifeFusionChestplate.get());
+        targets.put(ModItems.akaishiLeggings.get(), AkaishiForbiddenItems.lifeFusionLeggings.get());
+        targets.put(ModItems.akaishiBoots.get(), AkaishiForbiddenItems.lifeFusionBoots.get());
         return Collections.unmodifiableMap(targets);
     }
 
@@ -80,7 +81,7 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
             return false;
         }
         ItemStack ingot = inventory.getItem(INPUT_INGOT_SLOT);
-        if (!ingot.is(ModItems.lifeFusionIngot.get()) || ingot.getCount() < 1) {
+        if (!ingot.is(AkaishiForbiddenItems.lifeFusionIngot.get()) || ingot.getCount() < 1) {
             return false;
         }
         return inventory.getItem(OUTPUT_SLOT).isEmpty();
@@ -111,7 +112,7 @@ public class AkaishiLifeFusionAnvilBlockEntity extends BlockEntity implements Ex
         inventory.setItem(OUTPUT_SLOT, result);
         setChanged();
         // 融合为单次动作，播放一次性运转音
-        MachineHum.playOnce(level, worldPosition, ModSounds.LIFE_FUSION_ANVIL_HUM, 0.4F, 1.0F);
+        MachineHum.playOnce(level, worldPosition, AkaishiForbiddenSounds.LIFE_FUSION_ANVIL_HUM, 0.4F, 1.0F);
     }
 
     public SimpleContainer inventory() {

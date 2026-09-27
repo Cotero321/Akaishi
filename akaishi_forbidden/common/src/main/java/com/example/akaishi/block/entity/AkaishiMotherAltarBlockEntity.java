@@ -4,15 +4,15 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.ILifeEnergyReceiver;
 import com.example.akaishi.block.AkaishiMotherAltarBlock;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.effect.ForbiddenSetHooks;
-import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.life.altar.AkaishiAltarDrain;
 import com.example.akaishi.life.altar.AkaishiAltarRitual;
 import com.example.akaishi.menu.AkaishiMotherAltarMenu;
 import com.example.akaishi.multiblock.AkaishiAltarFormation;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import com.example.akaishi.sound.MachineHum;
-import com.example.akaishi.sound.ModSounds;
 import com.example.akaishi.util.LongDataSlots;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
@@ -86,9 +86,9 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
     private final SimpleContainerData data = new SimpleContainerData(DATA_SLOTS);
 
     /** 成型后未工作的氛围音：虚空的心跳声（素材 5s，间隔取 100 tick 实现连续无缝循环） */
-    private final MachineHum heartbeatHum = new MachineHum(ModSounds.VOID_HEARTBEAT, 0.4F, 1.0F, 100);
+    private final MachineHum heartbeatHum = new MachineHum(AkaishiForbiddenSounds.VOID_HEARTBEAT, 0.4F, 1.0F, 100);
     /** 仪式进行中的氛围音：虚空呓语声（素材 8s，间隔取 160 tick） */
-    private final MachineHum whisperHum = new MachineHum(ModSounds.VOID_WHISPER, 0.4F, 1.0F, 160);
+    private final MachineHum whisperHum = new MachineHum(AkaishiForbiddenSounds.VOID_WHISPER, 0.4F, 1.0F, 160);
 
     /** 氛围音档位：未成型 / 非主座，静默 */
     private static final int AMBIENCE_SILENT = 0;
@@ -181,7 +181,7 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
     };
 
     public AkaishiMotherAltarBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), pos, state);
+        super(AkaishiForbiddenBlockEntities.CHISHI_MOTHER_ALTAR.get(), pos, state);
     }
 
     public ItemStack getOffering() {
@@ -366,11 +366,11 @@ public class AkaishiMotherAltarBlockEntity extends BlockEntity
             }
             // ambient=true 降低粒子密度、visible=false 不冒粒子、showIcon=true 保留 HUD 图标
             // 套装集齐者在所有施加入口统一 +1 级（D73/D191）
-            player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
+            player.addEffect(new MobEffectInstance(AkaishiForbiddenEffects.UNNAMEABLE.get(),
                     AFFLICT_DURATION, ForbiddenSetHooks.unnameableBonus(player), true, false, true));
             if (whisper) {
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        ModSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS,
+                        AkaishiForbiddenSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS,
                         0.7F, 0.9F + serverLevel.random.nextFloat() * 0.2F);
             }
         }

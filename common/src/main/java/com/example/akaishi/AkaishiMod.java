@@ -11,7 +11,6 @@ import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
 import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiMiniatureBlocks;
-import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.block.AkaishiReactorBlocks;
@@ -72,7 +71,7 @@ public final class AkaishiMod {
         AkaishiWirelessBlocks.register();
         AkaishiFusionBlocks.register();
         AkaishiMinerBlocks.register();
-        AkaishiMotherAltarBlocks.register();
+        // 母神祭坛方块族随祭坛迁往 akaishi_forbidden（由该模块 init 注册）
         AkaishiReactorBlocks.register();
         AkaishiLifeBlocks.register();
         AkaishiMatrixBlocks.register();

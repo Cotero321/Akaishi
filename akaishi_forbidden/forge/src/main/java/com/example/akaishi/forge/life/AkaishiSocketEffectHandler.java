@@ -3,8 +3,8 @@ package com.example.akaishi.forge.life;
 import com.example.akaishi.combat.ModCombatAttributes;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.effect.ForbiddenSetHooks;
-import com.example.akaishi.effect.ModEffects;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import com.example.akaishi.item.curio.AkaishiSocketCurioItem;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.nbt.CompoundTag;
@@ -108,8 +108,8 @@ public final class AkaishiSocketEffectHandler {
         ForbiddenSetHooks.setSocketLockQuery(player -> AkaishiForbiddenCurios.countWorn(player) > 0);
         // 躯体检查仪饰品区（D96）：固定四件顺序，未佩戴以空占位，GUI 端据此灰化
         ForbiddenSetHooks.setCurioStateProvider(player -> {
-            Item[] pieces = {ModItems.lifeTouch.get(), ModItems.cubHeart.get(),
-                    ModItems.motherSeal.get(), ModItems.fertilityRing.get()};
+            Item[] pieces = {AkaishiForbiddenItems.lifeTouch.get(), AkaishiForbiddenItems.cubHeart.get(),
+                    AkaishiForbiddenItems.motherSeal.get(), AkaishiForbiddenItems.fertilityRing.get()};
             List<ForbiddenSetHooks.CurioState> states = new ArrayList<>(pieces.length);
             for (Item piece : pieces) {
                 ItemStack stack = AkaishiForbiddenCurios.find(player, piece).orElse(ItemStack.EMPTY);
@@ -211,7 +211,7 @@ public final class AkaishiSocketEffectHandler {
         }
         // 自施不可名状（所有入口统一叠加套装等级加成，D73/D191）
         if (attacker.getRandom().nextDouble() < ModConfig.cubHeartUnnameableChance) {
-            attacker.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
+            attacker.addEffect(new MobEffectInstance(AkaishiForbiddenEffects.UNNAMEABLE.get(),
                     ModConfig.cubHeartUnnameableTicks,
                     ModConfig.cubHeartUnnameableAmplifier + ForbiddenSetHooks.unnameableBonus(attacker),
                     true, false, true));
@@ -295,7 +295,7 @@ public final class AkaishiSocketEffectHandler {
         data.putLong(TAG_NEAR_DEATH_READY_AT, now + ModConfig.setNearDeathCooldownTicks);
         event.setAmount(0.0F);
         player.heal((float) (player.getMaxHealth() * ModConfig.setNearDeathHealPercent));
-        player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
+        player.addEffect(new MobEffectInstance(AkaishiForbiddenEffects.UNNAMEABLE.get(),
                 ModConfig.setNearDeathUnnameableTicks,
                 ForbiddenSetHooks.unnameableBonus(player), true, false, true));
     }
@@ -384,7 +384,7 @@ public final class AkaishiSocketEffectHandler {
     private static void applyMotherSealBonuses(Player player) {
         double factor = 0.0;
         if (ModConfig.motherSealEnabled && AkaishiForbiddenCurios.hasMotherSeal(player)) {
-            MobEffectInstance unnameable = player.getEffect(ModEffects.UNNAMEABLE.get());
+            MobEffectInstance unnameable = player.getEffect(AkaishiForbiddenEffects.UNNAMEABLE.get());
             if (unnameable != null) {
                 factor = switch (Math.min(unnameable.getAmplifier(), 2)) {
                     case 0 -> 1.0;
@@ -410,7 +410,7 @@ public final class AkaishiSocketEffectHandler {
                 || !AkaishiForbiddenCurios.hasMotherSeal(player)) {
             return;
         }
-        player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
+        player.addEffect(new MobEffectInstance(AkaishiForbiddenEffects.UNNAMEABLE.get(),
                 ModConfig.motherSealSelfUnnameableTicks,
                 ModConfig.motherSealSelfUnnameableAmplifier + ForbiddenSetHooks.unnameableBonus(player),
                 true, false, true));
@@ -422,7 +422,7 @@ public final class AkaishiSocketEffectHandler {
      */
     private static void applySetUnnameableCrit(Player player) {
         boolean active = AkaishiForbiddenCurios.isFullSet(player)
-                && player.hasEffect(ModEffects.UNNAMEABLE.get());
+                && player.hasEffect(AkaishiForbiddenEffects.UNNAMEABLE.get());
         applyCritBonus(player, ModCombatAttributes.CRIT_CHANCE, U_SET_CRIT_CHANCE,
                 active ? ModConfig.setUnnameableCritChance : 0.0);
         applyCritBonus(player, ModCombatAttributes.CRIT_DAMAGE, U_SET_CRIT_DAMAGE,

@@ -6,7 +6,7 @@ import com.example.akaishi.api.hud.HudAnchor;
 import com.example.akaishi.api.hud.HudRenderContext;
 import com.example.akaishi.api.sanity.SanityValues;
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.sanity.ClientSanityData;
 import com.example.akaishi.sanity.SanityPenalties;
 import com.example.akaishi.sanity.SanityState;
@@ -387,10 +387,10 @@ public final class AkaishiSanityHudElement implements AkaishiHudElement {
     /** 本地玩家身上「不可名状」的剩余秒数（无效果 = 0）；取上整，避免最后一秒显示 0。 */
     private static int unnameableSeconds() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || ModEffects.UNNAMEABLE == null) {
+        if (player == null || AkaishiForbiddenEffects.UNNAMEABLE == null) {
             return 0;
         }
-        MobEffectInstance instance = player.getEffect(ModEffects.UNNAMEABLE.get());
+        MobEffectInstance instance = player.getEffect(AkaishiForbiddenEffects.UNNAMEABLE.get());
         return instance == null ? 0 : (instance.getDuration() + 19) / 20;
     }
 }

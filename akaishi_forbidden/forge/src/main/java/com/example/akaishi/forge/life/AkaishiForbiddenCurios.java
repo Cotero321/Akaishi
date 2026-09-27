@@ -1,6 +1,6 @@
 package com.example.akaishi.forge.life;
 
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import com.example.akaishi.item.curio.AkaishiForbiddenTooltip;
 import com.example.akaishi.item.curio.AkaishiSocketCurioItem;
 import net.minecraft.world.entity.player.Player;
@@ -37,19 +37,19 @@ final class AkaishiForbiddenCurios {
     }
 
     static boolean hasLifeTouch(Player player) {
-        return worn(player, ModItems.lifeTouch.get());
+        return worn(player, AkaishiForbiddenItems.lifeTouch.get());
     }
 
     static boolean hasCubHeart(Player player) {
-        return worn(player, ModItems.cubHeart.get());
+        return worn(player, AkaishiForbiddenItems.cubHeart.get());
     }
 
     static boolean hasMotherSeal(Player player) {
-        return worn(player, ModItems.motherSeal.get());
+        return worn(player, AkaishiForbiddenItems.motherSeal.get());
     }
 
     static boolean hasFertilityRing(Player player) {
-        return worn(player, ModItems.fertilityRing.get());
+        return worn(player, AkaishiForbiddenItems.fertilityRing.get());
     }
 
     /**
@@ -58,10 +58,10 @@ final class AkaishiForbiddenCurios {
      */
     static List<ItemStack> wornPieces(Player player) {
         List<ItemStack> pieces = new ArrayList<>(AkaishiForbiddenTooltip.SET_PIECES);
-        collect(player, ModItems.lifeTouch.get(), pieces);
-        collect(player, ModItems.cubHeart.get(), pieces);
-        collect(player, ModItems.motherSeal.get(), pieces);
-        collect(player, ModItems.fertilityRing.get(), pieces);
+        collect(player, AkaishiForbiddenItems.lifeTouch.get(), pieces);
+        collect(player, AkaishiForbiddenItems.cubHeart.get(), pieces);
+        collect(player, AkaishiForbiddenItems.motherSeal.get(), pieces);
+        collect(player, AkaishiForbiddenItems.fertilityRing.get(), pieces);
         return pieces;
     }
 

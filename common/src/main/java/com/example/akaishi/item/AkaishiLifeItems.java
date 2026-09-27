@@ -14,14 +14,15 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
 
 /**
- * 生命域物品注册：生命能量固态物、样本/基因/胚胎（生命科技链）、生命的融合锭与融合护甲、
+ * 生命域物品注册：生命能量固态物、样本/基因/胚胎（生命科技链）、
  * 药剂与排异中和剂、器官（9 槽位）、衰竭/活化结晶与活化成分（离心与分馏产物）。
+ * <p>生命的融合锭与生命融合护甲属禁忌（生命融合体系），已迁往 {@code akaishi_forbidden}
+ * （见 {@code AkaishiForbiddenItems}），本类不再持有。
  */
 public final class AkaishiLifeItems {
 
@@ -33,11 +34,6 @@ public final class AkaishiLifeItems {
     public static RegistrySupplier<Item> lifeSample;
     public static RegistrySupplier<Item> geneSequence;
     public static RegistrySupplier<Item> lifeEmbryo;
-    public static RegistrySupplier<Item> lifeFusionIngot;
-    public static RegistrySupplier<Item> lifeFusionHelmet;
-    public static RegistrySupplier<Item> lifeFusionChestplate;
-    public static RegistrySupplier<Item> lifeFusionLeggings;
-    public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
     /** 金西瓜：理智系统的食补食物（食用属性见 register 处注释） */
@@ -79,17 +75,7 @@ public final class AkaishiLifeItems {
         geneSequence = item(ModItems.GENE_SEQUENCE_ID, () -> new AkaishiGeneSequenceItem(new Item.Properties()));
         // 生命胚胎（8 生命固态 + 鸡蛋：献给母神祭坛）
         lifeEmbryo = item(ModItems.LIFE_EMBRYO_ID, () -> new AkaishiLifeEmbryoItem(new Item.Properties()));
-        // 生命的融合锭（母神祭坛仪式产物）
-        lifeFusionIngot = item(ModItems.LIFE_FUSION_INGOT_ID);
-        // 生命融合护甲（赤石护甲 2 倍基础数值，融合砧产出，保留升级数据）
-        lifeFusionHelmet = item(ModItems.LIFE_FUSION_HELMET_ID,
-                () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.HELMET, new Item.Properties()));
-        lifeFusionChestplate = item(ModItems.LIFE_FUSION_CHESTPLATE_ID,
-                () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties()));
-        lifeFusionLeggings = item(ModItems.LIFE_FUSION_LEGGINGS_ID,
-                () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties()));
-        lifeFusionBoots = item(ModItems.LIFE_FUSION_BOOTS_ID,
-                () -> new AkaishiLifeFusionArmorItem(ArmorItem.Type.BOOTS, new Item.Properties()));
+        // 生命的融合锭与生命融合护甲随生命融合体系迁往 akaishi_forbidden（见 AkaishiForbiddenItems）
         // 药剂（永久/突破模板，模板 id + 纯度写 NBT，可堆叠）+ 排异中和剂
         akaishiPotion = item(ModItems.POTION_ID,
                 () -> new AkaishiPotionItem(new Item.Properties().stacksTo(16)));

@@ -4,8 +4,13 @@ import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
 import com.example.akaishi.command.AkaishiSanityCommand;
 import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.forbidden.AkaishiForbiddenMod;
+import com.example.akaishi.forge.AkaishiAltarDrainHandler;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosArenaEvents;
 import com.example.akaishi.forge.boss.agaitolos.AgaitolosDoomHandler;
+import com.example.akaishi.forge.life.AkaishiForbiddenErosionHandler;
+import com.example.akaishi.forge.life.AkaishiForbiddenTooltipHandler;
+import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
+import com.example.akaishi.forge.life.AkaishiSocketEffectHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityCombatHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityDamageHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityDamageSeenHandler;
@@ -14,6 +19,7 @@ import com.example.akaishi.forge.sanity.AkaishiSanityKillHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityPotionBrewing;
 import com.example.akaishi.forge.sanity.AkaishiSanitySleepHandler;
 import com.example.akaishi.forge.sanity.AkaishiSanityUnnameableHandler;
+import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
 import com.example.akaishi.sanity.shadow.ShadowEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,6 +78,25 @@ public final class AkaishiForbiddenModForge {
         MinecraftForge.EVENT_BUS.register(AgaitolosDoomHandler.INSTANCE);
         // 下界牢狱：召唤仪式右键入口（RightClickBlock）+ 场地方块不可破坏（BreakEvent / ExplosionEvent.Detonate）
         MinecraftForge.EVENT_BUS.register(AgaitolosArenaEvents.INSTANCE);
+
+        // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发；P3d 自本体迁入）
+        MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
+
+        // 禁忌四件饰品（P3d 自本体迁入）：
+        // 统一生效层（生命之触/幼崽之心/母神之印/孕育之环 + 套装）
+        // 构造器内完成 common↔forge 接口注入（套装等级加成 / 扭曲屏蔽），注册即生效
+        MinecraftForge.EVENT_BUS.register(AkaishiSocketEffectHandler.INSTANCE);
+        // 禁忌套装实时状态 tooltip（已集齐件数，仅客户端渲染触发）
+        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenTooltipHandler.INSTANCE);
+        // 禁忌侵蚀推进层：阈值低语提示 + 跑满结算（9 槽乱码 + 数值重抽，幂等一次）
+        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenErosionHandler.INSTANCE);
+
+        // 母神祭坛（P3d 自本体迁入）：
+        // 祭坛成型静音：屏蔽四个结构信标的环境音/激活音（取消位置音事件，无需 Mixin）
+        MinecraftForge.EVENT_BUS.register(AkaishiAltarSoundMuter.INSTANCE);
+        // 仪式吸取掉落豁免：被吸死无掉落/无经验（common 定钩子，此处注入实现并消费事件，D158/D257）
+        AkaishiAltarDrainHandler.install();
+        MinecraftForge.EVENT_BUS.register(AkaishiAltarDrainHandler.INSTANCE);
 
         // 理智系统调试指令：/akaishi sanity get|set|env|food
         MinecraftForge.EVENT_BUS.addListener(

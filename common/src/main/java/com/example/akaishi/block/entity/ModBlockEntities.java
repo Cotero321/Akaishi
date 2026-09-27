@@ -9,7 +9,6 @@ import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
 import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiMiniatureBlocks;
-import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiMechanicalBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
@@ -68,8 +67,6 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiEquipmentForgerBlockEntity>> CHISHI_EQUIPMENT_FORGER;
     /** 赤红升级台方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiUpgradeStationBlockEntity>> CHISHI_UPGRADE_STATION;
-    /** 生命的融合砧方块实体类型（赤石护甲 + 融合锭 → 生命融合护甲） */
-    public static RegistrySupplier<BlockEntityType<AkaishiLifeFusionAnvilBlockEntity>> CHISHI_LIFE_FUSION_ANVIL;
     /** 创造模式能量源（赤/生命两种方块共用，无限输出） */
     public static RegistrySupplier<BlockEntityType<CreativeEnergySourceBlockEntity>> CREATIVE_ENERGY_SOURCE;
     /** 赤石催化器方块实体类型（4 级共用，等级由方块决定） */
@@ -170,8 +167,6 @@ public final class ModBlockEntities {
     public static RegistrySupplier<BlockEntityType<AkaishiSampleVaultBlockEntity>> CHISHI_SAMPLE_VAULT;
     /** 衰变净化塔方块实体类型 */
     public static RegistrySupplier<BlockEntityType<AkaishiDecayPurifierBlockEntity>> CHISHI_DECAY_PURIFIER;
-    /** 母神祭坛（无 GUI 供奉位，NBT 识别 + 供奉物悬浮展示） */
-    public static RegistrySupplier<BlockEntityType<AkaishiMotherAltarBlockEntity>> CHISHI_MOTHER_ALTAR;
     /** 发生器矩阵控制器方块实体类型（低级/高级共用，等级由方块决定） */
     public static RegistrySupplier<BlockEntityType<AkaishiGenMatrixControllerBlockEntity>> CHISHI_GEN_MATRIX_CONTROLLER;
     /** 发生器矩阵能量输出口方块实体类型 */
@@ -318,9 +313,7 @@ public final class ModBlockEntities {
         // 赤红升级台
         CHISHI_UPGRADE_STATION = be("akaishi_upgrade_station", AkaishiUpgradeStationBlockEntity::new,
                 ModBlocks.CHISHI_UPGRADE_STATION);
-        // 生命的融合砧（赤石护甲 + 融合锭 → 生命融合护甲）
-        CHISHI_LIFE_FUSION_ANVIL = be("akaishi_life_fusion_anvil", AkaishiLifeFusionAnvilBlockEntity::new,
-                ModBlocks.CHISHI_LIFE_FUSION_ANVIL);
+        // 生命的融合砧随生命融合体系迁往 akaishi_forbidden（见 AkaishiForbiddenBlockEntities）
         // 创造模式能量源（赤能源 / 生命能量两种方块共用，无限输出测试）
         CREATIVE_ENERGY_SOURCE = be("creative_energy_source", CreativeEnergySourceBlockEntity::new,
                 AkaishiEnergyBlocks.CHISHI_CREATIVE_ENERGY_CELL, AkaishiLifeBlocks.CHISHI_CREATIVE_LIFE_CELL);
@@ -475,9 +468,7 @@ public final class ModBlockEntities {
         // 衰变净化塔（消耗赤能源净化衰竭区域）
         CHISHI_DECAY_PURIFIER = be("akaishi_decay_purifier", AkaishiDecayPurifierBlockEntity::new,
                 ModBlocks.CHISHI_DECAY_PURIFIER);
-        // 母神祭坛（黑山羊之母：NBT 识别供奉 + 供奉物悬浮展示）
-        CHISHI_MOTHER_ALTAR = be("akaishi_mother_altar", AkaishiMotherAltarBlockEntity::new,
-                AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR);
+        // 母神祭坛随祭坛迁往 akaishi_forbidden（见 AkaishiForbiddenBlockEntities）
         // ===== 发生器矩阵 =====
         // 控制器（低级/高级两个方块共用一个方块实体类型，等级由方块实例决定）
         CHISHI_GEN_MATRIX_CONTROLLER = be("akaishi_gen_matrix_controller", AkaishiGenMatrixControllerBlockEntity::new,

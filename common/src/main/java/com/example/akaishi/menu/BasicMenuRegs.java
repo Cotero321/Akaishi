@@ -13,7 +13,6 @@ import com.example.akaishi.block.entity.AkaishiLifeEnergyEmitterBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEnergyAggregatorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiEquipmentForgerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiUpgradeStationBlockEntity;
-import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
 import com.example.akaishi.block.entity.AkaishiAutoCollectorBlockEntity;
 import com.example.akaishi.block.entity.AkaishiCatalystBlockEntity;
 import com.example.akaishi.block.entity.AkaishiLifePurifierBlockEntity;
@@ -236,20 +235,7 @@ final class BasicMenuRegs {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(upgradeType, AkaishiUpgradeStationScreen::new));
 
-        // 生命的融合砧：赤石护甲 + 融合锭 → 生命融合护甲（无能量/进度数据，纯槽位合成）
-        MenuType<AkaishiLifeFusionAnvilMenu> fusionAnvilType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
-            BlockPos pos = buf.readBlockPos();
-            Level level = inv.player.level();
-            return level.getBlockEntity(pos) instanceof AkaishiLifeFusionAnvilBlockEntity anvil
-                    ? new AkaishiLifeFusionAnvilMenu(syncId, inv, anvil)
-                    : new AkaishiLifeFusionAnvilMenu(syncId, inv, null);
-        });
-        ModMenus.CHISHI_LIFE_FUSION_ANVIL = (RegistrySupplier<MenuType<AkaishiLifeFusionAnvilMenu>>) (Object) RegistrarManager
-                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
-                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_life_fusion_anvil"), () -> fusionAnvilType);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
-                MenuRegistry.registerScreenFactory(fusionAnvilType, AkaishiLifeFusionAnvilScreen::new));
-
+        // 生命的融合砧随生命融合体系迁往 akaishi_forbidden（见 AkaishiForbiddenMenuRegs）
         // 自动收集器：27 槽存储 + 能量/进度同步
         MenuType<AkaishiAutoCollectorMenu> collectorType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
             BlockPos pos = buf.readBlockPos();

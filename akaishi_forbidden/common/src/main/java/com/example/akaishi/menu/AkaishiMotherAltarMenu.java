@@ -26,7 +26,7 @@ public class AkaishiMotherAltarMenu extends AbstractContainerMenu {
     private final ContainerData data;
 
     public AkaishiMotherAltarMenu(int id, Inventory playerInv, Container altarSlot, ContainerData data) {
-        super(ModMenus.CHISHI_MOTHER_ALTAR.get(), id);
+        super(AkaishiForbiddenMenuRegs.CHISHI_MOTHER_ALTAR.get(), id);
         this.data = data;
 
         // 供奉槽：任意物品均可放入，但槽位上限为 1（由容器 getMaxStackSize 约束）

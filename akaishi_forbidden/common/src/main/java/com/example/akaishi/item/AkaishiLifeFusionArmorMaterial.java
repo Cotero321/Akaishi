@@ -40,7 +40,7 @@ public final class AkaishiLifeFusionArmorMaterial {
 
         @Override
         public Ingredient getRepairIngredient() {
-            return Ingredient.of(ModItems.lifeFusionIngot.get());
+            return Ingredient.of(AkaishiForbiddenItems.lifeFusionIngot.get());
         }
 
         @Override

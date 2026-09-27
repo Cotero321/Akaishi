@@ -7,7 +7,6 @@ import com.example.akaishi.block.entity.AkaishiMaterialFuserBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMechanicalTemplateFactoryBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMechanicalProcessingFactoryBlockEntity;
 import com.example.akaishi.block.entity.AkaishiMechanicalAssemblyStationBlockEntity;
-import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import dev.architectury.registry.menu.MenuRegistry;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -23,9 +22,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
- * 菜单注册 · 机械改造与祭坛族（承接 {@link ModMenus} 原注册序第 65~68 位）：
- * 机械改造模板制造厂、加工制作厂、组装加工台、合并母神祭坛。
- * <p>类内注册顺序与原 {@code ModMenus.register()} 逐位一致。
+ * 菜单注册 · 机械改造族（承接 {@link ModMenus} 原注册序第 65~67 位，另含材料融合器）：
+ * 机械改造模板制造厂、加工制作厂、组装加工台、材料融合器。
+ * <p>类内注册顺序与原 {@code ModMenus.register()} 逐位一致；合并母神祭坛已于 P3d 迁往 akaishi_forbidden。
  */
 final class MachineMenuRegs {
 
@@ -100,20 +99,6 @@ final class MachineMenuRegs {
         EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
                 MenuRegistry.registerScreenFactory(materialFuserType, AkaishiMaterialFuserScreen::new));
 
-        // 合并母神祭坛：同步结构等级（1 槽）+ 单物品供奉槽
-        MenuType<AkaishiMotherAltarMenu> motherAltarType = MenuRegistry.ofExtended((syncId, inv, buf) -> {
-            BlockPos pos = buf.readBlockPos();
-            Level level = inv.player.level();
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof AkaishiMotherAltarBlockEntity altar) {
-                return new AkaishiMotherAltarMenu(syncId, inv, altar.altarSlot(), altar.data());
-            }
-            return AkaishiMotherAltarMenu.emptyMenu(syncId, inv);
-        });
-        ModMenus.CHISHI_MOTHER_ALTAR = (RegistrySupplier<MenuType<AkaishiMotherAltarMenu>>) (Object) RegistrarManager
-                .get(AkaishiMod.MOD_ID).get(Registries.MENU)
-                .register(new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_mother_altar"), () -> motherAltarType);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> () ->
-                MenuRegistry.registerScreenFactory(motherAltarType, AkaishiMotherAltarScreen::new));
+        // 合并母神祭坛随祭坛迁往 akaishi_forbidden（见 AkaishiForbiddenMenuRegs）
     }
 }

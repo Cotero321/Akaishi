@@ -36,8 +36,6 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiEquipmentForgerMenu>> CHISHI_EQUIPMENT_FORGER;
     /** 赤红升级台菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiUpgradeStationMenu>> CHISHI_UPGRADE_STATION;
-    /** 生命的融合砧菜单类型（赤石护甲 + 融合锭 → 生命融合护甲） */
-    public static RegistrySupplier<MenuType<AkaishiLifeFusionAnvilMenu>> CHISHI_LIFE_FUSION_ANVIL;
     /** 自动收集器菜单类型 */
     public static RegistrySupplier<MenuType<AkaishiAutoCollectorMenu>> CHISHI_AUTO_COLLECTOR;
     public static RegistrySupplier<MenuType<AkaishiCatalystMenu>> CHISHI_CATALYST;
@@ -151,8 +149,6 @@ public final class ModMenus {
     public static RegistrySupplier<MenuType<AkaishiFusionEnergyOutputMenu>> CHISHI_FUSION_ENERGY_OUTPUT;
     /** 生命能量发射器菜单类型（能量条 + 绑定坐标/射程展示） */
     public static RegistrySupplier<MenuType<AkaishiLifeEnergyEmitterMenu>> CHISHI_LIFE_ENERGY_EMITTER;
-    /** 合并母神祭坛菜单类型（结构等级展示 + 单物品供奉槽） */
-    public static RegistrySupplier<MenuType<AkaishiMotherAltarMenu>> CHISHI_MOTHER_ALTAR;
     /** 物品终端菜单类型（库页为可滚动聚合列表：4×9 可视区 + 客户端只读虚拟槽） */
     public static RegistrySupplier<MenuType<AkaishiItemTerminalMenu>> CHISHI_ITEM_TERMINAL;
     /** 物品储存单元菜单类型（D18 只读视图：54 槽展示 + 占用/剩余 IP） */
@@ -170,8 +166,9 @@ public final class ModMenus {
     /**
      * 注册全部菜单类型。按原 {@code register()} 的注册顺序逐域委托：
      * 基础机械（1~21）→ 反应堆（22~25）→ 生命器官（26~39）→ 矩阵与加工机（40~48）→
-     * 矿机与聚变前哨（49~55）→ 无线终端（56~61）→ 聚变堆（62~64）→ 机械改造与祭坛（65~68）→
-     * 终端与储存（69~74；禁忌秘典已于 P3a 迁往 akaishi_forbidden）。域内与域间顺序都与原文件逐位一致。
+     * 矿机与聚变前哨（49~55）→ 无线终端（56~61）→ 聚变堆（62~64）→ 机械改造（65~67）→
+     * 终端与储存（68~73；禁忌秘典已于 P3a、生命融合砧与母神祭坛已于 P3d 迁往 akaishi_forbidden）。
+     * 域内与域间顺序都与原文件逐位一致。
      */
     public static void register() {
         BasicMenuRegs.register();

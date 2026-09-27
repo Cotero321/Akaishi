@@ -13,8 +13,10 @@ import net.minecraft.world.effect.MobEffect;
  *
  * <p>「理智恢复」是理智回复药水的载体效果，随理智系统归本模块；
  * 「凋亡」是 BOSS 阿盖托洛丝阶段三的上位减益，随 BOSS 归本模块；
- * 注册 id 与迁前逐字一致：{@code akaishi:sanity_restore} / {@code akaishi:doom}（命名空间仍为三模块共用的 {@code akaishi:}）。
- * 其余效果（衰变 / 不可名状）留在本体 {@code ModEffects}。
+ * 「不可名状」是母神祭坛仪式减益，随母神祭坛归本模块（P3d 迁入）；
+ * 注册 id 与迁前逐字一致：{@code akaishi:sanity_restore} / {@code akaishi:doom} / {@code akaishi:unnameable}
+ * （命名空间仍为三模块共用的 {@code akaishi:}）。
+ * 其余效果（衰变）留在本体 {@code ModEffects}。
  */
 public final class AkaishiForbiddenEffects {
 
@@ -32,6 +34,12 @@ public final class AkaishiForbiddenEffects {
      */
     public static RegistrySupplier<MobEffect> DOOM;
 
+    /**
+     * 不可名状：黑山羊母神仪式进行中与完成瞬间施加，仅驱动客户端画面/音效表现（P3d 自本体 {@code ModEffects} 迁入）。
+     * <p>施加侧入口见母神祭坛（{@code AkaishiMotherAltarBlockEntity} / {@code AkaishiAltarRitual}）与禁断饰品。
+     */
+    public static RegistrySupplier<MobEffect> UNNAMEABLE;
+
     private AkaishiForbiddenEffects() {
     }
 
@@ -41,5 +49,6 @@ public final class AkaishiForbiddenEffects {
         SANITY_RESTORE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "sanity_restore"),
                 SanityRestoreEffect::new);
         DOOM = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "doom"), DoomEffect::new);
+        UNNAMEABLE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "unnameable"), UnnameableEffect::new);
     }
 }

@@ -13,8 +13,6 @@ import net.minecraft.sounds.SoundEvent;
  * 由 sounds.json 关联事件名。注册时机与方块一致：注册事件期间延迟求值。
  * <p>
  * 机器运转音一律以 {@code *_hum} 结尾，并由 {@link MachineHum} 在各机器 tickServer 中播放。
- * 祭坛氛围音（{@code VOID_*}）为整段无缝循环素材，同样经 {@link MachineHum} 播放，
- * 只是重播间隔取音效时长以实现连续不断（见 {@code AkaishiMotherAltarBlockEntity}）。
  */
 public final class ModSounds {
 
@@ -77,8 +75,6 @@ public final class ModSounds {
     public static final RegistrySupplier<SoundEvent> LIFE_CENTRIFUGE_HUM = reg("life_centrifuge_hum");
     /** 生命聚合转换器运转 */
     public static final RegistrySupplier<SoundEvent> LIFE_AGGREGATION_HUM = reg("life_aggregation_hum");
-    /** 生命融合砧运转 */
-    public static final RegistrySupplier<SoundEvent> LIFE_FUSION_ANVIL_HUM = reg("life_fusion_anvil_hum");
     /** 生命矩阵控制器运转 */
     public static final RegistrySupplier<SoundEvent> LIFE_MATRIX_HUM = reg("life_matrix_hum");
 
@@ -129,22 +125,11 @@ public final class ModSounds {
     /** 自动收集器运转 */
     public static final RegistrySupplier<SoundEvent> AUTO_COLLECTOR_HUM = reg("auto_collector_hum");
 
-    // ==================== 祭坛氛围音 ====================
-
-    /** 母神祭坛成型后未工作的氛围音：虚空的心跳声（5s 无缝循环） */
-    public static final RegistrySupplier<SoundEvent> VOID_HEARTBEAT = reg("void_heartbeat");
-    /** 母神祭坛仪式进行中的氛围音：虚空呓语声（8s 无缝循环） */
-    public static final RegistrySupplier<SoundEvent> VOID_WHISPER = reg("void_whisper");
-
-    // ==================== 不可名状 ====================
-
-    /** 「不可名状」减益的耳中呓语：以玩家自身为音源播放的一次性低语（8s） */
-    public static final RegistrySupplier<SoundEvent> UNNAMEABLE_WHISPER = reg("unnameable_whisper");
-
-    // ==================== BOSS 战斗音乐 ====================
-    // 阿盖托洛丝战斗音乐（agaitolos_theme，53s 无缝循环）随 BOSS 迁往 akaishi_forbidden：
-    // SoundEvent 注册代码见 AkaishiForbiddenSounds；本表不再持有该事件。
-    // ⚠ sounds.json 与本表音效文件同属 assets/akaishi/，故该条目与 .ogg 仍留在本体资源内（id 不变）。
+    // ==================== 已随内容迁往禁忌模块的音效 ====================
+    // BOSS 战斗音乐（agaitolos_theme）、生命融合砧（life_fusion_anvil_hum）、
+    // 母神祭坛氛围音（void_heartbeat / void_whisper）、不可名状低语（unnameable_whisper）：
+    // SoundEvent 注册代码见 AkaishiForbiddenSounds；本表不再持有这些事件。
+    // ⚠ sounds.json 与本表音效文件同属 assets/akaishi/，故这些条目与 .ogg 仍留在本体资源内（id 不变）。
 
     /** 强制类加载：确保 SoundEvent 在注册事件前完成注册（游戏启动阶段由 AkaishiMod.init 调用） */
     public static void touch() {

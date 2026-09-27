@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 /**
- * 禁忌模块·音效注册（P3c 随 BOSS 阿盖托洛丝从本体 {@code ModSounds} 迁入）。
+ * 禁忌模块·音效注册（P3c 随 BOSS 阿盖托洛丝、P3d 随生命融合 / 母神祭坛 / 不可名状从本体 {@code ModSounds} 迁入）。
  *
  * <p><b>只搬注册代码、不搬 {@code sounds.json}</b>：音效事件的键是相对所在命名空间解析的
  * —— 本体 {@code assets/akaishi/sounds.json} 里的 {@code "agaitolos_theme"} ⇒ {@code akaishi:agaitolos_theme}。
@@ -29,6 +29,25 @@ public final class AkaishiForbiddenSounds {
      * 但命名空间目录仍为 {@code assets/akaishi/}（见类注释）。
      */
     public static final RegistrySupplier<SoundEvent> AGAITOLOS_THEME = reg("agaitolos_theme");
+
+    /**
+     * 生命融合砧运转音（P3d 随生命融合自本体 {@code ModSounds} 迁入）。
+     * <p>与 BOSS 音乐同类：只搬注册代码，{@code sounds.json} 条目与 .ogg 仍留在本体
+     * {@code assets/akaishi/}（键按所在命名空间解析，见类注释）。
+     */
+    public static final RegistrySupplier<SoundEvent> LIFE_FUSION_ANVIL_HUM = reg("life_fusion_anvil_hum");
+
+    /**
+     * 母神祭坛成型后未工作的氛围音：虚空的心跳声（5s 无缝循环，P3d 随祭坛自本体 {@code ModSounds} 迁入）。
+     * <p>由整段无缝循环素材经 {@code MachineHum} 播放（重播间隔取音效时长），见 {@code AkaishiMotherAltarBlockEntity}。
+     */
+    public static final RegistrySupplier<SoundEvent> VOID_HEARTBEAT = reg("void_heartbeat");
+
+    /** 母神祭坛仪式进行中的氛围音：虚空呓语声（8s 无缝循环） */
+    public static final RegistrySupplier<SoundEvent> VOID_WHISPER = reg("void_whisper");
+
+    /** 「不可名状」减益的耳中呓语：以玩家自身为音源播放的一次性低语（8s，P3d 迁入） */
+    public static final RegistrySupplier<SoundEvent> UNNAMEABLE_WHISPER = reg("unnameable_whisper");
 
     private AkaishiForbiddenSounds() {
     }

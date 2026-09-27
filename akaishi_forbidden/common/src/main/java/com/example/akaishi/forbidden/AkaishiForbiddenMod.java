@@ -2,14 +2,20 @@ package com.example.akaishi.forbidden;
 
 import com.example.akaishi.api.life.BodySubStateFactory;
 import com.example.akaishi.api.sanity.SanityServices;
+import com.example.akaishi.block.AkaishiForbiddenBlocks;
+import com.example.akaishi.block.AkaishiMotherAltarBlocks;
+import com.example.akaishi.block.entity.AkaishiForbiddenBlockEntities;
 import com.example.akaishi.boss.agaitolos.arena.NetherPrisonArena;
 import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.item.AkaishiCodexItems;
+import com.example.akaishi.item.AkaishiForbiddenItems;
+import com.example.akaishi.item.AkaishiLifeFusionSet;
 import com.example.akaishi.item.AkaishiSanityItems;
-import com.example.akaishi.life.altar.AltarRitualHooks;
+import com.example.akaishi.item.PoweredArmorQuery;
 import com.example.akaishi.menu.AkaishiCodexMenuRegs;
 import com.example.akaishi.menu.AkaishiCodexSync;
+import com.example.akaishi.menu.AkaishiForbiddenMenuRegs;
 import com.example.akaishi.sanity.SanityEnvironmentSettlement;
 import com.example.akaishi.sanity.SanityFirstEncounterSettlement;
 import com.example.akaishi.sanity.SanityNaturalRegen;
@@ -40,8 +46,11 @@ import dev.architectury.utils.Env;
  * 相关物品 + 调试指令 + 服务端结算节拍 + S2C 同步）整体自本体与核心迁入本模块。
  * <p><b>P3c</b>：BOSS「阿盖托洛丝（下界本源）」（{@code boss/agaitolos} 实现包 + 下界牢狱场地 +
  * 召唤仪式 + 凋亡效果 + 凋零头颅实体 + 战斗音乐 SoundEvent 注册）整体自本体迁入本模块。
- * 未安装本模块时这些内容一律不注册（注册命名空间仍为三模块共用的 {@code akaishi:}）；
- * 其余禁忌内容（母神祭坛 / 生命融合）在后续阶段迁入。
+ * <p><b>P3d</b>：母神祭坛体系（祭坛方块族 + 仪式/配方/吸取 + 菜单与界面 + 渲染器/静音/掉落豁免 +
+ * 不可名状效果与客户端表现）、生命融合体系（融合砧 + 融合护甲四件 + 套装数值查询注入）、
+ * 禁断四件培育饰品（生命之触 / 幼崽之心 / 母神之印 / 孕育之环 + 侵蚀与套装生效层）整体自本体迁入本模块。
+ * <p>至此 P3 四步（P3a 秘典 / P3b 理智 / P3c BOSS / P3d 祭坛+融合）全部完成。
+ * 未安装本模块时这些内容一律不注册（注册命名空间仍为三模块共用的 {@code akaishi:}）。
  */
 public final class AkaishiForbiddenMod {
     /** 模组 ID，需与禁忌模块 mods.toml 中的 modId 保持一致 */
@@ -60,6 +69,14 @@ public final class AkaishiForbiddenMod {
         }
         initialized = true;
         // ===== 注册内容（先内容、后创造栏，与本体 §1 顺序约定一致）=====
+        // 生命融合（P3d 自本体迁入）：融合砧方块须先于其方块实体类型注册
+        AkaishiForbiddenBlocks.register();
+        // 母神祭坛（P3d 自本体迁入）：祭坛方块族须先于其方块实体类型注册
+        AkaishiMotherAltarBlocks.register();
+        AkaishiForbiddenBlockEntities.register();
+        AkaishiForbiddenItems.register();
+        // 生命融合套装数值查询注入：本体器官/战斗/修复逻辑经 PoweredArmorQuery 读取（未装本模块时为本体中性默认）
+        PoweredArmorQuery.install(AkaishiLifeFusionSet.asQuery());
         // 禁忌秘典物品
         AkaishiCodexItems.register();
         // 理智系统：影怪 + 精神弹实体类型；状态效果 akaishi:sanity_restore；物品（两瓶药剂 + 花环）
@@ -73,6 +90,8 @@ public final class AkaishiForbiddenMod {
         AkaishiForbiddenCreativeTabs.register();
         // 秘典菜单类型（+ 客户端 screen factory）
         AkaishiCodexMenuRegs.register();
+        // 生命融合砧菜单类型（+ 客户端 screen factory）
+        AkaishiForbiddenMenuRegs.register();
         // 秘典网络包：C2S 研究请求（服务端注册；客户端注册也无害，与本体同口径）
         AkaishiCodexSync.register();
         // 秘典进度快照接收器：仅客户端注册
@@ -83,9 +102,8 @@ public final class AkaishiForbiddenMod {
         // ===== 理智系统·服务与节拍（P3b 自本体迁入）=====
         // 躯体 capability 的状态段实现注入：本体只按段名原样存取（见 api.life.IBodySubState）
         BodySubStateFactory.install(SanityState::new);
-        // 母神祭坛·仪式完成回调：把"首见 mother_altar"上报接回理智系统（本体只广播事件，不依赖本模块）
-        AltarRitualHooks.install(player ->
-                SanityServices.get().reportFirstEncounter(player, SanityBuiltinFirstEncounters.MOTHER_ALTAR));
+        // 注：P3b 的 AltarRitualHooks 临时桥已在 P3d 拆除 —— 母神祭坛仪式与理智系统现已同模块，
+        // 仪式完成回调直接调 SanityServices（见 AkaishiAltarRitual#announce）。
 
         // 理智系统：内部实现注册（对外契约只在 api.sanity）+ 环境结算与数值同步两条服务端 tick
         SanityServices.register(SanityServiceImpl.instance());

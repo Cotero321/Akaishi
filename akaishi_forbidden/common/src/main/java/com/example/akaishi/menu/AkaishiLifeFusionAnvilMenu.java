@@ -1,7 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,7 +23,7 @@ public class AkaishiLifeFusionAnvilMenu extends AbstractContainerMenu {
     private final AkaishiLifeFusionAnvilBlockEntity be;
 
     public AkaishiLifeFusionAnvilMenu(int id, Inventory inv, AkaishiLifeFusionAnvilBlockEntity be) {
-        super(ModMenus.CHISHI_LIFE_FUSION_ANVIL.get(), id);
+        super(AkaishiForbiddenMenuRegs.CHISHI_LIFE_FUSION_ANVIL.get(), id);
         this.container = be != null ? be.inventory() : new SimpleContainer(AkaishiLifeFusionAnvilBlockEntity.SLOT_COUNT);
         this.be = be;
 
@@ -38,7 +38,7 @@ public class AkaishiLifeFusionAnvilMenu extends AbstractContainerMenu {
         addSlot(new Slot(container, AkaishiLifeFusionAnvilBlockEntity.INPUT_INGOT_SLOT, 80, 34) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.is(ModItems.lifeFusionIngot.get());
+                return stack.is(AkaishiForbiddenItems.lifeFusionIngot.get());
             }
         });
         // 输出槽只读：防止放入杂物卡死融合

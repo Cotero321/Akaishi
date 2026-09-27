@@ -1,7 +1,7 @@
 package com.example.akaishi.block;
 
+import com.example.akaishi.block.entity.AkaishiForbiddenBlockEntities;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
-import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
@@ -63,7 +63,7 @@ public class AkaishiMotherAltarBlock extends AkaishiMachineBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntities.CHISHI_MOTHER_ALTAR.get().create(pos, state);
+        return AkaishiForbiddenBlockEntities.CHISHI_MOTHER_ALTAR.get().create(pos, state);
     }
 
     /** 祭坛用普通方块模型渲染本体（BaseEntityBlock 默认 INVISIBLE 会导致本体透明） */
@@ -78,7 +78,7 @@ public class AkaishiMotherAltarBlock extends AkaishiMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(type, ModBlockEntities.CHISHI_MOTHER_ALTAR.get(),
+        return createTickerHelper(type, AkaishiForbiddenBlockEntities.CHISHI_MOTHER_ALTAR.get(),
                 AkaishiMotherAltarBlockEntity::serverTick);
     }
 

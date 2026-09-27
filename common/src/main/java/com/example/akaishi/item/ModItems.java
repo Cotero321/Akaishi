@@ -123,14 +123,6 @@ public final class ModItems {
     public static final String ANTIDOTE_BRACELET_ID = "akaishi_antidote_bracelet";
     /** 赤石凋零护符（belt 槽）：消耗赤能源移除凋零 */
     public static final String WITHER_CHARM_ID = "akaishi_wither_charm";
-    /** 禁忌·生命之触（akaishi_socket_1）：攻击距离 +2、概率双击、概率自伤与饥饿代价 */
-    public static final String LIFE_TOUCH_ID = "akaishi_life_touch";
-    /** 禁忌·幼崽之心（akaishi_socket_2）：黄心、微量增益、伤害转移、不可名状、兴奋攻速 */
-    public static final String CUB_HEART_ID = "akaishi_cub_heart";
-    /** 禁忌·母神之印（akaishi_socket_3）：伤害/生命/移速/攻速加成，素食代价与抗性 */
-    public static final String MOTHER_SEAL_ID = "akaishi_mother_seal";
-    /** 禁忌·孕育之环（akaishi_socket_4）：受击治疗、攻速爆发、肉食治疗、饥饿惩罚 */
-    public static final String FERTILITY_RING_ID = "akaishi_fertility_ring";
     /** 样本采集器：随身生命能量容器，右键生物抽取生命样本，右键生命能量方块充能 */
     public static final String SAMPLE_COLLECTOR_ID = "akaishi_sample_collector";
     /** 生命样本：从活体生物抽取的遗传物质，生命分析台原料 */
@@ -139,13 +131,6 @@ public final class ModItems {
     public static final String GENE_SEQUENCE_ID = "akaishi_gene_sequence";
     /** 生命胚胎：八份生命固态 + 一枚鸡蛋 */
     public static final String LIFE_EMBRYO_ID = "akaishi_life_embryo";
-    /** 生命的融合锭：母神祭坛仪式的产物 */
-    public static final String LIFE_FUSION_INGOT_ID = "akaishi_life_fusion_ingot";
-    /** 生命融合护甲（4 件）：赤石护甲 2 倍基础数值，保留升级数据，穿齐触发套装效果 */
-    public static final String LIFE_FUSION_HELMET_ID = "akaishi_life_fusion_helmet";
-    public static final String LIFE_FUSION_CHESTPLATE_ID = "akaishi_life_fusion_chestplate";
-    public static final String LIFE_FUSION_LEGGINGS_ID = "akaishi_life_fusion_leggings";
-    public static final String LIFE_FUSION_BOOTS_ID = "akaishi_life_fusion_boots";
     /** 药剂（单物品承载永久/突破模板，模板 id 与纯度写 NBT） */
     public static final String POTION_ID = "akaishi_potion";
     /** 排异中和剂：消耗品，减轻已移植非原生器官的排斥 */
@@ -188,10 +173,6 @@ public final class ModItems {
     public static RegistrySupplier<Item> blastCharm;
     public static RegistrySupplier<Item> antidoteBracelet;
     public static RegistrySupplier<Item> witherCharm;
-    public static RegistrySupplier<Item> lifeTouch;
-    public static RegistrySupplier<Item> cubHeart;
-    public static RegistrySupplier<Item> motherSeal;
-    public static RegistrySupplier<Item> fertilityRing;
     public static RegistrySupplier<Item> machineSpeedUpgrade;
     public static RegistrySupplier<Item> machineEnergyUpgrade;
     public static RegistrySupplier<Item> machineWirelessReceiverUpgrade;
@@ -260,11 +241,6 @@ public final class ModItems {
     public static RegistrySupplier<Item> lifeSample;
     public static RegistrySupplier<Item> geneSequence;
     public static RegistrySupplier<Item> lifeEmbryo;
-    public static RegistrySupplier<Item> lifeFusionIngot;
-    public static RegistrySupplier<Item> lifeFusionHelmet;
-    public static RegistrySupplier<Item> lifeFusionChestplate;
-    public static RegistrySupplier<Item> lifeFusionLeggings;
-    public static RegistrySupplier<Item> lifeFusionBoots;
     public static RegistrySupplier<Item> akaishiPotion;
     public static RegistrySupplier<Item> rejectionSerum;
     public static RegistrySupplier<Item> goldenMelonSlice;
@@ -369,10 +345,6 @@ public final class ModItems {
         blastCharm = AkaishiBaseItems.blastCharm;
         antidoteBracelet = AkaishiBaseItems.antidoteBracelet;
         witherCharm = AkaishiBaseItems.witherCharm;
-        lifeTouch = AkaishiBaseItems.lifeTouch;
-        cubHeart = AkaishiBaseItems.cubHeart;
-        motherSeal = AkaishiBaseItems.motherSeal;
-        fertilityRing = AkaishiBaseItems.fertilityRing;
         machineSpeedUpgrade = AkaishiBaseItems.machineSpeedUpgrade;
         machineEnergyUpgrade = AkaishiBaseItems.machineEnergyUpgrade;
         machineWirelessReceiverUpgrade = AkaishiBaseItems.machineWirelessReceiverUpgrade;
@@ -441,11 +413,6 @@ public final class ModItems {
         lifeSample = AkaishiLifeItems.lifeSample;
         geneSequence = AkaishiLifeItems.geneSequence;
         lifeEmbryo = AkaishiLifeItems.lifeEmbryo;
-        lifeFusionIngot = AkaishiLifeItems.lifeFusionIngot;
-        lifeFusionHelmet = AkaishiLifeItems.lifeFusionHelmet;
-        lifeFusionChestplate = AkaishiLifeItems.lifeFusionChestplate;
-        lifeFusionLeggings = AkaishiLifeItems.lifeFusionLeggings;
-        lifeFusionBoots = AkaishiLifeItems.lifeFusionBoots;
         akaishiPotion = AkaishiLifeItems.akaishiPotion;
         rejectionSerum = AkaishiLifeItems.rejectionSerum;
         goldenMelonSlice = AkaishiLifeItems.goldenMelonSlice;

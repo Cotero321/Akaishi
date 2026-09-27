@@ -164,7 +164,7 @@ public final class AkaishiUpgradeHelper {
         return stack.getItem() instanceof AkaishiArmorItem || stack.getItem() instanceof AkaishiSwordItem
                 || stack.getItem() instanceof AkaishiShovelItem || stack.getItem() instanceof AkaishiAxeItem
                 || stack.getItem() instanceof AkaishiPickaxeItem
-                || stack.getItem() instanceof AkaishiLifeFusionArmorItem;
+                || PoweredArmorQuery.isSetArmor(stack);
     }
 
     /** 是否支持效率升级的挖掘类工具（铲/斧/镐） */

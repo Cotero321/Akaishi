@@ -1,9 +1,9 @@
 package com.example.akaishi.forge.jei;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.ModBlocks;
+import com.example.akaishi.block.AkaishiForbiddenBlocks;
 import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
-import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import com.example.akaishi.menu.GuiWidgets;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -54,7 +54,7 @@ public class LifeFusionAnvilRecipeCategory implements IRecipeCategory<LifeFusion
         this.slotY = 12 + tipLines * LINE_HEIGHT;
         this.cardHeight = slotY + 44;
         this.background = helper.createBlankDrawable(176, cardHeight);
-        this.icon = helper.createDrawableItemStack(new ItemStack(ModBlocks.CHISHI_LIFE_FUSION_ANVIL.get()));
+        this.icon = helper.createDrawableItemStack(new ItemStack(AkaishiForbiddenBlocks.CHISHI_LIFE_FUSION_ANVIL.get()));
     }
 
     @Override
@@ -111,7 +111,7 @@ public class LifeFusionAnvilRecipeCategory implements IRecipeCategory<LifeFusion
             List<LifeFusionRecipe> list = new ArrayList<>(AkaishiLifeFusionAnvilBlockEntity.FUSION_TARGETS.size());
             for (Map.Entry<Item, Item> entry : AkaishiLifeFusionAnvilBlockEntity.FUSION_TARGETS.entrySet()) {
                 list.add(new LifeFusionRecipe(new ItemStack(entry.getKey()),
-                        new ItemStack(ModItems.lifeFusionIngot.get()), new ItemStack(entry.getValue())));
+                        new ItemStack(AkaishiForbiddenItems.lifeFusionIngot.get()), new ItemStack(entry.getValue())));
             }
             return List.copyOf(list);
         }

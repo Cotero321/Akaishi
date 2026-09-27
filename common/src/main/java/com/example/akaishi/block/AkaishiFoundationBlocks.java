@@ -44,8 +44,6 @@ public final class AkaishiFoundationBlocks {
     public static RegistrySupplier<Block> CHISHI_EQUIPMENT_FORGER = null;
     /** 赤红升级台（模板 + 槽位 → 升级赤石装备） */
     public static RegistrySupplier<Block> CHISHI_UPGRADE_STATION = null;
-    /** 生命的融合砧（赤石护甲 + 生命的融合锭 → 生命融合护甲，保留升级数据） */
-    public static RegistrySupplier<Block> CHISHI_LIFE_FUSION_ANVIL = null;
     /** 燃料装罐机：液体燃料灌装进 10L 燃料罐 */
     public static RegistrySupplier<Block> CHISHI_FUEL_CANNER = null;
     /** 燃料混合器：两种燃料液体 1:1:1 调和为高阶混合燃料 */
@@ -100,8 +98,7 @@ public final class AkaishiFoundationBlocks {
         CHISHI_EQUIPMENT_FORGER = AkaishiBlockRegistrar.registerMachineBlock(blockRegistrar, "akaishi_equipment_forger", AkaishiEquipmentForgerBlock::new);
         // 赤红升级台（模板 + 槽位 + 赤能源 → 升级赤石装备）
         CHISHI_UPGRADE_STATION = AkaishiBlockRegistrar.registerMachineBlock(blockRegistrar, "akaishi_upgrade_station", AkaishiUpgradeStationBlock::new);
-        // 生命的融合砧
-        CHISHI_LIFE_FUSION_ANVIL = AkaishiBlockRegistrar.registerMachineBlock(blockRegistrar, "akaishi_life_fusion_anvil", AkaishiLifeFusionAnvilBlock::new);
+        // 生命的融合砧随生命融合体系迁往 akaishi_forbidden（见 AkaishiForbiddenBlocks）
         // 燃料装罐机（液体燃料 → 10L 燃料罐）
         CHISHI_FUEL_CANNER = AkaishiBlockRegistrar.registerMachineBlock(blockRegistrar, "akaishi_fuel_canner", AkaishiFuelCannerBlock::new);
         // 燃料混合器（燃料液体 1:1:1 调和 → 高级/终极混合燃料）

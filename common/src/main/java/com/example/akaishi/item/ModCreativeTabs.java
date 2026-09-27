@@ -10,7 +10,6 @@ import com.example.akaishi.block.AkaishiLifeBlocks;
 import com.example.akaishi.block.AkaishiMinerBlocks;
 import com.example.akaishi.block.AkaishiMiniMatrixBlocks;
 import com.example.akaishi.block.AkaishiMiniatureBlocks;
-import com.example.akaishi.block.AkaishiMotherAltarBlocks;
 import com.example.akaishi.block.AkaishiMatrixBlocks;
 import com.example.akaishi.block.AkaishiReactorBlocks;
 import com.example.akaishi.block.AkaishiItemTerminalBlocks;
@@ -297,10 +296,7 @@ public final class ModCreativeTabs {
         accept(output, AkaishiLifeBlocks.CHISHI_ORGAN_VAULT);
         accept(output, AkaishiLifeBlocks.CHISHI_SAMPLE_VAULT);
         accept(output, AkaishiLifeBlocks.CHISHI_POTION_CABINET);
-        // 母神祭坛体系
-        accept(output, AkaishiMotherAltarBlocks.CHISHI_MOTHER_ALTAR);
-        accept(output, AkaishiMotherAltarBlocks.CHISHI_ALTAR_STONE);
-        accept(output, AkaishiMotherAltarBlocks.CRYING_OBSIDIAN_RED);
+        // 母神祭坛体系随祭坛迁往禁忌栏 akaishi_forbidden（母神祭坛 / 祭坛石 / 猩红哭泣黑曜石）
         // 样本 / 基因 / 胚胎
         accept(output, ModItems.sampleCollector);
         accept(output, ModItems.lifeSample);
@@ -329,13 +325,7 @@ public final class ModCreativeTabs {
         accept(output, ModItems.activatedPureComponent);
         accept(output, ModItems.activatedDragonComponent);
         accept(output, ModItems.activatedUltimateMixtureComponent);
-        // 生命融合体系
-        accept(output, ModItems.lifeFusionIngot);
-        accept(output, ModBlocks.CHISHI_LIFE_FUSION_ANVIL);
-        accept(output, ModItems.lifeFusionHelmet);
-        accept(output, ModItems.lifeFusionChestplate);
-        accept(output, ModItems.lifeFusionLeggings);
-        accept(output, ModItems.lifeFusionBoots);
+        // 生命融合体系（融合锭 / 融合砧 / 生命融合护甲）随生命融合迁往禁忌栏 akaishi_forbidden
     }
 
     // ==================== 栏 4：机器与结构 ====================

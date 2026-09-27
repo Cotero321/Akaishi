@@ -50,7 +50,7 @@ public final class UnnameableClientAmbience {
         if (ForbiddenSetHooks.isDistortionSuppressed(player)) {
             return 0f;
         }
-        MobEffectInstance instance = player.getEffect(ModEffects.UNNAMEABLE.get());
+        MobEffectInstance instance = player.getEffect(AkaishiForbiddenEffects.UNNAMEABLE.get());
         if (instance == null) {
             return 0f;
         }

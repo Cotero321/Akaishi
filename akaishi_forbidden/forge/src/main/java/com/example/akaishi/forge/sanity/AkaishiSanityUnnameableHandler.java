@@ -1,6 +1,6 @@
 package com.example.akaishi.forge.sanity;
 
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.sanity.content.SanityBuiltinRules;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -40,7 +40,7 @@ public final class AkaishiSanityUnnameableHandler {
             return; // 只对玩家结算（生物没有理智值）
         }
         MobEffectInstance added = event.getEffectInstance();
-        MobEffect unnameable = ModEffects.UNNAMEABLE == null ? null : ModEffects.UNNAMEABLE.get();
+        MobEffect unnameable = AkaishiForbiddenEffects.UNNAMEABLE == null ? null : AkaishiForbiddenEffects.UNNAMEABLE.get();
         if (added == null || unnameable == null || added.getEffect() != unnameable) {
             return;
         }

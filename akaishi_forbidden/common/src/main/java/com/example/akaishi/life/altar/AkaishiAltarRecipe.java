@@ -2,6 +2,7 @@ package com.example.akaishi.life.altar;
 
 import com.example.akaishi.block.ModBlocks;
 import com.example.akaishi.config.ModConfig;
+import com.example.akaishi.item.AkaishiForbiddenItems;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
@@ -67,56 +68,56 @@ public record AkaishiAltarRecipe(Predicate<ItemStack> hostOffering,
                             ModItems.geneSequence::get),
                     Requirement.of(2, stack -> stack.is(ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem()),
                             () -> ModBlocks.CHISHI_ESSENCE_BLOCK.get().asItem())),
-            () -> ModItems.lifeFusionIngot.get(),
+            () -> AkaishiForbiddenItems.lifeFusionIngot.get(),
             false,
             null);
 
     private static final AkaishiAltarRecipe LIFE_TOUCH = new AkaishiAltarRecipe(
-            stack -> stack.is(ModItems.lifeFusionIngot.get()),
-            ModItems.lifeFusionIngot::get,
+            stack -> stack.is(AkaishiForbiddenItems.lifeFusionIngot.get()),
+            AkaishiForbiddenItems.lifeFusionIngot::get,
             List.of(
                     organ(1, ModItems.akaishiOrganLeftArm::get, BodySlot.LEFT_ARM),
                     organ(1, ModItems.akaishiOrganRightArm::get, BodySlot.RIGHT_ARM),
                     basic(2, ModItems.lifeEmbryo::get),
                     gene(2),
                     potion(2)),
-            () -> ModItems.lifeTouch.get(),
+            () -> AkaishiForbiddenItems.lifeTouch.get(),
             true,
             "message.akaishi.altar.ritual.life_touch");
 
     private static final AkaishiAltarRecipe CUB_HEART = new AkaishiAltarRecipe(
-            stack -> stack.is(ModItems.lifeFusionIngot.get()),
-            ModItems.lifeFusionIngot::get,
+            stack -> stack.is(AkaishiForbiddenItems.lifeFusionIngot.get()),
+            AkaishiForbiddenItems.lifeFusionIngot::get,
             List.of(
                     organ(2, ModItems.akaishiOrganHeart::get, BodySlot.HEART),
                     basic(2, ModItems.lifeEmbryo::get),
                     gene(2),
                     potion(2)),
-            () -> ModItems.cubHeart.get(),
+            () -> AkaishiForbiddenItems.cubHeart.get(),
             true,
             "message.akaishi.altar.ritual.cub_heart");
 
     private static final AkaishiAltarRecipe MOTHER_SEAL = new AkaishiAltarRecipe(
-            stack -> stack.is(ModItems.lifeFusionIngot.get()),
-            ModItems.lifeFusionIngot::get,
+            stack -> stack.is(AkaishiForbiddenItems.lifeFusionIngot.get()),
+            AkaishiForbiddenItems.lifeFusionIngot::get,
             List.of(
                     organ(2, ModItems.akaishiOrganEye::get, BodySlot.EYE),
                     basic(2, ModItems.lifeAsh::get),
                     gene(2),
                     potion(2)),
-            () -> ModItems.motherSeal.get(),
+            () -> AkaishiForbiddenItems.motherSeal.get(),
             true,
             "message.akaishi.altar.ritual.mother_seal");
 
     private static final AkaishiAltarRecipe FERTILITY_RING = new AkaishiAltarRecipe(
-            stack -> stack.is(ModItems.lifeFusionIngot.get()),
-            ModItems.lifeFusionIngot::get,
+            stack -> stack.is(AkaishiForbiddenItems.lifeFusionIngot.get()),
+            AkaishiForbiddenItems.lifeFusionIngot::get,
             List.of(
                     organ(2, ModItems.akaishiOrganViscera::get, BodySlot.VISCERA),
                     basic(2, ModItems.lifeAsh::get),
                     gene(2),
                     potion(2)),
-            () -> ModItems.fertilityRing.get(),
+            () -> AkaishiForbiddenItems.fertilityRing.get(),
             true,
             "message.akaishi.altar.ritual.fertility_ring");
 

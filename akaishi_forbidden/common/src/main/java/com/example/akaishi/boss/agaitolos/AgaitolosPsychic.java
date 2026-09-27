@@ -1,6 +1,6 @@
 package com.example.akaishi.boss.agaitolos;
 
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
  * <p>
  * <b>三件事收在一个类里</b>（与 {@link AgaitolosDoom} 同款思路：口径只此一处，技能类只负责调用）：
  * <ol>
- *   <li><b>施放</b>：{@link #applyCalamity} —— 复用现成的 {@code ModEffects.UNNAMEABLE}（30s），
+ *   <li><b>施放</b>：{@link #applyCalamity} —— 复用现成的 {@code AkaishiForbiddenEffects.UNNAMEABLE}（30s），
  *       并把"改写窗口"写进玩家侧持久状态；</li>
  *   <li><b>判定</b>：{@link #isConverted} —— "这个玩家现在算不算精神伤害受体"的唯一读法
  *       （含"窗口走完即转永久"的一次性提升）；</li>
@@ -77,7 +77,7 @@ public final class AgaitolosPsychic {
         if (boss.level().isClientSide() || !(target instanceof Player player) || !player.isAlive()) {
             return false;
         }
-        MobEffect unnameable = ModEffects.UNNAMEABLE == null ? null : ModEffects.UNNAMEABLE.get();
+        MobEffect unnameable = AkaishiForbiddenEffects.UNNAMEABLE == null ? null : AkaishiForbiddenEffects.UNNAMEABLE.get();
         // 注册表尚未就绪（理论上不可达：本方法只在游戏内被调用）时不静默：仍写窗口，只少一层视觉表现
         if (unnameable != null) {
             player.addEffect(new MobEffectInstance(unnameable, WINDOW_TICKS, UNNAMEABLE_AMPLIFIER), boss);

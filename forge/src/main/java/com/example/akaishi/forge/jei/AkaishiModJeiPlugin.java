@@ -44,10 +44,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
                 // 材料融合：两种原料 + 赤能源 → 机械材料（机械材料的唯一获取途径）
                 new FusingRecipeCategory(helper),
                 new ForgingRecipeCategory(helper),
-                // 生命融合锻台：赤石装备 + 生命融合锭 → 生命融合装备（获得途径展示）
-                new LifeFusionAnvilRecipeCategory(helper),
-                // 母神祭坛仪式：巨坛主祭品 + 外圈 8 座子祭坛供奉 → 生命融合锭 / 四件禁断饰品
-                new AkaishiAltarRecipeCategory(helper),
+                // 生命融合锻台、母神祭坛仪式随内容迁往禁忌模块（其 JEI 类别由 AkaishiForbiddenJeiPlugin 注册）
                 new UpgradeRecipeCategory(helper),
                 // 燃料生产链：液化 → 加工 → 调和（燃料产生展示）
                 new LiquefactionRecipeCategory(helper),
@@ -80,9 +77,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         RecipeManager recipeManager = ServerLifecycleHooks.getCurrentServer().getRecipeManager();
         registration.addRecipes(PurificationRecipeCategory.TYPE, PurificationRecipeCategory.PurificationRecipe.getAll());
         registration.addRecipes(ForgingRecipeCategory.TYPE, ForgingRecipeCategory.ForgingRecipe.getAll());
-        registration.addRecipes(LifeFusionAnvilRecipeCategory.TYPE, LifeFusionAnvilRecipeCategory.LifeFusionRecipe.getAll());
-        // 母神祭坛仪式配方（旧 1 条 + 新 4 条）
-        registration.addRecipes(AkaishiAltarRecipeCategory.TYPE, AkaishiAltarRecipeCategory.AltarRecipe.getAll());
+        // 母神祭坛仪式配方随祭坛迁往禁忌模块（其 JEI 类别由 AkaishiForbiddenJeiPlugin 注册）
         registration.addRecipes(UpgradeRecipeCategory.TYPE, UpgradeRecipeCategory.UpgradeRecipe.getAll());
         // 燃料生产链配方（数据包）
         registration.addRecipes(LiquefactionRecipeCategory.TYPE, LiquefactionRecipeCategory.LiquefactionRecipe.getAll(recipeManager));
@@ -275,8 +270,7 @@ public class AkaishiModJeiPlugin implements IModPlugin {
         }
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.exhaustedCrystal.get(), "jei.akaishi.exhausted_crystal");
         addIngredientInfo(registration, com.example.akaishi.item.ModItems.lifeAsh.get(), "jei.akaishi.life_ash");
-        // 生命融合锭：无合成配方，为黑山羊之母祭坛仪式专属产物
-        addIngredientInfo(registration, com.example.akaishi.item.ModItems.lifeFusionIngot.get(), "jei.akaishi.life_fusion_ingot");
+        // 生命融合锭随生命融合迁往禁忌模块（其物品信息由 AkaishiForbiddenJeiPlugin 注册）
     }
 
     private static void addIngredientInfo(IRecipeRegistration registration, net.minecraft.world.level.block.Block block, String langKey, Object... args) {

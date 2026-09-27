@@ -1,7 +1,7 @@
 package com.example.akaishi.sanity;
 
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.effect.ModEffects;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.sanity.content.SanityBuiltinThresholdCuts;
 import com.example.akaishi.sanity.shadow.ShadowSpawner;
 import net.minecraft.server.level.ServerLevel;
@@ -133,7 +133,7 @@ public final class SanityPenaltySettlement {
         }
         // 不可名状：每秒以 5s 时长刷新。回到 20% 以上即停止刷新 ⇒ 效果在 ≤5s 内自然过期，
         // 即设计要求的"周期性检查、5 秒后移除、不是立即"；也不会缩短外部更长的施加（BOSS 的 30s）
-        MobEffect unnameable = ModEffects.UNNAMEABLE == null ? null : ModEffects.UNNAMEABLE.get();
+        MobEffect unnameable = AkaishiForbiddenEffects.UNNAMEABLE == null ? null : AkaishiForbiddenEffects.UNNAMEABLE.get();
         if (unnameable != null) {
             player.addEffect(new MobEffectInstance(unnameable, SanityPenalties.UNNAMEABLE_TICKS, 0, false, false));
         }

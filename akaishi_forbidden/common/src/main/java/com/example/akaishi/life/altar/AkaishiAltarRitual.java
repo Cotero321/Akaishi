@@ -1,10 +1,12 @@
 package com.example.akaishi.life.altar;
 
+import com.example.akaishi.api.sanity.SanityServices;
 import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
+import com.example.akaishi.effect.AkaishiForbiddenEffects;
 import com.example.akaishi.effect.ForbiddenSetHooks;
-import com.example.akaishi.effect.ModEffects;
 import com.example.akaishi.multiblock.AkaishiGoatAltarTiersStructure;
-import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.sanity.content.SanityBuiltinFirstEncounters;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -205,17 +207,18 @@ public final class AkaishiAltarRitual {
             }
             // 完成爆发：叠加 II 级「不可名状」，客户端画面扭曲/噪点/低语文字随之加剧
             // 套装集齐者在所有施加入口统一 +1 级（D73/D191）
-            player.addEffect(new MobEffectInstance(ModEffects.UNNAMEABLE.get(),
+            player.addEffect(new MobEffectInstance(AkaishiForbiddenEffects.UNNAMEABLE.get(),
                     BURST_DURATION, BURST_AMPLIFIER + ForbiddenSetHooks.unnameableBonus(player), true, false, true));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    ModSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS, 1.0F, 0.85F);
+                    AkaishiForbiddenSounds.UNNAMEABLE_WHISPER.get(), SoundSource.PLAYERS, 1.0F, 0.85F);
             if (ritualKey != null) {
                 player.sendSystemMessage(Component.translatable("message.akaishi.altar.ritual.done",
                         Component.translatable(ritualKey)));
             }
             // 首见：初次完成母神祭坛仪式（行为类，环境轮询表达不了"完成了一次仪式"；
-            // 是否首次由监听方按玩家存档判定，本处只负责广播"发生了什么"）
-            AltarRitualHooks.ritualCompleted(player);
+            // 是否首次由理智系统按玩家存档判定，本处只负责上报"发生了什么"）。
+            // P3d 拆除 P3b 的 AltarRitualHooks 临时桥后直调理智服务（祭坛与理智现已同模块，语义不变）。
+            SanityServices.get().reportFirstEncounter(player, SanityBuiltinFirstEncounters.MOTHER_ALTAR);
         }
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                 hostPos.getX() + 0.5D, hostPos.getY() + 1.5D, hostPos.getZ() + 0.5D,

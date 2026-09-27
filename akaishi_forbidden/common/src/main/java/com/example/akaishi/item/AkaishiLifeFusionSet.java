@@ -90,4 +90,68 @@ public final class AkaishiLifeFusionSet {
         }
         return amount - remaining;
     }
+
+    /**
+     * 导出为本体可消费的查询实现（P3d 依赖倒置）：
+     * 本体的器官/战斗/修复逻辑经 {@link PoweredArmorQuery} 读取套装数值，由禁忌模块注入本实现。
+     * 条件式（全套 ×倍率 / 未全套中性值）内联在此，保证与迁前的判定口径逐位一致。
+     */
+    public static PoweredArmorQuery.Query asQuery() {
+        return new PoweredArmorQuery.Query() {
+            @Override
+            public boolean isSetArmor(ItemStack stack) {
+                return isLifeFusionArmor(stack);
+            }
+
+            @Override
+            public int countWorn(Player player) {
+                return AkaishiLifeFusionSet.countWorn(player);
+            }
+
+            @Override
+            public boolean fullSet(Player player) {
+                return isFullSet(player);
+            }
+
+            @Override
+            public int geneCompatBonus(Player player) {
+                return AkaishiLifeFusionSet.geneCompatBonus(player);
+            }
+
+            @Override
+            public double organStrengthMultiplier(Player player) {
+                return isFullSet(player) ? ORGAN_STRENGTH_MULTIPLIER : 1.0;
+            }
+
+            @Override
+            public double rejectionSlowFactor(Player player) {
+                return isFullSet(player) ? REJECTION_SLOW_FACTOR : 1.0;
+            }
+
+            @Override
+            public double bossDragonHealthBonus(Player player, IPlayerBodyState state) {
+                return isFullSet(player) && hasBossOrDragonOrgan(player, state) ? BOSS_DRAGON_HEALTH_BONUS : 0.0;
+            }
+
+            @Override
+            public boolean hasBossOrDragonOrgan(Player player, IPlayerBodyState state) {
+                return AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state);
+            }
+
+            @Override
+            public long energyPerDamage() {
+                return ENERGY_PER_DAMAGE;
+            }
+
+            @Override
+            public long drainEnergy(Player player, long amount) {
+                return AkaishiLifeFusionSet.drainEnergy(player, amount);
+            }
+
+            @Override
+            public int repairMultiplier() {
+                return LIFE_FUSION_REPAIR_MULTIPLIER;
+            }
+        };
+    }
 }

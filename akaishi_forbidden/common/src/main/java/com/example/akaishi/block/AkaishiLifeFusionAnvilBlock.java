@@ -1,7 +1,7 @@
 package com.example.akaishi.block;
 
+import com.example.akaishi.block.entity.AkaishiForbiddenBlockEntities;
 import com.example.akaishi.block.entity.AkaishiLifeFusionAnvilBlockEntity;
-import com.example.akaishi.block.entity.ModBlockEntities;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,7 +31,7 @@ public class AkaishiLifeFusionAnvilBlock extends AkaishiMachineBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntities.CHISHI_LIFE_FUSION_ANVIL.get().create(pos, state);
+        return AkaishiForbiddenBlockEntities.CHISHI_LIFE_FUSION_ANVIL.get().create(pos, state);
     }
 
     @Override

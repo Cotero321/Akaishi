@@ -28,7 +28,6 @@ public final class ModBlocks {
     public static RegistrySupplier<Block> CHISHI_ESSENCE_BLOCK;
     public static RegistrySupplier<Block> CHISHI_EQUIPMENT_FORGER;
     public static RegistrySupplier<Block> CHISHI_UPGRADE_STATION;
-    public static RegistrySupplier<Block> CHISHI_LIFE_FUSION_ANVIL;
     public static RegistrySupplier<Block> CHISHI_FUEL_CANNER;
     public static RegistrySupplier<Block> CHISHI_FUEL_MIXER;
     public static RegistrySupplier<Block> CHISHI_LIFE_ACTIVATOR;
@@ -93,7 +92,6 @@ public final class ModBlocks {
         CHISHI_ESSENCE_BLOCK = AkaishiFoundationBlocks.CHISHI_ESSENCE_BLOCK;
         CHISHI_EQUIPMENT_FORGER = AkaishiFoundationBlocks.CHISHI_EQUIPMENT_FORGER;
         CHISHI_UPGRADE_STATION = AkaishiFoundationBlocks.CHISHI_UPGRADE_STATION;
-        CHISHI_LIFE_FUSION_ANVIL = AkaishiFoundationBlocks.CHISHI_LIFE_FUSION_ANVIL;
         CHISHI_FUEL_CANNER = AkaishiFoundationBlocks.CHISHI_FUEL_CANNER;
         CHISHI_FUEL_MIXER = AkaishiFoundationBlocks.CHISHI_FUEL_MIXER;
         CHISHI_LIFE_ACTIVATOR = AkaishiFoundationBlocks.CHISHI_LIFE_ACTIVATOR;

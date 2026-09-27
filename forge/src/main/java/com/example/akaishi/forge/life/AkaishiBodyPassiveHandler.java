@@ -26,7 +26,7 @@ import com.example.akaishi.life.organ.OrganSpecial;
 import com.example.akaishi.life.organ.OrganTemplate;
 import com.example.akaishi.life.organ.QualityTier;
 import com.example.akaishi.life.sample.SampleGroup;
-import com.example.akaishi.item.AkaishiLifeFusionSet;
+import com.example.akaishi.item.PoweredArmorQuery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -212,9 +212,8 @@ public final class AkaishiBodyPassiveHandler {
         // 2) 生效器官：MAX_HEALTH 按百分比聚合，其余属性按基础值 × 倍率 × 适配度（突破激活时正数基础值
         //    再 ×(1+pct%)，负数基础值词条暂时失效）——适配度含基因加成与突破额外适配，可临时超 100
         // 生命融合套装加成：全基因适配（每件 +2）与器官强度倍率（全套 ×1.2）
-        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
-        double strengthMult = AkaishiLifeFusionSet.isFullSet(player)
-                ? AkaishiLifeFusionSet.ORGAN_STRENGTH_MULTIPLIER : 1.0;
+        int gearCompat = PoweredArmorQuery.geneCompatBonus(player);
+        double strengthMult = PoweredArmorQuery.organStrengthMultiplier(player);
         for (OrganEffectResolver.ActiveOrgan organ : OrganEffectResolver.collect(state)) {
             double compatFactor = BodyGeneHelper.effectiveCompat(state, organ.stack(), gearCompat) / 100.0;
             // 基因属性权重：按来源专精轴放大长项、衰减弱势轴，叠加于基础公式（正交于适配度）
@@ -306,9 +305,7 @@ public final class AkaishiBodyPassiveHandler {
                     ModConfig.mechBodyDodgeScale, 0.1);
         }
         // 生命融合套装·BOSS/龙肢体：移植 BOSS 或龙族来源器官时额外 +10 最大生命
-        if (AkaishiLifeFusionSet.isFullSet(player) && AkaishiLifeFusionSet.hasBossOrDragonOrgan(player, state)) {
-            healthPct += AkaishiLifeFusionSet.BOSS_DRAGON_HEALTH_BONUS / BASE_HEALTH;
-        }
+        healthPct += PoweredArmorQuery.bossDragonHealthBonus(player, state) / BASE_HEALTH;
         // 3) 生命上限 = 20 × (1 + 加成% − 空槽权重%)
         double healthDelta = BASE_HEALTH * (1.0 + healthPct) - BASE_HEALTH;
         if (Math.abs(healthDelta) > 0.001) {
@@ -443,7 +440,7 @@ public final class AkaishiBodyPassiveHandler {
                 .append(state.getBreakthroughPct()).append(':')
                 .append(state.getBreakthroughUntil()).append(';');
         // 生命融合装备穿戴件数（+2 全基因适配 / 全套器官强度与 +10 生命随穿脱即时触发重建）
-        sb.append("LF").append(AkaishiLifeFusionSet.countWorn(player)).append(';');
+        sb.append("LF").append(PoweredArmorQuery.countWorn(player)).append(';');
         // 基因属性权重强度（配置热重载后即时触发重建，属性面板随 k 变化）
         sb.append("GW").append(ModConfig.geneWeightStrength).append(';');
         return sb.toString();
@@ -479,7 +476,7 @@ public final class AkaishiBodyPassiveHandler {
      * 脱下后若非创造/旁观则撤销飞行能力。状态变化才同步，避免每 tick 刷包。
      */
     private static void applyLifeFusionSet(Player player) {
-        boolean full = AkaishiLifeFusionSet.isFullSet(player);
+        boolean full = PoweredArmorQuery.fullSet(player);
         Boolean last = FLIGHT_CACHE.get(player);
         if (last != null && last == full) {
             return;
@@ -648,7 +645,7 @@ public final class AkaishiBodyPassiveHandler {
 
     private static void tickRejection(Player player, IPlayerBodyState state) {
         // 生命融合装备全基因适配加成（每件 +2，减缓排斥）
-        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
+        int gearCompat = PoweredArmorQuery.geneCompatBonus(player);
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             // 原生器官与身体完全契合，不产生排斥
@@ -672,10 +669,8 @@ public final class AkaishiBodyPassiveHandler {
             }
             // 基因强度联动：强基因（末影/龙）排斥增长更快（OrganLinkage.rejectionFactorOf）
             factor *= OrganLinkage.rejectionFactorOf(organ);
-            // 生命融合套装：排斥增长速度 -25%
-            if (AkaishiLifeFusionSet.isFullSet(player)) {
-                factor *= AkaishiLifeFusionSet.REJECTION_SLOW_FACTOR;
-            }
+            // 生命融合套装：排斥增长速度 -25%（未全套时倍率为 1.0，等价于原 if 分支）
+            factor *= PoweredArmorQuery.rejectionSlowFactor(player);
             // 增长间隔 ≥300t：即使极端低适配也不低于 15s/点，保留梯度同时封住爆炸增速
             // 乱码器官（禁忌饰品侵蚀产物）排异冻结：既不涨也不降，保留既有读数（D8/D128）
             int interval = (int) Math.max(ModConfig.growthIntervalMinTicks, tier.getGrowthIntervalSeconds() * 20.0 / factor);
@@ -737,7 +732,7 @@ public final class AkaishiBodyPassiveHandler {
             return;
         }
         // 生命融合装备全基因适配加成（每件 +2，抬高部位 debuff 判定阈值）
-        int gearCompat = AkaishiLifeFusionSet.geneCompatBonus(player);
+        int gearCompat = PoweredArmorQuery.geneCompatBonus(player);
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
             if (!(organ.getItem() instanceof AkaishiOrganItem) || AkaishiOrganItem.isNative(organ)) {

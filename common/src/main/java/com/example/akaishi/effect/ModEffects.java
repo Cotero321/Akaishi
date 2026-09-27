@@ -10,17 +10,14 @@ import net.minecraft.world.effect.MobEffect;
 
 /**
  * 模组自定义状态效果注册表。
- * 目前注册"衰变"（衰竭区域减益）与"不可名状"（黑山羊母神仪式减益）。
- * <p>理智恢复效果（{@code akaishi:sanity_restore}）随理智系统、凋亡效果（{@code akaishi:doom}）
- * 随 BOSS 阿盖托洛丝迁往 {@code akaishi_forbidden}，由该模块自行注册（id 不变）。
+ * 目前仅注册"衰变"（衰竭区域减益）。
+ * <p>理智恢复效果（{@code akaishi:sanity_restore}）随理智系统、凋亡效果（{@code akaishi:doom}）随 BOSS、
+ * 不可名状效果（{@code akaishi:unnameable}）随母神祭坛迁往 {@code akaishi_forbidden}，由该模块自行注册（id 不变）。
  */
 public final class ModEffects {
 
     /** 衰变：衰竭区域内每秒造成 2×(等级+1) 点魔法伤害（亡灵免疫） */
     public static RegistrySupplier<MobEffect> DECAY;
-
-    /** 不可名状：黑山羊母神仪式进行中与完成瞬间施加，仅驱动客户端画面/音效表现 */
-    public static RegistrySupplier<MobEffect> UNNAMEABLE;
 
     private ModEffects() {
     }
@@ -29,6 +26,5 @@ public final class ModEffects {
     public static void register() {
         Registrar<MobEffect> registrar = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.MOB_EFFECT);
         DECAY = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "decay"), DecayEffect::new);
-        UNNAMEABLE = registrar.register(new ResourceLocation(AkaishiMod.MOD_ID, "unnameable"), UnnameableEffect::new);
     }
 }

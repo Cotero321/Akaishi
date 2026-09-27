@@ -30,6 +30,10 @@ repositories {
         url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
         name "GeckoLib"
     }
+    // JEI（P3d：生命融合 / 母神祭坛 JEI 配方类别随内容迁入本模块）
+    maven { url "https://maven.blamejared.com/" }
+    // Curios API（P3d：禁忌四件饰品的 Curios 访问辅助/生效层随内容迁入本模块）
+    maven { url "https://maven.theillusivec4.top/" }
 }
 
 // 产物名与 modId 对齐：akaishi_forbidden-<version>.jar
@@ -123,6 +127,15 @@ dependencies {
     // Architectury API：平台侧读 common 侧注册表字段（RegistrySupplier）需要编译期类型。
     // 只 compileOnly、不 include：运行时的 architectury 由本体 jar-in-jar 唯一提供（见 forbiddencommon/build.gradle）。
     modCompileOnly("dev.architectury:architectury-forge:9.2.14")
+
+    // JEI：配方展示（P3d：AkaishiForbiddenJeiPlugin 注册生命融合 / 母神祭坛两个类别）。
+    // 与本体同口径：编译用 API artifact，dev 运行加载完整 jar；非硬依赖（未装 JEI 时插件不被发现）。
+    modCompileOnly("mezz.jei:jei-1.20.1-forge-api:${rootProject.jei_version}")
+    modLocalRuntime("mezz.jei:jei-1.20.1-forge:${rootProject.jei_version}")
+
+    // Curios API：禁忌四件饰品的生效层（AkaishiForbiddenCurios / AkaishiSocketEffectHandler）直接调 CuriosApi，
+    // 需要编译期 API（运行时由玩家安装的 Curios 提供完整 jar；与本体同口径，非硬依赖）。
+    modCompileOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}:api")
 
     // 注：architectury / cloth-config 等由本体 akaishi 提供，不在此重复 include。
 }

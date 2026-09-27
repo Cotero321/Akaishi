@@ -5,7 +5,7 @@ import com.example.akaishi.block.entity.AkaishiMotherAltarBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.effect.AkaishiDrainHooks;
 import com.example.akaishi.effect.ScreenFlashS2C;
-import com.example.akaishi.sound.ModSounds;
+import com.example.akaishi.sound.AkaishiForbiddenSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -111,7 +111,7 @@ public final class AkaishiAltarDrain {
         }
         if (total > 0L) {
             // 低语音效变调：每次吸取随机微调音调，避免机械重复感（D159）
-            level.playSound(null, cx, cy, cz, ModSounds.UNNAMEABLE_WHISPER.get(), SoundSource.BLOCKS,
+            level.playSound(null, cx, cy, cz, AkaishiForbiddenSounds.UNNAMEABLE_WHISPER.get(), SoundSource.BLOCKS,
                     0.8F, 0.55F + level.random.nextFloat() * 0.25F);
             cleanWarnTable(level.getGameTime());
         }

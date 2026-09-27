@@ -31,15 +31,11 @@ import com.example.akaishi.forge.client.AkaishiConfigScreenFactory;
 import com.example.akaishi.forge.client.DrillBitBeaconRenderer;
 import com.example.akaishi.forge.decay.AkaishiDecaySpawnBlocker;
 import com.example.akaishi.forge.client.LifeEnergyEmitterRenderer;
-import com.example.akaishi.forge.client.MotherAltarRenderer;
 import com.example.akaishi.forge.client.PipeSideOverlayRenderer;
 import com.example.akaishi.forge.client.WirelessFieldRenderer;
 import com.example.akaishi.forge.client.WirelessNodeFieldRenderer;
-import com.example.akaishi.forge.client.AkaishiUnnameableHandler;
 import com.example.akaishi.forge.client.AkaishiErosionFlashOverlay;
-import com.example.akaishi.forge.client.AkaishiUnnameableOverlay;
 import com.example.akaishi.forge.client.hud.AkaishiHudLayer;
-import com.example.akaishi.forge.client.AkaishiUnnameablePostHandler;
 import com.example.akaishi.api.miniature.IMiniaturizableTerminal;
 import com.example.akaishi.miniature.MiniatureCollapse;
 import com.example.akaishi.forge.client.mechanical.MechanicalPartRenderer;
@@ -53,23 +49,18 @@ import com.example.akaishi.forge.io.MachineCapabilityProvider;
 import com.example.akaishi.forge.io.MiniatureTerminalItemHandler;
 import com.example.akaishi.forge.life.AkaishiBodyCombatHandler;
 import com.example.akaishi.forge.life.AkaishiBodyPassiveHandler;
-import com.example.akaishi.forge.life.AkaishiForbiddenErosionHandler;
-import com.example.akaishi.forge.life.AkaishiForbiddenTooltipHandler;
-import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
 import com.example.akaishi.forge.life.AkaishiLifeInteraction;
 import com.example.akaishi.forge.life.AkaishiMechanicalEffectHandler;
-import com.example.akaishi.forge.life.AkaishiSocketEffectHandler;
 import com.example.akaishi.forge.life.PlayerBodyCapability;
 import com.example.akaishi.forge.life.WardenBossHandler;
-import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
 import com.example.akaishi.forge.value.AkaishiValueForgeEvents;
 import com.example.akaishi.forge.value.ValuePlatformImpl;
 import com.example.akaishi.gametest.AkaishiFuelSystemTests;
 import com.example.akaishi.gametest.AkaishiLifeSystemTests;
-import com.example.akaishi.item.AkaishiLifeFusionSet;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;
 import com.example.akaishi.item.AkaishiUpgradeHelper;
 import com.example.akaishi.item.ModItems;
+import com.example.akaishi.item.PoweredArmorQuery;
 import com.example.akaishi.wireless.PortableSupplyService;
 import com.example.akaishi.wireless.WirelessFieldManager;
 import com.example.akaishi.wireless.WirelessNetworkManager;
@@ -253,16 +244,10 @@ public final class AkaishiModForge {
         // 机械义体特殊效果（DNA 授予）：tick / 受击 / 击退消费，缺注册则义体效果不可见亦无效
         MinecraftForge.EVENT_BUS.register(AkaishiMechanicalEffectHandler.INSTANCE);
 
-        // 生命融合护甲实时状态 tooltip（已穿件数/激活情况，仅客户端渲染触发）
-        MinecraftForge.EVENT_BUS.register(AkaishiLifeFusionTooltipHandler.INSTANCE);
+        // 生命融合护甲实时状态 tooltip 随生命融合迁往禁忌模块（由 AkaishiForbiddenModForge 注册）
 
-        // 禁忌四件饰品统一生效层（生命之触/幼崽之心/母神之印/孕育之环 + 套装）
-        // 构造器内完成 common↔forge 接口注入（套装等级加成 / 扭曲屏蔽），注册即生效
-        MinecraftForge.EVENT_BUS.register(AkaishiSocketEffectHandler.INSTANCE);
-        // 禁忌套装实时状态 tooltip（已集齐件数，仅客户端渲染触发）
-        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenTooltipHandler.INSTANCE);
-        // 禁忌侵蚀推进层：阈值低语提示 + 跑满结算（9 槽乱码 + 数值重抽，幂等一次）
-        MinecraftForge.EVENT_BUS.register(AkaishiForbiddenErosionHandler.INSTANCE);
+        // 禁忌四件饰品统一生效层、套装 tooltip、侵蚀推进层随禁忌饰品迁往 akaishi_forbidden
+        // （由 AkaishiForbiddenModForge 注册）
 
         // 监守者 Boss 化：紫色 Boss 血条 + Boss 保护（免疫击退/免疫负面）
         MinecraftForge.EVENT_BUS.register(WardenBossHandler.INSTANCE);
@@ -270,12 +255,7 @@ public final class AkaishiModForge {
         // 衰竭区域死寂：区域内禁止生物自然生成
         MinecraftForge.EVENT_BUS.register(AkaishiDecaySpawnBlocker.INSTANCE);
 
-        // 祭坛成型静音：屏蔽四个结构信标的环境音/激活音（取消位置音事件，无需 Mixin）
-        MinecraftForge.EVENT_BUS.register(AkaishiAltarSoundMuter.INSTANCE);
-
-        // 仪式吸取掉落豁免：被吸死无掉落/无经验（common 定钩子，此处注入实现并消费事件，D158/D257）
-        AkaishiAltarDrainHandler.install();
-        MinecraftForge.EVENT_BUS.register(AkaishiAltarDrainHandler.INSTANCE);
+        // 祭坛成型静音、仪式吸取掉落豁免随母神祭坛迁往禁忌模块（由 AkaishiForbiddenModForge 注册）
 
         // 估值内核平台桥接：注入「当前服务端」获取方式（common 层通过 ValuePlatform 读取）
         ValuePlatformImpl.install();
@@ -345,11 +325,11 @@ public final class AkaishiModForge {
         }
     }
 
-    /** 注册客户端 HUD 叠加层：「不可名状」边缘粗线 + 噪点 + 低语；侵蚀泛红；统一 HUD 渲染层（含理智条） */
+    /** 注册客户端 HUD 叠加层：侵蚀泛红；统一 HUD 渲染层（含理智条）；不可名状叠加层随内容迁往禁忌模块 */
     private void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         // 泛红先注册（位于下层），避免盖住低语文字
         event.registerAboveAll("erosion_flash_overlay", new AkaishiErosionFlashOverlay());
-        event.registerAboveAll("unnameable_overlay", new AkaishiUnnameableOverlay());
+        // 「不可名状」边缘粗线 + 噪点 + 低语随不可名状迁往禁忌模块（由 AkaishiForbiddenClientSetup 注册）
         // 统一 HUD 渲染层：理智条等"贴边自绘"组件由禁忌模块登记到 api.hud 注册表，
         // 再由本层统一解算锚点 / 组内堆叠 / 与原版 HUD 避让（元素自身不再硬编码屏幕坐标）。
         event.registerAboveAll("akaishi_hud_layer", new AkaishiHudLayer());
@@ -387,8 +367,7 @@ public final class AkaishiModForge {
                 AkaishiWirelessBlocks.CHISHI_WIRELESS_STRUCTURE_GLASS.get(),
                 AkaishiLifeBlocks.CHISHI_LIFE_WIRELESS_STRUCTURE_GLASS.get(),
                 AkaishiItemTerminalBlocks.CHISHI_ITEM_TERMINAL_STRUCTURE_GLASS.get());
-        // 母神祭坛：注册方块实体渲染器（供奉物悬浮展示）
-        BlockEntityRenderers.register(ModBlockEntities.CHISHI_MOTHER_ALTAR.get(), MotherAltarRenderer::new);
+        // 母神祭坛方块实体渲染器（供奉物悬浮展示）随祭坛迁往禁忌模块（由 AkaishiForbiddenClientSetup 注册）
         // 钻机钻头：结构成型时从钻头底面打出向下的信标光束（客户端渲染器）
         BlockEntityRenderers.register(ModBlockEntities.CHISHI_MINER_DRILL_BIT.get(), DrillBitBeaconRenderer::new);
         // 能量发射器：头部朝向与蓄能光效（方块实体渲染器）
@@ -411,10 +390,7 @@ public final class AkaishiModForge {
         // 衰竭区域氛围：玩家身处区域时染污雾色并收拢雾距（伪群系渲染）
         MinecraftForge.EVENT_BUS.register(AkaishiDecayFogHandler.INSTANCE);
         // 深海视野锁定（理智系统 P6）与低理智视野后处理由禁忌模块注册（P3b 迁出）
-        // 「不可名状」视野扭曲：相机滚转/抖动与 FOV 脉动
-        MinecraftForge.EVENT_BUS.register(AkaishiUnnameableHandler.INSTANCE);
-        // 「不可名状」后处理：整帧对比度提升 + 电视机花白
-        MinecraftForge.EVENT_BUS.register(AkaishiUnnameablePostHandler.INSTANCE);
+        // 「不可名状」视野扭曲（相机滚转/抖动与 FOV 脉动）与整帧后处理随不可名状迁往禁忌模块（P3d 迁出）
         // 阿盖托洛丝战斗音乐随 BOSS 迁往禁忌模块（P3c 迁出，由 AkaishiForbiddenClientSetup 注册）
         // 初始化机械部件纹理合成缓存（BEWLR 渲染准备）
         MechanicalPartRenderer.initialize();
@@ -598,7 +574,7 @@ public final class AkaishiModForge {
                     break; // 本单元本 tick 额度用完
                 }
                 ItemStack gear = player.getItemBySlot(slot);
-                if (gear.isEmpty() || !gear.isDamaged() || AkaishiLifeFusionSet.isLifeFusionArmor(gear)) {
+                if (gear.isEmpty() || !gear.isDamaged() || PoweredArmorQuery.isSetArmor(gear)) {
                     continue;
                 }
                 // 兼容创造模式直接取用的无标签装备，并过滤非赤石装备
@@ -616,13 +592,13 @@ public final class AkaishiModForge {
                 repairLimit -= toRepair;
             }
             // 2) 生命融合护甲：同样消耗赤能源，但修复速率 ×4，恢复显著快于普通赤石装备
-            int lifeBudget = portable.tier.repairPerTick * AkaishiLifeFusionSet.LIFE_FUSION_REPAIR_MULTIPLIER;
+            int lifeBudget = portable.tier.repairPerTick * PoweredArmorQuery.repairMultiplier();
             for (EquipmentSlot slot : armorSlots) {
                 if (lifeBudget <= 0) {
                     break; // 本单元本 tick 的生命护甲修复额度用完
                 }
                 ItemStack gear = player.getItemBySlot(slot);
-                if (gear.isEmpty() || !gear.isDamaged() || !AkaishiLifeFusionSet.isLifeFusionArmor(gear)) {
+                if (gear.isEmpty() || !gear.isDamaged() || !PoweredArmorQuery.isSetArmor(gear)) {
                     continue;
                 }
                 int toRepair = (int) Math.min(lifeBudget, Math.min(gear.getDamageValue(),
