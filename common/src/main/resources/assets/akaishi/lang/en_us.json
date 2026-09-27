@@ -663,6 +663,8 @@
 "itemGroup.akaishi.mechanical": "Mechanical Augmentation",
 "itemGroup.akaishi.life": "Life Technology",
 "itemGroup.akaishi.machines": "Machines & Structures",
+"itemGroup.akaishi.materials": "Akaishi Materials",
+"itemGroup.akaishi.machinery": "Akaishi Machinery",
 "block.akaishi.akaishi_mechanical_template_factory": "Mechanical Template Factory",
 "block.akaishi.akaishi_mechanical_processing_factory": "Mechanical Processing Factory",
 "block.akaishi.akaishi_mechanical_assembly_station": "Mechanical Assembly Station",

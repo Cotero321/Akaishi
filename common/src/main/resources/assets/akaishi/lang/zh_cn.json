@@ -676,6 +676,8 @@
 "itemGroup.akaishi.mechanical": "机械改造",
 "itemGroup.akaishi.life": "生命科技",
 "itemGroup.akaishi.machines": "机器与结构",
+"itemGroup.akaishi.materials": "赤石-材料",
+"itemGroup.akaishi.machinery": "赤石机械",
 "block.akaishi.akaishi_mechanical_template_factory": "机械模板制造厂",
 "block.akaishi.akaishi_mechanical_processing_factory": "机械加工制作厂",
 "block.akaishi.akaishi_mechanical_assembly_station": "机械组装加工台",

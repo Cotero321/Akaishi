@@ -21,30 +21,34 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
- * 创造模式物品栏分类（按体系拆分为 4 栏）：
+ * 创造模式物品栏分类（P4 重排为 2 栏，含禁忌栏合计 3 栏）：
  * <ol>
- *   <li>{@link #CHISHI_TAB_ID} 赤石之章：通用材料 / 装备 / 工具 / 采集体系（主栏），帕秋莉手册引用</li>
- *   <li>{@link #MECHANICAL_TAB_ID} 机械改造：机械器官 / 部件模板 / 加工件 / 机械材料 / 3 台机器</li>
- *   <li>{@link #LIFE_TAB_ID} 生命科技：生物器官 / 样本 / 药剂 / 生命能量 / 手术与基因机器</li>
- *   <li>{@link #MACHINES_TAB_ID} 机器与结构：能源 / 管道 / 储罐 / 多方块结构件</li>
+ *   <li>{@link #MATERIALS_TAB_ID} 赤石-材料：所有非方块物品 + 矿石/自然方块白名单（帕秋莉手册引用该 id）</li>
+ *   <li>{@link #MACHINERY_TAB_ID} 赤石机械：其余全部方块（机器与结构）</li>
  * </ol>
+ * <p>原 4 栏（主栏 / 机械改造 / 生命科技 / 机器与结构）合并为上述 2 栏：两栏各自复用同一组
+ * {@code add*Items} 策展方法一次，由类型谓词（非方块物品或白名单方块 → 材料；其余方块 → 机械）分流，
+ * 两栏并集与原 4 栏并集逐项一致（不重不漏），入栏顺序仍为原有策展顺序。
  * <p>原第 5 栏「禁忌」随禁忌秘典一并迁往 {@code akaishi_forbidden}（未装禁忌包即无该栏）。
  */
 public final class ModCreativeTabs {
 
-    /** 主栏 id，帕秋莉手册 book.json 的 creative_tab 也引用该 id */
-    public static final String CHISHI_TAB_ID = "akaishi";
-    /** 机械改造栏 id */
-    public static final String MECHANICAL_TAB_ID = "akaishi_mechanical";
-    /** 生命科技栏 id */
-    public static final String LIFE_TAB_ID = "akaishi_life";
-    /** 机器与结构栏 id */
-    public static final String MACHINES_TAB_ID = "akaishi_machines";
+    /** 材料栏 id（复用原主栏 id；帕秋莉手册 book.json 的 creative_tab 也引用该 id） */
+    public static final String MATERIALS_TAB_ID = "akaishi";
+    /** 机械栏 id（复用原机器与结构栏 id） */
+    public static final String MACHINERY_TAB_ID = "akaishi_machines";
 
     private ModCreativeTabs() {
     }
@@ -52,37 +56,102 @@ public final class ModCreativeTabs {
     public static void register() {
         var tabs = RegistrarManager.get(AkaishiMod.MOD_ID).get(Registries.CREATIVE_MODE_TAB);
 
-        // 1. 主栏：赤石之章（通用材料 / 装备 / 工具 / 采集体系）
-        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, CHISHI_TAB_ID),
+        // 1. 材料栏：所有非方块物品 + 矿石/自然方块白名单（原 4 栏并集的「材料」子集）
+        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, MATERIALS_TAB_ID),
                 () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
-                        .title(Component.translatable("itemGroup.akaishi.akaishi"))
+                        .title(Component.translatable("itemGroup.akaishi.materials"))
                         .icon(() -> new ItemStack(ModBlocks.get(ModBlocks.ALL_ORES.get(0))))
-                        .displayItems((params, output) -> addMainItems(output))
+                        .displayItems((params, output) -> fillMaterialItems(output))
                         .build());
 
-        // 2. 机械改造栏
-        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, MECHANICAL_TAB_ID),
+        // 2. 机械栏：其余全部方块（机器与结构，原 4 栏并集的「机械」子集）
+        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, MACHINERY_TAB_ID),
                 () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 1)
-                        .title(Component.translatable("itemGroup.akaishi.mechanical"))
-                        .icon(() -> new ItemStack(AkaishiMechanicalBlocks.CHISHI_MECHANICAL_TEMPLATE_FACTORY.get()))
-                        .displayItems((params, output) -> addMechanicalItems(output))
-                        .build());
-
-        // 3. 生命科技栏
-        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, LIFE_TAB_ID),
-                () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 2)
-                        .title(Component.translatable("itemGroup.akaishi.life"))
-                        .icon(() -> new ItemStack(AkaishiLifeBlocks.CHISHI_SURGERY.get()))
-                        .displayItems((params, output) -> addLifeItems(output))
-                        .build());
-
-        // 4. 机器与结构栏
-        tabs.register(new ResourceLocation(AkaishiMod.MOD_ID, MACHINES_TAB_ID),
-                () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 3)
-                        .title(Component.translatable("itemGroup.akaishi.machines"))
+                        .title(Component.translatable("itemGroup.akaishi.machinery"))
                         .icon(() -> new ItemStack(AkaishiReactorBlocks.CHISHI_REACTOR_CONTROLLER.get()))
-                        .displayItems((params, output) -> addMachinesItems(output))
+                        .displayItems((params, output) -> fillMachineryItems(output))
                         .build());
+    }
+
+    // ==================== 两栏分流：复用同一组策展方法，按类型谓词拆分 ====================
+
+    /**
+     * 材料栏内容：依次跑完原 4 栏的策展方法（顺序不变），仅保留「非方块物品」与「白名单矿石/自然方块」。
+     * <p>与原 4 栏并集的关系：材料栏 ≡ {非方块物品} ∪ {白名单方块}，机械栏 ≡ {其余方块}，二者互斥且并集为全集。
+     */
+    private static void fillMaterialItems(CreativeModeTab.Output output) {
+        Set<Item> natural = naturalOrOreBlocks();
+        CreativeModeTab.Output filtered = new FilteredOutput(output, stack -> isMaterial(stack, natural));
+        addMainItems(filtered);
+        addMechanicalItems(filtered);
+        addLifeItems(filtered);
+        addMachinesItems(filtered);
+    }
+
+    /** 机械栏内容：同 {@link #fillMaterialItems} 的策展顺序，仅保留「非白名单方块」。 */
+    private static void fillMachineryItems(CreativeModeTab.Output output) {
+        Set<Item> natural = naturalOrOreBlocks();
+        CreativeModeTab.Output filtered = new FilteredOutput(output, stack -> !isMaterial(stack, natural));
+        addMainItems(filtered);
+        addMechanicalItems(filtered);
+        addLifeItems(filtered);
+        addMachinesItems(filtered);
+    }
+
+    /** 材料栏判据：非方块物品一律入材料栏；方块只有命中矿石/自然方块白名单才入材料栏，其余归机械栏。 */
+    private static boolean isMaterial(ItemStack stack, Set<Item> naturalBlocks) {
+        Item item = stack.getItem();
+        return !(item instanceof BlockItem) || naturalBlocks.contains(item);
+    }
+
+    /**
+     * 矿石/自然方块白名单（显式列出，不用名字匹配）：4 环境赤石矿簇、粗制赤石块、赤石精华块、
+     * 4 级晶洞母岩、赤石水晶簇、赤石水晶块。其余方块（催化器/收集器/机器/结构件）一律归机械栏。
+     */
+    private static Set<Item> naturalOrOreBlocks() {
+        Set<Item> set = new HashSet<>();
+        for (AkaishiOreDef def : ModBlocks.ALL_ORES) {
+            addBlockItem(set, ModBlocks.get(def));
+        }
+        addBlockItem(set, ModBlocks.RAW_CHISHI_BLOCK);
+        addBlockItem(set, ModBlocks.CHISHI_ESSENCE_BLOCK);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_GEODE_FLAWED);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_GEODE_NORMAL);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_GEODE_PRISTINE);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_GEODE_PERFECT);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_CRYSTAL_CLUSTER);
+        addBlockItem(set, AkaishiCrystalBlocks.CHISHI_CRYSTAL_BLOCK);
+        return set;
+    }
+
+    private static void addBlockItem(Set<Item> set, Block block) {
+        if (block != null) {
+            set.add(block.asItem());
+        }
+    }
+
+    private static void addBlockItem(Set<Item> set, RegistrySupplier<? extends Block> supplier) {
+        if (supplier != null) {
+            addBlockItem(set, supplier.get());
+        }
+    }
+
+    /** 类型过滤的 Output 包装器：仅把满足谓词的 ItemStack 转发给真实 output，其余丢弃。 */
+    private static final class FilteredOutput implements CreativeModeTab.Output {
+        private final CreativeModeTab.Output delegate;
+        private final Predicate<ItemStack> keep;
+
+        private FilteredOutput(CreativeModeTab.Output delegate, Predicate<ItemStack> keep) {
+            this.delegate = delegate;
+            this.keep = keep;
+        }
+
+        @Override
+        public void accept(ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+            if (keep.test(stack)) {
+                delegate.accept(stack, visibility);
+            }
+        }
     }
 
     // ==================== 栏 1：主栏（通用材料 / 装备 / 工具 / 采集体系） ====================
