@@ -1,6 +1,6 @@
 package com.example.akaishi.api.fluid;
 
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

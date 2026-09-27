@@ -14,7 +14,7 @@ import com.example.akaishi.craft.VirtualCraftTask;
 import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;

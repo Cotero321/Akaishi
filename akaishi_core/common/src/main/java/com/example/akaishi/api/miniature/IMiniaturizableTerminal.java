@@ -1,6 +1,6 @@
 package com.example.akaishi.api.miniature;
 
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

@@ -1,4 +1,5 @@
 package com.example.akaishi.fluid;
+import com.example.akaishi.core.fluid.FluidTank;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;

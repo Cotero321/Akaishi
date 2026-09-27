@@ -4,7 +4,7 @@ import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.item.ModItems;
 import com.example.akaishi.menu.AkaishiPlasmaFillerMenu;

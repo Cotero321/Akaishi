@@ -5,7 +5,7 @@ import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.block.entity.AkaishiFluidPipeBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.config.ModConfig;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;

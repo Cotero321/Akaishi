@@ -5,7 +5,7 @@ import com.example.akaishi.block.entity.AkaishiFuelCannerBlockEntity;
 import com.example.akaishi.block.entity.AkaishiFuelMixerBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.item.AkaishiFuelCellItem;
 import com.example.akaishi.item.ModItems;

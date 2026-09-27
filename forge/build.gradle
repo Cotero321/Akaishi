@@ -14,14 +14,14 @@ loom {
     runs {
         client {
             client()
-            name "Forge Client"
+            name "Client · 核心+本体（2 模组）"
             runDir "run/client"
             vmArgs "-Dneoforge.enabledGameTestNamespace=akaishi"
             programArgs "--username", "Player1"
         }
         server {
             server()
-            name "Forge Server"
+            name "Server · 核心+本体（2 模组）"
             runDir "run/server"
             vmArgs "-Dneoforge.enabledGameTestNamespace=akaishi"
             // 转发测试开关：Gradle --system-prop 仅写入 Gradle JVM，JavaExec 子进程不继承，
@@ -35,10 +35,11 @@ loom {
 configurations {
     common
     shadowCommon // Don't use shadow from the shadow plugin since it conflicts with Loom.
-    crossMod // 跨模组依赖（赤石核心），普通配置而非 modImplementation，理由见 akaishi_forbidden/forge/build.gradle
-    compileClasspath.extendsFrom common, crossMod
-    runtimeClasspath.extendsFrom common, crossMod
-    developmentForge.extendsFrom common, crossMod
+    crossMod // 跨模组依赖（赤石核心平台 :coreforge）：dev 下它是真实 mod（自带 mods.toml），只作普通 classpath 依赖即可
+    crossCommon // 跨模组依赖（赤石核心 common :corecommon）：无 mods.toml，dev 下必须经 Architectury Transformer 注入为 fake mod 才在 ModLauncher 可见
+    compileClasspath.extendsFrom common, crossMod, crossCommon
+    runtimeClasspath.extendsFrom common, crossMod, crossCommon
+    developmentForge.extendsFrom common, crossCommon
 }
 
 shadowJar {
@@ -146,7 +147,7 @@ dependencies {
     // （Architectury 的 common 与 forge 是两个独立项目，平台的 namedElements 不含 common 类）。
     // 与本模块 mods.toml 的 [[dependencies.akaishi]]（modId = akaishi_core，mandatory + AFTER）成对声明。
     crossMod(project(path: ":coreforge", configuration: "namedElements")) { transitive false }
-    crossMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+    crossCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
 
     // Architectury API - 使用 Jar-in-Jar 内嵌
     modApi("dev.architectury:architectury-forge:9.2.14")

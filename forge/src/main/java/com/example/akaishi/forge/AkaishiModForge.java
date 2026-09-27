@@ -63,7 +63,7 @@ import com.example.akaishi.item.ModItems;
 import com.example.akaishi.item.PoweredArmorQuery;
 import com.example.akaishi.wireless.PortableSupplyService;
 import com.example.akaishi.wireless.WirelessFieldManager;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 import com.example.akaishi.wireless.WirelessNodeRegistry;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;

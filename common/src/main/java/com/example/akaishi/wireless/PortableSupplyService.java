@@ -1,4 +1,6 @@
 package com.example.akaishi.wireless;
+import com.example.akaishi.core.wireless.WirelessFamily;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 
 import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.item.AkaishiPortableEnergyCell;

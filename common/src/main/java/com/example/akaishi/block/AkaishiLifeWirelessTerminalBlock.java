@@ -3,7 +3,7 @@ package com.example.akaishi.block;
 import com.example.akaishi.block.entity.AkaishiLifeWirelessTerminalBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
 import com.example.akaishi.miniature.MiniatureCollapse;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;

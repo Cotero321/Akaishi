@@ -8,9 +8,9 @@ import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.config.ModConfig;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.util.LongDataSlots;
-import com.example.akaishi.wireless.TerminalSecurity;
-import com.example.akaishi.wireless.WirelessFamily;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.WirelessFamily;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

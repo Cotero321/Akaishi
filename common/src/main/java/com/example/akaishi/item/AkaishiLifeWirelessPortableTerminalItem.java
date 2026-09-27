@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 无线生命便捷终端：手持右键打开只读遥控面板（生命族，赤版便携终端的生命镜像）。
  * <p>
- * 服务端每 tick 扫描玩家背包中的第一张身份卡，按 {@link com.example.akaishi.wireless.WirelessFamily#LIFE}
+ * 服务端每 tick 扫描玩家背包中的第一张身份卡，按 {@link com.example.akaishi.core.wireless.WirelessFamily#LIFE}
  * 族反查授权该卡的在线生命终端，把其状态（成型/储能/口统计/卡与终端短 ID）同步到界面。
  * 手持终端不传输能量，仅作状态面板；身份卡与赤能源体系共用（一张卡不可跨族命中，族隔离）。
  */

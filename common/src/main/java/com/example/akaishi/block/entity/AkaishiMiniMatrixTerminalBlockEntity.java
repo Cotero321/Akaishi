@@ -22,7 +22,7 @@ import com.example.akaishi.craft.ProcessCoverage;
 import com.example.akaishi.craft.VirtualCraftPlanner;
 import com.example.akaishi.craft.VirtualCraftTask;
 import com.example.akaishi.craft.WirelessMachineScanner;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 import com.example.akaishi.wireless.WirelessFieldManager;
 import com.example.akaishi.wireless.WirelessNodeRegistry;
 

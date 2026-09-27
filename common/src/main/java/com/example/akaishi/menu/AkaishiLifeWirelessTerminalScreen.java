@@ -1,7 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;

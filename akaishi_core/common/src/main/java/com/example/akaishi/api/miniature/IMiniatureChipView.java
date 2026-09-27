@@ -1,6 +1,6 @@
 package com.example.akaishi.api.miniature;
 
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

@@ -16,9 +16,9 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.wireless.IWirelessTerminal;
 import com.example.akaishi.wireless.ItemPortTransfer;
 import com.example.akaishi.wireless.ItemTerminalRegistry;
-import com.example.akaishi.wireless.TerminalSecurity;
-import com.example.akaishi.wireless.WirelessFamily;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.WirelessFamily;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;

@@ -1,4 +1,5 @@
 package com.example.akaishi.wireless;
+import com.example.akaishi.core.wireless.WirelessFamily;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

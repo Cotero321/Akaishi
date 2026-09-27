@@ -23,7 +23,7 @@ import com.example.akaishi.storage.TerminalRejectLog;
 import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemTerminalFee;
 import com.example.akaishi.wireless.ItemTerminalRegistry;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

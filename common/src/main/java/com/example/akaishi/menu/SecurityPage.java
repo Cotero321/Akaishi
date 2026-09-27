@@ -2,7 +2,7 @@ package com.example.akaishi.menu;
 
 import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.item.AkaishiWirelessIdentityCardItem;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

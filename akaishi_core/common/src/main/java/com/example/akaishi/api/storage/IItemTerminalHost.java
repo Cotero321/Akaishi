@@ -3,7 +3,7 @@ package com.example.akaishi.api.storage;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.ContainerData;

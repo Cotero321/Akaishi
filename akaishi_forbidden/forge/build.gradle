@@ -13,6 +13,22 @@ loom {
     forge {
         mixinConfig "akaishi_forbidden.mixins.json"
     }
+    // dev 运行环境：核心 + 本体 + 禁忌（3 模组）。
+    // 本模块的运行 classpath 天然包含三者（见下方 crossMod 声明），
+    // 是唯一能一次加载全部三个模组的入口；本体的 :forge:runClient 只加载 2 模组。
+    runs {
+        client {
+            client()
+            name "Client · 核心+本体+禁忌（3 模组）"
+            runDir "run/client"
+            programArgs "--username", "Player3"
+        }
+        server {
+            server()
+            name "Server · 核心+本体+禁忌（3 模组）"
+            runDir "run/server"
+        }
+    }
 }
 
 repositories {
@@ -44,10 +60,11 @@ base {
 configurations {
     common
     shadowCommon
-    crossMod // 跨模组依赖（核心 + 本体），普通配置而非 modImplementation，理由见 forbiddencommon/build.gradle
-    compileClasspath.extendsFrom common, crossMod
-    runtimeClasspath.extendsFrom common, crossMod
-    developmentForge.extendsFrom common, crossMod
+    crossMod // 平台侧真实 mod（自带 mods.toml）：coreforge / forge
+    crossCommon // common 侧无 mods.toml：corecommon / common，dev 下需经 transformer 注入为 fake mod 才可见
+    compileClasspath.extendsFrom common, crossMod, crossCommon
+    runtimeClasspath.extendsFrom common, crossMod, crossCommon
+    developmentForge.extendsFrom common, crossCommon
 }
 
 shadowJar {
@@ -116,17 +133,26 @@ dependencies {
     // （Architectury 的 common 与 forge 是两个独立项目，平台的 namedElements 不含 common 类）。
     // 与本模块 mods.toml 的 [[dependencies.akaishi_forbidden]]（akaishi_core / akaishi，mandatory + AFTER）成对声明。
     crossMod(project(path: ":coreforge", configuration: "namedElements")) { transitive false }
-    crossMod(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
     crossMod(project(path: ":forge", configuration: "namedElements")) { transitive false }
-    crossMod(project(path: ":common", configuration: "namedElements")) { transitive false }
+    crossCommon(project(path: ":corecommon", configuration: "namedElements")) { transitive false }
+    crossCommon(project(path: ":common", configuration: "namedElements")) { transitive false }
 
     // GeckoLib：影怪渲染器（GeoEntityRenderer / GeoModel / GeoRenderLayer）编译期与 dev 运行都需要。
     // 不 include：本体 tech 已声明为硬依赖，运行时由玩家安装的 geckolib 提供，避免重复打包。
     modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${rootProject.geckolib_version}")
 
     // Architectury API：平台侧读 common 侧注册表字段（RegistrySupplier）需要编译期类型。
-    // 只 compileOnly、不 include：运行时的 architectury 由本体 jar-in-jar 唯一提供（见 forbiddencommon/build.gradle）。
+    // 只 compileOnly / 不 include：**发布版**的 architectury 由本体 jar-in-jar 唯一提供（见 forbiddencommon/build.gradle）。
     modCompileOnly("dev.architectury:architectury-forge:9.2.14")
+
+    // ===== dev 运行时依赖（只影响 runClient/runServer，不进 jar）=====
+    // 发布版中这些由本体（或玩家安装）提供；但 dev 运行不会从"别的模组的 build.gradle"继承依赖，
+    // 缺了就是 NoClassDefFoundError。故此处显式补运行时（modRuntimeOnly 不打包，无重复内嵌风险）。
+    modRuntimeOnly("dev.architectury:architectury-forge:9.2.14")
+    // 本体配置系统（ModConfig / CurioSpecs）在运行时需要 Cloth Config
+    modRuntimeOnly("me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}")
+    // 禁忌四件饰品的生效层直接调 CuriosApi
+    modRuntimeOnly("top.theillusivec4.curios:curios-forge:${rootProject.curios_version}")
 
     // JEI：配方展示（P3d：AkaishiForbiddenJeiPlugin 注册生命融合 / 母神祭坛两个类别）。
     // 与本体同口径：编译用 API artifact，dev 运行加载完整 jar；非硬依赖（未装 JEI 时插件不被发现）。
@@ -166,6 +192,7 @@ processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+// dev 运行前先编出三个模块的 classes（dev 直接加载 build/classes 目录，无 jar 参与）
 tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
-    dependsOn(":forbiddencommon:classes")
+    dependsOn(":forbiddencommon:classes", ":common:classes", ":corecommon:classes")
 }

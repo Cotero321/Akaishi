@@ -14,7 +14,7 @@ import com.example.akaishi.craft.recipe.AkaishiMachineRecipeIndex;
 import com.example.akaishi.craft.recipe.AkaishiRecipeTypes;
 import com.example.akaishi.energy.AkaishiEnergyStorage;
 import com.example.akaishi.energy.AkaishiEnergyType;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import com.example.akaishi.menu.AkaishiEnergyProcessorMenu;
 import com.example.akaishi.sound.MachineHum;

@@ -1,7 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;

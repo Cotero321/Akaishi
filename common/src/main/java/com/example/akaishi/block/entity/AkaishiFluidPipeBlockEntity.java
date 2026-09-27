@@ -3,7 +3,7 @@ package com.example.akaishi.block.entity;
 import com.example.akaishi.api.fluid.IExternalFluidAccess;
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
 import com.example.akaishi.block.AkaishiFluidPipeBlock;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import com.example.akaishi.fluid.ModFluids;
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;

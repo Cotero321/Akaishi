@@ -6,7 +6,7 @@ import com.example.akaishi.api.security.AkaishiSecurityPermission;
 import com.example.akaishi.block.AkaishiMiniatureBlocks;
 import com.example.akaishi.block.entity.MiniatureTerminalBlockEntity;
 import com.example.akaishi.item.AkaishiMiniatureBlockItem;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;

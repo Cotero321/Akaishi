@@ -1,26 +1,26 @@
 package com.example.akaishi.forbidden.forge;
 
-import com.example.akaishi.boss.agaitolos.AgaitolosEntity;
-import com.example.akaishi.command.AkaishiSanityCommand;
-import com.example.akaishi.entity.AkaishiForbiddenEntities;
+import com.example.akaishi.forbidden.boss.agaitolos.AgaitolosEntity;
+import com.example.akaishi.forbidden.command.AkaishiSanityCommand;
+import com.example.akaishi.forbidden.entity.AkaishiForbiddenEntities;
 import com.example.akaishi.forbidden.AkaishiForbiddenMod;
-import com.example.akaishi.forge.AkaishiAltarDrainHandler;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosArenaEvents;
-import com.example.akaishi.forge.boss.agaitolos.AgaitolosDoomHandler;
-import com.example.akaishi.forge.life.AkaishiForbiddenErosionHandler;
-import com.example.akaishi.forge.life.AkaishiForbiddenTooltipHandler;
-import com.example.akaishi.forge.life.AkaishiLifeFusionTooltipHandler;
-import com.example.akaishi.forge.life.AkaishiSocketEffectHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityCombatHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityDamageHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityDamageSeenHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityFoodHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityKillHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityPotionBrewing;
-import com.example.akaishi.forge.sanity.AkaishiSanitySleepHandler;
-import com.example.akaishi.forge.sanity.AkaishiSanityUnnameableHandler;
-import com.example.akaishi.forge.sound.AkaishiAltarSoundMuter;
-import com.example.akaishi.sanity.shadow.ShadowEntity;
+import com.example.akaishi.forbidden.forge.AkaishiAltarDrainHandler;
+import com.example.akaishi.forbidden.forge.boss.agaitolos.AgaitolosArenaEvents;
+import com.example.akaishi.forbidden.forge.boss.agaitolos.AgaitolosDoomHandler;
+import com.example.akaishi.forbidden.forge.life.AkaishiForbiddenErosionHandler;
+import com.example.akaishi.forbidden.forge.life.AkaishiForbiddenTooltipHandler;
+import com.example.akaishi.forbidden.forge.life.AkaishiLifeFusionTooltipHandler;
+import com.example.akaishi.forbidden.forge.life.AkaishiSocketEffectHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityCombatHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityDamageHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityDamageSeenHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityFoodHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityKillHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityPotionBrewing;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanitySleepHandler;
+import com.example.akaishi.forbidden.forge.sanity.AkaishiSanityUnnameableHandler;
+import com.example.akaishi.forbidden.forge.sound.AkaishiAltarSoundMuter;
+import com.example.akaishi.forbidden.sanity.shadow.ShadowEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -28,6 +28,7 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
@@ -102,7 +103,10 @@ public final class AkaishiForbiddenModForge {
         MinecraftForge.EVENT_BUS.addListener(
                 (RegisterCommandsEvent event) -> AkaishiSanityCommand.register(event.getDispatcher()));
 
-        // 客户端专属注册（渲染器 / HUD 元素 / 雾效 / 后处理）：延时到客户端求值，服务端不加载客户端类型
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AkaishiForbiddenClientSetup::register);
+        // 客户端专属注册（渲染器 / HUD 元素 / 雾效 / 后处理）：在 FMLClientSetupEvent 中求值 ——
+        // 该事件晚于各注册表填充，AkaishiForbiddenEntities.*.get() 才能取到值；服务端不加载客户端类型
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(
+                (FMLClientSetupEvent event) ->
+                        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> AkaishiForbiddenClientSetup::register));
     }
 }

@@ -1,11 +1,11 @@
 package com.example.akaishi.forbidden;
 
 import com.example.akaishi.AkaishiMod;
-import com.example.akaishi.block.AkaishiForbiddenBlocks;
-import com.example.akaishi.block.AkaishiMotherAltarBlocks;
-import com.example.akaishi.item.AkaishiCodexItems;
-import com.example.akaishi.item.AkaishiForbiddenItems;
-import com.example.akaishi.item.AkaishiSanityItems;
+import com.example.akaishi.forbidden.block.AkaishiForbiddenBlocks;
+import com.example.akaishi.forbidden.block.AkaishiMotherAltarBlocks;
+import com.example.akaishi.forbidden.item.AkaishiCodexItems;
+import com.example.akaishi.forbidden.item.AkaishiForbiddenItems;
+import com.example.akaishi.forbidden.item.AkaishiSanityItems;
 
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;

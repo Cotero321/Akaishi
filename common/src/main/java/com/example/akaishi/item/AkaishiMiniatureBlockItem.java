@@ -2,7 +2,7 @@ package com.example.akaishi.item;
 
 import com.example.akaishi.api.miniature.MiniatureTerminalAdapter;
 import com.example.akaishi.api.miniature.MiniatureTerminalRegistry;
-import com.example.akaishi.wireless.WirelessNetworkManager;
+import com.example.akaishi.core.wireless.WirelessNetworkManager;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;

@@ -105,7 +105,7 @@ public interface MiniatureTerminalState {
      * 物品族微缩件即使摆在与端口同坐标处也不会被认作能量中枢。
      */
     @Nullable
-    default com.example.akaishi.wireless.WirelessFamily family() {
+    default com.example.akaishi.core.wireless.WirelessFamily family() {
         return null;
     }
 

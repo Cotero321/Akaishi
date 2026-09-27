@@ -18,7 +18,7 @@ import com.example.akaishi.util.LongDataSlots;
 import com.example.akaishi.value.ItemPoints;
 import com.example.akaishi.value.ItemTerminalFee;
 import com.example.akaishi.wireless.ItemPortTransfer;
-import com.example.akaishi.wireless.TerminalSecurity;
+import com.example.akaishi.core.wireless.TerminalSecurity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

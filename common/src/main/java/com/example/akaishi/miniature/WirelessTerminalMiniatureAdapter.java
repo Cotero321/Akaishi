@@ -10,7 +10,7 @@ import com.example.akaishi.energy.AkaishiEnergyType;
 import com.example.akaishi.energy.LifeEnergyType;
 import com.example.akaishi.menu.AkaishiLifeWirelessTerminalMenu;
 import com.example.akaishi.menu.AkaishiWirelessTerminalMenu;
-import com.example.akaishi.wireless.WirelessFamily;
+import com.example.akaishi.core.wireless.WirelessFamily;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

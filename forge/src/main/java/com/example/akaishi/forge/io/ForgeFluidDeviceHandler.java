@@ -1,7 +1,7 @@
 package com.example.akaishi.forge.io;
 
 import com.example.akaishi.api.fluid.IFluidPipeDevice;
-import com.example.akaishi.fluid.FluidTank;
+import com.example.akaishi.core.fluid.FluidTank;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
