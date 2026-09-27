@@ -11,25 +11,28 @@ import net.minecraft.world.entity.player.Player;
  * 需为效果实现本接口并在 {@link MechanicalEffectHandlerRegistry} 注册。
  * 未注册处理器的效果只展示、不生效（不会报错）。
  * <p>
- * 所有回调均运行在服务端，且仅在玩家装备了带该效果的机械器官时触发；
- * {@code sources} 为当前携带该效果的器官数量（≥1），供强度叠加使用。
+ * 所有回调均运行在服务端，且仅在玩家装备了带该效果的机械器官时触发。
+ * <p>
+ * <b>参数语义（T4 起）</b>：{@code sources} 已由旧的「携带该效果的器官数量（按槽位去重计数）」升级为
+ * <b>「该器官内的 DNA 等级（1~4）」</b>——等级 = clamp(该 DNA 来源在同一个器官 4 个部件中出现的次数, 1, 4)。
+ * 与材料特性一致，回调按「每个携带该效果的器官各触发一次」分发（M2：各器官各自生效、不跨器官合并等级）。
  */
 public interface IMechanicalDnaEffectHandler {
 
-    /** 玩家每 tick 末回调（可做常驻 buff / 周期恢复）。 */
+    /** 玩家每 tick 末回调（可做常驻 buff / 周期恢复）。{@code sources} = 该器官内的 DNA 等级（1~4）。 */
     default void onPlayerTick(Player player, int sources) {
     }
 
-    /** 玩家命中目标后回调（可附加药水、点燃等）。 */
+    /** 玩家命中目标后回调（可附加药水、点燃等）。{@code sources} = 该器官内的 DNA 等级（1~4）。 */
     default void onAttack(Player attacker, LivingEntity target, int sources) {
     }
 
-    /** 玩家受击结算前回调，返回修正后的伤害值；默认原样返回。 */
+    /** 玩家受击结算前回调，返回修正后的伤害值；默认原样返回。{@code sources} = 该器官内的 DNA 等级（1~4）。 */
     default float modifyIncomingDamage(Player player, DamageSource source, float amount, int sources) {
         return amount;
     }
 
-    /** 玩家被击退结算前回调，返回修正后的击退强度；默认原样返回。 */
+    /** 玩家被击退结算前回调，返回修正后的击退强度；默认原样返回。{@code sources} = 该器官内的 DNA 等级（1~4）。 */
     default float modifyKnockback(Player player, float strength, int sources) {
         return strength;
     }

@@ -58,6 +58,8 @@ public final class AkaishiMod {
         // 机械域注册表默认项：材料 / DNA 模板（渲染预合成与部件校验依赖该注册）
         MechanicalMaterial.registerDefaults();
         MechanicalDnaProfile.registerDefaults();
+        // 机械材料特性（T5）：17 个特性定义 + 挂到材料（须在材料注册之后）
+        com.example.akaishi.life.mechanical.trait.MechanicalTraits.register();
         // 旗帜图案域：须先于物品域注册（山羊头旗帜图案物品引用其标签）
         AkaishiBannerPatterns.register();
         // 加工配方类型与序列化器：须在数据包配方加载前注册

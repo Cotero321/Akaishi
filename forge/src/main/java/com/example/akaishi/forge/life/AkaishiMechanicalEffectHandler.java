@@ -1,97 +1,110 @@
 package com.example.akaishi.forge.life;
 
-import com.example.akaishi.api.mechanical.IMechanicalDnaEffect;
 import com.example.akaishi.api.mechanical.IMechanicalDnaEffectHandler;
 import com.example.akaishi.api.mechanical.MechanicalEffectHandlerRegistry;
+import com.example.akaishi.api.mechanical.trait.IMechanicalTraitHandler;
+import com.example.akaishi.api.mechanical.trait.MechanicalTraitHandlerRegistry;
 import com.example.akaishi.item.MechanicalOrganItem;
 import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.IPlayerBodyState;
 import com.example.akaishi.life.body.PlayerBodyHelper;
+import com.example.akaishi.life.mechanical.MechanicalDnaProfile;
+import com.example.akaishi.life.mechanical.MechanicalLevels;
 import com.example.akaishi.life.mechanical.MechanicalSpecialEffect;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 机械义体特殊效果处理器（Forge 服务端）。
- * 机械成品的效果由 DNA 授予并持久化在 NBT，本类负责平台侧实际消费，避免"看得到用不到"：
- * - tick 类：毒素免疫 / 低血自愈 / 水下加速 / 金装共鸣 / 瞬移冷却减少
- * - 受击类：爆炸抗性 / 击退抗性
- * - 命中类：火焰攻击 / 凋零攻击
- * - 第三方扩展：每个效果可通过 {@link MechanicalEffectHandlerRegistry} 挂接执行钩子，
- *   本类统一按效果 ID 分发，无需为附属模组硬编码分支。
- * - 暴击强化由 {@link #critBonus(IPlayerBodyState)} 供战斗处理器求和，避免二次暴击判定
+ * 机械义体效果处理器（Forge 服务端，T4 逐器官分发版）。
+ * <p>
+ * <b>分发模型（M2：各器官各自生效）</b>：遍历玩家每个槽位上的机械器官，对每个器官分别算出
+ * 「材料特性 → 该器官内的等级」与「DNA 来源 → 该器官内的等级」，并<b>逐个器官</b>按各自 level 回调，
+ * 不存在跨器官等级合并（企划 §2.1b）。
+ * <ul>
+ *   <li>材料特性：{@link MechanicalTraitHandlerRegistry} 按特性 ID 取处理器，逐个器官调用 7 个钩子；
+ *       未注册处理器的特性只不生效、不报错；</li>
+ *   <li>DNA 效果：{@link MechanicalEffectHandlerRegistry} 按效果 ID 取处理器，参数语义已由"来源数"
+ *       升级为"该器官内的 DNA 等级(1~4)"；内置 10 个效果的曲线见 {@link MechanicalDnaEffects}；</li>
+ *   <li>连续型 DNA 效果（免疫 / 自愈 / 水下 / 金装 / 瞬移）取全身最强一份调用一次，
+ *       瞬时型（伤害 / 火焰 / 凋零 / 击退）逐器官叠加；</li>
+ *   <li>装备变更（onEquip / onUnequip）由每 tick 与上次器官快照差分检测。</li>
+ * </ul>
+ * 暴击强化由 {@link #critBonus(IPlayerBodyState)} 供战斗处理器求和，避免二次暴击判定。
  */
 public final class AkaishiMechanicalEffectHandler {
 
     public static final AkaishiMechanicalEffectHandler INSTANCE = new AkaishiMechanicalEffectHandler();
 
-    /** 暴击强化：每条来源 +5% 暴击率 */
-    private static final float CRIT_BONUS_PER_SOURCE = 0.05F;
-    /** 爆炸抗性：爆炸伤害保留 60%（减免 40%） */
-    private static final float EXPLOSION_RESIST_FACTOR = 0.6F;
-    /** 击退抗性：击退强度保留 40% */
-    private static final float KNOCKBACK_RESIST_FACTOR = 0.4F;
-    /** 低血自愈触发线（最大生命占比） */
-    private static final float LOW_HEALTH_THRESHOLD = 0.3F;
-
-    // 内置效果稳定 ID（引用兼容门面，保证与历史 NBT / 注册表一致）
-    private static final ResourceLocation ID_CRITICAL_BOOST = MechanicalSpecialEffect.CRITICAL_BOOST.id();
-    private static final ResourceLocation ID_POISON_RESIST = MechanicalSpecialEffect.POISON_RESIST.id();
-    private static final ResourceLocation ID_LOW_HEALTH_REGEN = MechanicalSpecialEffect.LOW_HEALTH_REGENERATION.id();
-    private static final ResourceLocation ID_UNDERWATER_SPEED = MechanicalSpecialEffect.UNDERWATER_SPEED.id();
-    private static final ResourceLocation ID_GOLD_ARMOR_BONUS = MechanicalSpecialEffect.GOLD_ARMOR_BONUS.id();
-    private static final ResourceLocation ID_TELEPORT_COOLDOWN = MechanicalSpecialEffect.TELEPORT_COOLDOWN.id();
-    private static final ResourceLocation ID_EXPLOSION_RESIST = MechanicalSpecialEffect.EXPLOSION_RESIST.id();
-    private static final ResourceLocation ID_FIRE_ATTACK = MechanicalSpecialEffect.FIRE_ATTACK.id();
-    private static final ResourceLocation ID_WITHER_ATTACK = MechanicalSpecialEffect.WITHER_ATTACK.id();
-    private static final ResourceLocation ID_KNOCKBACK_RESIST = MechanicalSpecialEffect.KNOCKBACK_RESIST.id();
+    /** 每玩家「上次见到的器官」快照，用于 onEquip / onUnequip 差分（登出时清理）。 */
+    private static final Map<UUID, EnumMap<BodySlot, ItemStack>> LAST_ORGANS = new ConcurrentHashMap<>();
 
     private AkaishiMechanicalEffectHandler() {
     }
 
-    // ==================== 效果收集 ====================
+    // ==================== 逐器官数据 ====================
 
-    /**
-     * 收集玩家当前全部机械义体特殊效果 → 携带来源数（同一槽位内去重，跨槽位累加）。
-     * 采用普通 Map（效果已去枚举），内置与附属效果一视同仁。
-     */
-    public static Map<ResourceLocation, Integer> collectSources(IPlayerBodyState state) {
-        Map<ResourceLocation, Integer> sources = new HashMap<>();
+    /** 收集玩家所有机械器官（按槽位顺序）。 */
+    private static List<ItemStack> mechanicalOrgans(IPlayerBodyState state) {
+        List<ItemStack> organs = new ArrayList<>(BodySlot.values().length);
         for (BodySlot slot : BodySlot.values()) {
             ItemStack organ = state.getOrgan(slot);
-            if (!(organ.getItem() instanceof MechanicalOrganItem)) {
-                continue;
-            }
-            Set<ResourceLocation> inSlot = new HashSet<>();
-            for (IMechanicalDnaEffect effect : MechanicalOrganItem.getEffects(organ)) {
-                ResourceLocation id = effect.id();
-                if (id != null && inSlot.add(id)) {
-                    sources.merge(id, 1, Integer::sum);
-                }
+            if (organ.getItem() instanceof MechanicalOrganItem) {
+                organs.add(organ);
             }
         }
-        return sources;
+        return organs;
     }
 
-    /** 暴击强化加成（与器官暴击属性求和后统一受配置上限裁剪） */
+    /**
+     * 某器官的「DNA 效果等级表」：把逐部件 DNA 来源的等级汇总到其授予的效果上
+     * （同一效果由多个来源授予时取最高等级）。空 Map 表示该器官无有效效果。
+     */
+    private static Map<ResourceLocation, Integer> effectLevels(ItemStack organ) {
+        Map<String, Integer> dnaLevels = MechanicalLevels.dnaLevels(organ);
+        if (dnaLevels.isEmpty()) {
+            return Map.of();
+        }
+        Map<ResourceLocation, Integer> levels = new HashMap<>(dnaLevels.size());
+        for (Map.Entry<String, Integer> entry : dnaLevels.entrySet()) {
+            MechanicalDnaProfile profile = MechanicalDnaProfile.get(entry.getKey());
+            if (profile == null || MechanicalSpecialEffect.isNone(profile.effect())) {
+                continue;
+            }
+            ResourceLocation id = profile.effect().id();
+            if (id != null) {
+                levels.merge(id, entry.getValue(), Math::max);
+            }
+        }
+        return levels;
+    }
+
+    /** 暴击强化加成：逐器官累加（M2），与器官暴击属性求和后统一受配置上限裁剪。 */
     public static float critBonus(IPlayerBodyState state) {
-        return CRIT_BONUS_PER_SOURCE * collectSources(state).getOrDefault(ID_CRITICAL_BOOST, 0);
+        ResourceLocation critId = MechanicalSpecialEffect.CRITICAL_BOOST.id();
+        float bonus = 0F;
+        for (ItemStack organ : mechanicalOrgans(state)) {
+            Integer level = effectLevels(organ).get(critId);
+            if (level != null) {
+                bonus += MechanicalDnaEffects.critBonus(level);
+            }
+        }
+        return bonus;
     }
 
     // ==================== tick 类 ====================
@@ -109,100 +122,92 @@ public final class AkaishiMechanicalEffectHandler {
         if (state == null) {
             return;
         }
-        Map<ResourceLocation, Integer> sources = collectSources(state);
-        if (sources.isEmpty()) {
-            return;
-        }
-        // 毒素免疫：清除中毒状态，中毒伤害随之归零
-        if (sources.containsKey(ID_POISON_RESIST) && player.hasEffect(MobEffects.POISON)) {
-            player.removeEffect(MobEffects.POISON);
-        }
-        // 低血自愈：生命低于 30% 时每 2 秒回复 1 点（不越线，与再生类被动独立）
-        if (sources.containsKey(ID_LOW_HEALTH_REGEN)
-                && player.tickCount % 40 == 0
-                && player.getHealth() < player.getMaxHealth() * LOW_HEALTH_THRESHOLD) {
-            player.heal(1.0F);
-        }
-        // 水下加速：浸水时持续海豚的恩惠
-        if (sources.containsKey(ID_UNDERWATER_SPEED) && player.isInWater()) {
-            applyPotion(player, MobEffects.DOLPHINS_GRACE, 0);
-        }
-        // 金装共鸣：穿戴金甲 2 件起抗性提升 I，集齐 4 件提升至 II
-        if (sources.containsKey(ID_GOLD_ARMOR_BONUS)) {
-            int gold = countGoldenArmor(player);
-            if (gold >= 2) {
-                applyPotion(player, MobEffects.DAMAGE_RESISTANCE, gold >= 4 ? 1 : 0);
-            }
-        }
-        // 瞬移冷却减少：末影珍珠冷却清零（原版 1 秒等待被义体消除）
-        if (sources.containsKey(ID_TELEPORT_COOLDOWN)
-                && player.getCooldowns().isOnCooldown(Items.ENDER_PEARL)) {
-            player.getCooldowns().removeCooldown(Items.ENDER_PEARL);
-        }
-        // 第三方扩展：按效果 ID 分发 tick 钩子
-        if (!MechanicalEffectHandlerRegistry.isEmpty()) {
-            for (Map.Entry<ResourceLocation, Integer> entry : sources.entrySet()) {
-                IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
+        // 装备差分 → onEquip / onUnequip（属性型特性亦借此清理瞬时修饰符）
+        handleEquipDiff(player, state);
+
+        // 逐器官分发：材料特性（7 钩子之 onPlayerTick）与 DNA 效果（第三方按器官等级回调）
+        Map<ResourceLocation, Integer> tickMax = new HashMap<>();
+        for (ItemStack organ : mechanicalOrgans(state)) {
+            for (Map.Entry<String, Integer> trait : MechanicalLevels.traitLevels(organ).entrySet()) {
+                IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(trait.getKey());
                 if (handler != null) {
-                    handler.onPlayerTick(player, entry.getValue());
+                    handler.onPlayerTick(player, trait.getValue());
+                }
+            }
+            for (Map.Entry<ResourceLocation, Integer> effect : effectLevels(organ).entrySet()) {
+                tickMax.merge(effect.getKey(), effect.getValue(), Math::max);
+                IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(effect.getKey());
+                if (handler != null) {
+                    handler.onPlayerTick(player, effect.getValue());
                 }
             }
         }
+        // 内置连续效果：取全身最强一份
+        tickMax.forEach((id, level) -> MechanicalDnaEffects.applyTick(player, id, level));
     }
 
-    // ==================== 受击 / 命中类 ====================
+    // ==================== 受击 / 命中 / 击杀类 ====================
 
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event) {
         if (event.getEntity().level().isClientSide) {
             return;
         }
-        // 受害方：爆炸抗性（与器官 BLAST_RESIST 独立结算）+ 第三方入伤修正
+        // 受害方：材料特性 / DNA 受击修正 + 第三方入伤修正（逐器官）
         if (event.getEntity() instanceof Player victim) {
             IPlayerBodyState state = PlayerBodyHelper.of(victim);
             if (state != null) {
-                Map<ResourceLocation, Integer> sources = collectSources(state);
                 float amount = event.getAmount();
-                if (event.getSource().is(DamageTypeTags.IS_EXPLOSION) && sources.containsKey(ID_EXPLOSION_RESIST)) {
-                    amount *= EXPLOSION_RESIST_FACTOR;
-                }
-                if (!MechanicalEffectHandlerRegistry.isEmpty()) {
-                    for (Map.Entry<ResourceLocation, Integer> entry : sources.entrySet()) {
-                        IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
+                for (ItemStack organ : mechanicalOrgans(state)) {
+                    for (Map.Entry<String, Integer> trait : MechanicalLevels.traitLevels(organ).entrySet()) {
+                        IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(trait.getKey());
                         if (handler != null) {
-                            amount = handler.modifyIncomingDamage(victim, event.getSource(), amount, entry.getValue());
+                            amount = handler.modifyIncomingDamage(victim, event.getSource(), amount, trait.getValue());
+                        }
+                    }
+                    for (Map.Entry<ResourceLocation, Integer> effect : effectLevels(organ).entrySet()) {
+                        amount = MechanicalDnaEffects.modifyIncoming(victim, event.getSource(), amount,
+                                effect.getKey(), effect.getValue());
+                        IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(effect.getKey());
+                        if (handler != null) {
+                            amount = handler.modifyIncomingDamage(victim, event.getSource(), amount, effect.getValue());
                         }
                     }
                 }
                 event.setAmount(amount);
             }
         }
-        // 攻击方：命中附加火焰 / 凋零 + 第三方命中钩子
+        // 攻击方：材料特性命中钩子 / DNA 火焰凋零 + 第三方命中钩子（逐器官）
         if (event.getSource().getEntity() instanceof Player attacker) {
             IPlayerBodyState state = PlayerBodyHelper.of(attacker);
             if (state == null) {
                 return;
             }
-            Map<ResourceLocation, Integer> sources = collectSources(state);
             LivingEntity target = event.getEntity();
-            if (sources.containsKey(ID_FIRE_ATTACK) && !target.fireImmune()) {
-                target.setSecondsOnFire(4);
-            }
-            if (sources.containsKey(ID_WITHER_ATTACK)) {
-                applyToTarget(target, MobEffects.WITHER, 0, 100); // 5 秒
-            }
-            if (!MechanicalEffectHandlerRegistry.isEmpty()) {
-                for (Map.Entry<ResourceLocation, Integer> entry : sources.entrySet()) {
-                    IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
+            float amount = event.getAmount();
+            for (ItemStack organ : mechanicalOrgans(state)) {
+                for (Map.Entry<String, Integer> trait : MechanicalLevels.traitLevels(organ).entrySet()) {
+                    IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(trait.getKey());
                     if (handler != null) {
-                        handler.onAttack(attacker, target, entry.getValue());
+                        amount = handler.modifyOutgoingDamage(attacker, target, amount, trait.getValue());
+                        handler.onAttack(attacker, target, trait.getValue());
+                    }
+                }
+                for (Map.Entry<ResourceLocation, Integer> effect : effectLevels(organ).entrySet()) {
+                    MechanicalDnaEffects.applyAttack(attacker, target, effect.getKey(), effect.getValue());
+                    amount = MechanicalDnaEffects.modifyOutgoing(attacker, target, amount,
+                            effect.getKey(), effect.getValue());
+                    IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(effect.getKey());
+                    if (handler != null) {
+                        handler.onAttack(attacker, target, effect.getValue());
                     }
                 }
             }
+            event.setAmount(amount);
         }
     }
 
-    /** 击退抗性：受击击退强度按比例保留（与原版击退抗性属性叠加结算）+ 第三方击退修正 */
+    /** 击退抗性：逐器官按 DNA 等级保留击退强度（与原版击退抗性属性叠加结算）+ 第三方击退修正。 */
     @SubscribeEvent
     public void onKnockback(LivingKnockBackEvent event) {
         if (event.getEntity().level().isClientSide || !(event.getEntity() instanceof Player player)) {
@@ -212,47 +217,83 @@ public final class AkaishiMechanicalEffectHandler {
         if (state == null) {
             return;
         }
-        Map<ResourceLocation, Integer> sources = collectSources(state);
         float strength = event.getStrength();
-        if (sources.containsKey(ID_KNOCKBACK_RESIST)) {
-            strength *= KNOCKBACK_RESIST_FACTOR;
-        }
-        if (!MechanicalEffectHandlerRegistry.isEmpty()) {
-            for (Map.Entry<ResourceLocation, Integer> entry : sources.entrySet()) {
-                IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
+        for (ItemStack organ : mechanicalOrgans(state)) {
+            for (Map.Entry<ResourceLocation, Integer> effect : effectLevels(organ).entrySet()) {
+                strength = MechanicalDnaEffects.modifyKnockback(player, strength, effect.getKey(), effect.getValue());
+                IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(effect.getKey());
                 if (handler != null) {
-                    strength = handler.modifyKnockback(player, strength, entry.getValue());
+                    strength = handler.modifyKnockback(player, strength, effect.getValue());
                 }
             }
         }
         event.setStrength(strength);
     }
 
-    // ==================== 工具 ====================
-
-    /** 穿戴金甲件数（头盔/胸甲/护腿/靴子） */
-    private static int countGoldenArmor(Player player) {
-        int n = 0;
-        for (ItemStack armor : player.getInventory().armor) {
-            if (armor.is(Items.GOLDEN_HELMET) || armor.is(Items.GOLDEN_CHESTPLATE)
-                    || armor.is(Items.GOLDEN_LEGGINGS) || armor.is(Items.GOLDEN_BOOTS)) {
-                n++;
+    /** 击杀钩子：逐器官回调材料特性的 onKill（DNA 效果无此钩子）。 */
+    @SubscribeEvent
+    public void onLivingDeath(LivingDeathEvent event) {
+        if (event.getEntity().level().isClientSide || !(event.getSource().getEntity() instanceof Player player)) {
+            return;
+        }
+        IPlayerBodyState state = PlayerBodyHelper.of(player);
+        if (state == null) {
+            return;
+        }
+        LivingEntity victim = event.getEntity();
+        for (ItemStack organ : mechanicalOrgans(state)) {
+            for (Map.Entry<String, Integer> trait : MechanicalLevels.traitLevels(organ).entrySet()) {
+                IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(trait.getKey());
+                if (handler != null) {
+                    handler.onKill(player, victim, trait.getValue());
+                }
             }
         }
-        return n;
     }
 
-    /** 缺失时补充指定药水效果（5 秒持续；每 tick 巡检近似常驻，摘除义体后自然消退） */
-    private static void applyPotion(Player player, MobEffect effect, int amplifier) {
-        if (!player.hasEffect(effect)) {
-            player.addEffect(new MobEffectInstance(effect, 100, amplifier, false, false));
+    // ==================== 装备差分 ====================
+
+    /** 与上次快照差分：新增 / 变更的器官触发 onEquip，移除 / 变更前的器官触发 onUnequip。 */
+    private static void handleEquipDiff(Player player, IPlayerBodyState state) {
+        EnumMap<BodySlot, ItemStack> previous = LAST_ORGANS.computeIfAbsent(
+                player.getUUID(), k -> new EnumMap<>(BodySlot.class));
+        for (BodySlot slot : BodySlot.values()) {
+            ItemStack now = state.getOrgan(slot);
+            ItemStack old = previous.get(slot);
+            if (old != null && ItemStack.matches(now, old)) {
+                continue;
+            }
+            if (old != null && old.getItem() instanceof MechanicalOrganItem) {
+                dispatchEquipChange(player, old, false);
+            }
+            if (now.getItem() instanceof MechanicalOrganItem) {
+                dispatchEquipChange(player, now, true);
+            }
+            if (now.isEmpty()) {
+                previous.remove(slot);
+            } else {
+                previous.put(slot, now.copy());
+            }
         }
     }
 
-    /** 命中附加效果：目标当前无同效果时补充（避免覆盖更强来源的等级/时长） */
-    private static void applyToTarget(LivingEntity target, MobEffect effect, int amplifier, int durationTicks) {
-        if (!target.hasEffect(effect)) {
-            target.addEffect(new MobEffectInstance(effect, durationTicks, amplifier, false, false));
+    private static void dispatchEquipChange(Player player, ItemStack organ, boolean equip) {
+        for (Map.Entry<String, Integer> trait : MechanicalLevels.traitLevels(organ).entrySet()) {
+            IMechanicalTraitHandler handler = MechanicalTraitHandlerRegistry.get(trait.getKey());
+            if (handler == null) {
+                continue;
+            }
+            if (equip) {
+                handler.onEquip(player, trait.getValue());
+            } else {
+                handler.onUnequip(player, trait.getValue());
+            }
         }
+    }
+
+    /** 玩家登出：丢弃器官快照，避免长期钉住 UUID。 */
+    @SubscribeEvent
+    public void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        LAST_ORGANS.remove(event.getEntity().getUUID());
     }
 }

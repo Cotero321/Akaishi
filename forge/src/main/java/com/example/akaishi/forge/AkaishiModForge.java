@@ -243,6 +243,8 @@ public final class AkaishiModForge {
         MinecraftForge.EVENT_BUS.register(AkaishiBodyCombatHandler.INSTANCE);
         // 机械义体特殊效果（DNA 授予）：tick / 受击 / 击退消费，缺注册则义体效果不可见亦无效
         MinecraftForge.EVENT_BUS.register(AkaishiMechanicalEffectHandler.INSTANCE);
+        // 机械材料特性中需平台事件的 4 个（净化滤芯 / 掘进 / 探矿 / 数据收割）
+        MinecraftForge.EVENT_BUS.register(com.example.akaishi.forge.life.trait.AkaishiMechanicalTraitEvents.INSTANCE);
 
         // 生命融合护甲实时状态 tooltip 随生命融合迁往禁忌模块（由 AkaishiForbiddenModForge 注册）
 
@@ -272,6 +274,8 @@ public final class AkaishiModForge {
 
         // 调用通用初始化逻辑
         AkaishiMod.init();
+        // 机械材料特性处理器（T5）：7 钩子处理器须在特性定义注册之后绑定
+        com.example.akaishi.forge.life.trait.MechanicalTraitHandlers.register();
         // 相邻容器物品访问：装上 forge 物品能力实现（common 侧默认只有原版容器兜底）
         com.example.akaishi.api.transfer.ItemAccessHolder.install(new com.example.akaishi.forge.transfer.ForgeItemAccess());
 

@@ -190,8 +190,8 @@ public final class MechanicalOrganResolver {
      * 收集所有部件的DNA特殊效果（保持部件顺序、<b>保留重复项</b>——同一 DNA 跨部件出现多次时原样保留，
      * 供运行时按部件计数推导等级；空白/none 项跳过；内置与附属效果一视同仁）。
      * <p>
-     * 注意：运行时 {@code AkaishiMechanicalEffectHandler#collectSources} 会按槽位对效果 ID 去重，
-     * 故此处重复项不改变现有生效强度（仅 NBT 列表长度变化）。
+     * 注意：T4 起运行时 {@code AkaishiMechanicalEffectHandler} 按「器官内 DNA 来源的出现次数」推导等级，
+     * 故此处保留的重复项<b>会</b>参与等级计算（同一 DNA 出现 4 次 ⇒ 该器官 Lv4），不再是无效冗余。
      */
     private static List<IMechanicalDnaEffect> collectEffects(
             List<MechanicalPartTemplate> templates) {
