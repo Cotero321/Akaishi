@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "akaishi:block/akaishi_ender_bush_0"
+    },
+    "age=1": {
+      "model": "akaishi:block/akaishi_ender_bush_1"
+    }
+  }
+}

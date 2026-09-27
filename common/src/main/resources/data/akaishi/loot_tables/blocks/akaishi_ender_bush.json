@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "akaishi:akaishi_ender_bush",
+          "properties": { "age": "0" }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "akaishi:akaishi_ender_seed"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

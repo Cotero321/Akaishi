@@ -277,6 +277,10 @@ public final class ModItems {
     public static RegistrySupplier<Item> akaishiBlazeCondensate;
     public static RegistrySupplier<Item> akaishiCurseVineSeed;
     public static RegistrySupplier<Item> akaishiCurseBlossom;
+    public static RegistrySupplier<Item> akaishiEchoSeed;
+    public static RegistrySupplier<Item> akaishiEchoFruit;
+    public static RegistrySupplier<Item> akaishiEnderSeed;
+    public static RegistrySupplier<Item> akaishiEnderFruit;
 
     // —— 无线域（AkaishiWirelessItems）——
     public static RegistrySupplier<Item> akaishiWirelessComponent;
@@ -449,6 +453,10 @@ public final class ModItems {
         akaishiBlazeCondensate = AkaishiTransgeneItems.akaishiBlazeCondensate;
         akaishiCurseVineSeed = AkaishiTransgeneItems.akaishiCurseVineSeed;
         akaishiCurseBlossom = AkaishiTransgeneItems.akaishiCurseBlossom;
+        akaishiEchoSeed = AkaishiTransgeneItems.akaishiEchoSeed;
+        akaishiEchoFruit = AkaishiTransgeneItems.akaishiEchoFruit;
+        akaishiEnderSeed = AkaishiTransgeneItems.akaishiEnderSeed;
+        akaishiEnderFruit = AkaishiTransgeneItems.akaishiEnderFruit;
 
         // —— 无线域 ——
         akaishiWirelessComponent = AkaishiWirelessItems.akaishiWirelessComponent;

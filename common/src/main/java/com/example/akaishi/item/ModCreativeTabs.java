@@ -378,6 +378,10 @@ public final class ModCreativeTabs {
         accept(output, ModItems.akaishiBlazeCondensate);
         accept(output, ModItems.akaishiCurseVineSeed);
         accept(output, ModItems.akaishiCurseBlossom);
+        accept(output, ModItems.akaishiEchoSeed);
+        accept(output, ModItems.akaishiEchoFruit);
+        accept(output, ModItems.akaishiEnderSeed);
+        accept(output, ModItems.akaishiEnderFruit);
         // 离心结晶 + 活化成分
         accept(output, ModItems.exhaustedCrystal);
         accept(output, ModItems.activatedSculkCrystal);

@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 /**
- * 转基因域方块注册：转基因植物（凋零藤 / 烈焰花）的作物方块。
- * 根/茎、花株/花冠为纯植物方块（无物品形态），由转基因植物种子（见 item 域）右键种植生成根，
- * 根随机刻长茎、成熟顶端可收获凋零果（烈焰花体系同理：花株成株长花冠、盛开花冠收获烈焰花瓣）。
- * 与 {@code AkaishiTransgeneItems} 同属转基因工厂作物体系。
+ * 转基因域方块注册：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓 / 回响花 / 末影花）的作物方块。
+ * 每株植物各自独立成类（照其参考的原版植物建模，不做通用抽象）：
+ * 回响花=紫颂（茎→顶花）、末影花=杜鹃花丛（单丛）；均为纯植物方块（无物品形态），
+ * 由对应种子（见 item 域）右键种植生成。与 {@code AkaishiTransgeneItems} 同属转基因工厂作物体系。
  * <p>
  * 从 ModBlocks 拆分出的域注册类。所有静态字段显式初始化为 null，由 {@link #register()}
  * 在 {@link AkaishiMod#init()} 阶段填充；任何消费方都须在 register() 之后访问。
@@ -31,6 +31,12 @@ public final class AkaishiTransgeneBlocks {
     public static RegistrySupplier<Block> CHISHI_CURSE_VINE_ROOT = null;
     /** 咒怨垂蔓茎：整株第 2~5 格（无物品、只能由根长出），最底端成熟可收咒怨花 */
     public static RegistrySupplier<Block> CHISHI_CURSE_VINE_STEM = null;
+    /** 回响花茎：参考紫颂植株，第 1 格（种子仅可种于幽匿块），随机刻在顶端长出顶花；支撑消失自灭 */
+    public static RegistrySupplier<Block> CHISHI_ECHO_STEM = null;
+    /** 回响花顶花：参考紫颂花，顶端第 2 格（无物品、只能由茎长出），有 age 成熟度，盛开可收幽匿果 */
+    public static RegistrySupplier<Block> CHISHI_ECHO_FLOWER = null;
+    /** 末影花丛：参考杜鹃花丛，单块丛状（种子仅可种于末地石），成熟可收末影果 */
+    public static RegistrySupplier<Block> CHISHI_ENDER_BUSH = null;
 
     private AkaishiTransgeneBlocks() {
     }
@@ -53,5 +59,13 @@ public final class AkaishiTransgeneBlocks {
                 new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_curse_vine_root"), AkaishiCurseVineRootBlock::new);
         CHISHI_CURSE_VINE_STEM = blockRegistrar.register(
                 new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_curse_vine_stem"), AkaishiCurseVineStemBlock::new);
+        // 回响花茎/顶花：参考紫颂（茎→顶花两格），种子仅可种于幽匿块，盛开顶花可收幽匿果
+        CHISHI_ECHO_STEM = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_echo_stem"), AkaishiEchoStemBlock::new);
+        CHISHI_ECHO_FLOWER = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_echo_flower"), AkaishiEchoFlowerBlock::new);
+        // 末影花丛：参考杜鹃花丛（单块丛状），种子仅可种于末地石，成熟可收末影果
+        CHISHI_ENDER_BUSH = blockRegistrar.register(
+                new ResourceLocation(AkaishiMod.MOD_ID, "akaishi_ender_bush"), AkaishiEnderBushBlock::new);
     }
 }

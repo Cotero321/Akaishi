@@ -57,12 +57,16 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
      * 配方表：
      * 凋零骷髅基因 + 缠怨藤 + 凋零玫瑰 → 凋零藤种子；
      * 烈焰人基因 + 缠怨藤 + 烈焰粉 → 烈焰花种；
-     * 恶魂基因 + 垂泪藤 + 光浆果 → 咒怨垂蔓种子。
+     * 恶魂基因 + 垂泪藤 + 光浆果 → 咒怨垂蔓种子；
+     * 循声守卫基因 + 紫颂花 + 回响碎片 → 回响花种；
+     * 末影人基因 + 杜鹃花 + 紫颂果 → 末影花种。
      */
     public static final List<TransgeneFactoryRecipe> RECIPES = List.of(
             new TransgeneFactoryRecipe("minecraft:wither_skeleton", 50, Items.TWISTING_VINES, Items.WITHER_ROSE, ModItems.akaishiWitherSeed.get()),
             new TransgeneFactoryRecipe("minecraft:blaze", 50, Items.TWISTING_VINES, Items.BLAZE_POWDER, ModItems.akaishiBlazeSeed.get()),
-            new TransgeneFactoryRecipe("minecraft:ghast", 50, Items.WEEPING_VINES, Items.GLOW_BERRIES, ModItems.akaishiCurseVineSeed.get())
+            new TransgeneFactoryRecipe("minecraft:ghast", 50, Items.WEEPING_VINES, Items.GLOW_BERRIES, ModItems.akaishiCurseVineSeed.get()),
+            new TransgeneFactoryRecipe("minecraft:warden", 50, Items.CHORUS_FLOWER, Items.ECHO_SHARD, ModItems.akaishiEchoSeed.get()),
+            new TransgeneFactoryRecipe("minecraft:enderman", 50, Items.AZALEA, Items.CHORUS_FRUIT, ModItems.akaishiEnderSeed.get())
     );
 
     public static final int SLOT_GENE = 0;
@@ -262,9 +266,10 @@ public class AkaishiTransgeneFactoryBlockEntity extends BlockEntity implements
         }
         return switch (index) {
             case SLOT_GENE -> isValidGene(stack);
-            case SLOT_VINE -> stack.is(Items.TWISTING_VINES) || stack.is(Items.WEEPING_VINES);
+            case SLOT_VINE -> stack.is(Items.TWISTING_VINES) || stack.is(Items.WEEPING_VINES)
+                    || stack.is(Items.CHORUS_FLOWER) || stack.is(Items.AZALEA);
             case SLOT_CATALYST -> stack.is(Items.WITHER_ROSE) || stack.is(Items.BLAZE_POWDER)
-                    || stack.is(Items.GLOW_BERRIES);
+                    || stack.is(Items.GLOW_BERRIES) || stack.is(Items.ECHO_SHARD) || stack.is(Items.CHORUS_FRUIT);
             case SLOT_SOLID -> stack.is(ModItems.akaishiLifeEssenceSolid.get());
             default -> false;
         };

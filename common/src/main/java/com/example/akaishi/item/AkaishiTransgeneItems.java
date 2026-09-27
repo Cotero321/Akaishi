@@ -30,6 +30,14 @@ public final class AkaishiTransgeneItems {
     public static RegistrySupplier<Item> akaishiCurseVineSeed;
     /** 转基因植物：咒怨花（成熟垂蔓最底端收获，恶魂系高级原料/介质） */
     public static RegistrySupplier<Item> akaishiCurseBlossom;
+    /** 转基因植物：回响花种（仅可种于幽匿块生成回响花株，循声守卫系原料） */
+    public static RegistrySupplier<Item> akaishiEchoSeed;
+    /** 转基因植物：幽匿果（盛开的回响花冠收获，右键铺开幽匿且不施加状态效果） */
+    public static RegistrySupplier<Item> akaishiEchoFruit;
+    /** 转基因植物：末影花种（仅可种于末地石生成末影花株，末影人系原料） */
+    public static RegistrySupplier<Item> akaishiEnderSeed;
+    /** 转基因植物：末影果（盛开的末影花冠收获，右键传送且不造成任何伤害） */
+    public static RegistrySupplier<Item> akaishiEnderFruit;
 
     public static void register() {
         akaishiWitherSeed = item("akaishi_wither_seed", () -> new AkaishiWitherSeedItem(new Item.Properties()));
@@ -38,6 +46,11 @@ public final class AkaishiTransgeneItems {
         akaishiBlazeCondensate = item("akaishi_blaze_condensate");
         akaishiCurseVineSeed = item("akaishi_curse_vine_seed", () -> new AkaishiCurseVineSeedItem(new Item.Properties()));
         akaishiCurseBlossom = item("akaishi_curse_blossom");
+        // 回响花（种幽匿块）/ 末影花（种末地石）：种子各自的独立物品类（参照各自原版植物，不做通用抽象）
+        akaishiEchoSeed = item("akaishi_echo_seed", () -> new AkaishiEchoSeedItem(new Item.Properties()));
+        akaishiEchoFruit = item("akaishi_echo_fruit", () -> new AkaishiEchoFruitItem(new Item.Properties()));
+        akaishiEnderSeed = item("akaishi_ender_seed", () -> new AkaishiEnderSeedItem(new Item.Properties()));
+        akaishiEnderFruit = item("akaishi_ender_fruit", () -> new AkaishiEnderFruitItem(new Item.Properties()));
     }
 
     private static RegistrySupplier<Item> item(String id) {

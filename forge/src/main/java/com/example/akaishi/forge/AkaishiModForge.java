@@ -345,6 +345,12 @@ public final class AkaishiModForge {
                 AkaishiTransgeneBlocks.CHISHI_WITHER_STEM.get(),
                 AkaishiTransgeneBlocks.CHISHI_BLAZE_FLOWER_ROOT.get(),
                 AkaishiTransgeneBlocks.CHISHI_BLAZE_BLOOM.get());
+        // 转基因植物（回响花茎/顶花、末影花丛）贴图含透明缺口（丛叶间隙、花瓣缝隙、底面星形），
+        // 不注册 cutout 会在透明处渲染成黑色块，且末影花丛照原版杜鹃花丛的镂空丛形无法成立
+        RenderTypeRegistry.register(RenderType.cutout(),
+                AkaishiTransgeneBlocks.CHISHI_ECHO_STEM.get(),
+                AkaishiTransgeneBlocks.CHISHI_ECHO_FLOWER.get(),
+                AkaishiTransgeneBlocks.CHISHI_ENDER_BUSH.get());
         // 衰竭木门/活板门贴图含镂空透明区，须注册 cutout，否则透明部分渲染为黑色
         RenderTypeRegistry.register(RenderType.cutout(),
                 AkaishiDecayBlocks.CHISHI_DECAY_DOOR.get(),

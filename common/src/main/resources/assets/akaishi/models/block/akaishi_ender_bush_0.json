@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/template_azalea",
+  "textures": {
+    "particle": "akaishi:block/akaishi_ender_bush",
+    "side": "akaishi:block/akaishi_ender_bush",
+    "top": "akaishi:block/akaishi_ender_bush_0_top",
+    "plant": "akaishi:block/akaishi_ender_bush"
+  }
+}
