@@ -72,6 +72,30 @@ allprojects {
 	}
 }
 
+// ============================================================================
+// dev 运行环境策略（集中一处声明，避免"每个模块都冒出一个 runClient"的混乱）
+// ----------------------------------------------------------------------------
+// 只有两个平台模块提供可用的 dev 运行环境：
+//   :forge            = 核心 + 本体（2 模组）—— 同时用于验证"不装禁忌包"的场景
+//   :forbiddenforge   = 核心 + 本体 + 禁忌（3 模组）—— 主力开发环境
+// 其余模块（common / corecommon / coreforge / forbiddencommon）由 Loom 自动生成的
+// run 任务是**空配置**（configName 为 null，无 runDir 与用户名），一律停用并清除分组，
+// 使其不再作为"可运行任务"出现在 IDE 中。
+// ============================================================================
+def DEV_RUN_MODULES = ['forge', 'forbiddenforge'] as Set
+
+subprojects { p ->
+	if (!DEV_RUN_MODULES.contains(p.name)) {
+		p.afterEvaluate {
+			p.tasks.matching { it.name in ['runClient', 'runServer', 'runData', 'runGameTestServer'] }.configureEach { t ->
+				t.enabled = false
+				t.group = null
+				t.description = '已停用：本模块不提供 dev 运行环境，请改用 :forge（2 模组）或 :forbiddenforge（3 模组）'
+			}
+		}
+	}
+}
+
 subprojects {
 	apply plugin: 'dev.architectury.loom'
 	
