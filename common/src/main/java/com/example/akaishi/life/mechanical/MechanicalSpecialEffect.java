@@ -63,6 +63,21 @@ public final class MechanicalSpecialEffect implements IMechanicalDnaEffect {
     public static final MechanicalSpecialEffect KNOCKBACK_ON_HIT = create("KNOCKBACK_ON_HIT", "akaishi:knockback_on_hit");
     /** 负面时长减免（参考 OrganPassive.ANTIDOTE 思路） */
     public static final MechanicalSpecialEffect DEBUFF_RESIST = create("DEBUFF_RESIST", "akaishi:debuff_resist");
+    // ---- 追加批次新增（均镜像生物侧 OrganPassive，不新造强度天花板）----
+    /** 命中施加缓慢（镜像 OrganPassive.SLOW_ON_HIT） */
+    public static final MechanicalSpecialEffect SLOW_ON_HIT = create("SLOW_ON_HIT", "akaishi:slow_on_hit");
+    /** 命中附加中毒（镜像 OrganPassive.POISON_ON_HIT） */
+    public static final MechanicalSpecialEffect POISON_ON_HIT = create("POISON_ON_HIT", "akaishi:poison_on_hit");
+    /** 命中附加挖掘疲劳（镜像 OrganPassive.FATIGUE_ON_HIT） */
+    public static final MechanicalSpecialEffect FATIGUE_ON_HIT = create("FATIGUE_ON_HIT", "akaishi:fatigue_on_hit");
+    /** 受击概率瞬移脱身（镜像 OrganPassive.TELEPORT_DODGE） */
+    public static final MechanicalSpecialEffect TELEPORT_DODGE = create("TELEPORT_DODGE", "akaishi:teleport_dodge");
+    /** 弹射物伤害提升（镜像 OrganPassive.PROJECTILE_BOOST） */
+    public static final MechanicalSpecialEffect PROJECTILE_BOOST = create("PROJECTILE_BOOST", "akaishi:projectile_boost");
+    /** 空中攻击伤害提升（镜像 OrganPassive.JUMP_ATTACK_BOOST） */
+    public static final MechanicalSpecialEffect JUMP_ATTACK_BOOST = create("JUMP_ATTACK_BOOST", "akaishi:jump_attack_boost");
+    /** 近战攻击距离提升（镜像 OrganPassive.LONG_REACH） */
+    public static final MechanicalSpecialEffect LONG_REACH = create("LONG_REACH", "akaishi:long_reach");
     // ---- 机制型基因（自带负面代价；无实体/分组来源，属性由 MechanicalDnaProfile 逐条挂载）----
     /** 过热核心：血量越低攻击越高，代价是持续掉血 */
     public static final MechanicalSpecialEffect OVERHEAT_CORE = create("OVERHEAT_CORE", "akaishi:overheat_core");

@@ -266,27 +266,22 @@ public final class MechanicalDnaProfile {
         register(NONE_ID, c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), MechanicalSpecialEffect.NONE, ALL_PARTS);
 
         // ---- 分组级（与内置分组一一对应，保证各组基因全部有落点）----
-        // 温血：代谢/恢复 → 散热（+外壳，兼护甲）
-        register("akaishi:warm_blooded", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION,
-                parts(MechanicalPartType.COOLING, MechanicalPartType.SHELL));
-        // 亡灵：坚韧防御 + 凋零攻击 → 外壳（+模块）
-        register("akaishi:undead", c(0, 2, 1, -1, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK,
-                parts(MechanicalPartType.SHELL, MechanicalPartType.MODULE));
-        // 爆炸：爆破功能特化 → 模块
-        register("akaishi:explosive", c(0, -1, 2, 0, 0, 0, 0, 2, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST,
-                parts(MechanicalPartType.MODULE));
-        // 异变：全能偏攻 → 模块
-        register("akaishi:aberration", c(0, 0, 1, 1, 0, 1, 1, 0, 0, 0), MechanicalSpecialEffect.POISON_RESIST,
-                parts(MechanicalPartType.MODULE));
-        // 末影：瞬移/感知 → 核心
-        register("akaishi:ender", c(0, -1, 0, 0, 2, 0, 0, 0, 1, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN,
-                parts(MechanicalPartType.CORE));
-        // 首领：压迫感/生命护甲 → 核心（+外壳）
-        register("akaishi:boss", c(0, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST,
-                parts(MechanicalPartType.CORE, MechanicalPartType.SHELL));
-        // 龙族：倍率/火焰 → 模块（+外壳）
-        register("akaishi:dragon", c(2, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK,
-                parts(MechanicalPartType.MODULE, MechanicalPartType.SHELL));
+        // 组级基因是「血统大类」，本就泛用 ⇒ 不设部件约束（四部件皆可同源）；
+        // 四部件同用同一组级基因 ⇒ 单器官计数 4 ⇒ 该 DNA 效果达 Lv4（四级曲线满级可达）。
+        // 温血：代谢/恢复（低血自愈）
+        register("akaishi:warm_blooded", c(0, 2, 0, 0, 1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.LOW_HEALTH_REGENERATION);
+        // 亡灵：坚韧防御 + 凋零攻击
+        register("akaishi:undead", c(0, 2, 1, -1, 0, 2, 0, 0, 0, 0), MechanicalSpecialEffect.WITHER_ATTACK);
+        // 爆炸：爆破功能特化
+        register("akaishi:explosive", c(0, -1, 2, 0, 0, 0, 0, 2, 0, 0), MechanicalSpecialEffect.EXPLOSION_RESIST);
+        // 异变：全能偏攻
+        register("akaishi:aberration", c(0, 0, 1, 1, 0, 1, 1, 0, 0, 0), MechanicalSpecialEffect.POISON_RESIST);
+        // 末影：瞬移/感知
+        register("akaishi:ender", c(0, -1, 0, 0, 2, 0, 0, 0, 1, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN);
+        // 首领：压迫感/生命护甲
+        register("akaishi:boss", c(0, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST);
+        // 龙族：倍率/火焰
+        register("akaishi:dragon", c(2, 2, 2, 0, -1, 1, 0, 0, 0, 0), MechanicalSpecialEffect.FIRE_ATTACK);
 
         // ---- 实体级（具体生物样本优先命中）----
         // 骷髅：精准远程（感知） → 核心
@@ -359,6 +354,44 @@ public final class MechanicalDnaProfile {
                 parts(MechanicalPartType.SHELL, MechanicalPartType.COOLING));
         // 美西螈：两栖再生 → 散热（水下呼吸）
         register("akaishi:axolotl", c(1, 2, 0, 0, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.WATER_BREATHING,
+                parts(MechanicalPartType.COOLING));
+
+        // ---- 追加批次（12 个实体级扩展，覆盖缺失的常见生物；均 ≤2 部件，守 T7 专属感）----
+        // 溺尸：水生不死（水下机动） → 散热
+        register("akaishi:drowned", c(0, 0, 1, 0, 2, 0, 0, 0, 0, 1), MechanicalSpecialEffect.UNDERWATER_SPEED,
+                parts(MechanicalPartType.COOLING));
+        // 尸壳：沙暴坚韧（抗击退） → 外壳
+        register("akaishi:husk", c(0, 2, 1, 0, 0, 1, 0, 0, 0, 0), MechanicalSpecialEffect.KNOCKBACK_RESIST,
+                parts(MechanicalPartType.SHELL));
+        // 流浪者：寒冬射手（命中迟缓） → 模块
+        register("akaishi:stray", c(0, 0, 0, 1, 0, 0, 1, 0, 1, 0), MechanicalSpecialEffect.SLOW_ON_HIT,
+                parts(MechanicalPartType.MODULE));
+        // 洞穴蜘蛛：剧毒甲壳（命中施毒） → 模块
+        register("akaishi:cave_spider", c(0, -1, 1, 1, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.POISON_ON_HIT,
+                parts(MechanicalPartType.MODULE));
+        // 末影螨：空间蚕食（瞬移冷却） → 核心
+        register("akaishi:endermite", c(0, -1, 0, 0, 1, 0, 0, 0, 0, 2), MechanicalSpecialEffect.TELEPORT_COOLDOWN,
+                parts(MechanicalPartType.CORE));
+        // 远古守卫者：深海压制（命中挖掘疲劳） → 外壳/散热
+        register("akaishi:elder_guardian", c(0, 0, 1, 0, 0, 2, 0, 0, 1, 0), MechanicalSpecialEffect.FATIGUE_ON_HIT,
+                parts(MechanicalPartType.SHELL, MechanicalPartType.COOLING));
+        // 唤魔者：邪术隐匿（受击瞬移脱身） → 模块
+        register("akaishi:evoker", c(0, 0, 0, 0, 0, 0, 1, 1, 0, 2), MechanicalSpecialEffect.TELEPORT_DODGE,
+                parts(MechanicalPartType.MODULE));
+        // 卫道士：重斧劈击（近战距离提升） → 模块
+        register("akaishi:vindicator", c(0, 1, 2, -1, 0, 1, 0, 0, 1, 0), MechanicalSpecialEffect.LONG_REACH,
+                parts(MechanicalPartType.MODULE));
+        // 掠夺者：弩矢强化（投射物增伤） → 模块
+        register("akaishi:pillager", c(0, 0, 0, 1, 0, 0, 1, 0, 2, 0), MechanicalSpecialEffect.PROJECTILE_BOOST,
+                parts(MechanicalPartType.MODULE));
+        // 山羊：跃击冲撞（空中攻击增伤） → 模块/散热
+        register("akaishi:goat", c(0, 1, 1, 0, 1, 0, 0, 0, 0, 1), MechanicalSpecialEffect.JUMP_ATTACK_BOOST,
+                parts(MechanicalPartType.MODULE, MechanicalPartType.COOLING));
+        // 狼：群猎本能（暴击强化） → 核心
+        register("akaishi:wolf", c(0, 0, 1, 1, 2, 0, 0, 0, 0, 1), MechanicalSpecialEffect.CRITICAL_BOOST,
+                parts(MechanicalPartType.CORE));
+        // 嗅探兽：掘觅天赋（自动拾取） → 散热
+        register("akaishi:sniffer", c(0, 1, 0, 0, 1, 1, 0, 0, 1, 0), MechanicalSpecialEffect.AUTO_PICKUP,
                 parts(MechanicalPartType.COOLING));
 
         // ---- 机制型基因（自带负面代价；生物来源见本方法末尾的 bindEntitySource 绑定）----

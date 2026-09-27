@@ -155,7 +155,7 @@ public final class AkaishiMechanicalEffectHandler {
             for (Map.Entry<ResourceLocation, Integer> entry
                     : MechanicalAggregation.effectLevels(organs).entrySet()) {
                 MechanicalDnaEffects.applyAttack(attacker, target, entry.getKey(), entry.getValue());
-                amount = MechanicalDnaEffects.modifyOutgoing(attacker, target, amount,
+                amount = MechanicalDnaEffects.modifyOutgoing(attacker, target, event.getSource(), amount,
                         entry.getKey(), entry.getValue());
                 IMechanicalDnaEffectHandler handler = MechanicalEffectHandlerRegistry.get(entry.getKey());
                 if (handler != null) {

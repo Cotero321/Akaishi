@@ -16,28 +16,30 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.ForgeMod;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
- * 机制型机械基因（6 个）的运行时实现入口（forge 侧）。
+ * 机械基因的运行时实现入口（forge 侧）。
  * <p>
- * 每个基因 = 一个 {@link MechanicalSpecialEffect}（效果定义，注册于 common 双注册表之一）+ 本类的
- * 一个 {@link IMechanicalDnaEffectHandler} 实现（运行时逻辑，注册于 {@link MechanicalEffectHandlerRegistry}）。
- * 与既有 16 个内置效果完全同构，未新造机制。
+ * 机制型基因（6 个）：每个 = 一个 {@link MechanicalSpecialEffect}（效果定义，注册于 common 双注册表之一）+ 本类的一个
+ * {@link IMechanicalDnaEffectHandler} 实现（运行时逻辑，注册于 {@link MechanicalEffectHandlerRegistry}）。
+ * 另含属性型基因 {@code akaishi:long_reach}（卫道士）：需要挂载/清理瞬时属性修饰符，故同样以 handler 承载
+ * （复用同一套 onEquip/onUnequip 基础设施）。与既有内置效果完全同构，未新造机制。
  * <p>
  * <b>强度口径</b>：全部数值按「跨器官有效等级」1~4 档取值（{@code MechanicalAggregation.effectLevels}，取各器官最高等级），
  * 分发层<b>每个效果只回调一次</b>，禁止逐器官线性叠加。全部数值均为<b>待调手感值</b>。
  * <p>
- * <b>自带负面</b>：每个基因都有一条真实生效的代价（掉血 / 掉饥饿 / 受伤加重 / 减速 / 攻速下降 / 虚弱）。
+ * <b>自带负面</b>：6 个机制型基因各有一条真实生效的代价（掉血 / 掉饥饿 / 受伤加重 / 减速 / 攻速下降 / 虚弱）。
  */
 public final class MechanicalDnaHandlers {
 
     private MechanicalDnaHandlers() {
     }
 
-    /** 注册全部 6 个机制型基因处理器；须在效果定义与机械基因注册之后调用（仅调用一次）。 */
+    /** 注册全部基因处理器；须在效果定义与机械基因注册之后调用（仅调用一次）。 */
     public static void register() {
         MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.OVERHEAT_CORE.getId(), new OverheatCore());
         MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.PARASITIC_SYMBIOSIS.getId(), new ParasiticSymbiosis());
@@ -45,6 +47,8 @@ public final class MechanicalDnaHandlers {
         MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.ARMOR_OVERLOAD.getId(), new ArmorOverload());
         MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.NEURAL_SPASM.getId(), new NeuralSpasm());
         MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.METABOLIC_OVERDRAFT.getId(), new MetabolicOverdraft());
+        // 属性型：长臂（近战攻击距离提升，镜像 OrganPassive.LONG_REACH）
+        MechanicalEffectHandlerRegistry.register(MechanicalSpecialEffect.LONG_REACH.getId(), new LongReach());
     }
 
     private static int clamp(int level) {
@@ -348,6 +352,37 @@ public final class MechanicalDnaHandlers {
             if (player.tickCount % healIntervalTicks(level) == 0) {
                 player.heal(1.0F);
             }
+        }
+    }
+
+    // ==================== 长臂（属性型） ====================
+
+    /**
+     * 长臂：按等级提升近战攻击距离（挂 Forge 专属属性 {@code ENTITY_REACH}，与生物侧 LONG_REACH 同属性）。
+     * <p>无负面；摘除义体后由 {@link #onUnequip} 移除修饰符，避免属性残留。
+     */
+    private static final class LongReach implements IMechanicalDnaEffectHandler {
+        /** 近战攻击距离加成（格，Lv1~4 = +0.5/1.0/1.5/2.0），待调手感值 */
+        private static final TraitTier REACH_BONUS = TraitTier.of(0.5F, 1.0F, 1.5F, 2.0F);
+        private static final String KEY_REACH = "long_reach";
+
+        /** 正向：该等级的攻击距离加成（供探针/单测）。 */
+        static double reachBonus(int level) {
+            return REACH_BONUS.at(level);
+        }
+
+        @Override
+        public void onPlayerTick(Player player, int level) {
+            if (player.level().isClientSide) {
+                return;
+            }
+            setModifier(player, ForgeMod.ENTITY_REACH.get(), KEY_REACH, reachBonus(level),
+                    AttributeModifier.Operation.ADDITION);
+        }
+
+        @Override
+        public void onUnequip(Player player, int level) {
+            setModifier(player, ForgeMod.ENTITY_REACH.get(), KEY_REACH, 0, AttributeModifier.Operation.ADDITION);
         }
     }
 }

@@ -64,6 +64,8 @@ public final class SampleGroup implements ISampleGroup {
                         || t == EntityType.SNOW_GOLEM || t == EntityType.ALLAY
                         || t == EntityType.GHAST || t == EntityType.VINDICATOR
                         || t == EntityType.RAVAGER
+                        // 灾厄村民（1.14+ 袭击生态）：唤魔者 / 掠夺者（实体级基因来源，原不属任何分组）
+                        || t == EntityType.EVOKER || t == EntityType.PILLAGER
                         // 非自然强敌补充：蠹虫 / 恼鬼（机制型机械基因的生物来源，见 MechanicalDnaProfile）
                         || t == EntityType.SILVERFISH || t == EntityType.VEX
                         // 下界系（1.16+ 火狱生态）：猪灵/蛮兵、疣猪兽、女巫

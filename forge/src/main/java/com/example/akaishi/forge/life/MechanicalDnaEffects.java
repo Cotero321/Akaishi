@@ -62,6 +62,15 @@ public final class MechanicalDnaEffects {
     private static final TraitTier KNOCKBACK_POWER = TraitTier.of(0.25F, 0.35F, 0.45F, 0.55F);
     /** 负面时长减免：负面药水时长上限 tick 200/160/120/80（10s/8s/6s/4s） */
     private static final TraitTier DEBUFF_CAP_TICKS = TraitTier.of(200, 160, 120, 80);
+    // ---- 追加批次新增曲线（镜像 OrganPassive，待调手感值）----
+    /** 命中施加减益（缓慢/中毒/挖掘疲劳）的持续 tick（5 秒） */
+    private static final int DEBUFF_ON_HIT_TICKS = 100;
+    /** 瞬移闪避触发概率（Lv1~4 = 15/20/25/30%） */
+    private static final TraitTier TELEPORT_DODGE_CHANCE = TraitTier.of(0.15F, 0.20F, 0.25F, 0.30F);
+    /** 弹射物增伤（Lv1~4 = +10/15/20/25%） */
+    private static final TraitTier PROJECTILE_BONUS = TraitTier.of(0.10F, 0.15F, 0.20F, 0.25F);
+    /** 空中攻击增伤（Lv1~4 = +30/40/50/60%） */
+    private static final TraitTier JUMP_ATTACK_BONUS = TraitTier.of(0.30F, 0.40F, 0.50F, 0.60F);
     /** 纳入时长减免的负面效果集合 */
     private static final MobEffect[] NEGATIVE_EFFECTS = {
             MobEffects.POISON, MobEffects.WITHER, MobEffects.WEAKNESS, MobEffects.MOVEMENT_SLOWDOWN,
@@ -149,14 +158,30 @@ public final class MechanicalDnaEffects {
                 && source.is(DamageTypeTags.IS_FALL)) {
             return amount * FALL_RETAIN.at(level);
         }
+        // 追加批次：受击概率瞬移脱身（不减免伤害，只躲后续；镜像 OrganPassive.TELEPORT_DODGE）
+        if (MechanicalSpecialEffect.TELEPORT_DODGE.id().equals(effectId)) {
+            if (player.getRandom().nextFloat() < TELEPORT_DODGE_CHANCE.at(level)) {
+                teleportRandomly(player);
+            }
+            return amount;
+        }
         return amount;
     }
 
-    /** 命中结算前：火焰攻击 Lv4 额外 +20% 火伤。 */
-    public static float modifyOutgoing(Player attacker, LivingEntity target, float amount,
+    /** 命中结算前：火焰攻击 Lv4 额外 +20% 火伤；弹射物 / 空中攻击按等级增伤。 */
+    public static float modifyOutgoing(Player attacker, LivingEntity target, DamageSource source, float amount,
                                        ResourceLocation effectId, int level) {
         if (MechanicalSpecialEffect.FIRE_ATTACK.id().equals(effectId) && level >= 4) {
             return amount * (1F + FIRE_L4_BONUS);
+        }
+        // 弹射物增伤（来源为投射物时；镜像 OrganPassive.PROJECTILE_BOOST）
+        if (MechanicalSpecialEffect.PROJECTILE_BOOST.id().equals(effectId)
+                && source != null && source.isIndirect()) {
+            return amount * (1F + PROJECTILE_BONUS.at(level));
+        }
+        // 空中攻击增伤（镜像 OrganPassive.JUMP_ATTACK_BOOST）
+        if (MechanicalSpecialEffect.JUMP_ATTACK_BOOST.id().equals(effectId) && !attacker.onGround()) {
+            return amount * (1F + JUMP_ATTACK_BONUS.at(level));
         }
         return amount;
     }
@@ -171,6 +196,19 @@ public final class MechanicalDnaEffects {
         if (MechanicalSpecialEffect.WITHER_ATTACK.id().equals(effectId)) {
             int i = clamp(level) - 1;
             applyToTarget(target, MobEffects.WITHER, WITHER_AMPLIFIER[i], WITHER_TICKS[i]);
+            return;
+        }
+        // 追加批次：命中施加减益（缓慢 / 中毒 / 挖掘疲劳；增幅随等级，镜像生物侧同名被动）
+        if (MechanicalSpecialEffect.SLOW_ON_HIT.id().equals(effectId)) {
+            applyToTarget(target, MobEffects.MOVEMENT_SLOWDOWN, clamp(level), DEBUFF_ON_HIT_TICKS);
+            return;
+        }
+        if (MechanicalSpecialEffect.POISON_ON_HIT.id().equals(effectId)) {
+            applyToTarget(target, MobEffects.POISON, clamp(level), DEBUFF_ON_HIT_TICKS);
+            return;
+        }
+        if (MechanicalSpecialEffect.FATIGUE_ON_HIT.id().equals(effectId)) {
+            applyToTarget(target, MobEffects.DIG_SLOWDOWN, clamp(level), DEBUFF_ON_HIT_TICKS);
             return;
         }
         // T7 Stage 2：命中把目标沿击退方向顶开（与武器击退叠加）
@@ -263,6 +301,20 @@ public final class MechanicalDnaEffects {
                 boolean visible = inst.isVisible();
                 player.removeEffect(negative);
                 player.addEffect(new MobEffectInstance(negative, capTicks, amplifier, ambient, visible));
+            }
+        }
+    }
+
+    /** 受击瞬移：在附近随机寻找无碰撞落点并传送（镜像 AkaishiBodyCombatHandler#teleportRandomly）。 */
+    private static void teleportRandomly(Player player) {
+        for (int i = 0; i < 16; i++) {
+            double x = player.getX() + (player.getRandom().nextDouble() - 0.5) * 12.0;
+            double y = player.getY() + player.getRandom().nextInt(7) - 3;
+            double z = player.getZ() + (player.getRandom().nextDouble() - 0.5) * 12.0;
+            if (player.level().noCollision(player.getBoundingBox().move(
+                    x - player.getX(), y - player.getY(), z - player.getZ()))) {
+                player.teleportTo(x, y, z);
+                return;
             }
         }
     }
