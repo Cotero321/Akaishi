@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " N ",
-    "NBN",
-    " N "
-  ],
-  "key": {
-    "N": { "item": "akaishi:gold_dust" },
-    "B": { "item": "minecraft:blaze_powder" }
-  },
-  "result": { "item": "akaishi:akaishi_fire_necklace", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " N ", "NBN", " N " ], "key": { "N": { "item": "akaishi:akaishi_ingot" }, "B": { "item": "minecraft:magma_cream" } }, "result": { "item": "akaishi:akaishi_fire_necklace", "count": 1 } }

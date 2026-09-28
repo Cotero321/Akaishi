@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "WDW",
-    "DCD",
-    "WDW"
-  ],
-  "key": {
-    "D": { "item": "akaishi:diamond_dust" },
-    "W": { "item": "akaishi:akaishi_wireless_component" },
-    "C": { "item": "minecraft:lodestone" }
-  },
-  "result": { "item": "akaishi:akaishi_life_wireless_chunk_loader", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "WSW", "SCS", "WSW" ], "key": { "W": { "item": "akaishi:akaishi_wireless_component" }, "S": { "item": "akaishi:akaishi_life_wireless_shell" }, "C": { "item": "minecraft:lodestone" } }, "result": { "item": "akaishi:akaishi_life_wireless_chunk_loader", "count": 1 } }

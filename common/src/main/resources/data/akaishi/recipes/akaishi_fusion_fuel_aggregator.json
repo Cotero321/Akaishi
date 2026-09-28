@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "CGC",
-    "FMF",
-    "CGC"
-  ],
-  "key": {
-    "C": { "item": "akaishi:akaishi_advanced_component" },
-    "G": { "item": "minecraft:glass" },
-    "F": { "item": "akaishi:akaishi_fusion_rod" },
-    "M": { "item": "akaishi:akaishi_fuel_mixer" }
-  },
-  "result": { "item": "akaishi:akaishi_fusion_fuel_aggregator", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "CSC", "FMF", "CSC" ], "key": { "C": { "item": "akaishi:akaishi_advanced_component" }, "S": { "item": "akaishi:akaishi_fusion_shell" }, "F": { "item": "akaishi:akaishi_fusion_rod" }, "M": { "item": "akaishi:akaishi_fuel_mixer" } }, "result": { "item": "akaishi:akaishi_fusion_fuel_aggregator", "count": 1 } }

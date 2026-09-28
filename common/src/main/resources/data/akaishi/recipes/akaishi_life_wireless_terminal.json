@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "W W",
-    "WCW",
-    "W W"
-  ],
-  "key": {
-    "C": { "item": "minecraft:crafting_table" },
-    "W": { "item": "akaishi:akaishi_advanced_component" }
-  },
-  "result": { "item": "akaishi:akaishi_life_wireless_terminal", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SWS", "WCW", "SWS" ], "key": { "S": { "item": "akaishi:akaishi_life_wireless_shell" }, "W": { "item": "akaishi:akaishi_advanced_component" }, "C": { "item": "minecraft:crafting_table" } }, "result": { "item": "akaishi:akaishi_life_wireless_terminal", "count": 1 } }

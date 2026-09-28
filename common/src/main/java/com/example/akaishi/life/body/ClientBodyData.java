@@ -17,6 +17,9 @@ import java.util.Map;
  */
 public final class ClientBodyData {
 
+    /** 解码端防畸形包：条目数上限（同 AkaishiItemTerminalSync 范式；正常快照远小于此值） */
+    private static final int MAX_SNAPSHOT_ENTRIES = 4096;
+
     private static final Map<BodySlot, ItemStack> ORGANS = new EnumMap<>(BodySlot.class);
     private static final Map<BodySlot, Integer> REJECTION = new EnumMap<>(BodySlot.class);
     /** 机械整合度（0~100），未安装机械器官为 0 */
@@ -36,13 +39,18 @@ public final class ClientBodyData {
     private ClientBodyData() {
     }
 
+    /** 钳制对端声明的条目数：不信任畸形包（否则循环/预分配会爆内存） */
+    private static int clampCount(int n) {
+        return Math.max(0, Math.min(n, MAX_SNAPSHOT_ENTRIES));
+    }
+
     /** 从同步包读取数据（必须在客户端主线程调用） */
     public static void apply(FriendlyByteBuf buf) {
         ORGANS.clear();
         REJECTION.clear();
         INTEGRATION.clear();
         GENE_BONUSES.clear();
-        int geneCount = buf.readVarInt();
+        int geneCount = clampCount(buf.readVarInt());
         for (int i = 0; i < geneCount; i++) {
             String entityId = buf.readUtf();
             int bonus = buf.readInt();
@@ -78,12 +86,12 @@ public final class ClientBodyData {
         }
         // 躯体总览（顺序与发送端一致：突破数据之后）
         OVERVIEW.clear();
-        int overviewCount = buf.readVarInt();
+        int overviewCount = clampCount(buf.readVarInt());
         for (int i = 0; i < overviewCount; i++) {
             OVERVIEW.add(new BodyOverviewEntry(buf.readUtf(), buf.readDouble()));
         }
         PASSIVES.clear();
-        int passiveCount = buf.readVarInt();
+        int passiveCount = clampCount(buf.readVarInt());
         for (int i = 0; i < passiveCount; i++) {
             PASSIVES.add(new BodyPassiveEntry(buf.readUtf(), buf.readVarInt()));
         }

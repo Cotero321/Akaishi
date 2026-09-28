@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_cell_basic",
-      "text": "Energy Cells are your grid's $(4)reservoir$(0): they decouple generation from consumption, so a stuttering generator never starves your machines.$(br2)$(bold)Basic Cell:$(0)$(li)Capacity: $(bold)500 million$(0) AE$(li)Up to $(4)1 million AE/tick$(0) in or out (shared charge/discharge limit)$(br2)Tier comparison on the next page. Pro tip: drop a Portable Cell into its charge slot and the cell tops it up for you."
+      "text": "Energy Cells act as the grid's buffer, separating generation from consumption so that an intermittent generator does not starve the machines.$(br2)$(bold)Basic Cell:$(reset)$(li)Capacity: $(bold)500 million$(reset) AE$(li)Transfer: up to 1 million AE/tick in or out (shared charge/discharge limit)$(br2)Tier comparison follows on the next page. A Portable Cell placed in the charge slot is recharged by the cell."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_cell_super",
-      "text": "$(bold)Three tiers of storage$(0) (capacity / per-tick transfer):$(li)$(4)Basic$(0): 500 million / 1 million$(li)Advanced: 2 billion / 5 million$(li)$(4)Super$(0): 20 billion / 50 million$(br2)Advanced and Super are crafted by upgrading the tier below them, and tiers mix freely in one grid.$(br2)That transfer limit decides your burst throughput — when your generators and pipes are fast, don't let a small cell become the bottleneck.$(br2)One cell not enough? See the \"$(l:akaishi:cell_serializer)Cell Serializer$(/l)\" for a mega-battery."
+      "text": "$(bold)Three storage tiers$(reset) (capacity / per-tick transfer):$(li)Basic: 500 million / 1 million$(li)Advanced: 2 billion / 5 million$(li)Super: 20 billion / 50 million$(br2)Advanced and Super are crafted by upgrading the tier below, and tiers can be mixed in one grid.$(br2)The transfer limit determines burst throughput; if generators and pipes are faster, the cell becomes the bottleneck.$(br2)For capacity beyond a single cell, see the $(l:akaishi:cell_serializer)Cell Serializer$(/l)."
     },
     {
       "type": "patchouli:relations",
@@ -23,7 +23,7 @@
         "akaishi:portable_cell",
         "akaishi:cell_serializer"
       ],
-      "text": "Storing is only half the job: get started with \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\", then pair the \"$(l:akaishi:generator)Energy Generator$(/l)\" or \"$(l:akaishi:gen_matrix)Generator Matrix$(/l)\" with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" into a full loop — scale up with the \"$(l:akaishi:cell_serializer)Cell Serializer$(/l)\" and carry \"$(l:akaishi:portable_cell)Portable Cells$(/l)\" when you head out."
+      "text": "Storing is one part of the grid. Start with $(l:akaishi:energy_basics)Akaishi Energy Basics$(/l), then connect the $(l:akaishi:generator)Energy Generator$(/l) or $(l:akaishi:gen_matrix)Generator Matrix$(/l) to $(l:akaishi:energy_pipe)Energy Pipes$(/l) to complete the loop. Scale up with the $(l:akaishi:cell_serializer)Cell Serializer$(/l) and carry $(l:akaishi:portable_cell)Portable Cells$(/l) when away from the base."
     }
   ]
 }

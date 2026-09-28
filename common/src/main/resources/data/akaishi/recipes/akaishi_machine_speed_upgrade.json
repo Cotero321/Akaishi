@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "EME",
-    "MGM",
-    "EME"
-  ],
-  "key": {
-    "E": { "item": "akaishi:akaishi_essence" },
-    "M": { "item": "akaishi:akaishi_machine_component" },
-    "G": { "item": "akaishi:akaishi_speed_upgrade" }
-  },
-  "result": { "item": "akaishi:akaishi_machine_speed_upgrade", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "EME", "MGM", "EME" ], "key": { "E": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "M": { "item": "akaishi:akaishi_machine_component" }, "G": { "item": "akaishi:akaishi_speed_upgrade" } }, "result": { "item": "akaishi:akaishi_machine_speed_upgrade", "count": 1 } }

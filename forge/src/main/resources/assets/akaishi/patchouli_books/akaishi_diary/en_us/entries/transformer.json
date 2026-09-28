@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transformer",
-      "text": "The Akaishi Transformer $(4)converts raw ores, Lapis Dust or Akaishi Dust into standardized bases and concentrates$(0): one input in, one output out (Akaishi Dust is processed 9 at a time). Each change takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(li)Lapis Dust → Cooling Base$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)$(4)9 Akaishi Dust → 1 Compressed Akaishi Essence$(0)$(li)$(4)Compressed Akaishi Essence → Akaishi Ore Base$(0)"
+      "text": "The Akaishi Transformer converts raw ores, Lapis Dust or Akaishi Dust into standardized bases and concentrates: one input to one output (Akaishi Dust is processed 9 at a time). Each operation takes 100 ticks at 15 energy/tick with a 100k internal buffer.$(li)Lapis Dust → Cooling Base$(li)Coal, Iron, Copper, Gold, Redstone, Lapis, Diamond, Emerald or Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)9 Akaishi Dust → 1 Compressed Akaishi Essence$(li)Compressed Akaishi Essence → Akaishi Ore Base"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:cooling_base",
-      "text": "Bases are never used directly — they are the $(4)keys that unlock advanced recipes$(0), vouching for a mineral's origin:$(li)Cooling Base + Copper Ingot → Poor Heat Sink — the whole heat-sink line starts here (see $(l:akaishi:fuel_system)Fuel & Cooling$(/l))$(li)Iron / Gold / Diamond / Ancient Debris Bases → the four Catalyst tiers$(li)Copper / Redstone / Lapis Bases → the Auto Collector upgrade line$(li)Other bases feed the fuel canner, wireless core and more — check JEI$(br2)For the full roll call of bases, read the Ore Bases entry."
+      "text": "Bases are not used directly; they are intermediate materials that unlock advanced recipes:$(li)Cooling Base + Copper Ingot → Poor Heat Sink; the heat-sink line starts here (see $(l:akaishi:fuel_system)Fuel & Cooling$(/l))$(li)Iron, Gold, Diamond and Ancient Debris Bases → the four Catalyst tiers$(li)Copper, Redstone and Lapis Bases → the Auto Collector upgrade line$(li)Other bases feed the fuel canner, wireless core and other recipes; see JEI$(br2)The complete base list is in the Ore Bases entry."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:ore_bases",
         "akaishi:dusts"
       ],
-      "text": "See $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:dusts)Dusts$(/l) for where the feedstock comes from, and $(l:akaishi:ore_bases)Ore Bases$(/l) for the full family and every recipe that needs them. Note for the Akaishi line: Akaishi Ore is pulverized into Compressed Akaishi Essence first, and the Akaishi Ore Base now comes from that concentrate rather than straight from the ore."
+      "text": "Feedstock sources are described in $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:dusts)Dusts$(/l); the complete family and its recipes are in $(l:akaishi:ore_bases)Ore Bases$(/l). Note: Akaishi Ore is pulverized into Compressed Akaishi Essence first, and the Akaishi Ore Base is produced from that concentrate rather than directly from the ore."
     }
   ]
 }

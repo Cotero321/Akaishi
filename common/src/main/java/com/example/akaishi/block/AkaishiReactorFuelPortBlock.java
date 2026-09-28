@@ -2,7 +2,9 @@ package com.example.akaishi.block;
 
 import com.example.akaishi.block.entity.AkaishiReactorFuelPortBlockEntity;
 import com.example.akaishi.block.entity.ModBlockEntities;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,17 +22,15 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 燃料投放口：反应堆外壳上的燃料输入口（可多个，数据共享）。
- * 仅作物流输入接口（管道插入燃料罐/取出空罐），不开放手动 GUI；
- * 手动添加燃料通过控制器燃料页操作。
+ * 既作物流输入接口（管道插入燃料罐/取出空罐），也可右键打开 27 格燃料缓冲界面手动操作。
  */
 public class AkaishiReactorFuelPortBlock extends AkaishiMachineBlock {
 
     public AkaishiReactorFuelPortBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_YELLOW)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable
@@ -54,9 +54,12 @@ public class AkaishiReactorFuelPortBlock extends AkaishiMachineBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        // 燃料口仅作物流输入接口（管道/漏斗），不开放手动 GUI；
-        // 手动添加燃料请通过控制器燃料页操作
-        return InteractionResult.PASS;
+        // 右键打开 27 格燃料缓冲界面（同族端口统一走 ExtendedMenuProvider 携带方块坐标）
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
+                && level.getBlockEntity(pos) instanceof AkaishiReactorFuelPortBlockEntity port) {
+            MenuRegistry.openExtendedMenu(serverPlayer, port);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

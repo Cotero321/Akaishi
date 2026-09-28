@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "IPI",
-    "III"
-  ],
-  "key": {
-    "P": { "item": "minecraft:piston" },
-    "I": { "item": "minecraft:iron_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_compressor", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IRI", "IPI", "III" ], "key": { "I": { "item": "minecraft:iron_ingot" }, "R": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "P": { "item": "minecraft:piston" } }, "result": { "item": "akaishi:akaishi_compressor", "count": 1 } }

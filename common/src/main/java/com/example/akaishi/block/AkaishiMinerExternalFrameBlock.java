@@ -18,7 +18,6 @@ public class AkaishiMinerExternalFrameBlock extends AkaishiMachineBlock {
     public AkaishiMinerExternalFrameBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

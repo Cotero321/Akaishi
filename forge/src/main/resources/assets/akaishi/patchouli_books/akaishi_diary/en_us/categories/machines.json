@@ -1,6 +1,6 @@
 {
   "name": "Machines",
-  "description": "The basic production line: pulverizing, pressing, transforming and growing.$(br)Dusts and bases made here feed cooling sinks and advanced recipes — have power ready.",
+  "description": "The basic production line: pulverizing, pressing, transforming and growing.$(br)The dusts and bases produced here are consumed by cooling sinks and advanced recipes, so power must be available first.",
   "icon": "akaishi:akaishi_plant_cultivator",
   "sortnum": 3
 }

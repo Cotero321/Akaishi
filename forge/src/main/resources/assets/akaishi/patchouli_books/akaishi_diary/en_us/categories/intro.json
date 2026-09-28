@@ -1,6 +1,6 @@
 {
   "name": "Introduction",
-  "description": "The starting point of Akaishi tech: mining, crafting crystals, and powering your first purifier.$(br)Read the \"Journey Overview\" first, then follow the entries in order.",
+  "description": "The starting point of Akaishi technology: mining, crafting crystals, and powering the first purifier.$(br)Read the Journey Overview entry first, then follow the entries in order.",
   "icon": "akaishi:akaishi_crystal",
   "sortnum": 1
 }

@@ -37,9 +37,8 @@ public class AkaishiReactorControllerBlock extends AkaishiMachineBlock {
     public AkaishiReactorControllerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }
 

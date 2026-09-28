@@ -28,9 +28,8 @@ public class AkaishiPlasmaTankBlock extends AkaishiMachineBlock {
     public AkaishiPlasmaTankBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_BLUE)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

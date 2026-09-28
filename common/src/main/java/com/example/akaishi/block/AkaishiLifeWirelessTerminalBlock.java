@@ -36,9 +36,8 @@ public class AkaishiLifeWirelessTerminalBlock extends AkaishiMachineBlock {
     public AkaishiLifeWirelessTerminalBlock() {
         super(Properties.of()
                 .mapColor(MapColor.GOLD)
-                .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }
 

@@ -37,7 +37,6 @@ public class AkaishiEnergyAssemblyBlock extends AkaishiMachineBlock {
     public AkaishiEnergyAssemblyBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

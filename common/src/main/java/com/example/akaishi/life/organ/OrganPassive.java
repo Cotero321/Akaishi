@@ -25,7 +25,7 @@ public enum OrganPassive {
     FOOD_BOOST("food_boost"),
     /** 自动拾取周围掉落物（5 格） */
     AUTO_PICKUP("auto_pickup"),
-    /** 免疫移动减速（蛛网/黏液等） */
+    /** 免疫缓慢药水效果（MOVEMENT_SLOWDOWN；蛛网/黏液减速非药水效果，不在此列） */
     SLOW_IMMUNE("slow_immune"),
     /** 游泳加速 */
     SWIM_BOOST("swim_boost"),

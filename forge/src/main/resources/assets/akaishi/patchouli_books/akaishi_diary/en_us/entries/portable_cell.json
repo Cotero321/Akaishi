@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:portable_akaishi_cell_basic",
-      "text": "A Portable Akaishi Cell is a $(4)pocket power bank$(0).$(br2)$(bold)Three tiers$(0) (capacity / per-tick charge & output):$(li)Basic: 50 million / 500 thousand$(li)Advanced: 200 million / 1 million$(li)Super: 1 billion / 4 million$(br2)$(bold)How to use it:$(0)just carry it in your inventory. When Akaishi curios run dry, they $(4)automatically draw power from the Portable Cells in your backpack$(0) — and it also patches up your equipped Akaishi gear. Details on the next page."
+      "text": "A Portable Akaishi Cell is a portable energy buffer.$(br2)$(bold)Three tiers$(reset) (capacity / per-tick charge and output):$(li)Basic: 50 million / 500 thousand$(li)Advanced: 200 million / 1 million$(li)Super: 1 billion / 4 million$(br2)$(bold)Usage:$(reset) carry it in the inventory. Akaishi curios automatically draw power from Portable Cells in the inventory when their own buffer is depleted; equipped Akaishi gear is also repaired. Details follow on the next page."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Auto-repair:$(0)a Portable Cell anywhere in your inventory continuously repairs the Akaishi gear on your body and in your hands:$(li)Basic: 10 durability per tick$(li)Advanced: 20 durability per tick$(li)Super: 40 durability per tick$(br2)Each point of durability costs $(bold)100 AE$(0). Several cells in the bag $(4)stack their power$(0) — when one runs dry, the next takes over automatically.$(br2)$(bold)Recharging:$(0)drop the Portable Cell into the charge slot of a \"$(l:akaishi:energy_cell)Storage Cell$(/l)\" GUI."
+      "text": "$(bold)Auto-repair:$(reset) a Portable Cell in the inventory continuously repairs Akaishi gear worn or held:$(li)Basic: 10 durability per tick$(li)Advanced: 20 durability per tick$(li)Super: 40 durability per tick$(br2)Each point of durability costs $(bold)100 AE$(reset). Multiple cells combine their power; when one is depleted, the next is used automatically.$(br2)$(bold)Recharging:$(reset) place the Portable Cell in the charge slot of an $(l:akaishi:energy_cell)Energy Cell$(/l) interface."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:equipment",
         "akaishi:curios"
       ],
-      "text": "It travels, while the block-sized cells stay home — the capacity ladder is in \"$(l:akaishi:energy_basics)Akaishi Energy Basics$(/l)\" and \"$(l:akaishi:energy_cell)Energy Storage$(/l)\". It shines brightest with \"$(l:akaishi:equipment)Equipment$(/l)\" and \"$(l:akaishi:curios)Akaishi Trinkets$(/l)\"."
+      "text": "The Portable Cell is the mobile variant of the block-sized Energy Cells; capacities are listed in $(l:akaishi:energy_basics)Akaishi Energy Basics$(/l) and $(l:akaishi:energy_cell)Energy Storage$(/l). It is used with $(l:akaishi:equipment)Equipment$(/l) and $(l:akaishi:curios)Akaishi Trinkets$(/l)."
     }
   ]
 }

@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FF" ], "key": { "F": { "item": "akaishi:akaishi_curse_blossom" } }, "result": { "item": "minecraft:gunpowder", "count": 4 } }

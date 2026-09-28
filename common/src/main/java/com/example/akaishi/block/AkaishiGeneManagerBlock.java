@@ -27,9 +27,8 @@ public class AkaishiGeneManagerBlock extends AkaishiMachineBlock {
     public AkaishiGeneManagerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

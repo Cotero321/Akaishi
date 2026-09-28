@@ -30,7 +30,6 @@ public class AkaishiEnergyProcessorBlock extends AkaishiMachineBlock {
     public AkaishiEnergyProcessorBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_ORANGE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

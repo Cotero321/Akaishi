@@ -39,7 +39,6 @@ public class AkaishiPurifierBlock extends AkaishiMachineBlock {
     public AkaishiPurifierBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

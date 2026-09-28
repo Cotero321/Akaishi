@@ -29,7 +29,6 @@ public class AkaishiPlasmaFillerBlock extends AkaishiMachineBlock {
     public AkaishiPlasmaFillerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

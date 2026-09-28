@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " I ",
-    "IRI",
-    " I "
-  ],
-  "key": {
-    "R": { "item": "akaishi:akaishi_dust" },
-    "I": { "item": "minecraft:iron_nugget" }
-  },
-  "result": { "item": "akaishi:akaishi_hunting_ring", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " I ", "IRI", " I " ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "R": { "item": "minecraft:rabbit_foot" } }, "result": { "item": "akaishi:akaishi_hunting_ring", "count": 1 } }

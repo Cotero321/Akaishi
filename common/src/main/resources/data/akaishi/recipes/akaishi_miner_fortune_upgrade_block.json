@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IEI",
-    "EGE",
-    "IEI"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "E": { "item": "minecraft:emerald" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_miner_fortune_upgrade_block", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "UEU", "EGE", "UEU" ], "key": { "U": { "item": "akaishi:akaishi_miner_upgrade_frame" }, "E": { "item": "minecraft:emerald" }, "G": { "item": "akaishi:gold_dust" } }, "result": { "item": "akaishi:akaishi_miner_fortune_upgrade_block", "count": 1 } }

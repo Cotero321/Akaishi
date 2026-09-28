@@ -30,7 +30,7 @@ public class AkaishiItemStorageUnitBlock extends AkaishiMachineBlock {
     private final ItemStorageUnitTier tier;
 
     public AkaishiItemStorageUnitBlock(ItemStorageUnitTier tier) {
-        super(Properties.of().strength(4.0F, 6.0F).requiresCorrectToolForDrops());
+        super(Properties.of());
         this.tier = tier;
     }
 

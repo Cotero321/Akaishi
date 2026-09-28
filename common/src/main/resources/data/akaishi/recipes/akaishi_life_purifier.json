@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "LGL",
-    "RPR",
-    "LGL"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "L": { "item": "akaishi:lapis_dust" },
-    "R": { "item": "akaishi:akaishi_dust" },
-    "P": { "item": "akaishi:akaishi_purifier" }
-  },
-  "result": { "item": "akaishi:akaishi_life_purifier", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "LSL", "RPR", "LSL" ], "key": { "L": { "item": "akaishi:lapis_dust" }, "S": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "R": { "item": "akaishi:akaishi_dust" }, "P": { "item": "akaishi:akaishi_purifier" } }, "result": { "item": "akaishi:akaishi_life_purifier", "count": 1 } }

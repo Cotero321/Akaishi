@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "QQQ",
-    "QHQ",
-    "QQQ"
-  ],
-  "key": {
-    "H": { "item": "akaishi:heat_sink_normal" },
-    "Q": { "item": "akaishi:quartz_ore_base" }
-  },
-  "result": { "item": "akaishi:akaishi_fusion_insulation", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FFF", "FHF", "FFF" ], "key": { "F": { "item": "akaishi:akaishi_fusion_shell" }, "H": { "item": "akaishi:heat_sink_normal" } }, "result": { "item": "akaishi:akaishi_fusion_insulation", "count": 8 } }

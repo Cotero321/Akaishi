@@ -1,6 +1,6 @@
 {
   "name": "Gene Mutations",
-  "description": "The codex of organ mutation traits and reforging: traits attach randomly while breeding, and can be rerolled by the Trait Reforger.$(br)Read \"Organ Research\" to build your organ line first.",
+  "description": "Codex of organ mutation traits and reforging: traits attach randomly during breeding and can be rerolled at the Trait Reforger.$(br)Read \"Organ Research\" first to build the organ line.",
   "icon": "akaishi:akaishi_life_breeder",
   "sortnum": 5
 }

@@ -1,6 +1,6 @@
 {
   "name": "High Tech",
-  "description": "The crown of Akaishi tech: fuel & cooling → reactor → plasma → fusion → wireless energy.$(br)Cooling sinks from the Advanced chapter are your ticket in.",
+  "description": "The final tier of Akaishi technology: fuel and cooling, reactor, plasma, fusion and wireless energy.$(br)Cooling sinks introduced in the Advanced Industry chapter are the prerequisite.",
   "icon": "akaishi:akaishi_reactor_controller",
   "sortnum": 6
 }

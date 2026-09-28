@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "ILI",
-    "LCL",
-    "ILI"
-  ],
-  "key": {
-    "C": { "item": "akaishi:raw_akaishi_block" },
-    "L": { "item": "akaishi:lapis_dust" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_wireless_security", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SLS", "LCL", "SLS" ], "key": { "S": { "item": "akaishi:akaishi_wireless_shell" }, "L": { "item": "akaishi:lapis_dust" }, "C": { "item": "akaishi:raw_akaishi_block" } }, "result": { "item": "akaishi:akaishi_wireless_security", "count": 1 } }

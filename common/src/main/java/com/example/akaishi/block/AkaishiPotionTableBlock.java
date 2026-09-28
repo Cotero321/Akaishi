@@ -28,7 +28,6 @@ public class AkaishiPotionTableBlock extends AkaishiMachineBlock {
     public AkaishiPotionTableBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

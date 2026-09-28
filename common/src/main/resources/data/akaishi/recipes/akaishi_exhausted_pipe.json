@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "ILI",
-    "L L",
-    "ILI"
-  ],
-  "key": {
-    "L": { "item": "minecraft:lead" },
-    "I": { "item": "minecraft:iron_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_exhausted_pipe", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IRI", "L L", "IRI" ], "key": { "I": { "item": "minecraft:iron_ingot" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "L": { "item": "minecraft:lead" } }, "result": { "item": "akaishi:akaishi_exhausted_pipe", "count": 8 } }

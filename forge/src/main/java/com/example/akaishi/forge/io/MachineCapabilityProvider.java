@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class MachineCapabilityProvider implements ICapabilitySerializable<CompoundTag> {
 
+    /** 液体设备引用（非液体机器为 null）；家族过滤判定延后到查询期，见 {@link #getCapability} */
+    private final IFluidPipeDevice fluidDevice;
     private final LazyOptional<IItemHandlerModifiable> item;
     private final LazyOptional<IFluidHandler> fluid;
 
@@ -29,9 +31,15 @@ public final class MachineCapabilityProvider implements ICapabilitySerializable<
         this.item = be instanceof IItemPipeDevice device
                 ? LazyOptional.of(() -> new ForgeItemHandler(device))
                 : LazyOptional.empty();
-        this.fluid = be instanceof IFluidPipeDevice device
-                ? LazyOptional.of(() -> new ForgeFluidDeviceHandler(device))
-                : LazyOptional.empty();
+        if (be instanceof IFluidPipeDevice device) {
+            this.fluidDevice = device;
+            // 能力实例惰性创建：构造期（super → gatherCapabilities）罐实例尚未赋值，
+            // 此处只能记录设备、不得触碰 getFluidTanks()
+            this.fluid = LazyOptional.of(() -> new ForgeFluidDeviceHandler(device));
+        } else {
+            this.fluidDevice = null;
+            this.fluid = LazyOptional.empty();
+        }
     }
 
     @Override
@@ -40,6 +48,12 @@ public final class MachineCapabilityProvider implements ICapabilitySerializable<
             return item.cast();
         }
         if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            // 设备的罐全被家族过滤（废料/等离子专用罐）时不挂能力，
+            // 否则第三方管道会看到一个"存在但恒定容量 0"的假 fluid handler。
+            // 该判定必须在查询期执行：BE 构造期罐字段尚未初始化，提前读取会 NPE。
+            if (fluidDevice == null || !ForgeFluidDeviceHandler.hasOpenTank(fluidDevice)) {
+                return LazyOptional.empty();
+            }
             return fluid.cast();
         }
         return LazyOptional.empty();

@@ -10,7 +10,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -30,15 +29,15 @@ import org.jetbrains.annotations.Nullable;
  * 124 台赤能源发生机环绕成型（formed=true）后，以最高速率集中产能并统一输出。
  * 中心方块被外壳包围无法直接点击，右键任一发生机外壳可代理打开本界面。
  */
-public class AkaishiSuperGeneratorCoreBlock extends BaseEntityBlock {
+public class AkaishiSuperGeneratorCoreBlock extends AkaishiMachineBlock {
 
     /** 结构是否完整（激活状态） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
     public AkaishiSuperGeneratorCoreBlock() {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

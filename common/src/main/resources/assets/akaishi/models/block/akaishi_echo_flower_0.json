@@ -1,19 +1,43 @@
 {
   "textures": {
     "particle": "akaishi:block/akaishi_echo_flower",
-    "flower": "akaishi:block/akaishi_echo_flower"
+    "bloom": "akaishi:block/akaishi_echo_flower"
   },
   "elements": [
     {
-      "from": [6, 0, 6],
+      "from": [7, 0, 7],
+      "to": [9, 4, 9],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [6, 4, 6],
       "to": [10, 6, 10],
       "faces": {
-        "up": { "uv": [8, 0, 16, 8], "texture": "#flower" },
-        "down": { "uv": [0, 8, 8, 16], "texture": "#flower" },
-        "north": { "uv": [0, 0, 8, 8], "texture": "#flower" },
-        "south": { "uv": [0, 0, 8, 8], "texture": "#flower" },
-        "east": { "uv": [0, 0, 8, 8], "texture": "#flower" },
-        "west": { "uv": [0, 0, 8, 8], "texture": "#flower" }
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
+      }
+    },
+    {
+      "from": [6, 6, 6],
+      "to": [10, 12, 10],
+      "faces": {
+        "up": { "texture": "#bloom" },
+        "down": { "texture": "#bloom" },
+        "north": { "texture": "#bloom" },
+        "south": { "texture": "#bloom" },
+        "east": { "texture": "#bloom" },
+        "west": { "texture": "#bloom" }
       }
     }
   ]

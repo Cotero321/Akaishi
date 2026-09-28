@@ -29,7 +29,6 @@ public class AkaishiItemReconstructorBlock extends AkaishiMachineBlock {
     public AkaishiItemReconstructorBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "EME",
-    "MTM",
-    "EME"
-  ],
-  "key": {
-    "E": { "item": "akaishi:akaishi_essence" },
-    "M": { "item": "akaishi:akaishi_machine_component" },
-    "T": { "item": "akaishi:akaishi_upgrade_template" }
-  },
-  "result": { "item": "akaishi:akaishi_machine_energy_upgrade", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "EME", "MTM", "EME" ], "key": { "E": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "M": { "item": "akaishi:akaishi_machine_component" }, "T": { "item": "akaishi:akaishi_upgrade_template" } }, "result": { "item": "akaishi:akaishi_machine_energy_upgrade", "count": 1 } }

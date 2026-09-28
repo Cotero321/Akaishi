@@ -17,7 +17,6 @@ public class AkaishiMinerFrameBlock extends AkaishiMachineBlock {
     public AkaishiMinerFrameBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

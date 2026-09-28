@@ -28,7 +28,6 @@ public class AkaishiFuelMixerBlock extends AkaishiMachineBlock {
     public AkaishiFuelMixerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

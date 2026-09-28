@@ -17,6 +17,10 @@ public class MachineUpgradeSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return container.canPlaceItem(index, stack);
+        // 必须用 getContainerSlot()（容器槽位号）而非 index：
+        // Slot#index 是「菜单内序号」，由 AbstractContainerMenu#addSlot 按加入顺序赋值，
+        // 两者只有在"升级槽按容器顺序且排在最前"时才恰好相等；一旦加入顺序或数量不同就会整体错位
+        // （生命提纯器只加 1 个无线槽 → 菜单序号 0 → 被误判成速度格，只收速度升级）。
+        return container.canPlaceItem(getContainerSlot(), stack);
     }
 }

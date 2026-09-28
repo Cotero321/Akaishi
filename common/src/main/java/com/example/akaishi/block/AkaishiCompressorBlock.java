@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiCompressorBlock extends AkaishiMachineBlock {
 
     public AkaishiCompressorBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(5.0F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_ORANGE).sound(SoundType.METAL));
     }
 
     @Nullable

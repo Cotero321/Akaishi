@@ -30,9 +30,8 @@ public class AkaishiReactorEnergyOutputBlock extends AkaishiMachineBlock {
     public AkaishiReactorEnergyOutputBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_ORANGE)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

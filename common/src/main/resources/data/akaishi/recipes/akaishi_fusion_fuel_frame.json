@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IFI",
-    "F F",
-    "IFI"
-  ],
-  "key": {
-    "F": { "item": "akaishi:akaishi_fusion_rod" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_fusion_fuel_frame", "count": 4 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SFS", "F F", "SFS" ], "key": { "S": { "item": "akaishi:akaishi_fusion_shell" }, "F": { "item": "akaishi:akaishi_fusion_rod" } }, "result": { "item": "akaishi:akaishi_fusion_fuel_frame", "count": 4 } }

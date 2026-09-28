@@ -6,7 +6,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -21,15 +20,15 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 生命转换架构：已停用为纯材料（生命转换矩阵取代），右键无界面、结构不再形成。
  */
-public class AkaishiLifeConversionArchitectureBlock extends BaseEntityBlock {
+public class AkaishiLifeConversionArchitectureBlock extends AkaishiMachineBlock {
 
     /** 结构是否成型（保留状态属性，恒为 false） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
     public AkaishiLifeConversionArchitectureBlock() {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

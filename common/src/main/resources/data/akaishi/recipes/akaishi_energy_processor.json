@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "BMB",
-    "MEM",
-    "BMB"
-  ],
-  "key": {
-    "B": { "item": "minecraft:glass_bottle" },
-    "M": { "item": "akaishi:akaishi_machine_component" },
-    "E": { "item": "akaishi:akaishi_energy_cell_basic" }
-  },
-  "result": { "item": "akaishi:akaishi_energy_processor", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "BMB", "MEM", "BMB" ], "key": { "B": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "M": { "item": "akaishi:akaishi_machine_component" }, "E": { "item": "akaishi:akaishi_energy_cell_basic" } }, "result": { "item": "akaishi:akaishi_energy_processor", "count": 1 } }

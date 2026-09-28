@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "PBP",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "B": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "P": { "item": "akaishi:akaishi_energy_pipe" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_purifier_energy_input", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "CGC", "PBP", "CGC" ], "key": { "C": { "item": "akaishi:akaishi_purifier_matrix_casing" }, "G": { "item": "minecraft:glass" }, "B": { "item": "akaishi:akaishi_energy_cell_basic" }, "P": { "item": "akaishi:akaishi_energy_pipe" } }, "result": { "item": "akaishi:akaishi_purifier_energy_input", "count": 1 } }

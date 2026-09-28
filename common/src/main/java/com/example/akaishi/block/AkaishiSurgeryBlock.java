@@ -28,7 +28,6 @@ public class AkaishiSurgeryBlock extends AkaishiMachineBlock {
     public AkaishiSurgeryBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_BLUE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

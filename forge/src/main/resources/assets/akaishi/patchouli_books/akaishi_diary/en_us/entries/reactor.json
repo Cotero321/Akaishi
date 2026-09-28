@@ -7,21 +7,21 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_reactor_controller",
-      "text": "The Reactor is your mid-game $(4)powerhouse$(0): one unit outshines a dozen generators — but it demands you master $(bold)heat control$(0).$(br2)$(bold)Building it:$(0)$(li)Frame a $(4)hollow sealed box$(0) with Reactor Casings (outer edge length 5 or 7)$(li)Place 1 Reactor Core inside$(li)Put the $(l:akaishi:fuel_system)controller$(/l) and ports (Fuel/Energy Output/Waste) into the walls$(li)Add fuel rods (up to 10) and cooling components (up to 20) inside$(br2)The controller only works once the structure is formed. Break any casing and the structure collapses, halting the burn."
+      "text": "The Reactor is the mid-game power source: one unit outperforms a dozen generators but requires heat control.$(br2)$(bold)Construction:$(reset)$(li)Build a hollow sealed box from Reactor Casings (outer edge length 5 or 7)$(li)Place 1 Reactor Core inside$(li)Mount the $(l:akaishi:fuel_system)controller$(/l) and ports (Fuel/Energy Output/Waste) on the walls$(li)Add fuel rods (up to 10) and cooling components (up to 20) inside$(br2)The controller only operates once the structure is formed. Breaking any casing collapses the structure and halts the burn."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_reactor_fuel_rod",
-      "text": "$(bold)Firing it up:$(0)$(li)Each fuel rod unlocks one fuel slot — more rods, more fuel cells burned at once$(li)Drop fuel cells into the Fuel Port (27-slot buffer, item-pipe friendly); they are fed into the controller automatically$(li)Empty cells are retrieved on their own$(br2)$(bold)Where the output goes:$(0)power flows out through the Energy Output Port into your grid; $(4)depleted fuel$(0) is pumped into the Waste Port's tank.$(br2)Want longer, stronger burns? Master both fuel and cooling first — see \"$(l:akaishi:fuel_system)Fuel & Cooling$(/l)\"."
+      "text": "$(bold)Operation:$(reset)$(li)Each fuel rod unlocks one fuel slot; more rods allow more fuel cells to be burned at once$(li)Fuel cells are placed in the Fuel Port (27-slot buffer, item-pipe compatible) and fed into the controller automatically$(li)Empty cells are retrieved automatically$(br2)$(bold)Output:$(reset) power flows through the Energy Output Port into the grid; depleted fuel is pumped into the Waste Port's tank.$(br2)For longer and stronger burns, both fuel and cooling must be handled first; see $(l:akaishi:fuel_system)Fuel & Cooling$(/l)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Temperature is the line between life and boom:$(0)$(li)Base temperature is 300℃; hotter fuel raises it$(li)$(4)400-700℃$(0): the sweet spot, full output$(li)$(e)850℃$(0): warning — output starts to drop (it won't shut down)$(li)$(c)1000℃$(0): the cap! A $(4)10-second countdown to explosion$(0) that leaves a huge decay zone$(br2)$(bold)Cooling it down:$(0)cooling components only work when $(4)adjacent to a fuel rod$(0), and heat sinks make them far stronger; passive cooling alone removes only about 20% of heat — heat sinks do the heavy lifting.$(br2)Even mining blocks at full heat leaks a decay zone — $(bold)always keep an exit plan$(0)."
+      "text": "$(bold)Temperature thresholds:$(reset)$(li)Base temperature is 300℃; hotter fuel raises it$(li)400-700℃: the optimal range, full output$(li)850℃: warning; output begins to decrease (operation does not stop)$(li)1000℃: the limit; a 10-second countdown to explosion that creates a large decay zone$(br2)$(bold)Cooling:$(reset) cooling components only work when adjacent to a fuel rod, and heat sinks make them more effective; passive cooling removes only about 20% of heat, so heat sinks provide the majority of cooling.$(br2)Mining blocks at full heat also leaks a decay zone, so an exit plan must always be prepared."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_reactor_waste_port",
-      "text": "$(bold)Depleted fuel is not junk:$(0)roughly 20% of what you burn becomes it, and it can be $(4)recycled$(0) instead of thrown away.$(br2)That waste tank has a capacity limit — pump it out with fluid pipes on time, or feed it into your purification/recycling chain, or the reactor will stall once it's full. A full tank burns your fuel for nothing.$(br2)Follow the recycling path in \"$(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l)\" and \"$(l:akaishi:plasma)Plasma Chain$(/l)\"."
+      "text": "$(bold)Depleted fuel:$(reset) approximately 20% of consumed fuel becomes depleted fuel, which can be recycled rather than discarded.$(br2)The waste tank has a capacity limit; it must be pumped out with fluid pipes or fed into a purification/recycling chain, otherwise the reactor stalls once full and the fuel is consumed without benefit.$(br2)The recycling path is in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l) and $(l:akaishi:plasma)Plasma Chain$(/l)."
     },
     {
       "type": "patchouli:relations",
@@ -31,7 +31,7 @@
         "akaishi:liquid_fuel",
         "akaishi:fusion"
       ],
-      "text": "Suggested reading order: start with the \"$(l:akaishi:generator)Energy Generator$(/l)\" → understand \"Fuel & Cooling\" → then take on the Reactor → push toward the Fusion Reactor once your power needs outgrow it."
+      "text": "Reading order: the $(l:akaishi:generator)Energy Generator$(/l) first, then Fuel & Cooling, then the Reactor, and finally the Fusion Reactor once power demands exceed it."
     }
   ]
 }

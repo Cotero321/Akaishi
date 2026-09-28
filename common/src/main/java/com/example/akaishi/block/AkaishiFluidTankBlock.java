@@ -32,9 +32,8 @@ public class AkaishiFluidTankBlock extends AkaishiMachineBlock {
     public AkaishiFluidTankBlock(FluidTankTier tier) {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
         this.tier = tier;
     }
 

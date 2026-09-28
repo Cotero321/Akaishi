@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IBI",
-    "BCB",
-    "IBI"
-  ],
-  "key": {
-    "B": { "item": "akaishi:iron_ore_base" },
-    "C": { "item": "akaishi:akaishi_machine_component" },
-    "I": { "item": "minecraft:iron_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_catalyst_basic", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "RBR", "BCB", "RBR" ], "key": { "R": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "B": { "item": "akaishi:iron_ore_base" }, "C": { "item": "akaishi:akaishi_machine_component" } }, "result": { "item": "akaishi:akaishi_catalyst_basic", "count": 1 } }

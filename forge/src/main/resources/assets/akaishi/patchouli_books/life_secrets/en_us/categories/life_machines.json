@@ -1,6 +1,6 @@
 {
   "name": "Life Machines",
-  "description": "Solidify Life Energy into \"essence\" and set up sample / organ / potion vaults.$(br)Essence is the cornerstone material of all organ research.",
+  "description": "Solidify Life Energy into \"essence\" and set up sample / organ / potion vaults.$(br)Essence is the base material of all later organ research.",
   "icon": "akaishi:akaishi_life_purifier",
   "sortnum": 2
 }

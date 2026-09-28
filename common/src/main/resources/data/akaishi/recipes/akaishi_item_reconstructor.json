@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "AEA",
-    "ECE",
-    "AEA"
-  ],
-  "key": {
-    "A": { "item": "akaishi:akaishi_advanced_component" },
-    "E": { "item": "akaishi:akaishi_exhausted_crystal" },
-    "C": { "item": "minecraft:crafting_table" }
-  },
-  "result": { "item": "akaishi:akaishi_item_reconstructor", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "AEA", "EPE", "AEA" ], "key": { "A": { "item": "akaishi:akaishi_advanced_component" }, "E": { "item": "akaishi:akaishi_exhausted_crystal" }, "P": { "item": "akaishi:akaishi_precision_alloy_ingot" } }, "result": { "item": "akaishi:akaishi_item_reconstructor", "count": 1 } }

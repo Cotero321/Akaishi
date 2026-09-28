@@ -30,7 +30,7 @@ public class AkaishiEnergyCellBlock extends AkaishiMachineBlock {
     private final EnergyCellTier tier;
 
     public AkaishiEnergyCellBlock(EnergyCellTier tier) {
-        super(Properties.of().strength(5.0F, 6.0F).requiresCorrectToolForDrops());
+        super(Properties.of());
         this.tier = tier;
     }
 

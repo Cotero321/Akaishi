@@ -7,25 +7,25 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_transgene_factory",
-      "text": "The $(bold)Transgene Factory$(0) rewrites creature genes into plantable exotic crops. Each operation uses $(4)5,000 Life Energy$(0), 1 Life Essence Solid, 1 base vine and 1 catalyst, taking about 5 seconds by default; the sequence must come from the specified creature and have at least $(4)50$(0) purity.$(br2)$(bold)Three recipes:$(0)$(li)Wither Skeleton gene + Twisting Vine + Wither Rose → Wither Vine Seed$(li)Blaze gene + Twisting Vine + Blaze Powder → Blaze Flower Seed$(li)Ghast gene + Weeping Vines + Glow Berries → Curse Vine Seed$(br2)The output slot only exports and supports hoppers or item pipes; its Life Energy interface only receives energy. Exact recipes are also available in JEI."
+      "text": "The $(bold)Transgene Factory$(reset) rewrites creature genes into plantable exotic crops. Each operation uses $(reset)5,000 Life Energy$(reset), 1 Life Essence Solid, 1 base vine and 1 catalyst, taking about 5 seconds by default; the sequence must come from the specified creature and have at least $(reset)50$(reset) purity.$(br2)$(bold)Five recipes:$(reset)$(li)Wither Skeleton gene + Twisting Vine + Wither Rose → Wither Vine Seed$(li)Blaze gene + Twisting Vine + Blaze Powder → Blaze Flower Seed$(li)Ghast gene + Weeping Vines + Glow Berries → Curse Vine Seed$(li)Warden gene + Chorus Flower + Echo Shard → Echo Flower Seed$(li)Enderman gene + Azalea + Chorus Fruit → Ender Flower Seed$(br2)The output slot only exports and supports hoppers or item pipes; its Life Energy interface only receives energy. Exact recipes are also available in JEI."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_wither_seed",
       "title": "Wither Vine: Repeatable Fruit",
-      "text": "Wither Vine Seeds can be planted on top of any sturdy block. Random ticks grow the plant through a root, lower stem, and upper tip; the tip then progresses from bare vine to young fruit to ripe fruit.$(br2)$(bold)Harvest:$(0) right-click a ripe tip for 1 Wither Fruit. The tip resets to bare vine and fruits again. Breaking the tip outside Creative also drops 1 Wither Fruit; breaking the root or its support returns the seed.$(br2)It is a stable crop with repeatable harvests and recoverable seeds."
+      "text": "Wither Vine Seeds can be planted on top of any sturdy block. Random ticks grow the plant through a root, lower stem, and upper tip; the tip then progresses from bare vine to young fruit to ripe fruit.$(br2)$(bold)Harvest:$(reset) right-click a ripe tip for 1 Wither Fruit. The tip resets to bare vine and fruits again. Breaking the tip outside Creative also drops 1 Wither Fruit; breaking the root or its support returns the seed.$(br2)It is a stable crop with repeatable harvests and recoverable seeds.$(br2)$(bold)Fruit effect:$(reset) right-click a Wither Fruit to cleanse your Wither and Poison and gain brief Resistance; it applies no negative status effect and deals no damage."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_blaze_seed",
       "title": "Blaze Flower: Soul Sand Bloom",
-      "text": "Blaze Flower Seeds $(4)can only be planted on Soul Sand$(0). The root grows from sprout to seedling to maturity; when space above is clear, it grows a bloom that progresses from bud to opening bloom to full bloom.$(br2)$(bold)Harvest:$(0) a full bloom emits light level 12. Right-click it for 1 Blaze Petal; it resets to a bud and can bloom again. Breaking a full bloom outside Creative also drops Blaze Petal.$(br2)Note: breaking the root or removing its Soul Sand support never returns a seed, so Blaze Flower Seeds cannot be renewed by harvesting."
+      "text": "Blaze Flower Seeds $(reset)can only be planted on Soul Sand$(reset). The root grows from sprout to seedling to maturity; when space above is clear, it grows a bloom that progresses from bud to opening bloom to full bloom.$(br2)$(bold)Harvest:$(reset) a full bloom emits light level 12. Right-click it for 1 Blaze Petal; it resets to a bud and can bloom again. Breaking a full bloom outside Creative also drops Blaze Petal.$(br2)Note: breaking the root or removing its Soul Sand support never returns a seed, so Blaze Flower Seeds cannot be renewed by harvesting.$(br2)$(bold)Fruit effect:$(reset) right-click a Blaze Petal to extinguish yourself and gain brief Fire Resistance; it applies no negative status effect and deals no damage."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_curse_vine_seed",
       "title": "Curse Vine: Weeping Blossom",
-      "text": "Curse Vine Seeds can be planted on the underside of any sturdy block. Random ticks grow the vine downward from the root, one stem segment at a time, up to $(4)5 blocks long in total$(0) (1 root + 4 stems). Once the lowest segment is reached, it enters the fruiting stage: bare vine, young blossom, ripe curse blossom.$(br2)$(bold)Harvest:$(0) right-click a ripe lowest segment for 1 Curse Blossom; it resets to bare vine and fruits again. Breaking that segment outside Creative also drops 1 Curse Blossom; breaking the root or its ceiling support returns the seed."
+      "text": "Curse Vine Seeds can be planted on the underside of any sturdy block. Random ticks grow the vine downward from the root, one stem segment at a time, up to $(reset)5 blocks long in total$(reset) (1 root + 4 stems). Once the lowest segment is reached, it enters the fruiting stage: bare vine, young blossom, ripe curse blossom.$(br2)$(bold)Harvest:$(reset) right-click a ripe lowest segment for 1 Curse Blossom; it resets to bare vine and fruits again. Breaking that segment outside Creative also drops 1 Curse Blossom; breaking the root or its ceiling support returns the seed.$(br2)$(bold)Fruit effect:$(reset) right-click a Curse Blossom to gain Slow Falling and clear accumulated fall damage; it applies no negative status effect and deals no damage."
     },
     {
       "type": "patchouli:relations",
@@ -34,7 +34,7 @@
         "akaishi:life_purifier",
         "akaishi:life_energy"
       ],
-      "text": "First obtain high-purity genes from $(l:akaishi:life_samples)Life Samples$(/l), then prepare Solids and Life Energy with the $(l:akaishi:life_purifier)Life Purifier$(/l)."
+      "text": "First obtain high-purity genes from $(l:akaishi:life_samples)Life Samples$(/l), then prepare Solids and Life Energy with the $(l:akaishi:life_purifier)Life Purifier$(/l).$(br2)$(bold)Fruit uses:$(reset) all five fruits (Wither Fruit / Blaze Petal / Curse Blossom / Sculk Fruit / Ender Fruit) can be $(bold)used by right-click$(reset) for an effect, and can also be $(bold)traded at a crafting table in 4 layouts$(reset) (2 in a row, 2 in a column, 2×2, and a full 3×3 grid). Effects never apply negative status effects and never deal damage: Wither Fruit cleanses Wither and Poison and grants brief Resistance, Blaze Petal extinguishes fire and grants Fire Resistance, Curse Blossom grants Slow Falling and clears accumulated fall damage, Sculk Fruit spreads Sculk around the user, Ender Fruit teleports the user along their line of sight.$(br2)$(bold)Full-grid results:$(reset) Wither Fruit → 3 Wither Bone Shards; Blaze Petal → 2 Blaze Rods; Curse Blossom → 4 Ghast Tears; Sculk Fruit → 1 Echo Shard; Ender Fruit → 2 Ender Pearls.$(br2)$(bold)Wither Bone Shard:$(reset) 9 Wither Bone Shards arranged in a full 3×3 grid craft 1 Wither Skeleton Skull (about 27 Wither Fruits per skull)."
     }
   ]
 }

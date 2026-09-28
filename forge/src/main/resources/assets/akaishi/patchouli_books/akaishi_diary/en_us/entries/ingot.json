@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_ingot",
-      "text": "The Akaishi Ingot is the $(bold)core material$(0) of mid-to-late-game machines and gear.$(br2)$(bold)One way to get it:$(0) feed $(4)10M Akaishi Energy + 1 Netherite Ingot$(0) into the \"$(l:akaishi:aggregator)Energy Aggregator$(/l)\" and it condenses 1 ingot.$(br2)There is no furnace shortcut — $(e)without 10M-scale storage you can't mass-produce$(0). Keep the Ancient Debris you mine; it's the ingredient that gets you here."
+      "text": "The Akaishi Ingot is the core material for mid- and late-game machines and equipment.$(br2)$(bold)Production:$(reset) 10M Akaishi Energy and 1 Netherite Ingot fed into the $(l:akaishi:aggregator)Energy Aggregator$(/l) condense into 1 ingot.$(br2)No furnace recipe exists; mass production requires 10M-scale energy storage. Ancient Debris should be retained, as it is the required ingredient."
     },
     {
       "type": "patchouli:text",
-      "text": "The ingot is the $(bold)king of upstream materials$(0): the upgrade template, reactor fuel rods and shells, the fuel canner, fusion and wireless parts... a whole stack of premium recipes is built on it, and \"$(l:akaishi:equipment)Equipment$(/l)\" is fed by it too.$(br2)$(bold)Spending advice$(0): secure your share for the Equipment Forger and upgrade templates first — $(4)you can never have enough ingots$(0). If the grid can take it, leave the Aggregator running and let them pile up: $(e)each ingot is a Netherite Ingot, upgraded$(0)."
+      "text": "The ingot is the primary upstream material: upgrade templates, reactor fuel rods and shells, the fuel canner, and fusion and wireless components all require it, as does $(l:akaishi:equipment)Equipment$(/l).$(br2)$(bold)Allocation:$(reset) reserve ingots for the Equipment Forger and upgrade templates first. If the grid can supply it, leave the Aggregator running and stockpile ingots."
     },
     {
       "type": "patchouli:relations",
@@ -20,7 +20,7 @@
         "akaishi:aggregator",
         "akaishi:equipment"
       ],
-      "text": "How you got here: crystals → blocks → essence (see \"Crystal & Essence\") built your fortune → the grid reached 10M-scale storage → the Aggregator started condensing → and now ingots flow into the Equipment Forger. Read how to set up the Aggregator before you talk about getting rich."
+      "text": "Chain: crystals → blocks → essence (see Crystal & Essence) → 10M-scale energy storage → the Aggregator condenses ingots → the ingots are consumed by the Equipment Forger."
     }
   ]
 }

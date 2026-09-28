@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "DBD",
-    "BCB",
-    "DBD"
-  ],
-  "key": {
-    "B": { "item": "akaishi:lapis_ore_base" },
-    "D": { "item": "akaishi:diamond_dust" },
-    "C": { "item": "akaishi:akaishi_collector_medium" }
-  },
-  "result": { "item": "akaishi:akaishi_collector_advanced", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "PBP", "BCB", "PBP" ], "key": { "P": { "item": "akaishi:akaishi_precision_alloy_ingot" }, "B": { "item": "akaishi:lapis_ore_base" }, "C": { "item": "akaishi:akaishi_collector_medium" } }, "result": { "item": "akaishi:akaishi_collector_advanced", "count": 1 } }

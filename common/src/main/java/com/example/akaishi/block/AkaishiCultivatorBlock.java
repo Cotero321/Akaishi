@@ -29,7 +29,6 @@ public class AkaishiCultivatorBlock extends AkaishiMachineBlock {
     public AkaishiCultivatorBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

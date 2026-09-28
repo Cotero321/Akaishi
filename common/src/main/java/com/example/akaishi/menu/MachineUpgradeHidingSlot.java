@@ -17,6 +17,8 @@ public class MachineUpgradeHidingSlot extends OverlayHidingSlot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return container.canPlaceItem(index, stack);
+        // 与 MachineUpgradeSlot 同源修正：用容器槽位号 getContainerSlot()，
+        // 不能用 Slot#index（那是 addSlot 赋的"菜单内序号"，顺序一变就会整体错位）
+        return container.canPlaceItem(getContainerSlot(), stack);
     }
 }

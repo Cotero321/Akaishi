@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_controller",
-      "text": "The flagship production line: the $(4)only source$(0) that refines Life Energy out of Akaishi Energy.$(br2)$(bold)Building it:$(0)$(li)Frame a $(4)3×3×3$(0) hollow sealed box with Life Conversion Matrix Casings$(li)Put an Energy Input Port and a Life Output Port into the walls$(li)Mount the controller $(4)on a wall$(0) — once the structure forms it runs itself; break any casing and it stops instantly$(br2)$(bold)Rates:$(0) up to $(4)45$(0) conversions per tick, each burning $(4)10M Akaishi Energy$(0) for $(4)10 Life Energy$(0) — about 450 Life/tick at full speed, demanding ~450M akaishi/tick. $(bold)Feed the grid first, then switch it on$(0)."
+      "text": "The current main production line: the $(reset)only source$(reset) that refines Life Energy from Akaishi Energy.$(br2)$(bold)Building it:$(reset)$(li)Frame a $(reset)3×3×3$(reset) hollow sealed box with Life Conversion Matrix Casings$(li)Put an Energy Input Port and a Life Output Port into the walls$(li)Mount the controller $(reset)on a wall$(reset) — once the structure forms it runs automatically; breaking any casing stops it immediately$(br2)$(bold)Rates:$(reset) up to $(reset)45$(reset) conversions per tick, each burning $(reset)10M Akaishi Energy$(reset) for $(reset)10 Life Energy$(reset) — about 450 Life/tick at full speed, demanding ~450M akaishi/tick. $(bold)Ensure the grid can sustain it before switching it on$(reset)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_energy_input",
-      "text": "$(bold)Energy Input Port$(0): a $(4)100M$(0) buffer that feeds the controller every tick, smoothing out the 10M gulps of each conversion.$(br2)$(bold)Life Output Port$(0): pulls up to $(4)450$(0) Life Energy per tick (at full output) into its own 5,000 buffer for Life Energy Pipes to drain.$(br2)Remember the pipe rule: $(bold)akaishi goes in, life comes out$(0) — don't swap them."
+      "text": "$(bold)Energy Input Port$(reset): a $(reset)100M$(reset) buffer that feeds the controller every tick, smoothing the 10M draw of each conversion.$(br2)$(bold)Life Output Port$(reset): pulls up to $(reset)450$(reset) Life Energy per tick (at full output) into its own 5,000 buffer for Life Energy Pipes to drain.$(br2)$(bold)Pipe rule:$(reset) akaishi energy goes in, life energy comes out; do not swap them."
     },
     {
       "type": "patchouli:text",
-      "title": "About the Old Machines",
-      "text": "$(bold)Beware outdated blueprints$(0): the old $(4)Life Aggregation Converter$(0) and $(4)Life Conversion Architecture$(0) have $(bold)been replaced by the Matrix$(0). They are now just $(4)crafting materials$(0) with an energy buffer — they never run or form a structure on their own.$(br2)Fine as components, but if you expect them to refine life? $(bold)Build the Matrix$(0)."
+      "title": "Outdated Machines",
+      "text": "$(bold)Outdated machines$(reset): the older $(reset)Life Aggregation Converter$(reset) and $(reset)Life Conversion Architecture$(reset) have $(bold)been replaced by the Matrix$(reset). They now serve only as $(reset)crafting materials$(reset) with an energy buffer — they never run or form a structure on their own.$(br2)They can be used as building materials, but they no longer refine Life Energy."
     },
     {
       "type": "patchouli:relations",
@@ -26,7 +26,7 @@
         "akaishi:life_path",
         "akaishi:life_purifier"
       ],
-      "text": "Storage and transport: \"$(l:akaishi:life_energy)Life Energy$(/l)\". The refined energy next becomes currency at the \"$(l:akaishi:life_purifier)Life Energy Purifier$(/l)\"."
+      "text": "Storage and transport: \"$(l:akaishi:life_energy)Life Energy$(/l)\". The refined energy is next solidified into currency at the \"$(l:akaishi:life_purifier)Life Energy Purifier$(/l)\"."
     }
   ]
 }

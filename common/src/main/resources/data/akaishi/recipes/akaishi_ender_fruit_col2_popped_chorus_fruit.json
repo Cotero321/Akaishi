@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "F", "F" ], "key": { "F": { "item": "akaishi:akaishi_ender_fruit" } }, "result": { "item": "minecraft:popped_chorus_fruit", "count": 2 } }

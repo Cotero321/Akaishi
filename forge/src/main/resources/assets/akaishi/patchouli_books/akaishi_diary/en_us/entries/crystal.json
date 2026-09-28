@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_crystal",
-      "text": "The Akaishi Crystal is the tech line's $(bold)base currency and fuel$(0): recipes need it, power generation needs it, and refining can't do without it.$(br2)$(bold)First craft:$(0) fill a 3×3 grid with 9 crystals to get 1 $(bold)Raw Akaishi Block$(0) (and you can always break it back into 9).$(br2)Don't waste raw blocks: they're the purifier's $(4)raw material and fuel$(0), and the generator's second-tier fuel — $(e)one block outburns ten crystals$(0)."
+      "text": "The Akaishi Crystal is the base currency and fuel of the tech line; it is required by recipes, power generation and refining.$(br2)$(bold)First recipe:$(reset) fill a 3×3 grid with 9 crystals to obtain 1 $(bold)Raw Akaishi Block$(reset) (reversible back into 9 crystals).$(br2)Raw Akaishi Blocks are the Purifier's raw material and fuel and the generator's second-tier fuel. $(bold)One Raw Akaishi Block outburns ten crystals.$(reset)"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_essence",
-      "text": "Akaishi Essence is the \"refined intermediate\": feed a raw block or crystal block into the $(l:akaishi:purifier)Purifier$(/l) and it squeezes essence out. You can concentrate it into two $(4)premium materials$(0):$(li)9 essence → Compressed Akaishi Essence: used in upgrade templates and fusion parts$(li)9 essence → Compressed Akaishi Essence Block: reversible, the building block of the Equipment Forger and reactor/fusion shells$(br2)$(bold)Fuel climbs the same ladder$(0): essence → compressed essence → compressed block are tiers 3-5 of the generator's fuel list — $(4)refine one more step, reload ten fewer times$(0)."
+      "text": "Akaishi Essence is the refined intermediate: a Raw Akaishi Block or Crystal Block fed into the $(l:akaishi:purifier)Purifier$(/l) produces essence. It can be concentrated into two premium materials:$(li)9 essence → Compressed Akaishi Essence, used in upgrade templates and fusion parts$(li)9 essence → Compressed Akaishi Essence Block, reversible, used for the Equipment Forger and reactor/fusion shells$(br2)$(bold)Fuel follows the same ladder:$(reset) essence, Compressed Akaishi Essence and Compressed Akaishi Essence Block are tiers 3-5 of the generator fuel list."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_crystal_block",
-      "text": "Three more members of the crystal family:$(li)$(bold)Akaishi Crystal Block$(0): 9 crystals pressed in the Compressor (reversible); feed it to a purifier or matrix for $(4)4 essence$(0)$(li)Akaishi Crystal Geode: sprouts clusters over time, and the Aggregator can tier it up$(li)Akaishi Crystal Cluster: mined for 1-2 essence$(br2)\"Grow + harvest\" with geodes is your mid-game crystal farm — see the Catalyst in the Advanced chapter."
+      "text": "Three further members of the crystal family:$(li)$(bold)Akaishi Crystal Block$(reset): 9 crystals pressed in the Compressor (reversible); feeding it to a Purifier or Matrix yields 4 essence$(li)Akaishi Crystal Geode: produces clusters over time and can be upgraded by the Aggregator$(li)Akaishi Crystal Cluster: mined for 1-2 essence$(br2)Geode-based growth and harvesting forms the mid-game crystal farm; see the Catalyst entry in the Advanced Industry chapter."
     },
     {
       "type": "patchouli:relations",
@@ -27,7 +27,7 @@
         "akaishi:ingot",
         "akaishi:compressor"
       ],
-      "text": "Reading order: mine crystals from ore → squeeze blocks into essence at the Purifier → concentrate essence into premium materials → save up and condense an Akaishi Ingot at the Aggregator. Want a shortcut? The Compressor's dust-to-block and crystal-to-crystal-block recipes plug right into this chain."
+      "text": "Reading order: mine crystals from ore → extract essence from blocks at the Purifier → concentrate essence into premium materials → condense an Akaishi Ingot at the Aggregator. The Compressor's dust-to-block and crystal-to-crystal-block recipes also feed this chain."
     }
   ]
 }

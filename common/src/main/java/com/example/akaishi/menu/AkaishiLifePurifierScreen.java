@@ -23,9 +23,10 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
     private static final int LIFE_BAR_Y = 36;
     /** 固化进度条区域（位于两条下方空档） */
     private static final int PROGRESS_X = 20, PROGRESS_Y = 48, PROGRESS_W = 88, PROGRESS_H = 8;
-    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，输出槽右侧，固定面板右上角并排 y=8 起，规则3） */
-    private static final int SPEED_SLOT_X = 134, SPEED_SLOT_Y = 8;
-    private static final int ENERGY_SLOT_X = 152, ENERGY_SLOT_Y = 8;
+    /** 升级槽 GUI 位置（与 Menu 槽位坐标一致，固定面板右上角，规则3） */
+    private static final int WIRELESS_SLOT_X = 152, WIRELESS_SLOT_Y = 8;
+    /** 输入槽 GUI 位置（与 Menu 槽位坐标一致） */
+    private static final int INPUT_SLOT_X = 116, INPUT_SLOT_Y = 52;
     /** 输出槽 GUI 位置（与 Menu 槽位坐标一致） */
     private static final int OUTPUT_SLOT_X = 116, OUTPUT_SLOT_Y = 30;
 
@@ -50,7 +51,8 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
         int y = this.topPos;
         gui.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // 机器槽位框（贴图无图形，自绘补齐；输出槽位于条形区右侧）
+        // 机器槽位框（贴图无图形，自绘补齐；输入槽在下、输出槽在上）
+        GuiWidgets.slotBox(gui, x + INPUT_SLOT_X, y + INPUT_SLOT_Y);
         GuiWidgets.slotBox(gui, x + OUTPUT_SLOT_X, y + OUTPUT_SLOT_Y);
 
         // 赤能源条（红）
@@ -66,9 +68,8 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
             gui.fill(x + PROGRESS_X, y + PROGRESS_Y, x + PROGRESS_X + progressWidth, y + PROGRESS_Y + PROGRESS_H, 0xFFFFD030);
         }
 
-        // 升级槽（速度/能量，纹理无图案需自绘框 + 槽位上方标签；无线接收格已按需求移除）
-        GuiWidgets.slotBox(gui, x + SPEED_SLOT_X, y + SPEED_SLOT_Y);
-        GuiWidgets.slotBox(gui, x + ENERGY_SLOT_X, y + ENERGY_SLOT_Y);
+        // 升级槽（无线接收槽，纹理无图案需自绘框）
+        GuiWidgets.slotBox(gui, x + WIRELESS_SLOT_X, y + WIRELESS_SLOT_Y);
     }
 
     @Override
@@ -95,18 +96,19 @@ public class AkaishiLifePurifierScreen extends AbstractContainerScreen<AkaishiLi
                             formatEnergy(menu.getLifeEnergy()), formatEnergy(menu.getLifeMax())),
                     mouseX, mouseY);
         }
-        // 升级槽悬停提示
-        if (isHovering(SPEED_SLOT_X, SPEED_SLOT_Y, 16, 16, mouseX, mouseY)) {
-            gui.renderTooltip(this.font,
-                    Component.translatable("gui.akaishi.upgrade.speed_slot", menu.getSpeedUpgradeCount(),
-                            "x" + (1F + menu.getSpeedUpgradeCount())),
+        // 无线接收槽悬停提示：仅空槽时提示用途
+        // （有物品时原版会画物品名与说明，此处必须让位，否则两个 tooltip 叠在同一坐标上）
+        if (isHovering(WIRELESS_SLOT_X, WIRELESS_SLOT_Y, 16, 16, mouseX, mouseY)
+                && menu.isWirelessSlotEmpty()) {
+            gui.renderTooltip(this.font, Component.translatable("gui.akaishi.upgrade.wireless_slot",
+                            Component.translatable(menu.hasWirelessReceiver()
+                                    ? "gui.akaishi.upgrade.installed" : "gui.akaishi.upgrade.absent")),
                     mouseX, mouseY);
         }
-        if (isHovering(ENERGY_SLOT_X, ENERGY_SLOT_Y, 16, 16, mouseX, mouseY)) {
+        // 输入槽悬停：仅空槽时提示用途（有物品时让原版物品提示独占）
+        if (isHovering(INPUT_SLOT_X, INPUT_SLOT_Y, 16, 16, mouseX, mouseY) && menu.isInputSlotEmpty()) {
             gui.renderTooltip(this.font,
-                    Component.translatable("gui.akaishi.upgrade.energy_slot", menu.getEnergyUpgradeCount(),
-                            "x" + (1F + 0.5F * menu.getEnergyUpgradeCount())),
-                    mouseX, mouseY);
+                    Component.translatable("gui.akaishi.life_purifier.input_tip"), mouseX, mouseY);
         }
         // 输出槽悬停：仅空槽时提示用途（有物品时 vanilla 已显示物品名，避免重复 tooltip）
         if (isHovering(OUTPUT_SLOT_X, OUTPUT_SLOT_Y, 16, 16, mouseX, mouseY)

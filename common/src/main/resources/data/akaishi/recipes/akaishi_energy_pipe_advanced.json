@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " P ",
-    "PCP",
-    " P "
-  ],
-  "key": {
-    "P": { "item": "akaishi:akaishi_energy_pipe" },
-    "C": { "item": "akaishi:copper_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_energy_pipe_advanced", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " P ", "PCP", " P " ], "key": { "P": { "item": "akaishi:akaishi_energy_pipe" }, "C": { "item": "akaishi:akaishi_ingot" } }, "result": { "item": "akaishi:akaishi_energy_pipe_advanced", "count": 1 } }

@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "SIS",
-    "IPI",
-    "SIS"
-  ],
-  "key": {
-    "S": { "item": "minecraft:soul_sand" },
-    "P": { "item": "akaishi:akaishi_purifier" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_decay_purifier", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SIS", "RPR", "SIS" ], "key": { "S": { "item": "minecraft:soul_sand" }, "I": { "item": "akaishi:akaishi_ingot" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "P": { "item": "akaishi:akaishi_purifier" } }, "result": { "item": "akaishi:akaishi_decay_purifier", "count": 1 } }

@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_generator",
-      "text": "赤能源发生机是$(4)入门级单块发电$(0)：喂入赤石燃料，按基准 $(bold)75 赤能源/tick$(0) 持续产电。$(br2)$(bold)扩产$(0)：自带 10 个升级槽，每放一个「能源产生升级组件」产率 ×1.75（附带 1% 产量损失），$(4)满配 10 个约 ×242$(0)。$(br2)$(bold)燃料五档热值$(0)：$(li)赤石晶 2000$(li)粗制赤石块 20000$(li)赤石精华 80000$(li)浓缩赤石精华 800000$(li)浓缩赤石精华块 7200000$(br2)燃料从哪来、如何精炼，见「$(l:akaishi:energy_basics)赤能源基础$(/l)」。嫌一台不够猛？升级方向是「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」。"
+      "text": "赤能源发生机是$(reset)入门级单块发电设备$(reset)：投入赤石燃料，按基准 $(bold)75 赤能源/tick$(reset) 持续产电。$(br2)$(bold)扩容$(reset)：自带 10 个升级槽，每放一个「能源产生升级组件」产率 ×1.75（附带 1% 产量损失），$(reset)装满 10 个约 ×242$(reset)。$(br2)$(bold)燃料五档热值$(reset)：$(li)赤石晶 2000$(li)粗制赤石块 20000$(li)赤石精华 80000$(li)浓缩赤石精华 800000$(li)浓缩赤石精华块 7200000$(br2)燃料来源与精炼方式见「$(l:akaishi:energy_basics)赤能源基础$(/l)」。如需更大产能，见「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)退役结构说明：$(0)旧版「$(4)小型组合$(0)」（3×3×3）与「$(4)超级发生器$(0)」（5×5×5）等散装形态$(bold)已经退役$(0)，如今统一由「赤石发生器矩阵」接手，老结构的方块只能当$(e)材料$(0)用。$(br2)$(bold)发生机 vs 矩阵：$(0)单块机便宜、随放随用、自带燃料槽；$(4)矩阵要吃电网$(0)，但倍率从 ×45 起步——预算和产线规模决定你选哪条路。$(br2)矩阵的成型清单与两档参数见「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」条目。"
+      "text": "$(bold)退役结构说明：$(reset)旧版「$(reset)小型组合$(reset)」（3×3×3）与「$(reset)超级发生器$(reset)」（5×5×5）等散装形态$(bold)已退役$(reset)，现统一由「赤石发生器矩阵」承接，旧结构方块仅可作为$(reset)材料$(reset)使用。$(br2)$(bold)发生机与矩阵对比：$(reset)单块发生机成本较低、可随时放置、自带燃料槽；$(reset)矩阵需要电网供电$(reset)，但倍率从 ×45 起步。$(br2)矩阵的成型清单与两档参数见「$(l:akaishi:gen_matrix)赤石发生器矩阵$(/l)」条目。"
     },
     {
       "type": "patchouli:relations",
@@ -22,7 +22,7 @@
         "akaishi:gen_matrix",
         "akaishi:reactor"
       ],
-      "text": "阅读顺序建议：先读「$(l:akaishi:energy_basics)赤能源基础$(/l)」搞懂燃料，再配「$(l:akaishi:energy_pipe)管道$(/l)」与「$(l:akaishi:energy_cell)储存单元$(/l)」铺好电网；要上规模就搭「$(l:akaishi:gen_matrix)发生器矩阵$(/l)」；矩阵都不够时，就该上「$(l:akaishi:reactor)反应堆$(/l)」了。"
+      "text": "阅读顺序建议：先读「$(l:akaishi:energy_basics)赤能源基础$(/l)」了解燃料，再配「$(l:akaishi:energy_pipe)管道$(/l)」与「$(l:akaishi:energy_cell)储存单元$(/l)」搭建电网；需要规模化时搭建「$(l:akaishi:gen_matrix)发生器矩阵$(/l)」；矩阵仍不足时使用「$(l:akaishi:reactor)反应堆$(/l)」。"
     }
   ]
 }

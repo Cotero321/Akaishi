@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FF" ], "key": { "F": { "item": "akaishi:akaishi_blaze_condensate" } }, "result": { "item": "minecraft:blaze_powder", "count": 3 } }

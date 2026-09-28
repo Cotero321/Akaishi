@@ -148,7 +148,11 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
         return Math.min(stack.getCount(), MAX_UPGRADES);
     }
 
-    /** 成型后作为多方块外壳：容器访问动态代理到中心主方块，使 AE2 存储总线 / Mekanism 物流管道能经外壳给结构喂燃料 */
+    /**
+     * 成型后作为多方块外壳：容器访问动态代理到中心主方块，使 AE2 存储总线 / Mekanism 物流管道能经外壳给结构喂燃料。
+     * 注：中心（超级发生器核心 / 小型组合结构）已停用为纯材料、恒不成型，本机 FORMED 永不置位，
+     * 因此下方代理分支实际为死分支——保留以不改动既有结构语义，备将来重新启用。
+     */
     private Container currentContainer() {
         if (getBlockState().getValue(com.example.akaishi.block.AkaishiEnergyGeneratorBlock.FORMED)) {
             AkaishiSuperGeneratorCoreBlockEntity superCenter = findSuperCenter();
@@ -229,6 +233,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
     public IEnergyStorage getEnergyStorage() {
         // 成型后作为多方块外壳：代理中心主方块的存储。
         // 中心主方块被外壳完全包围，管道无法直连，必须经外壳才能把结构能量导出网络。
+        // 注：中心已停用为纯材料、恒不成型，本机 FORMED 永不置位，以下代理分支为死分支（保留不改语义）
         if (getBlockState().getValue(com.example.akaishi.block.AkaishiEnergyGeneratorBlock.FORMED)) {
             AkaishiSuperGeneratorCoreBlockEntity superCenter = findSuperCenter();
             if (superCenter != null) {
@@ -242,7 +247,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
         return energy;
     }
 
-    /** 在自身为中心的 5×5×5 范围内查找成型中的超级发生器架构核心 */
+    /** 在自身为中心的 5×5×5 范围内查找成型中的超级发生器架构核心（中心已停用恒不成型 → 恒返回 null 的死查找） */
     private AkaishiSuperGeneratorCoreBlockEntity findSuperCenter() {
         for (int dx = -2; dx <= 2; dx++) {
             for (int dy = -2; dy <= 2; dy++) {
@@ -261,7 +266,7 @@ public class AkaishiEnergyGeneratorBlockEntity extends BlockEntity implements Ex
         return null;
     }
 
-    /** 在自身为中心的 3×3×3 范围内查找成型中的组合结构主方块实体 */
+    /** 在自身为中心的 3×3×3 范围内查找成型中的组合结构主方块实体（中心已停用恒不成型 → 恒返回 null 的死查找） */
     private AkaishiEnergyAssemblyBlockEntity findAssemblyCenter() {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {

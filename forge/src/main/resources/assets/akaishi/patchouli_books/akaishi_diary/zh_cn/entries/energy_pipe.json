@@ -7,16 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_pipe",
-      "text": "赤能源管道 = 电网的$(4)血管$(0)：把发生机、储存单元与机器连成一张会自动调度的网。$(br2)$(bold)要点$(0)：$(li)相邻管道与方块会$(4)自动连接$(0)，互相连通即成一张网络$(li)$(bold)单张网络最多 1024 段$(0)管道，足够铺开大型基地$(li)连上设备就供电，多台设备按需自动分配$(br2)想精细控制流向？每段管道都能设「正常 / 推 / 拉」模式，还能单独断开某一侧——工具在下一页。"
+      "text": "$(reset)赤能源管道$(reset)用于连接发生机、储存单元与机器，构成自动调度的能量网络。$(br2)$(bold)要点$(reset)：$(li)相邻管道与方块会$(reset)自动连接$(reset)，互相连通即组成一张网络$(li)$(bold)单张网络最多 1024 段$(reset)管道$(li)连接设备后即供电，多台设备按需自动分配$(br2)每段管道均可设置为「正常 / 推 / 拉」模式，也可单独断开某一侧，用于控制流向；相关工具见下页。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_debug_tool",
-      "text": "$(4)赤能源配置器$(0)就是管道的「施工钳」：$(li)$(bold)右键$(0)管道：在「正常 → 推 → 拉」间循环切换。$(bold)正常$(0)双向自由流通；$(bold)推$(0)只向相连设备送电；$(bold)拉$(0)只从相连设备抽电$(li)$(bold)潜行 + 右键$(0)点击某一面：$(4)断开 / 恢复$(0)那一侧的连接，让电绕开不想接的方块$(br2)接错方向？掏出配置器点两下就改，无需拆管。"
+      "text": "$(reset)赤能源配置器$(reset)用于设置管道模式：$(li)$(bold)右键$(reset)管道：在「正常 → 推 → 拉」之间循环切换。$(bold)正常$(reset)双向流通；$(bold)推$(reset)仅向相连设备送电；$(bold)拉$(reset)仅从相连设备抽电$(li)$(bold)潜行 + 右键$(reset)点击某一面：$(reset)断开或恢复$(reset)该侧连接$(br2)方向设置错误时，可使用配置器直接修改，无需拆除管道。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)四档管道每 tick 传输速率$(0)：$(li)赤能源管道：5 万$(li)中级（advanced）：50 万$(li)高级（elite）：500 万$(li)超级（ultimate）：5000 万$(br2)相邻档位相差 10 倍。$(4)基础款就带得动单台发生器矩阵$(0)，大规模电网再换高档次——$(bold)别让管道成了瓶颈$(0)。"
+      "text": "$(bold)四档管道每 tick 传输速率$(reset)：$(li)赤能源管道：5 万$(li)中级（advanced）：50 万$(li)高级（elite）：500 万$(li)超级（ultimate）：5000 万$(br2)相邻档位相差 10 倍。$(reset)基础档即可支持单台发生器矩阵$(reset)，大规模电网需更换更高档位，避免管道成为传输瓶颈。"
     },
     {
       "type": "patchouli:relations",
@@ -25,7 +25,7 @@
         "akaishi:energy_cell",
         "akaishi:energy_basics"
       ],
-      "text": "把「$(l:akaishi:generator)发生机$(/l)」产出的电经管道送进「$(l:akaishi:energy_cell)储存单元$(/l)」，再分给各台机器，一套完整电网就位。忘了基础？回看「$(l:akaishi:energy_basics)赤能源基础$(/l)」。"
+      "text": "将「$(l:akaishi:generator)发生机$(/l)」产出的电力经管道送入「$(l:akaishi:energy_cell)储存单元$(/l)」，再分配至各机器，即构成完整电网。基础内容见「$(l:akaishi:energy_basics)赤能源基础$(/l)」。"
     }
   ]
 }

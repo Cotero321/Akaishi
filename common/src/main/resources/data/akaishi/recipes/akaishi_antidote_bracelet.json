@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " I ",
-    "IHI",
-    " I "
-  ],
-  "key": {
-    "H": { "item": "minecraft:honey_bottle" },
-    "I": { "item": "akaishi:iron_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_antidote_bracelet", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " I ", "IHI", " I " ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "H": { "item": "minecraft:honey_bottle" } }, "result": { "item": "akaishi:akaishi_antidote_bracelet", "count": 1 } }

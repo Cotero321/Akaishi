@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IHI",
-    "PFP",
-    "IHI"
-  ],
-  "key": {
-    "P": { "item": "akaishi:akaishi_item_pipe" },
-    "F": { "item": "minecraft:furnace" },
-    "I": { "item": "akaishi:akaishi_ingot" },
-    "H": { "item": "minecraft:hopper" }
-  },
-  "result": { "item": "akaishi:akaishi_purifier_item_input", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "CHC", "PFP", "CHC" ], "key": { "C": { "item": "akaishi:akaishi_purifier_matrix_casing" }, "H": { "item": "minecraft:hopper" }, "P": { "item": "akaishi:akaishi_item_pipe" }, "F": { "item": "minecraft:furnace" } }, "result": { "item": "akaishi:akaishi_purifier_item_input", "count": 1 } }

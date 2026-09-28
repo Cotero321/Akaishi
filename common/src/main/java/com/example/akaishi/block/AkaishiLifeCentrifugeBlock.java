@@ -29,7 +29,6 @@ public class AkaishiLifeCentrifugeBlock extends AkaishiMachineBlock {
     public AkaishiLifeCentrifugeBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

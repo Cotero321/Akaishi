@@ -54,6 +54,8 @@ public final class MechanicalOrganTooltip {
     private static final String KEY_PART_LINE = "tooltip.akaishi.mechanical.part_line";
     /** 等级口径提示：本页显示的是「该器官自身」等级，实际生效取全身最高（跨器官） */
     private static final String KEY_LEVEL_SCOPE = "tooltip.akaishi.mechanical.level_scope";
+    /** 植入引导：复用生物器官的同一语言键，统一口径「在手术仓中移植」 */
+    private static final String KEY_IMPLANT_HINT = "gui.akaishi.organ.hint";
     /** 特性区标题后的上限提示（语言无关的灰度数字，提示企划 D5「单器官特性上限」） */
     private static final Component TRAITS_CAP_HINT =
             Component.literal(" §8[≤" + MechanicalLevels.MAX_TRAITS + "]");
@@ -89,6 +91,8 @@ public final class MechanicalOrganTooltip {
             appendOverview(stack, lines);
             lines.add(Component.translatable(KEY_HOLD_HINT));
         }
+        // 植入引导：成品器官无论哪一页都提示「需在手术仓移植」，避免玩家在组装台直接放器官却无反应
+        lines.add(Component.translatable(KEY_IMPLANT_HINT));
         return lines;
     }
 

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiUpgradeStationBlock extends AkaishiMachineBlock {
 
     public AkaishiUpgradeStationBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_RED).strength(5.0F, 6.0F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_RED).sound(SoundType.METAL));
     }
 
     @Nullable

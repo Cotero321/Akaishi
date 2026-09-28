@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "DAD",
-    "ATA",
-    "DAD"
-  ],
-  "key": {
-    "A": { "item": "akaishi:akaishi_advanced_component" },
-    "D": { "item": "akaishi:diamond_dust" },
-    "T": { "item": "akaishi:akaishi_fluid_tank_advanced" }
-  },
-  "result": { "item": "akaishi:akaishi_fluid_tank_super", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "PAP", "ATA", "PAP" ], "key": { "P": { "item": "akaishi:akaishi_precision_alloy_ingot" }, "A": { "item": "akaishi:akaishi_advanced_component" }, "T": { "item": "akaishi:akaishi_fluid_tank_advanced" } }, "result": { "item": "akaishi:akaishi_fluid_tank_super", "count": 1 } }

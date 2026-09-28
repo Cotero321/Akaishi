@@ -1,6 +1,6 @@
 {
   "name": "Life Introduction",
-  "description": "Meet the energy form above Akaishi Energy.$(br)Read \"The Path of Life Research\" first. Prerequisite: a stable Akaishi Energy grid (Diary, Energy chapter).",
+  "description": "Introduces the energy form above Akaishi Energy.$(br)Read \"The Path of Life Research\" first. Prerequisite: a stable Akaishi Energy grid (Diary, Energy chapter).",
   "icon": "akaishi:akaishi_life_energy_cell",
   "sortnum": 1
 }

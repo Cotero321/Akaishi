@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "PEP",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "E": { "item": "akaishi:akaishi_energy_cell_advanced" },
-    "P": { "item": "akaishi:akaishi_energy_pipe" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_reactor_energy_output", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "PEP", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_reactor_shell" }, "G": { "item": "minecraft:glass" }, "P": { "item": "akaishi:akaishi_energy_pipe" }, "E": { "item": "akaishi:akaishi_energy_cell_advanced" } }, "result": { "item": "akaishi:akaishi_reactor_energy_output", "count": 1 } }

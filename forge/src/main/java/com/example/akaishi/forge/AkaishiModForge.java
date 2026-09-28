@@ -193,10 +193,11 @@ public final class AkaishiModForge {
                 // 微缩终端一律由本分支处理，**绝不落到下面的通用分支**：通用适配层按"真实槽位"记账，
                 // 对虚拟槽纯转发件会丢物/复制。无物品能力的族（containerSize == 0，纯能量族）直接不挂物品能力；
                 // 能量亦不外转第三方（赤能源/生命能量自研，见项目铁律）。
-                if (miniature.getContainerSize() > 0) {
-                    event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "miniature_terminal_external"),
-                            new MiniatureTerminalItemHandler(miniature));
-                }
+                // 注意：本事件在 BE 构造期触发（Forge 的 gatherCapabilities 只执行一次，reviveCaps 不会重跑），
+                // 此时装载状态尚未建立、getContainerSize() 恒为 0 —— 不能据此做门禁，否则能力永远挂不上。
+                // 无物品槽的族由 handler 惰性查询表现为 0 槽，与"不挂能力"对外等效。
+                event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "miniature_terminal_external"),
+                        new MiniatureTerminalItemHandler(miniature));
             } else if (be instanceof IItemPipeDevice || be instanceof IFluidPipeDevice) {
                 event.addCapability(new ResourceLocation(AkaishiMod.MOD_ID, "external_logistics"),
                         new MachineCapabilityProvider(be));
@@ -270,6 +271,9 @@ public final class AkaishiModForge {
             WirelessFieldManager.clearServer(event.getServer());
             WirelessNodeRegistry.clearServer(event.getServer());
             WirelessNetworkManager.clear();
+            // 反应堆/聚变控制器活跃表按维度 key 复用，停机须清空避免单人反复读档残留旧坐标
+            AkaishiReactorControllerBlockEntity.clearStatics();
+            AkaishiFusionControllerBlockEntity.clearStatics();
         });
 
         // 调用通用初始化逻辑

@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * 赤石催化器：消耗赤能源"催生"范围内母岩的水晶簇生长。
  * 4 级（初/中/高/终）共用本方块类与方块实体，等级参数由构造器传入。
  */
-public class AkaishiCatalystBlock extends BaseEntityBlock {
+public class AkaishiCatalystBlock extends AkaishiMachineBlock {
 
     /** 催化器等级：范围边长 / 单次催化成功率% / 每 tick 耗能（5 的 1-4 次方） */
     public enum CatalystTier {
@@ -57,9 +56,9 @@ public class AkaishiCatalystBlock extends BaseEntityBlock {
     }
 
     public AkaishiCatalystBlock(CatalystTier tier) {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         this.tier = tier;
     }

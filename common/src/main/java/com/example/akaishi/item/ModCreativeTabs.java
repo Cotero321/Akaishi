@@ -374,6 +374,7 @@ public final class ModCreativeTabs {
         // 转基因/培育产物
         accept(output, ModItems.akaishiWitherSeed);
         accept(output, ModItems.akaishiWitherCondensate);
+        accept(output, ModItems.akaishiWitherBoneShard);
         accept(output, ModItems.akaishiBlazeSeed);
         accept(output, ModItems.akaishiBlazeCondensate);
         accept(output, ModItems.akaishiCurseVineSeed);
@@ -407,6 +408,9 @@ public final class ModCreativeTabs {
         // 矿石→锭基础机器
         accept(output, ModBlocks.CHISHI_PURIFIER);
         accept(output, ModBlocks.CHISHI_ADVANCED_PURIFIER);
+        // 赤石装备打造器 + 赤红升级台（装备打造与升级）
+        accept(output, ModBlocks.CHISHI_EQUIPMENT_FORGER);
+        accept(output, ModBlocks.CHISHI_UPGRADE_STATION);
         // 单槽处理机器（植物培养机/压缩机/打粉机/变化器）
         accept(output, ModBlocks.CHISHI_PLANT_CULTIVATOR);
         accept(output, ModBlocks.CHISHI_COMPRESSOR);

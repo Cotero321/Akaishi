@@ -358,7 +358,7 @@ public class AkaishiFusionFuelAggregatorBlockEntity extends BlockEntity implemen
 
     @Override
     public String[] excludedKeys() {
-        return new String[]{"Plasma"};
+        return new String[]{"Input", "Plasma"};
     }
 
     @Override

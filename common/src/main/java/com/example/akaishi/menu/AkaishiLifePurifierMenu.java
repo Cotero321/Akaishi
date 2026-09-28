@@ -1,6 +1,7 @@
 package com.example.akaishi.menu;
 
 import com.example.akaishi.block.entity.AkaishiLifePurifierBlockEntity;
+import com.example.akaishi.item.ModItems;
 import com.example.akaishi.upgrade.MachineUpgradeSlots;
 import com.example.akaishi.util.LongDataSlots;
 import net.minecraft.world.Container;
@@ -17,9 +18,8 @@ import net.minecraft.world.item.ItemStack;
  */
 public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
 
-    /** 机器区槽数（升级槽 2 + 输出槽 1），玩家背包紧随其后 */
-    public static final int MACHINE_SLOT_END = MachineUpgradeSlots.SLOT_COUNT_NO_WIRELESS
-            + AkaishiLifePurifierBlockEntity.SLOT_COUNT;
+    /** 机器区槽数（无线接收槽 1 + 输入槽 1 + 输出槽 1），玩家背包紧随其后 */
+    public static final int MACHINE_SLOT_END = 1 + AkaishiLifePurifierBlockEntity.SLOT_COUNT;
 
     private final Container container;
     private final ContainerData data;
@@ -39,11 +39,17 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
         this.data = data;
         this.upgrades = upgrades;
 
-        // 升级槽（速度/能量各一格，mayPlace 由 MachineUpgradeSlots 按类型互斥过滤；输出槽右侧，固定面板右上角并排 y=8，规则3）
-        // 生命系机器无线接收格已彻底移除：旧档/旧机器残留件当场退还玩家（物品守恒）
-        MachineUpgradeSlots.refundWireless(upgrades, inv.player);
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_SPEED, 134, 8));
-        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_ENERGY, 152, 8));
+        // 升级槽：本机只保留无线接收槽（固定面板右上角，规则3）
+        // 装入后本机器加入所在无线场域，可由微缩矩阵终端直供赤能源 / 生命能量
+        addSlot(new MachineUpgradeSlot(upgrades, MachineUpgradeSlots.SLOT_WIRELESS, 152, 8));
+
+        // 输入槽：只收固化原料（浓缩赤石精华），口径与配方 ingredient 一致
+        addSlot(new Slot(container, AkaishiLifePurifierBlockEntity.INPUT_SLOT, 116, 52) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.is(ModItems.akaishiEssenceCompressed.get());
+            }
+        });
 
         // 输出槽：只出不进
         addSlot(new Slot(container, AkaishiLifePurifierBlockEntity.OUTPUT_SLOT, 116, 30) {
@@ -93,20 +99,22 @@ public class AkaishiLifePurifierMenu extends AbstractContainerMenu {
         return data.get(AkaishiLifePurifierBlockEntity.DATA_PROGRESS);
     }
 
-    /** 速度升级组件数量（0~8） */
-    public int getSpeedUpgradeCount() {
-        return upgrades.getItem(MachineUpgradeSlots.SLOT_SPEED).getCount();
-    }
-
-    /** 能量升级组件数量（0~8） */
-    public int getEnergyUpgradeCount() {
-        return upgrades.getItem(MachineUpgradeSlots.SLOT_ENERGY).getCount();
-    }
-
     /** 无线接收升级是否已装（界面提示用） */
     public boolean hasWirelessReceiver() {
-        // 生命系机器无线接收格已移除 ⇒ 恒 false（保留方法避免影响既有调用点）
-        return false;
+        return upgrades.getItem(MachineUpgradeSlots.SLOT_WIRELESS).getCount() > 0;
+    }
+
+    /**
+     * 无线接收槽是否为空（界面提示用）。
+     * <p>有物品时原版已画物品提示，自定义槽位提示必须让位，否则两个 tooltip 叠在同一坐标上。
+     */
+    public boolean isWirelessSlotEmpty() {
+        return upgrades.getItem(MachineUpgradeSlots.SLOT_WIRELESS).isEmpty();
+    }
+
+    /** 输入槽是否为空（同上：仅空槽时提示用途） */
+    public boolean isInputSlotEmpty() {
+        return container.getItem(AkaishiLifePurifierBlockEntity.INPUT_SLOT).isEmpty();
     }
 
     @Override

@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "WCW",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "W": { "item": "akaishi:akaishi_wireless_component" },
-    "C": { "item": "minecraft:paper" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_wireless_identity_card", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "WCW", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_wireless_shell" }, "G": { "item": "akaishi:gold_dust" }, "W": { "item": "akaishi:akaishi_wireless_component" }, "C": { "item": "minecraft:paper" } }, "result": { "item": "akaishi:akaishi_wireless_identity_card", "count": 1 } }

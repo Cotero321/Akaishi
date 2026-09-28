@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(bold)Aberrant traits are \"double-edged swords\": strong positives with a mandatory price.$(0)$(br2)$(bold)【Tier 2 · Aberrations】$(0)$(li)Berserker Gene (berserk_gene): +2 attack, −1.5 armor$(li)Glass Bones (glass_bone): +0.8 attack speed, −2 max health$(br2)$(bold)【Tier 3 · Aberrations】$(0)$(li)Predator Instinct (predator_instinct): +3 attack, +2% move speed, −4 max health$(li)Pyroblast Flesh (pyroblast_flesh): +3 attack, $(c)fears fire$(0) — fire damage against you is greatly amplified$(br2)The higher the tier, the more extreme it gets: $(4)the bigger the payoff, the deadlier the price$(0)."
+      "text": "$(bold)Aberrant traits are \"double-edged swords\": strong positives with a mandatory price.$(reset)$(br2)$(bold)【Tier 2 · Aberrations】$(reset)$(li)Berserker Gene (berserk_gene): +2 attack, −1.5 armor$(li)Glass Bones (glass_bone): +0.8 attack speed, −2 max health$(br2)$(bold)【Tier 3 · Aberrations】$(reset)$(li)Predator Instinct (predator_instinct): +3 attack, +2% move speed, −4 max health$(li)Pyroblast Flesh (pyroblast_flesh): +3 attack, $(reset)fears fire$(reset) — fire damage against you is greatly amplified$(br2)Higher tiers increase both the benefit and the cost.$(reset)"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Once attached, a trait cannot be removed$(0) — aberrations are no exception.$(br2)$(bold)Your two ways out:$(0)$(li)Hand the organ to the \"$(l:akaishi:trait_reforger)Trait Reforger$(/l)\" to swap that trait in place: it re-rolls within the same tier pool, so the aberration may vanish — or return$(li)Cut your losses and grow a fresh organ on the organ line$(br2)$(bold)Reminder:$(0) aberrations are not a bug — they are a high-risk, high-reward play. Building around them usually beats endlessly re-rolling. If you gamble, be ready to win or lose."
+      "text": "$(bold)Once attached, a trait cannot be removed$(reset) — aberrations are no exception.$(br2)$(bold)Your two ways out:$(reset)$(li)Hand the organ to the \"$(l:akaishi:trait_reforger)Trait Reforger$(/l)\" to swap that trait in place: it re-rolls within the same tier pool, so the aberration may be removed or drawn again$(li)Abandon the organ and grow a new one on the organ line$(br2)$(bold)Note:$(reset) aberrant traits are a high-risk, high-reward mechanic, not a defect; building around them usually beats repeated reforging."
     },
     {
       "type": "patchouli:relations",

@@ -30,9 +30,8 @@ public class AkaishiReactorCoolerBlock extends AkaishiMachineBlock {
     public AkaishiReactorCoolerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)
-                .strength(4.0F, 5.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

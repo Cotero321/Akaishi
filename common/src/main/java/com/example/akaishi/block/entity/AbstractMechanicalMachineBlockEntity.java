@@ -394,8 +394,8 @@ public abstract class AbstractMechanicalMachineBlockEntity extends BlockEntity
     /** 掉落保留数据（能量/进度/升级/槽位），排除已随方块掉落的内部物品键 */
     @Override
     public String[] excludedKeys() {
-        // 内部物品（含升级槽 "Items" 键）已随方块掉落，排除防止 loot 实体 + BlockEntityTag 双重掉落
-        return new String[]{"Items"};
+        // 主库存（"Items"）与独立升级库存（"Upgrades"）均已随方块掉落，两者都要排除，防止 loot 实体 + BlockEntityTag 双重掉落
+        return new String[]{"Items", "Upgrades"};
     }
 
     @Override

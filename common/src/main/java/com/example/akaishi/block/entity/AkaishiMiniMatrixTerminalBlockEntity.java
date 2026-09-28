@@ -13,6 +13,7 @@ import com.example.akaishi.block.AkaishiMiniMatrixUpgradeType;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.energy.IWirelessEnergyDemand;
 import com.example.akaishi.api.storage.IItemTerminalHost;
 import com.example.akaishi.craft.CraftLibrary;
 import com.example.akaishi.craft.ICraftEnergyPool;
@@ -243,6 +244,11 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity
                 if (!(level.getBlockEntity(pos) instanceof IEnergyProvider provider) || !provider.canInputEnergy()) {
                     continue;
                 }
+                // 按需机组（IWirelessEnergyDemand）：池式高耗能机器常态不受补给，
+                // 只在自述"要跑工序"时才进入本轮 —— 否则细水长流供进去会被瞬间抽干，界面永远显示 0
+                if (provider instanceof IWirelessEnergyDemand demand && !demand.requestsWirelessTopUp()) {
+                    continue;
+                }
                 IEnergyStorage target = provider.getEnergyStorage(buffer.getType());
                 if (target == null) {
                     continue; // 该机器不接受这种能量（如只吃赤能源的机器遇到生命能源芯片）
@@ -251,7 +257,13 @@ public class AkaishiMiniMatrixTerminalBlockEntity extends BlockEntity
                 if (room <= 0L) {
                     continue;
                 }
-                long want = Math.min(Math.min(room, PER_MACHINE_ENERGY), buffer.getEnergyStored());
+                // 单轮上限：普通机器仍按 PER_MACHINE_ENERGY 雨露均沾（一次给太多会把芯片抽空、
+                // 让同场域其它机台挨饿）；只有"按需机组"（自述吃得下，如池式高耗能的提纯器）
+                // 才允许一轮补满自身池 —— 否则百万级抽取的机台永远攒不满一次加工。
+                long perMachine = provider instanceof IWirelessEnergyDemand
+                        ? Math.max(PER_MACHINE_ENERGY, target.getMaxEnergy())
+                        : PER_MACHINE_ENERGY;
+                long want = Math.min(Math.min(room, perMachine), buffer.getEnergyStored());
                 long fit = target.addEnergy(want, true);
                 if (fit <= 0L) {
                     continue;

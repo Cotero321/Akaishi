@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "The liquid fuel line in one sentence: $(4)liquefy → process → mix → can → burn$(0).$(br2)$(li)$(l:akaishi:fuel_liquefier)Energy Liquefier$(/l): squeezes solid ingredients into liquid energy$(li)$(l:akaishi:fuel_processor)Energy Processor$(/l): turns liquid energy into burnable fuel$(li)$(l:akaishi:fuel_mixer)Fuel Mixer$(/l): blends low-tier fuel into high-tier fuel$(li)$(l:akaishi:fuel_canner)Fuel Canner$(/l): pours liquid into fuel cells$(br2)Hand the filled cells to \"$(l:akaishi:reactor)The Reactor$(/l)\"; the very top fuel keeps climbing into \"$(l:akaishi:plasma)Plasma Chain$(/l)\". Recipes and stats for each machine live in their own entries — click through above."
+      "text": "The liquid fuel line consists of five steps: $(bold)liquefy → process → mix → can → burn$(reset).$(br2)$(li)$(l:akaishi:fuel_liquefier)Energy Liquefier$(/l): converts solid ingredients into liquid energy$(li)$(l:akaishi:fuel_processor)Energy Processor$(/l): converts liquid energy into burnable fuel$(li)$(l:akaishi:fuel_mixer)Fuel Mixer$(/l): blends low-tier fuel into high-tier fuel$(li)$(l:akaishi:fuel_canner)Fuel Canner$(/l): fills fuel cells with liquid$(br2)The filled cells are used in $(l:akaishi:reactor)The Reactor$(/l); the highest-tier fuel is further processed in the $(l:akaishi:plasma)Plasma Chain$(/l). Recipes and stats for each machine are in their own entries."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Line logistics:$(0)$(li)Fluid Tanks: Basic 16,000 mb / Advanced 64,000 mb / Super 256,000 mb — let output settle in a tank before feeding the next stage so machines never wait$(li)Fluid Pipe: moves $(4)4,000 mb/tick$(0) of any liquid — no discrimination$(br2)$(bold)Exception:$(0) exhausted fuel is corrosive and must ride the dedicated $(bold)Sealed Exhausted Pipe$(0); normal pipes refuse that cargo.$(br2)Its recycling route lives in \"Secrets of Life\" — until then, remember: $(4)don't dump it$(0)."
+      "text": "$(bold)Line logistics:$(reset)$(li)Fluid Tanks: Basic 16,000 mb / Advanced 64,000 mb / Super 256,000 mb; output should settle in a tank before the next stage so machines do not wait$(li)Fluid Pipe: moves 4,000 mb/tick of any liquid$(br2)$(bold)Exception:$(reset) exhausted fuel is corrosive and must use the dedicated $(bold)Sealed Exhausted Pipe$(reset); normal pipes reject it.$(br2)Its recycling route is in Secrets of Life; in the meantime, it must not be discarded."
     },
     {
       "type": "patchouli:relations",
@@ -19,7 +19,7 @@
         "akaishi:reactor",
         "akaishi:plasma"
       ],
-      "text": "Upstream sits \"$(l:akaishi:fuel_system)Fuel & Cooling$(/l)\", downstream \"$(l:akaishi:reactor)The Reactor$(/l)\"; this line's top product keeps condensing onward into the Plasma Chain."
+      "text": "Upstream is $(l:akaishi:fuel_system)Fuel & Cooling$(/l) and downstream is $(l:akaishi:reactor)The Reactor$(/l); the top product of this line is further processed in the Plasma Chain."
     }
   ]
 }

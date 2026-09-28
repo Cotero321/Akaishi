@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -27,15 +26,15 @@ import org.jetbrains.annotations.Nullable;
  * 生命聚合转换器：单方块独立转换器（赤能源 → 生命能量）。
  * 每 tick 恒定转换 1 次，右键打开双能量条界面（标记"单台 · 独立转换"）。
  */
-public class AkaishiLifeAggregationConverterBlock extends BaseEntityBlock {
+public class AkaishiLifeAggregationConverterBlock extends AkaishiMachineBlock {
 
     /** 结构是否成型（保留状态属性，恒为 false） */
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
     public AkaishiLifeAggregationConverterBlock() {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

@@ -1,11 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "I I",
-    "I I"
-  ],
-  "key": {
-    "I": { "item": "minecraft:iron_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_item_pipe", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IRI", "I I", "IRI" ], "key": { "I": { "item": "minecraft:iron_ingot" }, "R": { "item": "akaishi:akaishi_ingot" } }, "result": { "item": "akaishi:akaishi_item_pipe", "count": 8 } }

@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_pulverizer",
-      "text": "The Akaishi Pulverizer is the first stop of the ore-processing line. Each grind takes 100 ticks at 15 energy/tick, with a 100k internal buffer; deepslate ores give the same result as normal ones.$(br2)$(bold)Akaishi line (two hops):$(0)$(li)Akaishi Ore (4 tiers x 4 environments) -> $(4)1 Compressed Akaishi Essence$(0)$(li)$(4)Compressed Akaishi Essence -> x2 Akaishi Dust$(0)$(br2)$(bold)Other ores (one hop):$(0)$(li)Coal / Iron / Gold / Diamond / Emerald / Quartz ore -> x2 matching dust$(li)Copper ore -> x3 Copper Dust$(li)Lapis ore -> x4 Lapis Dust$(li)Redstone ore -> x4 vanilla Redstone$(li)Ancient Debris -> 1 Netherite Dust$(li)Obsidian -> 1 Obsidian Dust"
+      "text": "The Akaishi Pulverizer is the first machine of the ore-processing line. Each operation takes 100 ticks at 15 energy/tick with a 100k internal buffer; deepslate ores yield the same result as their normal variants.$(br2)$(bold)Akaishi line (two steps):$(reset)$(li)Akaishi Ore (4 tiers × 4 environments) → 1 Compressed Akaishi Essence$(li)Compressed Akaishi Essence → ×2 Akaishi Dust$(br2)$(bold)Other ores (one step):$(reset)$(li)Coal, Iron, Gold, Diamond, Emerald or Quartz ore → ×2 matching dust$(li)Copper ore → ×3 Copper Dust$(li)Lapis ore → ×4 Lapis Dust$(li)Redstone ore → ×4 vanilla Redstone$(li)Ancient Debris → 1 Netherite Dust$(li)Obsidian → 1 Obsidian Dust"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:obsidian_dust",
-      "text": "Dust is the machine line's $(4)universal middleman$(0): press it back into blocks with the Compressor, or turn it into bases with the Transformer.$(br2)$(bold)Two things to remember:$(0)$(li)Obsidian Dust and Netherite Dust have $(e)no vanilla smelting route$(0) — to recover Obsidian or Netherite Ingots you must pulverize first and then compress$(li)Lapis, copper and redstone give the fattest yields (3-4 per ore) — feed those ores here first$(br2)Connect item pipes to auto-feed ores and pull dust out, and you've got a hands-off ore-processing start."
+      "text": "Dust is the intermediate product of the machine line: it is pressed back into blocks by the Compressor or converted into bases by the Transformer.$(br2)$(bold)Two notes:$(reset)$(li)Obsidian Dust and Netherite Dust have no vanilla smelting recipe; recovering Obsidian or Netherite Ingots requires pulverizing and then compressing$(li)Lapis, copper and redstone yield the most dust (3-4 per ore) and should be processed first$(br2)Connecting item pipes to feed ores in and extract dust provides an automated ore-processing line."
     },
     {
       "type": "patchouli:relations",
@@ -22,7 +22,7 @@
         "akaishi:transformer",
         "akaishi:ore"
       ],
-      "text": "After pulverizing: press blocks with $(l:akaishi:compressor)Compressor$(/l), make bases with $(l:akaishi:transformer)Transformer$(/l), or browse the list in $(l:akaishi:dusts)Dusts$(/l). Ore sources are covered in $(l:akaishi:ore)Akaishi Ore Clusters$(/l)."
+      "text": "After pulverizing, press blocks with the $(l:akaishi:compressor)Compressor$(/l), produce bases with the $(l:akaishi:transformer)Transformer$(/l), or consult the $(l:akaishi:dusts)Dusts$(/l) list. Ore sources are covered in $(l:akaishi:ore)Akaishi Ore Clusters$(/l)."
     }
   ]
 }

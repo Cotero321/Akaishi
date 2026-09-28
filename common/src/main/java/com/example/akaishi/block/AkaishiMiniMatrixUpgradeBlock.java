@@ -29,7 +29,6 @@ public class AkaishiMiniMatrixUpgradeBlock extends AkaishiMachineBlock {
     public AkaishiMiniMatrixUpgradeBlock(AkaishiMiniMatrixUpgradeType type) {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(3.0F)
                 .sound(SoundType.METAL));
         this.type = type;
     }

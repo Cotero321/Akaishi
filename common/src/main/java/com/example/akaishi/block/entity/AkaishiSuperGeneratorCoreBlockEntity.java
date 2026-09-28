@@ -1,5 +1,6 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.item.IItemPipeDevice;
@@ -28,7 +29,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * 超级发生器架构核心方块实体：已停用为纯材料（发生器矩阵取代），不再形成多方块结构、不再提供界面。
  * 保留能量/燃料存储（NBT 持久化），作为合成材料时无实际功能。
  */
-public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements IEnergyProvider, Container, IItemPipeDevice {
+public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity
+        implements IEnergyProvider, Container, IItemPipeDevice, IDataCarrier {
 
     public static final int FUEL_SLOT = 0;
     public static final int SLOT_COUNT = 1;
@@ -103,6 +105,10 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
     }
 
     private void tickServer() {
+        // 结构恒不成型（已停用为纯材料，见类注释）：每 tick 直接早退，不写数据槽、不做成型检测与产能分支
+        if (!isStructureValid()) {
+            return;
+        }
         boolean changed = false;
         LongDataSlots.write(data, DATA_ENERGY_LOW, DATA_ENERGY_HIGH, energy.getEnergyStored());
         LongDataSlots.writeInt(data, DATA_BURN_LOW, DATA_BURN_HIGH, burnEnergy);
@@ -278,5 +284,11 @@ public class AkaishiSuperGeneratorCoreBlockEntity extends BlockEntity implements
         for (int i = 0; i < TOTAL_SLOTS; i++) {
             inventory.setItem(i, items.get(i));
         }
+    }
+
+    @Override
+    public String[] excludedKeys() {
+        // 方块 onRemove 只解除外壳成型、不单独掉落物品，故燃料槽（"Items"）随 BlockEntityTag 一并保留，无需排除
+        return new String[0];
     }
 }

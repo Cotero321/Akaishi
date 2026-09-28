@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "SCS",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "S": { "item": "akaishi:akaishi_speed_upgrade" },
-    "C": { "item": "akaishi:akaishi_energy_cell_basic" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_miner_controller_basic", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "RGR", "SCS", "RGR" ], "key": { "R": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "G": { "item": "akaishi:gold_dust" }, "S": { "item": "akaishi:akaishi_speed_upgrade" }, "C": { "item": "akaishi:akaishi_energy_cell_basic" } }, "result": { "item": "akaishi:akaishi_miner_controller_basic", "count": 1 } }

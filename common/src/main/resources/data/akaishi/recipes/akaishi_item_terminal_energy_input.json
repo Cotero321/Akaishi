@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "PWP",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "I": { "item": "akaishi:akaishi_ingot" },
-    "P": { "item": "akaishi:akaishi_item_pipe" },
-    "W": { "item": "akaishi:akaishi_item_terminal_shell" }
-  },
-  "result": { "item": "akaishi:akaishi_item_terminal_energy_input", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "PSP", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_item_terminal_shell" }, "G": { "item": "minecraft:glass" }, "P": { "item": "akaishi:akaishi_item_pipe" } }, "result": { "item": "akaishi:akaishi_item_terminal_energy_input", "count": 1 } }

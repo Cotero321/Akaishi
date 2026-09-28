@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "MCM",
-    "III"
-  ],
-  "key": {
-    "C": { "item": "akaishi:akaishi_crystal" },
-    "M": { "item": "akaishi:akaishi_machine_component" },
-    "I": { "item": "akaishi:iron_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_energy_cell_basic", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "III", "MCM", "III" ], "key": { "I": { "item": "akaishi:iron_dust" }, "M": { "item": "akaishi:akaishi_machine_component" }, "C": { "item": "akaishi:akaishi_crystal" } }, "result": { "item": "akaishi:akaishi_energy_cell_basic", "count": 1 } }

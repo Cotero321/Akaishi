@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "FRF",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "R": { "item": "akaishi:akaishi_reactor_fuel_rod" },
-    "F": { "item": "akaishi:fuel_cell" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_reactor_fuel_port", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "FRF", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_reactor_shell" }, "G": { "item": "minecraft:glass" }, "R": { "item": "akaishi:akaishi_reactor_fuel_rod" }, "F": { "item": "akaishi:fuel_cell" } }, "result": { "item": "akaishi:akaishi_reactor_fuel_port", "count": 1 } }

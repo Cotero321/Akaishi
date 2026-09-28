@@ -1,5 +1,6 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
@@ -31,7 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * 数据槽：0/1=赤能源低/高，2/3=赤容量低/高，4/5=生命能量低/高，6/7=生命容量低/高，
  * 8=预留(0)，9=独立转换标记(1)。
  */
-public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity implements ExtendedMenuProvider, IEnergyProvider {
+public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity
+        implements ExtendedMenuProvider, IEnergyProvider, IDataCarrier {
 
     public static final int DATA_SLOTS = 10;
 
@@ -151,5 +153,11 @@ public class AkaishiLifeAggregationConverterBlockEntity extends BlockEntity impl
         super.load(tag);
         akaishi.setEnergy(tag.getLong("AkaishiEnergy"));
         life.setEnergy(tag.getLong("LifeEnergy"));
+    }
+
+    @Override
+    public String[] excludedKeys() {
+        // 方块 onRemove 不单独掉落任何容器（本机仅有能量，无物品槽），故无需排除
+        return new String[0];
     }
 }

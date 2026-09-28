@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_fuel_canner",
-      "text": "The Canner pours liquid into fuel cells: $(4)10,000 mb per cell$(0), filling at 1,000 mb/tick and $(bold)free of charge$(0).$(br2)Fully automatic: empty cell in → filled → full cell out. Hook up fluid and item pipes and it runs unattended."
+      "text": "The Fuel Canner fills fuel cells with liquid: 10,000 mb per cell, at 1,000 mb/tick and with no energy cost.$(br2)Operation is automatic: empty cell in → filled → full cell out. Connecting fluid and item pipes allows unattended operation."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)What to can:$(0) the Nether Compound / Pure fuel from the $(l:akaishi:fuel_processor)Energy Processor$(/l) and the Advanced / Ultimate Mixture from the $(l:akaishi:fuel_mixer)Fuel Mixer$(/l).$(br2)Carry the filled cells straight to the $(l:akaishi:reactor)Reactor$(/l); chasing the top tier? Blend it in the Mixer first."
+      "text": "$(bold)Contents:$(reset) Nether Compound or Pure fuel from the $(l:akaishi:fuel_processor)Energy Processor$(/l), and Advanced or Ultimate Mixture from the $(l:akaishi:fuel_mixer)Fuel Mixer$(/l).$(br2)Filled cells are carried to the $(l:akaishi:reactor)Reactor$(/l); the top tier must first be blended in the Mixer."
     },
     {
       "type": "patchouli:relations",
@@ -19,7 +19,7 @@
         "akaishi:liquid_fuel",
         "akaishi:reactor"
       ],
-      "text": "Overview in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l); the $(l:akaishi:reactor)Reactor$(/l) is where the cells get burned."
+      "text": "The overview is in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l); the $(l:akaishi:reactor)Reactor$(/l) is where the cells are burned."
     }
   ]
 }

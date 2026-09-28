@@ -26,16 +26,18 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JEI「生命能量固化」配方类别：生命提纯器<b>没有物品输入</b>，
- * 靠赤能源（驱动）+ 生命能量（原料）直接固化成固态物。
+ * JEI「生命能量固化」配方类别：生命提纯器把<b>浓缩赤石精华</b>在赤能源（驱动）+ 生命能量（原料）
+ * 的作用下固化成固态物。
  * <p>
- * <b>配方真源 = 数据包</b>（{@code data/akaishi/recipes/life_purifying/*.json}）；
+ * <b>配方真源 = 数据包</b>（{@code data/akaishi/recipes/life_purifying/*.json}）：
+ * 是否需要物品输入由配方的 {@code ingredient} 决定（有则画输入槽，没有则退化为纯能量配方）；
  * <b>成本不与机器脱节</b>：每次绘制实时问 {@link MachineProcessEnergy}，
  * 与加工详情页报价、机器实扣是同一套口径（配置热重载后 JEI 立刻跟着变）。
- * <p>槽位坐标与游戏内提纯器一致（输出 116,30）。
+ * <p>槽位坐标与同类单槽机器一致（输入 44,30 / 输出 116,30）。
  */
 public class LifePurifyingRecipeCategory implements IRecipeCategory<AkaishiEnergyProcessRecipe> {
 
@@ -46,6 +48,9 @@ public class LifePurifyingRecipeCategory implements IRecipeCategory<AkaishiEnerg
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(AkaishiMod.MOD_ID, "textures/gui/akaishi_energy_cell.png");
 
+    /** 输入槽（与同类单槽机器一致） */
+    private static final int INPUT_SLOT_X = 44;
+    private static final int INPUT_SLOT_Y = 30;
     /** 输出槽（与提纯器 GUI 一致） */
     private static final int OUTPUT_SLOT_X = 116;
     private static final int OUTPUT_SLOT_Y = 30;
@@ -92,7 +97,16 @@ public class LifePurifyingRecipeCategory implements IRecipeCategory<AkaishiEnerg
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AkaishiEnergyProcessRecipe recipe, IFocusGroup focuses) {
-        // 无物品输入（纯能量配方）：只画输出槽
+        // 物品原料（如浓缩赤石精华）：配方声明了 ingredient 才画输入槽；标签原料展开为全部候选，
+        // 件数按 inputCount 显示 —— JEI 图与机器实扣必须一致，否则玩家按图备料会差料。
+        if (recipe.ingredient() != null) {
+            List<ItemStack> inputs = new ArrayList<>();
+            for (ItemStack candidate : recipe.ingredient().getItems()) {
+                inputs.add(new ItemStack(candidate.getItem(), recipe.inputCount()));
+            }
+            builder.addSlot(RecipeIngredientRole.INPUT, INPUT_SLOT_X, INPUT_SLOT_Y)
+                    .addIngredients(VanillaTypes.ITEM_STACK, inputs);
+        }
         builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_SLOT_X, OUTPUT_SLOT_Y)
                 .addIngredient(VanillaTypes.ITEM_STACK, recipe.result());
     }
@@ -101,6 +115,9 @@ public class LifePurifyingRecipeCategory implements IRecipeCategory<AkaishiEnerg
     public void draw(AkaishiEnergyProcessRecipe recipe, IRecipeSlotsView recipeSlotsView,
             GuiGraphics guiGraphics, double mouseX, double mouseY) {
         GuiWidgets.slotBox(guiGraphics, OUTPUT_SLOT_X, OUTPUT_SLOT_Y);
+        if (recipe.ingredient() != null) {
+            GuiWidgets.slotBox(guiGraphics, INPUT_SLOT_X, INPUT_SLOT_Y);
+        }
         Font font = Minecraft.getInstance().font;
         // 成本实时取自统一口径（读的是同步后的服务端权威配置，玩家热改配置即刻反映）
         MachineProcessEnergy.Cost cost = MachineProcessEnergy.costPerRun(recipe);

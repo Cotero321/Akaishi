@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "G G",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_miner_upgrade_frame", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FGF", "G G", "FGF" ], "key": { "F": { "item": "akaishi:akaishi_miner_frame" }, "G": { "item": "akaishi:gold_dust" } }, "result": { "item": "akaishi:akaishi_miner_upgrade_frame", "count": 4 } }

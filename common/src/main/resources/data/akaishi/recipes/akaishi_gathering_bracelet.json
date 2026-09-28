@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " L ",
-    "LCL",
-    " L "
-  ],
-  "key": {
-    "C": { "item": "akaishi:akaishi_crystal" },
-    "L": { "item": "akaishi:lapis_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_gathering_bracelet", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " I ", "ICI", " I " ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "C": { "item": "minecraft:emerald" } }, "result": { "item": "akaishi:akaishi_gathering_bracelet", "count": 1 } }

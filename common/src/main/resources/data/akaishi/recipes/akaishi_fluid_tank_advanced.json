@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "GMG",
-    "MTM",
-    "GMG"
-  ],
-  "key": {
-    "T": { "item": "akaishi:akaishi_fluid_tank_basic" },
-    "G": { "item": "akaishi:gold_dust" },
-    "M": { "item": "akaishi:akaishi_machine_component" }
-  },
-  "result": { "item": "akaishi:akaishi_fluid_tank_advanced", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SMS", "MTM", "SMS" ], "key": { "S": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "M": { "item": "akaishi:akaishi_machine_component" }, "T": { "item": "akaishi:akaishi_fluid_tank_basic" } }, "result": { "item": "akaishi:akaishi_fluid_tank_advanced", "count": 1 } }

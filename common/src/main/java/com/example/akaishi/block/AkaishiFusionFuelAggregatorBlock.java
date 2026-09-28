@@ -29,7 +29,6 @@ public class AkaishiFusionFuelAggregatorBlock extends AkaishiMachineBlock {
     public AkaishiFusionFuelAggregatorBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

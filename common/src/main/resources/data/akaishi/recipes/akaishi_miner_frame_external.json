@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FCF", "C C", "FCF" ], "key": { "F": { "item": "akaishi:akaishi_miner_frame" }, "C": { "item": "akaishi:copper_dust" } }, "result": { "item": "akaishi:akaishi_miner_frame_external", "count": 8 } }

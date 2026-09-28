@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "WQW",
-    "QEQ",
-    "WQW"
-  ],
-  "key": {
-    "Q": { "item": "minecraft:quartz" },
-    "W": { "item": "akaishi:akaishi_advanced_component" },
-    "E": { "item": "minecraft:ender_pearl" }
-  },
-  "result": { "item": "akaishi:akaishi_life_wireless_core", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "WQW", "QSQ", "WQW" ], "key": { "Q": { "item": "akaishi:akaishi_life_wireless_shell" }, "W": { "item": "akaishi:akaishi_advanced_component" }, "S": { "item": "minecraft:ender_pearl" } }, "result": { "item": "akaishi:akaishi_life_wireless_core", "count": 1 } }

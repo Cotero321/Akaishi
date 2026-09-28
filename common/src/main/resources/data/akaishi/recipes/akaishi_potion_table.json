@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "GSG",
-    "III"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "S": { "item": "minecraft:brewing_stand" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_potion_table", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IGI", "GSG", "IBI" ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "G": { "item": "minecraft:glass" }, "S": { "item": "minecraft:brewing_stand" }, "B": { "item": "akaishi:akaishi_bio_ceramic_plate" } }, "result": { "item": "akaishi:akaishi_potion_table", "count": 1 } }

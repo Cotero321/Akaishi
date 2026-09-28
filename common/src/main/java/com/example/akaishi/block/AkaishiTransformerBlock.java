@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiTransformerBlock extends AkaishiMachineBlock {
 
     public AkaishiTransformerBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(5.0F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_PURPLE).sound(SoundType.METAL));
     }
 
     @Nullable

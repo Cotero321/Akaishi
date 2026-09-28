@@ -32,9 +32,8 @@ public class AkaishiExhaustedBarrelBlock extends AkaishiMachineBlock {
     public AkaishiExhaustedBarrelBlock() {
         super(Properties.of()
                 .mapColor(MapColor.PLANT)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

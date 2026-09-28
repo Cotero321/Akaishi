@@ -27,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiMaterialFuserBlock extends AkaishiMachineBlock {
 
     public AkaishiMaterialFuserBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_GRAY).strength(5.0F, 6.0F)
-                .sound(SoundType.METAL).requiresCorrectToolForDrops());
+        super(Properties.of().mapColor(MapColor.COLOR_GRAY)
+                .sound(SoundType.METAL));
     }
 
     @Nullable

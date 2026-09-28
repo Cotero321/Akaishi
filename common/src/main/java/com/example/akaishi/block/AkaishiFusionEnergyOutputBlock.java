@@ -25,9 +25,8 @@ public class AkaishiFusionEnergyOutputBlock extends AkaishiMachineBlock {
     public AkaishiFusionEnergyOutputBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

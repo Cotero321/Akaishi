@@ -1,5 +1,9 @@
 package com.example.akaishi.menu;
 
+import com.example.akaishi.api.mechanical.IMechanicalDnaEffect;
+import com.example.akaishi.api.mechanical.MechanicalEffectRegistry;
+import com.example.akaishi.api.mechanical.trait.IMechanicalTrait;
+import com.example.akaishi.api.mechanical.trait.MechanicalTraitRegistry;
 import com.example.akaishi.effect.ForbiddenSetHooks;
 import com.example.akaishi.item.MechanicalOrganItem;
 import com.example.akaishi.life.body.BodyOverviewEntry;
@@ -8,6 +12,7 @@ import com.example.akaishi.life.body.BodySlot;
 import com.example.akaishi.life.body.ClientBodyData;
 import com.example.akaishi.life.body.PlayerBodyState;
 import com.example.akaishi.life.organ.AkaishiOrganItem;
+import com.example.akaishi.life.organ.OrganPassive;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
@@ -82,9 +87,11 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
     /** 顶部页签（互斥双页：槽位扫描 / 躯体总览），右对齐于面板内容区右上角 */
     private static final int TAB_Y = 4;
 
-    /** 躯体总览页排版：纯文字行距（收窄以容纳更多属性种类），内容区上限 12 行 */
+    /** 躯体总览页排版：纯文字行距；内容区高度可容 15 行，另留 1 行画滚动提示/翻看区间 */
     private static final int OVERVIEW_LINE_H = 13;
-    private static final int OVERVIEW_MAX_ROWS = 12;
+    private static final int OVERVIEW_MAX_ROWS = 15;
+    /** 滚动提示行 Y（相对面板，位于 15 行正文之下） */
+    private static final int OVERVIEW_HINT_Y = ROW_START_Y + OVERVIEW_MAX_ROWS * OVERVIEW_LINE_H;
 
     /** 背景色 */
     private static final int BG_COLOR = 0xFFC6C6C6;
@@ -146,7 +153,7 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         // 顶部页签（互斥双页）
         drawTabs(gui);
         if (overviewMode) {
-            renderOverview(gui);
+            renderOverview(gui, mouseX, mouseY);
             return;
         }
 
@@ -354,24 +361,26 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         gui.drawString(this.font, overview, overLeft, y, overColor, false);
     }
 
-    /** 躯体总览页：身体系统当前实际生效的属性净加成 + 被动叠加（服务端计算随包下发）。
-     *  属性在前、被动在后统一成行模型；超出可视行数（OVERVIEW_MAX_ROWS）由滚轮滚动，右侧绘制滚动条。
+    /** 躯体总览页：身体系统当前实际生效的属性净加成 + 被动词条（服务端计算随包下发）。
+     *  属性在前、被动在后统一成行模型；超出可视行数（OVERVIEW_MAX_ROWS）由滚轮滚动，右侧绘制滚动条，
+     *  底部显示当前翻看区间；悬停任意行给出词条/特性说明（机械特性附当前档效果描述）。
      *  被动叠加 ≥2 来源时右侧显示罗马数字等级（与强度升级一一对应） */
-    private void renderOverview(GuiGraphics gui) {
-        List<BodyOverviewEntry> attributes = ClientBodyData.getOverview();
-        List<BodyPassiveEntry> passives = ClientBodyData.getPassives();
+    private void renderOverview(GuiGraphics gui, int mouseX, int mouseY) {
         List<OverviewRow> rows = new ArrayList<>();
-        for (BodyOverviewEntry entry : attributes) {
+        for (BodyOverviewEntry entry : ClientBodyData.getOverview()) {
             // 移动速度为小秒速（0.03），与器官 tooltip 同口径按百分比呈现（+3%）
             boolean percent = Attributes.MOVEMENT_SPEED.getDescriptionId().equals(entry.attributeKey());
             rows.add(new OverviewRow(Component.translatable(entry.attributeKey()),
                     formatOverview(entry.value(), percent),
-                    entry.value() < 0 ? 0xFFD64545 : 0xFF2E7D32));
+                    entry.value() < 0 ? 0xFFD64545 : 0xFF2E7D32,
+                    null));
         }
-        for (BodyPassiveEntry passive : passives) {
+        for (BodyPassiveEntry passive : ClientBodyData.getPassives()) {
             int roman = passive.count() >= 2 ? Math.min(passive.count(), 10) : 0;
             rows.add(new OverviewRow(Component.translatable("life.akaishi.organ_passive." + passive.passiveId()),
-                    roman > 0 ? toRoman(roman) : "", roman > 0 ? 0xFFC8A03C : 0xFF9E9E9E));
+                    roman > 0 ? toRoman(roman) : "",
+                    roman > 0 ? 0xFFC8A03C : 0xFF9E9E9E,
+                    resolvePassive(passive.passiveId(), passive.count())));
         }
         int x = this.leftPos + ROW_X;
         int y = this.topPos + ROW_START_Y;
@@ -379,7 +388,7 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_empty"),
                     x, y, 0x707070, false);
             gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_hint"),
-                    x, y + 13, 0x8B8B8B, false);
+                    x, y + OVERVIEW_LINE_H, 0x8B8B8B, false);
             return;
         }
         int total = rows.size();
@@ -387,6 +396,7 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
         if (overviewScroll > maxOffset) {
             overviewScroll = maxOffset; // 防御：数据收缩后滚动位置越界即钳制
         }
+        int hovered = -1;
         int shown = 0;
         for (int i = overviewScroll; i < total && shown < OVERVIEW_MAX_ROWS; i++, shown++) {
             OverviewRow row = rows.get(i);
@@ -396,13 +406,17 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
                 gui.drawString(this.font, row.right(),
                         this.leftPos + REJECT_NUM_X - this.font.width(row.right()), y, row.color(), false);
             }
+            // 悬停命中整行（含右侧等级列）：行距 13、字高 9，上下各留 2px 容错
+            if (mouseY >= y - 2 && mouseY < y + 11 && mouseX >= x - 1 && mouseX < this.leftPos + PANEL_W - 8) {
+                hovered = i;
+            }
             y += OVERVIEW_LINE_H;
         }
-        if (maxOffset == 0 && shown < OVERVIEW_MAX_ROWS) {
-            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_hint"),
-                    x, y, 0x8B8B8B, false);
-        } else if (maxOffset > 0) {
-            // 可滚动：右侧轨道 + 滑块（vanilla 灰阶，与界面配色一致）
+        int hintY = this.topPos + OVERVIEW_HINT_Y;
+        if (maxOffset > 0) {
+            // 可滚动：底部翻看区间 + 右侧轨道/滑块（vanilla 灰阶，与界面配色一致）
+            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_scroll",
+                    overviewScroll + 1, overviewScroll + shown, total), x, hintY, 0x8B8B8B, false);
             int trackTop = this.topPos + ROW_START_Y;
             int trackH = OVERVIEW_LINE_H * OVERVIEW_MAX_ROWS;
             int barX = this.leftPos + PANEL_W - 6; // 贴内容区右缘，与数值列（REJECT_NUM_X）留出间隙
@@ -410,11 +424,82 @@ public class AkaishiBodyScannerScreen extends AbstractContainerScreen<AkaishiBod
             int thumbH = Math.max(14, trackH * OVERVIEW_MAX_ROWS / total);
             int thumbY = trackTop + (trackH - thumbH) * overviewScroll / maxOffset;
             gui.fill(barX, thumbY, barX + 2, thumbY + thumbH, 0xFF8B8B8B);
+        } else {
+            gui.drawString(this.font, Component.translatable("gui.akaishi.body_scanner.overview_hint"),
+                    x, hintY, 0x8B8B8B, false);
+        }
+        if (hovered >= 0) {
+            gui.renderComponentTooltip(this.font, overviewTooltip(rows.get(hovered)), mouseX, mouseY);
         }
     }
 
-    /** 总览页单行（属性行：右侧数值着色；被动行：右侧罗马级金色） */
-    private record OverviewRow(Component name, String right, int color) {
+    /** 总览页单行（属性行 passive 为 null；被动行携带悬浮详情所需的解析结果） */
+    private record OverviewRow(Component name, String right, int color, PassiveInfo passive) {
+    }
+
+    /** 被动行悬浮详情：来源标志 + 数值（生物被动为器官来源数；机械特性 / DNA 为跨器官有效等级） */
+    private record PassiveInfo(String id, int value, boolean fromOrgan, boolean fromTrait, boolean fromEffect) {
+    }
+
+    /** 器官被动按 id 索引（悬浮时判定代价型，避免每帧遍历枚举） */
+    private static final Map<String, OrganPassive> ORGAN_PASSIVES = new LinkedHashMap<>();
+
+    static {
+        for (OrganPassive passive : OrganPassive.values()) {
+            ORGAN_PASSIVES.put(passive.getId(), passive);
+        }
+    }
+
+    /**
+     * 解析被动 id 的来源：id 在三张注册表里共用同一命名空间路径，
+     * 机械材料特性带等级与逐级效果描述；镜像类 DNA 效果与生物被动同 id，故来源可并存。
+     */
+    private static PassiveInfo resolvePassive(String id, int value) {
+        IMechanicalTrait trait = MechanicalTraitRegistry.resolve(id);
+        IMechanicalDnaEffect effect = trait == null ? MechanicalEffectRegistry.resolve(id) : null;
+        if (effect != null && MechanicalEffectRegistry.isNone(effect)) {
+            effect = null;
+        }
+        return new PassiveInfo(id, value, ORGAN_PASSIVES.containsKey(id), trait != null, effect != null);
+    }
+
+    /** 总览行悬浮文本：属性行给出净加成口径；被动行给出名字、来源、等级/叠加与效果描述 */
+    private List<Component> overviewTooltip(OverviewRow row) {
+        List<Component> tip = new ArrayList<>();
+        tip.add(row.name());
+        PassiveInfo info = row.passive();
+        if (info == null) {
+            tip.add(Component.translatable("gui.akaishi.body_scanner.overview_attr_hint"));
+            return tip;
+        }
+        List<String> sources = new ArrayList<>(3);
+        if (info.fromOrgan()) {
+            sources.add(Component.translatable("gui.akaishi.body_scanner.overview_src_organ").getString());
+        }
+        if (info.fromTrait()) {
+            sources.add(Component.translatable("gui.akaishi.body_scanner.overview_src_trait").getString());
+        }
+        if (info.fromEffect()) {
+            sources.add(Component.translatable("gui.akaishi.body_scanner.overview_src_effect").getString());
+        }
+        if (!sources.isEmpty()) {
+            tip.add(Component.translatable("gui.akaishi.body_scanner.overview_src", String.join(" · ", sources)));
+        }
+        IMechanicalTrait trait = info.fromTrait() ? MechanicalTraitRegistry.resolve(info.id()) : null;
+        if (trait != null) {
+            // 特性：等级上限 + 当前档实际效果（等级为跨器官有效等级，见 MechanicalAggregation）
+            int level = Math.max(1, Math.min(info.value(), trait.maxLevel()));
+            tip.add(Component.translatable("gui.akaishi.body_scanner.overview_trait_level",
+                    info.value(), trait.maxLevel()));
+            tip.add(Component.translatable(trait.descriptionKey(level)));
+        } else {
+            tip.add(Component.translatable("gui.akaishi.body_scanner.overview_stacks", info.value()));
+        }
+        OrganPassive organ = ORGAN_PASSIVES.get(info.id());
+        if (organ != null && organ.isNegative()) {
+            tip.add(Component.translatable("gui.akaishi.body_scanner.overview_negative"));
+        }
+        return tip;
     }
 
     /** 被动叠加计数 → 罗马数字（I~X，超出回退十进制） */

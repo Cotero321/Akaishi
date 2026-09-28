@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "GMG",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "akaishi:gold_dust" },
-    "I": { "item": "akaishi:akaishi_essence_block" },
-    "M": { "item": "akaishi:akaishi_machine_component" }
-  },
-  "result": { "item": "akaishi:akaishi_gen_matrix_casing", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IPI", "M M", "IPI" ], "key": { "I": { "item": "akaishi:akaishi_essence_block" }, "P": { "item": "akaishi:akaishi_polymerized_redstone_core" }, "M": { "item": "akaishi:akaishi_machine_component" } }, "result": { "item": "akaishi:akaishi_gen_matrix_casing", "count": 8 } }

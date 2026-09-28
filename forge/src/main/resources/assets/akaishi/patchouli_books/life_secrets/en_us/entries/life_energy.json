@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_essence_solid",
-      "text": "Life Energy is a high-tier form of energy, $(4)independent of Akaishi Energy$(0): it has its own pipes and tanks and can never be mixed with akaishi power — the $(l:akaishi:life_conversion)Life Conversion Matrix$(/l) is its only refinery.$(br2)A player's own Life Energy caps at a base of $(4)1000$(0) and $(bold)never regenerates on its own$(0) — don't treat it as a self-filling fuel gauge.$(br2)$(bold)Core use:$(0) solidify it into $(4)Life Essence Solids$(0), the currency of the whole life line — see the $(l:akaishi:life_purifier)Life Energy Purifier$(/l)."
+      "text": "Life Energy is a high-tier form of energy, $(reset)independent of Akaishi Energy$(reset): it has its own pipes and tanks and can never be mixed with akaishi power — the $(l:akaishi:life_conversion)Life Conversion Matrix$(/l) is its only refinery.$(br2)A player's own Life Energy caps at a base of $(reset)1000$(reset) and $(bold)never regenerates on its own$(reset), so spend it carefully.$(br2)$(bold)Core use:$(reset) solidify it into $(reset)Life Essence Solids$(reset), the currency of the whole life line — see the $(l:akaishi:life_purifier)Life Energy Purifier$(/l)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_energy_cell_advanced",
-      "text": "$(bold)Storage:$(0) Life Energy Cells come in tiers — Basic $(4)1,000,000$(0) (crafted) → Advanced $(4)4,000,000$(0) → Super $(4)40,000,000$(0), upgraded step by step with high-tier components. Every cell has a two-way buffer you can freely charge and drain — the \"second life line\" beside your power grid.$(br2)$(bold)Transport:$(0) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — hook them up wrong and nothing flows. Pipes come in four tiers (per-tick throughput): Basic $(4)1000$(0) → Intermediate $(4)4000$(0) → Advanced $(4)16000$(0) → Ultimate $(4)64000$(0), upgraded step by step as a cross of the previous tier x4 plus metal dust."
+      "text": "$(bold)Storage:$(reset) Life Energy Cells come in tiers — Basic $(reset)1,000,000$(reset) (crafted) → Advanced $(reset)4,000,000$(reset) → Super $(reset)40,000,000$(reset), upgraded step by step with high-tier components. Every cell has a two-way buffer you can freely charge and drain: a backup storage system beside your power grid.$(br2)$(bold)Transport:$(reset) Life Energy Pipes carry Life Energy only and never mix with akaishi power pipes — connected wrong, they transfer nothing. Pipes come in four tiers (per-tick throughput): Basic $(reset)1000$(reset) → Intermediate $(reset)4000$(reset) → Advanced $(reset)16000$(reset) → Ultimate $(reset)64000$(reset), upgraded step by step as a cross of the previous tier x4 plus metal dust."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_energy_cell_serializer",
-      "text": "$(bold)Cell Serializer:$(0) place 1 Life Energy Cell Serializer in the center and wrap it in an enclosed $(4)3x3x3 shell of 26 Life Energy Cells$(0) of any tier to form the structure (the core is hidden — right-click any shell cell to open its UI).$(br2)Once formed, the 26 shell cells and the core combine into a single pooled buffer whose capacity adds up per cell; attach a pipe to any shell to charge or drain the whole structure. Breaking it apart keeps each cell's own energy safe."
+      "text": "$(bold)Cell Serializer:$(reset) place 1 Life Energy Cell Serializer in the center and wrap it in an enclosed $(reset)3x3x3 shell of 26 Life Energy Cells$(reset) of any tier to form the structure (the core is hidden — right-click any shell cell to open its UI).$(br2)Once formed, the 26 shell cells and the core combine into a single pooled buffer whose capacity adds up per cell; attach a pipe to any shell to charge or drain the whole structure. Breaking it apart keeps each cell's own energy safe."
     },
     {
       "type": "patchouli:relations",
@@ -26,7 +26,7 @@
         "akaishi:life_path",
         "akaishi:life_purifier"
       ],
-      "text": "Missed the roadmap? Read \"$(l:akaishi:life_path)The Path of Life Research$(/l)\". How it is made and spent: see the Matrix and the Purifier."
+      "text": "Read \"$(l:akaishi:life_path)The Path of Life Research$(/l)\" first. How it is produced and consumed: see the Matrix and the Purifier."
     }
   ]
 }

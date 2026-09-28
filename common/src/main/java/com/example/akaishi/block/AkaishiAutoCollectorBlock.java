@@ -61,7 +61,6 @@ public class AkaishiAutoCollectorBlock extends AkaishiMachineBlock {
     public AkaishiAutoCollectorBlock(CollectorTier tier) {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         this.tier = tier;
     }

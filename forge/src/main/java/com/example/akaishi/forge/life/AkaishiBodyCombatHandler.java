@@ -29,9 +29,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
@@ -44,8 +45,8 @@ public final class AkaishiBodyCombatHandler {
 
     public static final AkaishiBodyCombatHandler INSTANCE = new AkaishiBodyCombatHandler();
 
-    /** 特殊弹射物冷却：玩家 → 上次发射 tick（4 秒） */
-    private static final Map<Player, Integer> PROJECTILE_COOLDOWN = new WeakHashMap<>();
+    /** 特殊弹射物冷却：玩家 → 上次发射 tick（4 秒）；并发表强引用玩家，登出必须清理 */
+    private static final Map<Player, Integer> PROJECTILE_COOLDOWN = new ConcurrentHashMap<>();
     private static final int PROJECTILE_COOLDOWN_TICKS = 80;
 
     /** 音爆单次伤害（原版监守者音爆量级，无视护甲） */
@@ -54,7 +55,24 @@ public final class AkaishiBodyCombatHandler {
     private static final double SONIC_BOOM_RANGE = 24.0;
     private static final double SONIC_BOOM_RADIUS = 1.0;
 
+    // ===== 生态套装数值（口径：与既有 4 组同量级，均为单维 ±10%~20% 的微调，不叠加倍率放大）=====
+    /** 纯爆炸：自身受到的爆炸伤害倍率（小 / 大共鸣），越低减伤越多 */
+    private static final float SYNERGY_EXPLOSIVE_TAKEN_SMALL = 0.90F;
+    private static final float SYNERGY_EXPLOSIVE_TAKEN_MAJOR = 0.80F;
+    /** 纯首领：对首领级（BOSS 组）目标的伤害倍率（小 / 大共鸣） */
+    private static final float SYNERGY_BOSS_DEALT_SMALL = 1.08F;
+    private static final float SYNERGY_BOSS_DEALT_MAJOR = 1.12F;
+    /** 纯龙族：自身受到的摔落伤害倍率（小 / 大共鸣），越低减伤越多 */
+    private static final float SYNERGY_DRAGON_FALL_SMALL = 0.50F;
+    private static final float SYNERGY_DRAGON_FALL_MAJOR = 0.25F;
+
     private AkaishiBodyCombatHandler() {
+    }
+
+    /** 玩家登出：移除并发冷却表中的强引用条目，避免玩家对象随静态表泄漏 */
+    @SubscribeEvent
+    public void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        PROJECTILE_COOLDOWN.remove(event.getEntity());
     }
 
     @SubscribeEvent
@@ -128,6 +146,10 @@ public final class AkaishiBodyCombatHandler {
         if (synergy.group() == SampleGroup.UNDEAD && attacker.level().isNight()) {
             amount *= synergy.isMajor() ? 1.15F : 1.10F;
         }
+        // 生态套装·纯首领：对首领级目标（凋灵/循声守卫等 BOSS 组）增伤（小共鸣 +8% / 大共鸣 +12%）
+        if (synergy.group() == SampleGroup.BOSS && SampleGroup.of(target) == SampleGroup.BOSS) {
+            amount *= synergy.isMajor() ? SYNERGY_BOSS_DEALT_MAJOR : SYNERGY_BOSS_DEALT_SMALL;
+        }
         // 底层暴击：暴击率命中时按暴击伤害属性放大本次伤害（暴击伤害 0.5 → 最终 ×1.5）；
         // 开关与上限由配置裁剪（上限 0 = 用内置），钳制后避免配置被手改成超人倍率
         if (CombatTuning.critEnabled()) {
@@ -195,6 +217,16 @@ public final class AkaishiBodyCombatHandler {
         if (blast > 0 && event.getSource().is(DamageTypeTags.IS_EXPLOSION)) {
             amount *= 1.0F - 0.3F * Math.min(blast, 2);
         }
+        // 生态套装（3 件小共鸣 / 6 件大共鸣）：受击侧效果统一在此处读取一次，伤害倍率类须在写回前应用
+        OrganEffectResolver.Synergy synergy = OrganEffectResolver.synergyOf(state, victim.level());
+        // 纯爆炸：减免自身受到的爆炸伤害（苦力怕硫磺体质；小共鸣 -10% / 大共鸣 -20%）
+        if (synergy.group() == SampleGroup.EXPLOSIVE && event.getSource().is(DamageTypeTags.IS_EXPLOSION)) {
+            amount *= synergy.isMajor() ? SYNERGY_EXPLOSIVE_TAKEN_MAJOR : SYNERGY_EXPLOSIVE_TAKEN_SMALL;
+        }
+        // 纯龙族：减免自身受到的摔落伤害（龙翼缓冲；小共鸣 -50% / 大共鸣 -75%）
+        if (synergy.group() == SampleGroup.DRAGON && event.getSource().is(DamageTypeTags.IS_FALL)) {
+            amount *= synergy.isMajor() ? SYNERGY_DRAGON_FALL_MAJOR : SYNERGY_DRAGON_FALL_SMALL;
+        }
         event.setAmount(amount);
         // 荆棘反弹：近战伤害 30%/来源 返还攻击者（封顶 60%，防高层反弹伤害互相弹射失控；受来源品质放大）
         OrganEffectResolver.PassiveStrengths thorns = OrganEffectResolver.strengthsOf(state, OrganPassive.THORNS);
@@ -217,9 +249,7 @@ public final class AkaishiBodyCombatHandler {
                     victim.getX(), victim.getY() + victim.getBbHeight() * 0.5, victim.getZ(),
                     0.0, 0.0, 0.0);
         }
-        // 生态套装（3 件小共鸣 / 6 件大共鸣）：
-        OrganEffectResolver.Synergy synergy = OrganEffectResolver.synergyOf(state, victim.level());
-        // 纯异变：受击狂怒——概率获得速度（小：25% 速度 I 2 秒 / 大：30% 速度 II 3 秒）
+        // 生态套装·纯异变：受击狂怒——概率获得速度（小：25% 速度 I 2 秒 / 大：30% 速度 II 3 秒）
         if (synergy.group() == SampleGroup.ABERRATION
                 && victim.getRandom().nextFloat() < (synergy.isMajor() ? 0.30F : 0.25F)) {
             victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED,

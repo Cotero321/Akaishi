@@ -25,9 +25,8 @@ public class AkaishiFusionItemInputPortBlock extends AkaishiMachineBlock {
     public AkaishiFusionItemInputPortBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

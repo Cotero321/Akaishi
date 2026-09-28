@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "CHC",
-    "H H",
-    "CHC"
-  ],
-  "key": {
-    "H": { "item": "akaishi:heat_sink_good" },
-    "C": { "item": "akaishi:copper_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_fusion_cooler_frame", "count": 4 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FHF", "H H", "FHF" ], "key": { "F": { "item": "akaishi:akaishi_fusion_shell" }, "H": { "item": "akaishi:heat_sink_good" } }, "result": { "item": "akaishi:akaishi_fusion_cooler_frame", "count": 4 } }

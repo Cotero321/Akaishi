@@ -28,7 +28,6 @@ public class AkaishiTransgeneFactoryBlock extends AkaishiMachineBlock {
     public AkaishiTransgeneFactoryBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

@@ -38,7 +38,6 @@ public class AkaishiMiniatureTerminalBlock extends AkaishiMachineBlock {
     public AkaishiMiniatureTerminalBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

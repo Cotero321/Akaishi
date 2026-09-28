@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "AIA",
-    "ISI",
-    "AIA"
-  ],
-  "key": {
-    "A": { "item": "akaishi:akaishi_advanced_component" },
-    "S": { "item": "akaishi:akaishi_energy_cell_advanced" },
-    "I": { "item": "akaishi:gold_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_life_energy_cell", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SIS", "ITI", "SIS" ], "key": { "S": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "I": { "item": "akaishi:gold_dust" }, "T": { "item": "akaishi:akaishi_energy_cell_advanced" } }, "result": { "item": "akaishi:akaishi_life_energy_cell", "count": 1 } }

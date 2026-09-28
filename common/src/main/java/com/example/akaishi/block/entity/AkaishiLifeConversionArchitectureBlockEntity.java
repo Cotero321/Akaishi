@@ -1,5 +1,6 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
@@ -16,7 +17,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * 生命转换架构方块实体：已停用为纯材料（生命转换矩阵取代），
  * 结构恒不成型、不再提供界面，仅保留能量存储（NBT 持久化）供合成材料使用。
  */
-public class AkaishiLifeConversionArchitectureBlockEntity extends BlockEntity implements IEnergyProvider {
+public class AkaishiLifeConversionArchitectureBlockEntity extends BlockEntity
+        implements IEnergyProvider, IDataCarrier {
 
     private final AkaishiEnergyStorage akaishi;
     private final AkaishiEnergyStorage life;
@@ -27,7 +29,8 @@ public class AkaishiLifeConversionArchitectureBlockEntity extends BlockEntity im
         this.life = new AkaishiEnergyStorage(LifeEnergyType.INSTANCE, ModConfig.lifeConversionLifeCapacity);
     }
 
-    /** 结构校验：恒不成型（新式转换矩阵由 {@link AkaishiLifeMatrixControllerBlockEntity} 接管） */
+    /** 结构校验：恒不成型（新式转换矩阵由 {@link AkaishiLifeMatrixControllerBlockEntity} 接管）。
+     *  本实体未注册 ticker、无 tickServer，故不存在每 tick 空跑，无需早退。 */
     public boolean isStructureValid() {
         return false;
     }
@@ -81,5 +84,11 @@ public class AkaishiLifeConversionArchitectureBlockEntity extends BlockEntity im
         super.load(tag);
         akaishi.setEnergy(tag.getLong("AkaishiEnergy"));
         life.setEnergy(tag.getLong("LifeEnergy"));
+    }
+
+    @Override
+    public String[] excludedKeys() {
+        // 方块 onRemove 不单独掉落任何容器（已停用为纯材料，仅能量数据），故无需排除
+        return new String[0];
     }
 }

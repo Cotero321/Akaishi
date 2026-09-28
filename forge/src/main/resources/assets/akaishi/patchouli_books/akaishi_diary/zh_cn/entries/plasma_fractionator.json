@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_activated_fractionator",
-      "text": "活化分馏器：$(4)1 个活化结晶 → 1 个对应活化成分 + 1 个衰竭结晶$(0)。$(br2)每刀耗电 2000、耗时 100 tick。$(br2)活化成分是「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」的口粮。"
+      "text": "活化分馏器：$(reset)1 个活化结晶 → 1 个对应活化成分 + 1 个衰竭结晶$(reset)。$(br2)每次加工耗电 2000、耗时 100 tick。$(br2)活化成分是「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」的原料。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)衰竭结晶别丢：$(0)$(4)词条重铸、物品重构都点名要它$(0)，具体用法见《生命的奥秘》。$(br2)活化结晶本身出自衰竭燃料的活化器 → 离心机路线，同样在《生命的奥秘》里——这条链要和那边对着读。"
+      "text": "$(bold)衰竭结晶的用途：$(reset)词条重铸与物品重构均需要它，具体用法见《生命的奥秘》。$(br2)活化结晶本身出自衰竭燃料的活化器 → 离心机路线，同样位于《生命的奥秘》中，本链需与该内容对照阅读。"
     },
     {
       "type": "patchouli:relations",

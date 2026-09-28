@@ -7,16 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_trait_reforger",
-      "text": "The Trait Reforger replaces a $(4)chosen trait in place$(0) with a new one drawn from the same tier pool.$(br2)$(bold)Three iron rules:$(0)$(li)Deterministic success — with materials and energy ready it always succeeds, no gambling$(li)Never damages the organ$(li)Excludes traits the organ already carries, so it never rolls a duplicate$(br2)Requirements: the organ must be $(bold)non-native and set$(0), carrying at least 1 trait.$(br2)Rolled a bad trait? This is your only \"in-place respec\"."
+      "text": "The Trait Reforger replaces a $(reset)chosen trait in place$(reset) with a new one drawn from the same tier pool.$(br2)$(bold)Three rules:$(reset)$(li)Guaranteed success — always succeeds once materials and energy are supplied, with no random failure$(li)Never damages the organ$(li)Excludes traits the organ already carries, so it never rolls a duplicate$(br2)Requirements: the organ must be $(bold)non-native and set$(reset), carrying at least 1 trait.$(br2)To replace a trait, this is the only in-place swap method."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Cost per reroll:$(0)$(li)Exhausted Crystals: tier × 2 — tier 1/2/3 traits need 2 / 4 / 6 respectively$(li)120,000 life energy$(li)600 ticks (30 seconds)$(br2)$(bold)Note:$(0) the new trait is drawn from the $(bold)same tier pool$(0) — rolling a tier-3 trait out of a tier-2 pool is impossible.$(br2)Carrying several traits? Pick the one that bothers you most: one reroll swaps one trait."
+      "text": "$(bold)Cost per reroll:$(reset)$(li)Exhausted Crystals: tier × 2 — tier 1/2/3 traits need 2 / 4 / 6 respectively$(li)120,000 life energy$(li)600 ticks (30 seconds)$(br2)$(bold)Note:$(reset) the new trait is drawn from the $(bold)same tier pool$(reset) — a tier-2 pool cannot yield a tier-3 trait.$(br2)When an organ carries several traits, one reroll replaces only one."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_exhausted_crystal",
-      "text": "Exhausted Crystals are the $(4)hard currency$(0) of trait reforging.$(br2)$(bold)Where they come from:$(0) they are the common byproduct of the Activated Fractionator and the Life Centrifuge — the whole purification chain is under \"$(l:akaishi:life_waste)Waste Neutralization$(/l)\".$(br2)Each reroll eats 2-6 of them, so hoard them early: the sooner your waste pipe network is up, the sooner you stop worrying."
+      "text": "Exhausted Crystals are the $(reset)key consumable$(reset) of trait reforging.$(br2)$(bold)Where they come from:$(reset) they are the common byproduct of the Activated Fractionator and the Life Centrifuge — the whole purification chain is under \"$(l:akaishi:life_waste)Waste Neutralization$(/l)\".$(br2)Each reroll consumes 2-6; stock up in advance, and set up the waste pipe network early for a steady supply."
     },
     {
       "type": "patchouli:crafting",

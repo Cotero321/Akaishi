@@ -28,7 +28,6 @@ public class AkaishiSampleVaultBlock extends AkaishiMachineBlock {
     public AkaishiSampleVaultBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

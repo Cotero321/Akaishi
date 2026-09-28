@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sword",
-      "text": "Akaishi gear is a $(4)beefed-up Netherite set$(0), roughly x1.25 on the stats sheet:$(li)armor $(4){4,7,10,4}$(0) (boots/legs/chest/head), toughness 4$(li)knockback resistance 0.1, enchantability 15$(li)the sword hits for 11; pickaxe/shovel/axe outclass Netherite the same way$(br2)$(bold)None of it is crafted at a table anymore$(0) — the front door is the Equipment Forger below."
+      "text": "Akaishi gear is an upgraded Netherite set, approximately ×1.25 on stats:$(li)armor {4,7,10,4} (boots/legs/chest/head), toughness 4$(li)knockback resistance 0.1, enchantability 15$(li)the sword deals 11 damage; pickaxe, shovel and axe exceed Netherite by the same ratio$(br2)$(bold)The set is no longer crafted at a table;$(reset) it is produced at the Equipment Forger described below."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Craft it:$(0) every piece of Akaishi gear comes from the $(l:akaishi:equipment_forger)Equipment Forger$(/l) — feed it Netherite gear and Akaishi Ingots, each piece has its own cost.$(br2)$(bold)Enhance it:$(0) after recasting, the $(l:akaishi:upgrade_station)Upgrade Station$(/l) bolts special abilities on, and the ticket is the $(l:akaishi:upgrade_template)Upgrade Template$(/l).$(br2)To farm ingots on autopilot, read $(l:akaishi:ingot)Akaishi Ingot$(/l) first."
+      "text": "$(bold)Production:$(reset) every piece of Akaishi gear is produced by the $(l:akaishi:equipment_forger)Equipment Forger$(/l); Netherite gear and Akaishi Ingots are supplied, and each piece has its own cost.$(br2)$(bold)Enhancement:$(reset) after recasting, the $(l:akaishi:upgrade_station)Upgrade Station$(/l) adds special abilities, requiring the $(l:akaishi:upgrade_template)Upgrade Template$(/l).$(br2)For automated ingot production, see $(l:akaishi:ingot)Akaishi Ingot$(/l)."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:upgrade_template",
         "akaishi:ingot"
       ],
-      "text": "The Forger, the Station and the Template are one pipeline: recast, then bolt on abilities, then bolt on more; Akaishi Ingots are the recasting fuel."
+      "text": "The Forger, the Station and the Template form one pipeline: recast, then add abilities. Akaishi Ingots are the recasting fuel."
     }
   ]
 }

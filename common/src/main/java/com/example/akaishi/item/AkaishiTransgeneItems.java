@@ -22,6 +22,8 @@ public final class AkaishiTransgeneItems {
     public static RegistrySupplier<Item> akaishiWitherSeed;
     /** 转基因植物：凋零果（成熟藤收获，凋零系高级原料/介质） */
     public static RegistrySupplier<Item> akaishiWitherCondensate;
+    /** 转基因植物：凋零骨片（凋零果满格兑换，9 片在工作台拼成 1 个凋零骷髅头） */
+    public static RegistrySupplier<Item> akaishiWitherBoneShard;
     /** 转基因植物：烈焰花种（仅可种于灵魂沙生成烈焰花株，烈焰系火种来源） */
     public static RegistrySupplier<Item> akaishiBlazeSeed;
     /** 转基因植物：烈焰花瓣（盛开的烈焰花冠收获，烈焰系高级原料/介质） */
@@ -41,11 +43,16 @@ public final class AkaishiTransgeneItems {
 
     public static void register() {
         akaishiWitherSeed = item("akaishi_wither_seed", () -> new AkaishiWitherSeedItem(new Item.Properties()));
-        akaishiWitherCondensate = item("akaishi_wither_condensate");
+        akaishiWitherCondensate = item("akaishi_wither_condensate",
+                () -> new AkaishiWitherCondensateItem(new Item.Properties()));
+        akaishiWitherBoneShard = item("akaishi_wither_bone_shard",
+                () -> new AkaishiWitherBoneShardItem(new Item.Properties()));
         akaishiBlazeSeed = item("akaishi_blaze_seed", () -> new AkaishiBlazeSeedItem(new Item.Properties()));
-        akaishiBlazeCondensate = item("akaishi_blaze_condensate");
+        akaishiBlazeCondensate = item("akaishi_blaze_condensate",
+                () -> new AkaishiBlazeCondensateItem(new Item.Properties()));
         akaishiCurseVineSeed = item("akaishi_curse_vine_seed", () -> new AkaishiCurseVineSeedItem(new Item.Properties()));
-        akaishiCurseBlossom = item("akaishi_curse_blossom");
+        akaishiCurseBlossom = item("akaishi_curse_blossom",
+                () -> new AkaishiCurseBlossomItem(new Item.Properties()));
         // 回响花（种幽匿块）/ 末影花（种末地石）：种子各自的独立物品类（参照各自原版植物，不做通用抽象）
         akaishiEchoSeed = item("akaishi_echo_seed", () -> new AkaishiEchoSeedItem(new Item.Properties()));
         akaishiEchoFruit = item("akaishi_echo_fruit", () -> new AkaishiEchoFruitItem(new Item.Properties()));

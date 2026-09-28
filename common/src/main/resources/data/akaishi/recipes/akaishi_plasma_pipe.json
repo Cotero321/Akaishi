@@ -1,11 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "O O",
-    "O O"
-  ],
-  "key": {
-    "O": { "item": "minecraft:obsidian" }
-  },
-  "result": { "item": "akaishi:akaishi_plasma_pipe", "count": 8 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "ORO", "O O", "ORO" ], "key": { "O": { "item": "minecraft:obsidian" }, "R": { "item": "akaishi:akaishi_precision_alloy_ingot" } }, "result": { "item": "akaishi:akaishi_plasma_pipe", "count": 8 } }

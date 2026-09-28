@@ -7,25 +7,25 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_wireless_terminal",
-      "text": "Wireless akaishi energy $(4)beams power across the map$(0) straight into distant Input/Output Ports — say goodbye to forests of energy pipes.$(br2)$(bold)Structure:$(0) a $(4)sealed hollow box$(0), edge length 5:$(li)Walls: Wireless Terminal Shell as the base, swappable for the Terminal / Security Block / Controller$(li)Cavity: exactly 1 Wireless Terminal Core, plus air or modules of your choice$(li)The controller sits on a wall — only then does the terminal activate as the network's energy hub."
+      "text": "Wireless akaishi energy transmits power across the map directly into distant Input/Output Ports.$(br2)$(bold)Structure:$(reset) a sealed hollow box with edge length 5:$(li)Walls: Wireless Terminal Shell as the base, replaceable by the Terminal, Security Block or Controller$(li)Cavity: exactly 1 Wireless Terminal Core, plus air or modules$(li)The controller is mounted on a wall; only then does the terminal become the network's energy hub."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Bound storage:$(0) the terminal auto-binds Energy Cells within $(4)1 block outside the structure$(0) as the network's battery pool — to grow capacity, just crowd more cells around the box.$(br2)$(bold)Authentication:$(0) authorize identity cards on the Security page; $(4)one terminal caps at 8 cards$(0), and only authorized cards may join.$(br2)$(bold)Chunk tax:$(0) with a Chunk Loader module installed, every weakly-loaded chunk costs 1000 energy per tick (billed every 20 ticks). Broke? Chunk loading pauses, and resumes on its own once power returns."
+      "text": "$(bold)Bound storage:$(reset) the terminal automatically binds Energy Cells within 1 block outside the structure as the network's battery pool; capacity increases by placing more cells around the box.$(br2)$(bold)Authentication:$(reset) identity cards are authorized on the Security page; one terminal supports up to 8 cards, and only authorized cards may join.$(br2)$(bold)Chunk cost:$(reset) with a Chunk Loader module installed, every weakly-loaded chunk costs 1000 energy per tick (billed every 20 ticks). If power is insufficient, chunk loading pauses and resumes automatically once power returns."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_wireless_identity_card",
-      "text": "$(bold)The identity card is the key to the grid:$(0)$(li)Authorize the card number at the terminal first (8-card cap)$(li)Place an Input/Output Port far away, then right-click it holding the same card to bind — ports trust the card, not the player$(br2)$(bold)Transfer is uncapped:$(0) the card is pure authentication — wireless transfer has $(4)no rate cap$(0) and no tiers; the card $(bold)cannot be upgraded$(0).$(br2)How much moves per tick is limited only by the port's buffer and the terminal's bound storage — loss still applies by distance (next page)."
+      "text": "$(bold)The identity card authenticates the grid:$(reset)$(li)Authorize the card number at the terminal first (8-card limit)$(li)Place an Input/Output Port at a distance, then right-click it while holding the same card to bind; ports trust the card, not the player$(br2)$(bold)Transfer is uncapped:$(reset) the card provides authentication only; wireless transfer has no rate cap and no tiers, and the card cannot be upgraded.$(br2)Transfer per tick is limited only by the port's buffer and the terminal's bound storage; loss still applies by distance (next page)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Transmission loss, laid out in plain numbers:$(0)$(li)$(4)Same dimension$(0): base 5% + 0.1% per block of distance, capped at 50%$(li)$(4)Cross-dimension$(0): flat 25%, and only unlocked when the terminal cavity holds a Dimension Bridge module$(br2)$(bold)Cutting the bill:$(0)$(li)Input/Output Loss Suppression modules shave 5% each, stacking up to a 90% reduction$(li)Chunk Loader weakly loads the terminal's and every port's chunks — transfers keep flowing while you're away$(li)Chunk Range module expands each loaded chunk into a 3×3 area$(br2)Modules go inside the cavity. More isn't always better — don't get greedy."
+      "text": "$(bold)Transmission loss:$(reset)$(li)Same dimension: base 5% + 0.1% per block of distance, capped at 50%$(li)Cross-dimension: flat 25%, unlocked only when the terminal cavity contains a Dimension Bridge module$(br2)$(bold)Reducing loss:$(reset)$(li)Input/Output Loss Suppression modules reduce loss by 5% each, stacking up to a 90% reduction$(li)Chunk Loader weakly loads the terminal's chunks and every port's chunks; transfers continue while the player is away$(li)Chunk Range module expands each loaded chunk into a 3×3 area$(br2)Modules are placed inside the cavity."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_wireless_portable_terminal",
-      "text": "$(4)Wireless Portable Terminal$(0): a read-only remote for your pocket.$(br2)Right-click it and it scans your inventory for an identity card, looks up the matching network, and puts stored energy, port counts and card IDs on screen — check on your home grid from anywhere.$(br2)Mind you: it $(bold)watches$(0), it doesn't $(bold)transmit$(0). For moving power, use the real Input/Output Ports."
+      "text": "$(bold)Wireless Portable Terminal$(reset): a read-only remote.$(br2)On right-click it scans the inventory for an identity card, looks up the matching network, and displays stored energy, port counts and card IDs.$(br2)It only monitors and does not transmit. For power transfer, use Input/Output Ports."
     },
     {
       "type": "patchouli:relations",
@@ -34,7 +34,7 @@
         "akaishi:energy_cell",
         "akaishi:matrix"
       ],
-      "text": "Suggested reading order: generate power with the Energy Generator and bank it in Energy Cells first, then build the wireless grid; for bulk generation, the Matrix Structures entry is a better deal."
+      "text": "Reading order: generate power with the Energy Generator and store it in Energy Cells first, then build the wireless grid; for bulk generation, see the Matrix Structures entry."
     }
   ]
 }

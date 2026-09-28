@@ -47,7 +47,6 @@ public class AkaishiMiniMatrixTerminalBlock extends AkaishiMachineBlock {
     public AkaishiMiniMatrixTerminalBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
         registerDefaultState(stateDefinition.any().setValue(FORMED, false));
     }

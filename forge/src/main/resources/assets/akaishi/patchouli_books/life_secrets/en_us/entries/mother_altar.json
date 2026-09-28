@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_mother_altar",
-      "text": "$(bold)Purpose:$(0) the Mother Altar is the $(4)core block$(0) of the Life line's multiblock shrine. A single altar can hold 1 offering; stacking many of them into the shrine is covered in $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l).$(br2)$(bold)Interaction:$(0)$(li)Single / unformed: right-click while holding an item to place 1 offering, it floats above the altar; right-click empty-handed to take it back$(li)$(4)The formed center 2x2$(0): right-click opens the merged altar screen (tier display + single-item slot)$(br2)$(bold)No whitelist:$(0) there is $(4)no allow/deny list - any item can be offered$(0); whether it counts is decided by the Life Fusion Ritual recipe on the $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l) page."
+      "text": "$(bold)Purpose:$(reset) the Mother Altar is the $(reset)core block$(reset) of the Life line's multiblock shrine. A single altar can hold 1 offering; stacking many of them into the shrine is covered in $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l).$(br2)$(bold)Interaction:$(reset)$(li)Single / unformed: right-click while holding an item to place 1 offering, it floats above the altar; right-click empty-handed to take it back$(li)$(reset)The formed center 2x2$(reset): right-click opens the merged altar screen (tier display + single-item slot)$(br2)$(bold)No whitelist:$(reset) there is $(reset)no allow/deny list - any item can be offered$(reset); whether it counts is decided by the Life Fusion Ritual recipe on the $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l) page."
     },
     {
       "type": "patchouli:text",
       "title": "Using a Single Altar",
-      "text": "$(bold)Offering slot:$(0) every unformed Mother Altar carries one independent slot; placing and taking are both right-click only, with no screen. If a slot is occupied, take the offering back empty-handed before placing another.$(br2)$(bold)Once formed:$(0) the four altars forming the center 2x2 of the $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l) merge into a great altar and right-click opens the $(4)merged altar screen$(0) (current tier + a single-item offering slot); single-altar interaction gives way to the screen. The 8 outer altars are unaffected and still take offerings by right-click.$(br2)$(bold)No interference:$(0) neighbouring altars and altar stones keep separate books and never affect each other.$(br2)$(bold)Orientation:$(0) the altar has no facing, so any orientation is fine."
+      "text": "$(bold)Offering slot:$(reset) every unformed Mother Altar carries one independent slot; placing and taking are both right-click only, with no screen. If a slot is occupied, take the offering back empty-handed before placing another.$(br2)$(bold)Once formed:$(reset) the four altars forming the center 2x2 of the $(l:akaishi:goat_altar)Goat Altar (3 Tiers)$(/l) merge into a great altar and right-click opens the $(reset)merged altar screen$(reset) (current tier + a single-item offering slot); single-altar interaction gives way to the screen. The 8 outer altars are unaffected and still take offerings by right-click.$(br2)$(bold)No interference:$(reset) neighbouring altars and altar stones keep separate books and never affect each other.$(br2)$(bold)Orientation:$(reset) the altar has no facing, so any orientation is fine."
     },
     {
       "type": "patchouli:text",
       "title": "Crafting & Cost",
-      "text": "$(bold)Mother Altar Stone:$(0) COC/OEO/COC (C=Crying Obsidian, O=Obsidian, E=Life Essence Solid) -> 8. $(bold)Altar of the Black Mother:$(0) 8 Altar Stone around 1 Life Essence Solid -> 1.$(br2)Altar Stone is the bulk material - stock up with the recipe above before breaking ground."
+      "text": "$(bold)Mother Altar Stone:$(reset) COC/OEO/COC (C=Crying Obsidian, O=Obsidian, E=Life Essence Solid) -> 8. $(bold)Altar of the Black Mother:$(reset) 8 Altar Stone around 1 Life Essence Solid -> 1.$(br2)Altar Stone is the main building material; gather it with the recipe above before building."
     },
     {
       "type": "patchouli:relations",

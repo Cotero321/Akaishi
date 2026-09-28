@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "IHI",
-    "III"
-  ],
-  "key": {
-    "H": { "item": "minecraft:hopper" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_sample_vault", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IRI", "IHI", "IRI" ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "H": { "item": "minecraft:hopper" } }, "result": { "item": "akaishi:akaishi_sample_vault", "count": 1 } }

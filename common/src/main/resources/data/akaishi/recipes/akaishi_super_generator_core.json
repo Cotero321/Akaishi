@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "AAA",
-    "AEA",
-    "AAA"
-  ],
-  "key": {
-    "A": { "item": "akaishi:akaishi_advanced_component" },
-    "E": { "item": "akaishi:akaishi_energy_assembly" }
-  },
-  "result": { "item": "akaishi:akaishi_super_generator_core", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "KAK", "AEA", "KAK" ], "key": { "K": { "item": "akaishi:akaishi_alloy_steel_ingot" }, "A": { "item": "akaishi:akaishi_advanced_component" }, "E": { "item": "akaishi:akaishi_energy_assembly" } }, "result": { "item": "akaishi:akaishi_super_generator_core", "count": 1 } }

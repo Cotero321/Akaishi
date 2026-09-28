@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "G G",
-    "GCG",
-    "G G"
-  ],
-  "key": {
-    "C": { "item": "akaishi:akaishi_energy_generator" },
-    "G": { "item": "minecraft:gold_block" }
-  },
-  "result": { "item": "akaishi:akaishi_gen_matrix_controller_basic", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "RGR", "GCG", "RGR" ], "key": { "R": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "G": { "item": "minecraft:gold_block" }, "C": { "item": "akaishi:akaishi_energy_generator" } }, "result": { "item": "akaishi:akaishi_gen_matrix_controller_basic", "count": 1 } }

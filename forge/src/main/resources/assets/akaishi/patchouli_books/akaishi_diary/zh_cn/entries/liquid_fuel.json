@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "液体燃料产线一句话：$(4)液化 → 加工 → 混合 → 装罐 → 燃烧$(0)。$(br2)$(li)「$(l:akaishi:fuel_liquefier)能量液化装置$(/l)」：固态原料压成液体能量$(li)「$(l:akaishi:fuel_processor)能量加工器$(/l)」：液体能量兑成可烧燃料$(li)「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」：低级燃料兑成高级燃料$(li)「$(l:akaishi:fuel_canner)燃料装罐机$(/l)」：液体灌进燃料罐$(br2)成品罐交给「$(l:akaishi:reactor)反应堆$(/l)」烧；最顶级的燃料还会继续走向「$(l:akaishi:plasma)等离子体链$(/l)」。每台机器的配方与参数点上方链接逐台看。"
+      "text": "液体燃料产线流程为：$(reset)液化 → 加工 → 混合 → 装罐 → 燃烧$(reset)。$(br2)$(li)「$(l:akaishi:fuel_liquefier)能量液化装置$(/l)」：将固态原料转化为液体能量$(li)「$(l:akaishi:fuel_processor)能量加工器$(/l)」：将液体能量加工为可燃燃料$(li)「$(l:akaishi:fuel_mixer)燃料混合器$(/l)」：将低级燃料混合为高级燃料$(li)「$(l:akaishi:fuel_canner)燃料装罐机$(/l)」：将液体灌入燃料罐$(br2)成品燃料罐送入「$(l:akaishi:reactor)反应堆$(/l)」燃烧；最高档燃料继续进入「$(l:akaishi:plasma)等离子体链$(/l)」。各机器的配方与参数见对应条目。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)产线后勤：$(0)$(li)液体储罐三档：基础 16000mb / 高级 64000mb / 超级 256000mb——输出先落罐再抽给下游，机器不等料$(li)液体管道：$(4)4000mb/tick$(0) 搬任何液体，通用无歧视$(br2)$(bold)例外：$(0)衰竭燃料有腐蚀性，必须走专用「封闭性衰竭管道」，普通管道不接这种货。$(br2)衰竭燃料的回收路线在《生命的奥秘》里——先记住$(4)别乱倒$(0)。"
+      "text": "$(bold)产线配套：$(reset)$(li)液体储罐三档：基础 16000mb / 高级 64000mb / 超级 256000mb；产出先存入储罐再输送至下游，可避免机器等待原料$(li)液体管道：$(reset)4000mb/tick$(reset)，可输送任意普通液体$(br2)$(bold)例外：$(reset)衰竭燃料具有腐蚀性，必须使用专用「封闭性衰竭管道」，普通管道无法输送。$(br2)衰竭燃料的回收路线见《生命的奥秘》。"
     },
     {
       "type": "patchouli:relations",
@@ -19,7 +19,7 @@
         "akaishi:reactor",
         "akaishi:plasma"
       ],
-      "text": "上游看「$(l:akaishi:fuel_system)燃料与散热$(/l)」，下游看「$(l:akaishi:reactor)反应堆$(/l)」；本链最顶级的产物会汇入「$(l:akaishi:plasma)等离子体链$(/l)」继续浓缩。"
+      "text": "上游内容见「$(l:akaishi:fuel_system)燃料与散热$(/l)」，下游见「$(l:akaishi:reactor)反应堆$(/l)」；本链最高档产物汇入「$(l:akaishi:plasma)等离子体链$(/l)」继续浓缩。"
     }
   ]
 }

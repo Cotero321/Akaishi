@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_plant_cultivator",
-      "text": "The Akaishi Plant Cultivator $(4)fast-forwards seeds and stalks into crops$(0) — the seed stays in its slot and is $(bold)never consumed$(0), so one machine can farm forever.$(br2)$(bold)How to use:$(0) drop a seed into the input slot and feed it Akaishi Energy. Each grow takes 200 ticks at 10 energy/tick, with a 100k internal buffer.$(li)Wheat / Beetroot / Melon / Pumpkin Seeds → their crop$(li)Carrot, Potato → themselves$(li)Sugar Cane, Cactus, Bamboo, Cocoa Beans, Nether Wart → themselves$(li)Mushrooms, Crimson & Warped Fungus → themselves$(br2)Outputs only land in the output slot — never seeds. Hook up item pipes for a fully hands-off farm, or slot in upgrades to speed it up."
+      "text": "The Akaishi Plant Cultivator grows seeds and stalks into crops; the seed stays in its slot and is $(bold)never consumed$(reset), so one machine can operate indefinitely.$(br2)$(bold)Usage:$(reset) place a seed in the input slot and supply Akaishi Energy. Each operation takes 200 ticks at 10 energy/tick with a 100k internal buffer.$(li)Wheat, Beetroot, Melon or Pumpkin Seeds → the matching crop$(li)Carrot, Potato → the same item$(li)Sugar Cane, Cactus, Bamboo, Cocoa Beans, Nether Wart → the same item$(li)Mushrooms, Crimson and Warped Fungus → the same item$(br2)Output only appears in the output slot, never seeds. Item pipes can be connected for a fully automated farm, or upgrades can be fitted to increase speed."
     },
     {
       "type": "patchouli:relations",
@@ -16,7 +16,7 @@
         "akaishi:pulverizer",
         "akaishi:crystal"
       ],
-      "text": "The Cultivator grows, the Pulverizer grinds, the Compressor presses — gather this chapter's machines for a fully automated farm. For crystal materials, revisit $(l:akaishi:crystal)Crystal & Essence$(/l)."
+      "text": "The Cultivator grows, the Pulverizer grinds and the Compressor presses; together with the other machines in this chapter they form an automated farm. Crystal materials are covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

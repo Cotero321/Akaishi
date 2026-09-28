@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_hunting_ring",
-      "text": "$(4)Akaishi Hunting Ring$(0) (ring slot, 100k buffer): $(4)15%$(0) chance per kill to drop 1 Akaishi Crystal straight into your inventory — $(bold)no energy used$(0)."
+      "text": "Akaishi Hunting Ring (ring slot, 100k buffer): a 15% chance per kill to drop 1 Akaishi Crystal directly into the inventory. $(bold)No energy is consumed.$(reset)"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_gathering_bracelet",
-      "text": "$(4)Akaishi Gathering Bracelet$(0) (hands slot, 100k buffer): $(4)5%$(0) chance per block mined to drop 1 Akaishi Crystal — also free.$(br2)One farms mobs, the other farms mining. Wear them and you carry a crystal dispenser everywhere."
+      "text": "Akaishi Gathering Bracelet (hands slot, 100k buffer): a 5% chance per block mined to drop 1 Akaishi Crystal, also without energy cost.$(br2)One covers mob drops, the other mining; together they provide a constant crystal supply."
     },
     {
       "type": "patchouli:relations",
@@ -20,7 +20,7 @@
         "akaishi:curios",
         "akaishi:portable_cell"
       ],
-      "text": "Shared mechanics and the slot map live in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; the crystals they drop feed the refining line of $(l:akaishi:crystal)Crystals & Essence$(/l)."
+      "text": "Shared mechanics and the slot map are in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; the crystals they drop feed the refining line of $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

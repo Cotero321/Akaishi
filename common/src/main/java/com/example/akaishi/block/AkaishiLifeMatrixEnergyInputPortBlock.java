@@ -24,7 +24,6 @@ public class AkaishiLifeMatrixEnergyInputPortBlock extends AkaishiMachineBlock {
     public AkaishiLifeMatrixEnergyInputPortBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
     }
 

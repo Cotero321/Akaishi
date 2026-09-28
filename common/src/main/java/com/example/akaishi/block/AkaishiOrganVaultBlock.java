@@ -28,7 +28,6 @@ public class AkaishiOrganVaultBlock extends AkaishiMachineBlock {
     public AkaishiOrganVaultBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_BLUE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

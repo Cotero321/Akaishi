@@ -27,7 +27,6 @@ public class AkaishiPotionCabinetBlock extends AkaishiMachineBlock {
     public AkaishiPotionCabinetBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

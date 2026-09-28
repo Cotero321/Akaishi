@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "NNN",
-    "NCN",
-    "NNN"
-  ],
-  "key": {
-    "N": { "item": "akaishi:netherite_ore_base" },
-    "C": { "item": "akaishi:akaishi_catalyst_advanced" }
-  },
-  "result": { "item": "akaishi:akaishi_catalyst_ultimate", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "KNK", "NCN", "KNK" ], "key": { "K": { "item": "akaishi:akaishi_alloy_steel_ingot" }, "N": { "item": "akaishi:netherite_ore_base" }, "C": { "item": "akaishi:akaishi_catalyst_advanced" } }, "result": { "item": "akaishi:akaishi_catalyst_ultimate", "count": 1 } }

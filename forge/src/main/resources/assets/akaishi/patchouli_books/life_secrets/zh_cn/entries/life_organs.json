@@ -6,17 +6,17 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(bold)器官图鉴$(0)——九件，槽位各一：$(li)$(4)眼部器官$(0)（eye）→ 眼槽$(li)$(4)心脏器官$(0)（heart）→ 心脏槽$(li)$(4)肺部器官$(0)（lungs）→ 肺槽$(li)$(4)内体器官$(0)（viscera）→ 内体槽$(li)$(4)肾脏器官$(0)（kidneys）→ 肾脏槽$(li)$(4)左臂/右臂器官$(0)（left_arm / right_arm）→ 肢体槽$(li)$(4)左腿/右腿器官$(0)（left_leg / right_leg）→ 肢体槽$(br2)前五件占「器官」槽，后四件占「肢体」槽——$(bold)槽位类型$(0)决定排斥与负面效果的规则。"
+      "text": "$(bold)器官图鉴$(reset)——九件，槽位各一：$(li)$(reset)眼部器官$(reset)（eye）→ 眼槽$(li)$(reset)心脏器官$(reset)（heart）→ 心脏槽$(li)$(reset)肺部器官$(reset)（lungs）→ 肺槽$(li)$(reset)内体器官$(reset)（viscera）→ 内体槽$(li)$(reset)肾脏器官$(reset)（kidneys）→ 肾脏槽$(li)$(reset)左臂/右臂器官$(reset)（left_arm / right_arm）→ 肢体槽$(li)$(reset)左腿/右腿器官$(reset)（left_leg / right_leg）→ 肢体槽$(br2)前五件占「器官」槽，后四件占「肢体」槽——$(bold)槽位类型$(reset)决定排斥与负面效果的规则。"
     },
     {
       "type": "patchouli:text",
       "title": "属性与品质",
-      "text": "$(bold)默认模板增益$(0)（基础值，未乘品质）：$(li)眼部：攻击 +0.5、暴击率 +3%$(li)心脏：最大生命 +2$(li)肺部：护甲韧性 +0.5$(li)内体：幸运 +0.5$(li)肾脏：攻击 +0.5$(li)每只手臂：攻击 +0.75、击退抗性 +0.05、暴击伤害 +10%$(li)每条腿：移速 +1.5%、闪避 +2%$(br2)$(bold)品质 I-IV 倍率：1.25 / 1.5 / 1.75 / 2.0$(0)——品质越高增益越大，$(4)初始排斥与排斥增速也越高$(0)：高品器官更强，也更「挑身体」。"
+      "text": "$(bold)默认模板增益$(reset)（基础值，未乘品质）：$(li)眼部：攻击 +0.5、暴击率 +3%$(li)心脏：最大生命 +2$(li)肺部：护甲韧性 +0.5$(li)内体：幸运 +0.5$(li)肾脏：攻击 +0.5$(li)每只手臂：攻击 +0.75、击退抗性 +0.05、暴击伤害 +10%$(li)每条腿：移速 +1.5%、闪避 +2%$(br2)$(bold)品质 I-IV 倍率：1.25 / 1.5 / 1.75 / 2.0$(reset)——品质越高增益越大，$(reset)初始排斥与排斥增速也越高$(reset)。"
     },
     {
       "type": "patchouli:text",
       "title": "一段流程，三台机器",
-      "text": "$(li)1. $(l:akaishi:life_struct)生命结构台$(/l)：基因序列铸器官（必成，完整度取决于纯度）$(li)2. $(l:akaishi:surgery)手术仓$(/l)：装进身体或摘除（要交固态物与生命能量）$(li)3. $(l:akaishi:cultivator)部件培养舱$(/l)：样本提纯、器官升品$(br2)器官供「$(l:akaishi:mother_altar)黑山羊之母祭坛$(/l)」献祭、做护甲材料；排斥管理走「$(l:akaishi:life_potions)生命药剂$(/l)」。"
+      "text": "$(li)1. $(l:akaishi:life_struct)生命结构台$(/l)：基因序列铸器官（必成，完整度取决于纯度）$(li)2. $(l:akaishi:surgery)手术仓$(/l)：装进身体或摘除（要交固态物与生命能量）$(li)3. $(l:akaishi:cultivator)部件培养舱$(/l)：样本提纯、器官升品$(br2)器官可用于「$(l:akaishi:mother_altar)黑山羊之母祭坛$(/l)」献祭与作为护甲材料；排斥管理见「$(l:akaishi:life_potions)生命药剂$(/l)」。"
     },
     {
       "type": "patchouli:relations",
@@ -28,7 +28,7 @@
         "akaishi:life_potions",
         "akaishi:life_vaults"
       ],
-      "text": "阅读顺序：样本出序列 → 结构台铸器官 → 手术仓移植 → 培养舱提纯升品。好器官存「仓库体系」，排斥交给「生命药剂」。"
+      "text": "阅读顺序：样本出序列 → 结构台铸器官 → 手术仓移植 → 培养舱提纯升品。器官存储见「仓库体系」，排斥管理见「生命药剂」。"
     }
   ]
 }

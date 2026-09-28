@@ -38,9 +38,8 @@ public class AkaishiItemTerminalBlock extends AkaishiMachineBlock {
     public AkaishiItemTerminalBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(6.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }
 

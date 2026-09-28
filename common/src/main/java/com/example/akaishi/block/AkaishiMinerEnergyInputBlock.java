@@ -29,7 +29,6 @@ public class AkaishiMinerEnergyInputBlock extends AkaishiMachineBlock {
     public AkaishiMinerEnergyInputBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

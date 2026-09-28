@@ -20,6 +20,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -143,8 +144,24 @@ public final class PlayerBodyCapability {
     };
 
     /**
-     * 躯体总览计算：读取玩家身上由身体系统挂载的临时属性修饰（"Akaishi organ*" 器官加成与
-     * "Akaishi long reach" 长臂），按属性求和 → 实际生效净加成；并附被动叠加计数。
+     * 身体系统属性修饰符名（{@link #collect} 只采集这些来源的真实字符串，避免混入外部 buff）：
+     * <ul>
+     *   <li>{@code "Akaishi organ*"} / {@code "Akaishi long reach"}：生物器官（AkaishiBodyPassiveHandler）；</li>
+     *   <li>{@code "Akaishi mechanical organ"}：机械义体属性（AkaishiBodyPassiveHandler#mountMechanicalAttribute）；</li>
+     *   <li>{@code "akaishi_mech_trait_*"}：机械材料特性（forge .../life/trait/TraitSupport#setModifier）；</li>
+     *   <li>{@code "akaishi_mech_dna_*"}：机械 DNA 效果（forge .../life/dna/MechanicalDnaHandlers#setModifier）。</li>
+     * </ul>
+     * 注意："Akaishi mechanical organ" <b>不</b>以 "Akaishi organ" 开头，必须单独精确匹配，否则机械属性会被整段丢弃。
+     */
+    private static final String MOD_ORGAN = "Akaishi organ";
+    private static final String MOD_LONG_REACH = "Akaishi long reach";
+    private static final String MOD_MECH_ORGAN = "Akaishi mechanical organ";
+    private static final String MOD_MECH_TRAIT = "akaishi_mech_trait_";
+    private static final String MOD_MECH_DNA = "akaishi_mech_dna_";
+
+    /**
+     * 躯体总览计算：读取玩家身上由身体系统挂载的临时属性修饰（生物器官/长臂 + 机械义体/特性/DNA），
+     * 按属性求和 → 实际生效净加成；并附被动叠加计数（生物被动 + 机械特性/DNA）。
      * 固定优先级属性先逐个取实例采集（覆盖全部身体属性，不依赖同步清单顺序），与属性面板数值一致。
      */
     private static BodyOverviewResult overviewOf(ServerPlayer player) {
@@ -171,17 +188,41 @@ public final class PlayerBodyCapability {
             }
         }
         // 被动叠加计数（跨器官来源数，供总览页显示叠加强度/罗马级）
-        List<BodyPassiveEntry> passives = new ArrayList<>();
+        // 以 id 为键合并：镜像类 DNA 效果（night_vision/long_reach 等）与生物被动同 id，
+        // 不合并会在总览里出现两条同名条目；取最大值作为展示强度，来源差异由客户端 tooltip 呈现。
+        Map<String, Integer> passiveLevels = new LinkedHashMap<>();
         IPlayerBodyState state = PlayerBodyHelper.of(player);
         if (state != null) {
             for (OrganPassive passive : OrganPassive.values()) {
                 int count = OrganEffectResolver.countPassive(state, passive);
                 if (count > 0) {
-                    passives.add(new BodyPassiveEntry(passive.getId(), count));
+                    passiveLevels.merge(passive.getId(), count, Math::max);
+                }
+            }
+            // 机械义体被动（材料特性 / DNA 效果）：沿用同一份 state，与生物条目同结构追加。
+            // 条目 id 取资源路径 → 客户端以 "life.akaishi.organ_passive." + id 渲染；
+            List<ItemStack> mechOrgans = MechanicalAggregation.organs(state);
+            for (Map.Entry<String, Integer> trait : MechanicalAggregation.traitLevels(mechOrgans).entrySet()) {
+                String id = passivePath(trait.getKey());
+                if (id != null && trait.getValue() > 0) {
+                    passiveLevels.merge(id, trait.getValue(), Math::max);
+                }
+            }
+            for (Map.Entry<ResourceLocation, Integer> effect : MechanicalAggregation.effectLevels(mechOrgans).entrySet()) {
+                if (effect.getValue() > 0) {
+                    passiveLevels.merge(effect.getKey().getPath(), effect.getValue(), Math::max);
                 }
             }
         }
+        List<BodyPassiveEntry> passives = new ArrayList<>(passiveLevels.size());
+        passiveLevels.forEach((id, level) -> passives.add(new BodyPassiveEntry(id, level)));
         return new BodyOverviewResult(out, passives);
+    }
+
+    /** 资源 ID 字符串 → 路径段（作为 passiveId 拼语言键）；非法 id 返回 null */
+    private static String passivePath(String id) {
+        ResourceLocation rl = ResourceLocation.tryParse(id);
+        return rl == null ? null : rl.getPath();
     }
 
     /** 汇总单个属性实例上属于身体系统的修饰值 */
@@ -191,7 +232,9 @@ public final class PlayerBodyCapability {
         }
         for (AttributeModifier mod : inst.getModifiers()) {
             String name = mod.getName();
-            if (name.startsWith("Akaishi organ") || name.equals("Akaishi long reach")) {
+            if (name.startsWith(MOD_ORGAN) || name.equals(MOD_LONG_REACH)
+                    || name.equals(MOD_MECH_ORGAN)
+                    || name.startsWith(MOD_MECH_TRAIT) || name.startsWith(MOD_MECH_DNA)) {
                 merged.merge(inst.getAttribute(), mod.getAmount(), Double::sum);
             }
         }

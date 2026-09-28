@@ -6,19 +6,19 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "每件赤石饰品都内置能量池，靠共同机制运转：$(li)触发效果时先扣自身能量池$(li)池空后会自动从背包里的「$(l:akaishi:portable_cell)便捷单元$(/l)」抽电续命$(li)出门挂饰品时，包里备一个便携单元就够撑全场$(br2)按用途分三组，各自有专条：$(l:akaishi:curios_income)生财饰品$(/l) 掉晶、$(l:akaishi:curios_defense)防御饰品$(/l) 扛伤、$(l:akaishi:curios_survival)续航饰品$(/l) 回饱食解 debuff。"
+      "text": "每件赤石饰品均内置能量池，运行机制统一：$(li)触发效果时优先消耗自身能量池$(li)能量池耗尽后自动从背包中的「$(l:akaishi:portable_cell)便捷单元$(/l)」取电$(li)外出佩戴饰品时，背包内备一个便捷单元即可维持运行$(br2)按用途分为三组，各有专条：$(l:akaishi:curios_income)生财饰品$(/l)（掉落赤石晶）、$(l:akaishi:curios_defense)防御饰品$(/l)（抵挡伤害）、$(l:akaishi:curios_survival)续航饰品$(/l)（恢复饱食度与解除负面效果）。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)槽位对应（Curios 槽）：$(0)$(li)指环 → ring$(li)手环 → hands$(li)吊坠 → necklace$(li)护符 → charm$(li)胸饰 → body$(li)手镯 → bracelet$(li)腰带件 → belt$(br2)槽位不对装不上，戴之前先看准自己解锁了哪个槽。"
+      "text": "$(bold)槽位对应（Curios 槽）：$(reset)$(li)指环 → ring$(li)手环 → hands$(li)吊坠 → necklace$(li)护符 → charm$(li)胸饰 → body$(li)手镯 → bracelet$(li)腰带件 → belt$(br2)槽位不匹配时无法装备，佩戴前需确认已解锁对应槽位。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)赤石扩展槽：$(0)随赤石进度推进，躯体上会额外长出四个槽位。四个槽名都被乱码遮蔽（游戏内会持续跳动、无法辨读），只能靠槽底图标的颜色区分：红 / 金 / 绿 / 青 依次对应槽一至槽四。$(br2)解锁门槛按「赤石之路」进度树上已完成的节点数计算：槽一需 1 个节点，槽二需 2 个，槽三需 3 个，槽四需 4 个。$(br2)门槛可在配置文件的「赤石饰品扩展槽」分类里逐项调整；关掉「扩展槽需要进度解锁」则四个槽直接全部开启。"
+      "text": "$(bold)赤石扩展槽：$(reset)随赤石进度推进，会额外解锁四个槽位。四个槽位名称显示为乱码（游戏内持续跳动、无法辨读），仅可通过槽底图标颜色区分：红 / 金 / 绿 / 青 依次对应槽一至槽四。$(br2)解锁门槛按「赤石之路」进度树上已完成的节点数计算：槽一需 1 个节点，槽二需 2 个，槽三需 3 个，槽四需 4 个。$(br2)门槛可在配置文件的「赤石饰品扩展槽」分类中逐项调整；关闭「扩展槽需要进度解锁」后，四个槽位直接全部开启。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)这四个槽位真正的归宿：$(0)它们是专为「$(4)禁忌$(0)」系饰品预留的。四件禁忌饰品与槽位颜色一一对应——$(li)$(4)红$(0) → 生命之触$(li)$(4)金$(0) → 幼崽之心$(li)$(4)绿$(0) → 母神之印$(li)$(4)青$(0) → 孕育之环$(br2)四件不靠合成台，只能靠$(4)母神祭坛仪式$(0)凝出，且需要三级祭坛、外圈 8 座祭品与大量生命能量。仪式流程、祭品清单与佩戴代价，详见《生命秘录》中的「禁忌仪式」条目。$(br2)戴上前先想清楚：效果强，代价同样真实。"
+      "text": "$(bold)这四个槽位专为「禁忌」系饰品预留。$(reset)四件禁忌饰品与槽位颜色一一对应：$(li)红 → 生命之触$(li)金 → 幼崽之心$(li)绿 → 母神之印$(li)青 → 孕育之环$(br2)四件均无法在工作台合成，只能通过$(reset)母神祭坛仪式$(reset)获得，且需要三级祭坛、外圈 8 座祭品与大量生命能量。仪式流程、祭品清单与佩戴代价详见《生命秘录》中的「禁忌仪式」条目。$(br2)佩戴前需确认可承受其代价。"
     },
     {
       "type": "patchouli:relations",
@@ -28,7 +28,7 @@
         "akaishi:curios_survival",
         "akaishi:portable_cell"
       ],
-      "text": "三组饰品专条：$(l:akaishi:curios_income)生财$(/l) / $(l:akaishi:curios_defense)防御$(/l) / $(l:akaishi:curios_survival)续航$(/l)；续电的电池见「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
+      "text": "三组饰品专条：$(l:akaishi:curios_income)生财$(/l) / $(l:akaishi:curios_defense)防御$(/l) / $(l:akaishi:curios_survival)续航$(/l)；供电用电池见「$(l:akaishi:portable_cell)便捷单元$(/l)」。"
     }
   ]
 }

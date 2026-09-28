@@ -355,7 +355,7 @@ public class AkaishiPlasmaFillerBlockEntity extends BlockEntity implements
 
     @Override
     public String[] excludedKeys() {
-        return new String[]{"Plasma", "Output"};
+        return new String[]{"Rods", "Plasma", "Output"};
     }
 
     @Override

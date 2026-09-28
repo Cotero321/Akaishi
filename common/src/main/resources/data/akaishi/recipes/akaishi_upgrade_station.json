@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "UUU",
-    "UCU",
-    "UUU"
-  ],
-  "key": {
-    "U": { "item": "akaishi:akaishi_upgrade_template" },
-    "C": { "item": "minecraft:smithing_table" }
-  },
-  "result": { "item": "akaishi:akaishi_upgrade_station", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "URU", "UCU", "URU" ], "key": { "U": { "item": "akaishi:akaishi_upgrade_template" }, "R": { "item": "akaishi:akaishi_redstone_alloy_ingot" }, "C": { "item": "minecraft:smithing_table" } }, "result": { "item": "akaishi:akaishi_upgrade_station", "count": 1 } }

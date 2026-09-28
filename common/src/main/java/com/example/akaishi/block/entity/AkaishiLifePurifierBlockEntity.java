@@ -1,8 +1,10 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
+import com.example.akaishi.api.energy.IWirelessEnergyDemand;
 import com.example.akaishi.api.item.IItemPipeDevice;
 import com.example.akaishi.api.recipe.IMachineProcessKind;
 import com.example.akaishi.config.ModConfig;
@@ -49,10 +51,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AkaishiLifePurifierBlockEntity extends BlockEntity
         implements ExtendedMenuProvider, IEnergyProvider, IItemPipeDevice, IUpgradeableMachine,
-        IMachineProcessKind {
+        IMachineProcessKind, IWirelessEnergyDemand, IDataCarrier {
 
-    public static final int OUTPUT_SLOT = 0;
-    public static final int SLOT_COUNT = 1;
+    /** 输入槽：浓缩赤石精华（固化原料，由配方 ingredient 声明） */
+    public static final int INPUT_SLOT = 0;
+    /** 输出槽：生命能量固态物 */
+    public static final int OUTPUT_SLOT = 1;
+    public static final int SLOT_COUNT = 2;
     /** Menu 同步数据槽：long 各占高低两槽（0/1=赤能量 2/3=赤容量 4/5=生命能量 6/7=生命容量 8=固化进度%） */
     public static final int DATA_AKAISHI_ENERGY = 0, DATA_AKAISHI_ENERGY_HIGH = 1;
     public static final int DATA_AKAISHI_CAPACITY = 2, DATA_AKAISHI_CAPACITY_HIGH = 3;
@@ -121,6 +126,14 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity
                     progressEnergy -= costTotal;
                     // 单次加工生命能量耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
                     life.extractEnergy((long) (ModConfig.lifePurifierLifeCost * getEnergyCostMultiplier()), false);
+                    // 消耗物品原料（浓缩赤石精华）：与产物同一次结算，绝不出现"出了东西没扣料"
+                    ItemStack in = inventory.getItem(INPUT_SLOT);
+                    if (!in.isEmpty()) {
+                        in.shrink(recipe.inputCount());
+                        if (in.isEmpty()) {
+                            inventory.setItem(INPUT_SLOT, ItemStack.EMPTY);
+                        }
+                    }
                     ItemStack product = recipe.result();
                     ItemStack out = inventory.getItem(OUTPUT_SLOT);
                     if (out.isEmpty()) {
@@ -152,18 +165,42 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity
         return AkaishiRecipeTypes.LIFE_PURIFYING.get();
     }
 
-    /** 固化条件：生命能量充足 + 输出可容纳（赤能源检查在 tick 内做，不足时暂停） */
-    private boolean canProcess(IAkaishiMachineRecipe recipe) {
-        // 单次加工生命能量耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
-        if (life.getEnergyStored() < (long) (ModConfig.lifePurifierLifeCost * getEnergyCostMultiplier())) {
-            return false;
-        }
+    /**
+     * 按需补能（{@link IWirelessEnergyDemand}）：本机是池式高耗能机器（每 tick 抽百万级），
+     * 常态直供会被瞬间抽干，故只在"这一轮吃得下"时才申请补能；空闲时完全不占用场域供给。
+     * <p>
+     * <b>刻意不要求生命能量已就位</b>：生命能量与本机赤能源往往由不同链路供给（场域按芯片族供能 / 管道），
+     * 若把它当作申请赤能源的前提，就会出现"没有生命能量 ⇒ 不申请赤能源 ⇒ 不运转 ⇒ 永远等不到生命能量"
+     * 的死锁，表现为"明明接进了场域却供不上电"。
+     */
+    @Override
+    public boolean requestsWirelessTopUp() {
+        IAkaishiMachineRecipe recipe = currentRecipe();
+        return recipe != null && hasInput(recipe) && hasOutputRoom(recipe);
+    }
+
+    /** 物品原料是否到位（配方声明的 ingredient，如浓缩赤石精华） */
+    private boolean hasInput(IAkaishiMachineRecipe recipe) {
+        return recipe.matchesInput(inventory.getItem(INPUT_SLOT));
+    }
+
+    /** 输出槽是否还能容下一次产物 */
+    private boolean hasOutputRoom(IAkaishiMachineRecipe recipe) {
         ItemStack out = inventory.getItem(OUTPUT_SLOT);
         if (out.isEmpty()) {
             return true;
         }
         ItemStack product = recipe.result();
         return out.is(product.getItem()) && out.getCount() + product.getCount() <= out.getMaxStackSize();
+    }
+
+    /** 固化条件：物品原料到位 + 生命能量充足 + 输出可容纳（赤能源检查在 tick 内做，不足时暂停） */
+    private boolean canProcess(IAkaishiMachineRecipe recipe) {
+        if (!hasInput(recipe) || !hasOutputRoom(recipe)) {
+            return false;
+        }
+        // 单次加工生命能量耗能 = 基础 × 速度升级耗能倍率（封顶 4×）
+        return life.getEnergyStored() >= (long) (ModConfig.lifePurifierLifeCost * getEnergyCostMultiplier());
     }
 
     public Container inventory() {
@@ -174,7 +211,12 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity
         return data;
     }
 
-    // ===== IItemPipeDevice：输出槽只允许管道抽取固态物（本机无输入槽） =====
+    // ===== IItemPipeDevice：输入槽只收原料、输出槽只允许管道抽取 =====
+
+    @Override
+    public int[] getPipeInputSlots() {
+        return new int[]{INPUT_SLOT};
+    }
 
     @Override
     public int[] getPipeOutputSlots() {
@@ -310,5 +352,11 @@ public class AkaishiLifePurifierBlockEntity extends BlockEntity
     @Override
     public MachineUpgradeSlots getUpgradeSlots() {
         return upgradeSlots;
+    }
+
+    @Override
+    public String[] excludedKeys() {
+        // 方块 onRemove 不单独掉落任何容器（物品/升级槽均只随 BlockEntityTag 一并保存），故不排除
+        return new String[0];
     }
 }

@@ -25,7 +25,6 @@ public class AkaishiGenFuelInputPortBlock extends AkaishiMachineBlock {
     public AkaishiGenFuelInputPortBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
     }
 

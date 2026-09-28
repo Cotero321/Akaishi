@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "N N",
-    "NAN",
-    "N N"
-  ],
-  "key": {
-    "N": { "item": "akaishi:netherite_ore_base" },
-    "A": { "item": "akaishi:akaishi_miner_controller_super" }
-  },
-  "result": { "item": "akaishi:akaishi_miner_controller_ultimate", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "KNK", "NAN", "KNK" ], "key": { "K": { "item": "akaishi:akaishi_alloy_steel_ingot" }, "N": { "item": "akaishi:netherite_ore_base" }, "A": { "item": "akaishi:akaishi_miner_controller_super" } }, "result": { "item": "akaishi:akaishi_miner_controller_ultimate", "count": 1 } }

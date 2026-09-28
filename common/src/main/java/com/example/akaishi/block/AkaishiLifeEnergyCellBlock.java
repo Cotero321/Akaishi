@@ -33,9 +33,8 @@ public class AkaishiLifeEnergyCellBlock extends AkaishiMachineBlock {
     public AkaishiLifeEnergyCellBlock(LifeEnergyCellTier tier) {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
         this.tier = tier;
     }
 

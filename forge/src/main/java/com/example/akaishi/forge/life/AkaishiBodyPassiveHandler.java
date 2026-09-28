@@ -533,6 +533,7 @@ public final class AkaishiBodyPassiveHandler {
             case SWIM_BOOST -> applyPotion(player, MobEffects.DOLPHINS_GRACE, 0);
             case GLOW -> applyPotion(player, MobEffects.GLOWING, 0);
             case FALL_IMMUNE -> player.fallDistance = 0.0F;
+            // 仅清除缓慢药水效果（蛛网/黏液减速由原版方块行为施加，无干净拦截点，不在此列）
             case SLOW_IMMUNE -> removeEffect(player, MobEffects.MOVEMENT_SLOWDOWN);
             case REGEN -> {
                 // 再生随最强来源品质逐档增强：每来源 +1 点/2 秒起步，每高一级 +0.5（IV 龙/凋灵心 ≈ 2.5 点/2 秒）

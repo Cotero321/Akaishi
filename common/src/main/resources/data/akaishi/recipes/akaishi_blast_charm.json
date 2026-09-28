@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " G ",
-    "GOG",
-    " G "
-  ],
-  "key": {
-    "O": { "item": "akaishi:obsidian_dust" },
-    "G": { "item": "minecraft:gunpowder" }
-  },
-  "result": { "item": "akaishi:akaishi_blast_charm", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " G ", "GOG", " G " ], "key": { "G": { "item": "akaishi:akaishi_ingot" }, "O": { "item": "minecraft:gunpowder" } }, "result": { "item": "akaishi:akaishi_blast_charm", "count": 1 } }

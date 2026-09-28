@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "GMG",
-    "MEM",
-    "GMG"
-  ],
-  "key": {
-    "E": { "item": "akaishi:akaishi_life_energy_cell" },
-    "G": { "item": "akaishi:gold_dust" },
-    "M": { "item": "akaishi:akaishi_machine_component" }
-  },
-  "result": { "item": "akaishi:akaishi_life_energy_cell_advanced", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "PMP", "MEM", "PMP" ], "key": { "P": { "item": "akaishi:akaishi_precision_alloy_ingot" }, "M": { "item": "akaishi:akaishi_machine_component" }, "E": { "item": "akaishi:akaishi_life_energy_cell" } }, "result": { "item": "akaishi:akaishi_life_energy_cell_advanced", "count": 1 } }

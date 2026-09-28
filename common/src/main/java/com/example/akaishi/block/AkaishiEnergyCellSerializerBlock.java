@@ -36,7 +36,6 @@ public class AkaishiEnergyCellSerializerBlock extends AkaishiMachineBlock {
     public AkaishiEnergyCellSerializerBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

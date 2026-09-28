@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "WTW",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "W": { "item": "akaishi:akaishi_wireless_component" },
-    "T": { "item": "akaishi:akaishi_wireless_terminal" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_wireless_portable_terminal", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "WTW", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_wireless_shell" }, "G": { "item": "minecraft:glass" }, "W": { "item": "akaishi:akaishi_wireless_component" }, "T": { "item": "akaishi:akaishi_wireless_terminal" } }, "result": { "item": "akaishi:akaishi_wireless_portable_terminal", "count": 1 } }

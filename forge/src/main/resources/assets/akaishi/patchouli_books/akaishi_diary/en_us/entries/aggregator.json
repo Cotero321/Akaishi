@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_energy_aggregator",
-      "text": "The Energy Aggregator condenses a mountain of Akaishi Energy into something real:$(br2)$(bold)Two uses:$(0)$(li)$(4)10M energy + 1 Netherite Ingot -> 1 Akaishi Ingot$(0)$(li)$(4)10M energy + 1 Geode -> Geode one grade higher$(0) (Flawed -> Normal -> Pristine -> Perfect)$(br2)It carries a $(4)200M$(0) energy buffer and only takes power in — pipe energy over, drop in the material, and it works on its own."
+      "text": "The Energy Aggregator converts large amounts of Akaishi Energy into materials.$(br2)$(bold)Two uses:$(reset)$(li)10M energy + 1 Netherite Ingot → 1 Akaishi Ingot$(li)10M energy + 1 Geode → the Geode one grade higher (Flawed → Normal → Pristine → Perfect)$(br2)It has a 200M energy buffer and accepts power only; energy is piped in and the material is inserted, after which it operates automatically."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Remember this: the Aggregator is the only way to mass-produce Akaishi Ingots.$(0) It gates everything downstream — Akaishi gear, machine components, the whole industrial chain.$(br2)Geode upgrades run through it too: push a Flawed Geode all the way to Perfect and your crystal farm yields several times over.$(br2)Low on power? Add generators, mesh them into one grid with \"$(l:akaishi:energy_pipe)Energy Pipes$(/l)\" and bank it in Energy Cells."
+      "text": "$(bold)Note: the Aggregator is the only method of mass-producing Akaishi Ingots.$(reset) It gates all downstream content: Akaishi equipment, machine components and the industrial chain.$(br2)Geode upgrades also use it; a Flawed Geode upgraded to Perfect multiplies the crystal farm yield several times.$(br2)If power is insufficient, add generators, connect them into one grid with $(l:akaishi:energy_pipe)Energy Pipes$(/l) and store the output in Energy Cells."
     },
     {
       "type": "patchouli:relations",
@@ -20,7 +20,7 @@
         "akaishi:catalyst",
         "akaishi:energy_pipe"
       ],
-      "text": "What the ingots build and how the Geode farm works: see \"$(l:akaishi:ingot)Akaishi Ingot$(/l)\" and \"$(l:akaishi:catalyst)Catalyst$(/l)\"."
+      "text": "Ingot uses and the Geode farm are covered in $(l:akaishi:ingot)Akaishi Ingot$(/l) and $(l:akaishi:catalyst)Catalyst$(/l)."
     }
   ]
 }

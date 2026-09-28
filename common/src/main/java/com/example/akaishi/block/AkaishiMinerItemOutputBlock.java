@@ -30,7 +30,6 @@ public class AkaishiMinerItemOutputBlock extends AkaishiMachineBlock {
     public AkaishiMinerItemOutputBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

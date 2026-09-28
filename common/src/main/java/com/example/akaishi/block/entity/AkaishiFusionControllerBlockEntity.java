@@ -216,6 +216,11 @@ public class AkaishiFusionControllerBlockEntity extends BlockEntity implements E
         }
     }
 
+    /** 服务器停止时整组丢弃活跃控制器表：维度 key 会跨存档复用，不清会残留旧坐标（平台层钩子调用） */
+    public static void clearStatics() {
+        ACTIVE.clear();
+    }
+
     /** 向成型结构内的部件广播控制器坐标 */
     private void broadcastToParts() {
         if (structure == null) {

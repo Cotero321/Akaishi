@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sample_vault",
-      "text": "Sample Vault: a $(4)54-slot$(0) warehouse dedicated to life samples.$(li)Accepts samples only — pipes push samples in too (every slot is pipeable)$(li)Auto-merges identical-NBT samples every 10 ticks, so same source & purity stop hogging separate slots$(br2)Within $(4)3 blocks$(0) of machines like the Gene Analyzer it acts as linked storage. Bank your samples instead of piling them up."
+      "text": "Sample Vault: a $(reset)54-slot$(reset) warehouse dedicated to life samples.$(li)Accepts samples only — pipes push samples in too (every slot is pipeable)$(li)Auto-merges identical-NBT samples every 10 ticks, so same source & purity stop hogging separate slots$(br2)Within $(reset)3 blocks$(reset) of machines like the Gene Analyzer it acts as linked storage. Store samples in the vault rather than keeping them in inventory."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_potion_cabinet",
-      "text": "Potion Cabinet: a $(4)54-slot$(0) warehouse dedicated to potions.$(li)Accepts potions only; every slot is pipeable$(li)Auto-merges identical-NBT potions every 10 ticks (same template, purity and source)$(li)Filter by template in the UI — no more digging through stacks$(br2)Within $(4)3 blocks$(0) of the Potion Table it links in for quick access — keep your staples at hand."
+      "text": "Potion Cabinet: a $(reset)54-slot$(reset) warehouse dedicated to potions.$(li)Accepts potions only; every slot is pipeable$(li)Auto-merges identical-NBT potions every 10 ticks (same template, purity and source)$(li)Filter by template in the UI, allowing lookup by template$(br2)Within $(reset)3 blocks$(reset) of the Potion Table it links in for quick access, keeping common potions accessible."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_organ_vault",
-      "text": "Organ Vault: an organ freezer paged by the body's $(4)9 slots$(0).$(li)$(4)9 pages × 9 slots + 9 staging slots$(0) = 90 slots$(li)Organs auto-file into their own slot page; pipe output draws from the staging area$(li)Life Energy buffer of $(4)100,000$(0), draining 1 per tick to keep organs viable — when empty it only warns, it never blocks access$(br2)A must before large-scale organ hoarding; link it to the Surgery Chamber within 3 blocks, and $(bold)keep its Life Energy topped up$(0)."
+      "text": "Organ Vault: an organ freezer paged by the body's $(reset)9 slots$(reset).$(li)$(reset)9 pages × 9 slots + 9 staging slots$(reset) = 90 slots$(li)Organs auto-file into their own slot page; pipe output draws from the staging area$(li)Life Energy buffer of $(reset)100,000$(reset), draining 1 per tick to keep organs viable — when empty it only warns, it never blocks access$(br2)Required before large-scale organ storage; link it to the Surgery Chamber within 3 blocks, and $(bold)keep its Life Energy topped up$(reset)."
     },
     {
       "type": "patchouli:relations",

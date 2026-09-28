@@ -105,6 +105,10 @@ public class AkaishiEnergyAssemblyBlockEntity extends BlockEntity implements IEn
     }
 
     private void tickServer() {
+        // 结构恒不成型（已停用为纯材料，见类注释）：每 tick 直接早退，不写数据槽、不做成型检测与产能分支
+        if (!isStructureValid()) {
+            return;
+        }
         boolean changed = false;
         LongDataSlots.write(data, DATA_ENERGY_LOW, DATA_ENERGY_HIGH, energy.getEnergyStored());
         LongDataSlots.writeInt(data, DATA_BURN_LOW, DATA_BURN_HIGH, burnEnergy);

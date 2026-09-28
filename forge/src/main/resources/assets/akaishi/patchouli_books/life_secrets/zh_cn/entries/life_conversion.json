@@ -7,17 +7,17 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_controller",
-      "text": "现役主生产线：把海量赤能源炼成生命能量的$(4)唯一来源$(0)。$(br2)$(bold)怎么搭：$(0)$(li)用「生命转换矩阵外壳」围出 $(4)3×3×3$(0) 的中空封闭箱$(li)墙面装「赤能源输入口」与「生命输出口」$(li)控制器$(4)贴墙$(0)安装，结构成型即自动开工；拆任意一块外壳立即停摆$(br2)$(bold)参数：$(0)每 tick 至多 $(4)45 次$(0)转换，单次烧 $(4)1000 万赤能源$(0) 换 $(4)10 点生命能量$(0)——满速约 450 生命/tick，需约 4.5 亿赤/tick 持续供能，$(bold)先喂饱电网再开机$(0)。"
+      "text": "当前主生产线：将海量赤能源炼制成生命能量的$(reset)唯一来源$(reset)。$(br2)$(bold)搭建方式：$(reset)$(li)用「生命转换矩阵外壳」围出 $(reset)3×3×3$(reset) 的中空封闭箱$(li)墙面装「赤能源输入口」与「生命输出口」$(li)控制器$(reset)贴墙$(reset)安装，结构成型后自动运行；拆除任意一块外壳立即停止$(br2)$(bold)参数：$(reset)每 tick 至多 $(reset)45 次$(reset)转换，单次烧 $(reset)1000 万赤能源$(reset) 换 $(reset)10 点生命能量$(reset)——满速约 450 生命/tick，需约 4.5 亿赤/tick 持续供能，$(bold)需先保障电网供能再开机$(reset)。"
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_matrix_energy_input",
-      "text": "$(bold)赤能源输入口$(0)：自带 $(4)1 亿$(0)缓冲，能量管道灌入后逐 tick 喂给控制器，专治单次 10M 消耗的供能落差。$(br2)$(bold)生命输出口$(0)：每 tick 从控制器拉走至多 $(4)450$(0)（满产时）存入自己的 5000 缓冲，供生命能量管道抽取。$(br2)接管道记住一句话：$(bold)输入走赤、输出走命$(0)，别接反。"
+      "text": "$(bold)赤能源输入口$(reset)：自带 $(reset)1 亿$(reset)缓冲，能量管道灌入后逐 tick 喂给控制器，用于缓解单次 10M 消耗造成的供能落差。$(br2)$(bold)生命输出口$(reset)：每 tick 从控制器拉走至多 $(reset)450$(reset)（满产时）存入自己的 5000 缓冲，供生命能量管道抽取。$(br2)$(bold)管道接入规则：$(reset)输入口接赤能源、输出口接生命能量，不可接反。"
     },
     {
       "type": "patchouli:text",
       "title": "旧机器说明",
-      "text": "$(bold)当心过时图纸$(0)：老教程里的「$(4)生命聚合转换器$(0)」与「$(4)生命转换架构$(0)」$(bold)已被矩阵取代$(0)——如今只是带能量缓存的$(4)合成材料$(0)，不再单独运转、结构永远不成型。$(br2)留作建材没问题，想靠它们炼命？$(bold)搭矩阵去$(0)。"
+      "text": "$(bold)过时机器说明$(reset)：旧版说明中的「$(reset)生命聚合转换器$(reset)」与「$(reset)生命转换架构$(reset)」$(bold)已被矩阵取代$(reset)——如今只是带能量缓存的$(reset)合成材料$(reset)，不再单独运转、结构永远不成型。$(br2)二者可作为建材使用，但已不再具备炼制生命能量的功能。"
     },
     {
       "type": "patchouli:relations",
@@ -26,7 +26,7 @@
         "akaishi:life_path",
         "akaishi:life_purifier"
       ],
-      "text": "能量存与传看「$(l:akaishi:life_energy)生命能量$(/l)」；炼出的能量下一步固化成货币，见「$(l:akaishi:life_purifier)生命能量提纯器$(/l)」。"
+      "text": "能量的存储与传输见「$(l:akaishi:life_energy)生命能量$(/l)」；炼出的能量下一步固化为货币，见「$(l:akaishi:life_purifier)生命能量提纯器$(/l)」。"
     }
   ]
 }

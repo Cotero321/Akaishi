@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_sword",
-      "text": "赤石装备是下界合金的$(4)强化版$(0)，面板约 ×1.25：$(li)护甲值 $(4){4,7,10,4}$(0)（靴/腿/胸/头），韧性 4$(li)击退抗性 0.1，附魔能力 15$(li)剑攻击 11 点，镐/锹/斧同理强于下界合金$(br2)$(bold)它们不再能工作台合成$(0)——正门在下面的赤石装备打造器。"
+      "text": "赤石装备是下界合金装备的$(reset)强化版本$(reset)，面板数值约为其 ×1.25：$(li)护甲值 $(reset){4,7,10,4}$(reset)（靴/腿/胸/头），韧性 4$(li)击退抗性 0.1，附魔能力 15$(li)剑攻击 11 点，镐/锹/斧同样强于下界合金$(br2)$(bold)无法在工作台合成$(reset)，唯一获取途径为赤石装备打造器。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)打造：$(0)所有赤石装备都从「$(l:akaishi:equipment_forger)赤石装备打造器$(/l)」重铸而来——喂下界合金装备与赤石锭，按部位扣费。$(br2)$(bold)强化：$(0)重铸完还能上「$(l:akaishi:upgrade_station)赤红升级台$(/l)」附加特殊能力，门票是「$(l:akaishi:upgrade_template)赤红升级模板$(/l)」。$(br2)想挂机攒锭，先去读「$(l:akaishi:ingot)赤石锭$(/l)」。"
+      "text": "$(bold)打造：$(reset)所有赤石装备均由「$(l:akaishi:equipment_forger)赤石装备打造器$(/l)」重铸获得，投入下界合金装备与赤石锭，按部位扣除锭数。$(br2)$(bold)强化：$(reset)重铸后可在「$(l:akaishi:upgrade_station)赤红升级台$(/l)」附加特殊能力，消耗「$(l:akaishi:upgrade_template)赤红升级模板$(/l)」。$(br2)赤石锭的获取见「$(l:akaishi:ingot)赤石锭$(/l)」。"
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:upgrade_template",
         "akaishi:ingot"
       ],
-      "text": "打造器、升级台、模板是一套流程：打造 → 附能力 → 再附能力；赤石锭则是重铸的燃料。"
+      "text": "打造器、升级台与模板构成完整流程：打造 → 附加能力 → 再次附加；赤石锭为重铸所需材料。"
     }
   ]
 }

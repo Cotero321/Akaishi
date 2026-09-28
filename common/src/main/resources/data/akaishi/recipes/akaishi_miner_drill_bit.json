@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IDI", "DFD", "IDI" ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "D": { "item": "akaishi:diamond_dust" }, "F": { "item": "akaishi:akaishi_miner_frame" } }, "result": { "item": "akaishi:akaishi_miner_drill_bit", "count": 1 } }

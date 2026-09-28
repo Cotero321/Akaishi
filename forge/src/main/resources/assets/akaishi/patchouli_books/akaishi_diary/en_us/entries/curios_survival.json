@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_satiation_charm",
-      "text": "$(4)Akaishi Satiation Charm$(0) (charm slot, 500k buffer): when saturation drops below 5 it restores +0.1 every tick. The food supply, in trinket form."
+      "text": "Akaishi Satiation Charm (charm slot, 500k buffer): when saturation drops below 5, restores +0.1 saturation every tick."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_antidote_bracelet",
-      "text": "$(4)Akaishi Antidote Bracelet$(0) (bracelet slot, 200k buffer): instantly cures poison, $(4)500 energy per use$(0).$(br2)$(bold)Akaishi Wither Charm$(0) (belt slot, 200k buffer): instantly cures wither, $(4)1000 energy per use$(0).$(br2)Between them they chew through the nastiest debuffs the moment they land."
+      "text": "Akaishi Antidote Bracelet (bracelet slot, 200k buffer): immediately cures poison for 500 energy per use.$(br2)$(bold)Akaishi Wither Charm$(reset) (belt slot, 200k buffer): immediately cures wither for 1000 energy per use.$(br2)Together they remove these debuffs as soon as they are applied."
     },
     {
       "type": "patchouli:relations",
@@ -20,7 +20,7 @@
         "akaishi:curios",
         "akaishi:portable_cell"
       ],
-      "text": "Shared mechanics and the slot map live in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; the battery that keeps them going is the $(l:akaishi:portable_cell)Portable Cell$(/l)."
+      "text": "Shared mechanics and the slot map are in the $(l:akaishi:curios)Akaishi Trinkets$(/l) overview; they are powered by the $(l:akaishi:portable_cell)Portable Cell$(/l)."
     }
   ]
 }

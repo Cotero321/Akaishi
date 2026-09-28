@@ -22,7 +22,6 @@ public class AkaishiItemTerminalEnergyInputPortBlock extends AkaishiMachineBlock
     public AkaishiItemTerminalEnergyInputPortBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
     }
 

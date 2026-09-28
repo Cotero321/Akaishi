@@ -45,7 +45,6 @@ public class AkaishiWirelessAccessAdapterBlock extends AkaishiMachineBlock {
     public AkaishiWirelessAccessAdapterBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         registerDefaultState(stateDefinition.any().setValue(LINKED, false));
     }

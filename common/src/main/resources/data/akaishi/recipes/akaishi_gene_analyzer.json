@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "GLG",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "L": { "item": "akaishi:lapis_dust" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_gene_analyzer", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IGI", "GLG", "IPI" ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "G": { "item": "minecraft:glass" }, "L": { "item": "akaishi:lapis_dust" }, "P": { "item": "akaishi:akaishi_precision_alloy_ingot" } }, "result": { "item": "akaishi:akaishi_gene_analyzer", "count": 1 } }

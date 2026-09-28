@@ -184,14 +184,16 @@ public final class AkaishiUpgradeHelper {
         }
     }
 
-    /** 剩余升级槽位 */
+    /** 剩余升级槽位（只读：不得创建 NBT，客户端渲染循环会调用；无标签按 0） */
     public static int getSlots(ItemStack stack) {
-        return gearTag(stack).getInt(TAG_SLOTS);
+        CompoundTag tag = stack.getTagElement(TAG);
+        return tag == null ? 0 : tag.getInt(TAG_SLOTS);
     }
 
-    /** 某升级项当前计数 */
+    /** 某升级项当前计数（只读：无标签按 0） */
     public static int getCount(ItemStack stack, String key) {
-        return gearTag(stack).getInt(key);
+        CompoundTag tag = stack.getTagElement(TAG);
+        return tag == null ? 0 : tag.getInt(key);
     }
 
     /** 初始化一件赤石装备（锻造产出时调用）：初始 4 槽，清空所有升级 */

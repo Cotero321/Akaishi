@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "GBG",
-    "BCB",
-    "GBG"
-  ],
-  "key": {
-    "B": { "item": "akaishi:redstone_ore_base" },
-    "C": { "item": "akaishi:akaishi_collector_basic" },
-    "G": { "item": "akaishi:gold_dust" }
-  },
-  "result": { "item": "akaishi:akaishi_collector_medium", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SBS", "BCB", "SBS" ], "key": { "S": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "B": { "item": "akaishi:redstone_ore_base" }, "C": { "item": "akaishi:akaishi_collector_basic" } }, "result": { "item": "akaishi:akaishi_collector_medium", "count": 1 } }

@@ -37,7 +37,6 @@ public class AkaishiEnergyGeneratorBlock extends AkaishiMachineBlock {
     public AkaishiEnergyGeneratorBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FORMED, false));
     }

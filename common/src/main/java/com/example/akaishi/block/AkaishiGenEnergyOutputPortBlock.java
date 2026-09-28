@@ -24,7 +24,6 @@ public class AkaishiGenEnergyOutputPortBlock extends AkaishiMachineBlock {
     public AkaishiGenEnergyOutputPortBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
     }
 

@@ -46,7 +46,6 @@ public class AkaishiMinerControllerBlock extends AkaishiMachineBlock {
     public AkaishiMinerControllerBlock(AkaishiMinerTier tier) {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(4.0F)
                 .sound(SoundType.METAL));
         this.tier = tier;
         this.registerDefaultState(this.stateDefinition.any()

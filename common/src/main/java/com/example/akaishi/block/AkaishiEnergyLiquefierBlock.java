@@ -29,7 +29,6 @@ public class AkaishiEnergyLiquefierBlock extends AkaishiMachineBlock {
     public AkaishiEnergyLiquefierBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_BLACK)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

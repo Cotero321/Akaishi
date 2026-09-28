@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "等离子体链 = $(4)燃料的终极形态$(0)：把普通燃料一步步浓缩成等离子体燃料棒，专供聚变堆。$(br2)$(bold)上游：$(0)本链原料「活化结晶」产自衰竭燃料的活化器 → 离心机路线——那是《生命的奥秘》的内容。$(br2)$(bold)本链三步，逐台入口：$(0)$(li)「$(l:akaishi:plasma_fractionator)活化分馏器$(/l)」：活化结晶切成活化成分$(li)「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」：活化成分聚成等离子体$(li)「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」：等离子体灌进反应棒$(br2)成品直接喂「$(l:akaishi:fusion)聚变堆$(/l)」。"
+      "text": "等离子体链为$(reset)燃料的最高形态$(reset)：将普通燃料逐级浓缩为等离子体燃料棒，专供聚变堆使用。$(br2)$(bold)上游：$(reset)本链原料「活化结晶」产自衰竭燃料的活化器 → 离心机路线，属于《生命的奥秘》的内容。$(br2)$(bold)本链共三步，各步骤入口：$(reset)$(li)「$(l:akaishi:plasma_fractionator)活化分馏器$(/l)」：将活化结晶切割为活化成分$(li)「$(l:akaishi:plasma_aggregator)聚变燃料聚合器$(/l)」：将活化成分聚合为等离子体$(li)「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」：将等离子体灌入反应棒$(br2)成品直接送入「$(l:akaishi:fusion)聚变堆$(/l)」。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)物流专线：$(0)等离子体只能走$(4)等离子体管道 / 等离子体燃料储罐$(0)，普通液体管道一概不认——从聚合器到填装器先铺好这条专线，一滴不洒。$(br2)三种燃料棒总能量都是 $(4)6 万亿$(0)，只是脾气各异：怎么挑、怎么烧，见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」专条。"
+      "text": "$(bold)物流要求：$(reset)等离子体只能通过$(reset)等离子体管道或等离子体燃料储罐$(reset)输送，普通液体管道无法输送；从聚合器到填装器需先铺好这条专线。$(br2)三种燃料棒的总能量均为 $(reset)6 万亿$(reset)，差异体现在输出方式与热值，选择方法见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」专条。"
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:plasma_rods",
         "akaishi:fusion"
       ],
-      "text": "产线三台机器与成品棒的专条都在上方；最终烧掉它们的是「$(l:akaishi:fusion)聚变堆$(/l)」。"
+      "text": "产线三台机器与成品燃料棒的专条见上方条目；最终消耗它们的是「$(l:akaishi:fusion)聚变堆$(/l)」。"
     }
   ]
 }

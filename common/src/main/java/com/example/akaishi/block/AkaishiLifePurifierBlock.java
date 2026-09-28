@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
  * 消耗赤能源（输入率 1M/t）驱动，每 1000 生命能量 + 10M 赤能源
  * 提纯固化出 1 个生命能量固态物（物品）。
  */
-public class AkaishiLifePurifierBlock extends BaseEntityBlock {
+public class AkaishiLifePurifierBlock extends AkaishiMachineBlock {
 
     public AkaishiLifePurifierBlock() {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

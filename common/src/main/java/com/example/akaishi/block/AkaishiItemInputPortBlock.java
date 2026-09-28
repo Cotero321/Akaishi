@@ -40,7 +40,6 @@ public class AkaishiItemInputPortBlock extends AkaishiMachineBlock {
     public AkaishiItemInputPortBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }

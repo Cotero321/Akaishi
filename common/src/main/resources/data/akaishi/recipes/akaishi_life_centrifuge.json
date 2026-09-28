@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "ICI",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "C": { "item": "akaishi:emerald_ore_base" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_life_centrifuge", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IGI", "ICI", "IRI" ], "key": { "I": { "item": "akaishi:akaishi_ingot" }, "G": { "item": "minecraft:glass" }, "C": { "item": "akaishi:emerald_ore_base" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" } }, "result": { "item": "akaishi:akaishi_life_centrifuge", "count": 1 } }

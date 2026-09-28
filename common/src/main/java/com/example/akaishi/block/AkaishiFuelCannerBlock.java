@@ -29,7 +29,6 @@ public class AkaishiFuelCannerBlock extends AkaishiMachineBlock {
     public AkaishiFuelCannerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_GRAY)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

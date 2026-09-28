@@ -21,7 +21,6 @@ public class AkaishiMinerDrillBitBlock extends AkaishiMachineBlock {
     public AkaishiMinerDrillBitBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GRAY)
-                .strength(6.0F)
                 .sound(SoundType.METAL));
     }
 

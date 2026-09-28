@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_upgrade_template",
-      "text": "The Upgrade Template is the \"ticket\" for the Upgrade Station: at the \"$(l:akaishi:upgrade_station)Upgrade Station$(/l)\", every level of a special ability eats 1 template — plus $(4)20M$(0) energy and 1 upgrade slot on the gear.$(br2)Stock up before you tackle top-tier gear: templates are power."
+      "text": "The Upgrade Template is required by the $(l:akaishi:upgrade_station)Upgrade Station$(/l): each level of a special ability consumes 1 template plus 20M energy and 1 upgrade slot on the gear.$(br2)Large quantities should be prepared before producing top-tier gear."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Don't confuse it with this family of upgrades$(0) (each has its own job):$(li)$(4)Red Machine Component / Akaishi Advanced Mechanism$(0): shared machine crafting materials, upstream of dozens of recipes$(li)$(4)Energy Generation Upgrade$(0): fits the generator/matrix slots (max 10). Each level multiplies output by x1.75 but cuts yield by 1%, total = 1.75^n x (1 - 0.01n)$(li)$(4)Machine Speed / Machine Energy Upgrade$(0): go into the two upgrade slots of generic machines; +12.5% speed and +50% energy capacity per level, $(4)capped at 8$(0)$(br2)Templates buff gear; those buff machines. Don't buy the wrong ticket."
+      "text": "$(bold)Do not confuse it with the following upgrade items$(reset) (each has a distinct purpose):$(li)Red Machine Component / Akaishi Advanced Mechanism: shared machine crafting materials used by many recipes$(li)Energy Generation Upgrade: fits generator/matrix slots (max 10). Each level multiplies output by ×1.75 but reduces yield by 1%, total = 1.75^n × (1 - 0.01n)$(li)Machine Speed / Machine Energy Upgrade: fit the two upgrade slots of generic machines; each level gives +12.5% speed and +50% energy capacity, capped at 8$(br2)Templates upgrade gear; these items upgrade machines."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:pulverizer",
         "akaishi:transformer"
       ],
-      "text": "How to spend templates: \"$(l:akaishi:equipment)Equipment$(/l)\". Where machine upgrades slot in: start with \"$(l:akaishi:pulverizer)Pulverizer$(/l)\" and \"$(l:akaishi:transformer)Transformer$(/l)\"."
+      "text": "Template usage is described in $(l:akaishi:equipment)Equipment$(/l). Machine upgrade slots are shown in the $(l:akaishi:pulverizer)Pulverizer$(/l) and $(l:akaishi:transformer)Transformer$(/l) entries."
     }
   ]
 }

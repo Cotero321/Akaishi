@@ -1,6 +1,6 @@
 {
   "name": "Advanced Industry",
-  "description": "Automation & gear: the Aggregator forges Akaishi Ingots, Catalyst + Collector run crystal farms, pipes move items, and the Forger builds your equipment.$(br)Akaishi Ingots shine here.",
+  "description": "Automation and equipment. The Aggregator produces Akaishi Ingots, the Catalyst and Collector operate crystal farms, pipes transport items, and the Forger builds equipment.$(br)The Akaishi Ingot is the central material of this chapter.",
   "icon": "akaishi:akaishi_catalyst_basic",
   "sortnum": 5
 }

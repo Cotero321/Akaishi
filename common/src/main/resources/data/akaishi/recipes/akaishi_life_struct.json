@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "LDL",
-    "LSL",
-    "LLL"
-  ],
-  "key": {
-    "D": { "item": "akaishi:diamond_dust" },
-    "L": { "item": "minecraft:lapis_block" },
-    "S": { "item": "akaishi:akaishi_life_purifier" }
-  },
-  "result": { "item": "akaishi:akaishi_life_struct", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "LDL", "RSR", "LLL" ], "key": { "L": { "item": "minecraft:lapis_block" }, "D": { "item": "akaishi:diamond_dust" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" }, "S": { "item": "akaishi:akaishi_life_purifier" } }, "result": { "item": "akaishi:akaishi_life_struct", "count": 1 } }

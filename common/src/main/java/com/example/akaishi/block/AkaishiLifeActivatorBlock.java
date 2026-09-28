@@ -34,7 +34,6 @@ public class AkaishiLifeActivatorBlock extends AkaishiMachineBlock {
     public AkaishiLifeActivatorBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

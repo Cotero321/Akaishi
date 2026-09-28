@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IHI",
-    "PFP",
-    "IHI"
-  ],
-  "key": {
-    "P": { "item": "akaishi:akaishi_item_pipe" },
-    "F": { "item": "minecraft:crafting_table" },
-    "I": { "item": "akaishi:akaishi_ingot" },
-    "H": { "item": "minecraft:hopper" }
-  },
-  "result": { "item": "akaishi:akaishi_fusion_item_input", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SHS", "PFP", "SHS" ], "key": { "S": { "item": "akaishi:akaishi_fusion_shell" }, "H": { "item": "minecraft:hopper" }, "P": { "item": "akaishi:akaishi_item_pipe" }, "F": { "item": "minecraft:crafting_table" } }, "result": { "item": "akaishi:akaishi_fusion_item_input", "count": 1 } }

@@ -25,7 +25,6 @@ public class AkaishiPurifierItemOutputPortBlock extends AkaishiMachineBlock {
     public AkaishiPurifierItemOutputPortBlock() {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED)
-                .strength(3.5F)
                 .sound(SoundType.METAL));
     }
 

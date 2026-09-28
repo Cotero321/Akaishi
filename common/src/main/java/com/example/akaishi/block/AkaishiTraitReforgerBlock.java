@@ -29,7 +29,6 @@ public class AkaishiTraitReforgerBlock extends AkaishiMachineBlock {
     public AkaishiTraitReforgerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

@@ -27,9 +27,8 @@ public class AkaishiBodyScannerBlock extends AkaishiMachineBlock {
     public AkaishiBodyScannerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE)
-                .strength(5.0F, 6.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

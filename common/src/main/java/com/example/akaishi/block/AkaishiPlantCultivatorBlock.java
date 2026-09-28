@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiPlantCultivatorBlock extends AkaishiMachineBlock {
 
     public AkaishiPlantCultivatorBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_GREEN).strength(5.0F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_GREEN).sound(SoundType.METAL));
     }
 
     @Nullable

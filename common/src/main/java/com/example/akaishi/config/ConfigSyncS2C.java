@@ -37,6 +37,7 @@ public final class ConfigSyncS2C {
             int fusionTempOptMax = buf.readVarInt();
             int aggregatorProcessTicks = buf.readVarInt();
             int fillerProcessTicks = buf.readVarInt();
+            int fractionatorProcessTicks = buf.readVarInt();
             int[] cultivatorUpgradeSuccess = readArray(buf);
             int[] cultivatorPurifySuccess = readArray(buf);
             long surgeryImplantLifeCost = buf.readVarLong();
@@ -100,6 +101,7 @@ public final class ConfigSyncS2C {
                 ModConfig.fusionTempOptMax = fusionTempOptMax;
                 ModConfig.aggregatorProcessTicks = aggregatorProcessTicks;
                 ModConfig.fillerProcessTicks = fillerProcessTicks;
+                ModConfig.fractionatorProcessTicks = fractionatorProcessTicks;
                 ModConfig.cultivatorUpgradeSuccess = cultivatorUpgradeSuccess;
                 ModConfig.cultivatorPurifySuccess = cultivatorPurifySuccess;
                 ModConfig.surgeryImplantLifeCost = surgeryImplantLifeCost;
@@ -166,6 +168,7 @@ public final class ConfigSyncS2C {
         buf.writeVarInt(ModConfig.fusionTempOptMax);
         buf.writeVarInt(ModConfig.aggregatorProcessTicks);
         buf.writeVarInt(ModConfig.fillerProcessTicks);
+        buf.writeVarInt(ModConfig.fractionatorProcessTicks);
         writeArray(buf, ModConfig.cultivatorUpgradeSuccess);
         writeArray(buf, ModConfig.cultivatorPurifySuccess);
         buf.writeVarLong(ModConfig.surgeryImplantLifeCost);
@@ -219,23 +222,28 @@ public final class ConfigSyncS2C {
         NetworkManager.sendToPlayer(player, CHANNEL, buf);
     }
 
+    /** 列表同步上限：写端与读端必须一致，否则超长配置会导致协议错位（后续字段整体偏移） */
+    private static final int MAX_ARRAY = 64;
+
     private static void writeArray(FriendlyByteBuf buf, int[] arr) {
-        buf.writeVarInt(arr.length);
-        for (int v : arr) {
-            buf.writeVarInt(v);
+        int n = Math.min(MAX_ARRAY, arr.length);
+        buf.writeVarInt(n);
+        for (int i = 0; i < n; i++) {
+            buf.writeVarInt(arr[i]);
         }
     }
 
     /** 写入 long[] 数组（长度 + 逐元素 VarLong） */
     private static void writeLongArray(FriendlyByteBuf buf, long[] arr) {
-        buf.writeVarInt(arr.length);
-        for (long v : arr) {
-            buf.writeVarLong(v);
+        int n = Math.min(MAX_ARRAY, arr.length);
+        buf.writeVarInt(n);
+        for (int i = 0; i < n; i++) {
+            buf.writeVarLong(arr[i]);
         }
     }
 
     private static int[] readArray(FriendlyByteBuf buf) {
-        int n = Math.max(0, Math.min(16, buf.readVarInt()));
+        int n = Math.max(0, Math.min(MAX_ARRAY, buf.readVarInt()));
         int[] arr = new int[n];
         for (int i = 0; i < n; i++) {
             arr[i] = buf.readVarInt();
@@ -243,9 +251,9 @@ public final class ConfigSyncS2C {
         return arr;
     }
 
-    /** 读取 long[] 数组（长度防溢出上限 16） */
+    /** 读取 long[] 数组（长度防溢出上限 MAX_ARRAY） */
     private static long[] readLongArray(FriendlyByteBuf buf) {
-        int n = Math.max(0, Math.min(16, buf.readVarInt()));
+        int n = Math.max(0, Math.min(MAX_ARRAY, buf.readVarInt()));
         long[] arr = new long[n];
         for (int i = 0; i < n; i++) {
             arr[i] = buf.readVarLong();

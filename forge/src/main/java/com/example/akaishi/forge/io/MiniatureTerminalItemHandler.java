@@ -32,25 +32,11 @@ public final class MiniatureTerminalItemHandler implements IItemHandler, ICapabi
     private final MiniatureTerminalBlockEntity terminal;
     private final LazyOptional<IItemHandler> self = LazyOptional.of(() -> this);
 
-    /** 输/出槽位方向表（构造时按设备声明固化，槽位集合在设备生命周期内不变） */
-    private final boolean[] canInsert;
-    private final boolean[] canExtract;
-
     public MiniatureTerminalItemHandler(MiniatureTerminalBlockEntity terminal) {
+        // 构造期**不得**读取槽位信息：本能力是在 BE 的 super() 里（gatherCapabilities）挂载的，
+        // 此刻装载状态 state 尚未建立，getContainerSize() 恒为 0，据此固化的方向表会永久为空。
+        // 槽位集合随装载/读档建立，故方向一律在访问时惰性查询设备。
         this.terminal = terminal;
-        int n = terminal.getContainerSize();
-        this.canInsert = new boolean[n];
-        this.canExtract = new boolean[n];
-        for (int slot : terminal.getPipeInputSlots()) {
-            if (slot >= 0 && slot < n) {
-                canInsert[slot] = true;
-            }
-        }
-        for (int slot : terminal.getPipeOutputSlots()) {
-            if (slot >= 0 && slot < n) {
-                canExtract[slot] = true;
-            }
-        }
     }
 
     @Override
@@ -76,12 +62,12 @@ public final class MiniatureTerminalItemHandler implements IItemHandler, ICapabi
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         // 零副作用整堆预检：空间与费用都过才承诺收下
-        return inRange(slot) && canInsert[slot] && terminal.canPlaceItem(slot, stack);
+        return inRange(slot) && canInsert(slot) && terminal.canPlaceItem(slot, stack);
     }
 
     @Override
     public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        if (stack.isEmpty() || !inRange(slot) || !canInsert[slot]) {
+        if (stack.isEmpty() || !inRange(slot) || !canInsert(slot)) {
             return stack; // 越界/空栈/非输入槽 → 原样退回
         }
         int batch = Math.min(stack.getCount(), terminal.getMaxStackSize());
@@ -102,7 +88,7 @@ public final class MiniatureTerminalItemHandler implements IItemHandler, ICapabi
 
     @Override
     public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (amount <= 0 || !inRange(slot) || !canExtract[slot]) {
+        if (amount <= 0 || !inRange(slot) || !canExtract(slot)) {
             return ItemStack.EMPTY; // 非输出槽 → 抽不到
         }
         ItemStack preview = terminal.getItem(slot);
@@ -119,5 +105,24 @@ public final class MiniatureTerminalItemHandler implements IItemHandler, ICapabi
 
     private boolean inRange(int slot) {
         return slot >= 0 && slot < terminal.getContainerSize();
+    }
+
+    /** 输入槽 = 设备声明的可插槽（未装载时为空集，一切插入原样退回） */
+    private boolean canInsert(int slot) {
+        return contains(terminal.getPipeInputSlots(), slot);
+    }
+
+    /** 输出槽 = 设备声明的可抽槽（未装载时为空集，一切抽取返回空堆） */
+    private boolean canExtract(int slot) {
+        return contains(terminal.getPipeOutputSlots(), slot);
+    }
+
+    private static boolean contains(int[] slots, int slot) {
+        for (int s : slots) {
+            if (s == slot) {
+                return true;
+            }
+        }
+        return false;
     }
 }

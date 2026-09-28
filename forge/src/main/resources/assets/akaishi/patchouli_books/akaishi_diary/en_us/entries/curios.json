@@ -6,19 +6,19 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Every Akaishi trinket runs on the same shared machinery:$(li)each effect drains its own internal energy buffer first$(li)when the buffer runs dry, the trinket sips power from the $(l:akaishi:portable_cell)Portable Cells$(/l) in your inventory$(li)carry one cell and the whole set stays alive on the go$(br2)They split into three roles, each with its own entry: $(l:akaishi:curios_income)Fortune Trinkets$(/l) drop crystals, $(l:akaishi:curios_defense)Defense Trinkets$(/l) shrug off damage, $(l:akaishi:curios_survival)Sustain Trinkets$(/l) feed you and cure debuffs."
+      "text": "All Akaishi trinkets share the same energy handling:$(li)each effect drains its own internal energy buffer first$(li)when the buffer is depleted, the trinket draws power from $(l:akaishi:portable_cell)Portable Cells$(/l) in the inventory$(li)one cell keeps the whole set operational away from the base$(br2)They are divided into three roles, each with its own entry: $(l:akaishi:curios_income)Fortune Trinkets$(/l) drop crystals, $(l:akaishi:curios_defense)Defense Trinkets$(/l) reduce damage, and $(l:akaishi:curios_survival)Sustain Trinkets$(/l) provide food and cure debuffs."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Slot map (Curios):$(0)$(li)rings -> ring$(li)bracelets -> hands$(li)pendants -> necklace$(li)charms -> charm$(li)chest trinkets -> body$(li)bangles -> bracelet$(li)waist trinkets -> belt$(br2)Wrong slot? It won't equip. Check which slots you have unlocked before you wear anything."
+      "text": "$(bold)Slot map (Curios):$(reset)$(li)rings → ring$(li)bracelets → hands$(li)pendants → necklace$(li)charms → charm$(li)chest trinkets → body$(li)bangles → bracelet$(li)waist trinkets → belt$(br2)An item placed in the wrong slot cannot be equipped. Available slots should be checked before equipping."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Akaishi extension slots:$(0) as your Akaishi progress advances, four extra slots grow on your body. All four names are masked by gibberish (they flicker in-game and cannot be read), so tell them apart by the icon colour at the bottom of the slot: red / gold / green / aqua map to slots one through four.$(br2)Thresholds are counted in completed nodes on the Akaishi Path advancement tree: slot one needs 1 node, slot two needs 2, slot three needs 3, slot four needs 4.$(br2)Tune each threshold under the \"Akaishi curio extension slots\" config category; turn off \"Extension slots require progress\" to open all four at once."
+      "text": "$(bold)Akaishi extension slots:$(reset) four additional slots are unlocked on the body as Akaishi progression advances. The slot names are displayed as unreadable text, so they are distinguished by the icon colour at the bottom of the slot: red, gold, green and aqua correspond to slots one through four.$(br2)Thresholds are counted in completed nodes on the Akaishi Path advancement tree: slot one requires 1 node, slot two requires 2, slot three requires 3 and slot four requires 4.$(br2)Each threshold can be adjusted under the Akaishi curio extension slots config category; disabling Extension slots require progress unlocks all four immediately."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)What these four slots are really for:$(0) they exist for the $(4)Forbidden$(0) trinkets. Each forbidden trinket maps to one slot colour —$(li)$(4)red$(0) -> Touch of a Thousand Hands$(li)$(4)gold$(0) -> Quickening of the Cub$(li)$(4)green$(0) -> The Mother's Gaze$(li)$(4)aqua$(0) -> Endless Gestation$(br2)None of the four comes from a crafting table. They can only be condensed by the $(4)Mother Altar ritual$(0), which needs a Tier 3 altar, 8 outer offerings and a large amount of life energy. For the full ritual, the offering list and the price of wearing them, see the \"Forbidden Ritual\" entry in Life's Secrets.$(br2)Think it over before you wear one — the boons are strong, and so is the cost."
+      "text": "$(bold)Purpose of these four slots:$(reset) they are used by the Forbidden trinkets. Each forbidden trinket corresponds to one slot colour:$(li)red → Touch of a Thousand Hands$(li)gold → Quickening of the Cub$(li)green → The Mother's Gaze$(li)aqua → Endless Gestation$(br2)None of the four is craftable at a table. They are produced only by the Mother Altar ritual, which requires a Tier 3 altar, 8 outer offerings and a large amount of life energy. The complete ritual, offering list and wearing cost are in the Forbidden Ritual entry in Life's Secrets.$(br2)Wearing one has strong effects and a correspondingly high cost."
     },
     {
       "type": "patchouli:relations",
@@ -28,7 +28,7 @@
         "akaishi:curios_survival",
         "akaishi:portable_cell"
       ],
-      "text": "The three group entries: $(l:akaishi:curios_income)Fortune$(/l) / $(l:akaishi:curios_defense)Defense$(/l) / $(l:akaishi:curios_survival)Sustain$(/l); the battery that keeps them going is the $(l:akaishi:portable_cell)Portable Cell$(/l)."
+      "text": "The three group entries are $(l:akaishi:curios_income)Fortune$(/l), $(l:akaishi:curios_defense)Defense$(/l) and $(l:akaishi:curios_survival)Sustain$(/l); they are powered by the $(l:akaishi:portable_cell)Portable Cell$(/l)."
     }
   ]
 }

@@ -7,23 +7,23 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_breeder",
-      "text": "生命培育器：给器官$(4)上词条$(0)的地方。$(br2)$(bold)培养要求：$(0)器官$(bold)非原生、已定型$(0)，且词条未满上限。$(br2)$(bold)消耗：$(0)同来源基因序列 1 ＋ 衰竭结晶 2 ＋ 6 万生命能量，耗时 1000 tick（50 秒）。$(br2)$(bold)成功率：$(0)随序列纯度线性上升——纯度 25 约 35%、纯度 100 约 70%。$(br2)成功＝复制一份器官并附上 1 条随机词条；失败保器官，$(4)材料照常消耗$(0)。"
+      "text": "生命培育器：为器官$(reset)附加词条$(reset)的机器。$(br2)$(bold)培养要求：$(reset)器官$(bold)非原生、已定型$(reset)，且词条未满上限。$(br2)$(bold)消耗：$(reset)同来源基因序列 1 ＋ 衰竭结晶 2 ＋ 6 万生命能量，耗时 1000 tick（50 秒）。$(br2)$(bold)成功率：$(reset)随序列纯度线性上升——纯度 25 约 35%、纯度 100 约 70%。$(br2)成功＝复制一份器官并附上 1 条随机词条；失败保器官，$(reset)材料照常消耗$(reset)。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)词条分 1-3 级$(0)，能出几级由培育用序列的纯度决定：$(li)纯度 <60：只出 1 级$(li)60-84：出 1-2 级$(li)≥85：1-3 级全解锁$(br2)每次 roll，良性与畸变的比例约 $(4)7:3$(0)——七成是纯增益，三成是带代价的「$(l:akaishi:trait_dual)畸变双刃$(/l)」。$(br2)想摸高级词条，先保证高纯序列供应——这正是培养舱存在的意义。"
+      "text": "$(bold)词条分 1-3 级$(reset)，能出几级由培育用序列的纯度决定：$(li)纯度 <60：只出 1 级$(li)60-84：出 1-2 级$(li)≥85：1-3 级全解锁$(br2)每次抽取，良性与畸变的比例约 $(reset)7:3$(reset)——七成是纯增益，三成是带代价的「$(l:akaishi:trait_dual)畸变双刃$(/l)」。$(br2)获取高级词条需保证高纯序列供应，培养舱即为此提供支持。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)【1 级 · 常规词条】$(0)$(br2)$(li)致密组织（dense_tissue）：护甲 +1$(li)强韧肌纤维（muscle_fiber）：攻击 +1$(li)活性骨髓（marrow_hyper）：最大生命 +3$(li)反射神经元（reflex_neuron）：攻击速度 +0.4$(li)弹力肌腱（elastic_tendon）：移速 +1.5%$(br2)1 级全是干净正向的小增益——稳定、无副作用，打底首选。"
+      "text": "$(bold)【1 级 · 常规词条】$(reset)$(br2)$(li)致密组织（dense_tissue）：护甲 +1$(li)强韧肌纤维（muscle_fiber）：攻击 +1$(li)活性骨髓（marrow_hyper）：最大生命 +3$(li)反射神经元（reflex_neuron）：攻击速度 +0.4$(li)弹力肌腱（elastic_tendon）：移速 +1.5%$(br2)1 级均为纯正向增益，稳定且无副作用，适合作为基础词条。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)【2 级 · 常规词条】$(0)$(br2)$(li)夜视视网膜（night_retina）：常驻夜视$(li)鳃裂（gill_slit）：水下呼吸$(li)荧光细胞（glow_cells）：自身发光$(li)甲壳增生（carapace_growth）：护甲 +2、击退抗性 +0.2$(li)剧毒腺体（venom_gland）：攻击附带中毒$(br2)从 2 级起开始出现$(4)被动词条$(0)——词条不再只是堆数值。"
+      "text": "$(bold)【2 级 · 常规词条】$(reset)$(br2)$(li)夜视视网膜（night_retina）：常驻夜视$(li)鳃裂（gill_slit）：水下呼吸$(li)荧光细胞（glow_cells）：自身发光$(li)甲壳增生（carapace_growth）：护甲 +2、击退抗性 +0.2$(li)剧毒腺体（venom_gland）：攻击附带中毒$(br2)2 级起出现$(reset)被动词条$(reset)。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)【3 级 · 常规词条】$(0)$(br2)$(li)水晶甲壳（crystal_carapace）：护甲 +1.5，反弹近战伤害$(li)暗影静脉（shadow_vein）：受击概率瞬移闪避$(li)干细胞再生（stem_regen）：持续再生$(li)弹跳肌腱（jump_tendons）：跳跃提升$(br2)3 级是常规词条的天花板；更强的正面，往往得搭上「$(l:akaishi:trait_dual)畸变$(/l)」的代价。"
+      "text": "$(bold)【3 级 · 常规词条】$(reset)$(br2)$(li)水晶甲壳（crystal_carapace）：护甲 +1.5，反弹近战伤害$(li)暗影静脉（shadow_vein）：受击概率瞬移闪避$(li)干细胞再生（stem_regen）：持续再生$(li)弹跳肌腱（jump_tendons）：跳跃提升$(br2)3 级为常规词条上限；更高数值通常需以「$(l:akaishi:trait_dual)畸变$(/l)」词条为代价。"
     },
     {
       "type": "patchouli:relations",
@@ -32,7 +32,7 @@
         "akaishi:trait_reforger",
         "akaishi:life_organs"
       ],
-      "text": "阅读顺序：词条图鉴看本页与「畸变双刃」；长错词条靠「词条重铸仪」；词条长在器官上——器官怎么来，见「器官构造」。"
+      "text": "阅读顺序：词条图鉴见本页与「畸变双刃」；词条替换使用「词条重铸仪」；词条附着于器官，器官来源见「器官构造」。"
     }
   ]
 }

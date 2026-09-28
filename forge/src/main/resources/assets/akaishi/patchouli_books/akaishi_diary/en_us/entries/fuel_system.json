@@ -7,16 +7,16 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:fuel_cell",
-      "text": "$(bold)The Fuel Cell$(0) is the reactor's \"lunchbox\": liquid fuel must be canned in metal before it can be stuffed into a fuel slot.$(li)Capacity: $(bold)10 L = 10,000 mb$(0)$(li)Filled by the $(bold)Fuel Canner$(0); an empty cell can be reused over and over$(li)What's inside decides everything — the same can performs very differently (see page 3)$(br2)For the full liquid-to-can line, see \"$(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l)\"."
+      "text": "$(bold)The Fuel Cell$(reset) stores reactor fuel: liquid fuel must be canned before it can be placed in a fuel slot.$(li)Capacity: $(bold)10 L = 10,000 mb$(reset)$(li)Filled by the $(bold)Fuel Canner$(reset); an empty cell can be reused repeatedly$(li)Contents determine performance; the same can behaves differently depending on the fuel (see page 3)$(br2)The complete liquid-to-can line is in $(l:akaishi:liquid_fuel)Liquid Fuel Chain$(/l)."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:heat_sink_poor",
-      "text": "$(bold)Heat Sinks$(0) are the reactor's main cooling muscle — six grades: $(bold)Poor → Normal → Good → Fine → Exquisite → Ultimate$(0), crafted up tier by tier.$(li)Heat removal climbs from about 1% to 7%; higher grades cool harder and last longer$(li)Fit them into the reactor's cooling components, and they only work $(4)touching a fuel rod$(0)$(li)$(4)Consumables$(0): they wear down while the reactor runs — swap in fresh ones when they break$(br2)Starter recipe: 1 Cooling Base + 4 Copper Ingots = 1 Poor Heat Sink."
+      "text": "$(bold)Heat Sinks$(reset) provide the reactor's primary cooling; six grades exist: $(bold)Poor → Normal → Good → Fine → Exquisite → Ultimate$(reset), crafted tier by tier.$(li)Heat removal increases from about 1% to 7%; higher grades cool more and last longer$(li)They are fitted into the reactor's cooling components and only operate when touching a fuel rod$(li)Consumable: they wear down while the reactor runs and must be replaced when broken$(br2)Starter recipe: 1 Cooling Base + 4 Copper Ingots = 1 Poor Heat Sink."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Picking fuel = picking profit:$(0) the liquid inside sets the energy utilization multiplier — World Base Fuel 3 / Nether Compound Fuel 4 / End Mixture Fuel 4 / Advanced Mixture Fuel 5 / Pure Fuel 8 / End Dragon Fuel 7 / $(4)Ultimate Mixture Fuel 14$(0).$(br2)Higher multiplier means far more power from the same can — the burn rate never changes, only the output soars. Choose fuel before lighting up: lesson one of the reactor.$(br2)Temperature is still the line between life and boom: $(4)400-700℃$(0) full output, $(e)850℃$(0) warning, $(c)1000℃$(0) explosion countdown — details in \"$(l:akaishi:reactor)The Reactor$(/l)\". Craving higher-tier fuel? Read on to the Liquid Fuel Chain and the Plasma Chain."
+      "text": "$(bold)Fuel determines output:$(reset) the liquid inside the cell sets the energy utilization multiplier: World Base Fuel 3 / Nether Compound Fuel 4 / End Mixture Fuel 4 / Advanced Mixture Fuel 5 / Pure Fuel 8 / End Dragon Fuel 7 / $(bold)Ultimate Mixture Fuel 14$(reset).$(br2)A higher multiplier produces more power from the same cell; the burn rate does not change, only the output.$(br2)Temperature determines safety: $(bold)400-700℃$(reset) gives full output, $(bold)850℃$(reset) is a warning, and $(bold)1000℃$(reset) starts the explosion countdown; details are in $(l:akaishi:reactor)The Reactor$(/l). Higher-tier fuels are covered in the Liquid Fuel Chain and the Plasma Chain."
     },
     {
       "type": "patchouli:relations",
@@ -26,7 +26,7 @@
         "akaishi:plasma",
         "akaishi:transformer"
       ],
-      "text": "Suggested reading order: master how fuel and cooling cooperate in \"The Reactor\" → refine better fuel along the Liquid Fuel Chain → finally graduate to the Plasma Chain."
+      "text": "Reading order: fuel and cooling interaction is described in The Reactor, fuel refining in the Liquid Fuel Chain, and the final tier in the Plasma Chain."
     }
   ]
 }

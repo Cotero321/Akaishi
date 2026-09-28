@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "The Plasma Chain is the $(4)ultimate form of fuel$(0): ordinary fuel is condensed step by step into plasma fuel rods, made only for the Fusion Reactor.$(br2)$(bold)Upstream:$(0) its \"activated crystals\" come from the exhausted-fuel activator → centrifuge route — that belongs to \"Secrets of Life\".$(br2)$(bold)Three steps on this chain, one entry each:$(0)$(li)$(l:akaishi:plasma_fractionator)Activated Fractionator$(/l): splits activated crystals into components$(li)$(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l): condenses components into plasma$(li)$(l:akaishi:plasma_filler)Plasma Filler$(/l): pours plasma into fusion rods$(br2)The finished rods feed straight into \"$(l:akaishi:fusion)Fusion Reactor$(/l)\"."
+      "text": "The Plasma Chain is the final fuel tier: ordinary fuel is progressively condensed into plasma fuel rods, used only by the Fusion Reactor.$(br2)$(bold)Upstream:$(reset) the activated crystals required come from the exhausted-fuel activator and centrifuge route, which is covered in Secrets of Life.$(br2)$(bold)Three steps, each with its own entry:$(reset)$(li)$(l:akaishi:plasma_fractionator)Activated Fractionator$(/l): splits activated crystals into components$(li)$(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l): condenses components into plasma$(li)$(l:akaishi:plasma_filler)Plasma Filler$(/l): fills fusion rods with plasma$(br2)The finished rods are used in the $(l:akaishi:fusion)Fusion Reactor$(/l)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)A dedicated line:$(0) plasma travels only through the $(4)Plasma Pipe / Plasma Fuel Tank$(0) — ordinary fluid pipes won't touch it. Lay it from aggregator to filler first and not a drop spills.$(br2)All three rods carry $(4)6 trillion$(0) energy each; they differ only in temper — how to pick and burn them: $(l:akaishi:plasma_rods)Plasma Fuel Rods$(/l)."
+      "text": "$(bold)A dedicated line:$(reset) plasma travels only through the Plasma Pipe and Plasma Fuel Tank; ordinary fluid pipes reject it. The line from the aggregator to the filler must be laid with these components.$(br2)All three rods contain 6 trillion energy each; they differ only in temper. Selection and combustion are described in $(l:akaishi:plasma_rods)Plasma Fuel Rods$(/l)."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:plasma_rods",
         "akaishi:fusion"
       ],
-      "text": "The three machines and the finished rods each have their own entry above; the $(l:akaishi:fusion)Fusion Reactor$(/l) is where they get burned."
+      "text": "The three machines and the finished rods each have their own entry above; the $(l:akaishi:fusion)Fusion Reactor$(/l) is where they are burned."
     }
   ]
 }

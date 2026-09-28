@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(bold)畸变词条＝强力正向 ＋ 代价的「双刃剑」$(0)。$(br2)$(bold)【2 级 · 畸变】$(0)$(li)狂战基因（berserk_gene）：攻击 +2、护甲 −1.5$(li)玻璃骨（glass_bone）：攻击速度 +0.8、最大生命 −2$(br2)$(bold)【3 级 · 畸变】$(0)$(li)捕食者本能（predator_instinct）：攻击 +3、移速 +2%、最大生命 −4$(li)爆燃血肉（pyroblast_flesh）：攻击 +3、$(c)怕火$(0)——火焰伤害大幅加深$(br2)稀有度越高越极端：$(4)收益越夸张，代价越致命$(0)。"
+      "text": "$(bold)畸变词条＝强力正向 ＋ 代价的「双刃剑」$(reset)。$(br2)$(bold)【2 级 · 畸变】$(reset)$(li)狂战基因（berserk_gene）：攻击 +2、护甲 −1.5$(li)玻璃骨（glass_bone）：攻击速度 +0.8、最大生命 −2$(br2)$(bold)【3 级 · 畸变】$(reset)$(li)捕食者本能（predator_instinct）：攻击 +3、移速 +2%、最大生命 −4$(li)爆燃血肉（pyroblast_flesh）：攻击 +3、$(reset)怕火$(reset)——火焰伤害大幅加深$(br2)档位越高，收益与代价同步提高：$(reset)收益越高，代价越大$(reset)。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)词条长上就摘不掉$(0)——畸变也不例外。$(br2)$(bold)两条处理路径：$(0)$(li)交给「$(l:akaishi:trait_reforger)词条重铸仪$(/l)」原位换词：仍在同一档位池里 roll，可能洗掉畸变，也可能再来一条$(li)放弃这只器官，回器官产线重新培养$(br2)$(bold)提醒：$(0)畸变不是 bug，而是高风险高回报的玩法——围绕它配装，往往比反复硬洗更划算。$(br2)赌，就要赌得起。"
+      "text": "$(bold)词条一经附着无法移除$(reset)，畸变词条同样如此。$(br2)$(bold)两条处理路径：$(reset)$(li)交给「$(l:akaishi:trait_reforger)词条重铸仪$(/l)」原位替换：仍在同一档位池内抽取，可能剔除畸变，也可能再次抽到$(li)放弃这只器官，回器官产线重新培养$(br2)$(bold)提醒：$(reset)畸变词条属于高风险高回报机制，并非缺陷；围绕其配置装备的收益通常高于反复重铸。"
     },
     {
       "type": "patchouli:relations",
@@ -18,7 +18,7 @@
         "akaishi:trait_safe",
         "akaishi:trait_reforger"
       ],
-      "text": "阅读顺序：畸变与常规词条同池出现，图鉴对照见「常规变异」；想洗掉畸变或换一条，用「词条重铸仪」。"
+      "text": "阅读顺序：畸变与常规词条同池出现，对照图鉴见「常规变异」；替换畸变词条使用「词条重铸仪」。"
     }
   ]
 }

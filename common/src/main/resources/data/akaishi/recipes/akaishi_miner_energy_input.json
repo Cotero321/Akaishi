@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "UHU", "HCH", "UHU" ], "key": { "U": { "item": "akaishi:akaishi_miner_frame_external" }, "H": { "item": "akaishi:akaishi_energy_pipe" }, "C": { "item": "akaishi:akaishi_energy_cell_advanced" } }, "result": { "item": "akaishi:akaishi_miner_energy_input", "count": 1 } }

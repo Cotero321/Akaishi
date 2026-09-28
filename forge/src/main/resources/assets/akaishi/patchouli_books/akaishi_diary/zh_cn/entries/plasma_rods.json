@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_mixed_plasma_rod",
-      "text": "三种燃料棒，总能量都是 $(4)6 万亿$(0)，区别在脾气：$(li)$(bold)混合棒$(0)：400万/t、热值 2700万——均衡，适合叠效率框架$(li)$(bold)下界棒$(0)：400万/t、热值 4000万——高产高热，散热必须给足$(li)$(bold)末地棒$(0)：260万/t、热值 1500万——温和，4 根无散热即落聚变最佳温区$(br2)怎么烧见「$(l:akaishi:fusion)聚变堆$(/l)」。"
+      "text": "三种燃料棒的总能量均为 $(reset)6 万亿$(reset)，差异在输出与热值：$(li)$(bold)混合棒$(reset)：400万/t、热值 2700万，输出均衡，适合搭配效率框架$(li)$(bold)下界棒$(reset)：400万/t、热值 4000万，产量与温度均高，需要充足散热$(li)$(bold)末地棒$(reset)：260万/t、热值 1500万，输出温和，4 根无散热即可落入聚变最佳温区$(br2)使用方法见「$(l:akaishi:fusion)聚变堆$(/l)」。"
     },
     {
       "type": "patchouli:relations",
@@ -16,7 +16,7 @@
         "akaishi:plasma",
         "akaishi:fusion"
       ],
-      "text": "棒由「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」产出；想烧它，摆法看「$(l:akaishi:fusion)聚变堆$(/l)」。"
+      "text": "燃料棒由「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」产出；使用方式见「$(l:akaishi:fusion)聚变堆$(/l)」。"
     }
   ]
 }

@@ -273,6 +273,7 @@ public final class ModItems {
     // —— 转基因域（AkaishiTransgeneItems）：转基因植物（凋零藤 / 烈焰花 / 咒怨垂蔓）——
     public static RegistrySupplier<Item> akaishiWitherSeed;
     public static RegistrySupplier<Item> akaishiWitherCondensate;
+    public static RegistrySupplier<Item> akaishiWitherBoneShard;
     public static RegistrySupplier<Item> akaishiBlazeSeed;
     public static RegistrySupplier<Item> akaishiBlazeCondensate;
     public static RegistrySupplier<Item> akaishiCurseVineSeed;
@@ -449,6 +450,7 @@ public final class ModItems {
         // —— 转基因域 ——
         akaishiWitherSeed = AkaishiTransgeneItems.akaishiWitherSeed;
         akaishiWitherCondensate = AkaishiTransgeneItems.akaishiWitherCondensate;
+        akaishiWitherBoneShard = AkaishiTransgeneItems.akaishiWitherBoneShard;
         akaishiBlazeSeed = AkaishiTransgeneItems.akaishiBlazeSeed;
         akaishiBlazeCondensate = AkaishiTransgeneItems.akaishiBlazeCondensate;
         akaishiCurseVineSeed = AkaishiTransgeneItems.akaishiCurseVineSeed;

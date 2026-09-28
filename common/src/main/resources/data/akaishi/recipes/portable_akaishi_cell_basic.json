@@ -1,13 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " M ",
-    "MBM",
-    " M "
-  ],
-  "key": {
-    "M": { "item": "akaishi:akaishi_machine_component" },
-    "B": { "item": "akaishi:akaishi_energy_cell_basic" }
-  },
-  "result": { "item": "akaishi:portable_akaishi_cell_basic", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ " M ", "MBM", " M " ], "key": { "M": { "item": "akaishi:akaishi_machine_component" }, "B": { "item": "akaishi:akaishi_energy_cell_basic" } }, "result": { "item": "akaishi:portable_akaishi_cell_basic", "count": 1 } }

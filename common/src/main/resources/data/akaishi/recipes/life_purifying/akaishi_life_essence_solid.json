@@ -1,4 +1,1 @@
-{
-  "type": "akaishi:life_purifying",
-  "result": { "item": "akaishi:akaishi_life_essence_solid", "count": 1 }
-}
+{ "type": "akaishi:life_purifying", "ingredient": { "item": "akaishi:akaishi_essence_compressed" }, "input_count": 1, "result": { "item": "akaishi:akaishi_life_essence_solid", "count": 1 } }

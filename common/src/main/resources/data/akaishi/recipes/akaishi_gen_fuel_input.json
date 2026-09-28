@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "FPF",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "P": { "item": "akaishi:fuel_cell" },
-    "F": { "item": "minecraft:coal_block" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_gen_fuel_input", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "CGC", "FPF", "CGC" ], "key": { "C": { "item": "akaishi:akaishi_gen_matrix_casing" }, "G": { "item": "minecraft:glass" }, "P": { "item": "akaishi:fuel_cell" }, "F": { "item": "minecraft:coal_block" } }, "result": { "item": "akaishi:akaishi_gen_fuel_input", "count": 1 } }

@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "ICI", "CMC", "ICI" ], "key": { "I": { "item": "minecraft:iron_ingot" }, "C": { "item": "akaishi:akaishi_crystal" }, "M": { "item": "minecraft:blast_furnace" } }, "result": { "item": "akaishi:akaishi_material_fuser", "count": 1 } }

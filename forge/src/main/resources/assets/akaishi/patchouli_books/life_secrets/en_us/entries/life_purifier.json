@@ -7,12 +7,12 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_life_purifier",
-      "text": "$(bold)What it does:$(0) freezes \"flowing\" Life Energy into portable $(4)Life Essence Solids$(0).$(br2)$(bold)Recipe:$(0) $(4)10M Akaishi Energy + 1000 Life Energy$(0) → 1 Solid, about 10 ticks per run (draws up to 1M akaishi/tick).$(br2)$(bold)Interfaces:$(0) akaishi buffer of 20M (expandable with energy upgrades), Life Energy buffer of 5,000 (enough for 5 runs); the output slot accepts hoppers and item pipes for full automation."
+      "text": "$(bold)What it does:$(reset) freezes \"flowing\" Life Energy into portable $(reset)Life Essence Solids$(reset).$(br2)$(bold)Recipe:$(reset) $(reset)1 Compressed Akaishi Essence + 10M Akaishi Energy + 1000 Life Energy$(reset) → 1 Solid, about 10 ticks per run (akaishi is drawn at up to 1M/tick; the intake rate is configurable).$(br2)$(bold)Slots:$(reset) the input slot takes Compressed Akaishi Essence and the output slot yields Solids; both accept hoppers, AE2 and item pipes for full automation. The top-left upgrade area holds a single $(bold)Wireless Receiver Slot$(reset): installing 1 Wireless Receiver Upgrade joins the machine to the surrounding wireless field and lets a Miniature Matrix Terminal schedule it.$(br2)$(bold)Built-in buffers:$(reset) 20M akaishi (expandable with energy upgrades) and 5,000 Life Energy (enough for 5 runs).$(br2)$(bold)On-demand power:$(reset) this is a pool-style high-draw machine (about 1M akaishi per tick), so the terminal powers it $(bold)on demand$(reset) — only while the input slot holds material and the output slot has room; while idle it draws nothing from the field. It consumes both energy types: $(bold)akaishi energy$(reset) advances progress and $(bold)Life Energy$(reset) is a raw material. Akaishi can be fed by the field; Life Energy must arrive through pipes or the Life wireless terminal."
     },
     {
       "type": "patchouli:text",
       "title": "Solids = Universal Currency",
-      "text": "Solids are the life line's $(4)universal currency$(0) — $(bold)stockpile before you build$(0):$(li)Life Structuring Table: $(4)5$(0) per organ$(li)Surgery Chamber implant: $(4)3$(0) per operation (extraction: 1)$(li)Cultivator purification / tier upgrade: $(4)1-16$(0) by tier$(li)Potion Table: $(4)3$(0) permanent / $(4)5$(0) breakthrough$(li)Embryo recipe: $(4)8$(0) around 1 egg → 1 Life Embryo$(br2)$(bold)Tip:$(0) run your Matrix output into the Purifier first — bank the energy, then start researching."
+      "text": "Solids are the life line's $(reset)universal currency$(reset) — $(bold)stockpile before you build$(reset):$(li)Life Structuring Table: $(reset)5$(reset) per organ$(li)Surgery Chamber implant: $(reset)3$(reset) per operation (extraction: 1)$(li)Cultivator purification / tier upgrade: $(reset)1-16$(reset) by tier$(li)Potion Table: $(reset)3$(reset) permanent / $(reset)5$(reset) breakthrough$(li)Embryo recipe: $(reset)8$(reset) around 1 egg → 1 Life Embryo$(br2)$(bold)Recommendation:$(reset) route the Matrix output into the Purifier first — bank the Solids, then start researching."
     },
     {
       "type": "patchouli:relations",
@@ -21,7 +21,7 @@
         "akaishi:life_path",
         "akaishi:life_samples"
       ],
-      "text": "Where the feedstock comes from and goes: \"$(l:akaishi:life_energy)Life Energy$(/l)\" and \"$(l:akaishi:life_conversion)Life Conversion$(/l)\"; once you've banked enough, open the sample line."
+      "text": "Feedstock source and sink: \"$(l:akaishi:life_energy)Life Energy$(/l)\" and \"$(l:akaishi:life_conversion)Life Conversion$(/l)\"; once enough is banked, open the sample line."
     }
   ]
 }

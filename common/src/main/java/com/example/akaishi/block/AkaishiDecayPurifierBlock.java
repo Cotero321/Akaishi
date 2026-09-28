@@ -10,7 +10,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * 效果：每 tick 消耗能量，加速范围内同维度衰竭区域的自然消散（削减剩余时间）。
  * 无物品槽位；能量仅由赤能源管道输入；右键打开工作界面。
  */
-public class AkaishiDecayPurifierBlock extends BaseEntityBlock {
+public class AkaishiDecayPurifierBlock extends AkaishiMachineBlock {
 
     /** 外形：底座(满宽) + 中段 + 顶段，与三段内凹模型逐段对齐；非满方块，须配套 noOcclusion 防止剔除相邻方块贴面 */
     private static final VoxelShape SHAPE = Shapes.or(
@@ -40,9 +39,9 @@ public class AkaishiDecayPurifierBlock extends BaseEntityBlock {
             Block.box(5.0D, 11.0D, 5.0D, 11.0D, 16.0D, 11.0D));
 
     public AkaishiDecayPurifierBlock() {
+        // 硬度/抗爆/正确工具由 AkaishiMachineBlock 统一提供，此处只保留外观属性
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_GREEN)
-                .strength(3.5F)
                 // 模型为内凹塔（非满方块）：必须关闭遮挡，否则相邻方块朝它的一面会被整面剔除而"消失"
                 .noOcclusion()
                 .sound(SoundType.METAL));

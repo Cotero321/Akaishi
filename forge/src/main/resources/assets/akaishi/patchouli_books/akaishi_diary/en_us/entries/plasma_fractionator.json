@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_activated_fractionator",
-      "text": "Activated Fractionator: $(4)1 activated crystal → 1 matching activated component + 1 exhausted crystal$(0).$(br2)Each cut costs 2,000 energy and takes 100 ticks.$(br2)Components are the food of the $(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l)."
+      "text": "Activated Fractionator: converts 1 activated crystal into 1 matching activated component and 1 exhausted crystal.$(br2)Each operation costs 2,000 energy and takes 100 ticks.$(br2)Components are the input of the $(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Don't toss the exhausted crystals:$(0)$(4)entry reforging and item reconstruction both demand them$(0) — covered in \"Secrets of Life\".$(br2)Activated crystals themselves come from the exhausted-fuel activator → centrifuge route, also in \"Secrets of Life\" — read the two books side by side."
+      "text": "$(bold)Exhausted crystals are retained:$(reset) entry reforging and item reconstruction both require them; this is covered in Secrets of Life.$(br2)Activated crystals themselves come from the exhausted-fuel activator and centrifuge route, also in Secrets of Life."
     },
     {
       "type": "patchouli:relations",
@@ -19,7 +19,7 @@
         "akaishi:plasma",
         "akaishi:plasma_aggregator"
       ],
-      "text": "Chain overview in $(l:akaishi:plasma)Plasma Chain$(/l); hand the components to the $(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l)."
+      "text": "The chain overview is in $(l:akaishi:plasma)Plasma Chain$(/l); components are sent to the $(l:akaishi:plasma_aggregator)Fusion Fuel Aggregator$(/l)."
     }
   ]
 }

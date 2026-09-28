@@ -63,7 +63,6 @@ public class AkaishiMiniMatrixNetworkNodeBlock extends AkaishiMachineBlock {
     public AkaishiMiniMatrixNetworkNodeBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_CYAN)
-                .strength(3.0F)
                 .sound(SoundType.METAL));
         registerDefaultState(stateDefinition.any().setValue(ACTIVE, false));
     }

@@ -280,6 +280,12 @@ public class AkaishiAutoCollectorBlockEntity extends BlockEntity implements Exte
         buf.writeBlockPos(worldPosition);
     }
 
+    /** 挖掘保留数据：内部物品已由 onRemove 倒出，排除防止放置时复制 */
+    @Override
+    public String[] excludedKeys() {
+        return new String[]{"Items"};
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);

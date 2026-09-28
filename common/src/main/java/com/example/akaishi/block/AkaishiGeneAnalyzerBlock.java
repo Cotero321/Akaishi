@@ -29,7 +29,6 @@ public class AkaishiGeneAnalyzerBlock extends AkaishiMachineBlock {
     public AkaishiGeneAnalyzerBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

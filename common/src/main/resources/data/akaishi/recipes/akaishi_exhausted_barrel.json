@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IPI",
-    "PBP",
-    "IPI"
-  ],
-  "key": {
-    "B": { "item": "minecraft:barrel" },
-    "P": { "item": "minecraft:iron_bars" },
-    "I": { "item": "minecraft:iron_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_exhausted_barrel", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "IPI", "PBP", "IRI" ], "key": { "I": { "item": "minecraft:iron_ingot" }, "P": { "item": "minecraft:iron_bars" }, "B": { "item": "minecraft:barrel" }, "R": { "item": "akaishi:akaishi_resistant_steel_ingot" } }, "result": { "item": "akaishi:akaishi_exhausted_barrel", "count": 1 } }

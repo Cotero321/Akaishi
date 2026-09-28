@@ -1,6 +1,6 @@
 {
   "name": "赤石机器",
-  "description": "基础生产线：打粉、压块、变化、培养。$(br)本章产物（粉末、基底）是散热片与高阶合成的原料，请先备好电力。",
+  "description": "基础生产线：打粉、压块、变化、培养。$(br)本章产物（粉末、基底）是散热片与高阶合成的原料，需先备好电力。",
   "icon": "akaishi:akaishi_plant_cultivator",
   "sortnum": 3
 }

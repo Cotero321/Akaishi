@@ -6,11 +6,11 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Ore Bases are the Akaishi Transformer's $(4)signature output$(0): they squeeze any lump of ore into a single standardized base, so machines can recognize materials at a glance.$(br2)$(bold)The whole family:$(0)$(li)Coal / Iron / Copper / Gold / Redstone / Lapis / Diamond / Emerald / Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)$(4)Compressed Akaishi Essence → Akaishi Ore Base$(0) (Akaishi Ore no longer converts directly: pulverize it into the concentrate first)$(li)Lapis Dust → Cooling Base (it serves the cooling line, not the ores)$(br2)One machine makes them all: the Transformer, one in, one out."
+      "text": "Ore Bases are the primary output of the Akaishi Transformer, converting any ore into a standardized base that machines can recognize.$(br2)$(bold)The complete family:$(reset)$(li)Coal, Iron, Copper, Gold, Redstone, Lapis, Diamond, Emerald or Quartz (ore or deepslate) → the matching Ore Base$(li)Ancient Debris → Ancient Debris Base$(li)Compressed Akaishi Essence → Akaishi Ore Base (Akaishi Ore no longer converts directly; it must be pulverized into the concentrate first)$(li)Lapis Dust → Cooling Base (used by the cooling line, not by ores)$(br2)A single machine produces all of them: the Transformer, one input to one output."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Where they are used (verified from recipes):$(0)$(li)Iron → Gold → Diamond → Ancient Debris Bases: the four Catalyst tiers$(li)Copper → Redstone → Lapis Bases: the Auto Collector upgrade line$(li)Coal Ore Base → Fuel Canner$(li)Nether Quartz Ore Base → Wireless Core and Fusion Insulation$(li)Emerald Ore Base → Life Centrifuge; Akaishi Ore Base → Chi Energy Assembly$(li)Cooling Base → the start of the heat-sink line (see Fuel & Cooling)$(br2)Whichever base shows up in a recipe tells you which tier you have reached."
+      "text": "$(bold)Uses:$(reset)$(li)Iron, Gold, Diamond and Ancient Debris Bases: the four Catalyst tiers$(li)Copper, Redstone and Lapis Bases: the Auto Collector upgrade line$(li)Coal Ore Base: Fuel Canner$(li)Nether Quartz Ore Base: Wireless Core and Fusion Insulation$(li)Emerald Ore Base: Life Centrifuge; Akaishi Ore Base: Chi Energy Assembly$(li)Cooling Base: the start of the heat-sink line (see Fuel & Cooling)$(br2)The base required by a recipe indicates the progression tier reached."
     },
     {
       "type": "patchouli:relations",
@@ -18,7 +18,7 @@
         "akaishi:transformer",
         "akaishi:dusts"
       ],
-      "text": "These bases are made by the $(l:akaishi:transformer)Transformer$(/l), whose feedstock like Lapis Dust is covered in $(l:akaishi:dusts)Dusts$(/l)."
+      "text": "These bases are made by the $(l:akaishi:transformer)Transformer$(/l), whose feedstock such as Lapis Dust is covered in $(l:akaishi:dusts)Dusts$(/l)."
     }
   ]
 }

@@ -30,7 +30,6 @@ public class AkaishiLifeBreederBlock extends AkaishiMachineBlock {
     public AkaishiLifeBreederBlock() {
         super(Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(5.0F)
                 .sound(SoundType.METAL));
     }
 

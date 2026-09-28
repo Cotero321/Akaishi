@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class AkaishiPulverizerBlock extends AkaishiMachineBlock {
 
     public AkaishiPulverizerBlock() {
-        super(Properties.of().mapColor(MapColor.COLOR_GRAY).strength(5.0F).sound(SoundType.METAL));
+        super(Properties.of().mapColor(MapColor.COLOR_GRAY).sound(SoundType.METAL));
     }
 
     @Nullable

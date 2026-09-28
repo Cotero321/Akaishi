@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IRI",
-    "RBR",
-    "IRI"
-  ],
-  "key": {
-    "R": { "item": "akaishi:raw_akaishi_block" },
-    "B": { "item": "minecraft:barrel" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_miner_storage_upgrade_block", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "URU", "RBR", "URU" ], "key": { "U": { "item": "akaishi:akaishi_miner_upgrade_frame" }, "R": { "item": "akaishi:raw_akaishi_block" }, "B": { "item": "minecraft:barrel" } }, "result": { "item": "akaishi:akaishi_miner_storage_upgrade_block", "count": 1 } }

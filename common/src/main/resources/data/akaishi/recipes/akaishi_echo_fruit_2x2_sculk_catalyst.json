@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "pattern": [ "FF", "FF" ], "key": { "F": { "item": "akaishi:akaishi_echo_fruit" } }, "result": { "item": "minecraft:sculk_catalyst", "count": 1 } }

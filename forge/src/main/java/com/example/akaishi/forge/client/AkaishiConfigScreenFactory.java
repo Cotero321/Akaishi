@@ -3,6 +3,7 @@ package com.example.akaishi.forge.client;
 import com.example.akaishi.forge.config.AkaishiConfig;
 import com.example.akaishi.forge.config.AkaishiConfigSync;
 import com.example.akaishi.forge.config.specs.BufferValueSpecs;
+import com.example.akaishi.forge.config.specs.CoreMachineSpecs;
 import com.example.akaishi.forge.config.specs.CurioSpecs;
 import com.example.akaishi.forge.config.specs.DecayFusionSpecs;
 import com.example.akaishi.forge.config.specs.LifeMachineSpecs;
@@ -391,6 +392,132 @@ public final class AkaishiConfigScreenFactory {
         stringList(value, eb, "value.keywordExclusions", BufferValueSpecs.VALUE_KEYWORD_EXCLUSIONS);
         stringList(value, eb, "value.lootBlacklist", BufferValueSpecs.VALUE_LOOT_BLACKLIST);
         intField(value, eb, "value.unifiedVaultRows", BufferValueSpecs.UNIFIED_VAULT_ROWS);
+
+        // ===== 反应堆 =====
+        ConfigCategory reactor = category(builder, "reactor");
+        longField(reactor, eb, "reactor.energyPerSlot", CoreMachineSpecs.REACTOR_ENERGY_PER_SLOT);
+        intField(reactor, eb, "reactor.baseTemp", CoreMachineSpecs.REACTOR_BASE_TEMP);
+        doubleField(reactor, eb, "reactor.passiveCool", CoreMachineSpecs.REACTOR_PASSIVE_COOL);
+        doubleField(reactor, eb, "reactor.coolerCool", CoreMachineSpecs.REACTOR_COOLER_COOL);
+        doubleField(reactor, eb, "reactor.drainBase", CoreMachineSpecs.REACTOR_DRAIN_BASE);
+        doubleField(reactor, eb, "reactor.wasteRatio", CoreMachineSpecs.REACTOR_WASTE_RATIO);
+        intField(reactor, eb, "reactor.wasteCapacity", CoreMachineSpecs.REACTOR_WASTE_CAPACITY);
+        intField(reactor, eb, "reactor.tempMax", CoreMachineSpecs.REACTOR_TEMP_MAX);
+        intField(reactor, eb, "reactor.tempOptMin", CoreMachineSpecs.REACTOR_TEMP_OPT_MIN);
+        intField(reactor, eb, "reactor.tempOptMax", CoreMachineSpecs.REACTOR_TEMP_OPT_MAX);
+        intField(reactor, eb, "reactor.tempWarn", CoreMachineSpecs.REACTOR_TEMP_WARN);
+        intField(reactor, eb, "reactor.explosionDelayTicks", CoreMachineSpecs.REACTOR_EXPLOSION_DELAY_TICKS);
+
+        // ===== 基础物流 =====
+        ConfigCategory fluidPipe = category(builder, "fluid_pipe");
+        intField(fluidPipe, eb, "fluid_pipe.rate", CoreMachineSpecs.FLUID_PIPE_RATE);
+
+        ConfigCategory wastePort = category(builder, "waste_port");
+        intField(wastePort, eb, "waste_port.bufferCapacity", CoreMachineSpecs.WASTE_PORT_BUFFER_CAPACITY);
+
+        ConfigCategory exhaustedBarrel = category(builder, "exhausted_barrel");
+        longField(exhaustedBarrel, eb, "exhausted_barrel.capacity", CoreMachineSpecs.EXHAUSTED_BARREL_CAPACITY);
+
+        // ===== 生命活化器 =====
+        ConfigCategory lifeActivator = category(builder, "life_activator");
+        longField(lifeActivator, eb, "life_activator.lifeCapacity", CoreMachineSpecs.LIFE_ACTIVATOR_LIFE_CAPACITY);
+        longField(lifeActivator, eb, "life_activator.costPerMb", CoreMachineSpecs.LIFE_ACTIVATOR_COST_PER_MB);
+        longField(lifeActivator, eb, "life_activator.inputCapacity", CoreMachineSpecs.LIFE_ACTIVATOR_INPUT_CAPACITY);
+        longField(lifeActivator, eb, "life_activator.outputCapacity", CoreMachineSpecs.LIFE_ACTIVATOR_OUTPUT_CAPACITY);
+        longField(lifeActivator, eb, "life_activator.convertRate", CoreMachineSpecs.LIFE_ACTIVATOR_CONVERT_RATE);
+
+        // ===== 生命离心机 =====
+        ConfigCategory lifeCentrifuge = category(builder, "life_centrifuge");
+        longField(lifeCentrifuge, eb, "life_centrifuge.energyCapacity", CoreMachineSpecs.LIFE_CENTRIFUGE_ENERGY_CAPACITY);
+        longField(lifeCentrifuge, eb, "life_centrifuge.inputCapacity", CoreMachineSpecs.LIFE_CENTRIFUGE_INPUT_CAPACITY);
+        longField(lifeCentrifuge, eb, "life_centrifuge.convertRate", CoreMachineSpecs.LIFE_CENTRIFUGE_CONVERT_RATE);
+        longField(lifeCentrifuge, eb, "life_centrifuge.costPerMb", CoreMachineSpecs.LIFE_CENTRIFUGE_COST_PER_MB);
+
+        // ===== 物品重构器 =====
+        ConfigCategory itemReconstructor = category(builder, "item_reconstructor");
+        longField(itemReconstructor, eb, "item_reconstructor.energyCapacity", CoreMachineSpecs.RECONSTRUCTOR_ENERGY_CAPACITY);
+        longField(itemReconstructor, eb, "item_reconstructor.costPerCrystal", CoreMachineSpecs.RECONSTRUCTOR_COST_PER_CRYSTAL);
+
+        // ===== 聚变燃料聚合器 =====
+        ConfigCategory fusionFuelAggregator = category(builder, "fusion_fuel_aggregator");
+        longField(fusionFuelAggregator, eb, "fusion_fuel_aggregator.energyCapacity", CoreMachineSpecs.AGGREGATOR_ENERGY_CAPACITY);
+        longField(fusionFuelAggregator, eb, "fusion_fuel_aggregator.costPerCraft", CoreMachineSpecs.AGGREGATOR_COST_PER_CRAFT);
+        intField(fusionFuelAggregator, eb, "fusion_fuel_aggregator.processTicks", CoreMachineSpecs.AGGREGATOR_PROCESS_TICKS);
+        longField(fusionFuelAggregator, eb, "fusion_fuel_aggregator.plasmaCapacity", CoreMachineSpecs.AGGREGATOR_PLASMA_CAPACITY);
+        longField(fusionFuelAggregator, eb, "fusion_fuel_aggregator.producePerCraft", CoreMachineSpecs.AGGREGATOR_PRODUCE_PER_CRAFT);
+
+        // ===== 离子体填装器 =====
+        ConfigCategory plasmaFiller = category(builder, "plasma_filler");
+        longField(plasmaFiller, eb, "plasma_filler.plasmaCapacity", CoreMachineSpecs.FILLER_PLASMA_CAPACITY);
+        longField(plasmaFiller, eb, "plasma_filler.plasmaPerRod", CoreMachineSpecs.FILLER_PLASMA_PER_ROD);
+        intField(plasmaFiller, eb, "plasma_filler.processTicks", CoreMachineSpecs.FILLER_PROCESS_TICKS);
+
+        // ===== 赤石植物培养机 =====
+        ConfigCategory plantCultivator = category(builder, "plant_cultivator");
+        longField(plantCultivator, eb, "plant_cultivator.energyCapacity", CoreMachineSpecs.PLANT_CULTIVATOR_ENERGY_CAPACITY);
+        intField(plantCultivator, eb, "plant_cultivator.ticks", CoreMachineSpecs.PLANT_CULTIVATOR_TICKS);
+        longField(plantCultivator, eb, "plant_cultivator.costPerTick", CoreMachineSpecs.PLANT_CULTIVATOR_COST_PER_TICK);
+
+        // ===== 赤石压缩机 =====
+        ConfigCategory compressor = category(builder, "compressor");
+        longField(compressor, eb, "compressor.energyCapacity", CoreMachineSpecs.COMPRESSOR_ENERGY_CAPACITY);
+        intField(compressor, eb, "compressor.ticks", CoreMachineSpecs.COMPRESSOR_TICKS);
+        longField(compressor, eb, "compressor.costPerTick", CoreMachineSpecs.COMPRESSOR_COST_PER_TICK);
+
+        // ===== 赤石打粉机 =====
+        ConfigCategory pulverizer = category(builder, "pulverizer");
+        longField(pulverizer, eb, "pulverizer.energyCapacity", CoreMachineSpecs.PULVERIZER_ENERGY_CAPACITY);
+        intField(pulverizer, eb, "pulverizer.ticks", CoreMachineSpecs.PULVERIZER_TICKS);
+        longField(pulverizer, eb, "pulverizer.costPerTick", CoreMachineSpecs.PULVERIZER_COST_PER_TICK);
+
+        // ===== 赤石变化器 =====
+        ConfigCategory transformer = category(builder, "transformer");
+        longField(transformer, eb, "transformer.energyCapacity", CoreMachineSpecs.TRANSFORMER_ENERGY_CAPACITY);
+        intField(transformer, eb, "transformer.ticks", CoreMachineSpecs.TRANSFORMER_TICKS);
+        longField(transformer, eb, "transformer.costPerTick", CoreMachineSpecs.TRANSFORMER_COST_PER_TICK);
+
+        // ===== 赤石矿机 =====
+        ConfigCategory miner = category(builder, "miner");
+        intField(miner, eb, "miner.ticksBase", CoreMachineSpecs.MINER_TICKS_BASE);
+        longField(miner, eb, "miner.costPerTickBase", CoreMachineSpecs.MINER_COST_PER_TICK_BASE);
+        intField(miner, eb, "miner.preciseFortuneDivisor", CoreMachineSpecs.MINER_PRECISE_FORTUNE_DIVISOR);
+        intField(miner, eb, "miner.extraOreWeight", CoreMachineSpecs.MINER_EXTRA_ORE_WEIGHT);
+
+        // ===== 衰竭区域 =====
+        ConfigCategory decayZone = category(builder, "decay_zone");
+        longField(decayZone, eb, "decay_zone.durationTicks", DecayFusionSpecs.DECAY_ZONE_DURATION_TICKS);
+        intField(decayZone, eb, "decay_zone.samplesPerTick", DecayFusionSpecs.DECAY_ZONE_SAMPLES_PER_TICK);
+
+        // ===== 衰变净化塔 =====
+        ConfigCategory decayPurifier = category(builder, "decay_purifier");
+        longField(decayPurifier, eb, "decay_purifier.energyCapacity", DecayFusionSpecs.DECAY_PURIFIER_ENERGY_CAPACITY);
+        intField(decayPurifier, eb, "decay_purifier.range", DecayFusionSpecs.DECAY_PURIFIER_RANGE);
+        longField(decayPurifier, eb, "decay_purifier.costPerTick", DecayFusionSpecs.DECAY_PURIFIER_COST_PER_TICK);
+        longField(decayPurifier, eb, "decay_purifier.ticksPerTick", DecayFusionSpecs.DECAY_PURIFIER_TICKS_PER_TICK);
+
+        // ===== 聚变堆 =====
+        ConfigCategory fusionReactor = category(builder, "fusion_reactor");
+        doubleField(fusionReactor, eb, "fusion_reactor.efficiencyGrowth", DecayFusionSpecs.FUSION_EFFICIENCY_GROWTH);
+        doubleField(fusionReactor, eb, "fusion_reactor.coolerFrameBonus", DecayFusionSpecs.FUSION_COOLER_FRAME_BONUS);
+        longField(fusionReactor, eb, "fusion_reactor.coolingPerPercent", DecayFusionSpecs.FUSION_COOLING_PER_PERCENT);
+        intField(fusionReactor, eb, "fusion_reactor.baseTemp", DecayFusionSpecs.FUSION_BASE_TEMP);
+        intField(fusionReactor, eb, "fusion_reactor.tempMax", DecayFusionSpecs.FUSION_TEMP_MAX);
+        intField(fusionReactor, eb, "fusion_reactor.tempTrip", DecayFusionSpecs.FUSION_TEMP_TRIP);
+        intField(fusionReactor, eb, "fusion_reactor.tempOptMin", DecayFusionSpecs.FUSION_TEMP_OPT_MIN);
+        intField(fusionReactor, eb, "fusion_reactor.tempOptMax", DecayFusionSpecs.FUSION_TEMP_OPT_MAX);
+        intField(fusionReactor, eb, "fusion_reactor.tempResume", DecayFusionSpecs.FUSION_TEMP_RESUME);
+        intField(fusionReactor, eb, "fusion_reactor.tempStep", DecayFusionSpecs.FUSION_TEMP_STEP);
+        intField(fusionReactor, eb, "fusion_reactor.coolerDurabilityInterval", DecayFusionSpecs.FUSION_COOLER_DURABILITY_INTERVAL);
+        longField(fusionReactor, eb, "fusion_reactor.ashPerEnergy", DecayFusionSpecs.FUSION_ASH_PER_ENERGY);
+        longField(fusionReactor, eb, "fusion_reactor.rodEnergy", DecayFusionSpecs.FUSION_ROD_ENERGY);
+
+        // ===== 无线赤能源（损失模型；场域屏障可见性开关见「机制开关」）=====
+        ConfigCategory wireless = category(builder, "wireless");
+        doubleField(wireless, eb, "wireless.baseLoss", DecayFusionSpecs.WIRELESS_BASE_LOSS);
+        doubleField(wireless, eb, "wireless.lossPerBlock", DecayFusionSpecs.WIRELESS_LOSS_PER_BLOCK);
+        doubleField(wireless, eb, "wireless.maxLoss", DecayFusionSpecs.WIRELESS_MAX_LOSS);
+        doubleField(wireless, eb, "wireless.crossDimLoss", DecayFusionSpecs.WIRELESS_CROSS_DIM_LOSS);
+        doubleField(wireless, eb, "wireless.lossReductionPerModule", DecayFusionSpecs.WIRELESS_LOSS_REDUCTION_PER_MODULE);
 
         return builder.build();
     }

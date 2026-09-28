@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_fusion_fuel_aggregator",
-      "text": "聚变燃料聚合器：$(4)1 个活化成分 → 1000mb 等离子体$(0)，耗电 2000、耗时 100 tick。$(br2)产出的等离子体按成分归类：$(li)$(bold)混合等离子体$(0)：世界基础 / 高级混合 / 终极混合 成分$(li)$(bold)下界等离子体$(0)：下界复合 / 至纯 成分$(li)$(bold)末地等离子体$(0)：末地混合 / 巨龙 成分$(br2)三类分罐储存，别串味。"
+      "text": "聚变燃料聚合器：$(reset)1 个活化成分 → 1000mb 等离子体$(reset)，耗电 2000、耗时 100 tick。$(br2)产出的等离子体按成分归类：$(li)$(bold)混合等离子体$(reset)：世界基础 / 高级混合 / 终极混合 成分$(li)$(bold)下界等离子体$(reset)：下界复合 / 至纯 成分$(li)$(bold)末地等离子体$(reset)：末地混合 / 巨龙 成分$(br2)三类需分罐储存，不可混装。"
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)物流注意：$(0)等离子体只能走等离子体管道 / 等离子体燃料储罐，普通液体管道一概不认——从这台到「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」之间先铺好专线。$(br2)灌好棒直接进「$(l:akaishi:fusion)聚变堆$(/l)」，三种棒的脾气对比见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」。"
+      "text": "$(bold)物流要求：$(reset)等离子体只能通过等离子体管道或等离子体燃料储罐输送，普通液体管道无法输送；从本机到「$(l:akaishi:plasma_filler)等离子体填装器$(/l)」之间需先铺好专线。$(br2)装罐后直接送入「$(l:akaishi:fusion)聚变堆$(/l)」；三种燃料棒的参数对比见「$(l:akaishi:plasma_rods)等离子体燃料棒$(/l)」。"
     },
     {
       "type": "patchouli:relations",

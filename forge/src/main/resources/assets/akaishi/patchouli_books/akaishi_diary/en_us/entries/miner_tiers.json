@@ -6,20 +6,20 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "A Miner's tier is decided by the $(bold)controller block$(0) at its heart — four tiers in total. The build and size are identical across them; the tier only changes how hard the machine works.$(br2)$(li)$(4)Basic$(0): progress rate ×1.0, energy capacity 1M — roughly 200 ticks per haul on full power$(li)$(4)Advanced$(0): rate ×1.5, capacity 5M — ~133 ticks per haul$(li)$(4)Super$(0): rate ×2.0, capacity 20M — 100 ticks per haul$(li)$(4)Ultimate$(0): rate ×3.0, capacity 50M — ~67 ticks per haul$(br2)\"Capacity\" is the controller's internal power buffer; every tier burns a base of 10 energy per tick (speed modules add a surcharge)."
+      "text": "The Miner's tier is determined by the controller block at its center; four tiers exist. The structure and size are identical; the tier only changes performance.$(br2)$(li)Basic: progress rate ×1.0, energy capacity 1M, roughly 200 ticks per cycle at full power$(li)Advanced: rate ×1.5, capacity 5M, approximately 133 ticks per cycle$(li)Super: rate ×2.0, capacity 20M, 100 ticks per cycle$(li)Ultimate: rate ×3.0, capacity 50M, approximately 67 ticks per cycle$(br2)Capacity is the controller's internal power buffer; every tier consumes a base of 10 energy per tick (speed modules add a surcharge)."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)What it digs:$(0) all four tiers share one fixed roster — ten vanilla materials: coal, raw iron, raw copper, raw gold, redstone, lapis lazuli, quartz, diamond, emerald and netherite scrap.$(br2)Base weights, high to low: coal 30 / iron 24 / copper 22 / gold 12 / redstone 8 / lapis 6 / quartz 6 / diamond 3 / emerald 2 / scrap 1.$(br2)$(bold)The tier's hidden perk:$(0) the three \"rare\" minerals (diamond, emerald, netherite scrap) have their weight multiplied by $(4)×1.0 / ×1.5 / ×2.0 / ×3.0$(0). A tier never changes the ore list or unlocks deeper ores or special biomes — it just rolls the good stuff more often."
+      "text": "$(bold)Output:$(reset) all four tiers use the same fixed list of ten vanilla materials: coal, raw iron, raw copper, raw gold, redstone, lapis lazuli, quartz, diamond, emerald and netherite scrap.$(br2)Base weights, high to low: coal 30 / iron 24 / copper 22 / gold 12 / redstone 8 / lapis 6 / quartz 6 / diamond 3 / emerald 2 / scrap 1.$(br2)$(bold)Tier bonus:$(reset) the three rare minerals (diamond, emerald, netherite scrap) have their weight multiplied by ×1.0 / ×1.5 / ×2.0 / ×3.0. A tier never changes the ore list and does not unlock deeper ores or special biomes; it only increases the frequency of rare minerals."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Switching tiers?$(0) Break the controller at the center and put in the tier you want — $(4)the rest of the miner stays untouched$(0).$(br2)The new controller re-checks the structure on its own, forms again, re-links the ports and takes over on the spot.$(br2)$(c)Heads-up:$(0) removing the controller stalls the whole miner — clear the output buffer and the ports first, and confirm the \"formed\" state in its UI after the swap."
+      "text": "$(bold)Changing tiers:$(reset) break the controller at the center and insert the desired tier; the rest of the miner is unchanged.$(br2)The new controller re-checks the structure, forms again, re-links the ports and resumes operation.$(br2)Note: removing the controller halts the whole miner. Clear the output buffer and the ports first, and confirm the formed state in the interface after the swap."
     },
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_miner_port",
-      "text": "The Miner Port is your power inlet and product outlet in one. In the new 9x9x5 layout each miner has a single one, sitting at the $(bold)dead center of the top layer$(0) on the same axis as the controller — the $(bold)bottom center now belongs to the Drill Bit$(0).$(br2)$(bold)Feeding power:$(0) the port carries a $(4)10M$(0) energy buffer for your pipes; once formed it forwards power to the controller $(4)without a rate cap$(0).$(br2)$(bold)Collecting loot:$(0) the controller pushes ores into the port's $(4)27-slot$(0) buffer, and hoppers or item pipes can pull from any slot.$(br2)$(bold)Shipping order:$(0) if a Miner Item Output is installed on a pillar, products $(4)fill that output first$(0) and the port only takes the overflow; whatever already piled up in the port is $(4)handed over$(0) to any output with free space (a one-way move — nothing is created or destroyed).$(br2)One port not enough? The pillars accept extra \"Miner Energy Input\" and \"Miner Item Output\" blocks with the same interfaces — split your power and loot routing onto separate pillars. See the \"Miner Structure\" entry."
+      "text": "The Miner Port serves as both the power inlet and the product outlet. In the 9x9x5 layout each miner has one, located at the dead center of the top layer on the same axis as the controller; the bottom center is occupied by the Drill Bit.$(br2)$(bold)Power input:$(reset) the port has a 10M energy buffer for pipes and, once formed, forwards power to the controller without a rate cap.$(br2)$(bold)Product collection:$(reset) the controller pushes ores into the port's 27-slot buffer, and hoppers or item pipes can extract from any slot.$(br2)$(bold)Priority:$(reset) if a Miner Item Output is installed on a pillar, products fill that output first and the port receives only the overflow; items already in the port are transferred to any output with free space (a one-way transfer).$(br2)Additional Miner Energy Input and Miner Item Output blocks can be placed on the pillars; see the Miner Structure entry."
     },
     {
       "type": "patchouli:relations",
@@ -28,7 +28,7 @@
         "akaishi:miner_upgrades",
         "akaishi:generator"
       ],
-      "text": "Forgot the build? Head back to \"Miner Structure\". Want more performance? Read \"Miner Upgrades\". Grid running dry? Retake \"Energy Generator\" first."
+      "text": "Structure details are in Miner Structure; performance details are in Miner Upgrades; if the grid is insufficient, see the Energy Generator entry first."
     }
   ]
 }

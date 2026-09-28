@@ -34,9 +34,8 @@ public class AkaishiLifeWirelessOutputPortBlock extends AkaishiMachineBlock {
     public AkaishiLifeWirelessOutputPortBlock() {
         super(Properties.of()
                 .mapColor(MapColor.SNOW)
-                .strength(5.0F, 8.0F)
                 .sound(SoundType.METAL)
-                .requiresCorrectToolForDrops());
+                );
     }
 
     @Nullable

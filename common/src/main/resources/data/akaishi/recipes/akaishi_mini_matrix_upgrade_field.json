@@ -1,14 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "ISI",
-    "SGS",
-    "ISI"
-  ],
-  "key": {
-    "I": { "item": "akaishi:akaishi_ingot" },
-    "G": { "item": "akaishi:gold_dust" },
-    "S": { "item": "akaishi:akaishi_wireless_chunk_loader" }
-  },
-  "result": { "item": "akaishi:akaishi_mini_matrix_upgrade_field", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "CIC", "IGI", "CIC" ], "key": { "C": { "item": "akaishi:akaishi_mini_matrix_casing" }, "I": { "item": "akaishi:akaishi_wireless_chunk_loader" }, "G": { "item": "akaishi:gold_dust" } }, "result": { "item": "akaishi:akaishi_mini_matrix_upgrade_field", "count": 1 } }

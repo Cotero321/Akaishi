@@ -1,6 +1,6 @@
 {
   "name": "赤能源",
-  "description": "一切机器的动力源。本章教你发电、储电、输电与随身携带赤能源——$(bold)搭好供电体系再进入「赤石机器」$(0)。",
+  "description": "所有机器的动力源。本章说明发电、储电、输电与随身携带赤能源的完整流程。$(bold)搭好供电体系后再进入「赤石机器」$(reset)。",
   "icon": "akaishi:akaishi_energy_cell_basic",
   "sortnum": 2
 }

@@ -1,5 +1,6 @@
 package com.example.akaishi.block.entity;
 
+import com.example.akaishi.api.IDataCarrier;
 import com.example.akaishi.api.energy.IEnergyProvider;
 import com.example.akaishi.api.energy.IEnergyStorage;
 import com.example.akaishi.api.energy.IEnergyType;
@@ -53,7 +54,7 @@ import java.util.List;
  * <p>本机自述工序族（{@link IMachineProcessKind}）。
  */
 public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
-        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IMachineProcessKind {
+        ExtendedMenuProvider, IEnergyProvider, IFluidPipeDevice, IMachineProcessKind, IDataCarrier {
 
     /**
      * Menu 同步数据槽：每个 long 拆低/高 32 位两槽无损同步，避免 int 溢出。
@@ -273,5 +274,11 @@ public class AkaishiLifeActivatorBlockEntity extends BlockEntity implements
         inTank.readFromNbt(tag.getCompound("InTank"));
         outTank.readFromNbt(tag.getCompound("OutTank"));
         processed = tag.getLong("Processed");
+    }
+
+    @Override
+    public String[] excludedKeys() {
+        // 方块 onRemove 只泄漏输入罐触发衰竭区域、不产出物品，故罐内流体仍随 BlockEntityTag 保留，无需排除
+        return new String[0];
     }
 }

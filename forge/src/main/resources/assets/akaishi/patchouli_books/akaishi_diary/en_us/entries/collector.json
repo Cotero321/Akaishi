@@ -7,11 +7,11 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_collector_basic",
-      "text": "The Auto Collector is the \"harvester\" of a crystal farm: it reaps mature clusters in range and tucks the drops (1-2 Akaishi Essence) into its own $(4)27-slot chest$(0).$(br2)$(bold)Four tiers$(0) (range side / time per cluster / energy per tick):$(li)$(4)Basic$(0): 3x3x3, 30 ticks, 2 E/t$(li)Medium: 5x5x5, 15 ticks, 4 E/t$(li)Advanced: 9x9x9, 7 ticks, 8 E/t$(li)Ultimate: 16x16x16, 2 ticks, 16 E/t$(br2)Idle with peace of mind: when its chest is full it stops working instead of breaking your clusters."
+      "text": "The Auto Collector harvests a crystal farm: it collects mature clusters in range and stores the drops (1-2 Akaishi Essence) in its own 27-slot inventory.$(br2)$(bold)Four tiers$(reset) (range side / time per cluster / energy per tick):$(li)Basic: 3x3x3, 30 ticks, 2 E/t$(li)Medium: 5x5x5, 15 ticks, 4 E/t$(li)Advanced: 9x9x9, 7 ticks, 8 E/t$(li)Ultimate: 16x16x16, 2 ticks, 16 E/t$(br2)When its inventory is full it stops working rather than destroying the clusters."
     },
     {
       "type": "patchouli:text",
-      "text": "$(bold)Dream team: Catalyst + Collector = a fully automatic crystal farm.$(0)$(li)the Catalyst makes Geodes in range sprout clusters every tick$(li)the Collector then sweeps up the mature ones and stores the Essence$(br2)Place both with matching ranges and it runs on its own.$(br2)Hoppers and item pipes can pull the Essence out and feed it down the line — into a Compressor or whatever you need."
+      "text": "$(bold)Combination: Catalyst + Collector forms a fully automatic crystal farm.$(reset)$(li)the Catalyst makes Geodes in range produce clusters every tick$(li)the Collector collects the mature clusters and stores the Essence$(br2)With matching ranges the setup runs automatically.$(br2)Hoppers and item pipes can extract the Essence and feed it to a Compressor or other machines."
     },
     {
       "type": "patchouli:relations",
@@ -19,7 +19,7 @@
         "akaishi:catalyst",
         "akaishi:pulverizer"
       ],
-      "text": "The \"$(l:akaishi:catalyst)Catalyst$(/l)\" supplies the clusters; follow \"$(l:akaishi:pulverizer)Pulverizer$(/l)\" to see where the Essence goes."
+      "text": "The $(l:akaishi:catalyst)Catalyst$(/l) supplies the clusters; $(l:akaishi:pulverizer)Pulverizer$(/l) describes where the Essence goes."
     }
   ]
 }

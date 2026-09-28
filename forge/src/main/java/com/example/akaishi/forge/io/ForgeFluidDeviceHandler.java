@@ -37,6 +37,25 @@ public final class ForgeFluidDeviceHandler implements IFluidHandler {
         return !device.isWasteTank(tank) && !device.isPlasmaTank(tank);
     }
 
+    /**
+     * 是否存在未被家族过滤（废料/等离子专用罐）开放的罐。
+     * 全被过滤的设备（废料口/保存桶等）对第三方管道没有任何可对接罐，
+     * 由能力提供者在挂载阶段据此直接返回空能力，避免"存在但恒空"的假句柄。
+     */
+    static boolean hasOpenTank(IFluidPipeDevice device) {
+        List<FluidTank> tanks = device.getFluidTanks();
+        if (tanks == null) {
+            return false;
+        }
+        for (FluidTank tank : tanks) {
+            // 罐为 null（设备未初始化）时保守放行，避免误判成"全过滤"而永久摘掉能力
+            if (tank == null || (!device.isWasteTank(tank) && !device.isPlasmaTank(tank))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public int getTanks() {
         return tanks.size();

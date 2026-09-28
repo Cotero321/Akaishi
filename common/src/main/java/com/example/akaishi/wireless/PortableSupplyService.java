@@ -95,7 +95,8 @@ public final class PortableSupplyService {
         if (terminal == null || !terminal.hasTransmitFrame()) {
             return;
         }
-        long demand = Math.min(MAX_SUPPLY_PER_TICK, cellDemand(player) + platformSink.demand(player, MAX_SUPPLY_PER_TICK));
+        long capacity = cellDemand(player) + platformSink.demand(player, MAX_SUPPLY_PER_TICK);
+        long demand = Math.min(MAX_SUPPLY_PER_TICK, capacity);
         if (demand <= 0) {
             return; // 承接物已满，不抽能
         }
@@ -105,7 +106,13 @@ public final class PortableSupplyService {
         }
         long leftover = chargeCells(player, drawn);
         if (leftover > 0) {
-            platformSink.charge(player, leftover);
+            long accepted = platformSink.charge(player, leftover);
+            long unaccepted = leftover - accepted;
+            if (unaccepted > 0) {
+                // 守恒不变量：平台承接物收不下的部分必须原路退回终端。
+                // 原写法忽略 charge() 返回值，收不下的能量会凭空消失（终端被扣了、谁都没拿到）。
+                terminal.receiveWireless(unaccepted);
+            }
         }
     }
 

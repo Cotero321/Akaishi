@@ -305,7 +305,7 @@ public class AkaishiActivatedFractionatorBlockEntity extends BlockEntity impleme
 
     @Override
     public String[] excludedKeys() {
-        return new String[]{"Output"};
+        return new String[]{"Input", "Output"};
     }
 
     @Override

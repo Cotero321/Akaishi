@@ -7,7 +7,7 @@
     {
       "type": "patchouli:spotlight",
       "item": "akaishi:akaishi_compressor",
-      "text": "The Akaishi Compressor $(4)presses dust and crystals into solid blocks$(0): loose powder in, neat blocks out. One slot in, one out — just feed it power. Each press takes 100 ticks at 15 energy/tick, with a 100k internal buffer.$(br2)$(bold)Key recipes:$(0)$(li)Coal / Iron / Copper / Gold / Lapis / Diamond / Emerald / Quartz Dust → 9 press into the matching block$(li)$(4)9 Netherite Dust → 1 Netherite Ingot$(0) (an ingot, not a block!)$(li)$(4)4 Obsidian Dust → 1 Obsidian$(0)$(li)9 Akaishi Dust → 1 Akaishi Essence$(li)9 Akaishi Crystals → 1 Akaishi Crystal Block$(br2)Note: the Akaishi Crystal Block is pressed here only — 9 crystals in a crafting table make a Raw Akaishi Block instead. Don't mix the two up."
+      "text": "The Akaishi Compressor presses dust and crystals into solid blocks. One input slot and one output slot; power is the only other requirement. Each operation takes 100 ticks at 15 energy/tick with a 100k internal buffer.$(br2)$(bold)Key recipes:$(reset)$(li)Coal, Iron, Copper, Gold, Lapis, Diamond, Emerald or Quartz Dust → 9 press into the matching block$(li)9 Netherite Dust → 1 Netherite Ingot (an ingot, not a block)$(li)4 Obsidian Dust → 1 Obsidian$(li)9 Akaishi Dust → 1 Akaishi Essence$(li)9 Akaishi Crystals → 1 Akaishi Crystal Block$(br2)Note: the Akaishi Crystal Block is produced only here; 9 crystals in a crafting table produce a Raw Akaishi Block instead."
     },
     {
       "type": "patchouli:relations",
@@ -16,7 +16,7 @@
         "akaishi:dusts",
         "akaishi:crystal"
       ],
-      "text": "See the $(l:akaishi:pulverizer)Pulverizer$(/l) for where the dust comes from: Akaishi Ore grinds into $(4)Compressed Akaishi Essence$(0) first, and pulverizing that concentrate is what yields Akaishi Dust — one extra hop before you can press it. The full dust list is in $(l:akaishi:dusts)Dusts$(/l), and crystal refining is covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
+      "text": "Dust sources are described in the $(l:akaishi:pulverizer)Pulverizer$(/l) entry: Akaishi Ore first grinds into Compressed Akaishi Essence, and pulverizing that concentrate yields Akaishi Dust. The complete dust list is in $(l:akaishi:dusts)Dusts$(/l), and crystal refining is covered in $(l:akaishi:crystal)Crystal & Essence$(/l)."
     }
   ]
 }

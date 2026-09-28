@@ -1,15 +1,1 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "IGI",
-    "WPW",
-    "IGI"
-  ],
-  "key": {
-    "G": { "item": "minecraft:glass" },
-    "W": { "item": "akaishi:akaishi_wireless_component" },
-    "P": { "item": "akaishi:akaishi_item_pipe" },
-    "I": { "item": "akaishi:akaishi_ingot" }
-  },
-  "result": { "item": "akaishi:akaishi_wireless_output_port", "count": 1 }
-}
+{ "type": "minecraft:crafting_shaped", "pattern": [ "SGS", "WPW", "SGS" ], "key": { "S": { "item": "akaishi:akaishi_wireless_shell" }, "G": { "item": "minecraft:glass" }, "W": { "item": "akaishi:akaishi_wireless_component" }, "P": { "item": "akaishi:akaishi_item_pipe" } }, "result": { "item": "akaishi:akaishi_wireless_output_port", "count": 1 } }
